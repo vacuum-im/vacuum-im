@@ -72,49 +72,32 @@ bool MessageWidgets::initConnections(IPluginManager *APluginManager, int &AInitO
 	connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 
-	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString, QWidget *)),SLOT(onShortcutActivated(const QString, QWidget *)));
-
 	return true;
 }
 
 bool MessageWidgets::initObjects()
 {
-	Shortcuts::declareShortcut(SCT_MAINWINDOW_COMBINEWITHMESSAGES, tr("Combine/Split with message windows"), QKeySequence::UnknownKey);
-
 	Shortcuts::declareGroup(SCTG_TABWINDOW, tr("Tab window"), SGO_TABWINDOW);
 	Shortcuts::declareShortcut(SCT_TABWINDOW_CLOSETAB, tr("Close tab"), tr("Ctrl+W","Close tab"));
 	Shortcuts::declareShortcut(SCT_TABWINDOW_CLOSEOTHERTABS, tr("Close other tabs"), tr("Ctrl+Shift+W","Close other tabs"));
 	Shortcuts::declareShortcut(SCT_TABWINDOW_DETACHTAB, tr("Detach tab to separate window"), QKeySequence::UnknownKey);
 	Shortcuts::declareShortcut(SCT_TABWINDOW_NEXTTAB, tr("Next tab"), QKeySequence::NextChild);
 	Shortcuts::declareShortcut(SCT_TABWINDOW_PREVTAB, tr("Previous tab"), QKeySequence::PreviousChild);
-	Shortcuts::declareShortcut(SCT_TABWINDOW_SHOWCLOSEBUTTTONS, tr("Set tabs closable"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_TABWINDOW_TABSBOTTOM, tr("Show tabs at bottom"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_TABWINDOW_TABSINDICES, tr("Show tabs indices"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_TABWINDOW_RENAMEWINDOW, tr("Rename tab window"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_TABWINDOW_CLOSEWINDOW, tr("Close tab window"), tr("Esc","Close tab window"));
-	Shortcuts::declareShortcut(SCT_TABWINDOW_DELETEWINDOW, tr("Delete tab window"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_TABWINDOW_SETASDEFAULT, tr("Use as default tab window"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_TABWINDOW_CLOSEWINDOW, QString::null, tr("Esc","Close tab window"));
 
 	for (int tabNumber=1; tabNumber<=10; tabNumber++)
 		Shortcuts::declareShortcut(QString(SCT_TABWINDOW_QUICKTAB).arg(tabNumber), QString::null, tr("Alt+%1","Show tab").arg(tabNumber % 10));
 
 	Shortcuts::declareGroup(SCTG_MESSAGEWINDOWS, tr("Message windows"), SGO_MESSAGEWINDOWS);
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_QUOTE, tr("Quote selected text"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_CLOSEWINDOW, tr("Close message window"), tr("Esc","Close message window"));
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_CLOSEWINDOW, QString::null, tr("Esc","Close message window"));
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_QUOTE, tr("Quote selected text"), tr("Ctrl+Q","Quote selected text"));
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_EDITNEXTMESSAGE, tr("Edit next message"), tr("Ctrl+Down","Edit next message"), Shortcuts::WidgetShortcut);
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_EDITPREVMESSAGE, tr("Edit previous message"), tr("Ctrl+Up","Edit previous message"), Shortcuts::WidgetShortcut);
-	
-	Shortcuts::declareGroup(SCTG_MESSAGEWINDOWS_CHAT, tr("Chat window"), SGO_MESSAGEWINDOWS_CHAT);
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_CHAT_SENDMESSAGE, tr("Send message"), tr("Return","Send message"), Shortcuts::WidgetShortcut);
-
-	Shortcuts::declareGroup(SCTG_MESSAGEWINDOWS_NORMAL, tr("Message window"), SGO_MESSAGEWINDOWS_NORMAL);
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_NORMAL_SENDMESSAGE, tr("Send message"), tr("Ctrl+Return","Send message"), Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SENDCHATMESSAGE, tr("Send chat message"), tr("Return","Send chat message"), Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SENDNORMALMESSAGE, tr("Send single message"), tr("Ctrl+Return","Send single message"), Shortcuts::WidgetShortcut);
 
 	insertViewUrlHandler(MVUHO_MESSAGEWIDGETS_DEFAULT,this);
 	insertEditContentsHandler(MECHO_MESSAGEWIDGETS_COPY_INSERT,this);
-
-	if (FMainWindow)
-		Shortcuts::insertWidgetShortcut(SCT_MAINWINDOW_COMBINEWITHMESSAGES,FMainWindow->instance());
 
 	return true;
 }
@@ -757,12 +740,6 @@ void MessageWidgets::onTabWindowDestroyed()
 		FTabWindows.removeAt(FTabWindows.indexOf(window));
 		emit tabWindowDestroyed(window);
 	}
-}
-
-void MessageWidgets::onShortcutActivated(const QString &AId, QWidget *AWidget)
-{
-	if (AId==SCT_MAINWINDOW_COMBINEWITHMESSAGES && FMainWindow && AWidget==FMainWindow->instance())
-		Options::node(OPV_MESSAGES_COMBINEWITHROSTER).setValue(!Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool());
 }
 
 void MessageWidgets::onOptionsOpened()

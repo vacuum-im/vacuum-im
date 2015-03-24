@@ -20,17 +20,9 @@
         <translation>Erlaubt anderen Modulen ihre Widgets im Hauptfenster zu platzieren</translation>
     </message>
     <message>
-        <source>Main window</source>
-        <translation>Hauptfenster</translation>
-    </message>
-    <message>
-        <source>Hide roster</source>
-        <translation>Schließe Roster</translation>
-    </message>
-    <message>
         <source>Esc</source>
-        <comment>Hide roster</comment>
-        <translation>Esc</translation>
+        <comment>Close main window</comment>
+        <translation type="unfinished">Esc</translation>
     </message>
 </context>
 </TS>

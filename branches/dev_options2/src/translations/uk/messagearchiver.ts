@@ -544,10 +544,6 @@
         <translation>Ctrl+H</translation>
     </message>
     <message>
-        <source>Terminate Off-The-Record session</source>
-        <translation>Перервати ЗЗІ сесію</translation>
-    </message>
-    <message>
         <source>Allows to save the history of communications</source>
         <translation>Дозволяє зберігати історію повідомлень</translation>
     </message>
@@ -574,18 +570,6 @@
     <message>
         <source>Use Default Options</source>
         <translation>Використовувати налаштування по замовчуванню</translation>
-    </message>
-    <message>
-        <source>Enable message archiving</source>
-        <translation>Ввімкнути архівування повідомлень</translation>
-    </message>
-    <message>
-        <source>Disable message archiving</source>
-        <translation>Вимкнути архівування повідомлень</translation>
-    </message>
-    <message>
-        <source>Start Off-The-Record session</source>
-        <translation>Почати сесію ЗЗІ</translation>
     </message>
     <message>
         <source>Off-The-Record session not ready, please wait...</source>

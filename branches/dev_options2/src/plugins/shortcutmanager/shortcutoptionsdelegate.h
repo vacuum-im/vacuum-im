@@ -4,15 +4,15 @@
 #include <QStyledItemDelegate>
 
 enum ShortcutColumns {
-	COL_NAME,
-	COL_KEY
+	SCL_NAME,
+	SCL_KEY
 };
 
 enum ShortcutDataRoles {
-	MDR_SHORTCUTID              =Qt::UserRole+1,
-	MDR_ACTIVE_KEYSEQUENCE      =Qt::UserRole+2,
-	MDR_DEFAULT_KEYSEQUENCE     =Qt::UserRole+3,
-	MDR_SORTROLE                =Qt::UserRole+4
+	SDR_SHORTCUTID              = Qt::UserRole,
+	SDR_ACTIVE_KEYSEQUENCE,
+	SDR_DEFAULT_KEYSEQUENCE,
+	SDR_SORTROLE
 };
 
 class ShortcutOptionsDelegate : 
@@ -21,7 +21,6 @@ class ShortcutOptionsDelegate :
 	Q_OBJECT;
 public:
 	ShortcutOptionsDelegate(QObject *AParent);
-	~ShortcutOptionsDelegate();
 	virtual QWidget *createEditor(QWidget *AParent, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
 	virtual void setEditorData(QWidget *AEditor, const QModelIndex &AIndex) const;
 	virtual void setModelData(QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex) const;

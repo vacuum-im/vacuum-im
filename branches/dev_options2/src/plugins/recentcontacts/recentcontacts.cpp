@@ -181,7 +181,6 @@ bool RecentContacts::initObjects()
 {
 	Shortcuts::declareShortcut(SCT_ROSTERVIEW_INSERTFAVORITE,tr("Add contact to favorites"),QKeySequence::UnknownKey,Shortcuts::WidgetShortcut);
 	Shortcuts::declareShortcut(SCT_ROSTERVIEW_REMOVEFAVORITE,tr("Remove contact from favorites"),QKeySequence::UnknownKey,Shortcuts::WidgetShortcut);
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_REMOVEFROMRECENT,tr("Remove from recent contacts"),QKeySequence::UnknownKey,Shortcuts::WidgetShortcut);
 
 	if (FRostersView)
 	{
@@ -197,7 +196,6 @@ bool RecentContacts::initObjects()
 
 		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_INSERTFAVORITE,FRostersView->instance());
 		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_REMOVEFAVORITE,FRostersView->instance());
-		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_REMOVEFROMRECENT,FRostersView->instance());
 	}
 
 	if (FRostersModel)
@@ -1403,7 +1401,6 @@ void RecentContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 					removeRecent->setText(tr("Remove from Recent Contacts"));
 					removeRecent->setIcon(RSR_STORAGE_MENUICONS,MNI_RECENT_REMOVE_RECENT);
 					removeRecent->setData(data);
-					removeRecent->setShortcutId(SCT_ROSTERVIEW_REMOVEFROMRECENT);
 					connect(removeRecent,SIGNAL(triggered(bool)),SLOT(onRemoveFromRecentByAction()));
 					AMenu->addAction(removeRecent,AG_RVCM_RECENT_FAVORITES);
 				}
@@ -1545,21 +1542,6 @@ void RecentContacts::onShortcutActivated(const QString &AId, QWidget *AWidget)
 					rolesMap[RDR_RECENT_REFERENCE].append(item.reference);
 				}
 				setItemsFavorite(AId==SCT_ROSTERVIEW_INSERTFAVORITE,rolesMap.value(RDR_RECENT_TYPE),rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_RECENT_REFERENCE));
-			}
-		}
-		else if (AId == SCT_ROSTERVIEW_REMOVEFROMRECENT)
-		{
-			if (isRecentSelectionAccepted(indexes))
-			{
-				QMap<int, QStringList> rolesMap;
-				foreach(IRosterIndex *index, indexes)
-				{
-					IRecentItem item = rosterIndexItem(index);
-					rolesMap[RDR_RECENT_TYPE].append(item.type);
-					rolesMap[RDR_STREAM_JID].append(item.streamJid.full());
-					rolesMap[RDR_RECENT_REFERENCE].append(item.reference);
-				}
-				removeRecentItems(rolesMap.value(RDR_RECENT_TYPE),rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_RECENT_REFERENCE));
 			}
 		}
 		else if (hasProxiedIndexes(indexes))

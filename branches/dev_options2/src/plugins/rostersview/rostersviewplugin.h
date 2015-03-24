@@ -80,7 +80,6 @@ protected slots:
 	void onOptionsChanged(const OptionsNode &ANode);
 	void onCopyToClipboardActionTriggered(bool);
 	void onShowOfflineContactsAction(bool AChecked);
-	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 private:
 	IStatusIcons *FStatusIcons;
 	IRostersModel *FRostersModel;

@@ -40,10 +40,6 @@
         <translation>Borrar de los contactos recientes</translation>
     </message>
     <message>
-        <source>Remove from recent contacts</source>
-        <translation>Borrar de los contactos recientes</translation>
-    </message>
-    <message>
         <source>Sort by Last Activity</source>
         <translation>Ordenar por la última actividad</translation>
     </message>

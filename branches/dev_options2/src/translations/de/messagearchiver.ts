@@ -538,10 +538,6 @@
         <translation>Strg+H</translation>
     </message>
     <message>
-        <source>Terminate Off-The-Record session</source>
-        <translation>Off-The-Record Sitzung beenden</translation>
-    </message>
-    <message>
         <source>Allows to save the history of communications</source>
         <translation type="unfinished"></translation>
     </message>
@@ -567,18 +563,6 @@
     </message>
     <message>
         <source>Use Default Options</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enable message archiving</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Disable message archiving</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Start Off-The-Record session</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

@@ -125,19 +125,13 @@ bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &AIn
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 
-	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
-
 	return FRostersModel!=NULL;
 }
 
 bool RostersViewPlugin::initObjects()
 {
-	Shortcuts::declareShortcut(SCT_MAINWINDOW_TOGGLEOFFLINE, tr("Show/Hide disconnected contacts"),QKeySequence::UnknownKey);
-	
-	Shortcuts::declareGroup(SCTG_ROSTERVIEW,tr("Roster"),SGO_ROSTERVIEW);
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_COPYJID,tr("Copy contact JID to clipboard"),QKeySequence::UnknownKey,Shortcuts::WidgetShortcut);
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_COPYNAME,tr("Copy contact name to clipboard"),QKeySequence::UnknownKey,Shortcuts::WidgetShortcut);
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_COPYSTATUS,tr("Copy contact status to clipboard"),QKeySequence::UnknownKey,Shortcuts::WidgetShortcut);
+	Shortcuts::declareGroup(SCTG_ROSTERVIEW,tr("Contact-List"),SGO_ROSTERVIEW);
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_TOGGLESHOWOFFLINE, tr("Show/Hide disconnected contacts"),QKeySequence::UnknownKey);
 
 	FSortFilterProxyModel = new SortFilterProxyModel(this, this);
 	FSortFilterProxyModel->setSortLocaleAware(true);
@@ -151,7 +145,7 @@ bool RostersViewPlugin::initObjects()
 		FShowOfflineAction = new Action(this);
 		FShowOfflineAction->setIcon(RSR_STORAGE_MENUICONS, MNI_ROSTERVIEW_HIDE_OFFLINE);
 		FShowOfflineAction->setToolTip(tr("Show/Hide disconnected contacts"));
-		FShowOfflineAction->setShortcutId(SCT_MAINWINDOW_TOGGLEOFFLINE);
+		FShowOfflineAction->setShortcutId(SCT_ROSTERVIEW_TOGGLESHOWOFFLINE);
 		connect(FShowOfflineAction,SIGNAL(triggered(bool)),SLOT(onShowOfflineContactsAction(bool)));
 		FMainWindowPlugin->mainWindow()->topToolBarChanger()->insertAction(FShowOfflineAction,TBG_MWTTB_ROSTERSVIEW);
 
@@ -166,10 +160,6 @@ bool RostersViewPlugin::initObjects()
 
 	FRostersView->insertLabelHolder(RLHO_ROSTERSVIEW,this);
 	FRostersView->insertLabelHolder(RLHO_ROSTERSVIEW_NOTIFY,FRostersView);
-
-	Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_COPYJID,FRostersView);
-	Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_COPYNAME,FRostersView);
-	Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_COPYSTATUS,FRostersView);
 
 	registerExpandableRosterIndexKind(RIK_CONTACTS_ROOT,RDR_KIND);
 	registerExpandableRosterIndexKind(RIK_STREAM_ROOT,RDR_PREP_BARE_JID);
@@ -602,7 +592,6 @@ void RostersViewPlugin::onRostersViewClipboardMenu(const QList<IRosterIndex *> &
 				Action *nameAction = new Action(AMenu);
 				nameAction->setText(TextManager::getElidedString(name,Qt::ElideRight,50));
 				nameAction->setData(ADR_CLIPBOARD_DATA,name);
-				nameAction->setShortcutId(SCT_ROSTERVIEW_COPYNAME);
 				connect(nameAction,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
 				AMenu->addAction(nameAction, AG_RVCBM_NAME, true);
 			}
@@ -613,7 +602,6 @@ void RostersViewPlugin::onRostersViewClipboardMenu(const QList<IRosterIndex *> &
 				Action *bareJidAction = new Action(AMenu);
 				bareJidAction->setText(jid.uBare());
 				bareJidAction->setData(ADR_CLIPBOARD_DATA, jid.uBare());
-				bareJidAction->setShortcutId(SCT_ROSTERVIEW_COPYJID);
 				connect(bareJidAction,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
 				AMenu->addAction(bareJidAction, AG_RVCBM_JABBERID, true);
 			}
@@ -639,7 +627,6 @@ void RostersViewPlugin::onRostersViewClipboardMenu(const QList<IRosterIndex *> &
 						Action *statusAction = new Action(AMenu);
 						statusAction->setText(TextManager::getElidedString(pitem.status,Qt::ElideRight,50));
 						statusAction->setData(ADR_CLIPBOARD_DATA,pitem.status);
-						statusAction->setShortcutId(SCT_ROSTERVIEW_COPYSTATUS);
 						connect(statusAction,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
 						AMenu->addAction(statusAction, AG_RVCBM_STATUS, true);
 					}
@@ -870,34 +857,6 @@ void RostersViewPlugin::onShowOfflineContactsAction(bool)
 {
 	OptionsNode node = Options::node(OPV_ROSTER_SHOWOFFLINE);
 	node.setValue(!node.value().toBool());
-}
-
-void RostersViewPlugin::onShortcutActivated(const QString &AId, QWidget *AWidget)
-{
-	if (AWidget == FRostersView)
-	{
-		QList<IRosterIndex *> indexes = FRostersView->selectedRosterIndexes();
-		if (indexes.count() == 1)
-		{
-			IRosterIndex *index = indexes.first();
-			if (AId == SCT_ROSTERVIEW_COPYJID)
-			{
-				Jid jid = index->data(RDR_FULL_JID).toString();
-				if (!jid.isEmpty())
-					QApplication::clipboard()->setText(jid.uBare());
-			}
-			else if (AId == SCT_ROSTERVIEW_COPYNAME)
-			{
-				if (!index->data(RDR_NAME).toString().isEmpty())
-					QApplication::clipboard()->setText(index->data(RDR_NAME).toString());
-			}
-			else if (AId == SCT_ROSTERVIEW_COPYSTATUS)
-			{
-				if (!index->data(RDR_STATUS).toString().isEmpty())
-					QApplication::clipboard()->setText(index->data(RDR_STATUS).toString());
-			}
-		}
-	}
 }
 
 Q_EXPORT_PLUGIN2(plg_rostersview, RostersViewPlugin)

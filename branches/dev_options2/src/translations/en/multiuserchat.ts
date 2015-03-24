@@ -442,58 +442,8 @@ Check values and try again</translation>
         <translation>Supports the multi-user conferences</translation>
     </message>
     <message>
-        <source>Leave all hidden conferences</source>
-        <translation>Leave all hidden conferences</translation>
-    </message>
-    <message>
-        <source>Show all hidden conferences</source>
-        <translation>Show all hidden conferences</translation>
-    </message>
-    <message>
         <source>Show users status changes</source>
         <translation>Show users status changes</translation>
-    </message>
-    <message>
-        <source>Multi-user chat window</source>
-        <translation>Multi-user chat window</translation>
-    </message>
-    <message>
-        <source>Send message</source>
-        <translation>Send message</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <comment>Send message</comment>
-        <translation>Return</translation>
-    </message>
-    <message>
-        <source>Clear window</source>
-        <translation>Clear window</translation>
-    </message>
-    <message>
-        <source>Change nick</source>
-        <translation>Change nick</translation>
-    </message>
-    <message>
-        <source>Change topic</source>
-        <translation>Change topic</translation>
-    </message>
-    <message>
-        <source>Setup conference</source>
-        <translation>Setup conference</translation>
-    </message>
-    <message>
-        <source>Enter the conference</source>
-        <translation>Enter the conference</translation>
-    </message>
-    <message>
-        <source>Leave the conference</source>
-        <translation>Leave the conference</translation>
-    </message>
-    <message>
-        <source>Ctrl+Q</source>
-        <comment>Leave the conference</comment>
-        <translation>Ctrl+Q</translation>
     </message>
     <message>
         <source>I&apos;m too busy right now</source>
@@ -518,14 +468,6 @@ Check values and try again</translation>
     <message>
         <source>Leave the conference when window closed</source>
         <translation>Leave the conference when window closed</translation>
-    </message>
-    <message>
-        <source>Enter conference</source>
-        <translation>Enter conference</translation>
-    </message>
-    <message>
-        <source>Exit conference</source>
-        <translation>Exit conference</translation>
     </message>
     <message>
         <source>Enter</source>
@@ -625,6 +567,11 @@ Check values and try again</translation>
     </message>
     <message>
         <source>Select a user to refer by enumeration in the input field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+J</source>
+        <comment>Join conference</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>

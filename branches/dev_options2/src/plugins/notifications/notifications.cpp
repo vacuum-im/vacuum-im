@@ -153,7 +153,6 @@ bool Notifications::initObjects()
 {
 	Shortcuts::declareShortcut(SCT_GLOBAL_TOGGLESOUND, tr("Enable/Disable notifications sound"), QKeySequence::UnknownKey, Shortcuts::GlobalShortcut);
 	Shortcuts::declareShortcut(SCT_GLOBAL_ACTIVATELASTNOTIFICATION, tr("Activate notification"), QKeySequence::UnknownKey, Shortcuts::GlobalShortcut);
-	Shortcuts::declareShortcut(SCT_GLOBAL_REMOVEALLNOTIFICATIONS, tr("Remove all notifications"), QKeySequence::UnknownKey, Shortcuts::GlobalShortcut);
 
 	FSoundOnOff = new Action(this);
 	FSoundOnOff->setToolTip(tr("Enable/Disable notifications sound"));
@@ -171,7 +170,6 @@ bool Notifications::initObjects()
 	FRemoveAll->setVisible(false);
 	FRemoveAll->setText(tr("Remove All Notifications"));
 	FRemoveAll->setIcon(RSR_STORAGE_MENUICONS,MNI_NOTIFICATIONS_REMOVE_ALL);
-	FRemoveAll->setShortcutId(SCT_GLOBAL_REMOVEALLNOTIFICATIONS);
 	connect(FRemoveAll,SIGNAL(triggered(bool)),SLOT(onTrayActionTriggered(bool)));
 
 	FNotifyMenu = new Menu;
@@ -226,7 +224,6 @@ bool Notifications::startPlugin()
 {
 	Shortcuts::setGlobalShortcut(SCT_GLOBAL_TOGGLESOUND,true);
 	Shortcuts::setGlobalShortcut(SCT_GLOBAL_ACTIVATELASTNOTIFICATION,true);
-	Shortcuts::setGlobalShortcut(SCT_GLOBAL_REMOVEALLNOTIFICATIONS,true);
 	return true;
 }
 
@@ -832,10 +829,6 @@ void Notifications::onShortcutActivated(const QString &AId, QWidget *AWidget)
 		else if (AId == SCT_GLOBAL_ACTIVATELASTNOTIFICATION)
 		{
 			FActivateLast->trigger();
-		}
-		else if (AId == SCT_GLOBAL_REMOVEALLNOTIFICATIONS)
-		{
-			FRemoveAll->trigger();
 		}
 	}
 }

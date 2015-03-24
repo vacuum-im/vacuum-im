@@ -20,17 +20,9 @@
         <translation>Permite a otros módulos ubicar sus componentes visuales en la ventana principal</translation>
     </message>
     <message>
-        <source>Main window</source>
-        <translation>Ventana principal</translation>
-    </message>
-    <message>
-        <source>Hide roster</source>
-        <translation>Ocultar lista de contactos</translation>
-    </message>
-    <message>
         <source>Esc</source>
-        <comment>Hide roster</comment>
-        <translation>Esc</translation>
+        <comment>Close main window</comment>
+        <translation type="unfinished">Esc</translation>
     </message>
 </context>
 </TS>

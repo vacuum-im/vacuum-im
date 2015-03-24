@@ -869,21 +869,18 @@ void PluginManager::createMenuActions()
 		Action *aboutQt = new Action(mainWindowPlugin->mainWindow()->mainMenu());
 		aboutQt->setText(tr("About Qt"));
 		aboutQt->setIcon(RSR_STORAGE_MENUICONS,MNI_PLUGINMANAGER_ABOUT_QT);
-		aboutQt->setShortcutId(SCT_APP_ABOUTQT);
 		connect(aboutQt,SIGNAL(triggered()),QApplication::instance(),SLOT(aboutQt()));
 		mainWindowPlugin->mainWindow()->mainMenu()->addAction(aboutQt,AG_MMENU_PLUGINMANAGER_ABOUT);
 
 		Action *about = new Action(mainWindowPlugin->mainWindow()->mainMenu());
 		about->setText(tr("About the program"));
 		about->setIcon(RSR_STORAGE_MENUICONS,MNI_PLUGINMANAGER_ABOUT);
-		about->setShortcutId(SCT_APP_ABOUTPROGRAM);
 		connect(about,SIGNAL(triggered()),SLOT(onShowAboutBoxDialog()));
 		mainWindowPlugin->mainWindow()->mainMenu()->addAction(about,AG_MMENU_PLUGINMANAGER_ABOUT);
 
 		Action *pluginsDialog = new Action(mainWindowPlugin->mainWindow()->mainMenu());
 		pluginsDialog->setText(tr("Setup plugins"));
 		pluginsDialog->setIcon(RSR_STORAGE_MENUICONS, MNI_PLUGINMANAGER_SETUP);
-		pluginsDialog->setShortcutId(SCT_APP_SETUPPLUGINS);
 		connect(pluginsDialog,SIGNAL(triggered(bool)),SLOT(onShowSetupPluginsDialog(bool)));
 		mainWindowPlugin->mainWindow()->mainMenu()->addAction(pluginsDialog,AG_MMENU_PLUGINMANAGER_SETUP,true);
 	}
@@ -891,12 +888,8 @@ void PluginManager::createMenuActions()
 
 void PluginManager::declareShortcuts()
 {
-	Shortcuts::declareGroup(SCTG_GLOBAL, tr("Global"), SGO_GLOBAL);
-
-	Shortcuts::declareGroup(SCTG_APPLICATION, tr("Application"), SGO_APPLICATION);
-	Shortcuts::declareShortcut(SCT_APP_ABOUTQT, tr("Show information about Qt"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
-	Shortcuts::declareShortcut(SCT_APP_ABOUTPROGRAM, tr("Show information about client"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
-	Shortcuts::declareShortcut(SCT_APP_SETUPPLUGINS, tr("Show setup plugins dialog"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
+	Shortcuts::declareGroup(SCTG_GLOBAL, tr("Global shortcuts"), SGO_GLOBAL);
+	Shortcuts::declareGroup(SCTG_APPLICATION, tr("Application shortcuts"), SGO_APPLICATION);
 }
 
 void PluginManager::onApplicationAboutToQuit()

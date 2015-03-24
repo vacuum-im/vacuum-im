@@ -41,10 +41,6 @@
         <translation>Return</translation>
     </message>
     <message>
-        <source>Clear window</source>
-        <translation>Очистить окно</translation>
-    </message>
-    <message>
         <source>When receiving new chat message</source>
         <translation>При получении нового чат сообщения</translation>
     </message>

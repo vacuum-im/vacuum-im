@@ -212,25 +212,8 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &A
 
 bool MultiUserChatPlugin::initObjects()
 {
-	Shortcuts::declareShortcut(SCT_APP_MUCJOIN, tr("Join conference"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
-	Shortcuts::declareShortcut(SCT_APP_MUCSHOWHIDDEN, tr("Show all hidden conferences"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
-	Shortcuts::declareShortcut(SCT_APP_MUCLEAVEHIDDEN, tr("Leave all hidden conferences"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
-
-	Shortcuts::declareGroup(SCTG_MESSAGEWINDOWS_MUC, tr("Multi-user chat window"), SGO_MESSAGEWINDOWS_MUC);
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_MUC_SENDMESSAGE, tr("Send message"), tr("Return","Send message"), Shortcuts::WidgetShortcut);
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_MUC_CLEARWINDOW, tr("Clear window"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_MUC_CHANGENICK, tr("Change nick"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_MUC_CHANGETOPIC, tr("Change topic"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_MUC_ROOMSETTINGS, tr("Setup conference"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_MUC_ENTER, tr("Enter the conference"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_MUC_EXIT, tr("Leave the conference"), tr("Ctrl+Q","Leave the conference"));
-
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_ENTERCONFERENCE, tr("Enter conference"), QKeySequence::UnknownKey, Shortcuts::WidgetShortcut);
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_EXITCONFERENCE, tr("Exit conference"), QKeySequence::UnknownKey, Shortcuts::WidgetShortcut);
-
+	Shortcuts::declareShortcut(SCT_APP_MUCJOIN, tr("Join conference"), tr("Ctrl+J","Join conference"), Shortcuts::ApplicationShortcut);
 	Shortcuts::insertWidgetShortcut(SCT_APP_MUCJOIN,qApp->desktop());
-	Shortcuts::insertWidgetShortcut(SCT_APP_MUCSHOWHIDDEN,qApp->desktop());
-	Shortcuts::insertWidgetShortcut(SCT_APP_MUCLEAVEHIDDEN,qApp->desktop());
 
 	if (FMessageProcessor)
 	{
@@ -302,9 +285,6 @@ bool MultiUserChatPlugin::initObjects()
 	{
 		FRostersViewPlugin->rostersView()->insertClickHooker(RCHO_MULTIUSERCHAT,this);
 		FRostersViewPlugin->registerExpandableRosterIndexKind(RIK_GROUP_MUC,RDR_KIND);
-
-		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_ENTERCONFERENCE,FRostersViewPlugin->rostersView()->instance());
-		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_EXITCONFERENCE,FRostersViewPlugin->rostersView()->instance());
 	}
 
 	if (FRecentContacts)
@@ -1299,27 +1279,15 @@ void MultiUserChatPlugin::onActiveStreamRemoved(const Jid &AStreamJid)
 
 void MultiUserChatPlugin::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
-	Q_UNUSED(AWidget);
-	if (AId == SCT_APP_MUCJOIN)
+	if (FXmppStreams!=NULL && AId==SCT_APP_MUCJOIN)
 	{
-		showJoinMultiChatDialog(Jid::null,Jid::null,QString::null,QString::null);
-	}
-	else if (AId == SCT_APP_MUCSHOWHIDDEN)
-	{
-		if (!Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool())
+		foreach(IXmppStream *xmppStream, FXmppStreams->xmppStreams())
 		{
-			foreach(IMultiUserChatWindow *window, FChatWindows)
-				if (!window->isVisibleTabPage())
-					window->showTabPage();
-		}
-	}
-	else if (AId == SCT_APP_MUCLEAVEHIDDEN)
-	{
-		if (!Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool())
-		{
-			foreach(IMultiUserChatWindow *window, FChatWindows)
-				if (!window->isVisibleTabPage())
-					window->exitAndDestroy(QString::null);
+			if (isReady(xmppStream->streamJid()))
+			{
+				showJoinMultiChatDialog(xmppStream->streamJid(),Jid::null,QString::null,QString::null);
+				break;
+			}
 		}
 	}
 	else if (FRostersViewPlugin!=NULL && AWidget==FRostersViewPlugin->rostersView()->instance())
@@ -1333,24 +1301,6 @@ void MultiUserChatPlugin::onShortcutActivated(const QString &AId, QWidget *AWidg
 				if (!window->multiUserChat()->isConnected() && window->multiUserChat()->roomError().isNull())
 					window->multiUserChat()->sendStreamPresence();
 				window->showTabPage();
-			}
-		}
-		else if (AId==SCT_ROSTERVIEW_ENTERCONFERENCE)
-		{
-			foreach(IRosterIndex *index, indexes)
-			{
-				IMultiUserChatWindow *window = getMultiChatWindow(index->data(RDR_STREAM_JID).toString(),index->data(RDR_PREP_BARE_JID).toString(),index->data(RDR_MUC_NICK).toString(),index->data(RDR_MUC_PASSWORD).toString());
-				if (window && !window->multiUserChat()->isConnected())
-					window->multiUserChat()->sendStreamPresence();
-			}
-		}
-		else if (AId == SCT_ROSTERVIEW_EXITCONFERENCE && isSelectionAccepted(indexes) && indexes.first()->kind()==RIK_MUC_ITEM)
-		{
-			foreach(IRosterIndex *index, indexes)
-			{
-				IMultiUserChatWindow *window = findMultiChatWindow(index->data(RDR_STREAM_JID).toString(),index->data(RDR_PREP_BARE_JID).toString());
-				if (window)
-					window->exitAndDestroy(QString::null);
 			}
 		}
 	}
@@ -1384,6 +1334,7 @@ void MultiUserChatPlugin::onRostersViewIndexContextMenu(const QList<IRosterIndex
 				{
 					Action *action = createJoinAction(streamJid,Jid::null,AMenu);
 					AMenu->addAction(action,AG_RVCM_MULTIUSERCHAT_JOIN,true);
+					break;
 				}
 			}
 		}
@@ -1404,7 +1355,6 @@ void MultiUserChatPlugin::onRostersViewIndexContextMenu(const QList<IRosterIndex
 				enter->setText(tr("Enter"));
 				enter->setData(data);
 				enter->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_ENTER_ROOM);
-				enter->setShortcutId(SCT_ROSTERVIEW_ENTERCONFERENCE);
 				connect(enter,SIGNAL(triggered(bool)),SLOT(onEnterRoomActionTriggered(bool)));
 				AMenu->addAction(enter,AG_RVCM_MULTIUSERCHAT_EXIT);
 
@@ -1414,7 +1364,6 @@ void MultiUserChatPlugin::onRostersViewIndexContextMenu(const QList<IRosterIndex
 					exit->setText(tr("Exit"));
 					exit->setData(data);
 					exit->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_EXIT_ROOM);
-					exit->setShortcutId(SCT_ROSTERVIEW_EXITCONFERENCE);
 					connect(exit,SIGNAL(triggered(bool)),SLOT(onExitRoomActionTriggered(bool)));
 					AMenu->addAction(exit,AG_RVCM_MULTIUSERCHAT_EXIT);
 				}
@@ -1439,7 +1388,6 @@ void MultiUserChatPlugin::onRostersViewIndexContextMenu(const QList<IRosterIndex
 					enter->setData(ADR_NICK,QStringList()<<index->data(RDR_MUC_NICK).toString());
 					enter->setData(ADR_PASSWORD,QStringList()<<index->data(RDR_MUC_PASSWORD).toString());
 					enter->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_ENTER_ROOM);
-					enter->setShortcutId(SCT_ROSTERVIEW_ENTERCONFERENCE);
 					connect(enter,SIGNAL(triggered(bool)),SLOT(onEnterRoomActionTriggered(bool)));
 					AMenu->addAction(enter,AG_RVCM_MULTIUSERCHAT_EXIT);
 				}
@@ -1449,7 +1397,6 @@ void MultiUserChatPlugin::onRostersViewIndexContextMenu(const QList<IRosterIndex
 				exit->setData(ADR_STREAM_JID,QStringList()<<index->data(RDR_STREAM_JID).toString());
 				exit->setData(ADR_ROOM,QStringList()<<index->data(RDR_PREP_BARE_JID).toString());
 				exit->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_EXIT_ROOM);
-				exit->setShortcutId(SCT_ROSTERVIEW_EXITCONFERENCE);
 				connect(exit,SIGNAL(triggered(bool)),SLOT(onExitRoomActionTriggered(bool)));
 				AMenu->addAction(exit,AG_RVCM_MULTIUSERCHAT_EXIT);
 
@@ -1474,7 +1421,6 @@ void MultiUserChatPlugin::onRostersViewClipboardMenu(const QList<IRosterIndex *>
 					Action *nameAction = new Action(AMenu);
 					nameAction->setText(TextManager::getElidedString(name,Qt::ElideRight,50));
 					nameAction->setData(ADR_CLIPBOARD_DATA,name);
-					nameAction->setShortcutId(SCT_ROSTERVIEW_COPYNAME);
 					connect(nameAction,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
 					AMenu->addAction(nameAction, AG_RVCBM_NAME, true);
 				}
@@ -1485,7 +1431,6 @@ void MultiUserChatPlugin::onRostersViewClipboardMenu(const QList<IRosterIndex *>
 					Action *subjectAction = new Action(AMenu);
 					subjectAction->setText(TextManager::getElidedString(subject,Qt::ElideRight,50));
 					subjectAction->setData(ADR_CLIPBOARD_DATA,subject);
-					subjectAction->setShortcutId(SCT_ROSTERVIEW_COPYNAME);
 					connect(subjectAction,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
 					AMenu->addAction(subjectAction, AG_RVCBM_MUC_SUBJECT, true);
 				}

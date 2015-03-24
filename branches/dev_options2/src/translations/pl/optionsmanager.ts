@@ -175,14 +175,6 @@
         <translation>Opcje</translation>
     </message>
     <message>
-        <source>Show change profile dialog</source>
-        <translation>Pokaż okno zmiany profilu</translation>
-    </message>
-    <message>
-        <source>Show options dialog</source>
-        <translation>Pokaż okno ustawień</translation>
-    </message>
-    <message>
         <source>Common settings</source>
         <translation type="unfinished"></translation>
     </message>

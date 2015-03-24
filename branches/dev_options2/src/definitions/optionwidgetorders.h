@@ -101,6 +101,11 @@
 #define   OWO_NOTIFICATIONS_ALERTWINDOW           510
 #define   OWO_NOTIFICATIONS_KINDS                 590
 
+//Node = ON_SHORTCUTS
+#define OHO_SHORTCUTS                             500
+#define   OWO_SHORTCUTS                           510
+
+
 
 //Node = ON_STATUSICONS
 #define OWO_STATUSICONS                           500
@@ -123,8 +128,5 @@
 //Node = ON_FILETRANSFER
 #define OWO_FILESTREAMSMANAGER                    500
 #define OWO_FILETRANSFER                          600
-
-//Node = ON_SHORTCUTS
-#define OWO_SHORTCUTS                             500
 
 #endif

@@ -28,10 +28,6 @@
         <translation>Habilitar/Inhabilitar el sonido de las notificaciones</translation>
     </message>
     <message>
-        <source>Remove all notifications</source>
-        <translation>Borrar todas las notificaciones</translation>
-    </message>
-    <message>
         <source>Expand contact groups in roster</source>
         <translation>Expandir los grupos de contactos de la lista</translation>
     </message>

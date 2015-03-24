@@ -62,6 +62,11 @@
         <source>Data transmission terminated by remote user</source>
         <translation>Передача даних перервана віддаленим користувачем</translation>
     </message>
+    <message>
+        <source>Ctrl+T</source>
+        <comment>Show file transfers</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FileStreamsOptions</name>

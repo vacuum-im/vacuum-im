@@ -95,6 +95,11 @@
         <source>Data transmission terminated</source>
         <translation>Transmisión de datos terminada</translation>
     </message>
+    <message>
+        <source>Ctrl+S</source>
+        <comment>Send file</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>StreamDialog</name>

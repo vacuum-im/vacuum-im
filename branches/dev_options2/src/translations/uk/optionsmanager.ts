@@ -175,14 +175,6 @@
         <translation>Налаштування</translation>
     </message>
     <message>
-        <source>Show change profile dialog</source>
-        <translation>Показувати діалог зміни профілю</translation>
-    </message>
-    <message>
-        <source>Show options dialog</source>
-        <translation>Показувати діалог опцій</translation>
-    </message>
-    <message>
         <source>Common settings</source>
         <translation type="unfinished"></translation>
     </message>

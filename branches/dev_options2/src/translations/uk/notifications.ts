@@ -28,10 +28,6 @@
         <translation>Ввімкнути/Вимкнути звук сповіщень</translation>
     </message>
     <message>
-        <source>Remove all notifications</source>
-        <translation>Видалити всі сповіщення</translation>
-    </message>
-    <message>
         <source>Expand contact groups in roster</source>
         <translation>Розкривати групи контакту в ростері</translation>
     </message>

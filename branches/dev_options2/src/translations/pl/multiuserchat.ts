@@ -442,58 +442,8 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
         <translation>Obsługa konferencji z wieloma uczestnikami</translation>
     </message>
     <message>
-        <source>Leave all hidden conferences</source>
-        <translation>Opuść wszystkie ukryte konferencje</translation>
-    </message>
-    <message>
-        <source>Show all hidden conferences</source>
-        <translation>Pokaż wszystkie ukryte konferencje</translation>
-    </message>
-    <message>
         <source>Show users status changes</source>
         <translation>Pokazuj zmiany statusów użytkowników</translation>
-    </message>
-    <message>
-        <source>Multi-user chat window</source>
-        <translation>Okno konferencji</translation>
-    </message>
-    <message>
-        <source>Send message</source>
-        <translation>Wyślij wiadomość</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <comment>Send message</comment>
-        <translation>Return</translation>
-    </message>
-    <message>
-        <source>Clear window</source>
-        <translation>Wyczyść okno</translation>
-    </message>
-    <message>
-        <source>Change nick</source>
-        <translation>Zmień nick</translation>
-    </message>
-    <message>
-        <source>Change topic</source>
-        <translation>Zmień temat</translation>
-    </message>
-    <message>
-        <source>Setup conference</source>
-        <translation>Ustawienia konferencji</translation>
-    </message>
-    <message>
-        <source>Enter the conference</source>
-        <translation>Dołącz do konferencji</translation>
-    </message>
-    <message>
-        <source>Leave the conference</source>
-        <translation>Opuść konferencję</translation>
-    </message>
-    <message>
-        <source>Ctrl+Q</source>
-        <comment>Leave the conference</comment>
-        <translation>Ctrl+Q</translation>
     </message>
     <message>
         <source>I&apos;m too busy right now</source>
@@ -518,14 +468,6 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
     <message>
         <source>Leave the conference when window closed</source>
         <translation>Opuszczaj konferencje przy zamknięciu okna</translation>
-    </message>
-    <message>
-        <source>Enter conference</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Exit conference</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Enter</source>
@@ -625,6 +567,11 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
     </message>
     <message>
         <source>Select a user to refer by enumeration in the input field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+J</source>
+        <comment>Join conference</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>

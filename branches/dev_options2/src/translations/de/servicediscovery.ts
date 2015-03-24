@@ -198,52 +198,5 @@
         <source>Supports the displaying of the jabber identifiers with disallowed characters</source>
         <translation>Ermöglicht das Anzeigen von Jabber Identifikatoren mit nicht erlaubten Zeichen</translation>
     </message>
-    <message>
-        <source>Service discovery window</source>
-        <translation>Diensteermittlungsfenster</translation>
-    </message>
-    <message>
-        <source>Move back</source>
-        <translation>zurück</translation>
-    </message>
-    <message>
-        <source>Move forward</source>
-        <translation>vorwärts</translation>
-    </message>
-    <message>
-        <source>Discover item</source>
-        <translation>Elemente ermitteln</translation>
-    </message>
-    <message>
-        <source>Reload items</source>
-        <translation>Elemente neu laden</translation>
-    </message>
-    <message>
-        <source>Show discovery info</source>
-        <translation>Zeige Ermittlungsinformationen</translation>
-    </message>
-    <message>
-        <source>Add item to roster</source>
-        <translation>Eintrag zum Roster hinzufügen</translation>
-    </message>
-    <message>
-        <source>Close discovery window</source>
-        <translation>Ermittlungsfenster schließen</translation>
-    </message>
-    <message>
-        <source>Esc</source>
-        <comment>Close discovery window</comment>
-        <translation>Esc</translation>
-    </message>
-    <message>
-        <source>Show Profile</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Ctrl+I</source>
-        <comment>Show Profile</comment>
-        <translatorcomment>Показать личные данные</translatorcomment>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 </TS>

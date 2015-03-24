@@ -12,10 +12,6 @@
         <translation>Allows to create bookmarks at the jabber conference and web pages</translation>
     </message>
     <message>
-        <source>Edit bookmark</source>
-        <translation>Edit bookmark</translation>
-    </message>
-    <message>
         <source>Edit Bookmarks</source>
         <translation>Edit Bookmarks</translation>
     </message>

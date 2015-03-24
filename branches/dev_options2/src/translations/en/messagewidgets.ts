@@ -59,26 +59,6 @@
         <translation>Previous tab</translation>
     </message>
     <message>
-        <source>Set tabs closable</source>
-        <translation>Set tabs closable</translation>
-    </message>
-    <message>
-        <source>Show tabs at bottom</source>
-        <translation>Show tabs at bottom</translation>
-    </message>
-    <message>
-        <source>Rename tab window</source>
-        <translation>Rename tab window</translation>
-    </message>
-    <message>
-        <source>Delete tab window</source>
-        <translation>Delete tab window</translation>
-    </message>
-    <message>
-        <source>Use as default tab window</source>
-        <translation>Use as default tab window</translation>
-    </message>
-    <message>
         <source>Alt+%1</source>
         <comment>Show tab</comment>
         <translation>Alt+%1</translation>
@@ -86,28 +66,6 @@
     <message>
         <source>Message windows</source>
         <translation>Message windows</translation>
-    </message>
-    <message>
-        <source>Chat window</source>
-        <translation>Chat window</translation>
-    </message>
-    <message>
-        <source>Send message</source>
-        <translation>Send message</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <comment>Send message</comment>
-        <translation>Return</translation>
-    </message>
-    <message>
-        <source>Message window</source>
-        <translation>Message window</translation>
-    </message>
-    <message>
-        <source>Ctrl+Return</source>
-        <comment>Send message</comment>
-        <translation>Ctrl+Return</translation>
     </message>
     <message>
         <source>Edit next message</source>
@@ -133,21 +91,9 @@
         <translation>Ctrl+W</translation>
     </message>
     <message>
-        <source>Show tabs indices</source>
-        <translation>Show tabs indices</translation>
-    </message>
-    <message>
-        <source>Close tab window</source>
-        <translation>Close tab window</translation>
-    </message>
-    <message>
         <source>Esc</source>
         <comment>Close tab window</comment>
         <translation>Esc</translation>
-    </message>
-    <message>
-        <source>Close message window</source>
-        <translation>Close message window</translation>
     </message>
     <message>
         <source>Esc</source>
@@ -189,10 +135,6 @@
         <translation>google.com</translation>
     </message>
     <message>
-        <source>Combine/Split with message windows</source>
-        <translation>Combine/Split with message windows</translation>
-    </message>
-    <message>
         <source>Quote Selected Text</source>
         <translation>Quote Selected Text</translation>
     </message>
@@ -231,6 +173,29 @@
     <message>
         <source>Save contacts status messages in history</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+Q</source>
+        <comment>Quote selected text</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send chat message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Return</source>
+        <comment>Send chat message</comment>
+        <translation type="unfinished">Return</translation>
+    </message>
+    <message>
+        <source>Send single message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+Return</source>
+        <comment>Send single message</comment>
+        <translation type="unfinished">Ctrl+Return</translation>
     </message>
 </context>
 <context>

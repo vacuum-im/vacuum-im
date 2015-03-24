@@ -232,11 +232,6 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &AInit
 bool MessageArchiver::initObjects()
 {
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SHOWHISTORY, tr("Show history"), tr("Ctrl+H","Show history"));
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_HISTORYENABLE, tr("Enable message archiving"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_HISTORYDISABLE, tr("Disable message archiving"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_HISTORYREQUIREOTR, tr("Start Off-The-Record session"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_HISTORYTERMINATEOTR, tr("Terminate Off-The-Record session"), QKeySequence::UnknownKey);
-
 	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SHOWHISTORY,tr("Show history"),tr("Ctrl+H","Show history"),Shortcuts::WidgetShortcut);
 
 	XmppError::registerError(NS_INTERNAL_ERROR,IERR_HISTORY_HEADERS_LOAD_ERROR,tr("Failed to load conversation headers"));

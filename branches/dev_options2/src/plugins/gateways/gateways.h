@@ -69,7 +69,6 @@ protected slots:
 	void onKeepActionTriggered(bool);
 	void onChangeActionTriggered(bool);
 	void onRemoveActionTriggered(bool);
-	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
 	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onPresenceOpened(IPresence *APresence);

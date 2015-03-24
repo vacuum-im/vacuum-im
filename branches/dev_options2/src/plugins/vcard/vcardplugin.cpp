@@ -184,8 +184,8 @@ bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrde
 
 bool VCardPlugin::initObjects()
 {
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SHOWVCARD, tr("Show Profile"), tr("Ctrl+I","Show Profile"));
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SHOWVCARD, tr("Show Profile"), tr("Ctrl+I","Show Profile"), Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SHOWVCARD, tr("Show contact profile"), tr("Ctrl+I","Show contact profile"));
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SHOWVCARD, tr("Show contact profile"), tr("Ctrl+I","Show contact profile"), Shortcuts::WidgetShortcut);
 
 	FVCardFilesDir.setPath(FPluginManager->homePath());
 	if (!FVCardFilesDir.exists(DIR_VCARDS))

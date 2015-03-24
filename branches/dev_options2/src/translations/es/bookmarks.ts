@@ -12,10 +12,6 @@
         <translation>Permite la creación de marcadores para salas de conferencia y páginas web</translation>
     </message>
     <message>
-        <source>Edit bookmark</source>
-        <translation>Editar marcador</translation>
-    </message>
-    <message>
         <source>Edit Bookmarks</source>
         <translation>Editar marcadores</translation>
     </message>

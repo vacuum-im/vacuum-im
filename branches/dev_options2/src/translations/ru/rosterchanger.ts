@@ -146,14 +146,6 @@
         <translation>Добавить контакт</translation>
     </message>
     <message>
-        <source>Subscribe contact</source>
-        <translation>Авторизовать контакт</translation>
-    </message>
-    <message>
-        <source>Unsubscribe contact</source>
-        <translation>Удалить авторизацию</translation>
-    </message>
-    <message>
         <source>Subscribe for contact presence</source>
         <translation>Подписаться на получение статуса контакта</translation>
     </message>
@@ -196,18 +188,8 @@
         <translation>Удалить контакт/группу из группы</translation>
     </message>
     <message>
-        <source>Del</source>
-        <comment>Remove contact/group from group</comment>
-        <translation>Del</translation>
-    </message>
-    <message>
         <source>Remove contact/group from roster</source>
         <translation>Удалить контакт/группу из списка контактов</translation>
-    </message>
-    <message>
-        <source>Shift+Del</source>
-        <comment>Remove contact/group from roster</comment>
-        <translation>Shift+Del</translation>
     </message>
     <message>
         <source>When receiving authorization request</source>
@@ -340,6 +322,11 @@
     <message>
         <source>Remove subscription when you was deleted from contacts list</source>
         <translation>Удалять авторизацию при удалении вас из списка контактов</translation>
+    </message>
+    <message>
+        <source>Del</source>
+        <comment>Remove contact/group from roster</comment>
+        <translation>Del</translation>
     </message>
 </context>
 <context>

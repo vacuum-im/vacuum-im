@@ -82,26 +82,22 @@ void ChatWindowMenu::createActions()
 	FEnableArchiving = new Action(this);
 	FEnableArchiving->setCheckable(true);
 	FEnableArchiving->setText(tr("Enable Message Archiving"));
-	FEnableArchiving->setShortcutId(SCT_MESSAGEWINDOWS_HISTORYENABLE);
 	connect(FEnableArchiving,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 	addAction(FEnableArchiving,AG_DEFAULT,false);
 
 	FDisableArchiving = new Action(this);
 	FDisableArchiving->setCheckable(true);
 	FDisableArchiving->setText(tr("Disable Message Archiving"));
-	FDisableArchiving->setShortcutId(SCT_MESSAGEWINDOWS_HISTORYDISABLE);
 	connect(FDisableArchiving,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 	addAction(FDisableArchiving,AG_DEFAULT,false);
 
 	FStartOTRSession = new Action(this);
 	FStartOTRSession->setText(tr("Start Off-The-Record Session"));
-	FStartOTRSession->setShortcutId(SCT_MESSAGEWINDOWS_HISTORYREQUIREOTR);
 	connect(FStartOTRSession,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 	addAction(FStartOTRSession,AG_DEFAULT+100,false);
 
 	FStopOTRSession = new Action(this);
 	FStopOTRSession->setText(tr("Terminate Off-The-Record Session"));
-	FStopOTRSession->setShortcutId(SCT_MESSAGEWINDOWS_HISTORYTERMINATEOTR);
 	connect(FStopOTRSession,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 	addAction(FStopOTRSession,AG_DEFAULT+100,false);
 }

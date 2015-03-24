@@ -40,10 +40,6 @@
         <translation>Видалити з недавніх контактів</translation>
     </message>
     <message>
-        <source>Remove from recent contacts</source>
-        <translation>Видалити з недавніх контактів</translation>
-    </message>
-    <message>
         <source>Sort by Last Activity</source>
         <translation>Сортувати за останньою активністю</translation>
     </message>

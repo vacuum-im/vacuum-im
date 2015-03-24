@@ -8,12 +8,10 @@
 #include <definitions/rosterdataholderorders.h>
 #include <definitions/rostertooltiporders.h>
 #include <definitions/menuicons.h>
-#include <definitions/shortcuts.h>
 #include <definitions/resources.h>
 #include <utils/advanceditemdelegate.h>
 #include <utils/widgetmanager.h>
 #include <utils/textmanager.h>
-#include <utils/shortcuts.h>
 #include <utils/logger.h>
 
 #define PST_ANNOTATIONS       "storage"
@@ -111,19 +109,11 @@ bool Annotations::initConnections(IPluginManager *APluginManager, int &AInitOrde
 		FRosterSearch = qobject_cast<IRosterSearch *>(plugin->instance());
 	}
 
-	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
-
 	return FPrivateStorage!=NULL;
 }
 
 bool Annotations::initObjects()
 {
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_EDITANNOTATION, tr("Edit annotation"), QKeySequence::UnknownKey, Shortcuts::WidgetShortcut);
-
-	if (FRostersViewPlugin)
-	{
-		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_EDITANNOTATION, FRostersViewPlugin->rostersView()->instance());
-	}
 	if (FRostersModel)
 	{
 		FRostersModel->insertRosterDataHolder(RDHO_ANNOTATIONS,this);
@@ -385,20 +375,6 @@ void Annotations::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AIte
 	}
 }
 
-void Annotations::onShortcutActivated(const QString &AId, QWidget *AWidget)
-{
-	if (FRostersViewPlugin && AWidget==FRostersViewPlugin->rostersView()->instance())
-	{
-		QList<IRosterIndex *> indexes = FRostersViewPlugin->rostersView()->selectedRosterIndexes();
-		if (AId==SCT_ROSTERVIEW_EDITANNOTATION && indexes.count()==1)
-		{
-			IRosterIndex *index = indexes.first();
-			if (AnnotationRosterKinds.contains(index->data(RDR_KIND).toInt()))
-				showAnnotationDialog(index->data(RDR_STREAM_JID).toString(),index->data(RDR_PREP_BARE_JID).toString());
-		}
-	}
-}
-
 void Annotations::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
 	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1)
@@ -412,7 +388,6 @@ void Annotations::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIn
 			action->setIcon(RSR_STORAGE_MENUICONS,MNI_ANNOTATIONS);
 			action->setData(ADR_STREAMJID,streamJid.full());
 			action->setData(ADR_CONTACTJID,index->data(RDR_PREP_BARE_JID));
-			action->setShortcutId(SCT_ROSTERVIEW_EDITANNOTATION);
 			connect(action,SIGNAL(triggered(bool)),SLOT(onEditNoteActionTriggered(bool)));
 			AMenu->addAction(action,AG_RVCM_ANNOTATIONS,true);
 		}

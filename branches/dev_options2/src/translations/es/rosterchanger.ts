@@ -146,14 +146,6 @@
         <translation>Añadir contacto</translation>
     </message>
     <message>
-        <source>Subscribe contact</source>
-        <translation>Subscribir contacto</translation>
-    </message>
-    <message>
-        <source>Unsubscribe contact</source>
-        <translation>Borrar subscripción</translation>
-    </message>
-    <message>
         <source>Subscribe for contact presence</source>
         <translation>Subscribirse a la presencia del contacto</translation>
     </message>
@@ -196,18 +188,8 @@
         <translation>Borrar el contacto/grupo del grupo</translation>
     </message>
     <message>
-        <source>Del</source>
-        <comment>Remove contact/group from group</comment>
-        <translation>Del</translation>
-    </message>
-    <message>
         <source>Remove contact/group from roster</source>
         <translation>Borrar el contacto/grupo de la lista</translation>
-    </message>
-    <message>
-        <source>Shift+Del</source>
-        <comment>Remove contact/group from roster</comment>
-        <translation>Shift+Del</translation>
     </message>
     <message>
         <source>When receiving authorization request</source>
@@ -339,6 +321,11 @@
     <message>
         <source>Remove subscription when you was deleted from contacts list</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Del</source>
+        <comment>Remove contact/group from roster</comment>
+        <translation type="unfinished">Del</translation>
     </message>
 </context>
 <context>

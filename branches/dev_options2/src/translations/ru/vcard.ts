@@ -249,12 +249,6 @@
         <translation>Показать личные данные</translation>
     </message>
     <message>
-        <source>Ctrl+I</source>
-        <comment>Show Profile</comment>
-        <translatorcomment>Показать личные данные</translatorcomment>
-        <translation>Ctrl+I</translation>
-    </message>
-    <message>
         <source>Contact Profile</source>
         <translation>Личные данные контакта</translation>
     </message>
@@ -269,6 +263,15 @@
     <message>
         <source>Restrict maximum vCard images size</source>
         <translation>Ограничивать максимальный размер изображений в vCard-е</translation>
+    </message>
+    <message>
+        <source>Show contact profile</source>
+        <translation>Показать личные данные контакта</translation>
+    </message>
+    <message>
+        <source>Ctrl+I</source>
+        <comment>Show contact profile</comment>
+        <translation>Ctrl+I</translation>
     </message>
 </context>
 </TS>

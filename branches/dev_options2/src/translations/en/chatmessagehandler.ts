@@ -41,10 +41,6 @@
         <translation>Return</translation>
     </message>
     <message>
-        <source>Clear window</source>
-        <translation>Clear window</translation>
-    </message>
-    <message>
         <source>When receiving new chat message</source>
         <translation>When receiving new chat message</translation>
     </message>

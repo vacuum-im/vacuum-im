@@ -538,10 +538,6 @@
         <translation>Ctrl+H</translation>
     </message>
     <message>
-        <source>Terminate Off-The-Record session</source>
-        <translation>Terminar la sesión sin registrar historial</translation>
-    </message>
-    <message>
         <source>Allows to save the history of communications</source>
         <translation>Permite guardar el historial de la comunicación</translation>
     </message>
@@ -568,18 +564,6 @@
     <message>
         <source>Use Default Options</source>
         <translation>Usar opciones por defecto</translation>
-    </message>
-    <message>
-        <source>Enable message archiving</source>
-        <translation>Habilitar el archivado de mensajes</translation>
-    </message>
-    <message>
-        <source>Disable message archiving</source>
-        <translation>Inhabilitar el archivado de mensajes</translation>
-    </message>
-    <message>
-        <source>Start Off-The-Record session</source>
-        <translation>Iniciar sesión sin registro (OTR)</translation>
     </message>
     <message>
         <source>Off-The-Record session not ready, please wait...</source>

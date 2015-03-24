@@ -12,10 +12,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Edit bookmark</source>
-        <translation type="unfinished">Edytuj zakładkę</translation>
-    </message>
-    <message>
         <source>Edit Bookmarks</source>
         <translation type="unfinished"></translation>
     </message>

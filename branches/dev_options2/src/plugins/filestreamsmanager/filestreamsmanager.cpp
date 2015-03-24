@@ -81,7 +81,7 @@ bool FileStreamsManager::initConnections(IPluginManager *APluginManager, int &AI
 
 bool FileStreamsManager::initObjects()
 {
-	Shortcuts::declareShortcut(SCT_APP_SHOWFILETRANSFERS,tr("Show file transfers"),QKeySequence::UnknownKey,Shortcuts::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_APP_SHOWFILETRANSFERS,tr("Show file transfers"),tr("Ctrl+T","Show file transfers"),Shortcuts::ApplicationShortcut);
 
 	XmppError::registerError(NS_INTERNAL_ERROR,IERR_FILESTREAMS_STREAM_FILE_IO_ERROR,tr("File input/output error"));
 	XmppError::registerError(NS_INTERNAL_ERROR,IERR_FILESTREAMS_STREAM_FILE_SIZE_CHANGED,tr("File size unexpectedly changed"));

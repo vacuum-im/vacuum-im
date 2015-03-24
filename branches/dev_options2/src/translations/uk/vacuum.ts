@@ -50,24 +50,12 @@
         <translation>Про Програму</translation>
     </message>
     <message>
-        <source>Application</source>
-        <translation>Додаток</translation>
+        <source>Global shortcuts</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show information about Qt</source>
-        <translation>Показати інформацію про Qt</translation>
-    </message>
-    <message>
-        <source>Show information about client</source>
-        <translation>Показати інформацію про клієнт</translation>
-    </message>
-    <message>
-        <source>Show setup plugins dialog</source>
-        <translation>Показати діалог налаштувань плагінів</translation>
-    </message>
-    <message>
-        <source>Global</source>
-        <translation>Загальний</translation>
+        <source>Application shortcuts</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

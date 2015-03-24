@@ -12,9 +12,7 @@
 #include <definitions/discoitemdataroles.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
-#include <definitions/shortcuts.h>
 #include <utils/xmpperror.h>
-#include <utils/shortcuts.h>
 #include <utils/stanza.h>
 #include <utils/action.h>
 #include <utils/logger.h>
@@ -175,25 +173,15 @@ bool Gateways::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 		}
 	}
 
-	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
-
 	return FStanzaProcessor!=NULL;
 }
 
 bool Gateways::initObjects()
 {
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_GATELOGIN, tr("Login on transport"), QKeySequence::UnknownKey, Shortcuts::WidgetShortcut);
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_GATELOGOUT, tr("Logout from transport"), QKeySequence::UnknownKey, Shortcuts::WidgetShortcut);
-
 	if (FDiscovery)
 	{
 		registerDiscoFeatures();
 		FDiscovery->insertFeatureHandler(NS_JABBER_GATEWAY,this,DFO_DEFAULT);
-	}
-	if (FRostersViewPlugin)
-	{
-		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_GATELOGIN,FRostersViewPlugin->rostersView()->instance());
-		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_GATELOGOUT,FRostersViewPlugin->rostersView()->instance());
 	}
 	return true;
 }
@@ -720,28 +708,6 @@ void Gateways::onRemoveActionTriggered(bool)
 	}
 }
 
-void Gateways::onShortcutActivated(const QString &AId, QWidget *AWidget)
-{
-	if (FRostersViewPlugin && AWidget==FRostersViewPlugin->rostersView()->instance())
-	{
-		if (AId==SCT_ROSTERVIEW_GATELOGIN || AId==SCT_ROSTERVIEW_GATELOGOUT)
-		{
-			foreach(IRosterIndex *index, FRostersViewPlugin->rostersView()->selectedRosterIndexes())
-			{
-				if (index->kind() == RIK_AGENT)
-				{
-					bool logIn = AId==SCT_ROSTERVIEW_GATELOGIN;
-					Jid streamJid = index->data(RDR_STREAM_JID).toString();
-					Jid serviceJid = index->data(RDR_PREP_BARE_JID).toString();
-					if (FPrivateStorageKeep.value(streamJid).contains(serviceJid))
-						setKeepConnection(streamJid,serviceJid,logIn);
-					sendLogPresence(streamJid,serviceJid,logIn);
-				}
-			}
-		}
-	}
-}
-
 void Gateways::onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted)
 {
 	AAccepted = AAccepted || isSelectionAccepted(ASelected);
@@ -827,7 +793,6 @@ void Gateways::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndex
 				action->setData(ADR_STREAM_JID,rolesMap.value(RDR_STREAM_JID));
 				action->setData(ADR_SERVICE_JID,rolesMap.value(RDR_PREP_BARE_JID));
 				action->setData(ADR_LOG_IN,true);
-				action->setShortcutId(SCT_ROSTERVIEW_GATELOGIN);
 				connect(action,SIGNAL(triggered(bool)),SLOT(onLogActionTriggered(bool)));
 				AMenu->addAction(action,AG_RVCM_GATEWAYS_LOGIN);
 
@@ -837,7 +802,6 @@ void Gateways::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndex
 				action->setData(ADR_STREAM_JID,rolesMap.value(RDR_STREAM_JID));
 				action->setData(ADR_SERVICE_JID,rolesMap.value(RDR_PREP_BARE_JID));
 				action->setData(ADR_LOG_IN,false);
-				action->setShortcutId(SCT_ROSTERVIEW_GATELOGOUT);
 				connect(action,SIGNAL(triggered(bool)),SLOT(onLogActionTriggered(bool)));
 				AMenu->addAction(action,AG_RVCM_GATEWAYS_LOGIN);
 

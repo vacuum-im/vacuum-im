@@ -28,10 +28,6 @@
         <translation>Enable/Disable notifications sound</translation>
     </message>
     <message>
-        <source>Remove all notifications</source>
-        <translation>Remove all notifications</translation>
-    </message>
-    <message>
         <source>Expand contact groups in roster</source>
         <translation>Expand contact groups in roster</translation>
     </message>

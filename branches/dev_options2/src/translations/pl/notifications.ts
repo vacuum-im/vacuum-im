@@ -28,10 +28,6 @@
         <translation>Włącz/wyłącz dźwięk powiadomień</translation>
     </message>
     <message>
-        <source>Remove all notifications</source>
-        <translation>Usuń wszystkie powiadomienia</translation>
-    </message>
-    <message>
         <source>Expand contact groups in roster</source>
         <translation>Rozwiń grupy na liście kontaktów</translation>
     </message>

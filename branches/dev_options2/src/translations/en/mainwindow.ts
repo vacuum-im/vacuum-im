@@ -20,17 +20,9 @@
         <translation>Allows other modules to place their widgets in the main window</translation>
     </message>
     <message>
-        <source>Main window</source>
-        <translation>Main window</translation>
-    </message>
-    <message>
-        <source>Hide roster</source>
-        <translation>Hide roster</translation>
-    </message>
-    <message>
         <source>Esc</source>
-        <comment>Hide roster</comment>
-        <translation>Esc</translation>
+        <comment>Close main window</comment>
+        <translation type="unfinished">Esc</translation>
     </message>
 </context>
 </TS>

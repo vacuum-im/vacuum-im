@@ -40,10 +40,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Remove from recent contacts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Sort by Last Activity</source>
         <translation type="unfinished"></translation>
     </message>

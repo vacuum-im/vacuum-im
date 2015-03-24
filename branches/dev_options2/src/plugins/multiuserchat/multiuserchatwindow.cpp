@@ -987,7 +987,7 @@ void MultiUserChatWindow::createMessageWidgets()
 		ui.wdtEdit->setLayout(new QVBoxLayout);
 		ui.wdtEdit->layout()->setMargin(0);
 		FEditWidget = FMessageWidgets->newEditWidget(this,ui.wdtEdit);
-		FEditWidget->setSendShortcutId(SCT_MESSAGEWINDOWS_MUC_SENDMESSAGE);
+		FEditWidget->setSendShortcutId(SCT_MESSAGEWINDOWS_SENDCHATMESSAGE);
 		ui.wdtEdit->layout()->addWidget(FEditWidget->instance());
 		connect(FEditWidget->instance(),SIGNAL(keyEventReceived(QKeyEvent *,bool &)),SLOT(onMultiChatEditWidgetKeyEvent(QKeyEvent *,bool &)));
 
@@ -1013,13 +1013,11 @@ void MultiUserChatWindow::createStaticRoomActions()
 	FChangeNick = new Action(this);
 	FChangeNick->setText(tr("Change Nick"));
 	FChangeNick->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CHANGE_NICK);
-	FChangeNick->setShortcutId(SCT_MESSAGEWINDOWS_MUC_CHANGENICK);
 	connect(FChangeNick,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
 
 	FChangeTopic = new Action(this);
 	FChangeTopic->setText(tr("Change Topic"));
 	FChangeTopic->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CHANGE_TOPIC);
-	FChangeTopic->setShortcutId(SCT_MESSAGEWINDOWS_MUC_CHANGETOPIC);
 	connect(FChangeTopic,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
 
 	FInviteContact = new Action(this);
@@ -1055,7 +1053,6 @@ void MultiUserChatWindow::createStaticRoomActions()
 	FConfigRoom = new Action(this);
 	FConfigRoom->setText(tr("Configure Conference"));
 	FConfigRoom->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CONFIGURE_ROOM);
-	FConfigRoom->setShortcutId(SCT_MESSAGEWINDOWS_MUC_ROOMSETTINGS);
 	connect(FConfigRoom,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
 
 	FDestroyRoom = new Action(this);
@@ -1066,7 +1063,6 @@ void MultiUserChatWindow::createStaticRoomActions()
 	FClearChat = new Action(this);
 	FClearChat->setText(tr("Clear Conference Window"));
 	FClearChat->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CLEAR_CHAT);
-	FClearChat->setShortcutId(SCT_MESSAGEWINDOWS_MUC_CLEARWINDOW);
 	connect(FClearChat,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
 	FToolBarWidget->toolBarChanger()->insertAction(FClearChat,TBG_MWTBW_CLEAR_WINDOW);
 
@@ -1074,7 +1070,6 @@ void MultiUserChatWindow::createStaticRoomActions()
 	FEnterRoom->setText(tr("Enter"));
 	FEnterRoom->setToolTip(tr("Enter conference"));
 	FEnterRoom->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_ENTER_ROOM);
-	FEnterRoom->setShortcutId(SCT_MESSAGEWINDOWS_MUC_ENTER);
 	connect(FEnterRoom,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
 	QToolButton *enterButton = FToolBarWidget->toolBarChanger()->insertAction(FEnterRoom, TBG_MCWTBW_ROOM_ENTER);
 	enterButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -1083,7 +1078,6 @@ void MultiUserChatWindow::createStaticRoomActions()
 	FExitRoom->setText(tr("Exit"));
 	FExitRoom->setToolTip(tr("Exit conference"));
 	FExitRoom->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_EXIT_ROOM);
-	FExitRoom->setShortcutId(SCT_MESSAGEWINDOWS_MUC_EXIT);
 	connect(FExitRoom,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
 	QToolButton *exitButton = FToolBarWidget->toolBarChanger()->insertAction(FExitRoom, TBG_MCWTBW_ROOM_EXIT);
 	exitButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -1627,7 +1621,6 @@ IMessageChatWindow *MultiUserChatWindow::getPrivateChatWindow(const Jid &AContac
 				Action *clearAction = new Action(window->instance());
 				clearAction->setText(tr("Clear Chat Window"));
 				clearAction->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CLEAR_CHAT);
-				clearAction->setShortcutId(SCT_MESSAGEWINDOWS_CHAT_CLEARWINDOW);
 				connect(clearAction,SIGNAL(triggered(bool)),SLOT(onPrivateChatClearWindowActionTriggered(bool)));
 				window->toolBarWidget()->toolBarChanger()->insertAction(clearAction, TBG_MWTBW_CLEAR_WINDOW);
 

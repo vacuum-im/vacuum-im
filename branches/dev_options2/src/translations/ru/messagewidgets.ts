@@ -59,26 +59,6 @@
         <translation>Предыдущая вкладка</translation>
     </message>
     <message>
-        <source>Set tabs closable</source>
-        <translation>Сделать вкладки закрываемыми</translation>
-    </message>
-    <message>
-        <source>Show tabs at bottom</source>
-        <translation>Показывать вкладки внизу</translation>
-    </message>
-    <message>
-        <source>Rename tab window</source>
-        <translation>Переименовать окно со вкладками</translation>
-    </message>
-    <message>
-        <source>Delete tab window</source>
-        <translation>Удалить окно со вкладками</translation>
-    </message>
-    <message>
-        <source>Use as default tab window</source>
-        <translation>Использовать как основное окно со вкладками</translation>
-    </message>
-    <message>
         <source>Alt+%1</source>
         <comment>Show tab</comment>
         <translation>Alt+%1</translation>
@@ -86,28 +66,6 @@
     <message>
         <source>Message windows</source>
         <translation>Окна сообщений</translation>
-    </message>
-    <message>
-        <source>Chat window</source>
-        <translation>Окно чата</translation>
-    </message>
-    <message>
-        <source>Send message</source>
-        <translation>Отправить сообщение</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <comment>Send message</comment>
-        <translation>Return</translation>
-    </message>
-    <message>
-        <source>Message window</source>
-        <translation>Окно сообщения</translation>
-    </message>
-    <message>
-        <source>Ctrl+Return</source>
-        <comment>Send message</comment>
-        <translation>Ctrl+Return</translation>
     </message>
     <message>
         <source>Edit next message</source>
@@ -133,21 +91,9 @@
         <translation>Ctrl+W</translation>
     </message>
     <message>
-        <source>Show tabs indices</source>
-        <translation>Показывать номера вкладок</translation>
-    </message>
-    <message>
-        <source>Close tab window</source>
-        <translation>Закрыть окно со вкладками</translation>
-    </message>
-    <message>
         <source>Esc</source>
         <comment>Close tab window</comment>
         <translation>Esc</translation>
-    </message>
-    <message>
-        <source>Close message window</source>
-        <translation>Закрыть окно сообщений</translation>
     </message>
     <message>
         <source>Esc</source>
@@ -189,10 +135,6 @@
         <translation>google.ru</translation>
     </message>
     <message>
-        <source>Combine/Split with message windows</source>
-        <translation>Объединить/Разделить с окнами сообщений</translation>
-    </message>
-    <message>
         <source>Quote Selected Text</source>
         <translation>Цитировать выделенный текст</translation>
     </message>
@@ -231,6 +173,29 @@
     <message>
         <source>Save contacts status messages in history</source>
         <translation>Сохранять статусные сообщения контактов в истории</translation>
+    </message>
+    <message>
+        <source>Ctrl+Q</source>
+        <comment>Quote selected text</comment>
+        <translation>Ctrl+Q</translation>
+    </message>
+    <message>
+        <source>Send chat message</source>
+        <translation>Отправить чат сообщение</translation>
+    </message>
+    <message>
+        <source>Return</source>
+        <comment>Send chat message</comment>
+        <translation>Return</translation>
+    </message>
+    <message>
+        <source>Send single message</source>
+        <translation>Отправить одиночное сообщение</translation>
+    </message>
+    <message>
+        <source>Ctrl+Return</source>
+        <comment>Send single message</comment>
+        <translation>Ctrl+Return</translation>
     </message>
 </context>
 <context>

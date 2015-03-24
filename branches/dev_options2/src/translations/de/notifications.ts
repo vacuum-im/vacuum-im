@@ -28,10 +28,6 @@
         <translation>Erlaube/Sperre Benachrichtigungs Sound</translation>
     </message>
     <message>
-        <source>Remove all notifications</source>
-        <translation>Entferne alle Benachrichtigungen</translation>
-    </message>
-    <message>
         <source>Expand contact groups in roster</source>
         <translation>Erweitere Roster Kontaktgruppe</translation>
     </message>

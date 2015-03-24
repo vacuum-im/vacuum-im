@@ -442,58 +442,8 @@ Comprueba la configuración y vuelve a intentarlo.</translation>
         <translation>Soporta salas multiusuario</translation>
     </message>
     <message>
-        <source>Leave all hidden conferences</source>
-        <translation>Abandonar todas las salas ocultas</translation>
-    </message>
-    <message>
-        <source>Show all hidden conferences</source>
-        <translation>Mostrar todas las salas ocultas</translation>
-    </message>
-    <message>
         <source>Show users status changes</source>
         <translation>Mostrar los cambios de estado de los usuarios</translation>
-    </message>
-    <message>
-        <source>Multi-user chat window</source>
-        <translation>Ventana de chat multiusuario</translation>
-    </message>
-    <message>
-        <source>Send message</source>
-        <translation>Enviar mensaje</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <comment>Send message</comment>
-        <translation>Return</translation>
-    </message>
-    <message>
-        <source>Clear window</source>
-        <translation>Limpiar ventana</translation>
-    </message>
-    <message>
-        <source>Change nick</source>
-        <translation>Cambiar apodo</translation>
-    </message>
-    <message>
-        <source>Change topic</source>
-        <translation>Cambiar tema</translation>
-    </message>
-    <message>
-        <source>Setup conference</source>
-        <translation>Configurar sala</translation>
-    </message>
-    <message>
-        <source>Enter the conference</source>
-        <translation>Entrar a la sala</translation>
-    </message>
-    <message>
-        <source>Leave the conference</source>
-        <translation>Abandonar la sala</translation>
-    </message>
-    <message>
-        <source>Ctrl+Q</source>
-        <comment>Leave the conference</comment>
-        <translation>Ctrl+Q</translation>
     </message>
     <message>
         <source>I&apos;m too busy right now</source>
@@ -518,14 +468,6 @@ Comprueba la configuración y vuelve a intentarlo.</translation>
     <message>
         <source>Leave the conference when window closed</source>
         <translation>Abandonar la sala al cerrar la ventana</translation>
-    </message>
-    <message>
-        <source>Enter conference</source>
-        <translation>Entrar a la sala</translation>
-    </message>
-    <message>
-        <source>Exit conference</source>
-        <translation>Abandonar la sala</translation>
     </message>
     <message>
         <source>Enter</source>
@@ -625,6 +567,11 @@ Comprueba la configuración y vuelve a intentarlo.</translation>
     </message>
     <message>
         <source>Select a user to refer by enumeration in the input field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+J</source>
+        <comment>Join conference</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>

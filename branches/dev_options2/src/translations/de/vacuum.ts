@@ -50,24 +50,12 @@
         <translation>Über das Programm</translation>
     </message>
     <message>
-        <source>Application</source>
-        <translation>Anwendung</translation>
+        <source>Global shortcuts</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show information about Qt</source>
-        <translation>Zeige Informationen über Qt</translation>
-    </message>
-    <message>
-        <source>Show information about client</source>
-        <translation>Zeige Informationen über Programm</translation>
-    </message>
-    <message>
-        <source>Show setup plugins dialog</source>
-        <translation>Zeige Plugin Einrichtungsdialog</translation>
-    </message>
-    <message>
-        <source>Global</source>
-        <translation>Global</translation>
+        <source>Application shortcuts</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

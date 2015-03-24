@@ -13,14 +13,12 @@
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/serviceicons.h>
-#include <definitions/shortcuts.h>
 #include <definitions/shortcutgrouporders.h>
 #include <definitions/stanzahandlerorders.h>
 #include <definitions/xmppurihandlerorders.h>
 #include <definitions/discofeaturehandlerorders.h>
 #include <utils/widgetmanager.h>
 #include <utils/iconstorage.h>
-#include <utils/shortcuts.h>
 #include <utils/logger.h>
 
 #define SHC_DISCO_INFO          "/iq[@type='get']/query[@xmlns='" NS_DISCO_INFO "']"
@@ -195,16 +193,6 @@ bool ServiceDiscovery::initObjects()
 	if (!FCapsFilesDir.exists(CAPS_DIRNAME))
 		FCapsFilesDir.mkdir(CAPS_DIRNAME);
 	FCapsFilesDir.cd(CAPS_DIRNAME);
-
-	Shortcuts::declareGroup(SCTG_DISCOWINDOW,tr("Service discovery window"),SGO_DISCOWINDOW);
-	Shortcuts::declareShortcut(SCT_DISCOWINDOW_BACK,tr("Move back"),QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_DISCOWINDOW_FORWARD,tr("Move forward"),QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_DISCOWINDOW_DISCOVER,tr("Discover item"),QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_DISCOWINDOW_RELOAD,tr("Reload items"),QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_DISCOWINDOW_SHOWDISCOINFO,tr("Show discovery info"),QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_DISCOWINDOW_ADDCONTACT,tr("Add item to roster"),QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_DISCOWINDOW_SHOWVCARD,tr("Show Profile"),tr("Ctrl+I","Show Profile"));
-	Shortcuts::declareShortcut(SCT_DISCOWINDOW_CLOSEWINDOW,tr("Close discovery window"),tr("Esc","Close discovery window"));
 
 	FDiscoMenu = new Menu;
 	FDiscoMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_DISCOVER);

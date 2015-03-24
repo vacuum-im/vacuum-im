@@ -12,10 +12,6 @@
         <translation>Дозволяє створювати закладки для конференцій та веб-сторінок</translation>
     </message>
     <message>
-        <source>Edit bookmark</source>
-        <translation>Редагувати закладку</translation>
-    </message>
-    <message>
         <source>Edit Bookmarks</source>
         <translation>Редагувати закладки</translation>
     </message>

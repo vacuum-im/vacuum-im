@@ -196,9 +196,9 @@ bool MetaContacts::initConnections(IPluginManager *APluginManager, int &AInitOrd
 
 bool MetaContacts::initObjects()
 {
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_COMBINECONTACTS,tr("Combine Contacts"),QKeySequence::UnknownKey,Shortcuts::WidgetShortcut);
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_DESTROYMETACONTACT,tr("Destroy Metacontact"),QKeySequence::UnknownKey,Shortcuts::WidgetShortcut);
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_DETACHFROMMETACONTACT,tr("Detach from Metacontact"),QKeySequence::UnknownKey,Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_COMBINECONTACTS,tr("Combine contacts"),tr("Ctrl+M","Combine contacts"),Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_DESTROYMETACONTACT,tr("Destroy metacontact"),QKeySequence::UnknownKey,Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_DETACHFROMMETACONTACT,tr("Detach from metacontact"),QKeySequence::UnknownKey,Shortcuts::WidgetShortcut);
 
 	if (FRostersModel)
 	{

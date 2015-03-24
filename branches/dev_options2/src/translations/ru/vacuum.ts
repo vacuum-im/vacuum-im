@@ -50,24 +50,12 @@
         <translation>О Программе</translation>
     </message>
     <message>
-        <source>Application</source>
-        <translation>Приложение</translation>
+        <source>Global shortcuts</source>
+        <translation>Глобальные горячие клавиши</translation>
     </message>
     <message>
-        <source>Show information about Qt</source>
-        <translation>Показать информацию о Qt</translation>
-    </message>
-    <message>
-        <source>Show information about client</source>
-        <translation>Показать информацию о клиенте</translation>
-    </message>
-    <message>
-        <source>Show setup plugins dialog</source>
-        <translation>Показать диалог настройки плагинов</translation>
-    </message>
-    <message>
-        <source>Global</source>
-        <translation>Глобальные</translation>
+        <source>Application shortcuts</source>
+        <translation>Горячие клавиши приложения</translation>
     </message>
 </context>
 <context>

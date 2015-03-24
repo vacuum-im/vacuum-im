@@ -544,10 +544,6 @@
         <translation>Ctrl+H</translation>
     </message>
     <message>
-        <source>Terminate Off-The-Record session</source>
-        <translation>Завершить сессию без записи истории</translation>
-    </message>
-    <message>
         <source>Allows to save the history of communications</source>
         <translation>Позволяет сохранять историю общения</translation>
     </message>
@@ -574,18 +570,6 @@
     <message>
         <source>Use Default Options</source>
         <translation>Использовать настройки по умолчанию</translation>
-    </message>
-    <message>
-        <source>Enable message archiving</source>
-        <translation>Включить архивирование сообщений</translation>
-    </message>
-    <message>
-        <source>Disable message archiving</source>
-        <translation>Выключить архивирование сообщений</translation>
-    </message>
-    <message>
-        <source>Start Off-The-Record session</source>
-        <translation>Начать сессию Без-Записи-Истории</translation>
     </message>
     <message>
         <source>Off-The-Record session not ready, please wait...</source>

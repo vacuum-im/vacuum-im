@@ -15,28 +15,12 @@
 <context>
     <name>RostersViewPlugin</name>
     <message>
-        <source>Roster</source>
-        <translation>Lista kontaktów</translation>
-    </message>
-    <message>
         <source>Roster View</source>
         <translation>Widok rostera</translation>
     </message>
     <message>
         <source>Displays a hierarchical roster&apos;s model</source>
         <translation>Hierarchiczny widok listy kontaktów</translation>
-    </message>
-    <message>
-        <source>Copy contact JID to clipboard</source>
-        <translation>Kopiuj JID kontaktu do schowka</translation>
-    </message>
-    <message>
-        <source>Copy contact name to clipboard</source>
-        <translation>Kopiuj nazwę kontaktu do schowka</translation>
-    </message>
-    <message>
-        <source>Copy contact status to clipboard</source>
-        <translation>Kopiuj status kontaktu do schowka</translation>
     </message>
     <message>
         <source>Show/Hide disconnected contacts</source>
@@ -124,6 +108,10 @@
     </message>
     <message>
         <source>Full</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contact-List</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

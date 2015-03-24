@@ -124,7 +124,6 @@ protected slots:
 	void onTabWindowPageAdded(IMessageTabPage *APage);
 	void onTabWindowCurrentPageChanged(IMessageTabPage *APage);
 	void onTabWindowDestroyed();
-	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onOptionsOpened();
 	void onOptionsClosed();
 	void onOptionsChanged(const OptionsNode &ANode);

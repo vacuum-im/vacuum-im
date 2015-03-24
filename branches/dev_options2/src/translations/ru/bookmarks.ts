@@ -12,10 +12,6 @@
         <translation>Позволяет создавать закладки на джаббер конференции и веб-страницы</translation>
     </message>
     <message>
-        <source>Edit bookmark</source>
-        <translation>Редактировать закладку</translation>
-    </message>
-    <message>
         <source>Edit Bookmarks</source>
         <translation>Редактировать закладки</translation>
     </message>

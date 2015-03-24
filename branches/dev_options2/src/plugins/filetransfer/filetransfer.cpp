@@ -139,15 +139,12 @@ bool FileTransfer::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
 	}
 
-	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
-
 	return FFileManager!=NULL && FDataManager!=NULL;
 }
 
 bool FileTransfer::initObjects()
 {
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SENDFILE, tr("Send file"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SENDFILE, tr("Send file"), QKeySequence::UnknownKey, Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SENDFILE, tr("Send file"), tr("Ctrl+S","Send file"));
 
 	XmppError::registerError(NS_INTERNAL_ERROR,IERR_FILETRANSFER_TRANSFER_NOT_STARTED,tr("Failed to start file transfer"));
 	XmppError::registerError(NS_INTERNAL_ERROR,IERR_FILETRANSFER_TRANSFER_TERMINATED,tr("Data transmission terminated"));
@@ -174,7 +171,6 @@ bool FileTransfer::initObjects()
 	if (FRostersViewPlugin)
 	{
 		FRostersViewPlugin->rostersView()->insertDragDropHandler(this);
-		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_SENDFILE,FRostersViewPlugin->rostersView()->instance());
 	}
 	if (FMessageWidgets)
 	{
@@ -809,21 +805,6 @@ void FileTransfer::onToolBarWidgetDestroyed(QObject *AObject)
 	foreach(IMessageToolBarWidget *widget, FToolBarActions.keys())
 		if (qobject_cast<QObject *>(widget->instance()) == AObject)
 			FToolBarActions.remove(widget);
-}
-
-void FileTransfer::onShortcutActivated(const QString &AId, QWidget *AWidget)
-{
-	if (FRostersViewPlugin && AWidget==FRostersViewPlugin->rostersView()->instance())
-	{
-		QList<IRosterIndex *> indexes = FRostersViewPlugin->rostersView()->selectedRosterIndexes();
-		if (AId==SCT_ROSTERVIEW_SENDFILE && indexes.count()==1)
-		{
-			Jid streamJid = indexes.first()->data(RDR_STREAM_JID).toString();
-			Jid contactJid = indexes.first()->data(RDR_FULL_JID).toString();
-			if (isSupported(streamJid,contactJid))
-				sendFile(streamJid,contactJid);
-		}
-	}
 }
 
 Q_EXPORT_PLUGIN2(plg_filetransfer, FileTransfer);

@@ -59,26 +59,6 @@
         <translation>Попередня вкладка</translation>
     </message>
     <message>
-        <source>Set tabs closable</source>
-        <translation>Вкладки з закриттям</translation>
-    </message>
-    <message>
-        <source>Show tabs at bottom</source>
-        <translation>Показувати вкладки знизу</translation>
-    </message>
-    <message>
-        <source>Rename tab window</source>
-        <translation>Перейменувати вікно вкладки</translation>
-    </message>
-    <message>
-        <source>Delete tab window</source>
-        <translation>Видалити вікно вкладки</translation>
-    </message>
-    <message>
-        <source>Use as default tab window</source>
-        <translation>Використати як основне вікно вкладки</translation>
-    </message>
-    <message>
         <source>Alt+%1</source>
         <comment>Show tab</comment>
         <translation>Alt+%1</translation>
@@ -86,28 +66,6 @@
     <message>
         <source>Message windows</source>
         <translation>Вікно повідомлення</translation>
-    </message>
-    <message>
-        <source>Chat window</source>
-        <translation>Вікно чату</translation>
-    </message>
-    <message>
-        <source>Send message</source>
-        <translation>Надіслати повідомлення</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <comment>Send message</comment>
-        <translation>Return</translation>
-    </message>
-    <message>
-        <source>Message window</source>
-        <translation>Вікно повідомлення</translation>
-    </message>
-    <message>
-        <source>Ctrl+Return</source>
-        <comment>Send message</comment>
-        <translation>Ctrl+Return</translation>
     </message>
     <message>
         <source>Edit next message</source>
@@ -133,21 +91,9 @@
         <translation>Ctrl+W</translation>
     </message>
     <message>
-        <source>Show tabs indices</source>
-        <translation>Показувати індекс вкладки</translation>
-    </message>
-    <message>
-        <source>Close tab window</source>
-        <translation>Закрити вікно вкладки</translation>
-    </message>
-    <message>
         <source>Esc</source>
         <comment>Close tab window</comment>
         <translation>Esc</translation>
-    </message>
-    <message>
-        <source>Close message window</source>
-        <translation>Закрити вікно повідомлення</translation>
     </message>
     <message>
         <source>Esc</source>
@@ -189,10 +135,6 @@
         <translation>google.com.ua</translation>
     </message>
     <message>
-        <source>Combine/Split with message windows</source>
-        <translation>Об&apos;єднати/Розділити з вікнами повідомлень</translation>
-    </message>
-    <message>
         <source>Quote Selected Text</source>
         <translation>Цитувати виділений текст</translation>
     </message>
@@ -231,6 +173,29 @@
     <message>
         <source>Save contacts status messages in history</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+Q</source>
+        <comment>Quote selected text</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send chat message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Return</source>
+        <comment>Send chat message</comment>
+        <translation type="unfinished">Return</translation>
+    </message>
+    <message>
+        <source>Send single message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+Return</source>
+        <comment>Send single message</comment>
+        <translation type="unfinished">Ctrl+Return</translation>
     </message>
 </context>
 <context>

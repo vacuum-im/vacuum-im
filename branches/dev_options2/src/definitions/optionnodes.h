@@ -10,6 +10,7 @@
 #define OPN_MESSAGES                     "Messages"
 #define OPN_STATUSITEMS                  "StatusItems"
 #define OPN_NOTIFICATIONS                "Notifications"
+#define OPN_SHORTCUTS                    "Shortcuts"
 
 
 #define OPN_STATUSICONS                  "StatusIcons"
@@ -17,6 +18,5 @@
 #define OPN_MESSAGE_STYLES               "MessageStyles"
 #define OPN_DATASTREAMS                  "DataStreams"
 #define OPN_FILETRANSFER                 "FileTransfer"
-#define OPN_SHORTCUTS                    "Shortcuts"
 
 #endif // DEF_OPTIONNODES_H

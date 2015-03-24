@@ -153,10 +153,8 @@ bool RosterChanger::initObjects()
 {
 	Shortcuts::declareShortcut(SCT_ROSTERVIEW_ADDCONTACT,tr("Add contact"),tr("Ins","Add contact"),Shortcuts::WidgetShortcut);
 	Shortcuts::declareShortcut(SCT_ROSTERVIEW_RENAME,tr("Rename contact/group"),tr("F2","Rename contact/group"),Shortcuts::WidgetShortcut);
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_REMOVEFROMGROUP,tr("Remove contact/group from group"),tr("Del","Remove contact/group from group"),Shortcuts::WidgetShortcut);
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_REMOVEFROMROSTER,tr("Remove contact/group from roster"),tr("Shift+Del","Remove contact/group from roster"),Shortcuts::WidgetShortcut);
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SUBSCRIBE,tr("Subscribe contact"),QKeySequence::UnknownKey,Shortcuts::WidgetShortcut);
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_UNSUBSCRIBE,tr("Unsubscribe contact"),QKeySequence::UnknownKey,Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_REMOVEFROMGROUP,tr("Remove contact/group from group"),QKeySequence::UnknownKey,Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_REMOVEFROMROSTER,tr("Remove contact/group from roster"),tr("Del","Remove contact/group from roster"),Shortcuts::WidgetShortcut);
 
 	if (FNotifications)
 	{
@@ -176,8 +174,6 @@ bool RosterChanger::initObjects()
 		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_RENAME,FRostersView->instance());
 		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_REMOVEFROMGROUP,FRostersView->instance());
 		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_REMOVEFROMROSTER,FRostersView->instance());
-		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_SUBSCRIBE,FRostersView->instance());
-		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_UNSUBSCRIBE,FRostersView->instance());
 	}
 	if (FXmppUriQueries)
 	{
@@ -1729,32 +1725,6 @@ void RosterChanger::onShortcutActivated(const QString &AId, QWidget *AWidget)
 					removeContactsFromRoster(rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_PREP_BARE_JID));
 				}
 			}
-			else if (AId == SCT_ROSTERVIEW_SUBSCRIBE)
-			{
-				if (indexKind == RIK_METACONTACT)
-				{
-					QMap<int, QStringList> rolesMap = metaIndexesRolesMap(indexes);
-					changeSubscription(rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_PREP_BARE_JID),IRoster::Subscribe);
-				}
-				else if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT || indexKind==RIK_METACONTACT_ITEM)
-				{
-					QMap<int, QStringList> rolesMap = FRostersView->indexesRolesMap(indexes,QList<int>()<<RDR_STREAM_JID<<RDR_PREP_BARE_JID,RDR_PREP_BARE_JID,RDR_STREAM_JID);
-					changeSubscription(rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_PREP_BARE_JID),IRoster::Subscribe);
-				}
-			}
-			else if (AId == SCT_ROSTERVIEW_UNSUBSCRIBE)
-			{
-				if (indexKind == RIK_METACONTACT)
-				{
-					QMap<int, QStringList> rolesMap = metaIndexesRolesMap(indexes);
-					changeSubscription(rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_PREP_BARE_JID),IRoster::Unsubscribe);
-				}
-				else if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT || indexKind==RIK_METACONTACT_ITEM)
-				{
-					QMap<int, QStringList> rolesMap = FRostersView->indexesRolesMap(indexes,QList<int>()<<RDR_STREAM_JID<<RDR_PREP_BARE_JID,RDR_PREP_BARE_JID,RDR_STREAM_JID);
-					changeSubscription(rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_PREP_BARE_JID),IRoster::Unsubscribe);
-				}
-			}
 		}
 	}
 }
@@ -1804,7 +1774,6 @@ void RosterChanger::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &A
 			action->setText(tr("Subscribe Contact"));
 			action->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_SUBSCRIBE);
 			action->setData(ADR_SUBSCRIPTION,IRoster::Subscribe);
-			action->setShortcutId(SCT_ROSTERVIEW_SUBSCRIBE);
 			connect(action,SIGNAL(triggered(bool)),SLOT(onChangeSubscription(bool)));
 			subsMenu->addAction(action,AG_DEFAULT-1);
 
@@ -1813,7 +1782,6 @@ void RosterChanger::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &A
 			action->setText(tr("Unsubscribe Contact"));
 			action->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_UNSUBSCRIBE);
 			action->setData(ADR_SUBSCRIPTION,IRoster::Unsubscribe);
-			action->setShortcutId(SCT_ROSTERVIEW_UNSUBSCRIBE);
 			connect(action,SIGNAL(triggered(bool)),SLOT(onChangeSubscription(bool)));
 			subsMenu->addAction(action,AG_DEFAULT-1);
 

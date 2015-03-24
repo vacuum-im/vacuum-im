@@ -442,58 +442,8 @@ Check values and try again</source>
         <translation>Поддерживает многопользовательские конференции</translation>
     </message>
     <message>
-        <source>Leave all hidden conferences</source>
-        <translation>Покинуть все скрытые конференции</translation>
-    </message>
-    <message>
-        <source>Show all hidden conferences</source>
-        <translation>Показать все скрытые конференции</translation>
-    </message>
-    <message>
         <source>Show users status changes</source>
         <translation>Показывать изменения статусов пользователей</translation>
-    </message>
-    <message>
-        <source>Multi-user chat window</source>
-        <translation>Окно конференции</translation>
-    </message>
-    <message>
-        <source>Send message</source>
-        <translation>Отправить сообщение</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <comment>Send message</comment>
-        <translation>Return</translation>
-    </message>
-    <message>
-        <source>Clear window</source>
-        <translation>Очистить окно</translation>
-    </message>
-    <message>
-        <source>Change nick</source>
-        <translation>Изменить ник</translation>
-    </message>
-    <message>
-        <source>Change topic</source>
-        <translation>Изменить тему</translation>
-    </message>
-    <message>
-        <source>Setup conference</source>
-        <translation>Настроить комнату</translation>
-    </message>
-    <message>
-        <source>Enter the conference</source>
-        <translation>Войти в комнату</translation>
-    </message>
-    <message>
-        <source>Leave the conference</source>
-        <translation>Выйти из комнаты</translation>
-    </message>
-    <message>
-        <source>Ctrl+Q</source>
-        <comment>Leave the conference</comment>
-        <translation>Ctrl+Q</translation>
     </message>
     <message>
         <source>I&apos;m too busy right now</source>
@@ -518,14 +468,6 @@ Check values and try again</source>
     <message>
         <source>Leave the conference when window closed</source>
         <translation>Выходить из конференции при закрытии окна</translation>
-    </message>
-    <message>
-        <source>Enter conference</source>
-        <translation>Войти в конференцию</translation>
-    </message>
-    <message>
-        <source>Exit conference</source>
-        <translation>Выйти из конференции</translation>
     </message>
     <message>
         <source>Enter</source>
@@ -626,6 +568,11 @@ Check values and try again</source>
     <message>
         <source>Select a user to refer by enumeration in the input field</source>
         <translation>Выбирать пользователя для обращения перебором в поле ввода</translation>
+    </message>
+    <message>
+        <source>Ctrl+J</source>
+        <comment>Join conference</comment>
+        <translation>Ctrl+J</translation>
     </message>
 </context>
 <context>

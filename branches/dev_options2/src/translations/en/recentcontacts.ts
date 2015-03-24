@@ -40,10 +40,6 @@
         <translation>Remove from Recent Contacts</translation>
     </message>
     <message>
-        <source>Remove from recent contacts</source>
-        <translation>Remove from recent contacts</translation>
-    </message>
-    <message>
         <source>Sort by Last Activity</source>
         <translation>Sort by Last Activity</translation>
     </message>

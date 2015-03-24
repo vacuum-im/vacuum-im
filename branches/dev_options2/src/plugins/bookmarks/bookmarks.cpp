@@ -19,7 +19,6 @@
 #include <definitions/rosteredithandlerorders.h>
 #include <utils/advanceditemdelegate.h>
 #include <utils/textmanager.h>
-#include <utils/shortcuts.h>
 #include <utils/options.h>
 #include <utils/logger.h>
 #include <utils/menu.h>
@@ -169,8 +168,6 @@ bool Bookmarks::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 
 bool Bookmarks::initObjects()
 {
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_MUC_BOOKMARK, tr("Edit bookmark"), QKeySequence::UnknownKey);
-
 	if (FOptionsManager)
 	{
 		FOptionsManager->insertOptionsDialogHolder(this);
@@ -794,7 +791,6 @@ void Bookmarks::onMultiChatWindowCreated(IMultiUserChatWindow *AWindow)
 	Action *action = new Action(AWindow->instance());
 	action->setText(tr("Edit Bookmark"));
 	action->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_EDIT);
-	action->setShortcutId(SCT_MESSAGEWINDOWS_MUC_BOOKMARK);
 	connect(action,SIGNAL(triggered(bool)),SLOT(onMultiChatWindowAddBookmarkActionTriggered(bool)));
 	AWindow->toolBarWidget()->toolBarChanger()->insertAction(action,TBG_MCWTBW_BOOKMARKS);
 }
