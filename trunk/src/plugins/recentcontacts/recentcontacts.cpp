@@ -965,7 +965,7 @@ bool RecentContacts::saveItemsToStorage(const Jid &AStreamJid) const
 	{
 		QDomDocument doc;
 		QDomElement itemsElem = doc.appendChild(doc.createElementNS(PSN_RECENTCONTACTS,PST_RECENTCONTACTS)).toElement();
-		saveItemsToXML(itemsElem,streamItems(AStreamJid));
+		saveItemsToXML(itemsElem,streamItems(AStreamJid),true);
 		if (!FPrivateStorage->saveData(AStreamJid,itemsElem).isEmpty())
 		{
 			LOG_STRM_INFO(AStreamJid,"Save recent items request sent");
@@ -992,53 +992,6 @@ QString RecentContacts::recentFileName(const Jid &AStreamJid) const
 	return dir.absoluteFilePath(Jid::encode(AStreamJid.pBare())+".xml");
 }
 
-QList<IRecentItem> RecentContacts::loadItemsFromXML(const QDomElement &AElement) const
-{
-	QList<IRecentItem> items;
-	QDomElement itemElem = AElement.firstChildElement("item");
-	while (!itemElem.isNull())
-	{
-		IRecentItem item;
-		item.type = itemElem.attribute("type");
-		item.reference = itemElem.attribute("reference");
-		item.activeTime = DateTime(itemElem.attribute("activeTime")).toLocal();
-		item.updateTime = DateTime(itemElem.attribute("updateTime")).toLocal();
-
-		QDomElement propElem = itemElem.firstChildElement("property");
-		while(!propElem.isNull())
-		{
-			item.properties.insert(propElem.attribute("name"),propElem.text());
-			propElem = propElem.nextSiblingElement("property");
-		}
-		items.append(item);
-
-		itemElem = itemElem.nextSiblingElement("item");
-	}
-	return items;
-}
-
-void RecentContacts::saveItemsToXML(QDomElement &AElement, const QList<IRecentItem> &AItems) const
-{
-	for (QList<IRecentItem>::const_iterator itemIt=AItems.constBegin(); itemIt!=AItems.constEnd(); ++itemIt)
-	{
-		QDomElement itemElem = AElement.ownerDocument().createElement("item");
-		itemElem.setAttribute("type",itemIt->type);
-		itemElem.setAttribute("reference",itemIt->reference);
-		itemElem.setAttribute("activeTime",DateTime(itemIt->activeTime).toX85DateTime());
-		itemElem.setAttribute("updateTime",DateTime(itemIt->updateTime).toX85DateTime());
-		
-		for (QMap<QString, QVariant>::const_iterator propIt=itemIt->properties.constBegin(); propIt!=itemIt->properties.constEnd(); ++propIt)
-		{
-			QDomElement propElem = AElement.ownerDocument().createElement("property");
-			propElem.setAttribute("name",propIt.key());
-			propElem.appendChild(AElement.ownerDocument().createTextNode(propIt->toString()));
-			itemElem.appendChild(propElem);
-		}
-		
-		AElement.appendChild(itemElem);
-	}
-}
-
 QList<IRecentItem> RecentContacts::loadItemsFromFile(const QString &AFileName) const
 {
 	QList<IRecentItem> items;
@@ -1051,7 +1004,7 @@ QList<IRecentItem> RecentContacts::loadItemsFromFile(const QString &AFileName) c
 		if (doc.setContent(&file,true,&xmlError))
 		{
 			QDomElement itemsElem = doc.firstChildElement(PST_RECENTCONTACTS);
-			items = loadItemsFromXML(itemsElem);
+			items = loadItemsFromXML(itemsElem,false);
 		}
 		else
 		{
@@ -1074,13 +1027,68 @@ void RecentContacts::saveItemsToFile(const QString &AFileName, const QList<IRece
 	{
 		QDomDocument doc;
 		QDomElement itemsElem = doc.appendChild(doc.createElementNS(PSN_RECENTCONTACTS,PST_RECENTCONTACTS)).toElement();
-		saveItemsToXML(itemsElem,AItems);
+		saveItemsToXML(itemsElem,AItems,false);
 		file.write(doc.toByteArray());
 		file.flush();
 	}
 	else
 	{
 		REPORT_ERROR(QString("Failed to save recent items to file: %1").arg(file.errorString()));
+	}
+}
+
+QList<IRecentItem> RecentContacts::loadItemsFromXML(const QDomElement &AElement, bool APlainPassword) const
+{
+	QList<IRecentItem> items;
+	QDomElement itemElem = AElement.firstChildElement("item");
+	while (!itemElem.isNull())
+	{
+		IRecentItem item;
+		item.type = itemElem.attribute("type");
+		item.reference = itemElem.attribute("reference");
+		item.activeTime = DateTime(itemElem.attribute("activeTime")).toLocal();
+		item.updateTime = DateTime(itemElem.attribute("updateTime")).toLocal();
+
+		QDomElement propElem = itemElem.firstChildElement("property");
+		while(!propElem.isNull())
+		{
+			QString propName = propElem.attribute("name");
+			QString propValue = propElem.text();
+			bool decryptValue = !APlainPassword && propName=="password";
+
+			item.properties.insert(propName, decryptValue ? Options::decrypt(propValue.toAscii()).toString() : propValue);
+			propElem = propElem.nextSiblingElement("property");
+		}
+		items.append(item);
+
+		itemElem = itemElem.nextSiblingElement("item");
+	}
+	return items;
+}
+
+void RecentContacts::saveItemsToXML(QDomElement &AElement, const QList<IRecentItem> &AItems, bool APlainPassword) const
+{
+	for (QList<IRecentItem>::const_iterator itemIt=AItems.constBegin(); itemIt!=AItems.constEnd(); ++itemIt)
+	{
+		QDomElement itemElem = AElement.ownerDocument().createElement("item");
+		itemElem.setAttribute("type",itemIt->type);
+		itemElem.setAttribute("reference",itemIt->reference);
+		itemElem.setAttribute("activeTime",DateTime(itemIt->activeTime).toX85DateTime());
+		itemElem.setAttribute("updateTime",DateTime(itemIt->updateTime).toX85DateTime());
+
+		for (QMap<QString, QVariant>::const_iterator propIt=itemIt->properties.constBegin(); propIt!=itemIt->properties.constEnd(); ++propIt)
+		{
+			QString propName = propIt.key();
+			QString propValue = propIt->toString();
+			bool encryptValue = !APlainPassword && propName=="password";
+
+			QDomElement propElem = AElement.ownerDocument().createElement("property");
+			propElem.setAttribute("name",propName);
+			propElem.appendChild(AElement.ownerDocument().createTextNode(encryptValue ? QString::fromAscii(Options::encrypt(propValue)) : propValue));
+			itemElem.appendChild(propElem);
+		}
+		
+		AElement.appendChild(itemElem);
 	}
 }
 
@@ -1246,13 +1254,13 @@ void RecentContacts::onPrivateStorageDataLoaded(const QString &AId, const Jid &A
 		{
 			FLoadRequestId.remove(AStreamJid);
 			LOG_STRM_INFO(AStreamJid,"Recent items loaded");
-			mergeRecentItems(AStreamJid,loadItemsFromXML(AElement),true);
+			mergeRecentItems(AStreamJid,loadItemsFromXML(AElement,true),true);
 			emit recentContactsOpened(AStreamJid);
 		}
 		else
 		{
 			LOG_STRM_INFO(AStreamJid,"Recent items updated");
-			mergeRecentItems(AStreamJid,loadItemsFromXML(AElement),true);
+			mergeRecentItems(AStreamJid,loadItemsFromXML(AElement,true),true);
 		}
 	}
 }
@@ -1356,9 +1364,9 @@ void RecentContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 			QMap<int, QStringList> rolesMap;
 			foreach(IRosterIndex *index, AIndexes)
 			{
-				IRecentItem item = findRealItem(rosterIndexItem(index));
+				IRecentItem item = rosterIndexItem(index);
 
-				if (item.properties.value(REIP_FAVORITE).toBool())
+				if (itemProperty(item,REIP_FAVORITE).toBool())
 					anyFavorite = true;
 				else
 					allFavorite = false;
