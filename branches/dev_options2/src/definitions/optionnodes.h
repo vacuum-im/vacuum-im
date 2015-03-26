@@ -8,15 +8,15 @@
 #define OPN_ACCOUNTS_ADDITIONAL          OPN_ACCOUNTS".[id].Additional"
 #define OPN_ROSTERVIEW                   "RosterView"
 #define OPN_MESSAGES                     "Messages"
+#define OPN_HISTORY                      "History"
 #define OPN_STATUSITEMS                  "StatusItems"
 #define OPN_NOTIFICATIONS                "Notifications"
 #define OPN_SHORTCUTS                    "Shortcuts"
+#define OPN_DATATRANSFER                 "DataTransfer"
 
 
 #define OPN_STATUSICONS                  "StatusIcons"
 #define OPN_EMOTICONS                    "Emoticons"
 #define OPN_MESSAGE_STYLES               "MessageStyles"
-#define OPN_DATASTREAMS                  "DataStreams"
-#define OPN_FILETRANSFER                 "FileTransfer"
 
 #endif // DEF_OPTIONNODES_H

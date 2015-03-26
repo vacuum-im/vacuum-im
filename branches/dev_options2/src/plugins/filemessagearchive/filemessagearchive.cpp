@@ -127,7 +127,7 @@ bool FileMessageArchive::initObjects()
 bool FileMessageArchive::initSettings()
 {
 	Options::setDefaultValue(OPV_FILEARCHIVE_HOMEPATH,QString());
-	Options::setDefaultValue(OPV_FILEARCHIVE_DATABASESYNC,false);
+	Options::setDefaultValue(OPV_FILEARCHIVE_DATABASESYNC,true);
 	Options::setDefaultValue(OPV_FILEARCHIVE_COLLECTION_MINSIZE,1*1024);
 	Options::setDefaultValue(OPV_FILEARCHIVE_COLLECTION_MAXSIZE,20*1024);
 	Options::setDefaultValue(OPV_FILEARCHIVE_COLLECTION_CRITICALSIZE,25*1024);

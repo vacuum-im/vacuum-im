@@ -1,3 +1,3 @@
-set(SOURCES inbandstream.cpp inbandstreams.cpp inbandoptions.cpp )
-set(HEADERS inbandstreams.h inbandstream.h inbandoptions.h )
-set(UIS inbandoptions.ui )
+set(SOURCES inbandstream.cpp inbandstreams.cpp inbandoptionswidget.cpp )
+set(HEADERS inbandstreams.h inbandstream.h inbandoptionswidget.h )
+set(UIS inbandoptionswidget.ui )

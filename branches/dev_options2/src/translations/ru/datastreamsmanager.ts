@@ -28,10 +28,6 @@
         <translation>Поток с таким же ID уже существует</translation>
     </message>
     <message>
-        <source>Data Streams</source>
-        <translation>Потоки данных</translation>
-    </message>
-    <message>
         <source>&lt;Default Profile&gt;</source>
         <translation>&lt;Основной профиль&gt;</translation>
     </message>
@@ -47,43 +43,13 @@
         <source>Invalid stream initiation response</source>
         <translation>Неверный ответ на запрос инициализации потока</translation>
     </message>
-</context>
-<context>
-    <name>DataStreamsOptions</name>
     <message>
-        <source>Add Profile</source>
-        <translation>Добавить профиль</translation>
+        <source>Data Transfer</source>
+        <translation>Передача данных</translation>
     </message>
     <message>
-        <source>Enter profile name:</source>
-        <translation>Введите имя профиля:</translation>
-    </message>
-    <message>
-        <source>Delete Profile</source>
-        <translation>Удалить профиль</translation>
-    </message>
-    <message>
-        <source>Do you really want to delete a current data streams profile?</source>
-        <translation>Вы действительно ходите удалить текущий профиль потоков данных?</translation>
-    </message>
-</context>
-<context>
-    <name>DataStreamsOptionsClass</name>
-    <message>
-        <source>Data Streams Profiles</source>
-        <translation>Профили потоков данных</translation>
-    </message>
-    <message>
-        <source>Profile:</source>
-        <translation>Профиль:</translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation>Добавить</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>Удалить</translation>
+        <source>Transfer method %1</source>
+        <translation>Метод передачи %1</translation>
     </message>
 </context>
 </TS>

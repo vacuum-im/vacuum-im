@@ -183,7 +183,6 @@ bool FileTransfer::initSettings()
 {
 	Options::setDefaultValue(OPV_FILETRANSFER_AUTORECEIVE,false);
 	Options::setDefaultValue(OPV_FILETRANSFER_HIDEONSTART,false);
-	Options::setDefaultValue(OPV_FILETRANSFER_REMOVEONFINISH,false);
 
 	if (FOptionsManager)
 	{
@@ -195,11 +194,10 @@ bool FileTransfer::initSettings()
 QMultiMap<int, IOptionsDialogWidget *> FileTransfer::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
-	if (FOptionsManager && ANodeId == OPN_FILETRANSFER)
+	if (FOptionsManager && ANodeId==OPN_DATATRANSFER)
 	{
-		widgets.insertMulti(OWO_FILETRANSFER,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_FILETRANSFER_AUTORECEIVE),tr("Automatically receive files from contacts in roster"),AParent));
-		widgets.insertMulti(OWO_FILETRANSFER,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_FILETRANSFER_HIDEONSTART),tr("Hide dialog after transfer started"),AParent));
-		widgets.insertMulti(OWO_FILETRANSFER,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_FILETRANSFER_REMOVEONFINISH),tr("Automatically remove finished transfers"),AParent));
+		widgets.insertMulti(OWO_DATATRANSFER_AUTORECEIVE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_FILETRANSFER_AUTORECEIVE),tr("Automatically receive files from authorized contacts"),AParent));
+		widgets.insertMulti(OWO_DATATRANSFER_HIDEONSTART,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_FILETRANSFER_HIDEONSTART),tr("Hide file transfer dialog after transfer started"),AParent));
 	}
 	return widgets;
 }
@@ -451,9 +449,11 @@ IFileStream *FileTransfer::sendFile(const Jid &AStreamJid, const Jid &AContactJi
 			LOG_STRM_INFO(AStreamJid,QString("Send file stream created, to=%1, sid=%2").arg(AContactJid.full(),stream->streamId()));
 			stream->setFileName(AFileName);
 			stream->setFileDescription(AFileDesc);
+
 			StreamDialog *dialog = getStreamDialog(stream);
 			dialog->setSelectableMethods(Options::node(OPV_FILESTREAMS_ACCEPTABLEMETHODS).value().toStringList());
 			dialog->show();
+
 			return stream;
 		}
 		else
@@ -709,11 +709,6 @@ void FileTransfer::onStreamStateChanged()
 		{
 			if (Options::node(OPV_FILETRANSFER_HIDEONSTART).value().toBool() && FStreamDialog.contains(stream->streamId()))
 				FStreamDialog.value(stream->streamId())->close();
-		}
-		else if (stream->streamState() == IFileStream::Finished)
-		{
-			if (Options::node(OPV_FILETRANSFER_REMOVEONFINISH).value().toBool())
-				QTimer::singleShot(REMOVE_FINISHED_TIMEOUT, stream->instance(), SLOT(deleteLater()));
 		}
 		notifyStream(stream);
 	}

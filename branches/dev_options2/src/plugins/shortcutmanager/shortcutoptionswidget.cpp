@@ -136,12 +136,21 @@ QStandardItem *ShortcutOptionsWidget::createTreeRow(const QString &AId, QStandar
 		QString actionText = AGroup ? Shortcuts::groupDescription(AId) : QString::null;
 		nameItem = new QStandardItem(!actionText.isEmpty() ? actionText : actionName);
 		nameItem->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
-		nameItem->setData(AGroup ? Shortcuts::groupOrder(AId) : 0, SDR_SORTROLE);
-		nameItem->setBackground(AGroup ? palette().color(QPalette::AlternateBase) : palette().color(QPalette::Base));
 
 		QStandardItem *keyItem = new QStandardItem;
 		keyItem->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
-		keyItem->setBackground(AGroup ? palette().color(QPalette::AlternateBase) : palette().color(QPalette::Base));
+
+		if (AGroup)
+		{
+			QFont font = nameItem->font();
+			font.setUnderline(true);
+			font.setPointSize(font.pointSize() + 2);
+			nameItem->setFont(font);
+
+			nameItem->setData(Shortcuts::groupOrder(AId),SDR_SORTROLE);
+			nameItem->setBackground(palette().color(QPalette::AlternateBase));
+			keyItem->setBackground(palette().color(QPalette::AlternateBase));
+		}
 
 		QStandardItem *parentItem = !actionPath.isEmpty() ? createTreeRow(actionPath,AParent,true) : AParent;
 		parentItem->appendRow(QList<QStandardItem *>() << nameItem << keyItem);

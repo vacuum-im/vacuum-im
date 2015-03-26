@@ -20,9 +20,6 @@ StreamDialog::StreamDialog(IDataStreamsManager *ADataManager, IFileStreamsManage
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 
-	ui.wdtMethods->setLayout(new QVBoxLayout);
-	ui.wdtMethods->layout()->setMargin(0);
-
 	FFileStream = AFileStream;
 	FFileTransfer = AFileTransfer;
 	FFileManager = AFileManager;
@@ -43,18 +40,6 @@ StreamDialog::StreamDialog(IDataStreamsManager *ADataManager, IFileStreamsManage
 	}
 
 	ui.lblContact->setText(Qt::escape(FFileStream->contactJid().uFull()));
-
-	if (AFileStream->streamState() == IFileStream::Creating)
-	{
-		foreach(const QUuid &profileId, FDataManager->settingsProfiles())
-			ui.cmbSettingsProfile->addItem(FDataManager->settingsProfileName(profileId), profileId.toString());
-		ui.cmbSettingsProfile->setCurrentIndex(0);
-
-		connect(ui.cmbSettingsProfile, SIGNAL(currentIndexChanged(int)), SLOT(onMethodSettingsChanged(int)));
-		connect(FDataManager->instance(),SIGNAL(settingsProfileInserted(const QUuid &, const QString &)),
-		        SLOT(onSettingsProfileInserted(const QUuid &, const QString &)));
-		connect(FDataManager->instance(),SIGNAL(settingsProfileRemoved(const QUuid &)), SLOT(onSettingsProfileRemoved(const QUuid &)));
-	}
 
 	connect(FFileStream->instance(),SIGNAL(stateChanged()),SLOT(onStreamStateChanged()));
 	connect(FFileStream->instance(),SIGNAL(speedChanged()),SLOT(onStreamSpeedChanged()));
@@ -94,30 +79,42 @@ void StreamDialog::setContactName(const QString &AName)
 QList<QString> StreamDialog::selectedMethods() const
 {
 	QList<QString> methods;
-	foreach (QCheckBox *button, FMethodButtons.keys())
-		if (button->isChecked())
-			methods.append(FMethodButtons.value(button));
+	if (ui.cmbMethod->currentIndex() >= 0)
+		methods.append(ui.cmbMethod->itemData(ui.cmbMethod->currentIndex()).toString());
 	return methods;
 }
 
 void StreamDialog::setSelectableMethods(const QList<QString> &AMethods)
 {
-	qDeleteAll(FMethodButtons.keys());
-	FMethodButtons.clear();
-
+	ui.cmbMethod->clear();
 	foreach(const QString &methodNS, AMethods)
 	{
-		IDataStreamMethod *stremMethod = FDataManager->method(methodNS);
-		if (stremMethod)
-		{
-			QCheckBox *button = new QCheckBox(stremMethod->methodName(),ui.grbMethods);
-			button->setToolTip(stremMethod->methodDescription());
-			button->setAutoExclusive(FFileStream->streamKind() == IFileStream::ReceiveFile);
-			button->setChecked(FFileStream->streamKind()==IFileStream::SendFile || Options::node(OPV_FILESTREAMS_DEFAULTMETHOD).value().toString()==methodNS);
-			ui.wdtMethods->layout()->addWidget(button);
-			FMethodButtons.insert(button,methodNS);
-		}
+		IDataStreamMethod *method = FDataManager->method(methodNS);
+		if (method)
+			ui.cmbMethod->addItem(method->methodName(),method->methodNS());
 	}
+	ui.cmbMethod->setCurrentIndex(ui.cmbMethod->findData(Options::node(OPV_FILESTREAMS_DEFAULTMETHOD).value().toString()));
+}
+
+qint64 StreamDialog::minPosition() const
+{
+	return FFileStream->rangeOffset();
+}
+
+qint64 StreamDialog::maxPosition() const
+{
+	return FFileStream->rangeLength()>0 ? FFileStream->rangeOffset()+FFileStream->rangeLength() : FFileStream->fileSize();
+}
+
+qint64 StreamDialog::curPosition() const
+{
+	return minPosition() + FFileStream->progress();
+}
+
+int StreamDialog::curPercentPosition() const
+{
+	qint64 maxPos = maxPosition();
+	return maxPos>0 ? curPosition()*100/maxPos : 0;
 }
 
 bool StreamDialog::acceptFileName(const QString &AFile)
@@ -213,36 +210,15 @@ QString StreamDialog::sizeName(qint64 ABytes) const
 	return QString::number(value,'f',prec)+units;
 }
 
-qint64 StreamDialog::minPosition() const
-{
-	return FFileStream->rangeOffset();
-}
-
-qint64 StreamDialog::maxPosition() const
-{
-	return FFileStream->rangeLength()>0 ? FFileStream->rangeOffset()+FFileStream->rangeLength() : FFileStream->fileSize();
-}
-
-qint64 StreamDialog::curPosition() const
-{
-	return minPosition() + FFileStream->progress();
-}
-
-int StreamDialog::curPercentPosition() const
-{
-	qint64 maxPos = maxPosition();
-	return maxPos>0 ? curPosition()*100/maxPos : 0;
-}
-
 void StreamDialog::onStreamStateChanged()
 {
 	switch (FFileStream->streamState())
 	{
 	case IFileStream::Creating:
 		ui.tlbFile->setEnabled(true);
+		ui.cmbMethod->setEnabled(true);
 		ui.lneFile->setReadOnly(FFileStream->streamKind()==IFileStream::SendFile);
 		ui.pteDescription->setReadOnly(FFileStream->streamKind()!=IFileStream::SendFile);
-		ui.grbMethods->setVisible(true);
 		if (FFileStream->streamKind()==IFileStream::SendFile)
 			ui.bbxButtons->setStandardButtons(QDialogButtonBox::Ok|QDialogButtonBox::Cancel);
 		else
@@ -254,7 +230,7 @@ void StreamDialog::onStreamStateChanged()
 		ui.tlbFile->setEnabled(false);
 		ui.lneFile->setReadOnly(true);
 		ui.pteDescription->setReadOnly(true);
-		ui.grbMethods->setVisible(false);
+		ui.cmbMethod->setEnabled(false);
 		ui.bbxButtons->setStandardButtons(QDialogButtonBox::Abort|QDialogButtonBox::Close);
 		break;
 	case IFileStream::Disconnecting:
@@ -263,7 +239,7 @@ void StreamDialog::onStreamStateChanged()
 		ui.tlbFile->setEnabled(false);
 		ui.lneFile->setReadOnly(true);
 		ui.pteDescription->setReadOnly(true);
-		ui.grbMethods->setVisible(false);
+		ui.cmbMethod->setEnabled(false);
 		if (FFileStream->streamKind()==IFileStream::SendFile && FFileStream->streamState()==IFileStream::Aborted)
 			ui.bbxButtons->setStandardButtons(QDialogButtonBox::Retry|QDialogButtonBox::Close);
 		else if (FFileStream->streamKind()==IFileStream::ReceiveFile && FFileStream->streamState()==IFileStream::Finished)
@@ -390,23 +366,4 @@ void StreamDialog::onDialogButtonClicked(QAbstractButton *AButton)
 	{
 		close();
 	}
-}
-
-void StreamDialog::onMethodSettingsChanged(int AIndex)
-{
-	FFileStream->setSettingsProfile(ui.cmbSettingsProfile->itemData(AIndex).toString());
-}
-
-void StreamDialog::onSettingsProfileInserted(const QUuid &AProfileId, const QString &AName)
-{
-	int index = ui.cmbSettingsProfile->findData(AProfileId.toString());
-	if (index >= 0)
-		ui.cmbSettingsProfile->setItemText(index, AName);
-	else
-		ui.cmbSettingsProfile->addItem(AName, AProfileId.toString());
-}
-
-void StreamDialog::onSettingsProfileRemoved(const QUuid &AProfileId)
-{
-	ui.cmbSettingsProfile->removeItem(ui.cmbSettingsProfile->findData(AProfileId.toString()));
 }

@@ -12,7 +12,6 @@
 #define OPV_ACCOUNT_RESOURCE                            "accounts.account.resource"
 #define OPV_ACCOUNT_PASSWORD                            "accounts.account.password"
 #define OPV_ACCOUNT_REQUIREENCRYPTION                   "accounts.account.require-encryption"
-#define OPV_ACCOUNT_CREATEWIZARD_CONNECTION             "accounts.create-wizard.connection"
 // ConnectionManager
 #define OPV_ACCOUNT_CONNECTION_ITEM                     "accounts.account.connection"
 #define OPV_ACCOUNT_CONNECTION_TYPE                     "accounts.account.connection-type"
@@ -23,8 +22,6 @@
 #define OPV_ACCOUNT_CONNECTION_SSLPROTOCOL              "accounts.account.connection.ssl-protocol"
 #define OPV_ACCOUNT_CONNECTION_USELEGACYSSL             "accounts.account.connection.use-legacy-ssl"
 #define OPV_ACCOUNT_CONNECTION_CERTVERIFYMODE           "accounts.account.connection.cert-verify-mode"
-// Registration
-#define OPV_ACCOUNT_REGISTER                            "accounts.account.register-on-server"
 // StatusChanger
 #define OPV_ACCOUNT_AUTOCONNECT                         "accounts.account.auto-connect"
 #define OPV_ACCOUNT_AUTORECONNECT                       "accounts.account.auto-reconnect"
@@ -63,13 +60,14 @@
 // SocksStreams
 #define OPV_DATASTREAMS_SOCKSLISTENPORT                 "datastreams.socks-listen-port"
 #define OPV_DATASTREAMS_METHOD_CONNECTTIMEOUT           "datastreams.settings-profile.method.connect-timeout"
-#define OPV_DATASTREAMS_METHOD_DISABLEDIRECT            "datastreams.settings-profile.method.disable-direct-connections"
-#define OPV_DATASTREAMS_METHOD_FORWARDHOST              "datastreams.settings-profile.method.forward-host"
-#define OPV_DATASTREAMS_METHOD_FORWARDPORT              "datastreams.settings-profile.method.forward-port"
+#define OPV_DATASTREAMS_METHOD_ENABLEDIRECT             "datastreams.settings-profile.method.enable-direct-connections"
+#define OPV_DATASTREAMS_METHOD_ENABLEFORWARD            "datastreams.settings-profile.method.enable-forward-direct"
+#define OPV_DATASTREAMS_METHOD_FORWARDADDRESS           "datastreams.settings-profile.method.forward-direct-address"
 #define OPV_DATASTREAMS_METHOD_USEACCOUNTSTREAMPROXY    "datastreams.settings-profile.method.use-account-stream-proxy"
-#define OPV_DATASTREAMS_METHOD_STREAMPROXYLIST          "datastreams.settings-profile.method.stream-proxy-list"
+#define OPV_DATASTREAMS_METHOD_USEUSERSTREAMPROXY       "datastreams.settings-profile.method.use-user-stream-proxy"
+#define OPV_DATASTREAMS_METHOD_USERSTREAMPROXY          "datastreams.settings-profile.method.user-stream-proxy"
 #define OPV_DATASTREAMS_METHOD_USEACCOUNTNETPROXY       "datastreams.settings-profile.method.use-account-network-proxy"
-#define OPV_DATASTREAMS_METHOD_NETWORKPROXY             "datastreams.settings-profile.method.network-proxy"
+#define OPV_DATASTREAMS_METHOD_USERNETWORKPROXY         "datastreams.settings-profile.method.user-network-proxy"
 
 // FileStreamsManager
 #define OPV_FILESTREAMS_DEFAULTDIR                      "filestreams.default-dir"
@@ -80,7 +78,6 @@
 #define OPV_FILETRANSFER_ROOT                           "filestreams.filetransfer"
 #define OPV_FILETRANSFER_AUTORECEIVE                    "filestreams.filetransfer.autoreceive"
 #define OPV_FILETRANSFER_HIDEONSTART                    "filestreams.filetransfer.hide-dialog-on-start"
-#define OPV_FILETRANSFER_REMOVEONFINISH                 "filestreams.filetransfer.remove-stream-on-finish"
 
 // MainWindow
 #define OPV_MAINWINDOW_SHOWONSTART                      "mainwindow.show-on-start"

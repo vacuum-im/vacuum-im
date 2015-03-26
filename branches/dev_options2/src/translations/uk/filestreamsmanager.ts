@@ -35,10 +35,6 @@
         <translation>Передачі файлів</translation>
     </message>
     <message>
-        <source>File Transfer</source>
-        <translation>Передача файлів</translation>
-    </message>
-    <message>
         <source>Allows to initiate a thread for transferring files between two XMPP entities</source>
         <translation>Дозволяє ініціювати потік для передачі файлів між двома XMPP-сутностями</translation>
     </message>
@@ -67,35 +63,31 @@
         <comment>Show file transfers</comment>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>File transfer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create separate folder for each sender</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default transfer method:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
-    <name>FileStreamsOptions</name>
+    <name>FileStreamsOptionsWidget</name>
     <message>
         <source>Select default directory</source>
-        <translation>Виберіть директорію за замовчуванням</translation>
+        <translation type="unfinished">Виберіть директорію за замовчуванням</translation>
     </message>
 </context>
 <context>
-    <name>FileStreamsOptionsClass</name>
+    <name>FileStreamsOptionsWidgetClass</name>
     <message>
-        <source>...</source>
-        <translation>...</translation>
-    </message>
-    <message>
-        <source>Default Downloads Directory:</source>
-        <translation>Директорія завантажень за замовчуванням:</translation>
-    </message>
-    <message>
-        <source>Default Data Stream:</source>
-        <translation>Потік даних за замовчуванням:</translation>
-    </message>
-    <message>
-        <source>Acceptable Data Streams</source>
-        <translation>Дозволені потоки даних</translation>
-    </message>
-    <message>
-        <source>Group downloads by sender</source>
-        <translation>Групувати завантаження за відправником</translation>
+        <source>Default directory:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

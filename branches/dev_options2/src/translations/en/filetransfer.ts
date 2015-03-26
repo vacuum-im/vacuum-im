@@ -60,18 +60,6 @@
         <translation>Supports the sending of the file to another contact</translation>
     </message>
     <message>
-        <source>Automatically receive files from contacts in roster</source>
-        <translation>Automatically receive files from contacts in roster</translation>
-    </message>
-    <message>
-        <source>Hide dialog after transfer started</source>
-        <translation>Hide dialog after transfer started</translation>
-    </message>
-    <message>
-        <source>Automatically remove finished transfers</source>
-        <translation>Automatically remove finished transfers</translation>
-    </message>
-    <message>
         <source>File &apos;%1&apos; successfully sent.</source>
         <translation>File &apos;%1&apos; successfully sent.</translation>
     </message>
@@ -98,6 +86,14 @@
     <message>
         <source>Ctrl+S</source>
         <comment>Send file</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically receive files from authorized contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide file transfer dialog after transfer started</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -251,12 +247,8 @@
         <translation>Status:</translation>
     </message>
     <message>
-        <source>Profile:</source>
-        <translation>Profile:</translation>
-    </message>
-    <message>
-        <source>Select data stream and settings profile</source>
-        <translation>Select data stream and settings profile</translation>
+        <source>Method:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

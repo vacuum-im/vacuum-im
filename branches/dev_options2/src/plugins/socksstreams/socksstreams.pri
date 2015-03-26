@@ -1,9 +1,9 @@
-FORMS = socksoptions.ui
+FORMS = socksoptionswidget.ui
 
-HEADERS = socksoptions.h \
-          socksstream.h \
-          socksstreams.h
+HEADERS = socksstream.h \
+          socksstreams.h \
+          socksoptionswidget.h
 
-SOURCES = socksoptions.cpp \
-          socksstream.cpp \
-          socksstreams.cpp
+SOURCES = socksstream.cpp \
+          socksstreams.cpp \
+          socksoptionswidget.cpp

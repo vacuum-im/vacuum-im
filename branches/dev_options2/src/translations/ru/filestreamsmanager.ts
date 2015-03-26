@@ -35,10 +35,6 @@
         <translation>Передачи файлов</translation>
     </message>
     <message>
-        <source>File Transfer</source>
-        <translation>Передача файлов</translation>
-    </message>
-    <message>
         <source>Allows to initiate a thread for transferring files between two XMPP entities</source>
         <translation>Позволяет инициировать поток для передачи файлов между двумя XMPP сущностями</translation>
     </message>
@@ -67,35 +63,31 @@
         <comment>Show file transfers</comment>
         <translation>Ctrl+T</translation>
     </message>
+    <message>
+        <source>File transfer</source>
+        <translation>Передача файлов</translation>
+    </message>
+    <message>
+        <source>Create separate folder for each sender</source>
+        <translation>Создавать отдельную папку для каждого отправителя</translation>
+    </message>
+    <message>
+        <source>Default transfer method:</source>
+        <translation>Метод передачи по умолчанию:</translation>
+    </message>
 </context>
 <context>
-    <name>FileStreamsOptions</name>
+    <name>FileStreamsOptionsWidget</name>
     <message>
         <source>Select default directory</source>
         <translation>Выберите директорию по умолчанию</translation>
     </message>
 </context>
 <context>
-    <name>FileStreamsOptionsClass</name>
+    <name>FileStreamsOptionsWidgetClass</name>
     <message>
-        <source>...</source>
-        <translation>...</translation>
-    </message>
-    <message>
-        <source>Default Downloads Directory:</source>
-        <translation>Директория загрузок по умолчанию:</translation>
-    </message>
-    <message>
-        <source>Default Data Stream:</source>
-        <translation>Поток данных по умолчанию:</translation>
-    </message>
-    <message>
-        <source>Acceptable Data Streams</source>
-        <translation>Разрешённые потоки данных</translation>
-    </message>
-    <message>
-        <source>Group downloads by sender</source>
-        <translation>Группировать загрузки по отправителю</translation>
+        <source>Default directory:</source>
+        <translation>Папка по умолчанию:</translation>
     </message>
 </context>
 <context>

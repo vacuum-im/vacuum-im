@@ -14,7 +14,6 @@ class OptionsDialogHeader :
 	Q_INTERFACES(IOptionsDialogWidget);
 public:
 	OptionsDialogHeader(const QString &ACaption, QWidget *AParent);
-	~OptionsDialogHeader();
 	virtual QWidget *instance() { return this; }
 public slots:
 	virtual void apply();

@@ -2,6 +2,7 @@
 
 #include <QSet>
 #include <QDir>
+#include <QComboBox>
 #include <QDesktopServices>
 #include <definitions/namespaces.h>
 #include <definitions/menuicons.h>
@@ -116,13 +117,11 @@ bool FileStreamsManager::initSettings()
 	QStringList availMethods = FDataManager!=NULL ? FDataManager->methods() : QStringList();
 	Options::setDefaultValue(OPV_FILESTREAMS_DEFAULTDIR,QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation));
 	Options::setDefaultValue(OPV_FILESTREAMS_GROUPBYSENDER,false);
-	Options::setDefaultValue(OPV_FILESTREAMS_DEFAULTMETHOD,availMethods.contains(NS_SOCKS5_BYTESTREAMS) ? QString(NS_SOCKS5_BYTESTREAMS) : QString::null);
+	Options::setDefaultValue(OPV_FILESTREAMS_DEFAULTMETHOD,NS_SOCKS5_BYTESTREAMS);
 	Options::setDefaultValue(OPV_FILESTREAMS_ACCEPTABLEMETHODS,availMethods);
 
 	if (FOptionsManager)
 	{
-		IOptionsDialogNode fileNode = { ONO_FILETRANSFER, OPN_FILETRANSFER, MNI_FILESTREAMSMANAGER, tr("File Transfer") };
-		FOptionsManager->insertOptionsDialogNode(fileNode);
 		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 	return true;
@@ -131,9 +130,22 @@ bool FileStreamsManager::initSettings()
 QMultiMap<int, IOptionsDialogWidget *> FileStreamsManager::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
-	if (FDataManager && ANodeId == OPN_FILETRANSFER)
+	if (FOptionsManager && ANodeId==OPN_DATATRANSFER)
 	{
-		widgets.insertMulti(OWO_FILESTREAMSMANAGER, new FileStreamsOptions(FDataManager, this, AParent));
+		widgets.insertMulti(OHO_DATATRANSFER_FILETRANSFER, FOptionsManager->newOptionsDialogHeader(tr("File transfer"),AParent));
+		widgets.insertMulti(OWO_DATATRANSFER_FILESTREAMS, new FileStreamsOptionsWidget(this,AParent));
+		widgets.insertMulti(OWO_DATATRANSFER_GROUPBYSENDER,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_FILESTREAMS_GROUPBYSENDER),tr("Create separate folder for each sender"),AParent));
+
+		if (FDataManager)
+		{
+			QComboBox *cmbDefaultMethod = new QComboBox(AParent);
+			foreach(const QString &methodId, FDataManager->methods())
+			{
+				IDataStreamMethod *method = FDataManager->method(methodId);
+				cmbDefaultMethod->addItem(method->methodName(), method->methodNS());
+			}
+			widgets.insertMulti(OWO_DATATRANSFER_DEFAULTMETHOD,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_FILESTREAMS_DEFAULTMETHOD),tr("Default transfer method:"),cmbDefaultMethod,AParent));
+		}
 	}
 	return widgets;
 }

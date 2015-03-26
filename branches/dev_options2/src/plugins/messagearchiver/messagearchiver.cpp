@@ -254,6 +254,8 @@ bool MessageArchiver::initObjects()
 	}
 	if (FOptionsManager)
 	{
+		IOptionsDialogNode dnode = { ONO_HISTORY, OPN_HISTORY, MNI_HISTORY, tr("History") };
+		FOptionsManager->insertOptionsDialogNode(dnode);
 		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 	return true;
@@ -454,21 +456,21 @@ QMultiMap<int, IOptionsDialogWidget *> MessageArchiver::optionsDialogWidgets(con
 			}
 		}
 	}
-	else if (ANodeId == OPN_MESSAGES)
+	else if (ANodeId == OPN_HISTORY)
 	{
 		int index = 0;
-		widgets.insertMulti(OHO_MESSAGES_HISORYENGINES, FOptionsManager->newOptionsDialogHeader(tr("Used history archives"),AParent));
+		widgets.insertMulti(OHO_HISORY_ENGINES, FOptionsManager->newOptionsDialogHeader(tr("Used history archives"),AParent));
 		foreach(IArchiveEngine *engine, archiveEngines())
 		{
 			OptionsNode node = Options::node(OPV_HISTORY_ENGINE_ITEM,engine->engineId().toString()).node("enabled");
-			widgets.insertMulti(OWO_MESSAGES_HISORYENGINE,FOptionsManager->newOptionsDialogWidget(node,engine->engineName(),AParent));
+			widgets.insertMulti(OWO_HISORY_ENGINE,FOptionsManager->newOptionsDialogWidget(node,engine->engineName(),AParent));
 
 			IOptionsDialogWidget *engineSettings = engine->engineSettingsWidget(AParent);
 			if (engineSettings)
 			{
-				widgets.insertMulti(OHO_MESSAGES_HISTORYENGINESETTINGS+index*10,FOptionsManager->newOptionsDialogHeader(engine->engineName(),AParent));
-				widgets.insertMulti(OWO_MESSAGES_HISTORYENGINESETTINGS+index,engineSettings);
-				index++;
+				widgets.insertMulti(OHO_HISTORY_ENGINNAME + index,FOptionsManager->newOptionsDialogHeader(engine->engineName(),AParent));
+				widgets.insertMulti(OWO_HISTORY_ENGINESETTINGS + index,engineSettings);
+				index += 10;
 			}
 		}
 	}

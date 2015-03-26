@@ -2,74 +2,26 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="en" sourcelanguage="en">
 <context>
-    <name>SocksOptionsClass</name>
+    <name>SocksOptionsWidgetClass</name>
     <message>
-        <source>Disable direct connections</source>
-        <translation>Disable direct connections</translation>
+        <source>Use jabber-proxy on your server</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Port Forwarding</source>
-        <translation>Port Forwarding</translation>
+        <source>Use additional jabber-proxy:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Host:</source>
-        <translation>Host:</translation>
+        <source>Allow direct incoming connections on port:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Port:</source>
-        <translation>Port:</translation>
+        <source>Forward direct incoming connections to host:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Stream Proxy</source>
-        <translation>Stream Proxy</translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation>Add</translation>
-    </message>
-    <message>
-        <source>Up</source>
-        <translation>Up</translation>
-    </message>
-    <message>
-        <source>Down</source>
-        <translation>Down</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>Delete</translation>
-    </message>
-    <message>
-        <source>Connection Proxy</source>
-        <translation>Connection Proxy</translation>
-    </message>
-    <message>
-        <source>Use account connection proxy settings</source>
-        <translation>Use account connection proxy settings</translation>
-    </message>
-    <message>
-        <source>Listening port:</source>
-        <translation>Listening port:</translation>
-    </message>
-    <message>
-        <source>Use proxy on account server</source>
-        <translation>Use proxy on account server</translation>
-    </message>
-    <message>
-        <source>Outgoing Connections</source>
-        <translation>Outgoing Connections</translation>
-    </message>
-    <message>
-        <source>Connect timeout:</source>
-        <translation>Connect timeout:</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation>seconds</translation>
-    </message>
-    <message>
-        <source>Incoming Connections</source>
-        <translation>Incoming Connections</translation>
+        <source>Use account proxy settings for outgoing connections</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -35,10 +35,6 @@
         <translation>File Transfers</translation>
     </message>
     <message>
-        <source>File Transfer</source>
-        <translation>File Transfer</translation>
-    </message>
-    <message>
         <source>Allows to initiate a thread for transferring files between two XMPP entities</source>
         <translation>Allows to initiate a thread for transferring files between two XMPP entities</translation>
     </message>
@@ -67,35 +63,31 @@
         <comment>Show file transfers</comment>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>File transfer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create separate folder for each sender</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default transfer method:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
-    <name>FileStreamsOptions</name>
+    <name>FileStreamsOptionsWidget</name>
     <message>
         <source>Select default directory</source>
-        <translation>Select default directory</translation>
+        <translation type="unfinished">Select default directory</translation>
     </message>
 </context>
 <context>
-    <name>FileStreamsOptionsClass</name>
+    <name>FileStreamsOptionsWidgetClass</name>
     <message>
-        <source>...</source>
-        <translation>...</translation>
-    </message>
-    <message>
-        <source>Default Downloads Directory:</source>
-        <translation>Default Downloads Directory:</translation>
-    </message>
-    <message>
-        <source>Default Data Stream:</source>
-        <translation>Default Data Stream:</translation>
-    </message>
-    <message>
-        <source>Acceptable Data Streams</source>
-        <translation>Acceptable Data Streams</translation>
-    </message>
-    <message>
-        <source>Group downloads by sender</source>
-        <translation>Group downloads by sender</translation>
+        <source>Default directory:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

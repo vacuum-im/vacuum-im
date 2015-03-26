@@ -76,10 +76,12 @@
 #define   OWO_MESSAGES_MUC_REJOINAFTERKICK        550
 #define   OWO_MESSAGES_MUC_REFERENUMERATION       560
 #define   OWO_MESSAGES_MUC_SHOWAUTOJOINED         570
-#define OHO_MESSAGES_HISORYENGINES                700
-#define   OWO_MESSAGES_HISORYENGINE               710
-#define OHO_MESSAGES_HISTORYENGINESETTINGS        900
-#define   OWO_MESSAGES_HISTORYENGINESETTINGS      910
+
+// ON_HISTORY
+#define OHO_HISORY_ENGINES                        300
+#define   OWO_HISORY_ENGINE                       310
+#define OHO_HISTORY_ENGINNAME                     500
+#define   OWO_HISTORY_ENGINESETTINGS              505
 
 //Node = ON_STATUSITEMS
 #define OHO_AUTOSTATUS                            100
@@ -105,6 +107,16 @@
 #define OHO_SHORTCUTS                             500
 #define   OWO_SHORTCUTS                           510
 
+//Node = ON_DATASTREAMS
+#define OHO_DATATRANSFER_FILETRANSFER             100
+#define   OWO_DATATRANSFER_FILESTREAMS            110
+#define   OWO_DATATRANSFER_GROUPBYSENDER          120
+#define   OWO_DATATRANSFER_AUTORECEIVE            130
+#define   OWO_DATATRANSFER_HIDEONSTART            140
+#define   OWO_DATATRANSFER_DEFAULTMETHOD          150
+#define OHO_DATATRANSFER_METHODNAME               500
+#define   OWO_DATATRANSFER_METHODSETTINGS         505
+
 
 
 //Node = ON_STATUSICONS
@@ -113,20 +125,7 @@
 //Node = ON_EMOTICANS
 #define OWO_EMOTICONS                             500
 
-//Node = ON_HISTORY
-#define OWO_HISTORY_ENGINES                       500
-
-//Node = ON_HISTORY::<AccountId>
-#define OWO_HISTORY_STREAM                        500
-
 //Node = ON_MESSAGE_STYLES
 #define OWO_MESSAGE_STYLES                        500
 
-//Node = ON_DATASTREAMS
-#define OWO_DATASTREAMS                           500
-
-//Node = ON_FILETRANSFER
-#define OWO_FILESTREAMSMANAGER                    500
-#define OWO_FILETRANSFER                          600
-
-#endif
+#endif // DEF_OPTIONWIDGETORDERS_H

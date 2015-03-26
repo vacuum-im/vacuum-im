@@ -8,11 +8,6 @@ OptionsDialogHeader::OptionsDialogHeader(const QString &ACaption, QWidget *APare
 	setText(QString("<h2>%1</h2>").arg(Qt::escape(ACaption)));
 }
 
-OptionsDialogHeader::~OptionsDialogHeader()
-{
-
-}
-
 void OptionsDialogHeader::apply()
 {
 	emit childApply();

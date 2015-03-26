@@ -10,7 +10,7 @@
 #include <interfaces/ioptionsmanager.h>
 #include "filestream.h"
 #include "filestreamswindow.h"
-#include "filestreamsoptions.h"
+#include "filestreamsoptionswidget.h"
 
 class FileStreamsManager :
 	public QObject,

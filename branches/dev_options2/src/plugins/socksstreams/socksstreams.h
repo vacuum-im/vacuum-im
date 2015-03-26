@@ -12,7 +12,7 @@
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/iconnectionmanager.h>
 #include "socksstream.h"
-#include "socksoptions.h"
+#include "socksoptionswidget.h"
 
 class SocksStreams :
 	public QObject,
@@ -37,10 +37,7 @@ public:
 	virtual QString methodName() const;
 	virtual QString methodDescription() const;
 	virtual IDataStreamSocket *dataStreamSocket(const QString &ASocketId, const Jid &AStreamJid, const Jid &AContactJid, IDataStreamSocket::StreamKind AKind, QObject *AParent=NULL);
-	virtual IOptionsDialogWidget *methodSettingsWidget(const OptionsNode &ANode, bool AReadOnly, QWidget *AParent);
-	virtual IOptionsDialogWidget *methodSettingsWidget(IDataStreamSocket *ASocket, bool AReadOnly, QWidget *AParent);
-	virtual void saveMethodSettings(IOptionsDialogWidget *AWidget, OptionsNode ANode = OptionsNode::null);
-	virtual void loadMethodSettings(IDataStreamSocket *ASocket, IOptionsDialogWidget *AWidget);
+	virtual IOptionsDialogWidget *methodSettingsWidget(const OptionsNode &ANode, QWidget *AParent);
 	virtual void loadMethodSettings(IDataStreamSocket *ASocket, const OptionsNode &ANode);
 	//ISocksStreams
 	virtual quint16 listeningPort() const;

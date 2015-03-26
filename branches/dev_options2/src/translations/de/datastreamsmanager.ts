@@ -28,10 +28,6 @@
         <translation>Datenstrom mit der selben ID existiert bereits</translation>
     </message>
     <message>
-        <source>Data Streams</source>
-        <translation>Datenströme</translation>
-    </message>
-    <message>
         <source>&lt;Default Profile&gt;</source>
         <translation>&lt;Standard Profil&gt;</translation>
     </message>
@@ -47,43 +43,13 @@
         <source>Invalid stream initiation response</source>
         <translation>Ungültige Antwort auf Datenstromanfrage</translation>
     </message>
-</context>
-<context>
-    <name>DataStreamsOptions</name>
     <message>
-        <source>Add Profile</source>
-        <translation>Profil hinzufügen</translation>
+        <source>Data Transfer</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enter profile name:</source>
-        <translation>Profilnamen eingeben:</translation>
-    </message>
-    <message>
-        <source>Delete Profile</source>
-        <translation>Profil löschen</translation>
-    </message>
-    <message>
-        <source>Do you really want to delete a current data streams profile?</source>
-        <translation>Wollen Sie wirklich ein aktuelles Datenstrom Profil löschen?</translation>
-    </message>
-</context>
-<context>
-    <name>DataStreamsOptionsClass</name>
-    <message>
-        <source>Data Streams Profiles</source>
-        <translation>Datenstromprofile</translation>
-    </message>
-    <message>
-        <source>Profile:</source>
-        <translation>Profil:</translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation>Hinzufügen</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>Löschen</translation>
+        <source>Transfer method %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

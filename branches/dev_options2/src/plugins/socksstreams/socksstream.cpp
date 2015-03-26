@@ -70,7 +70,7 @@ SocksStream::SocksStream(ISocksStreams *ASocksStreams, IStanzaProcessor *AStanza
 
 	FTcpSocket = NULL;
 	FConnectTimeout = 10000;
-	FDirectConnectDisabled = false;
+	FDirectEnabled = false;
 
 	FSHIHosts= -1;
 
@@ -359,31 +359,45 @@ void SocksStream::setConnectTimeout(int ATimeout)
 	}
 }
 
-bool SocksStream::isDirectConnectionsDisabled() const
+bool SocksStream::isDirectConnectionEnabled() const
 {
-	return FDirectConnectDisabled;
+	return FDirectEnabled;
 }
 
-void SocksStream::setDirectConnectionsDisabled(bool ADisable)
+void SocksStream::setDirectConnectionEnabled(bool AEnabled)
 {
-	if (FDirectConnectDisabled != ADisable)
+	if (FDirectEnabled != AEnabled)
 	{
-		FDirectConnectDisabled = ADisable;
+		FDirectEnabled = AEnabled;
 		emit propertiesChanged();
 	}
 }
 
-QString SocksStream::forwardHost() const
+bool SocksStream::isDerectConnectionForwardEnabled() const
+{
+	return FForwardEnabled;
+}
+
+void SocksStream::setDirectConnectionForwardEnabled( bool AEnabled )
+{
+	if (FForwardEnabled != AEnabled)
+	{
+		FForwardEnabled = AEnabled;
+		emit propertiesChanged();
+	}
+}
+
+QString SocksStream::directConnectionForwardHost() const
 {
 	return FForwardHost;
 }
 
-quint16 SocksStream::forwardPort() const
+quint16 SocksStream::directConnectionForwardPort() const
 {
 	return FForwardPort;
 }
 
-void SocksStream::setForwardAddress(const QString &AHost, quint16 APort)
+void SocksStream::setDirectConnectionForwardAddress(const QString &AHost, quint16 APort)
 {
 	if (FForwardHost!=AHost || FForwardPort!=APort)
 	{
@@ -407,12 +421,12 @@ void SocksStream::setNetworkProxy(const QNetworkProxy &AProxy)
 	}
 }
 
-QList<QString> SocksStream::proxyList() const
+QList<QString> SocksStream::streamProxyList() const
 {
 	return FProxyList;
 }
 
-void SocksStream::setProxyList(const QList<QString> &AProxyList)
+void SocksStream::setStreamProxyList(const QList<QString> &AProxyList)
 {
 	if (FProxyList != AProxyList)
 	{
@@ -729,9 +743,9 @@ bool SocksStream::sendAvailHosts()
 	queryElem.setAttribute("mode","tcp");
 	queryElem.setAttribute("dstaddr",FConnectKey);
 
-	if (!isDirectConnectionsDisabled() && FSocksStreams->appendLocalConnection(FConnectKey))
+	if (isDirectConnectionEnabled() && FSocksStreams->appendLocalConnection(FConnectKey))
 	{
-		if (!FForwardHost.isEmpty() && FForwardPort>0)
+		if (isDerectConnectionForwardEnabled())
 		{
 			HostInfo info;
 			info.jid = FStreamJid;
