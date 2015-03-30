@@ -40,7 +40,7 @@
     </message>
     <message>
         <source>Failed to start connection</source>
-        <translation>Ha ocurrido un error al iniciar la conexión</translation>
+        <translation>Error al iniciar la conexión</translation>
     </message>
 </context>
 </TS>

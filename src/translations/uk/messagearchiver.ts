@@ -271,7 +271,7 @@
     </message>
     <message>
         <source>Duplicate messages in local archive (not recommended)</source>
-        <translation type="unfinished"></translation>
+        <translation>Дублювати повідомлення в локальному архіві (не рекомендується)</translation>
     </message>
     <message>
         <source>Replication Preferences</source>
@@ -319,18 +319,6 @@
     <message>
         <source>Phrase was not found</source>
         <translation>Фраза не знайдена</translation>
-    </message>
-    <message>
-        <source>Do you want to remove conversation history with &lt;b&gt;%1&lt;/b&gt; for &lt;b&gt;%2 %3&lt;/b&gt;?</source>
-        <translation>Ви хочете видалити історію розмов з &lt;b&gt;%1&lt;/b&gt; за &lt;b&gt;%2 %3&lt;/b&gt;?</translation>
-    </message>
-    <message>
-        <source>Do you want to remove conversation with &lt;b&gt;%1&lt;/b&gt; started at &lt;b&gt;%2&lt;/b&gt;?</source>
-        <translation>Ви хочете видалити розмову з &lt;b&gt;%1&lt;/b&gt; розпочату о &lt;b&gt;%2&lt;/b&gt;?</translation>
-    </message>
-    <message>
-        <source>Do you want to remove &lt;b&gt;all&lt;/b&gt; conversation history with &lt;b&gt;%1&lt;/b&gt;?</source>
-        <translation>Ви хочете видалити &lt;b&gt;всю&lt;/b&gt; історію розмов з &lt;b&gt;%1&lt;/b&gt;?</translation>
     </message>
     <message>
         <source>Remove conversation history</source>
@@ -398,7 +386,7 @@
     </message>
     <message>
         <source>Remove History for %1</source>
-        <translation type="unfinished">Видалити історію за %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>&lt;b&gt;%1&lt;/b&gt; with %2 in %3</source>
@@ -434,6 +422,66 @@
     </message>
     <message>
         <source>Shown %1 of %2 conversations...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>with &lt;b&gt;%1&lt;/b&gt; for &lt;b&gt;%2 %3&lt;/b&gt;?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>with &lt;b&gt;%1&lt;/b&gt; started at &lt;b&gt;%2&lt;/b&gt;?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>with &lt;b&gt;%1&lt;/b&gt; for all time?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>And %n other conversations</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Do you want to remove the following conversations?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Selected Conversations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Print Conversation History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HTML file (*.html)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Text file (*.txt)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Conversations to File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Print...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save as HTML</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save as Text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

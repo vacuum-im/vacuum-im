@@ -77,7 +77,7 @@
     </message>
     <message>
         <source>Failed to remove profile</source>
-        <translation>Ha ocurrido un error al eliminar el perfil</translation>
+        <translation>Error al eliminar el perfil</translation>
     </message>
 </context>
 <context>

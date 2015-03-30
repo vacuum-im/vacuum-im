@@ -1,7 +1,6 @@
 #include "rosterindex.h"
 
 #include <definitions/rosterindexroles.h>
-
 #include "rostersmodel.h"
 
 RosterIndex::RosterIndex(int AKind, RostersModel *AModel)
@@ -14,7 +13,11 @@ RosterIndex::RosterIndex(int AKind, RostersModel *AModel)
 
 RosterIndex::~RosterIndex()
 {
-	FModel->emitIndexDestroyed(this);
+	if (!FModel.isNull())
+	{
+		removeChildren();
+		FModel->emitIndexDestroyed(this);
+	}
 }
 
 int RosterIndex::type() const

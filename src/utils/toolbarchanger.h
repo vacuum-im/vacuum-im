@@ -20,6 +20,8 @@ public:
 	ToolBarChanger(QToolBar *AToolBar);
 	~ToolBarChanger();
 	bool isEmpty() const;
+	bool isMinimizeWidth() const;
+	void setMinimizeWidth(bool AMinimize);
 	bool separatorsVisible() const;
 	void setSeparatorsVisible(bool ASeparatorsVisible);
 	bool autoHideEmptyToolbar() const;
@@ -40,15 +42,18 @@ signals:
 	void itemRemoved(QAction *AHandle);
 	void toolBarChangerDestroyed(ToolBarChanger *AToolBarChanger);
 protected:
-	void updateVisible();
+	bool eventFilter(QObject *AWatched, QEvent *AEvent);
+protected:
 	void updateSeparatorVisible();
 	QAction *findGroupSeparator(int AGroup) const;
 	void insertGroupSeparator(int AGroup, QAction *ABefore);
 	void removeGroupSeparator(int AGroup);
 protected slots:
+	void onUpdateVisibilityAndWidth();
 	void onWidgetDestroyed(QObject *AObject);
 private:
 	QToolBar *FToolBar;
+	bool FMinimizeWidth;
 	bool FAutoHideIfEmpty;
 	bool FSeparatorsVisible;
 	QAction *FAllignChange;

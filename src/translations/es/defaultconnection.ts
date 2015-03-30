@@ -21,19 +21,19 @@
     </message>
     <message>
         <source>Auto Select</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleccionar automáticamente</translation>
     </message>
     <message>
         <source>SSLv3</source>
-        <translation type="unfinished"></translation>
+        <translation>TLSv1</translation>
     </message>
     <message>
         <source>SSLv2</source>
-        <translation type="unfinished"></translation>
+        <translation>SSLv3</translation>
     </message>
     <message>
         <source>TLSv1.0</source>
-        <translation type="unfinished"></translation>
+        <translation>SSLv2</translation>
     </message>
     <message>
         <source>TLSv1.1</source>
@@ -64,7 +64,7 @@
     </message>
     <message>
         <source>SSL Protocol:</source>
-        <translation type="unfinished"></translation>
+        <translation>Protocolo SSL:</translation>
     </message>
 </context>
 <context>

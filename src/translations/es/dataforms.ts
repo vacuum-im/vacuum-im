@@ -56,15 +56,15 @@
     </message>
     <message>
         <source>Supports the processing and displaying of the forms with the data</source>
-        <translation>Respalda el procesamiento y la visualización de formularios con datos</translation>
+        <translation>Soporta el procesamiento y la visualización de formularios con datos</translation>
     </message>
     <message>
         <source>Supports the validating of the data entered in the form</source>
-        <translation>Respalda la validación de los datos insertados en el formulario</translation>
+        <translation>Soporta la validación de los datos insertados en el formulario</translation>
     </message>
     <message>
         <source>Supports the layouting of the form, including the layout of form fields, pages and sections</source>
-        <translation>Respalda el formateo de formularios, incluyendo la ubicación de los campos, páginas y secciones</translation>
+        <translation>Soporta el formateo de formularios, incluyendo la ubicación de los campos, páginas y secciones</translation>
     </message>
     <message>
         <source>Unsupported media type</source>

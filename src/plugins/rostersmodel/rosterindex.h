@@ -1,6 +1,7 @@
 #ifndef ROSTERINDEX_H
 #define ROSTERINDEX_H
 
+#include <QPointer>
 #include <interfaces/irostersmodel.h>
 
 class RostersModel;
@@ -34,7 +35,7 @@ public:
 	virtual QList<IRosterIndex *> findChilds(const QMultiMap<int, QVariant> &AFindData, bool ARecursive = false) const;
 private:
 	int FKind;
-	RostersModel *FModel;
+	QPointer<RostersModel> FModel;
 };
 
 #endif // ROSTERINDEX_H

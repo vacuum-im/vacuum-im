@@ -36,8 +36,10 @@ EditWidget::EditWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow
 	toolBar->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
 
 	FEditToolBar = new ToolBarChanger(toolBar);
+	FEditToolBar->setMinimizeWidth(true);
 	FEditToolBar->setSeparatorsVisible(false);
-	FEditToolBar->toolBar()->installEventFilter(this);
+	connect(FEditToolBar,SIGNAL(itemRemoved(QAction *)),SLOT(onUpdateEditToolBarVisibility()));
+	connect(FEditToolBar,SIGNAL(itemInserted(QAction *, QAction *, Action *, QWidget *, int)),SLOT(onUpdateEditToolBarVisibility()));
 
 	ui.wdtSendToolBar->setLayout(new QHBoxLayout);
 	ui.wdtSendToolBar->layout()->setMargin(0);
@@ -67,6 +69,8 @@ EditWidget::EditWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow
 
 	connect(Shortcuts::instance(),SIGNAL(shortcutUpdated(const QString &)),SLOT(onShortcutUpdated(const QString &)));
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
+
+	onUpdateEditToolBarVisibility();
 }
 
 EditWidget::~EditWidget()
@@ -280,14 +284,6 @@ bool EditWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
 			hooked = true;
 		}
 	}
-	else if (AWatched == FEditToolBar->toolBar())
-	{
-		static const QList<QEvent::Type> updateEventTypes = QList<QEvent::Type>() 
-			<< QEvent::LayoutRequest << QEvent::ChildAdded << QEvent::ChildRemoved << QEvent::Show;
-
-		if (updateEventTypes.contains(AEvent->type()))
-			QTimer::singleShot(0,this,SLOT(onUpdateEditToolBarMaxWidth()));
-	}
 	return hooked || QWidget::eventFilter(AWatched,AEvent);
 }
 
@@ -335,20 +331,9 @@ void EditWidget::showPrevBufferedMessage()
 	}
 }
 
-void EditWidget::onUpdateEditToolBarMaxWidth()
+void EditWidget::onUpdateEditToolBarVisibility()
 {
-	int widgetWidth = 0;
-	int visibleItemsCount = 0;
-	for (int itemIndex=0; itemIndex<FEditToolBar->toolBar()->layout()->count(); itemIndex++)
-	{
-		QWidget *widget = FEditToolBar->toolBar()->layout()->itemAt(itemIndex)->widget();
-		if (widget && widget->isVisible())
-		{
-			visibleItemsCount++;
-			widgetWidth = widget->sizeHint().width();
-		}
-	}
-	FEditToolBar->toolBar()->setMaximumWidth(visibleItemsCount==1 ? widgetWidth : QWIDGETSIZE_MAX);
+	ui.wdtSendToolBar->setVisible(!FEditToolBar->isEmpty());
 }
 
 void EditWidget::onSendActionTriggered(bool)

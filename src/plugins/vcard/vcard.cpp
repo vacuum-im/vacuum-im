@@ -170,7 +170,7 @@ bool VCard::update(const Jid &AStreamJid)
 bool VCard::publish(const Jid &AStreamJid)
 {
 	if (isValid() && AStreamJid.isValid())
-		return FVCardPlugin->publishVCard(this,AStreamJid);
+		return FVCardPlugin->publishVCard(AStreamJid,this);
 	return false;
 }
 

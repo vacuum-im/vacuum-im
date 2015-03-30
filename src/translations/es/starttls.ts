@@ -21,7 +21,7 @@
     </message>
     <message>
         <source>Failed to begin StartTLS handshake</source>
-        <translation>Ha ocurrido un error al iniciar la comunicación StartTLS</translation>
+        <translation>Error al iniciar la comunicación StartTLS</translation>
     </message>
 </context>
 </TS>

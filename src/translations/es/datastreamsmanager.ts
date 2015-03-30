@@ -41,7 +41,7 @@
     </message>
     <message>
         <source>Supports the initiating of the custom stream of data between two XMPP entities</source>
-        <translation>Respalda la iniciación de flujos de dato personalizados entre dos entidades XMPP</translation>
+        <translation>Soporta la iniciación de flujos de dato personalizados entre dos entidades XMPP</translation>
     </message>
     <message>
         <source>Invalid stream initiation response</source>

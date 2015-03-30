@@ -16,47 +16,47 @@
     <name>XmppSaslError</name>
     <message>
         <source>Authorization aborted</source>
-        <translation type="unfinished"></translation>
+        <translation>Авторизація відмінена</translation>
     </message>
     <message>
         <source>Account disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Акаунт відключено</translation>
     </message>
     <message>
         <source>Credentials expired</source>
-        <translation type="unfinished"></translation>
+        <translation>Закінчився термін повноважень</translation>
     </message>
     <message>
         <source>Encryption required</source>
-        <translation type="unfinished"></translation>
+        <translation>Потребує шифрування</translation>
     </message>
     <message>
         <source>Incorrect encoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Невірне кодування</translation>
     </message>
     <message>
         <source>Invalid authorization id</source>
-        <translation type="unfinished"></translation>
+        <translation>Невірний id авторизації</translation>
     </message>
     <message>
         <source>Invalid mechanism</source>
-        <translation type="unfinished"></translation>
+        <translation>Невірний механізм</translation>
     </message>
     <message>
         <source>Malformed request</source>
-        <translation type="unfinished"></translation>
+        <translation>Некоректний запит</translation>
     </message>
     <message>
         <source>Mechanism is too weak</source>
-        <translation type="unfinished"></translation>
+        <translation>Механізм занадто слабкий</translation>
     </message>
     <message>
         <source>Not authorized</source>
-        <translation type="unfinished">Не пройдена авторизація</translation>
+        <translation>Не пройдено авторизацію</translation>
     </message>
     <message>
         <source>Temporary authentication failure</source>
-        <translation type="unfinished"></translation>
+        <translation>Тимчасовий збій авторизації</translation>
     </message>
 </context>
 <context>

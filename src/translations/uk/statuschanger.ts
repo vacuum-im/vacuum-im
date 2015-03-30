@@ -210,7 +210,7 @@ You can set status class for additional statuses defined by you.</source>
     </message>
     <message>
         <source>Left %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Вийшов з %1</translation>
     </message>
 </context>
 </TS>

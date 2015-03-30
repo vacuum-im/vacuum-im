@@ -11,7 +11,7 @@ class VCardDialog :
 {
 	Q_OBJECT;
 public:
-	VCardDialog(IVCardPlugin *AVCardPlugin,const Jid &AStreamJid, const Jid &AContactJid);
+	VCardDialog(IVCardPlugin *AVCardPlugin,const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent);
 	~VCardDialog();
 	Jid streamJid() const;
 	Jid contactJid() const;

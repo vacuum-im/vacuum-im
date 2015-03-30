@@ -119,18 +119,19 @@ bool CaptchaForms::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 		}
 		else
 		{
-			QString cid = findChallenge(AStreamJid, FDataForms->fieldValue("from",form.fields).toString());
+			QString cid = findChallenge(AStreamJid, AStanza.from());
 			if (cid.isEmpty())
 			{
 				LOG_STRM_INFO(AStreamJid,QString("Received new challenge from=%1, id=%2").arg(AStanza.from(),AStanza.id()));
 				ChallengeItem &item = FChallenges[AStanza.id()];
 				item.streamJid = AStreamJid;
 				item.challenger = AStanza.from();
+				item.challengeId = AStanza.id();
 				item.dialog = FDataForms->dialogWidget(FDataForms->localizeForm(form), NULL);
 				item.dialog->setAllowInvalid(false);
 				item.dialog->instance()->installEventFilter(this);
 				IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(item.dialog->instance(),MNI_CAPTCHAFORMS,0,0,"windowIcon");
-				item.dialog->instance()->setWindowTitle(tr("CAPTCHA Challenge - %1").arg(FDataForms->fieldValue("from",form.fields).toString()));
+				item.dialog->instance()->setWindowTitle(tr("CAPTCHA Challenge - %1").arg(AStanza.from()));
 				connect(item.dialog->instance(),SIGNAL(accepted()),SLOT(onChallengeDialogAccepted()));
 				connect(item.dialog->instance(),SIGNAL(rejected()),SLOT(onChallengeDialogRejected()));
 				notifyChallenge(item);
@@ -300,14 +301,19 @@ bool CaptchaForms::isValidChallenge(const Jid &AStreamJid, const Stanza &AStanza
 			formElem = formElem.nextSiblingElement("x");
 		AForm = FDataForms->dataForm(formElem);
 
-		Jid fromAttr = AStanza.from();
-		Jid fromField = FDataForms->fieldValue("from",AForm.fields).toString();
-		if (!(fromAttr && fromField) && (fromAttr.pBare()!=fromField.pDomain()))
+		if (AStanza.id().isEmpty())
 			return false;
 		if (FDataForms->fieldValue("FORM_TYPE",AForm.fields).toString() != NS_CAPTCHA_FORMS)
 			return false;
-		if (AStanza.id().isEmpty() || AStanza.id()!=FDataForms->fieldValue("challenge",AForm.fields).toString())
+		
+		/* This checks removed due to capability issues with entities that does not follow XEP
+		Jid fromAttr = AStanza.from();
+		Jid fromField = FDataForms->fieldValue("from",AForm.fields).toString();
+		if (fromAttr.pBare()!=fromField.pBare() && fromAttr.pBare()!=fromField.pDomain())
 			return false;
+		if (AStanza.id()!=FDataForms->fieldValue("challenge",AForm.fields).toString())
+			return false;
+		*/
 
 		return true;
 	}
@@ -322,17 +328,16 @@ void CaptchaForms::notifyChallenge(const ChallengeItem &AChallenge)
 		notify.kinds = FNotifications->enabledTypeNotificationKinds(NNT_CAPTCHA_REQUEST);
 		if (notify.kinds > 0)
 		{
-			Jid contactJid = FDataForms->fieldValue("from", AChallenge.dialog->formWidget()->dataForm().fields).toString();
 			notify.typeId = NNT_CAPTCHA_REQUEST;
 			notify.data.insert(NDR_ICON,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CAPTCHAFORMS));
-			notify.data.insert(NDR_POPUP_TITLE,FNotifications->contactName(AChallenge.streamJid,contactJid));
-			notify.data.insert(NDR_POPUP_IMAGE,FNotifications->contactAvatar(contactJid));
+			notify.data.insert(NDR_POPUP_TITLE,FNotifications->contactName(AChallenge.streamJid,AChallenge.challenger));
+			notify.data.insert(NDR_POPUP_IMAGE,FNotifications->contactAvatar(AChallenge.challenger));
 			notify.data.insert(NDR_POPUP_CAPTION, tr("CAPTCHA Challenge"));
 			notify.data.insert(NDR_POPUP_TEXT,tr("You have received the CAPTCHA challenge"));
 			notify.data.insert(NDR_SOUND_FILE,SDF_CAPTCHAFORMS_REQUEST);
 			notify.data.insert(NDR_ALERT_WIDGET,(qint64)AChallenge.dialog->instance());
 			notify.data.insert(NDR_SHOWMINIMIZED_WIDGET,(qint64)AChallenge.dialog->instance());
-			FChallengeNotify.insert(FNotifications->appendNotification(notify),FDataForms->fieldValue("challenge", AChallenge.dialog->formWidget()->dataForm().fields).toString());
+			FChallengeNotify.insert(FNotifications->appendNotification(notify),AChallenge.challengeId);
 			return;
 		}
 	}
@@ -358,7 +363,7 @@ QString CaptchaForms::findChallenge(const Jid &AStreamJid, const Jid &AContactJi
 		QMap<QString, ChallengeItem>::const_iterator it = FChallenges.constBegin();
 		while (it != FChallenges.constEnd())
 		{
-			if (AStreamJid==it->streamJid && AContactJid==FDataForms->fieldValue("from",it->dialog->formWidget()->dataForm().fields).toString())
+			if (AStreamJid==it->streamJid && AContactJid==it->challenger)
 				return it.key();
 			++it;
 		}

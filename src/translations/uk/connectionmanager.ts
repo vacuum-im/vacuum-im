@@ -25,51 +25,51 @@
     </message>
     <message>
         <source>Name: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ім&apos;я: %1</translation>
     </message>
     <message>
         <source>Organization: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Організація: %1</translation>
     </message>
     <message>
         <source>Subunit: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Підрозділ: %1</translation>
     </message>
     <message>
         <source>Country: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Країна: %1</translation>
     </message>
     <message>
         <source>Locality: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Положення: %1</translation>
     </message>
     <message>
         <source>State/Province: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Штат/Провінція: %1</translation>
     </message>
     <message>
         <source>&lt;b&gt;Certificate holder:&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Сертифікат видано:&lt;/b&gt;</translation>
     </message>
     <message>
         <source>&lt;b&gt;Certificate issuer:&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Сертифікат випущено:&lt;/b&gt;</translation>
     </message>
     <message>
         <source>&lt;b&gt;Certificate details:&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Відомості про сертифікат:&lt;/b&gt;</translation>
     </message>
     <message>
         <source>Effective from: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Дійсний з: %1</translation>
     </message>
     <message>
         <source>Expired at: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Дійсний до: %1</translation>
     </message>
     <message>
         <source>Serial number: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Серійний номер: %1</translation>
     </message>
 </context>
 <context>

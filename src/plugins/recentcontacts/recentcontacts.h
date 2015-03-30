@@ -105,10 +105,10 @@ protected:
 	bool saveItemsToStorage(const Jid &AStreamJid) const;
 protected:
 	QString recentFileName(const Jid &AStreamJid) const;
-	QList<IRecentItem> loadItemsFromXML(const QDomElement &AElement) const;
-	void saveItemsToXML(QDomElement &AElement, const QList<IRecentItem> &AItems) const;
 	QList<IRecentItem> loadItemsFromFile(const QString &AFileName) const;
 	void saveItemsToFile(const QString &AFileName, const QList<IRecentItem> &AItems) const;
+	QList<IRecentItem> loadItemsFromXML(const QDomElement &AElement, bool APlainPassword) const;
+	void saveItemsToXML(QDomElement &AElement, const QList<IRecentItem> &AItems, bool APlainPassword) const;
 protected:
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 	bool isRecentSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;

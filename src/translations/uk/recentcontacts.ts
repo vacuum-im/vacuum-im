@@ -57,7 +57,7 @@
     </message>
     <message>
         <source>&lt;b&gt;Account:&lt;/b&gt; %1</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Акаунт:&lt;/b&gt; %1</translation>
     </message>
 </context>
 </TS>

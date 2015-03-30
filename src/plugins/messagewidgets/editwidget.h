@@ -58,7 +58,7 @@ protected:
 	void showNextBufferedMessage();
 	void showPrevBufferedMessage();
 protected slots:
-	void onUpdateEditToolBarMaxWidth();
+	void onUpdateEditToolBarVisibility();
 	void onSendActionTriggered(bool);
 	void onShortcutUpdated(const QString &AId);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);

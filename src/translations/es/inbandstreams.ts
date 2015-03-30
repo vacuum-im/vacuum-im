@@ -47,7 +47,7 @@
     </message>
     <message>
         <source>Supports the initiating of the in-band stream of data between two XMPP entities</source>
-        <translation>Respalda la iniciación de flujo de datos por el canal de comunicación entre dos entidades XMPP</translation>
+        <translation>Soporta la iniciación de un flujo de datos por el canal de comunicación entre dos entidades XMPP</translation>
     </message>
     <message>
         <source>Stream destroyed</source>
