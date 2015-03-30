@@ -34,8 +34,10 @@ InfoWidget::InfoWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow
 	toolBar->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
 
 	FInfoToolBar = new ToolBarChanger(toolBar);
+	FInfoToolBar->setMinimizeWidth(true);
 	FInfoToolBar->setSeparatorsVisible(false);
-	toolBar->installEventFilter(this);
+	connect(FInfoToolBar,SIGNAL(itemRemoved(QAction *)),SLOT(onUpdateInfoToolBarVisibility()));
+	connect(FInfoToolBar,SIGNAL(itemInserted(QAction *, QAction *, Action *, QWidget *, int)),SLOT(onUpdateInfoToolBarVisibility()));
 
 	ui.wdtInfoToolBar->setLayout(new QHBoxLayout);
 	ui.wdtInfoToolBar->layout()->setMargin(0);
@@ -45,6 +47,7 @@ InfoWidget::InfoWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow
 	connect(FAddressMenu,SIGNAL(aboutToShow()),SLOT(onAddressMenuAboutToShow()));
 
 	initialize();
+	onUpdateInfoToolBarVisibility();
 }
 
 InfoWidget::~InfoWidget()
@@ -270,38 +273,13 @@ void InfoWidget::contextMenuEvent(QContextMenuEvent *AEvent)
 		delete menu;
 }
 
-bool InfoWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
-{
-	if (AWatched == FInfoToolBar->toolBar())
-	{
-		static const QList<QEvent::Type> updateEventTypes = QList<QEvent::Type>() 
-			<< QEvent::LayoutRequest << QEvent::ChildAdded << QEvent::ChildRemoved << QEvent::Show;
-
-		if (updateEventTypes.contains(AEvent->type()))
-			QTimer::singleShot(0,this,SLOT(onUpdateInfoToolBarMaxWidth()));
-	}
-	return QWidget::eventFilter(AWatched,AEvent);
-}
-
 void InfoWidget::onAddressMenuAboutToShow()
 {
 	FAddressMenu->clear();
 	emit addressMenuRequested(FAddressMenu);
 }
 
-void InfoWidget::onUpdateInfoToolBarMaxWidth()
+void InfoWidget::onUpdateInfoToolBarVisibility()
 {
-	int widgetWidth = 0;
-	int visibleItemsCount = 0;
 	ui.wdtInfoToolBar->setVisible(!FInfoToolBar->isEmpty());
-	for (int itemIndex=0; visibleItemsCount<2 && itemIndex<FInfoToolBar->toolBar()->layout()->count(); itemIndex++)
-	{
-		QWidget *widget = FInfoToolBar->toolBar()->layout()->itemAt(itemIndex)->widget();
-		if (widget && widget->isVisible())
-		{
-			visibleItemsCount++;
-			widgetWidth = widget->sizeHint().width();
-		}
-	}
-	FInfoToolBar->toolBar()->setMaximumWidth(visibleItemsCount==1 ? widgetWidth : QWIDGETSIZE_MAX);
 }

@@ -13,7 +13,7 @@
     </message>
     <message>
         <source>Roster request failed</source>
-        <translation>Ha ocurrido un error al consultar la lista de contactos</translation>
+        <translation>Error al consultar la lista de contactos</translation>
     </message>
 </context>
 </TS>

@@ -110,20 +110,28 @@ void DatabaseTaskOpenDatabase::run()
 			db.setDatabaseName(FDatabasePath);
 
 			if (!db.isValid())
+			{
 				FError = XmppError(IERR_FILEARCHIVE_DATABASE_NOT_CREATED,db.lastError().driverText());
+				Logger::reportError("DatabaseTaskOpenDatabase",QString("Failed to create file archive database: %1").arg(db.lastError().driverText()),false);
+			}
 			else if (!db.open())
+			{
 				FError = XmppError(IERR_FILEARCHIVE_DATABASE_NOT_OPENED,db.lastError().driverText());
+				Logger::reportError("DatabaseTaskOpenDatabase",QString("Failed to open file archive database: %1").arg(db.lastError().driverText()),false);
+			}
 			else if (!initializeDatabase(db))
+			{
 				db.close();
+				Logger::reportError("DatabaseTaskOpenDatabase",QString("Failed to initialize file archive database: %1").arg(FError.condition()),false);
+			}
 			else
+			{
 				initialized = true;
+			}
 		}
 
 		if (!initialized)
-		{
 			QSqlDatabase::removeDatabase(connection);
-			Logger::reportError("DatabaseTaskOpenDatabase",QString("Failed to initialize database: %1").arg(FError.condition()),false);
-		}
 	}
 }
 

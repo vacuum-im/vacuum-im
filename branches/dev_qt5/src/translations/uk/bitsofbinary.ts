@@ -21,11 +21,11 @@
     </message>
     <message>
         <source>Failed to load data</source>
-        <translation type="unfinished"></translation>
+        <translation>Не вдалося завантажити дані</translation>
     </message>
     <message>
         <source>Failed to save data</source>
-        <translation type="unfinished"></translation>
+        <translation>Не вдалося зберегти дані</translation>
     </message>
 </context>
 </TS>

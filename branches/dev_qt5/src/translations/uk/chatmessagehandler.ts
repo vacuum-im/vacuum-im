@@ -70,7 +70,7 @@
     </message>
     <message>
         <source>When receiving new chat message in current chat window</source>
-        <translation type="unfinished"></translation>
+        <translation>При отриманні нового повідомлення в активне вікно чату</translation>
     </message>
 </context>
 </TS>

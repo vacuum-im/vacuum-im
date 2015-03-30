@@ -21,7 +21,7 @@
     </message>
     <message>
         <source>Failed to begin StartTLS handshake</source>
-        <translation type="unfinished"></translation>
+        <translation>Не вдалося запустити ініціалізацію StartTLS</translation>
     </message>
 </context>
 </TS>

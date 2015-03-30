@@ -624,11 +624,11 @@ Werte überprüfen und neu probieren</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Do not Request CAPTCHA for Followed Jabber ID</source>
+        <source>Make this Room CAPTCHA Protected?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Make this Room CAPTCHA Protected?</source>
+        <source>Do not Request CAPTCHA for Followed Jabber ID</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
