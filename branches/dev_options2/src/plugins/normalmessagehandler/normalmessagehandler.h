@@ -81,7 +81,7 @@ protected:
 	void removeNotifiedMessages(IMessageNormalWindow *AWindow, int AMessageId = -1);
 protected:
 	void setMessageStyle(IMessageNormalWindow *AWindow);
-	void fillContentOptions(IMessageNormalWindow *AWindow, IMessageContentOptions &AOptions) const;
+	void fillContentOptions(IMessageNormalWindow *AWindow, IMessageStyleContentOptions &AOptions) const;
 	void showStyledMessage(IMessageNormalWindow *AWindow, const Message &AMessage);
 protected:
 	bool isAnyPresenceOpened(const QStringList &AStreams) const;
@@ -118,7 +118,7 @@ private:
 	IAvatars *FAvatars;
 	IMessageWidgets *FMessageWidgets;
 	IMessageProcessor *FMessageProcessor;
-	IMessageStyles *FMessageStyles;
+	IMessageStyleManager *FMessageStyleManager;
 	IStatusIcons *FStatusIcons;
 	INotifications *FNotifications;
 	IPresencePlugin *FPresencePlugin;

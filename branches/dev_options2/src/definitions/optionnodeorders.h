@@ -10,11 +10,11 @@
 #define ONO_STATUSITEMS           500
 #define ONO_NOTIFICATIONS         600
 #define ONO_SHORTCUTS             700
-#define ONO_DATATRANSFER           800
+#define ONO_DATATRANSFER          800
+#define ONO_APPEARANCE            900
 
 
 #define ONO_STATUSICONS           900
-#define ONO_MESSAGE_STYLES        1350
 #define ONO_EMOTICONS             1600
 
 // ONO_ACCOUNTS

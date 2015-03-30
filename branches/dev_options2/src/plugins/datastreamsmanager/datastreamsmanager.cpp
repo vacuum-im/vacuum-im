@@ -125,8 +125,8 @@ bool DataStreamsManger::initSettings()
 
 	if (FOptionsManager)
 	{
-		IOptionsDialogNode dnode = { ONO_DATATRANSFER, OPN_DATATRANSFER, MNI_DATASTREAMSMANAGER, tr("Data Transfer") };
-		FOptionsManager->insertOptionsDialogNode(dnode);
+		IOptionsDialogNode dataNode = { ONO_DATATRANSFER, OPN_DATATRANSFER, MNI_DATASTREAMSMANAGER, tr("Data Transfer") };
+		FOptionsManager->insertOptionsDialogNode(dataNode);
 		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 	return true;

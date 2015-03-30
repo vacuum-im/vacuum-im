@@ -198,5 +198,9 @@
         <source>Common</source>
         <translation>Общие</translation>
     </message>
+    <message>
+        <source>Appearance</source>
+        <translation>Оформление</translation>
+    </message>
 </context>
 </TS>

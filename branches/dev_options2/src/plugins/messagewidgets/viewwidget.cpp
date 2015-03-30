@@ -67,8 +67,8 @@ void ViewWidget::setMessageStyle(IMessageStyle *AStyle, const IMessageStyleOptio
 				this,SLOT(onMessageStyleUrlClicked(QWidget *, const QUrl &)));
 			disconnect(FStyleWidget,SIGNAL(customContextMenuRequested(const QPoint &)),
 				this,SLOT(onMessageStyleWidgetCustomContextMenuRequested(const QPoint &)));
-			disconnect(FMessageStyle->instance(),SIGNAL(contentAppended(QWidget *, const QString &, const IMessageContentOptions &)),
-				this, SLOT(onMessageStyleContentAppended(QWidget *, const QString &, const IMessageContentOptions &)));
+			disconnect(FMessageStyle->instance(),SIGNAL(contentAppended(QWidget *, const QString &, const IMessageStyleContentOptions &)),
+				this, SLOT(onMessageStyleContentAppended(QWidget *, const QString &, const IMessageStyleContentOptions &)));
 			disconnect(FMessageStyle->instance(),SIGNAL(optionsChanged(QWidget *, const IMessageStyleOptions &, bool)),
 				this,SLOT(onMessageStyleOptionsChanged(QWidget *, const IMessageStyleOptions &, bool)));
 
@@ -90,8 +90,8 @@ void ViewWidget::setMessageStyle(IMessageStyle *AStyle, const IMessageStyleOptio
 				SLOT(onMessageStyleUrlClicked(QWidget *, const QUrl &)));
 			connect(FStyleWidget,SIGNAL(customContextMenuRequested(const QPoint &)),
 				SLOT(onMessageStyleWidgetCustomContextMenuRequested(const QPoint &)));
-			connect(FMessageStyle->instance(),SIGNAL(contentAppended(QWidget *, const QString &, const IMessageContentOptions &)),
-				SLOT(onMessageStyleContentAppended(QWidget *, const QString &, const IMessageContentOptions &)));
+			connect(FMessageStyle->instance(),SIGNAL(contentAppended(QWidget *, const QString &, const IMessageStyleContentOptions &)),
+				SLOT(onMessageStyleContentAppended(QWidget *, const QString &, const IMessageStyleContentOptions &)));
 			connect(FMessageStyle->instance(),SIGNAL(optionsChanged(QWidget *, const IMessageStyleOptions &, bool)),
 				SLOT(onMessageStyleOptionsChanged(QWidget *, const IMessageStyleOptions &, bool)));
 		}
@@ -101,20 +101,20 @@ void ViewWidget::setMessageStyle(IMessageStyle *AStyle, const IMessageStyleOptio
 	}
 }
 
-void ViewWidget::appendHtml(const QString &AHtml, const IMessageContentOptions &AOptions)
+void ViewWidget::appendHtml(const QString &AHtml, const IMessageStyleContentOptions &AOptions)
 {
 	if (FMessageStyle)
 		FMessageStyle->appendContent(FStyleWidget,AHtml,AOptions);
 }
 
-void ViewWidget::appendText(const QString &AText, const IMessageContentOptions &AOptions)
+void ViewWidget::appendText(const QString &AText, const IMessageStyleContentOptions &AOptions)
 {
 	Message message;
 	message.setBody(AText);
 	appendMessage(message,AOptions);
 }
 
-void ViewWidget::appendMessage(const Message &AMessage, const IMessageContentOptions &AOptions)
+void ViewWidget::appendMessage(const Message &AMessage, const IMessageStyleContentOptions &AOptions)
 {
 	QTextDocument doc;
 	if (FMessageProcessor)
@@ -123,14 +123,14 @@ void ViewWidget::appendMessage(const Message &AMessage, const IMessageContentOpt
 		doc.setPlainText(AMessage.body());
 
 	// "/me" command
-	IMessageContentOptions options = AOptions;
-	if (AOptions.kind==IMessageContentOptions::KindMessage && !AOptions.senderName.isEmpty())
+	IMessageStyleContentOptions options = AOptions;
+	if (AOptions.kind==IMessageStyleContentOptions::KindMessage && !AOptions.senderName.isEmpty())
 	{
 		QTextCursor cursor(&doc);
 		cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor,4);
 		if (cursor.selectedText() == "/me ")
 		{
-			options.kind = IMessageContentOptions::KindMeCommand;
+			options.kind = IMessageStyleContentOptions::KindMeCommand;
 			cursor.removeSelectedText();
 		}
 	}
@@ -258,7 +258,7 @@ void ViewWidget::onMessageStyleOptionsChanged(QWidget *AWidget, const IMessageSt
 	}
 }
 
-void ViewWidget::onMessageStyleContentAppended(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions)
+void ViewWidget::onMessageStyleContentAppended(QWidget *AWidget, const QString &AHtml, const IMessageStyleContentOptions &AOptions)
 {
 	if (AWidget == FStyleWidget)
 		emit contentAppended(AHtml,AOptions);

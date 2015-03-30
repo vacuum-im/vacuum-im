@@ -212,8 +212,8 @@ bool Notifications::initSettings()
 
 	if (FOptionsManager)
 	{
-		IOptionsDialogNode dnode = { ONO_NOTIFICATIONS, OPN_NOTIFICATIONS, MNI_NOTIFICATIONS, tr("Notifications") };
-		FOptionsManager->insertOptionsDialogNode(dnode);
+		IOptionsDialogNode notificationsNode = { ONO_NOTIFICATIONS, OPN_NOTIFICATIONS, MNI_NOTIFICATIONS, tr("Notifications") };
+		FOptionsManager->insertOptionsDialogNode(notificationsNode);
 		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 

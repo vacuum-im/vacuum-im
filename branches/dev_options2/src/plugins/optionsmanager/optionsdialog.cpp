@@ -239,7 +239,7 @@ void OptionsDialog::onCurrentItemChanged(const QModelIndex &ACurrent, const QMod
 	if (curWidget)
 		ui.scaScroll->setWidget(curWidget);
 
-	Options::setFileValue(nodeId,OPV_COMMON_OPTIONS_DIALOG_LASTNODE,FRootNodeId);
+	Options::setFileValue(nodeId,"options.dialog.last-node",FRootNodeId);
 }
 
 void OptionsDialog::onDialogButtonClicked(QAbstractButton *AButton)

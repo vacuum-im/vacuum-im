@@ -13,18 +13,18 @@
     </message>
 </context>
 <context>
-    <name>AdiumMessageStylePlugin</name>
+    <name>AdiumMessageStyleEngine</name>
     <message>
         <source>Adium Message Style</source>
-        <translation>Стиль повідомлень Adium</translation>
+        <translation type="unfinished">Стиль повідомлень Adium</translation>
     </message>
     <message>
         <source>Allows to use a Adium style in message design</source>
-        <translation>Дозволяє використовувати стилі повідомлень для Adium</translation>
+        <translation type="unfinished">Дозволяє використовувати стилі повідомлень для Adium</translation>
     </message>
     <message>
-        <source>Adium Style</source>
-        <translation>Стиль Adium</translation>
+        <source>Adium</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -65,44 +65,48 @@
         <source>Image Files (*.png *.jpg *.bmp *.gif)</source>
         <translation>Файли зображень</translation>
     </message>
+    <message>
+        <source>Parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Background</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AdiumOptionsWidgetClass</name>
     <message>
-        <source>Message Style:</source>
-        <translation>Стиль:</translation>
-    </message>
-    <message>
         <source>Variant:</source>
         <translation>Варіант:</translation>
-    </message>
-    <message>
-        <source>Text Font:</source>
-        <translation>Шрифт:</translation>
-    </message>
-    <message>
-        <source>Set Font...</source>
-        <translation>Змінити шрифт...</translation>
-    </message>
-    <message>
-        <source>Default</source>
-        <translation>За замовчанням</translation>
-    </message>
-    <message>
-        <source>Background:</source>
-        <translation>Фонове зображення:</translation>
     </message>
     <message>
         <source>Color:</source>
         <translation>Колір:</translation>
     </message>
     <message>
-        <source>Set Image...</source>
-        <translation>Встановити зображення...</translation>
-    </message>
-    <message>
         <source>Layout:</source>
         <translation>Положення:</translation>
+    </message>
+    <message>
+        <source>Font:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>not set</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

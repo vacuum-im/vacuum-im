@@ -285,10 +285,10 @@ void ChatWindowMenu::onArchiveRequestFailed(const QString &AId, const XmppError 
 	{
 		if (FToolBarWidget->messageWindow()->viewWidget() != NULL)
 		{
-			IMessageContentOptions options;
-			options.kind = IMessageContentOptions::KindStatus;
-			options.type |= IMessageContentOptions::TypeEvent;
-			options.direction = IMessageContentOptions::DirectionIn;
+			IMessageStyleContentOptions options;
+			options.kind = IMessageStyleContentOptions::KindStatus;
+			options.type |= IMessageStyleContentOptions::TypeEvent;
+			options.direction = IMessageStyleContentOptions::DirectionIn;
 			options.time = QDateTime::currentDateTime();
 			FToolBarWidget->messageWindow()->viewWidget()->appendText(tr("Failed to change archive preferences: %1").arg(AError.errorMessage()),options);
 		}

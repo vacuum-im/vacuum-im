@@ -139,27 +139,26 @@
 // ServerMessageArchive
 #define OPV_SERVERARCHIVE_MAXUPLOADSIZE                 "history.server-archive.max-upload-size"
 
-// MessageStyles
+// MessageStyleManager
 #define OPV_MESSAGESTYLE_ROOT                           "message-styles"
 #define OPV_MESSAGESTYLE_MTYPE_ITEM                     "message-styles.message-type"
 #define OPV_MESSAGESTYLE_CONTEXT_ITEM                   "message-styles.message-type.context"
-#define OPV_MESSAGESTYLE_STYLE_TYPE                     "message-styles.message-type.context.style-type"
-#define OPV_MESSAGESTYLE_STYLE_ITEM                     "message-styles.message-type.context.style"
-// AdiumMessageStyle
-#define OPV_MESSAGESTYLE_STYLE_ID                       "message-styles.message-type.context.style.style-id"
-#define OPV_MESSAGESTYLE_STYLE_VARIANT                  "message-styles.message-type.context.style.variant"
-#define OPV_MESSAGESTYLE_STYLE_FONTFAMILY               "message-styles.message-type.context.style.font-family"
-#define OPV_MESSAGESTYLE_STYLE_FONTSIZE                 "message-styles.message-type.context.style.font-size"
-#define OPV_MESSAGESTYLE_STYLE_BGCOLOR                  "message-styles.message-type.context.style.bg-color"
-#define OPV_MESSAGESTYLE_STYLE_BGIMAGEFILE              "message-styles.message-type.context.style.bg-image-file"
-#define OPV_MESSAGESTYLE_STYLE_BGIMAGELAYOUT            "message-styles.message-type.context.style.bg-image-layout"
-#define OPV_MESSAGESTYLE_STYLE_ANIMATIONENABLE          "message-styles.message-type.context.style.animation-enable"
+#define OPV_MESSAGESTYLE_CONTEXT_ENGINEID               "message-styles.message-type.context.engine-id"
+#define OPV_MESSAGESTYLE_ENGINE_ITEM                    "message-styles.message-type.context.engine"
+#define OPV_MESSAGESTYLE_ENGINE_STYLEID                 "message-styles.message-type.context.engine.style-id"
+#define OPV_MESSAGESTYLE_STYLE_ITEM                     "message-styles.message-type.context.engine.style"
+// IMessageStyleEngine
+#define OPV_MESSAGESTYLE_STYLE_VARIANT                  "message-styles.message-type.context.engine.style.variant"
+#define OPV_MESSAGESTYLE_STYLE_FONTFAMILY               "message-styles.message-type.context.engine.style.font-family"
+#define OPV_MESSAGESTYLE_STYLE_FONTSIZE                 "message-styles.message-type.context.engine.style.font-size"
+#define OPV_MESSAGESTYLE_STYLE_BGCOLOR                  "message-styles.message-type.context.engine.style.bg-color"
+#define OPV_MESSAGESTYLE_STYLE_BGIMAGEFILE              "message-styles.message-type.context.engine.style.bg-image-file"
+#define OPV_MESSAGESTYLE_STYLE_BGIMAGELAYOUT            "message-styles.message-type.context.engine.style.bg-image-layout"
 
 // OptionsManager
 #define OPV_COMMON_ROOT                                 "common"
 #define OPV_COMMON_LANGUAGE                             "common.language"
 #define OPV_COMMON_AUTOSTART                            "common.autostart"
-#define OPV_COMMON_OPTIONS_DIALOG_LASTNODE              "common.options.dialog.last-node"
 // ClintInfo
 #define OPV_COMMON_SHAREOSVERSION                       "common.share-os-version"
 // Statistics

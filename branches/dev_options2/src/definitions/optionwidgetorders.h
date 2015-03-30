@@ -107,7 +107,7 @@
 #define OHO_SHORTCUTS                             500
 #define   OWO_SHORTCUTS                           510
 
-//Node = ON_DATASTREAMS
+//Node = ON_DATATRANSFER
 #define OHO_DATATRANSFER_FILETRANSFER             100
 #define   OWO_DATATRANSFER_FILESTREAMS            110
 #define   OWO_DATATRANSFER_GROUPBYSENDER          120
@@ -117,6 +117,10 @@
 #define OHO_DATATRANSFER_METHODNAME               500
 #define   OWO_DATATRANSFER_METHODSETTINGS         505
 
+//Node = OPN_APPEARANCE
+#define OHO_APPEARANCE_MESSAGESTYLE               200
+#define   OWO_APPEARANCE_MESSAGETYPESTYLE         201
+
 
 
 //Node = ON_STATUSICONS
@@ -124,8 +128,5 @@
 
 //Node = ON_EMOTICANS
 #define OWO_EMOTICONS                             500
-
-//Node = ON_MESSAGE_STYLES
-#define OWO_MESSAGE_STYLES                        500
 
 #endif // DEF_OPTIONWIDGETORDERS_H

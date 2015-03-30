@@ -7,7 +7,7 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessageprocessor.h>
 #include <interfaces/imessagewidgets.h>
-#include <interfaces/imessagestyles.h>
+#include <interfaces/imessagestylemanager.h>
 #include <interfaces/imessagearchiver.h>
 #include <interfaces/inotifications.h>
 #include <interfaces/ioptionsmanager.h>
@@ -31,7 +31,7 @@ struct WindowStatus {
 
 struct WindowContent {
 	QString html;
-	IMessageContentOptions options;
+	IMessageStyleContentOptions options;
 };
 
 class ChatMessageHandler :
@@ -78,7 +78,7 @@ protected:
 	void requestHistory(IMessageChatWindow *AWindow);
 	void setMessageStyle(IMessageChatWindow *AWindow);
 	void showDateSeparator(IMessageChatWindow *AWindow, const QDateTime &ADateTime);
-	void fillContentOptions(const Jid &AStreamJid, const Jid &AContactJid, IMessageContentOptions &AOptions) const;
+	void fillContentOptions(const Jid &AStreamJid, const Jid &AContactJid, IMessageStyleContentOptions &AOptions) const;
 	void showStyledStatus(IMessageChatWindow *AWindow, const QString &AMessage, bool ADontSave=false, const QDateTime &ATime=QDateTime::currentDateTime());
 	void showStyledMessage(IMessageChatWindow *AWindow, const Message &AMessage);
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
@@ -93,7 +93,7 @@ protected slots:
 	void onWindowContextMenuRequested(Menu *AMenu);
 	void onWindowToolTipsRequested(QMap<int,QString> &AToolTips);
 	void onWindowNotifierActiveNotifyChanged(int ANotifyId);
-	void onWindowContentAppended(const QString &AHtml, const IMessageContentOptions &AOptions);
+	void onWindowContentAppended(const QString &AHtml, const IMessageStyleContentOptions &AOptions);
 	void onWindowMessageStyleOptionsChanged(const IMessageStyleOptions &AOptions, bool ACleared);
 protected slots:
 	void onStatusIconsChanged();
@@ -114,7 +114,7 @@ private:
 	IAvatars *FAvatars;
 	IMessageWidgets *FMessageWidgets;
 	IMessageProcessor *FMessageProcessor;
-	IMessageStyles *FMessageStyles;
+	IMessageStyleManager *FMessageStyleManager;
 	IRosterPlugin *FRosterPlugin;
 	IPresencePlugin *FPresencePlugin;
 	IMessageArchiver *FMessageArchiver;

@@ -12,7 +12,7 @@
 #include <interfaces/ipresence.h>
 #include <interfaces/imetacontacts.h>
 #include <interfaces/istatusicons.h>
-#include <interfaces/imessagestyles.h>
+#include <interfaces/imessagestylemanager.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/imessageprocessor.h>
 #include <interfaces/ifilemessagearchive.h>
@@ -113,8 +113,8 @@ protected:
 	ArchiveHeader loadingCollectionHeader() const;
 	void showCollection(const ArchiveCollection &ACollection);
 	QString showInfo(const ArchiveCollection &ACollection);
-	QString showNote(const QString &ANote, const IMessageContentOptions &AOptions);
-	QString showMessage(const Message &AMessage, const IMessageContentOptions &AOptions);
+	QString showNote(const QString &ANote, const IMessageStyleContentOptions &AOptions);
+	QString showMessage(const Message &AMessage, const IMessageStyleContentOptions &AOptions);
 protected slots:
 	void onArchiveSearchStart();
 	void onTextHilightTimerTimeout();
@@ -148,9 +148,9 @@ private:
 	IMetaContacts *FMetaContacts;
 	IRosterPlugin *FRosterPlugin;
 	IUrlProcessor *FUrlProcessor;
-	IMessageStyles *FMessageStyles;
 	IMessageProcessor *FMessageProcessor;
 	IFileMessageArchive *FFileMessageArchive;
+	IMessageStyleManager *FMessageStyleManager;
 private:
 	QLabel *FHeaderActionLabel;
 	QLabel *FHeadersEmptyLabel;

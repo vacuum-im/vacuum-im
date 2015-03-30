@@ -1,29 +1,32 @@
 #include "adiumoptionswidget.h"
 
 #include <QColor>
+#include <QFileInfo>
 #include <QFileDialog>
 #include <QFontDialog>
 #include <QWebSettings>
 
-AdiumOptionsWidget::AdiumOptionsWidget(AdiumMessageStylePlugin *APlugin, const OptionsNode &ANode, int AMessageType, QWidget *AParent) : QWidget(AParent)
+AdiumOptionsWidget::AdiumOptionsWidget(AdiumMessageStyleEngine *AEngine, const OptionsNode &ANode, QWidget *AParent) : QWidget(AParent)
 {
 	ui.setupUi(this);
+	ui.lblParameters->setText(QString("<h2>%1</h2>").arg(tr("Parameters")));
+	ui.lblBackground->setText(QString("<h2>%1</h2>").arg(tr("Background")));
 
-	FStylePlugin = APlugin;
-	FOptions = ANode;
-	FMessageType = AMessageType;
+	FStyleNode = ANode;
+	FStyleEngine = AEngine;
 
-	foreach(const QString &styleId, FStylePlugin->styles())
-		ui.cmbStyle->addItem(styleId,styleId);
-	ui.cmbStyle->setCurrentIndex(-1);
+	foreach(const QString &variant, FStyleEngine->styleVariants(FStyleNode.nspace()))
+		ui.cmbVariant->addItem(variant,variant);
+	if (ui.cmbVariant->count() <= 0)
+		ui.cmbVariant->addItem(tr("Default"));
 
-	ui.cmbBackgoundColor->addItem(tr("Default"));
-	QStringList colors = QColor::colorNames();
-	colors.sort();
-	foreach(const QString &color, colors)
+	ui.cmbColor->addItem(tr("Default"));
+	QStringList sortedColors = QColor::colorNames();
+	sortedColors.sort();
+	foreach(const QString &color,sortedColors)
 	{
-		ui.cmbBackgoundColor->addItem(color,color);
-		ui.cmbBackgoundColor->setItemData(ui.cmbBackgoundColor->count()-1,QColor(color),Qt::DecorationRole);
+		ui.cmbColor->addItem(color,color);
+		ui.cmbColor->setItemData(ui.cmbColor->count()-1,QColor(color),Qt::DecorationRole);
 	}
 
 	ui.cmbImageLayout->addItem(tr("Normal"),AdiumMessageStyle::ImageNormal);
@@ -32,14 +35,13 @@ AdiumOptionsWidget::AdiumOptionsWidget(AdiumMessageStylePlugin *APlugin, const O
 	ui.cmbImageLayout->addItem(tr("Title center"),AdiumMessageStyle::ImageTitleCenter);
 	ui.cmbImageLayout->addItem(tr("Scale"),AdiumMessageStyle::ImageScale);
 
-	connect(ui.cmbStyle,SIGNAL(currentIndexChanged(int)),SLOT(onStyleChanged(int)));
 	connect(ui.cmbVariant,SIGNAL(currentIndexChanged(int)),SLOT(onVariantChanged(int)));
+	connect(ui.tlbFontChange,SIGNAL(clicked()),SLOT(onFontChangeClicked()));
+	connect(ui.tlbFontReset,SIGNAL(clicked()),SLOT(onFontResetClicked()));
+	connect(ui.cmbColor,SIGNAL(currentIndexChanged(int)),SLOT(onColorChanged(int)));
+	connect(ui.tlbImageChange,SIGNAL(clicked()),SLOT(onImageChangeClicked()));
+	connect(ui.tlbImageReset,SIGNAL(clicked()),SLOT(onImageResetClicked()));
 	connect(ui.cmbImageLayout,SIGNAL(currentIndexChanged(int)),SLOT(onImageLayoutChanged(int)));
-	connect(ui.cmbBackgoundColor,SIGNAL(currentIndexChanged(int)),SLOT(onBackgroundColorChanged(int)));
-	connect(ui.tlbSetFont,SIGNAL(clicked()),SLOT(onSetFontClicked()));
-	connect(ui.tlbDefaultFont,SIGNAL(clicked()),SLOT(onDefaultFontClicked()));
-	connect(ui.tlbSetImage,SIGNAL(clicked()),SLOT(onSetImageClicked()));
-	connect(ui.tlbDefaultImage,SIGNAL(clicked()),SLOT(onDefaultImageClicked()));
 
 	reset();
 }
@@ -49,83 +51,61 @@ AdiumOptionsWidget::~AdiumOptionsWidget()
 
 }
 
-void AdiumOptionsWidget::apply(OptionsNode ANode)
-{
-	OptionsNode node = ANode.isNull() ? FOptions : ANode;
-	node.setValue(FStyleOptions.extended.value(MSO_STYLE_ID),"style-id");
-	node.setValue(FStyleOptions.extended.value(MSO_VARIANT),"variant");
-	node.setValue(FStyleOptions.extended.value(MSO_FONT_FAMILY),"font-family");
-	node.setValue(FStyleOptions.extended.value(MSO_FONT_SIZE),"font-size");
-	node.setValue(FStyleOptions.extended.value(MSO_BG_COLOR),"bg-color");
-	node.setValue(FStyleOptions.extended.value(MSO_BG_IMAGE_FILE),"bg-image-file");
-	node.setValue(FStyleOptions.extended.value(MSO_BG_IMAGE_LAYOUT),"bg-image-layout");
-	emit childApply();
-}
-
-void AdiumOptionsWidget::apply()
-{
-	apply(FOptions);
-}
-
-void AdiumOptionsWidget::reset()
-{
-	disconnect(ui.cmbVariant,SIGNAL(currentIndexChanged(int)),this,SLOT(onVariantChanged(int)));
-
-	FStyleOptions = FStylePlugin->styleOptions(FOptions,FMessageType);
-	ui.cmbStyle->setCurrentIndex(ui.cmbStyle->findData(FStyleOptions.extended.value(MSO_STYLE_ID)));
-	ui.cmbVariant->setCurrentIndex(ui.cmbVariant->findData(FStyleOptions.extended.value(MSO_VARIANT)));
-	ui.cmbBackgoundColor->setCurrentIndex(ui.cmbBackgoundColor->findData(FStyleOptions.extended.value(MSO_BG_COLOR)));
-	ui.cmbImageLayout->setCurrentIndex(ui.cmbImageLayout->findData(FStyleOptions.extended.value(MSO_BG_IMAGE_LAYOUT)));
-	updateOptionsWidgets();
-
-	connect(ui.cmbVariant,SIGNAL(currentIndexChanged(int)),SLOT(onVariantChanged(int)));
-
-	emit childReset();
-}
-
 IMessageStyleOptions AdiumOptionsWidget::styleOptions() const
 {
 	return FStyleOptions;
 }
 
-void AdiumOptionsWidget::updateOptionsWidgets()
+void AdiumOptionsWidget::apply()
 {
-	QString family = FStyleOptions.extended.value(MSO_FONT_FAMILY).toString();
-	int size = FStyleOptions.extended.value(MSO_FONT_SIZE).toInt();
-	if (family.isEmpty())
-		family = QWebSettings::globalSettings()->fontFamily(QWebSettings::StandardFont);
-	if (size==0)
-		size = QWebSettings::globalSettings()->fontSize(QWebSettings::DefaultFontSize);
-	ui.lblFont->setText(family + " " +QString::number(size));
-	ui.cmbImageLayout->setEnabled(!FStyleOptions.extended.value(MSO_BG_IMAGE_FILE).toString().isEmpty());
+	FStyleNode.setValue(FStyleOptions.extended.value(MSO_VARIANT),"variant");
+	FStyleNode.setValue(FStyleOptions.extended.value(MSO_FONT_FAMILY),"font-family");
+	FStyleNode.setValue(FStyleOptions.extended.value(MSO_FONT_SIZE),"font-size");
+	FStyleNode.setValue(FStyleOptions.extended.value(MSO_BG_COLOR),"bg-color");
+	FStyleNode.setValue(FStyleOptions.extended.value(MSO_BG_IMAGE_FILE),"bg-image-file");
+	FStyleNode.setValue(FStyleOptions.extended.value(MSO_BG_IMAGE_LAYOUT),"bg-image-layout");
+	emit childApply();
 }
 
-void AdiumOptionsWidget::onStyleChanged(int AIndex)
+void AdiumOptionsWidget::reset()
 {
-	QString styleId = ui.cmbStyle->itemData(AIndex).toString();
-	FStyleOptions.extended.insert(MSO_STYLE_ID,styleId);
+	FStyleOptions = FStyleEngine->styleOptions(FStyleNode.parent(),FStyleNode.nspace());
+	QMap<QString, QVariant> styleInfo = FStyleEngine->styleInfo(FStyleOptions.styleId);
 
-	ui.cmbVariant->clear();
-	foreach(const QString &variant, FStylePlugin->styleVariants(styleId))
-		ui.cmbVariant->addItem(variant,variant);
-	ui.cmbVariant->setEnabled(ui.cmbVariant->count() > 0);
+	int variantIndex;
+	if ( (variantIndex = ui.cmbVariant->findData(FStyleOptions.extended.value(MSO_VARIANT))) >= 0)
+		ui.cmbVariant->setCurrentIndex(variantIndex);
+	else if ( (variantIndex = ui.cmbVariant->findData(styleInfo.value(MSIV_DEFAULT_VARIANT))) >= 0)
+		ui.cmbVariant->setCurrentIndex(variantIndex);
+	else
+		ui.cmbVariant->setCurrentIndex(0);
 
-	QMap<QString, QVariant> info = FStylePlugin->styleInfo(styleId);
-	if (info.contains(MSIV_DEFAULT_VARIANT))
-	{
-		int index = ui.cmbVariant->findData(info.value(MSIV_DEFAULT_VARIANT));
-		ui.cmbVariant->setCurrentIndex(index>=0 ? index : 0);
-	}
+	bool isCustomBackgroundEnabled = !styleInfo.value(MSIV_DISABLE_CUSTOM_BACKGROUND,false).toBool();
+	ui.cmbColor->setEnabled(isCustomBackgroundEnabled);
+	ui.tlbImageChange->setEnabled(isCustomBackgroundEnabled);
+	ui.tlbImageReset->setEnabled(isCustomBackgroundEnabled);
+	ui.cmbImageLayout->setEnabled(isCustomBackgroundEnabled);
 
-	bool backgroundEnabled = !info.value(MSIV_DISABLE_CUSTOM_BACKGROUND,false).toBool();
-	ui.tlbSetImage->setEnabled(backgroundEnabled);
-	ui.tlbDefaultImage->setEnabled(backgroundEnabled);
-	ui.cmbImageLayout->setEnabled(backgroundEnabled);
-	ui.cmbBackgoundColor->setEnabled(backgroundEnabled);
+	ui.cmbColor->setItemData(0,styleInfo.value(MSIV_DEFAULT_BACKGROUND_COLOR));
+	ui.cmbColor->setCurrentIndex(ui.cmbColor->findData(FStyleOptions.extended.value(MSO_BG_COLOR)));
 
-	ui.cmbBackgoundColor->setItemData(0,info.value(MSIV_DEFAULT_BACKGROUND_COLOR));
+	ui.cmbImageLayout->setCurrentIndex(ui.cmbImageLayout->findData(FStyleOptions.extended.value(MSO_BG_IMAGE_LAYOUT).toInt()));
 
-	onDefaultImageClicked();
+	updateOptionsWidgets();
+	emit childReset();
+}
+
+void AdiumOptionsWidget::updateOptionsWidgets()
+{
+	QString fontFamily = FStyleOptions.extended.value(MSO_FONT_FAMILY).toString();
+	int fontSize = FStyleOptions.extended.value(MSO_FONT_SIZE).toInt();
+	fontFamily = fontFamily.isEmpty() ? QFont().family() : fontFamily;
+	fontSize = fontSize<=0 ? QFont().pointSize() : fontSize;
+	ui.lneFont->setText(QString("%1 %2").arg(fontFamily).arg(fontSize));
+
+	QFileInfo fileInfo(FStyleOptions.extended.value(MSO_BG_IMAGE_FILE).toString());
+	ui.lneImage->setText(fileInfo.isFile() ? fileInfo.fileName() : QString::null);
+	ui.cmbImageLayout->setEnabled(!ui.lneImage->text().isEmpty());
 }
 
 void AdiumOptionsWidget::onVariantChanged(int AIndex)
@@ -134,7 +114,7 @@ void AdiumOptionsWidget::onVariantChanged(int AIndex)
 	emit modified();
 }
 
-void AdiumOptionsWidget::onSetFontClicked()
+void AdiumOptionsWidget::onFontChangeClicked()
 {
 	bool ok;
 	QFont font(FStyleOptions.extended.value(MSO_FONT_FAMILY).toString(),FStyleOptions.extended.value(MSO_FONT_SIZE).toInt());
@@ -148,12 +128,18 @@ void AdiumOptionsWidget::onSetFontClicked()
 	}
 }
 
-void AdiumOptionsWidget::onDefaultFontClicked()
+void AdiumOptionsWidget::onFontResetClicked()
 {
-	QMap<QString,QVariant> info = FStylePlugin->styleInfo(ui.cmbStyle->itemData(ui.cmbStyle->currentIndex()).toString());
-	FStyleOptions.extended.insert(MSO_FONT_FAMILY,info.value(MSIV_DEFAULT_FONT_FAMILY));
-	FStyleOptions.extended.insert(MSO_FONT_SIZE,info.value(MSIV_DEFAULT_FONT_SIZE));
+	QMap<QString,QVariant> styleInfo = FStyleEngine->styleInfo(FStyleOptions.styleId);
+	FStyleOptions.extended.insert(MSO_FONT_FAMILY,styleInfo.value(MSIV_DEFAULT_FONT_FAMILY));
+	FStyleOptions.extended.insert(MSO_FONT_SIZE,styleInfo.value(MSIV_DEFAULT_FONT_SIZE));
 	updateOptionsWidgets();
+	emit modified();
+}
+
+void AdiumOptionsWidget::onColorChanged(int AIndex)
+{
+	FStyleOptions.extended.insert(MSO_BG_COLOR,ui.cmbColor->itemData(AIndex));
 	emit modified();
 }
 
@@ -163,13 +149,7 @@ void AdiumOptionsWidget::onImageLayoutChanged(int AIndex)
 	emit modified();
 }
 
-void AdiumOptionsWidget::onBackgroundColorChanged(int AIndex)
-{
-	FStyleOptions.extended.insert(MSO_BG_COLOR,ui.cmbBackgoundColor->itemData(AIndex));
-	emit modified();
-}
-
-void AdiumOptionsWidget::onSetImageClicked()
+void AdiumOptionsWidget::onImageChangeClicked()
 {
 	QString fileName = QFileDialog::getOpenFileName(this, tr("Select background image"),QString::null,tr("Image Files (*.png *.jpg *.bmp *.gif)"));
 	if (!fileName.isEmpty())
@@ -180,14 +160,11 @@ void AdiumOptionsWidget::onSetImageClicked()
 	}
 }
 
-void AdiumOptionsWidget::onDefaultImageClicked()
+void AdiumOptionsWidget::onImageResetClicked()
 {
-	FStyleOptions.extended.remove(MSO_BG_IMAGE_FILE);
-	FStyleOptions.extended.remove(MSO_BG_IMAGE_LAYOUT);
-
-	ui.cmbBackgoundColor->setCurrentIndex(0);
+	FStyleOptions.extended.insert(MSO_BG_IMAGE_FILE,QVariant());
+	FStyleOptions.extended.insert(MSO_BG_IMAGE_LAYOUT,QVariant());
 	ui.cmbImageLayout->setCurrentIndex(ui.cmbImageLayout->findData(AdiumMessageStyle::ImageNormal));
-
 	updateOptionsWidgets();
 	emit modified();
 }

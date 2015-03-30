@@ -198,5 +198,9 @@
         <source>Common</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Appearance</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

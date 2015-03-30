@@ -2,12 +2,12 @@
 #define SIMPLEOPTIONSWIDGET_H
 
 #include <QWidget>
-#include <interfaces/imessagestyles.h>
+#include <interfaces/imessagestylemanager.h>
 #include <interfaces/ioptionsmanager.h>
-#include "simplemessagestyleplugin.h"
+#include "simplemessagestyleengine.h"
 #include "ui_simpleoptionswidget.h"
 
-class SimpleMessageStylePlugin;
+class SimpleMessageStyleEngine;
 
 class SimpleOptionsWidget :
 	public QWidget,
@@ -16,38 +16,32 @@ class SimpleOptionsWidget :
 	Q_OBJECT;
 	Q_INTERFACES(IOptionsDialogWidget);
 public:
-	SimpleOptionsWidget(SimpleMessageStylePlugin *APlugin, const OptionsNode &ANode, int AMessageType, QWidget *AParent = NULL);
+	SimpleOptionsWidget(SimpleMessageStyleEngine *AEngine, const OptionsNode &ANode, QWidget *AParent);
 	~SimpleOptionsWidget();
 	virtual QWidget *instance() { return this; }
+	IMessageStyleOptions styleOptions() const;
 public slots:
-	virtual void apply(OptionsNode ANode);
 	virtual void apply();
 	virtual void reset();
 signals:
 	void modified();
 	void childApply();
 	void childReset();
-public:
-	IMessageStyleOptions styleOptions() const;
 protected:
 	void updateOptionsWidgets();
 protected slots:
-	void onStyleChanged(int AIndex);
 	void onVariantChanged(int AIndex);
-	void onSetFontClicked();
-	void onDefaultFontClicked();
-	void onBackgroundColorChanged(int AIndex);
-	void onSetImageClicked();
-	void onDefaultImageClicked();
-	void onAnimationEnableToggled(int AState);
+	void onFontChangeClicked();
+	void onFontResetClicked();
+	void onColorChanged(int AIndex);
+	void onImageChangeClicked();
+	void onImageResetClicked();
 private:
 	Ui::SimpleOptionsWidgetClass ui;
 private:
-	SimpleMessageStylePlugin *FStylePlugin;
-private:
-	int FMessageType;
-	OptionsNode FOptions;
+	OptionsNode FStyleNode;
 	IMessageStyleOptions FStyleOptions;
+	SimpleMessageStyleEngine *FStyleEngine;
 };
 
 #endif // SIMPLEOPTIONSWIDGET_H

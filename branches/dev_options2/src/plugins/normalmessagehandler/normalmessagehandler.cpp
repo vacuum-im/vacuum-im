@@ -45,7 +45,7 @@ NormalMessageHandler::NormalMessageHandler()
 	FAvatars = NULL;
 	FMessageWidgets = NULL;
 	FMessageProcessor = NULL;
-	FMessageStyles = NULL;
+	FMessageStyleManager = NULL;
 	FStatusIcons = NULL;
 	FNotifications = NULL;
 	FPresencePlugin = NULL;
@@ -91,13 +91,13 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 			connect(FMessageProcessor->instance(),SIGNAL(activeStreamRemoved(const Jid &)),SLOT(onActiveStreamRemoved(const Jid &)));
 	}
 
-	plugin = APluginManager->pluginInterface("IMessageStyles").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IMessageStyleManager").value(0,NULL);
 	if (plugin)
 	{
-		FMessageStyles = qobject_cast<IMessageStyles *>(plugin->instance());
-		if (FMessageStyles)
+		FMessageStyleManager = qobject_cast<IMessageStyleManager *>(plugin->instance());
+		if (FMessageStyleManager)
 		{
-			connect(FMessageStyles->instance(),SIGNAL(styleOptionsChanged(const IMessageStyleOptions &, int, const QString &)),
+			connect(FMessageStyleManager->instance(),SIGNAL(styleOptionsChanged(const IMessageStyleOptions &, int, const QString &)),
 				SLOT(onStyleOptionsChanged(const IMessageStyleOptions &, int, const QString &)));
 		}
 	}
@@ -175,7 +175,7 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
 
-	return FMessageProcessor!=NULL && FMessageWidgets!=NULL && FMessageStyles!=NULL;
+	return FMessageProcessor!=NULL && FMessageWidgets!=NULL && FMessageStyleManager!=NULL;
 }
 
 bool NormalMessageHandler::initObjects()
@@ -665,7 +665,7 @@ void NormalMessageHandler::updateWindow(IMessageNormalWindow *AWindow) const
 			AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::Avatar,FAvatars->emptyAvatarImage());
 	}
 
-	QString name = FMessageStyles!=NULL ? FMessageStyles->contactName(AWindow->streamJid(),AWindow->contactJid()) : AWindow->contactJid().uFull();
+	QString name = FMessageStyleManager!=NULL ? FMessageStyleManager->contactName(AWindow->streamJid(),AWindow->contactJid()) : AWindow->contactJid().uFull();
 	AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::Name,name);
 
 	QIcon statusIcon;
@@ -740,33 +740,33 @@ void NormalMessageHandler::removeNotifiedMessages(IMessageNormalWindow *AWindow,
 
 void NormalMessageHandler::setMessageStyle(IMessageNormalWindow *AWindow)
 {
-	if (FMessageStyles)
+	if (FMessageStyleManager)
 	{
 		LOG_STRM_DEBUG(AWindow->streamJid(),QString("Changing message style for normal window, with=%1").arg(AWindow->contactJid().bare()));
-		IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::Normal);
+		IMessageStyleOptions soptions = FMessageStyleManager->styleOptions(Message::Normal);
 		if (AWindow->viewWidget()->messageStyle()==NULL || !AWindow->viewWidget()->messageStyle()->changeOptions(AWindow->viewWidget()->styleWidget(),soptions,false))
 		{
-			IMessageStyle *style = FMessageStyles->styleForOptions(soptions);
+			IMessageStyle *style = FMessageStyleManager->styleForOptions(soptions);
 			AWindow->viewWidget()->setMessageStyle(style,soptions);
 		}
 	}
 }
 
-void NormalMessageHandler::fillContentOptions(IMessageNormalWindow *AWindow, IMessageContentOptions &AOptions) const
+void NormalMessageHandler::fillContentOptions(IMessageNormalWindow *AWindow, IMessageStyleContentOptions &AOptions) const
 {
 	AOptions.senderColor = "blue";
 	AOptions.senderId = AWindow->contactJid().full();
-	AOptions.senderName = Qt::escape(FMessageStyles->contactName(AWindow->streamJid(),AWindow->contactJid()));
-	AOptions.senderAvatar = FMessageStyles->contactAvatar(AWindow->contactJid());
-	AOptions.senderIcon = FMessageStyles->contactIcon(AWindow->streamJid(),AWindow->contactJid());
+	AOptions.senderName = Qt::escape(FMessageStyleManager->contactName(AWindow->streamJid(),AWindow->contactJid()));
+	AOptions.senderAvatar = FMessageStyleManager->contactAvatar(AWindow->contactJid());
+	AOptions.senderIcon = FMessageStyleManager->contactIcon(AWindow->streamJid(),AWindow->contactJid());
 }
 
 void NormalMessageHandler::showStyledMessage(IMessageNormalWindow *AWindow, const Message &AMessage)
 {
-	IMessageContentOptions options;
+	IMessageStyleContentOptions options;
 	options.time = AMessage.dateTime();
-	options.timeFormat = FMessageStyles->timeFormat(options.time);
-	options.direction = IMessageContentOptions::DirectionIn;
+	options.timeFormat = FMessageStyleManager->timeFormat(options.time);
+	options.direction = IMessageStyleContentOptions::DirectionIn;
 	options.noScroll = true;
 	fillContentOptions(AWindow,options);
 
@@ -782,13 +782,13 @@ void NormalMessageHandler::showStyledMessage(IMessageNormalWindow *AWindow, cons
 		QString html = tr("<b>The message with a error is received</b>");
 		html += "<p style='color:red;'>"+Qt::escape(err.errorMessage())+"</p>";
 		html += "<hr>";
-		options.kind = IMessageContentOptions::KindMessage;
+		options.kind = IMessageStyleContentOptions::KindMessage;
 		AWindow->viewWidget()->appendHtml(html,options);
 	}
 
-	options.kind = IMessageContentOptions::KindTopic;
+	options.kind = IMessageStyleContentOptions::KindTopic;
 	AWindow->viewWidget()->appendText(tr("Subject: %1").arg(!AMessage.subject().isEmpty() ? AMessage.subject() : tr("<no subject>")),options);
-	options.kind = IMessageContentOptions::KindMessage;
+	options.kind = IMessageStyleContentOptions::KindMessage;
 	AWindow->viewWidget()->appendMessage(AMessage,options);
 }
 

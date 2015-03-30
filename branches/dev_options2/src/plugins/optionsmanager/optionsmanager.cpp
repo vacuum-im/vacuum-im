@@ -129,8 +129,12 @@ bool OptionsManager::initSettings()
 	if (profiles().count() == 0)
 		addProfile(DEFAULT_PROFILE, QString::null);
 
-	IOptionsDialogNode dnode = { ONO_COMMON, OPN_COMMON, MNI_OPTIONS_DIALOG, tr("Common") };
-	insertOptionsDialogNode(dnode);
+	IOptionsDialogNode commonNode = { ONO_COMMON, OPN_COMMON, MNI_OPTIONS_DIALOG, tr("Common") };
+	insertOptionsDialogNode(commonNode);
+
+	IOptionsDialogNode appearanceNode = { ONO_APPEARANCE, OPN_APPEARANCE, MNI_OPTIONS_APPEARANCE, tr("Appearance") };
+	insertOptionsDialogNode(appearanceNode);
+
 	insertOptionsDialogHolder(this);
 
 	return true;
@@ -558,7 +562,7 @@ QDialog *OptionsManager::showOptionsDialog(const QString &ANodeId, const QString
 			dialog = new OptionsDialog(this,ARootId,AParent);
 			connect(dialog,SIGNAL(applied()),SLOT(onOptionsDialogApplied()),Qt::QueuedConnection);
 		}
-		dialog->showNode(ANodeId.isNull() ? Options::fileValue(OPV_COMMON_OPTIONS_DIALOG_LASTNODE,ARootId).toString() : ANodeId);
+		dialog->showNode(ANodeId.isNull() ? Options::fileValue("options.dialog.last-node",ARootId).toString() : ANodeId);
 		WidgetManager::showActivateRaiseWindow(dialog);
 		return dialog;
 	}

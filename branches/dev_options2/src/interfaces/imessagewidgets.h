@@ -6,9 +6,9 @@
 #include <QTreeView>
 #include <QTextBrowser>
 #include <QTextDocument>
-#include <interfaces/ipluginmanager.h>
 #include <interfaces/imainwindow.h>
-#include <interfaces/imessagestyles.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/imessagestylemanager.h>
 #include <utils/jid.h>
 #include <utils/menu.h>
 #include <utils/action.h>
@@ -85,9 +85,9 @@ public:
 	virtual QWidget *styleWidget() const =0;
 	virtual IMessageStyle *messageStyle() const =0;
 	virtual void setMessageStyle(IMessageStyle *AStyle, const IMessageStyleOptions &AOptions) =0;
-	virtual void appendHtml(const QString &AHtml, const IMessageContentOptions &AOptions) =0;
-	virtual void appendText(const QString &AText, const IMessageContentOptions &AOptions) =0;
-	virtual void appendMessage(const Message &AMessage, const IMessageContentOptions &AOptions) =0;
+	virtual void appendHtml(const QString &AHtml, const IMessageStyleContentOptions &AOptions) =0;
+	virtual void appendText(const QString &AText, const IMessageStyleContentOptions &AOptions) =0;
+	virtual void appendMessage(const Message &AMessage, const IMessageStyleContentOptions &AOptions) =0;
 	virtual void contextMenuForView(const QPoint &APosition, Menu *AMenu) =0;
 	virtual QTextDocumentFragment selection() const =0;
 	virtual QTextCharFormat textFormatAt(const QPoint &APosition) const =0;
@@ -95,7 +95,7 @@ public:
 protected:
 	virtual void urlClicked(const QUrl &AUrl) =0;
 	virtual void viewContextMenu(const QPoint &APosition, Menu *AMenu) =0;
-	virtual void contentAppended(const QString &AHtml, const IMessageContentOptions &AOptions) =0;
+	virtual void contentAppended(const QString &AHtml, const IMessageStyleContentOptions &AOptions) =0;
 	virtual void messageStyleOptionsChanged(const IMessageStyleOptions &AOptions, bool ACleared) =0;
 	virtual void messageStyleChanged(IMessageStyle *ABefore, const IMessageStyleOptions &AOptions) =0;
 };

@@ -20,7 +20,7 @@ struct IOptionsDialogNode {
 class IOptionsDialogWidget
 {
 public:
-	virtual QWidget* instance() =0;
+	virtual QWidget *instance() =0;
 public slots:
 	virtual void apply() =0;
 	virtual void reset() =0;

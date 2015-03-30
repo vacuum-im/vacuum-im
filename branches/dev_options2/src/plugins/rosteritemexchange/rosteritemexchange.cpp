@@ -762,10 +762,10 @@ void RosterItemExchange::notifyInChatWindow(const Jid &AStreamJid, const Jid &AC
 	IMessageChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,AContactJid) : NULL;
 	if (window)
 	{
-		IMessageContentOptions options;
-		options.kind = IMessageContentOptions::KindStatus;
-		options.type |= IMessageContentOptions::TypeEvent;
-		options.direction = IMessageContentOptions::DirectionIn;
+		IMessageStyleContentOptions options;
+		options.kind = IMessageStyleContentOptions::KindStatus;
+		options.type |= IMessageStyleContentOptions::TypeEvent;
+		options.direction = IMessageStyleContentOptions::DirectionIn;
 		options.time = QDateTime::currentDateTime();
 		window->viewWidget()->appendText(AMessage,options);
 	}

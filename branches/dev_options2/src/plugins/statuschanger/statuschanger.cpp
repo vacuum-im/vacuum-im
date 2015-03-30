@@ -228,7 +228,8 @@ bool StatusChanger::initSettings()
 	Options::setDefaultValue(OPV_STATUS_PRIORITY,0);
 	Options::setDefaultValue(OPV_STATUSES_MAINSTATUS,STATUS_ONLINE);
 	Options::setDefaultValue(OPV_STATUSES_MODIFY,false);
-	Options::setDefaultValue(OPV_ACCOUNT_AUTOCONNECT,false);
+
+	Options::setDefaultValue(OPV_ACCOUNT_AUTOCONNECT,true);
 	Options::setDefaultValue(OPV_ACCOUNT_AUTORECONNECT,true);
 	Options::setDefaultValue(OPV_ACCOUNT_STATUS_ISMAIN,true);
 	Options::setDefaultValue(OPV_ACCOUNT_STATUS_LASTONLINE,STATUS_MAIN_ID);

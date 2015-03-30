@@ -254,8 +254,8 @@ bool MessageArchiver::initObjects()
 	}
 	if (FOptionsManager)
 	{
-		IOptionsDialogNode dnode = { ONO_HISTORY, OPN_HISTORY, MNI_HISTORY, tr("History") };
-		FOptionsManager->insertOptionsDialogNode(dnode);
+		IOptionsDialogNode historyNode = { ONO_HISTORY, OPN_HISTORY, MNI_HISTORY, tr("History") };
+		FOptionsManager->insertOptionsDialogNode(historyNode);
 		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 	return true;
@@ -2380,10 +2380,10 @@ void MessageArchiver::notifyInChatWindow(const Jid &AStreamJid, const Jid &ACont
 	IMessageChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,AContactJid,true) : NULL;
 	if (window)
 	{
-		IMessageContentOptions options;
-		options.kind = IMessageContentOptions::KindStatus;
-		options.type |= IMessageContentOptions::TypeEvent;
-		options.direction = IMessageContentOptions::DirectionIn;
+		IMessageStyleContentOptions options;
+		options.kind = IMessageStyleContentOptions::KindStatus;
+		options.type |= IMessageStyleContentOptions::TypeEvent;
+		options.direction = IMessageStyleContentOptions::DirectionIn;
 		options.time = QDateTime::currentDateTime();
 		window->viewWidget()->appendText(AMessage,options);
 	}

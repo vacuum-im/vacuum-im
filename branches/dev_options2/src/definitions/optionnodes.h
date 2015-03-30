@@ -13,10 +13,9 @@
 #define OPN_NOTIFICATIONS                "Notifications"
 #define OPN_SHORTCUTS                    "Shortcuts"
 #define OPN_DATATRANSFER                 "DataTransfer"
-
+#define OPN_APPEARANCE                   "Appearance"
 
 #define OPN_STATUSICONS                  "StatusIcons"
 #define OPN_EMOTICONS                    "Emoticons"
-#define OPN_MESSAGE_STYLES               "MessageStyles"
 
 #endif // DEF_OPTIONNODES_H

@@ -102,9 +102,6 @@
 #define MNI_HISTORY                     "history"
 #define MNI_HISTORY_DATE                "historyDate"
 
-//MessageStyles
-#define MNI_MESSAGE_STYLES              "messagestyles"
-
 //MessageWidgets
 #define MNI_MESSAGEWIDGETS_SEND         "messagewidgetsSend"
 #define MNI_MESSAGEWIDGETS_TAB_MENU     "messagewidgetsTabMenu"
@@ -161,6 +158,7 @@
 #define MNI_OPTIONS_PROFILE             "optionsProfile"
 #define MNI_OPTIONS_PROFILES            "optionsProfiles"
 #define MNI_OPTIONS_EDIT_PROFILES       "optionsEditProfiles"
+#define MNI_OPTIONS_APPEARANCE          "optionsAppearance"
 
 //PrivacyLists
 #define MNI_PRIVACYLISTS                "privacylists"
