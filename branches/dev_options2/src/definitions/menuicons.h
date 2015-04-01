@@ -61,11 +61,6 @@
 //DataStreamsManager
 #define MNI_DATASTREAMSMANAGER          "dataStreamsManager"
 
-//Emoticons
-#define MNI_EMOTICONS                   "emoticons"
-#define MNI_EMOTICONS_ARROW_UP          "emoticonsArrowUp"
-#define MNI_EMOTICONS_ARROW_DOWN        "emoticonsArrowDown"
-
 //FileStreamsManager
 #define MNI_FILESTREAMSMANAGER          "filestreamsmanager"
 
@@ -241,9 +236,6 @@
 #define MNI_SCHANGER_MODIFY_STATUS      "schangerModifyStatus"
 #define MNI_SCHANGER_EDIT_STATUSES      "schangerEditStatuses"
 #define MNI_SCHANGER_CONNECTING         "schangerConnecting"
-
-//StatusIcons
-#define MNI_STATUSICONS_OPTIONS         "statusiconsOptions"
 
 //VCard
 #define MNI_VCARD                       "VCard"

@@ -12,7 +12,15 @@
         <translation>Pozwala korzystać z emotek w rozmowach</translation>
     </message>
     <message>
-        <source>Convert text emoticons to images</source>
+        <source>&lt;Disabled&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Message windows</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Emoticons:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

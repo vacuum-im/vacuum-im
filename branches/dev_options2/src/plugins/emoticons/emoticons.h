@@ -9,7 +9,6 @@
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/ioptionsmanager.h>
 #include "selecticonmenu.h"
-#include "emoticonsoptions.h"
 
 struct EmoticonTreeItem {
 	QUrl url;

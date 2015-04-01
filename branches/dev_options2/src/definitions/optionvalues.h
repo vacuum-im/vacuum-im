@@ -99,7 +99,6 @@
 #define OPV_MESSAGES_TABWINDOW_TABSCLOSABLE             "messages.tab-windows.window.tabs-closable"
 #define OPV_MESSAGES_TABWINDOW_TABSBOTTOM               "messages.tab-windows.window.tabs-bottom"
 // Emoticons
-#define OPV_MESSAGES_EMOTICONS_CONVERT                  "messages.emoticons.convert"
 #define OPV_MESSAGES_EMOTICONS_ICONSET                  "messages.emoticons.iconset"
 #define OPV_MESSAGES_EMOTICONS_MAXINMESSAGE             "messages.emoticons.max-in-message"
 // ChatStates

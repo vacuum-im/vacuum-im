@@ -12,8 +12,16 @@
         <translation>Позволяет использовать изображения смайликов в сообщениях</translation>
     </message>
     <message>
-        <source>Convert text emoticons to images</source>
-        <translation>Конвертировать текстовые смайлы в графические</translation>
+        <source>&lt;Disabled&gt;</source>
+        <translation>&lt;Отключены&gt;</translation>
+    </message>
+    <message>
+        <source>Message windows</source>
+        <translation>Окна сообщений</translation>
+    </message>
+    <message>
+        <source>Emoticons:</source>
+        <translation>Смайлики:</translation>
     </message>
 </context>
 </TS>

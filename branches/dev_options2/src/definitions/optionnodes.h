@@ -15,7 +15,4 @@
 #define OPN_DATATRANSFER                 "DataTransfer"
 #define OPN_APPEARANCE                   "Appearance"
 
-#define OPN_STATUSICONS                  "StatusIcons"
-#define OPN_EMOTICONS                    "Emoticons"
-
 #endif // DEF_OPTIONNODES_H

@@ -10,7 +10,6 @@
 #include <interfaces/irostersview.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/ioptionsmanager.h>
-#include "iconsoptionswidget.h"
 
 class StatusIcons :
 	public QObject,
@@ -62,11 +61,11 @@ signals:
 protected:
 	void loadStorages();
 	void clearStorages();
-	void startStatusIconsChanged();
+	void startStatusIconsUpdate();
 	void updateCustomIconMenu(const QStringList &APatterns);
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 protected slots:
-	void onStatusIconsChangedTimer();
+	void onUpdateStatusIcons();
 	void onPresenceChanged(IPresence *APresence, int AShow, const QString &AStatus, int APriority);
 	void onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore);
 	void onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore);
@@ -77,7 +76,7 @@ protected slots:
 	void onOptionsClosed();
 	void onOptionsChanged(const OptionsNode &ANode);
 	void onDefaultIconsetChanged();
-	void onSetCustomIconset(bool);
+	void onSetCustomIconsetByAction(bool);
 private:
 	IRosterPlugin *FRosterPlugin;
 	IPresencePlugin *FPresencePlugin;
@@ -91,7 +90,7 @@ private:
 	IconStorage *FDefaultStorage;
 	QHash<QString,Action *> FCustomIconActions;
 private:
-	bool FStatusIconsChangedStarted;
+	bool FStatusIconsUpdateStarted;
 	QString FDefaultIconset;
 	QSet<QString> FStatusRules;
 	QMap<QString, QString> FUserRules;

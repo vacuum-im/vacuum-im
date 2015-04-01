@@ -65,7 +65,6 @@
 #define   OWO_MESSAGES_SHOWSTATUS                 320
 #define   OWO_MESSAGES_ARCHIVESTATUS              330
 #define   OWO_MESSAGES_SHOWDATESEPARATORS         340
-#define   OWO_MESSAGES_EMOTICONSENABLED           350
 #define   OWO_MESSAGES_CHATSTATESENABLED          360
 #define   OWO_MESSAGES_UNNOTIFYALLNORMAL          370
 #define OHO_MESSAGES_CONFERENCES                  500
@@ -120,13 +119,9 @@
 //Node = OPN_APPEARANCE
 #define OHO_APPEARANCE_MESSAGESTYLE               200
 #define   OWO_APPEARANCE_MESSAGETYPESTYLE         201
-
-
-
-//Node = ON_STATUSICONS
-#define OWO_STATUSICONS                           500
-
-//Node = ON_EMOTICANS
-#define OWO_EMOTICONS                             500
+#define OHO_APPEARANCE_ROSTER                     400
+#define   OWO_APPEARANCE_STATUSICONS              430
+#define OHO_APPEARANCE_MESSAGES                   700
+#define   OWO_APPEARANCE_EMOTICONS                730
 
 #endif // DEF_OPTIONWIDGETORDERS_H

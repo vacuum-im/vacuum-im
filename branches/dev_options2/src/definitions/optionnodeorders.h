@@ -13,10 +13,6 @@
 #define ONO_DATATRANSFER          800
 #define ONO_APPEARANCE            900
 
-
-#define ONO_STATUSICONS           900
-#define ONO_EMOTICONS             1600
-
 // ONO_ACCOUNTS
 #define ONO_ACCOUNTS_PARAMS       100
 #define ONO_ACCOUNTS_HISTORY      200
