@@ -88,10 +88,9 @@ private:
 	Menu *FCustomIconMenu;
 	Action *FDefaultIconAction;
 	IconStorage *FDefaultStorage;
-	QHash<QString,Action *> FCustomIconActions;
+	QHash<QString, Action *> FCustomIconActions;
 private:
 	bool FStatusIconsUpdateStarted;
-	QString FDefaultIconset;
 	QSet<QString> FStatusRules;
 	QMap<QString, QString> FUserRules;
 	QMap<QString, QString> FDefaultRules;

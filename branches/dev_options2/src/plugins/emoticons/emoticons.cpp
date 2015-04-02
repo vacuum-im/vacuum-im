@@ -15,6 +15,7 @@
 #include <definitions/optionwidgetorders.h>
 #include <definitions/messagewriterorders.h>
 #include <definitions/messageeditcontentshandlerorders.h>
+#include <utils/iconsetdelegate.h>
 #include <utils/iconstorage.h>
 #include <utils/options.h>
 #include <utils/logger.h>
@@ -119,16 +120,26 @@ QMultiMap<int, IOptionsDialogWidget *> Emoticons::optionsDialogWidgets(const QSt
 	if (ANodeId == OPN_APPEARANCE)
 	{
 		QComboBox *cmbEmoticons = new QComboBox(AParent);
-		cmbEmoticons->addItem(tr("<Disabled>"),QStringList());
+		cmbEmoticons->setItemDelegate(new IconsetDelegate(cmbEmoticons));
+
+		int index = 1;
+		cmbEmoticons->addItem(tr("Do not convert text smiles to images"),QStringList());
 		foreach(const QString &iconset, IconStorage::availSubStorages(RSR_STORAGE_EMOTICONS))
 		{
 			IconStorage *storage = new IconStorage(RSR_STORAGE_EMOTICONS,iconset);
 			cmbEmoticons->addItem(storage->getIcon(storage->fileKeys().value(0)),storage->storageProperty(FILE_STORAGE_NAME,iconset),QStringList()<<iconset);
+
+			cmbEmoticons->setItemData(index,storage->storage(),IconsetDelegate::IDR_STORAGE);
+			cmbEmoticons->setItemData(index,storage->subStorage(),IconsetDelegate::IDR_SUBSTORAGE);
+			cmbEmoticons->setItemData(index,true,IconsetDelegate::IDR_HIDE_STORAGE_NAME);
+
+			index++;
+
 			delete storage;
 		}
 
 		widgets.insertMulti(OHO_APPEARANCE_MESSAGES,FOptionsManager->newOptionsDialogHeader(tr("Message windows"),AParent));
-		widgets.insertMulti(OWO_APPEARANCE_EMOTICONS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_EMOTICONS_ICONSET),tr("Emoticons:"),cmbEmoticons,AParent));
+		widgets.insertMulti(OWO_APPEARANCE_EMOTICONS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_EMOTICONS_ICONSET),tr("Smiles:"),cmbEmoticons,AParent));
 	}
 	return widgets;
 }

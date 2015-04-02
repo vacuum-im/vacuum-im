@@ -13,6 +13,7 @@
 #include <definitions/rosterindexkinds.h>
 #include <definitions/rosterindexroles.h>
 #include <definitions/rosterdataholderorders.h>
+#include <utils/iconsetdelegate.h>
 #include <utils/options.h>
 #include <utils/logger.h>
 
@@ -152,6 +153,7 @@ bool StatusIcons::initSettings()
 	{
 		FOptionsManager->insertOptionsDialogHolder(this);
 	}
+
 	return true;
 }
 
@@ -161,11 +163,21 @@ QMultiMap<int, IOptionsDialogWidget *> StatusIcons::optionsDialogWidgets(const Q
 	if (FOptionsManager!=NULL && ANodeId==OPN_APPEARANCE)
 	{
 		QComboBox *cmbStatusIcons = new QComboBox(AParent);
+		cmbStatusIcons->setItemDelegate(new IconsetDelegate(cmbStatusIcons));
+
+		int index = 0;
 		for (QMap<QString, IconStorage *>::const_iterator it=FStorages.constBegin(); it!=FStorages.constEnd(); ++it)
 		{
 			QString name = it.value()->storageProperty(FILE_STORAGE_NAME,it.key());
 			cmbStatusIcons->addItem(it.value()->getIcon(SIK_ONLINE),name,it.key());
+
+			cmbStatusIcons->setItemData(index,it.value()->storage(),IconsetDelegate::IDR_STORAGE);
+			cmbStatusIcons->setItemData(index,it.value()->subStorage(),IconsetDelegate::IDR_SUBSTORAGE);
+			cmbStatusIcons->setItemData(index,true,IconsetDelegate::IDR_HIDE_STORAGE_NAME);
+
+			index++;
 		}
+		cmbStatusIcons->model()->sort(0);
 
 		widgets.insertMulti(OHO_APPEARANCE_ROSTER, FOptionsManager->newOptionsDialogHeader(tr("Contacts list"),AParent));
 		widgets.insertMulti(OWO_APPEARANCE_STATUSICONS, FOptionsManager->newOptionsDialogWidget(Options::node(OPV_STATUSICONS_DEFAULT),tr("Status icons:"),cmbStatusIcons,AParent));
@@ -221,9 +233,9 @@ QString StatusIcons::ruleIconset(const QString &APattern, RuleType ARuleType) co
 	switch (ARuleType)
 	{
 	case UserRule:
-		return FUserRules.value(APattern,FILE_STORAGE_SHARED_DIR);
+		return FUserRules.value(APattern,FDefaultStorage!=NULL ? FDefaultStorage->subStorage() : FILE_STORAGE_SHARED_DIR);
 	case DefaultRule:
-		return FDefaultRules.value(APattern,FILE_STORAGE_SHARED_DIR);
+		return FDefaultRules.value(APattern,FDefaultStorage!=NULL ? FDefaultStorage->subStorage() : FILE_STORAGE_SHARED_DIR);
 	}
 	return QString::null;
 }
@@ -411,8 +423,7 @@ QString StatusIcons::iconFileName(const QString &ASubStorage, const QString &AIc
 void StatusIcons::loadStorages()
 {
 	clearStorages();
-
-	QList<QString> storages = FileStorage::availSubStorages(RSR_STORAGE_STATUSICONS);
+	QList<QString> storages = FileStorage::availSubStorages(RSR_STORAGE_STATUSICONS) << FILE_STORAGE_SHARED_DIR;
 	foreach(const QString &substorage, storages)
 	{
 		LOG_DEBUG(QString("Status icon storage added, storage=%1").arg(substorage));
@@ -429,7 +440,7 @@ void StatusIcons::loadStorages()
 
 		Action *action = new Action(FCustomIconMenu);
 		action->setCheckable(true);
-		action->setIcon(storage->getIcon(iconKeyByStatus(IPresence::Online,QString::null,false)));
+		action->setIcon(storage->getIcon(SIK_ONLINE));
 		action->setText(storage->storageProperty(FILE_STORAGE_NAME,substorage));
 		action->setData(ADR_SUBSTORAGE,substorage);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onSetCustomIconsetByAction(bool)));
@@ -462,11 +473,11 @@ void StatusIcons::startStatusIconsUpdate()
 
 void StatusIcons::updateCustomIconMenu(const QStringList &APatterns)
 {
-	QString substorage = ruleIconset(APatterns.value(0),IStatusIcons::UserRule);
+	QString substorage = FUserRules.value(APatterns.value(0));
 	
 	FDefaultIconAction->setData(ADR_RULE,APatterns);
 	FDefaultIconAction->setIcon(iconByStatus(IPresence::Online,SUBSCRIPTION_BOTH,false));
-	FDefaultIconAction->setChecked(APatterns.count()==1 && FDefaultStorage!=NULL && FDefaultStorage->subStorage()==substorage);
+	FDefaultIconAction->setChecked(APatterns.count()==1 && substorage.isEmpty());
 
 	foreach(Action *action, FCustomIconActions)
 	{

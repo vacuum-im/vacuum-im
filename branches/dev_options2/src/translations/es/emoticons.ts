@@ -12,15 +12,15 @@
         <translation>Permite usar imágenes de caritas en los mensajes</translation>
     </message>
     <message>
-        <source>&lt;Disabled&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Message windows</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Emoticons:</source>
+        <source>Do not convert text smiles to images</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Smiles:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

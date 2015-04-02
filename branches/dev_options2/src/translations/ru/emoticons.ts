@@ -12,16 +12,16 @@
         <translation>Позволяет использовать изображения смайликов в сообщениях</translation>
     </message>
     <message>
-        <source>&lt;Disabled&gt;</source>
-        <translation>&lt;Отключены&gt;</translation>
-    </message>
-    <message>
         <source>Message windows</source>
         <translation>Окна сообщений</translation>
     </message>
     <message>
-        <source>Emoticons:</source>
-        <translation>Смайлики:</translation>
+        <source>Do not convert text smiles to images</source>
+        <translation>Не конвертировать текстовые смайлы в графические</translation>
+    </message>
+    <message>
+        <source>Smiles:</source>
+        <translation>Смайлы:</translation>
     </message>
 </context>
 </TS>
