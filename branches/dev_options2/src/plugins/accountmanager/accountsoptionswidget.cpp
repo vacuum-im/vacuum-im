@@ -95,9 +95,21 @@ void AccountsOptionsWidget::reset()
 
 void AccountsOptionsWidget::filterAccountItemWidgets() const
 {
+	int visibleCount = 0;
 	bool hidden = isInactiveAccountsHidden();
 	foreach(AccountItemWidget *item, FAccountItems)
-		item->setVisible(!hidden || item->isActive());
+	{
+		if (!hidden || item->isActive())
+		{
+			visibleCount++;
+			item->setVisible(true);
+		}
+		else
+		{
+			item->setVisible(false);
+		}
+	}
+	ui.lblNoAccounts->setVisible(visibleCount <= 0);
 	ui.lblHideShowInactive->setText(QString("<a href='hide-show'>%1</a>").arg(hidden ? tr("Show inactive accounts") : tr("Hide inactive accounts")));
 }
 
@@ -142,11 +154,13 @@ void AccountsOptionsWidget::updateAccountItemWidget(AccountItemWidget *AItem, IA
 	AItem->setAccountJid(AAccount->accountJid());
 	AItem->setActive(AAccount->optionsNode().value("active").toBool());
 	AItem->setIcon(FStatusIcons!=NULL ? FStatusIcons->iconByJidStatus(AItem->accountJid(),IPresence::Online,SUBSCRIPTION_BOTH,false) : QIcon());
+	filterAccountItemWidgets();
 }
 
 void AccountsOptionsWidget::removeAccountItemWidget(const QUuid &AAccountId)
 {
 	delete FAccountItems.take(AAccountId);
+	filterAccountItemWidgets();
 }
 
 void AccountsOptionsWidget::mousePressEvent(QMouseEvent *AEvent)

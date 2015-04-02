@@ -11,6 +11,7 @@
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/istatusicons.h>
 #include <interfaces/ipresence.h>
+#include <interfaces/ioptionsmanager.h>
 #include <utils/options.h>
 
 class RecentContacts : 
@@ -21,10 +22,11 @@ class RecentContacts :
 	public IRostersDragDropHandler,
 	public IRostersLabelHolder,
 	public IRostersClickHooker,
-	public IRecentItemHandler
+	public IRecentItemHandler,
+	public IOptionsDialogHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IRecentContacts IRosterDataHolder IRostersDragDropHandler IRostersLabelHolder IRostersClickHooker IRecentItemHandler);
+	Q_INTERFACES(IPlugin IRecentContacts IRosterDataHolder IRostersDragDropHandler IRostersLabelHolder IRostersClickHooker IRecentItemHandler IOptionsDialogHolder);
 public:
 	RecentContacts();
 	~RecentContacts();
@@ -40,6 +42,8 @@ public:
 	virtual QList<int> rosterDataRoles(int AOrder) const;
 	virtual QVariant rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const;
 	virtual bool setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole);
+	//IOptionsDialogHolder
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IRostersDragDropHandler
 	virtual Qt::DropActions rosterDragStart(const QMouseEvent *AEvent, IRosterIndex *AIndex, QDrag *ADrag);
 	virtual bool rosterDragEnter(const QDragEnterEvent *AEvent);
@@ -148,11 +152,6 @@ protected slots:
 protected slots:
 	void onOptionsOpened();
 	void onOptionsChanged(const OptionsNode &ANode);
-	void onChangeAlwaysShowOfflineItems();
-	void onChangeHideInactiveItems();
-	void onChangeSimpleContactsView();
-	void onChangeSortByLastActivity();
-	void onChangeShowOnlyFavorite();
 private:
 	IPluginManager *FPluginManager;
 	IPrivateStorage *FPrivateStorage;
@@ -162,6 +161,7 @@ private:
 	IMessageProcessor *FMessageProcessor;
 	IAccountManager *FAccountManager;
 	IStatusIcons *FStatusIcons;
+	IOptionsManager *FOptionsManager;
 private:
 	quint32 FShowFavoriteLabelId;
 private:

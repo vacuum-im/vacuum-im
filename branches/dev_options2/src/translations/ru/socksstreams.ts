@@ -23,6 +23,10 @@
         <source>Use account proxy settings for outgoing connections</source>
         <translation>Использовать прокси аккаунта для исходящих подключений</translation>
     </message>
+    <message>
+        <source>host:port</source>
+        <translation>хост:порт</translation>
+    </message>
 </context>
 <context>
     <name>SocksStreams</name>

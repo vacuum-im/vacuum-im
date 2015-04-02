@@ -20,10 +20,6 @@
         <translation>Видалити контакт з вибраних</translation>
     </message>
     <message>
-        <source>Always Show Offline Contacts</source>
-        <translation>Завжди відображати відключені контакти</translation>
-    </message>
-    <message>
         <source>Add to Favorites</source>
         <translation>Додати до вибраного</translation>
     </message>
@@ -32,27 +28,35 @@
         <translation>Видалити з вибраного</translation>
     </message>
     <message>
-        <source>Simplify Contacts View</source>
-        <translation>Спростити відображення контактів</translation>
-    </message>
-    <message>
         <source>Remove from Recent Contacts</source>
         <translation>Видалити з недавніх контактів</translation>
     </message>
     <message>
-        <source>Sort by Last Activity</source>
-        <translation>Сортувати за останньою активністю</translation>
-    </message>
-    <message>
-        <source>Show Only Favorite Contacts</source>
-        <translation>Показувати тільки вибрані контакти</translation>
-    </message>
-    <message>
-        <source>Hide Inactive Contacts</source>
-        <translation>Ховати неактивні контакти</translation>
-    </message>
-    <message>
         <source>&lt;b&gt;Account:&lt;/b&gt; %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recent contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide inactive contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort contacts by last activity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always show offline contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show only favorite contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Simplify recent contacts view</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

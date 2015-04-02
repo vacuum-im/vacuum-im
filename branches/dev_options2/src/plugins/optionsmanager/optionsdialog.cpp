@@ -69,7 +69,7 @@ OptionsDialog::OptionsDialog(IOptionsManager *AOptionsManager, const QString &AR
 	ui.trvNodes->setVisible(FItemsModel->rowCount() > 0);
 
 	if (!restoreGeometry(Options::fileValue("optionsmanager.optionsdialog.geometry",FRootNodeId).toByteArray()))
-		setGeometry(WidgetManager::alignGeometry(FItemsModel->rowCount()>0 ? QSize(800,600) : QSize(620,600),this));
+		setGeometry(WidgetManager::alignGeometry(FItemsModel->rowCount()>0 ? QSize(750,560) : QSize(570,560),this));
 	if (!ui.sprSplitter->restoreState(Options::fileValue("optionsmanager.optionsdialog.splitter.state",FRootNodeId).toByteArray()))
 		ui.sprSplitter->setSizes(QList<int>() << 180 << 620);
 }

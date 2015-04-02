@@ -128,7 +128,6 @@ protected:
 	void drawRow(QPainter *APainter, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex ) const;
 	//QAbstractItemView
 	bool viewportEvent(QEvent *AEvent);
-	void resizeEvent(QResizeEvent *AEvent);
 	bool edit(const QModelIndex &AIndex, EditTrigger ATrigger, QEvent *AEvent);
 	//QWidget
 	void paintEvent(QPaintEvent *AEvent);

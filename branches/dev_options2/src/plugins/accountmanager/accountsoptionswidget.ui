@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>412</width>
-    <height>41</height>
+    <height>57</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -21,6 +21,22 @@
      </property>
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="lblNoAccounts">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="text">
+      <string>Add or register a new account</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

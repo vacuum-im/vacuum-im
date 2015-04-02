@@ -87,7 +87,11 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lneForwardDirectAddress"/>
+      <widget class="QLineEdit" name="lneForwardDirectAddress">
+       <property name="placeholderText">
+        <string>host:port</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

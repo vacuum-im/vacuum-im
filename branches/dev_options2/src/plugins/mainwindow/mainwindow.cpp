@@ -221,12 +221,12 @@ void MainWindow::loadWindowGeometryAndState()
 		{
 			FLeftWidgetWidth = 200;
 			Options::setFileValue(0,"mainwindow.align",ns);
-			setGeometry(WidgetManager::alignGeometry(QSize(640,480),this,Qt::AlignCenter));
+			setGeometry(WidgetManager::alignGeometry(QSize(800,600),this,Qt::AlignCenter));
 		}
 		else
 		{
 			Options::setFileValue((int)(Qt::AlignRight|Qt::AlignBottom),"mainwindow.align",ns);
-			setGeometry(WidgetManager::alignGeometry(QSize(200,500),this,Qt::AlignRight|Qt::AlignBottom));
+			setGeometry(WidgetManager::alignGeometry(QSize(200,600),this,Qt::AlignRight|Qt::AlignBottom));
 		}
 	}
 	else if (isCentralWidgetVisible())
