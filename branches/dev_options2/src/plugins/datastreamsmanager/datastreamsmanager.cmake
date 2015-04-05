@@ -1,2 +1,2 @@
 set(SOURCES datastreamsmanager.cpp )
-set(HEADERS datastreamsoptions.h )
+set(HEADERS datastreamsmanager.h )
