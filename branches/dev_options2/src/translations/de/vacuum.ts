@@ -68,6 +68,43 @@
         <source>Settings saved. Do you want to restart application?</source>
         <translation>Einstellungen gespeichert. Wollen sie den Anwendung neu starten?</translation>
     </message>
+    <message>
+        <source>Disabled (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>With errors (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>This plugin depends on %n other plugins.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>This plugin does not depend on other plugins.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Other %n plugins depend on this plugin.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Other plugins don&apos;t depend on this plugin.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Not found %n dependences.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>SetupPluginsDialogClass</name>
@@ -76,24 +113,12 @@
         <translation>Plugin Einrichtung</translation>
     </message>
     <message>
-        <source>Error Message:</source>
-        <translation>Fehler Meldung:</translation>
+        <source>Search plugin</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Depends</source>
-        <translation>Abhängigkeiten</translation>
-    </message>
-    <message>
-        <source>Depend</source>
-        <translation>Abhängig von</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation>Name</translation>
-    </message>
-    <message>
-        <source>File</source>
-        <translation>Datei</translation>
+        <source>Plugin Information</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

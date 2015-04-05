@@ -159,42 +159,39 @@ const IPluginInfo *PluginManager::pluginInfo(const QUuid &AUuid) const
 	return FPluginItems.contains(AUuid) ? FPluginItems.value(AUuid).info : NULL;
 }
 
-QList<QUuid> PluginManager::pluginDependencesOn(const QUuid &AUuid) const
+QSet<QUuid> PluginManager::pluginDependencesOn(const QUuid &AUuid) const
 {
 	static QStack<QUuid> deepStack;
 	deepStack.push(AUuid);
 
-	QList<QUuid> plugins;
-	QHash<QUuid, PluginItem>::const_iterator it = FPluginItems.constBegin();
-	while (it != FPluginItems.constEnd())
+	QSet<QUuid> plugins;
+	for (QHash<QUuid, PluginItem>::const_iterator it = FPluginItems.constBegin(); it!=FPluginItems.constEnd(); ++it)
 	{
 		if (!deepStack.contains(it.key()) && it.value().info->dependences.contains(AUuid))
 		{
 			plugins += pluginDependencesOn(it.key());
-			plugins.append(it.key());
+			plugins += it.key();
 		}
-		++it;
 	}
 
 	deepStack.pop();
 	return plugins;
 }
 
-QList<QUuid> PluginManager::pluginDependencesFor(const QUuid &AUuid) const
+QSet<QUuid> PluginManager::pluginDependencesFor(const QUuid &AUuid) const
 {
 	static QStack<QUuid> deepStack;
 	deepStack.push(AUuid);
 
-	QList<QUuid> plugins;
+	QSet<QUuid> plugins;
 	if (FPluginItems.contains(AUuid))
 	{
-		QList<QUuid> dependences = FPluginItems.value(AUuid).info->dependences;
-		foreach(const QUuid &depend, dependences)
+		foreach(const QUuid &depend, FPluginItems.value(AUuid).info->dependences)
 		{
 			if (!deepStack.contains(depend) && FPluginItems.contains(depend))
 			{
-				plugins.append(depend);
 				plugins += pluginDependencesFor(depend);
+				plugins += depend;
 			}
 		}
 	}
