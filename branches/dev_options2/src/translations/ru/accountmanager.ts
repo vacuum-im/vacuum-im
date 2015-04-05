@@ -88,6 +88,13 @@
     </message>
 </context>
 <context>
+    <name>AccountsOptionsClass</name>
+    <message>
+        <source>Add or register a new account</source>
+        <translation>Добавьте или зарегистрируйте новый аккаунт</translation>
+    </message>
+</context>
+<context>
     <name>AccountsOptionsWidget</name>
     <message>
         <source>Add Account...</source>
@@ -162,10 +169,6 @@
     <message>
         <source>Google Talk</source>
         <translation>Google Talk</translation>
-    </message>
-    <message>
-        <source>Facebook</source>
-        <translation>Facebook</translation>
     </message>
     <message>
         <source>Yandex Online</source>

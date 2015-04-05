@@ -122,6 +122,7 @@ IMessageStyleOptions SimpleMessageStyleEngine::styleOptions(const OptionsNode &A
 	{
 		QString styleId = AStyleId.isEmpty() ? AEngineNode.value("style-id").toString() : AStyleId;
 
+		// Select default style
 		if (!FStylePaths.isEmpty() && !FStylePaths.contains(styleId))
 		{
 			int mtype = AEngineNode.parentNSpaces().value(1).toInt();
@@ -131,9 +132,11 @@ IMessageStyleOptions SimpleMessageStyleEngine::styleOptions(const OptionsNode &A
 			case Message::Headline:
 			case Message::Error:
 				styleId = "Message Style";
+				AEngineNode.node("style",styleId).setValue(QString("Default"),"variant");
 				break;
 			default:
 				styleId = "Chat Style";
+				AEngineNode.node("style",styleId).setValue(QString("Default"),"variant");
 			}
 			styleId = !FStylePaths.contains(styleId) ? FStylePaths.keys().first() : styleId;
 		}

@@ -88,6 +88,13 @@
     </message>
 </context>
 <context>
+    <name>AccountsOptionsClass</name>
+    <message>
+        <source>Add or register a new account</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AccountsOptionsWidget</name>
     <message>
         <source>Add Account...</source>
@@ -161,10 +168,6 @@
     </message>
     <message>
         <source>Google Talk</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Facebook</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

@@ -129,12 +129,12 @@ IMessageStyleOptions AdiumMessageStyleEngine::styleOptions(const OptionsNode &AE
 			switch (mtype)
 			{
 			case Message::GroupChat:
-				styleId = QString("yMous");
-				soptions.extended.insert(MSO_VARIANT,"Mercurial XtraColor Both");
+				styleId = "yMous";
+				AEngineNode.node("style",styleId).setValue(QString("Mercurial XtraColor Both"),"variant");
 				break;
 			default:
-				styleId = QString("Renkoo");
-				soptions.extended.insert(MSO_VARIANT,"Blue on Green");
+				styleId = "Renkoo";
+				AEngineNode.node("style",styleId).setValue(QString("Blue on Green"),"variant");
 			}
 			styleId = !FStylePaths.contains(styleId) ? FStylePaths.keys().first() : styleId;
 		}

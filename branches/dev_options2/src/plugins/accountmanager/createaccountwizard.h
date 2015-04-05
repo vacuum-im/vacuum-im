@@ -60,7 +60,6 @@ public:
 	enum ServiceType {
 		ServiceJabber,
 		ServiceGoogle,
-		ServiceFacebook,
 		ServiceYandex,
 		ServiceOdnoklassniki,
 		ServiceLiveJournal,

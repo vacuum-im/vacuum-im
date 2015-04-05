@@ -247,7 +247,6 @@ AppendServicePage::AppendServicePage(QWidget *AParent) : QWizardPage(AParent)
 	const struct { int type; QString name; } services[CreateAccountWizard::Service_Count] = {
 		{ CreateAccountWizard::ServiceJabber,        tr("Jabber/XMPP")        },
 		{ CreateAccountWizard::ServiceGoogle,        tr("Google Talk")        },
-		{ CreateAccountWizard::ServiceFacebook,      tr("Facebook")           },
 		{ CreateAccountWizard::ServiceYandex,        tr("Yandex Online")      },
 		{ CreateAccountWizard::ServiceOdnoklassniki, tr("Odnoklassniki")      },
 		{ CreateAccountWizard::ServiceLiveJournal,   tr("LiveJournal")        },
@@ -362,15 +361,6 @@ void AppendSettingsPage::initializePage()
 		{
 			static const QStringList domains = QStringList() 
 				<< "gmail.com" << "googlemail.com";
-
-			cmbDomain->setEditable(false);
-			cmbDomain->addItems(domains);
-		}
-		break;
-	case CreateAccountWizard::ServiceFacebook:
-		{
-			static const QStringList domains = QStringList() 
-				<< "chat.facebook.com";
 
 			cmbDomain->setEditable(false);
 			cmbDomain->addItems(domains);
