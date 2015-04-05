@@ -5,31 +5,31 @@
     <name>ConnectionOptionsWidget</name>
     <message>
         <source>Disable check</source>
-        <translation type="unfinished"></translation>
+        <translation>Вимкнути перевірку</translation>
     </message>
     <message>
         <source>Request on errors</source>
-        <translation type="unfinished"></translation>
+        <translation>Питати при помилках</translation>
     </message>
     <message>
         <source>Disconnect on errors</source>
-        <translation type="unfinished"></translation>
+        <translation>Відключатися при помилках</translation>
     </message>
     <message>
         <source>Allow only trusted</source>
-        <translation type="unfinished"></translation>
+        <translation>Дозволяти тільки довірені</translation>
     </message>
     <message>
         <source>TLSv1</source>
-        <translation type="unfinished"></translation>
+        <translation>TLSv1</translation>
     </message>
     <message>
         <source>SSLv3</source>
-        <translation type="unfinished"></translation>
+        <translation>SSLv3</translation>
     </message>
     <message>
         <source>SSLv2</source>
-        <translation type="unfinished"></translation>
+        <translation>SSLv2</translation>
     </message>
     <message>
         <source>Auto</source>
@@ -52,11 +52,11 @@
     </message>
     <message>
         <source>SSL Protocol:</source>
-        <translation type="unfinished"></translation>
+        <translation>Режим перевірки сертифікату:</translation>
     </message>
     <message>
         <source>Certificate:</source>
-        <translation type="unfinished"></translation>
+        <translation>SSL протокол:</translation>
     </message>
 </context>
 <context>
@@ -99,46 +99,46 @@
     </message>
     <message>
         <source>Certificate holder:</source>
-        <translation type="unfinished"></translation>
+        <translation>Підключитися один раз</translation>
     </message>
     <message>
         <source>Certificate issuer:</source>
-        <translation type="unfinished"></translation>
+        <translation>Підключатися завжди</translation>
     </message>
     <message>
         <source>Certificate details:</source>
-        <translation type="unfinished"></translation>
+        <translation>Підключення до &lt;b&gt;%1&lt;/b&gt; не може вважатися повністю безпечним через помилки при перевірці сертифікату сервера:</translation>
     </message>
     <message>
         <source>Effective from: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ім&apos;я: %1</translation>
     </message>
     <message>
         <source>Expired at: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Сертифікат видано:</translation>
     </message>
     <message>
         <source>Serial number: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>SSL Authentication Error</source>
-        <translation type="unfinished">Помилка автентифікації SSL</translation>
+        <translation>Сертифікат випущено:</translation>
     </message>
     <message>
         <source>Connection to &lt;b&gt;%1&lt;/b&gt; can not be considered completely safe due to errors in servers certificate check:</source>
+        <translation>Дійсний з: %1</translation>
+    </message>
+    <message>
+        <source>Connect Once</source>
+        <translation>Серійний номер: %1</translation>
+    </message>
+    <message>
+        <source>Connect Always</source>
+        <translation>Сертифікат хосту не знаходиться у списку довірених</translation>
+    </message>
+    <message>
+        <source>SSL Authentication Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Disconnect</source>
-        <translation type="unfinished">Відключитися</translation>
-    </message>
-    <message>
-        <source>Connect Once</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Connect Always</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

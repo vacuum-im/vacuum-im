@@ -33,7 +33,7 @@
     </message>
     <message>
         <source>Supports the exchanging of the information about the application version</source>
-        <translation>Respalda el intercambio de información acerca de la versión de la aplicación</translation>
+        <translation>Soporta el intercambio de información acerca de la versión de la aplicación</translation>
     </message>
     <message>
         <source>Last Activity</source>
@@ -41,7 +41,7 @@
     </message>
     <message>
         <source>Supports the exchanging of the information about the user last activity</source>
-        <translation>Respalda el intercambio de información acerca de la última actividad del usuario</translation>
+        <translation>Soporta el intercambio de información acerca de la última actividad del usuario</translation>
     </message>
     <message>
         <source>Entity Time</source>
@@ -49,7 +49,7 @@
     </message>
     <message>
         <source>Supports the exchanging of the information about the user local time</source>
-        <translation>Respalda el intercambio de información acerca de la hora local del usuario</translation>
+        <translation>Soporta el intercambio de información acerca de la hora local del usuario</translation>
     </message>
     <message>
         <source>Service Uptime</source>
@@ -65,7 +65,7 @@
     </message>
     <message>
         <source>Supports the exchanging of the application-level pings over XML streams</source>
-        <translation>Respalda el intercambio de pings a nivel de aplicación sobre tramas XML</translation>
+        <translation>Soporta el intercambio de pings a nivel de aplicación sobre tramas XML</translation>
     </message>
     <message>
         <source>Share information about your OS version</source>

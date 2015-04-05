@@ -21,15 +21,15 @@
     </message>
     <message>
         <source>TLSv1</source>
-        <translation type="unfinished"></translation>
+        <translation>TLSv1</translation>
     </message>
     <message>
         <source>SSLv3</source>
-        <translation type="unfinished"></translation>
+        <translation>SSLv3</translation>
     </message>
     <message>
         <source>SSLv2</source>
-        <translation type="unfinished"></translation>
+        <translation>SSLv2</translation>
     </message>
     <message>
         <source>Auto</source>
@@ -56,7 +56,7 @@
     </message>
     <message>
         <source>Certificate:</source>
-        <translation type="unfinished"></translation>
+        <translation>Protocolo SSL:</translation>
     </message>
 </context>
 <context>

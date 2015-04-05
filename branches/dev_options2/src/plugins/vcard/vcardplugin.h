@@ -67,8 +67,8 @@ public:
 	virtual bool hasVCard(const Jid &AContactJid) const;
 	virtual IVCard *getVCard(const Jid &AContactJid);
 	virtual bool requestVCard(const Jid &AStreamJid, const Jid &AContactJid);
-	virtual bool publishVCard(IVCard *AVCard, const Jid &AStreamJid);
-	virtual void showVCardDialog(const Jid &AStreamJid, const Jid &AContactJid);
+	virtual bool publishVCard(const Jid &AStreamJid, IVCard *AVCard);
+	virtual QDialog *showVCardDialog(const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent = NULL);
 signals:
 	void vcardReceived(const Jid &AContactJid);
 	void vcardPublished(const Jid &AContactJid);

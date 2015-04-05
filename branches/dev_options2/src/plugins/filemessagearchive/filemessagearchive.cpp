@@ -538,10 +538,14 @@ IArchiveCollection FileMessageArchive::loadFileCollection(const Jid &AStreamJid,
 			QFile file(filePath);
 			if (file.open(QFile::ReadOnly))
 			{
+				QString xmlError;
 				QDomDocument doc;
-				doc.setContent(&file,true);
+				doc.setContent(&file,true,&xmlError);
 				FArchiver->elementToCollection(AStreamJid,doc.documentElement(),collection);
-				collection.header.engineId = engineId();
+				if (collection.header.with.isValid() && collection.header.start.isValid())
+					collection.header.engineId = engineId();
+				else
+					REPORT_ERROR(QString("Failed to load file collection from file content: %1").arg(xmlError));
 			}
 			else if (file.exists())
 			{
@@ -1206,17 +1210,16 @@ FileWriter *FileMessageArchive::newFileWriter(const Jid &AStreamJid, const IArch
 		{
 			delete writer;
 			writer = NULL;
-			REPORT_ERROR("Failed to create file writer: Writer not opened");
 		}
 		return writer;
 	}
 	else if (FWritingFiles.contains(AFileName))
 	{
-		REPORT_ERROR("Failed to create file writer: File already exists");
+		REPORT_ERROR("Failed to create file writer: Writer already exists");
 	}
 	else
 	{
-		REPORT_ERROR("Failed to create file writer: Invalid params");
+		REPORT_ERROR("Failed to create file writer: Invalid parameters");
 	}
 	return NULL;
 }

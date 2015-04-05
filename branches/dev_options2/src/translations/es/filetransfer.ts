@@ -57,7 +57,7 @@
     </message>
     <message>
         <source>Supports the sending of the file to another contact</source>
-        <translation>Respalda el envío del archivo a otro contacto</translation>
+        <translation>Soporta el envío del archivo a otro contacto</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; successfully sent.</source>
@@ -69,7 +69,7 @@
     </message>
     <message>
         <source>Failed to start file transfer</source>
-        <translation>Ha habido un fallo al iniciar la transferencia</translation>
+        <translation>Error al iniciar la transferencia</translation>
     </message>
     <message>
         <source>Send file</source>

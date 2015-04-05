@@ -1,6 +1,7 @@
 #include "toolbarchanger.h"
 
 #include <QTimer>
+#include <QLayout>
 #include <QPointer>
 #include <QWidgetAction>
 
@@ -48,16 +49,16 @@ ToolBarChanger::ToolBarChanger(QToolBar *AToolBar) : QObject(AToolBar)
 {
 	FSeparatorsVisible = true;
 	FAutoHideIfEmpty = true;
+	FMinimizeWidth = false;
 
 	FToolBar = AToolBar;
 	FToolBar->clear();
+	AToolBar->installEventFilter(this);
 
 	QWidget *widget = new QWidget(FToolBar);
 	widget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	FAllignChange = insertWidget(widget, TBG_ALLIGN_CHANGE);
 	FAllignChange->setVisible(false);
-
-	updateVisible();
 }
 
 ToolBarChanger::~ToolBarChanger()
@@ -68,6 +69,17 @@ ToolBarChanger::~ToolBarChanger()
 bool ToolBarChanger::isEmpty() const
 {
 	return FWidgets.count() < 2;
+}
+
+bool ToolBarChanger::isMinimizeWidth() const
+{
+	return FMinimizeWidth;
+}
+
+void ToolBarChanger::setMinimizeWidth(bool AMinimize)
+{
+	FMinimizeWidth = AMinimize;
+	onUpdateVisibilityAndWidth();
 }
 
 bool ToolBarChanger::separatorsVisible() const
@@ -91,7 +103,7 @@ bool ToolBarChanger::autoHideEmptyToolbar() const
 void ToolBarChanger::setAutoHideEmptyToolbar(bool AAutoHide)
 {
 	FAutoHideIfEmpty = AAutoHide;
-	updateVisible();
+	onUpdateVisibilityAndWidth();
 }
 
 QToolBar *ToolBarChanger::toolBar() const
@@ -146,7 +158,6 @@ QAction *ToolBarChanger::insertWidget(QWidget *AWidget, int AGroup)
 		connect(AWidget,SIGNAL(destroyed(QObject *)),SLOT(onWidgetDestroyed(QObject *)));
 
 		emit itemInserted(before,handle,NULL,AWidget,AGroup);
-		updateVisible();
 	}
 	return FHandles.value(AWidget);
 }
@@ -171,7 +182,6 @@ QToolButton *ToolBarChanger::insertAction(Action *AAction, int AGroup)
 		connect(button,SIGNAL(destroyed(QObject *)),SLOT(onWidgetDestroyed(QObject *)));
 
 		emit itemInserted(before,buttonAction,AAction,button,AGroup);
-		updateVisible();
 	}
 	return FButtons.value(AAction);
 }
@@ -199,7 +209,6 @@ void ToolBarChanger::removeItem(QAction *AHandle)
 		removeGroupSeparator(group);
 
 		emit itemRemoved(AHandle);
-		updateVisible();
 	}
 }
 
@@ -210,10 +219,17 @@ void ToolBarChanger::clear()
 	FToolBar->clear();
 }
 
-void ToolBarChanger::updateVisible()
+bool ToolBarChanger::eventFilter(QObject *AWatched, QEvent *AEvent)
 {
-	FToolBar->setMaximumWidth(!FAutoHideIfEmpty || !isEmpty() ? QWIDGETSIZE_MAX : 0);
-	FToolBar->setMaximumHeight(!FAutoHideIfEmpty || !isEmpty() ? QWIDGETSIZE_MAX : 0);
+	if (AWatched == FToolBar)
+	{
+		static const QList<QEvent::Type> updateEventTypes = QList<QEvent::Type>() 
+			<< QEvent::LayoutRequest << QEvent::ChildAdded << QEvent::ChildRemoved << QEvent::Show;
+
+		if (updateEventTypes.contains(AEvent->type()))
+			QTimer::singleShot(0,this,SLOT(onUpdateVisibilityAndWidth()));
+	}
+	return QObject::eventFilter(AWatched,AEvent);
 }
 
 void ToolBarChanger::updateSeparatorVisible()
@@ -258,6 +274,38 @@ void ToolBarChanger::removeGroupSeparator(int AGroup)
 	if (FWidgets.keys().last()<=TBG_ALLIGN_CHANGE)
 	{
 		FAllignChange->setVisible(false);
+	}
+}
+
+void ToolBarChanger::onUpdateVisibilityAndWidth()
+{
+	if (FAutoHideIfEmpty && isEmpty())
+	{
+		FToolBar->setMaximumWidth(0);
+		FToolBar->setMaximumHeight(0);
+	}
+	else if (!FMinimizeWidth)
+	{
+		FToolBar->setMaximumWidth(QWIDGETSIZE_MAX);
+		FToolBar->setMaximumHeight(QWIDGETSIZE_MAX);
+	}
+	else
+	{
+		int maxWidth = 0;
+		int visibleItemsCount = 0;
+		foreach(QWidget *widget, FToolBar->findChildren<QWidget *>())
+		{
+			if (widget->isVisible() && widget->parentWidget()==FToolBar)
+			{
+				visibleItemsCount++;
+				if (visibleItemsCount == 1)
+					maxWidth = widget->sizeHint().width() + FToolBar->layout()->margin()*2;
+				else
+					break;
+			}
+		}
+		FToolBar->setMaximumHeight(QWIDGETSIZE_MAX);
+		FToolBar->setMaximumWidth(visibleItemsCount==1 ? maxWidth : QWIDGETSIZE_MAX);
 	}
 }
 

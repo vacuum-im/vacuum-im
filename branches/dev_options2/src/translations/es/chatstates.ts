@@ -21,7 +21,7 @@
     </message>
     <message>
         <source>Supports the exchanging of the information about the user&apos;s activity in the chat</source>
-        <translation>Respalda el intercambio de información sobre la actividad del usuario en el chat</translation>
+        <translation>Soporta el intercambio de información sobre la actividad del usuario en el chat</translation>
     </message>
     <message>
         <source>When contact is typing the message for you</source>

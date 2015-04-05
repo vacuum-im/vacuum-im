@@ -11,7 +11,7 @@ RootIndex::RootIndex(AdvancedItemModel *AModel)
 
 RootIndex::~RootIndex()
 {
-
+	removeChildren();
 }
 
 int RootIndex::kind() const

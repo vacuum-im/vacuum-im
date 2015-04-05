@@ -353,10 +353,7 @@ bool VCardPlugin::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, con
 {
 	Q_UNUSED(AParams);
 	if (AAction == "vcard")
-	{
-		showVCardDialog(AStreamJid, AContactJid);
-		return true;
-	}
+		return showVCardDialog(AStreamJid, AContactJid)!=NULL;
 	return false;
 }
 
@@ -381,7 +378,7 @@ IVCard *VCardPlugin::getVCard(const Jid &AContactJid)
 
 bool VCardPlugin::requestVCard(const Jid &AStreamJid, const Jid &AContactJid)
 {
-	if (FStanzaProcessor)
+	if (FStanzaProcessor && AContactJid.isValid())
 	{
 		if (FVCardRequestId.key(AContactJid).isEmpty())
 		{
@@ -402,10 +399,14 @@ bool VCardPlugin::requestVCard(const Jid &AStreamJid, const Jid &AContactJid)
 		}
 		return true;
 	}
+	else if (!AContactJid.isValid())
+	{
+		REPORT_ERROR("Failed to request user vCard: Invalid params");
+	}
 	return false;
 }
 
-bool VCardPlugin::publishVCard(IVCard *AVCard, const Jid &AStreamJid)
+bool VCardPlugin::publishVCard(const Jid &AStreamJid, IVCard *AVCard)
 {
 	if (FStanzaProcessor && AVCard->isValid() && FVCardPublishId.key(AStreamJid.pBare()).isEmpty())
 	{
@@ -427,22 +428,33 @@ bool VCardPlugin::publishVCard(IVCard *AVCard, const Jid &AStreamJid)
 			LOG_STRM_WARNING(AStreamJid,"Failed to send self vCard publish request");
 		}
 	}
+	else if (!AVCard->isValid())
+	{
+		REPORT_ERROR("Failed to publish self vCard: Invalid params");
+	}
 	return false;
 }
 
-void VCardPlugin::showVCardDialog(const Jid &AStreamJid, const Jid &AContactJid)
+QDialog *VCardPlugin::showVCardDialog(const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent)
 {
 	if (FVCardDialogs.contains(AContactJid))
 	{
 		VCardDialog *dialog = FVCardDialogs.value(AContactJid);
 		WidgetManager::showActivateRaiseWindow(dialog);
+		return dialog;
 	}
 	else if (AStreamJid.isValid() && AContactJid.isValid())
 	{
-		VCardDialog *dialog = new VCardDialog(this,AStreamJid,AContactJid);
+		VCardDialog *dialog = new VCardDialog(this,AStreamJid,AContactJid, AParent);
 		connect(dialog,SIGNAL(destroyed(QObject *)),SLOT(onVCardDialogDestroyed(QObject *)));
 		FVCardDialogs.insert(AContactJid,dialog);
-		dialog->show();
+		WidgetManager::showActivateRaiseWindow(dialog);
+		return dialog;
+	}
+	else
+	{
+		REPORT_ERROR("Failed to show vCard dialog: Invalid params");
+		return NULL;
 	}
 }
 
@@ -472,9 +484,9 @@ void VCardPlugin::unlockVCard(const Jid &AContactJid)
 void VCardPlugin::restrictVCardImagesSize(IVCard *AVCard)
 {
 	static const struct { const char *value; const char *type; } imageTags[] = {
-		{VVN_LOGO_VALUE,  VVN_LOGO_TYPE  },
-		{VVN_PHOTO_VALUE, VVN_PHOTO_TYPE },
-		{NULL,            NULL           },
+		{ VVN_LOGO_VALUE,  VVN_LOGO_TYPE  },
+		{ VVN_PHOTO_VALUE, VVN_PHOTO_TYPE },
+		{ NULL,            NULL           },
 	};
 
 	if (Options::node(OPV_COMMON_RESTRICT_VCARD_IMAGES_SIZE).value().toBool())
@@ -576,7 +588,6 @@ void VCardPlugin::insertMessageToolBarAction(IMessageToolBarWidget *AWidget)
 QList<Action *> VCardPlugin::createClipboardActions(const QSet<QString> &AStrings, QObject *AParent) const
 {
 	QList<Action *> actions;
-
 	foreach(const QString &string, AStrings)
 	{
 		if (!string.isEmpty())
@@ -588,7 +599,6 @@ QList<Action *> VCardPlugin::createClipboardActions(const QSet<QString> &AString
 			actions.append(action);
 		}
 	}
-
 	return actions;
 }
 

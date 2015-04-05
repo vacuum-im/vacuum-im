@@ -120,19 +120,19 @@ Comprueba la configuración y vuelve a intentarlo.</translation>
     </message>
     <message>
         <source>Failed to send request for list of %1s.</source>
-        <translation>No se pudo enviar la solicitud de la lista de %1s</translation>
+        <translation>Error al enviar la solicitud de la lista de %1s</translation>
     </message>
     <message>
         <source>Failed to send changes in list of %1s</source>
-        <translation>No se pudieron enviar los cambios en la lista de &apos;%1s&apos;</translation>
+        <translation>Error al enviar los cambios en la lista de &apos;%1s&apos;</translation>
     </message>
     <message>
         <source>Room configuration request failed.</source>
-        <translation>No se pudo solicitar la configuración de la sala.</translation>
+        <translation>La solicitud de configuración de la sala ha fallado.</translation>
     </message>
     <message>
         <source>Room configuration submit failed.</source>
-        <translation>No se pudo confirmar la configuración de la sala.</translation>
+        <translation>La confirmación de configuración de la sala ha fallado.</translation>
     </message>
     <message>
         <source>Room destruction request was sent.</source>
@@ -375,7 +375,7 @@ Comprueba la configuración y vuelve a intentarlo.</translation>
     </message>
     <message>
         <source>Affiliations that May Discover Real JIDs of Occupants</source>
-        <translation>Roles que pueden descubrir el veradero JID de los usuarios</translation>
+        <translation>Afiliaciones que pueden descubrir el verdadero JID de los usuarios</translation>
     </message>
     <message>
         <source>Conference information</source>
@@ -415,7 +415,7 @@ Comprueba la configuración y vuelve a intentarlo.</translation>
     </message>
     <message>
         <source>Requested Role</source>
-        <translation>Solicitar rol</translation>
+        <translation>Rol solicitado</translation>
     </message>
     <message>
         <source>User ID</source>
@@ -487,19 +487,19 @@ Comprueba la configuración y vuelve a intentarlo.</translation>
     </message>
     <message>
         <source>Given Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nombre</translation>
     </message>
     <message>
         <source>Family Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Apellido</translation>
     </message>
     <message>
         <source>Maximum Number of History Messages Returned by Room</source>
-        <translation type="unfinished"></translation>
+        <translation>Número máximo de mensajes del historial devueltos por la sala</translation>
     </message>
     <message>
         <source>Affiliations that May Retrieve Member List</source>
-        <translation type="unfinished"></translation>
+        <translation>Afiliaciones que pueden obtener la lista de miembros</translation>
     </message>
     <message>
         <source>XMPP URI of Associated Publish-Subscribe Node</source>
@@ -507,35 +507,35 @@ Comprueba la configuración y vuelve a intentarlo.</translation>
     </message>
     <message>
         <source>Roles for which Presence is Broadcasted</source>
-        <translation type="unfinished"></translation>
+        <translation>Roles a los que el estado de presencia es enviado</translation>
     </message>
     <message>
         <source>Full List of Room Administrators</source>
-        <translation type="unfinished"></translation>
+        <translation>Lista completa de los administradores de la sala</translation>
     </message>
     <message>
         <source>Make Participants List Public?</source>
-        <translation type="unfinished"></translation>
+        <translation>¿Hacer pública la lista de participantes?</translation>
     </message>
     <message>
         <source>Allow Occupants to Send Private Messages?</source>
-        <translation type="unfinished"></translation>
+        <translation>¿Permitir a los ocupantes enviar mensajes privados?</translation>
     </message>
     <message>
         <source>Allow Occupants to Query Other Occupants?</source>
-        <translation type="unfinished"></translation>
+        <translation>¿Permitir a los usuarios de la sala hacer consultas a otros?</translation>
     </message>
     <message>
         <source>Allow Visitors to Send Status Text in Presence Updates?</source>
-        <translation type="unfinished"></translation>
+        <translation>¿Permitir a los visitantes enviar textos en las actualizaciones de estados de presencia?</translation>
     </message>
     <message>
         <source>Allow Login Only With Registered Nickname?</source>
-        <translation type="unfinished"></translation>
+        <translation>¿Permitir solo la entrada de apodos registrados?</translation>
     </message>
     <message>
         <source>Allow Occupants to Change Nicknames?</source>
-        <translation type="unfinished"></translation>
+        <translation>¿Permitir a los ocupantes cambiar de apodo?</translation>
     </message>
     <message>
         <source>Allow Users to Register with the Room?</source>
@@ -543,14 +543,14 @@ Comprueba la configuración y vuelve a intentarlo.</translation>
     </message>
     <message>
         <source>Make all Occupants as Participants?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Do not Request CAPTCHA for Followed Jabber ID</source>
-        <translation type="unfinished"></translation>
+        <translation>¿Hacer a todos los ocupantes participantes?</translation>
     </message>
     <message>
         <source>Make this Room CAPTCHA Protected?</source>
+        <translation>¿Se requiere CAPTCHA parar entrar?</translation>
+    </message>
+    <message>
+        <source>Do not Request CAPTCHA for Followed Jabber ID</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -863,7 +863,7 @@ Comprueba la configuración y vuelve a intentarlo.</translation>
     </message>
     <message>
         <source>Failed to load history: %1</source>
-        <translation>No se pudo cargar el historial: %1</translation>
+        <translation>Error al cargar el historial: %1</translation>
     </message>
     <message>
         <source>Enter</source>

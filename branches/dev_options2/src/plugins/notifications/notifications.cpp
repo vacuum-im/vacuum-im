@@ -479,7 +479,7 @@ void Notifications::removeNotification(int ANotifyId)
 		if (!record.trayAction.isNull())
 		{
 			FNotifyMenu->removeAction(record.trayAction);
-			delete record.trayAction;
+			record.trayAction->deleteLater();
 		}
 		if (!record.tabPageNotifier.isNull())
 		{

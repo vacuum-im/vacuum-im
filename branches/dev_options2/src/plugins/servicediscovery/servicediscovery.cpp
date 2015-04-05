@@ -1208,6 +1208,7 @@ void ServiceDiscovery::removeStreamMenu(const Jid &AStreamJid)
 	{
 		FDiscoMenu->removeAction(action);
 		FDiscoMenu->setEnabled(!FDiscoMenu->isEmpty());
+		action->deleteLater();
 	}
 }
 

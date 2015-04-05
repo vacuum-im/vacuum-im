@@ -5,7 +5,7 @@
     <name>EditItemDialogClass</name>
     <message>
         <source>Edit item</source>
-        <translation>Редагувати значення</translation>
+        <translation>Введіть значення</translation>
     </message>
 </context>
 <context>
@@ -258,11 +258,11 @@
     </message>
     <message>
         <source>User Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Особисті дані</translation>
     </message>
     <message>
         <source>Restrict maximum vCard images size</source>
-        <translation type="unfinished"></translation>
+        <translation>Обмежувати максимальний розмір зображення в vCard</translation>
     </message>
     <message>
         <source>Show contact profile</source>

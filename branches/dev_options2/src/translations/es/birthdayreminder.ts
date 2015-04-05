@@ -40,9 +40,11 @@
     <message numerus="yes">
         <source>Birthday in %n day(s),
  %1</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Cumpleaños en %n día.
+%1</numerusform>
+            <numerusform>Cumpleaños en %n días.
+%1</numerusform>
         </translation>
     </message>
 </context>

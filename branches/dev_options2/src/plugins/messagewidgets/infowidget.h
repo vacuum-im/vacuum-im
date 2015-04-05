@@ -41,10 +41,9 @@ protected:
 protected:
 	bool event(QEvent *AEvent);
 	void contextMenuEvent(QContextMenuEvent *AEvent);
-	bool eventFilter(QObject *AWatched, QEvent *AEvent);
 protected slots:
 	void onAddressMenuAboutToShow();
-	void onUpdateInfoToolBarMaxWidth();
+	void onUpdateInfoToolBarVisibility();
 private:
 	Ui::InfoWidgetClass ui;
 private:

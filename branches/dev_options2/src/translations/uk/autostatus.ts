@@ -52,7 +52,7 @@
     </message>
     <message>
         <source>Automatic change of status</source>
-        <translation type="unfinished"></translation>
+        <translation>Авто-статус &apos;Відійшов&apos; внаслідок бездіяльності більше #(m) хвилин.</translation>
     </message>
     <message>
         <source>Auto status due to inactivity for more than #(m) minutes</source>
@@ -206,11 +206,7 @@
     <name>AutoStatusOptionsWidgetClass</name>
     <message>
         <source>Change status to</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>after</source>
-        <translation type="unfinished"></translation>
+        <translation>Пріоритет</translation>
     </message>
     <message>
         <source> minutes</source>
@@ -226,6 +222,10 @@
     </message>
     <message>
         <source>of inactivity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>after</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

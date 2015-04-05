@@ -49,7 +49,7 @@
     </message>
     <message>
         <source>Always show offline contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Акаунт:&lt;/b&gt; %1</translation>
     </message>
     <message>
         <source>Show only favorite contacts</source>

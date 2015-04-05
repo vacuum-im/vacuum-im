@@ -5,13 +5,13 @@
     <name>CombineContactsDialog</name>
     <message>
         <source>Combine Contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Fusión de contactos</translation>
     </message>
     <message numerus="yes">
         <source>The following &lt;b&gt;%n contact(s)&lt;/b&gt; will be merged into metacontact:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>El siguiente &lt;b&gt;%n contacto&lt;/b&gt; se fusionarán en un metacontacto:</numerusform>
+            <numerusform>Los siguientes &lt;b&gt;%n contactos&lt;/b&gt; se fusionarán en un metacontacto:</numerusform>
         </translation>
     </message>
 </context>
@@ -19,51 +19,51 @@
     <name>MetaContacts</name>
     <message>
         <source>Copy Metacontact to Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Copiar metacontacto al grupo</translation>
     </message>
     <message>
         <source>Move Metacontact to Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Mover metacontacto al grupo</translation>
     </message>
     <message>
         <source>Combine Contacts...</source>
-        <translation type="unfinished"></translation>
+        <translation>Fundir contactos</translation>
     </message>
     <message>
         <source>Rename Metacontact</source>
-        <translation type="unfinished"></translation>
+        <translation>Renombrar metacontacto</translation>
     </message>
     <message>
         <source>Enter name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Inserta el nombre:</translation>
     </message>
     <message>
         <source>Detach from Metacontact</source>
-        <translation type="unfinished"></translation>
+        <translation>Separar del metacontacto</translation>
     </message>
     <message>
         <source>Destroy Metacontact</source>
-        <translation type="unfinished"></translation>
+        <translation>Dividir metacontacto</translation>
     </message>
     <message>
         <source>Rename</source>
-        <translation type="unfinished"></translation>
+        <translation>Renombrar</translation>
     </message>
     <message>
         <source>Allows to combine single contacts to metacontacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Permite fusionar contactos individuales en metacontactos</translation>
     </message>
     <message>
         <source>Metacontacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Metacontactos</translation>
     </message>
     <message>
         <source>%1 - Chat</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 - Chat</translation>
     </message>
     <message>
         <source>Combine contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Fundir contactos</translation>
     </message>
     <message>
         <source>Ctrl+M</source>

@@ -91,11 +91,14 @@ protected:
 	ArchiveHeader itemHeader(const QStandardItem *AItem) const;
 	QList<ArchiveHeader> itemHeaders(const QStandardItem *AItem) const;
 	QMultiMap<Jid,Jid> itemAddresses(const QStandardItem *AItem) const;
+	QList<ArchiveHeader> itemsHeaders(const QList<QStandardItem *> &AItems) const;
 	QStandardItem *findItem(int AType, int ARole, const QVariant &AValue, QStandardItem *AParent) const;
 protected:
-	void removeRequestItems(const Jid &AStreamJid, const IArchiveRequest &ARequest);
+	QList<QStandardItem *> selectedItems() const;
+	QList<QStandardItem *> filterChildItems(const QList<QStandardItem *> &AItems) const;
 	QList<QStandardItem *> findStreamItems(const Jid &AStreamJid, QStandardItem *AParent = NULL) const;
 	QList<QStandardItem *> findRequestItems(const Jid &AStreamJid, const IArchiveRequest &ARequest, QStandardItem *AParent = NULL) const;
+	void removeRequestItems(const Jid &AStreamJid, const IArchiveRequest &ARequest);
 protected:
 	void setRequestStatus(RequestStatus AStatus, const QString &AMessage);
 	void setHeaderStatus(RequestStatus AStatus, const QString &AMessage = QString::null);
@@ -126,12 +129,15 @@ protected slots:
 	void onSetContactJidByAction();
 	void onRemoveCollectionsByAction();
 	void onHeaderContextMenuRequested(const QPoint &APos);
+	void onPrintConversationsByAction();
+	void onExportConversationsByAction();
+	void onExportLabelLinkActivated(const QString &ALink);
 protected slots:
 	void onHeadersRequestTimerTimeout();
 	void onHeadersLoadMoreLinkClicked();
 	void onCollectionsRequestTimerTimeout();
 	void onCollectionsProcessTimerTimeout();
-	void onCurrentItemChanged(const QModelIndex &ACurrent, const QModelIndex &ABefore);
+	void onCurrentSelectionChanged(const QItemSelection &ASelected, const QItemSelection &ADeselected);
 protected slots:
 	void onArchiveRequestFailed(const QString &AId, const XmppError &AError);
 	void onArchiveHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders);
@@ -152,6 +158,7 @@ private:
 	IFileMessageArchive *FFileMessageArchive;
 	IMessageStyleManager *FMessageStyleManager;
 private:
+	QLabel *FExportLabel;
 	QLabel *FHeaderActionLabel;
 	QLabel *FHeadersEmptyLabel;
 	QLabel *FMessagesEmptyLabel;

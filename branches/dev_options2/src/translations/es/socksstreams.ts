@@ -64,15 +64,15 @@
     </message>
     <message>
         <source>Failed to create hosts</source>
-        <translation>Ha ocurrido un error al crear los hosts</translation>
+        <translation>Error al crear los hosts</translation>
     </message>
     <message>
         <source>Failed to activate stream</source>
-        <translation>Ha ocurrido un error al activar el flujo</translation>
+        <translation>Error al activar el flujo</translation>
     </message>
     <message>
         <source>Failed to send data to socket</source>
-        <translation>Ha ocurrido un error al enviar datos al socket</translation>
+        <translation>Error al enviar datos al socket</translation>
     </message>
     <message>
         <source>Direct connection not established</source>
@@ -88,7 +88,7 @@
     </message>
     <message>
         <source>Failed to connect to host</source>
-        <translation>Ha ocurrido un error al conectar al host</translation>
+        <translation>Error al conectar al host</translation>
     </message>
     <message>
         <source>Host disconnected</source>

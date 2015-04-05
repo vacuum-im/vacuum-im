@@ -275,11 +275,11 @@
     </message>
     <message>
         <source>Failed to read file: %1</source>
-        <translation>No se puede leer el archivo: %1</translation>
+        <translation>Error al leer el archivo: %1</translation>
     </message>
     <message>
         <source>Failed to open file: %1</source>
-        <translation>No se puede abrir el archivo: %1</translation>
+        <translation>Error al abrir el archivo: %1</translation>
     </message>
     <message>
         <source>Save Contacts to File</source>
@@ -287,11 +287,11 @@
     </message>
     <message>
         <source>Failed to Save Contacts</source>
-        <translation>No se pudo guardar los contactos al archivo</translation>
+        <translation>Error al guardar los contactos al archivo</translation>
     </message>
     <message>
         <source>Failed to create file: %1</source>
-        <translation>No se pudo crear el archivo: %1</translation>
+        <translation>Error al crear el archivo: %1</translation>
     </message>
     <message>
         <source>Load Last Selection</source>

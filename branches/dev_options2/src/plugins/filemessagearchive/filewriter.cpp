@@ -38,13 +38,13 @@ FileWriter::FileWriter(const Jid &AStreamJid, const QString &AFileName, const IA
 		}
 		else
 		{
-			LOG_ERROR(QString("Failed to create message writer file=%1: %2").arg(FXmlFile->fileName(),FXmlFile->errorString()));
+			LOG_ERROR(QString("Failed to create file writer %1: %2").arg(FXmlFile->fileName(),FXmlFile->errorString()));
 			deleteLater();
 		}
 	}
 	else
 	{
-		REPORT_ERROR("Failed to create message writer file: File already exists");
+		REPORT_ERROR("Failed to create file writer: File already exists");
 		deleteLater();
 	}
 }

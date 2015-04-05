@@ -120,7 +120,7 @@
     </message>
     <message>
         <source>Standard and users statuses</source>
-        <translation type="unfinished"></translation>
+        <translation>Вийшов з %1</translation>
     </message>
 </context>
 <context>

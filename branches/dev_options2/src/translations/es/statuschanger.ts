@@ -108,7 +108,7 @@
     </message>
     <message>
         <source>Left %1</source>
-        <translation>Salir de %1</translation>
+        <translation>Quedan %1</translation>
     </message>
     <message>
         <source>Connect to server on startup</source>

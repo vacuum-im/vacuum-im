@@ -45,7 +45,7 @@
     </message>
     <message>
         <source>Disable sounds and popup windows if status is &apos;Away&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Використовувати системні спливаючі сповіщення, якщо доступні </translation>
     </message>
     <message>
         <source>Disable sounds and popup windows if status is &apos;Do not disturb&apos;</source>
