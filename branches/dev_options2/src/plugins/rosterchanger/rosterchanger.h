@@ -6,7 +6,7 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/irostersmodel.h>
 #include <interfaces/irostersview.h>
-#include <interfaces/iroster.h>
+#include <interfaces/irostermanager.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/inotifications.h>
 #include <interfaces/ioptionsmanager.h>
@@ -139,13 +139,13 @@ protected slots:
 	void onSubscriptionDialogDestroyed();
 private:
 	IPluginManager *FPluginManager;
-	IRosterPlugin *FRosterPlugin;
+	IRosterManager *FRosterManager;
 	IRostersModel *FRostersModel;
 	IRostersView *FRostersView;
 	INotifications *FNotifications;
 	IOptionsManager *FOptionsManager;
 	IXmppUriQueries *FXmppUriQueries;
-	IMultiUserChatPlugin *FMultiUserChatPlugin;
+	IMultiUserChatManager *FMultiChatManager;
 private:
 	QMap<int, int> FNotifySubsType;
 	QList<SubscriptionDialog *> FSubsDialogs;

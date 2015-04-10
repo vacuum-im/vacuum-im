@@ -3,7 +3,7 @@
 
 #include <QUrl>
 #include <interfaces/idataforms.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <utils/xmpperror.h>
 #include <utils/jid.h>
 

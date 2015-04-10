@@ -11,7 +11,7 @@
 #include <QRadioButton>
 #include <QProgressBar>
 #include <interfaces/iregistraton.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/iconnectionmanager.h>
 

@@ -3,8 +3,8 @@
 
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/irostersmodel.h>
-#include <interfaces/iroster.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/irostermanager.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/iaccountmanager.h>
 #include "rootindex.h"
 #include "rosterindex.h"
@@ -93,8 +93,8 @@ protected slots:
 private:
 	friend class RosterIndex;
 private:
-	IRosterPlugin *FRosterPlugin;
-	IPresencePlugin *FPresencePlugin;
+	IRosterManager *FRosterManager;
+	IPresenceManager *FPresenceManager;
 	IAccountManager *FAccountManager;
 private:
 	StreamsLayout FLayout;

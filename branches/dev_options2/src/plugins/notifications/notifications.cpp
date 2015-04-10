@@ -29,7 +29,7 @@
 Notifications::Notifications()
 {
 	FAvatars = NULL;
-	FRosterPlugin = NULL;
+	FRosterManager = NULL;
 	FStatusIcons = NULL;
 	FStatusChanger = NULL;
 	FTrayManager = NULL;
@@ -105,10 +105,10 @@ bool Notifications::initConnections(IPluginManager *APluginManager, int &AInitOr
 		FAvatars = qobject_cast<IAvatars *>(plugin->instance());
 	}
 
-	plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IRosterManager").value(0,NULL);
 	if (plugin)
 	{
-		FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
+		FRosterManager = qobject_cast<IRosterManager *>(plugin->instance());
 	}
 
 	plugin = APluginManager->pluginInterface("IStatusIcons").value(0,NULL);
@@ -620,8 +620,8 @@ QString Notifications::contactName(const Jid &AStreamJid, const Jid &AContactJid
 
 	if (name.isEmpty())
 	{
-		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
-		name = roster!=NULL ? roster->rosterItem(AContactJid).name : AContactJid.uNode();
+		IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(AStreamJid) : NULL;
+		name = roster!=NULL ? roster->findItem(AContactJid).name : AContactJid.uNode();
 	}
 
 	return name.isEmpty() ? AContactJid.uBare() : name;

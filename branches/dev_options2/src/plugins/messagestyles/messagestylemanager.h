@@ -5,9 +5,9 @@
 #include <interfaces/imessagestylemanager.h>
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/iavatars.h>
-#include <interfaces/ivcard.h>
-#include <interfaces/iroster.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/ivcardmanager.h>
+#include <interfaces/irostermanager.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/istatusicons.h>
 
 class MessageStyleManager :
@@ -56,8 +56,8 @@ protected slots:
 private:
 	IAvatars *FAvatars;
 	IStatusIcons *FStatusIcons;
-	IVCardPlugin *FVCardPlugin;
-	IRosterPlugin *FRosterPlugin;
+	IVCardManager *FVCardManager;
+	IRosterManager *FRosterManager;
 	IOptionsManager *FOptionsManager;
 private:
 	mutable QMap<Jid, QString> FStreamNames;

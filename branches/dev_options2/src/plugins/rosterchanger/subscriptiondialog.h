@@ -5,8 +5,8 @@
 #include <interfaces/inotifications.h>
 #include <interfaces/imessageprocessor.h>
 #include <interfaces/irosterchanger.h>
-#include <interfaces/iroster.h>
-#include <interfaces/ivcard.h>
+#include <interfaces/irostermanager.h>
+#include <interfaces/ivcardmanager.h>
 #include "ui_subscriptiondialog.h"
 
 class SubscriptionDialog :
@@ -36,7 +36,7 @@ private:
 	Ui::SubscriptionDialogClass ui;
 private:
 	IRoster *FRoster;
-	IVCardPlugin *FVcardPlugin;
+	IVCardManager *FVCardManager;
 	IRosterChanger *FRosterChanger;
 	INotifications *FNotifications;
 	IMessageProcessor *FMessageProcessor;

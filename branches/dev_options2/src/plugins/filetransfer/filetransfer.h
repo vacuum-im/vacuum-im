@@ -10,7 +10,7 @@
 #include <interfaces/ifilestreamsmanager.h>
 #include <interfaces/idatastreamsmanager.h>
 #include <interfaces/iservicediscovery.h>
-#include <interfaces/iroster.h>
+#include <interfaces/irostermanager.h>
 #include <interfaces/inotifications.h>
 #include <interfaces/imessagearchiver.h>
 #include <interfaces/imessagewidgets.h>
@@ -88,7 +88,7 @@ protected slots:
 	void onToolBarWidgetAddressChanged(const Jid &AStreamBefore, const Jid &AContactBefore);
 	void onToolBarWidgetDestroyed(QObject *AObject);
 private:
-	IRosterPlugin *FRosterPlugin;
+	IRosterManager *FRosterManager;
 	IServiceDiscovery *FDiscovery;
 	INotifications *FNotifications;
 	IDataStreamsManager *FDataManager;

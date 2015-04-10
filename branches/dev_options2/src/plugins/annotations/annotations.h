@@ -5,7 +5,7 @@
 #include <QDomDocument>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iannotations.h>
-#include <interfaces/iroster.h>
+#include <interfaces/irostermanager.h>
 #include <interfaces/irostersearch.h>
 #include <interfaces/iprivatestorage.h>
 #include <interfaces/irostersview.h>
@@ -77,7 +77,7 @@ protected slots:
 private:
 	IPrivateStorage *FPrivateStorage;
 	IRosterSearch *FRosterSearch;
-	IRosterPlugin *FRosterPlugin;
+	IRosterManager *FRosterManager;
 	IRostersModel *FRostersModel;
 	IRostersViewPlugin *FRostersViewPlugin;
 private:

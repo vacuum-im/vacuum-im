@@ -29,8 +29,8 @@
 StatusChanger::StatusChanger()
 {
 	FPluginManager = NULL;
-	FPresencePlugin = NULL;
-	FRosterPlugin = NULL;
+	FPresenceManager = NULL;
+	FRosterManager = NULL;
 	FMainWindowPlugin = NULL;
 	FRostersView = NULL;
 	FRostersViewPlugin = NULL;
@@ -72,26 +72,25 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
 	FPluginManager = APluginManager;
 	connect(APluginManager->instance(),SIGNAL(shutdownStarted()),SLOT(onApplicationShutdownStarted()));
 
-	IPlugin *plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
+	IPlugin *plugin = APluginManager->pluginInterface("IPresenceManager").value(0,NULL);
 	if (plugin)
 	{
-		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
-		if (FPresencePlugin)
+		FPresenceManager = qobject_cast<IPresenceManager *>(plugin->instance());
+		if (FPresenceManager)
 		{
-			connect(FPresencePlugin->instance(),SIGNAL(presenceAdded(IPresence *)),SLOT(onPresenceAdded(IPresence *)));
-			connect(FPresencePlugin->instance(),SIGNAL(presenceChanged(IPresence *, int, const QString &, int)),SLOT(onPresenceChanged(IPresence *, int, const QString &, int)));
-			connect(FPresencePlugin->instance(),SIGNAL(presenceRemoved(IPresence *)),SLOT(onPresenceRemoved(IPresence *)));
+			connect(FPresenceManager->instance(),SIGNAL(presenceActiveChanged(IPresence *, bool)),SLOT(onPresenceActiveChanged(IPresence *, bool)));
+			connect(FPresenceManager->instance(),SIGNAL(presenceChanged(IPresence *, int, const QString &, int)),SLOT(onPresenceChanged(IPresence *, int, const QString &, int)));
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IRosterManager").value(0,NULL);
 	if (plugin)
 	{
-		FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
-		if (FRosterPlugin)
+		FRosterManager = qobject_cast<IRosterManager *>(plugin->instance());
+		if (FRosterManager)
 		{
-			connect(FRosterPlugin->instance(),SIGNAL(rosterOpened(IRoster *)),SLOT(onRosterOpened(IRoster *)));
-			connect(FRosterPlugin->instance(),SIGNAL(rosterClosed(IRoster *)),SLOT(onRosterClosed(IRoster *)));
+			connect(FRosterManager->instance(),SIGNAL(rosterOpened(IRoster *)),SLOT(onRosterOpened(IRoster *)));
+			connect(FRosterManager->instance(),SIGNAL(rosterClosed(IRoster *)),SLOT(onRosterClosed(IRoster *)));
 		}
 	}
 
@@ -117,7 +116,7 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
 	{
 		FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
 		if (FRostersModel)
-			connect(FRostersModel->instance(),SIGNAL(streamJidChanged(const Jid &, const Jid &)),SLOT(onStreamJidChanged(const Jid &, const Jid &)));
+			connect(FRostersModel->instance(),SIGNAL(streamJidChanged(const Jid &, const Jid &)),SLOT(onRosterStreamJidChanged(const Jid &, const Jid &)));
 	}
 
 	plugin = APluginManager->pluginInterface("IAccountManager").value(0,NULL);
@@ -162,7 +161,7 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
 	connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 
-	return FPresencePlugin!=NULL;
+	return FPresenceManager!=NULL;
 }
 
 bool StatusChanger::initObjects()
@@ -1009,27 +1008,60 @@ void StatusChanger::onSetStatusByAction(bool)
 	}
 }
 
-void StatusChanger::onPresenceAdded(IPresence *APresence)
+void StatusChanger::onPresenceActiveChanged(IPresence *APresence, bool AActive)
 {
-	if (FStreamMenu.count() == 1)
-		FStreamMenu.value(FStreamMenu.keys().first())->menuAction()->setVisible(true);
-
-	createStreamMenu(APresence);
-	setStreamStatusId(APresence,STATUS_OFFLINE);
-
-	if (FStreamMenu.count() == 1)
-		FStreamMenu.value(FStreamMenu.keys().first())->menuAction()->setVisible(false);
-
-	IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(APresence->streamJid()) : NULL;
-	if (account)
+	if (AActive)
 	{
-		if (account->optionsNode().value("status.is-main").toBool())
-			FMainStatusStreams += APresence;
-		FLastOnlineStatus.insert(APresence, account->optionsNode().value("status.last-online").toInt());
-	}
+		if (FStreamMenu.count() == 1)
+			FStreamMenu.value(FStreamMenu.keys().first())->menuAction()->setVisible(true);
 
-	updateStreamMenu(APresence);
-	updateMainMenu();
+		createStreamMenu(APresence);
+		setStreamStatusId(APresence,STATUS_OFFLINE);
+
+		if (FStreamMenu.count() == 1)
+			FStreamMenu.value(FStreamMenu.keys().first())->menuAction()->setVisible(false);
+
+		IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(APresence->streamJid()) : NULL;
+		if (account)
+		{
+			if (account->optionsNode().value("status.is-main").toBool())
+				FMainStatusStreams += APresence;
+			FLastOnlineStatus.insert(APresence, account->optionsNode().value("status.last-online").toInt());
+		}
+
+		updateStreamMenu(APresence);
+		updateMainMenu();
+	}
+	else
+	{
+		IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(APresence->streamJid()) : NULL;
+		if (account)
+		{
+			bool isMainStatus = FMainStatusStreams.contains(APresence);
+			account->optionsNode().setValue(isMainStatus,"status.is-main");
+			account->optionsNode().setValue(FLastOnlineStatus.value(APresence, STATUS_MAIN_ID),"status.last-online");
+		}
+
+		removeStatusNotification(APresence);
+		removeTempStatus(APresence);
+
+		FConnectStatus.remove(APresence);
+		removeConnectingLabel(APresence);
+
+		FFastReconnect -= APresence;
+		FMainStatusStreams -= APresence;
+		FMainStatusActions.remove(APresence);
+		FCurrentStatus.remove(APresence);
+		FLastOnlineStatus.remove(APresence);
+		FPendingReconnect.remove(APresence);
+		delete FStreamMenu.take(APresence);
+
+		if (FStreamMenu.count() == 1)
+			FStreamMenu.value(FStreamMenu.keys().first())->menuAction()->setVisible(false);
+
+		updateMainMenu();
+		updateTrayToolTip();
+	}
 }
 
 void StatusChanger::onPresenceChanged(IPresence *APresence, int AShow, const QString &AText, int APriority)
@@ -1066,40 +1098,9 @@ void StatusChanger::onPresenceChanged(IPresence *APresence, int AShow, const QSt
 	}
 }
 
-void StatusChanger::onPresenceRemoved(IPresence *APresence)
-{
-	IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(APresence->streamJid()) : NULL;
-	if (account)
-	{
-		bool isMainStatus = FMainStatusStreams.contains(APresence);
-		account->optionsNode().setValue(isMainStatus,"status.is-main");
-		account->optionsNode().setValue(FLastOnlineStatus.value(APresence, STATUS_MAIN_ID),"status.last-online");
-	}
-
-	removeStatusNotification(APresence);
-	removeTempStatus(APresence);
-
-	FConnectStatus.remove(APresence);
-	removeConnectingLabel(APresence);
-
-	FFastReconnect -= APresence;
-	FMainStatusStreams -= APresence;
-	FMainStatusActions.remove(APresence);
-	FCurrentStatus.remove(APresence);
-	FLastOnlineStatus.remove(APresence);
-	FPendingReconnect.remove(APresence);
-	delete FStreamMenu.take(APresence);
-
-	if (FStreamMenu.count() == 1)
-		FStreamMenu.value(FStreamMenu.keys().first())->menuAction()->setVisible(false);
-
-	updateMainMenu();
-	updateTrayToolTip();
-}
-
 void StatusChanger::onRosterOpened(IRoster *ARoster)
 {
-	IPresence *presence = FPresencePlugin->findPresence(ARoster->streamJid());
+	IPresence *presence = FPresenceManager->findPresence(ARoster->streamJid());
 	if (FConnectStatus.contains(presence))
 		setStreamStatus(presence->streamJid(), FConnectStatus.value(presence));
 	FPluginManager->delayShutdown();
@@ -1107,13 +1108,13 @@ void StatusChanger::onRosterOpened(IRoster *ARoster)
 
 void StatusChanger::onRosterClosed(IRoster *ARoster)
 {
-	IPresence *presence = FPresencePlugin->findPresence(ARoster->streamJid());
+	IPresence *presence = FPresenceManager->findPresence(ARoster->streamJid());
 	if (FConnectStatus.contains(presence))
 		setStreamStatus(presence->streamJid(), FConnectStatus.value(presence));
 	FPluginManager->continueShutdown();
 }
 
-void StatusChanger::onStreamJidChanged(const Jid &ABefore, const Jid &AAfter)
+void StatusChanger::onRosterStreamJidChanged(const Jid &ABefore, const Jid &AAfter)
 {
 	QMultiHash<int,QVariant> data;
 	data.insert(ADR_STREAMJID,ABefore.full());

@@ -144,14 +144,275 @@ Check values and try again</source>
     </message>
 </context>
 <context>
-    <name>MultiUserChatPlugin</name>
+    <name>MultiUserChatManager</name>
+    <message>
+        <source>Multi-User Conferences</source>
+        <translation>Багатокористувацькі конференції</translation>
+    </message>
+    <message>
+        <source>Allows to use Jabber multi-user conferences</source>
+        <translation>Дозволяє використовувати багатокористувацькі джаббер-конференції</translation>
+    </message>
+    <message>
+        <source>Join conference</source>
+        <translation>Зайти до конференції</translation>
+    </message>
+    <message>
+        <source>Ctrl+J</source>
+        <comment>Join conference</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When receiving an invitation to the conference</source>
+        <translation type="unfinished">При отриманні запрошення в конференцію</translation>
+    </message>
+    <message>
+        <source>When receiving a new private message in conference</source>
+        <translation>При отриманні нового особистого повідомлення в конференції</translation>
+    </message>
+    <message>
+        <source>When receiving a new message in conference</source>
+        <translation>При отриманні нового повідомлення в конференції</translation>
+    </message>
+    <message>
+        <source>When referring to you at the conference</source>
+        <translation>При зверненні до Вас в конференції</translation>
+    </message>
     <message>
         <source>Conferences</source>
         <translation>Конференції</translation>
     </message>
     <message>
-        <source>Join conference</source>
-        <translation>Зайти до конференції</translation>
+        <source>Show users connections and disconnections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show users status changes</source>
+        <translation>Показувати зміну статусу користувачів</translation>
+    </message>
+    <message>
+        <source>Save users status messages in history</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Leave the conference when window closed</source>
+        <translation>Виходити з конференції при закритті вікна</translation>
+    </message>
+    <message>
+        <source>Automatically rejoin to conference after kick</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a user to refer by enumeration in the input field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Register in conference</source>
+        <translation>Зареєструватись у конференції</translation>
+    </message>
+    <message>
+        <source>Allow this person to register with the room?</source>
+        <translation>Дозволити цьому відвідувачу зареєструватись в кімнаті?</translation>
+    </message>
+    <message>
+        <source>EMail Address</source>
+        <translation>Адреса E-mail</translation>
+    </message>
+    <message>
+        <source>Rules and Notes</source>
+        <translation>Правила і нотатки</translation>
+    </message>
+    <message>
+        <source>Given Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Family Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Desired Nickname</source>
+        <translation>Бажане прізвисько</translation>
+    </message>
+    <message>
+        <source>Your URL</source>
+        <translation>Ваш URL</translation>
+    </message>
+    <message>
+        <source>Request for voice</source>
+        <translation>Запит &apos;голосу&apos;</translation>
+    </message>
+    <message>
+        <source>Requested Role</source>
+        <translation>Запитуваний тип</translation>
+    </message>
+    <message>
+        <source>User ID</source>
+        <translation>ID користувача</translation>
+    </message>
+    <message>
+        <source>Room Nickname</source>
+        <translation>Прізвисько у кімнаті</translation>
+    </message>
+    <message>
+        <source>Grant Voice?</source>
+        <translation>Дати &apos;голос&apos;?</translation>
+    </message>
+    <message>
+        <source>Configure conference</source>
+        <translation>Налаштування конференції</translation>
+    </message>
+    <message>
+        <source>Maximum Number of History Messages Returned by Room</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow Occupants to Send Private Messages?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow Occupants to Invite Others?</source>
+        <translation>Дозволити користувачам відсилати запрошення?</translation>
+    </message>
+    <message>
+        <source>Allow Occupants to Change Subject?</source>
+        <translation>Дозволити користувачам змінювати тему?</translation>
+    </message>
+    <message>
+        <source>Enable Logging of Room Conversations?</source>
+        <translation>Ввімкнути протоколювання розмов кімнати?</translation>
+    </message>
+    <message>
+        <source>Affiliations that May Retrieve Member List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>XMPP URI of Associated Publish-Subscribe Node</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Natural Language for Room Discussions</source>
+        <translation>Основна мова спілкування в кімнаті</translation>
+    </message>
+    <message>
+        <source>Maximum Number of Room Occupants</source>
+        <translation>Максимальна кількість учасників в кімнаті</translation>
+    </message>
+    <message>
+        <source>Make Room Members-Only?</source>
+        <translation>Зробити кімнату тільки для учасників?</translation>
+    </message>
+    <message>
+        <source>Make Room Moderated?</source>
+        <translation>Ввімкнути модерацію кімнати?</translation>
+    </message>
+    <message>
+        <source>Password is Required to Enter?</source>
+        <translation>Зробити кімнату захищену паролем?</translation>
+    </message>
+    <message>
+        <source>Make Room Persistent?</source>
+        <translation>Зробити кімнату постійною?</translation>
+    </message>
+    <message>
+        <source>Roles for which Presence is Broadcasted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow Public Searching for Room?</source>
+        <translation>Зробити кімнату видимою усім?</translation>
+    </message>
+    <message>
+        <source>Full List of Room Administrators</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description of Room</source>
+        <translation>Опис кімнати</translation>
+    </message>
+    <message>
+        <source>Natural-Language Room Name</source>
+        <translation>Назва кімнати</translation>
+    </message>
+    <message>
+        <source>Full List of Room Owners</source>
+        <translation>Повний список власників кімнати</translation>
+    </message>
+    <message>
+        <source>The Room Password</source>
+        <translation>Пароль кімнати</translation>
+    </message>
+    <message>
+        <source>Affiliations that May Discover Real JIDs of Occupants</source>
+        <translation>Зробити реальні JID користувачів видимими</translation>
+    </message>
+    <message>
+        <source>Make Participants List Public?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make all Occupants as Participants?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow Occupants to Query Other Occupants?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow Visitors to Send Status Text in Presence Updates?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make this Room CAPTCHA Protected?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not Request CAPTCHA for Followed Jabber ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow Login Only With Registered Nickname?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow Occupants to Change Nicknames?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow Users to Register with the Room?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Conference information</source>
+        <translation>Інформація про конференцію</translation>
+    </message>
+    <message>
+        <source>Contact JID</source>
+        <translation>Контактний JID</translation>
+    </message>
+    <message>
+        <source>Natural Language for Room</source>
+        <translation>Основна мова спілкування в кімнаті</translation>
+    </message>
+    <message>
+        <source>LDAP Group</source>
+        <translation>Група LDAP</translation>
+    </message>
+    <message>
+        <source>URL for Archived Discussion Logs</source>
+        <translation>URL для архіву протоколів спілкування</translation>
+    </message>
+    <message>
+        <source>Current Number of Occupants in Room</source>
+        <translation>Поточна кількість учасників в кімнаті</translation>
+    </message>
+    <message>
+        <source>Current Subject or Discussion Topic in Room</source>
+        <translation>Поточна тема в кімнаті</translation>
+    </message>
+    <message>
+        <source>The Room Subject Can be Modified by Participants?</source>
+        <translation>Тема кімнати може змінюватись користувачем?</translation>
     </message>
     <message>
         <source>You are invited to the conference %1</source>
@@ -172,6 +433,10 @@ Check values and try again</source>
     <message>
         <source>Invite</source>
         <translation>Запросити</translation>
+    </message>
+    <message>
+        <source>Supports the multi-user conferences</source>
+        <translation>Підтримує багатокористувацькі конференції</translation>
     </message>
     <message>
         <source>Hidden room</source>
@@ -278,198 +543,6 @@ Check values and try again</source>
         <translation>%1 від %2</translation>
     </message>
     <message>
-        <source>Decline invite</source>
-        <translation>Відхилити запрошення</translation>
-    </message>
-    <message>
-        <source>Enter a reason</source>
-        <translation>Введіть причину</translation>
-    </message>
-    <message>
-        <source>Invite user</source>
-        <translation>Запросити користувача</translation>
-    </message>
-    <message>
-        <source>Register in conference</source>
-        <translation>Зареєструватись у конференції</translation>
-    </message>
-    <message>
-        <source>Allow this person to register with the room?</source>
-        <translation>Дозволити цьому відвідувачу зареєструватись в кімнаті?</translation>
-    </message>
-    <message>
-        <source>Desired Nickname</source>
-        <translation>Бажане прізвисько</translation>
-    </message>
-    <message>
-        <source>Your URL</source>
-        <translation>Ваш URL</translation>
-    </message>
-    <message>
-        <source>EMail Address</source>
-        <translation>Адреса E-mail</translation>
-    </message>
-    <message>
-        <source>Rules and Notes</source>
-        <translation>Правила і нотатки</translation>
-    </message>
-    <message>
-        <source>Configure conference</source>
-        <translation>Налаштування конференції</translation>
-    </message>
-    <message>
-        <source>Allow Occupants to Invite Others?</source>
-        <translation>Дозволити користувачам відсилати запрошення?</translation>
-    </message>
-    <message>
-        <source>Allow Occupants to Change Subject?</source>
-        <translation>Дозволити користувачам змінювати тему?</translation>
-    </message>
-    <message>
-        <source>Enable Logging of Room Conversations?</source>
-        <translation>Ввімкнути протоколювання розмов кімнати?</translation>
-    </message>
-    <message>
-        <source>Natural Language for Room Discussions</source>
-        <translation>Основна мова спілкування в кімнаті</translation>
-    </message>
-    <message>
-        <source>Maximum Number of Room Occupants</source>
-        <translation>Максимальна кількість учасників в кімнаті</translation>
-    </message>
-    <message>
-        <source>Make Room Members-Only?</source>
-        <translation>Зробити кімнату тільки для учасників?</translation>
-    </message>
-    <message>
-        <source>Make Room Moderated?</source>
-        <translation>Ввімкнути модерацію кімнати?</translation>
-    </message>
-    <message>
-        <source>Password is Required to Enter?</source>
-        <translation>Зробити кімнату захищену паролем?</translation>
-    </message>
-    <message>
-        <source>Make Room Persistent?</source>
-        <translation>Зробити кімнату постійною?</translation>
-    </message>
-    <message>
-        <source>Allow Public Searching for Room?</source>
-        <translation>Зробити кімнату видимою усім?</translation>
-    </message>
-    <message>
-        <source>Description of Room</source>
-        <translation>Опис кімнати</translation>
-    </message>
-    <message>
-        <source>Natural-Language Room Name</source>
-        <translation>Назва кімнати</translation>
-    </message>
-    <message>
-        <source>Full List of Room Owners</source>
-        <translation>Повний список власників кімнати</translation>
-    </message>
-    <message>
-        <source>The Room Password</source>
-        <translation>Пароль кімнати</translation>
-    </message>
-    <message>
-        <source>Affiliations that May Discover Real JIDs of Occupants</source>
-        <translation>Зробити реальні JID користувачів видимими</translation>
-    </message>
-    <message>
-        <source>Conference information</source>
-        <translation>Інформація про конференцію</translation>
-    </message>
-    <message>
-        <source>Contact JID</source>
-        <translation>Контактний JID</translation>
-    </message>
-    <message>
-        <source>Natural Language for Room</source>
-        <translation>Основна мова спілкування в кімнаті</translation>
-    </message>
-    <message>
-        <source>LDAP Group</source>
-        <translation>Група LDAP</translation>
-    </message>
-    <message>
-        <source>URL for Archived Discussion Logs</source>
-        <translation>URL для архіву протоколів спілкування</translation>
-    </message>
-    <message>
-        <source>Current Number of Occupants in Room</source>
-        <translation>Поточна кількість учасників в кімнаті</translation>
-    </message>
-    <message>
-        <source>Current Subject or Discussion Topic in Room</source>
-        <translation>Поточна тема в кімнаті</translation>
-    </message>
-    <message>
-        <source>The Room Subject Can be Modified by Participants?</source>
-        <translation>Тема кімнати може змінюватись користувачем?</translation>
-    </message>
-    <message>
-        <source>Request for voice</source>
-        <translation>Запит &apos;голосу&apos;</translation>
-    </message>
-    <message>
-        <source>Requested Role</source>
-        <translation>Запитуваний тип</translation>
-    </message>
-    <message>
-        <source>User ID</source>
-        <translation>ID користувача</translation>
-    </message>
-    <message>
-        <source>Room Nickname</source>
-        <translation>Прізвисько у кімнаті</translation>
-    </message>
-    <message>
-        <source>Grant Voice?</source>
-        <translation>Дати &apos;голос&apos;?</translation>
-    </message>
-    <message>
-        <source>Multi-User Conferences</source>
-        <translation>Багатокористувацькі конференції</translation>
-    </message>
-    <message>
-        <source>Allows to use Jabber multi-user conferences</source>
-        <translation>Дозволяє використовувати багатокористувацькі джаббер-конференції</translation>
-    </message>
-    <message>
-        <source>Supports the multi-user conferences</source>
-        <translation>Підтримує багатокористувацькі конференції</translation>
-    </message>
-    <message>
-        <source>Show users status changes</source>
-        <translation>Показувати зміну статусу користувачів</translation>
-    </message>
-    <message>
-        <source>I&apos;m too busy right now</source>
-        <translation>Я надто зайнятий зараз</translation>
-    </message>
-    <message>
-        <source>When receiving an invitation to the conference</source>
-        <translation>При отриманні запрошення в конференцію</translation>
-    </message>
-    <message>
-        <source>When receiving a new private message in conference</source>
-        <translation>При отриманні нового особистого повідомлення в конференції</translation>
-    </message>
-    <message>
-        <source>When referring to you at the conference</source>
-        <translation>При зверненні до Вас в конференції</translation>
-    </message>
-    <message>
-        <source>When receiving a new message in conference</source>
-        <translation>При отриманні нового повідомлення в конференції</translation>
-    </message>
-    <message>
-        <source>Leave the conference when window closed</source>
-        <translation>Виходити з конференції при закритті вікна</translation>
-    </message>
-    <message>
         <source>Enter</source>
         <translation>Ввійти</translation>
     </message>
@@ -482,97 +555,24 @@ Check values and try again</source>
         <translation>Відкрити діалог конференції</translation>
     </message>
     <message>
+        <source>I&apos;m too busy right now</source>
+        <translation>Я надто зайнятий зараз</translation>
+    </message>
+    <message>
+        <source>Decline invite</source>
+        <translation>Відхилити запрошення</translation>
+    </message>
+    <message>
+        <source>Enter a reason</source>
+        <translation>Введіть причину</translation>
+    </message>
+    <message>
         <source>Please, enter this conference!</source>
         <translation>Будь ласка, ввійдіть до цієї конференції!</translation>
     </message>
     <message>
-        <source>Given Name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Family Name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Maximum Number of History Messages Returned by Room</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Affiliations that May Retrieve Member List</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>XMPP URI of Associated Publish-Subscribe Node</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Roles for which Presence is Broadcasted</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Full List of Room Administrators</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Make Participants List Public?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Allow Occupants to Send Private Messages?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Allow Occupants to Query Other Occupants?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Allow Visitors to Send Status Text in Presence Updates?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Allow Login Only With Registered Nickname?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Allow Occupants to Change Nicknames?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Allow Users to Register with the Room?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Make all Occupants as Participants?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Make this Room CAPTCHA Protected?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Do not Request CAPTCHA for Followed Jabber ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show users connections and disconnections</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Save users status messages in history</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Automatically rejoin to conference after kick</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select a user to refer by enumeration in the input field</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Ctrl+J</source>
-        <comment>Join conference</comment>
-        <translation type="unfinished"></translation>
+        <source>Invite user</source>
+        <translation>Запросити користувача</translation>
     </message>
 </context>
 <context>

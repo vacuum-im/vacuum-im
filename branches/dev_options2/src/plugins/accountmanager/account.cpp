@@ -1,12 +1,13 @@
 #include "account.h"
 
 #include <definitions/optionvalues.h>
+#include <definitions/internalerrors.h>
 #include <utils/logger.h>
 
-Account::Account(IXmppStreams *AXmppStreams, const OptionsNode &AOptionsNode, QObject *AParent) : QObject(AParent)
+Account::Account(IXmppStreamManager *AXmppStreams, const OptionsNode &AOptionsNode, QObject *AParent) : QObject(AParent)
 {
 	FXmppStream = NULL;
-	FXmppStreams = AXmppStreams;
+	FXmppStreamManager = AXmppStreams;
 	FOptionsNode = AOptionsNode;
 
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
@@ -39,11 +40,12 @@ void Account::setActive(bool AActive)
 	if (AActive && FXmppStream==NULL)
 	{
 		LOG_STRM_INFO(accountJid(),QString("Activating account=%1, id=%2").arg(name(), accountId().toString()));
-		FXmppStream = FXmppStreams->newXmppStream(streamJid());
+		
+		FXmppStream = FXmppStreamManager->createXmppStream(streamJid());
 		connect(FXmppStream->instance(),SIGNAL(closed()),SLOT(onXmppStreamClosed()),Qt::QueuedConnection);
 		onXmppStreamClosed();
 
-		FXmppStreams->addXmppStream(FXmppStream);
+		FXmppStreamManager->setXmppStreamActive(FXmppStream,true);
 		emit activeChanged(true);
 	}
 	else if (!AActive && FXmppStream!=NULL)
@@ -51,8 +53,9 @@ void Account::setActive(bool AActive)
 		LOG_STRM_INFO(accountJid(),QString("Deactivating account=%1, id=%2").arg(name(), accountId().toString()));
 		emit activeChanged(false);
 
-		FXmppStreams->removeXmppStream(FXmppStream);
-		FXmppStreams->destroyXmppStream(FXmppStream->streamJid());
+		FXmppStream->abort(XmppError(IERR_XMPPSTREAM_DESTROYED));
+		FXmppStreamManager->setXmppStreamActive(FXmppStream,false);
+		FXmppStreamManager->destroyXmppStream(FXmppStream);
 		FXmppStream = NULL;
 	}
 }

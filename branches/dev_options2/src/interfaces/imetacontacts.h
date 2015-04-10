@@ -3,7 +3,7 @@
 
 #include <QSet>
 #include <QUuid>
-#include <interfaces/ipresence.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/irostersmodel.h>
 #include <utils/jid.h>
 

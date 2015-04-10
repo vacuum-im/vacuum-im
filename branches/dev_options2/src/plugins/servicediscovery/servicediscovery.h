@@ -9,10 +9,10 @@
 #include <QMultiMap>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iservicediscovery.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <interfaces/istanzaprocessor.h>
-#include <interfaces/iroster.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/irostermanager.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/imainwindow.h>
@@ -163,13 +163,13 @@ protected slots:
 	void onSelfCapsChanged();
 private:
 	IPluginManager *FPluginManager;
-	IXmppStreams *FXmppStreams;
-	IRosterPlugin *FRosterPlugin;
-	IPresencePlugin *FPresencePlugin;
+	IXmppStreamManager *FXmppStreamManager;
+	IRosterManager *FRosterManager;
+	IPresenceManager *FPresenceManager;
 	IStanzaProcessor *FStanzaProcessor;
 	IRostersView *FRostersView;
 	IRostersViewPlugin *FRostersViewPlugin;
-	IMultiUserChatPlugin *FMultiUserChatPlugin;
+	IMultiUserChatManager *FMultiChatManager;
 	ITrayManager *FTrayManager;
 	IMainWindowPlugin *FMainWindowPlugin;
 	IStatusIcons *FStatusIcons;

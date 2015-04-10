@@ -6,7 +6,7 @@
 #include <QMultiMap>
 #include <QDomDocument>
 #include <QInputDialog>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <interfaces/iconnectionmanager.h>
 #include "streamparser.h"
 
@@ -28,7 +28,7 @@ class XmppStream :
 	Q_OBJECT;
 	Q_INTERFACES(IXmppStream IXmppStanzaHadler);
 public:
-	XmppStream(IXmppStreams *AXmppStreams, const Jid &AStreamJid);
+	XmppStream(IXmppStreamManager *AXmppStreamManager, const Jid &AStreamJid);
 	~XmppStream();
 	virtual QObject *instance() { return this; }
 	//IXmppStanzaHandler
@@ -62,8 +62,8 @@ public:
 	virtual void removeXmppStanzaHandler(int AOrder, IXmppStanzaHadler *AHandler);
 signals:
 	void opened();
-	void aboutToClose();
 	void closed();
+	void aboutToClose();
 	void error(const XmppError &AError);
 	void jidAboutToBeChanged(const Jid &AAfter);
 	void jidChanged(const Jid &ABefore);
@@ -102,7 +102,7 @@ protected slots:
 	void onKeepAliveTimeout();
 private:
 	IConnection *FConnection;
-	IXmppStreams *FXmppStreams;
+	IXmppStreamManager *FXmppStreamManager;
 private:
 	bool FReady;
 	bool FClosed;

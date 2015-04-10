@@ -6,8 +6,8 @@ Address::Address(IMessageWidgets *AMessageWidgets, const Jid &AStreamJid, const 
 {
 	FAutoAddresses = false;
 
-	FXmppStreams = NULL;
-	FPresencePlugin = NULL;
+	FXmppStreamManager = NULL;
+	FPresenceManager = NULL;
 	FMessageWidgets = AMessageWidgets;
 
 	initialize();
@@ -113,23 +113,23 @@ void Address::removeAddress(const Jid &AStreamJid, const Jid &AContactJid)
 
 void Address::initialize()
 {
-	IPlugin *plugin = FMessageWidgets->pluginManager()->pluginInterface("IXmppStreams").value(0,NULL);
+	IPlugin *plugin = FMessageWidgets->pluginManager()->pluginInterface("IXmppStreamManager").value(0,NULL);
 	if (plugin)
 	{
-		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-		if (FXmppStreams)
+		FXmppStreamManager = qobject_cast<IXmppStreamManager *>(plugin->instance());
+		if (FXmppStreamManager)
 		{
-			connect(FXmppStreams->instance(),SIGNAL(jidChanged(IXmppStream *, const Jid &)),SLOT(onXmppStreamJidChanged(IXmppStream *, const Jid &)));
+			connect(FXmppStreamManager->instance(),SIGNAL(streamJidChanged(IXmppStream *, const Jid &)),SLOT(onXmppStreamJidChanged(IXmppStream *, const Jid &)));
 		}
 	}
 
-	plugin = FMessageWidgets->pluginManager()->pluginInterface("IPresencePlugin").value(0,NULL);
+	plugin = FMessageWidgets->pluginManager()->pluginInterface("IPresenceManager").value(0,NULL);
 	if (plugin)
 	{
-		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
-		if (FPresencePlugin)
+		FPresenceManager = qobject_cast<IPresenceManager *>(plugin->instance());
+		if (FPresenceManager)
 		{
-			connect(FPresencePlugin->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
+			connect(FPresenceManager->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
 				SLOT(onPresenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)));
 		}
 	}
@@ -138,11 +138,11 @@ void Address::initialize()
 bool Address::updateAutoAddresses(bool AEmit)
 {
 	bool changed = false;
-	if (FAutoAddresses && FPresencePlugin)
+	if (FAutoAddresses && FPresenceManager)
 	{
 		for (QMap<Jid, QMultiMap<Jid,Jid> >::iterator streamIt=FAddresses.begin(); streamIt!=FAddresses.end(); ++streamIt)
 		{
-			IPresence *presence = FPresencePlugin->findPresence(streamIt.key());
+			IPresence *presence = FPresenceManager->findPresence(streamIt.key());
 			foreach(const Jid &contact, streamIt->keys())
 			{
 				QList<IPresenceItem> pitemList = presence!=NULL ? presence->findItems(contact) : QList<IPresenceItem>();

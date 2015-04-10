@@ -5,7 +5,7 @@
 #include <QTimer>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ichatstates.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/ioptionsmanager.h>
@@ -104,7 +104,7 @@ protected slots:
 	void onOptionsChanged(const OptionsNode &ANode);
 	void onStanzaSessionTerminated(const IStanzaSession &ASession);
 private:
-	IPresencePlugin *FPresencePlugin;
+	IPresenceManager *FPresenceManager;
 	IMessageWidgets *FMessageWidgets;
 	IStanzaProcessor *FStanzaProcessor;
 	IOptionsManager *FOptionsManager;
@@ -113,7 +113,7 @@ private:
 	IDataForms *FDataForms;
 	INotifications *FNotifications;
 	ISessionNegotiation *FSessionNegotiation;
-	IMultiUserChatPlugin *FMultiUserChatPlugin;
+	IMultiUserChatManager *FMultiChatManager;
 private:
 	QMap<Jid,int> FSHIMessagesIn;
 	QMap<Jid,int> FSHIMessagesOut;

@@ -4,7 +4,7 @@
 #include <QUuid>
 #include <QString>
 #include <QVariant>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <utils/jid.h>
 #include <utils/options.h>
 

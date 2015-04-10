@@ -9,9 +9,9 @@
 #include <utils/options.h>
 #include <utils/logger.h>
 
-XmppStream::XmppStream(IXmppStreams *AXmppStreams, const Jid &AStreamJid) : QObject(AXmppStreams->instance())
+XmppStream::XmppStream(IXmppStreamManager *AXmppStreamManager, const Jid &AStreamJid) : QObject(AXmppStreamManager->instance())
 {
-	FXmppStreams = AXmppStreams;
+	FXmppStreamManager = AXmppStreamManager;
 
 	FReady = false;
 	FClosed = true;
@@ -60,7 +60,7 @@ bool XmppStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOr
 		else if (FStreamState==SS_FEATURES && AStanza.element().nodeName()=="stream:features")
 		{
 			FServerFeatures = AStanza.element().cloneNode(true).toElement();
-			FAvailFeatures = FXmppStreams->xmppFeatures();
+			FAvailFeatures = FXmppStreamManager->xmppFeatures();
 			processFeatures();
 			return true;
 		}
@@ -501,9 +501,9 @@ void XmppStream::setStreamState(StreamState AState)
 bool XmppStream::startFeature(const QString &AFeatureNS, const QDomElement &AFeatureElem)
 {
 	LOG_STRM_DEBUG(streamJid(),QString("Starting XMPP stream feature=%1").arg(AFeatureNS));
-	foreach(IXmppFeaturesPlugin *plugin, FXmppStreams->xmppFeaturePlugins(AFeatureNS))
+	foreach(IXmppFeatureFactory *factory, FXmppStreamManager->xmppFeatureFactories(AFeatureNS))
 	{
-		IXmppFeature *feature = plugin->newXmppFeature(AFeatureNS, this);
+		IXmppFeature *feature = factory->newXmppFeature(AFeatureNS, this);
 		if (feature && feature->start(AFeatureElem))
 		{
 			FActiveFeatures.append(feature);

@@ -8,8 +8,8 @@
 #include <QSortFilterProxyModel>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagearchiver.h>
-#include <interfaces/iroster.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/irostermanager.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/imetacontacts.h>
 #include <interfaces/istatusicons.h>
 #include <interfaces/imessagestylemanager.h>
@@ -144,7 +144,7 @@ protected slots:
 	void onArchiveCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection);
 	void onArchiveCollectionsRemoved(const QString &AId, const IArchiveRequest &ARequest);
 protected slots:
-	void onRosterRemoved(IRoster *ARoster);
+	void onRosterActiveChanged(IRoster *ARoster, bool AActive);
 	void onRosterStreamJidChanged(IRoster *ARoster, const Jid &ABefore);
 private:
 	Ui::ArchiveViewWindowClass ui;
@@ -152,7 +152,7 @@ private:
 	IMessageArchiver *FArchiver;
 	IStatusIcons *FStatusIcons;
 	IMetaContacts *FMetaContacts;
-	IRosterPlugin *FRosterPlugin;
+	IRosterManager *FRosterManager;
 	IUrlProcessor *FUrlProcessor;
 	IMessageProcessor *FMessageProcessor;
 	IFileMessageArchive *FFileMessageArchive;

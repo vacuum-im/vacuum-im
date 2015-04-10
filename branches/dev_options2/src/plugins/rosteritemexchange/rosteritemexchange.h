@@ -3,8 +3,8 @@
 
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/irosteritemexchange.h>
-#include <interfaces/iroster.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/irostermanager.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/irosterchanger.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/istanzaprocessor.h>
@@ -86,9 +86,9 @@ protected slots:
 	void onExchangeApproveDialogDestroyed();
 private:
 	IGateways *FGateways;
-	IRosterPlugin *FRosterPlugin;
+	IRosterManager *FRosterManager;
 	IRosterChanger *FRosterChanger;
-	IPresencePlugin *FPresencePlugin;
+	IPresenceManager *FPresenceManager;
 	IServiceDiscovery *FDiscovery;
 	IStanzaProcessor *FStanzaProcessor;
 	IOptionsManager *FOptionsManager;

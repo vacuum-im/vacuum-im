@@ -48,7 +48,7 @@ NormalMessageHandler::NormalMessageHandler()
 	FMessageStyleManager = NULL;
 	FStatusIcons = NULL;
 	FNotifications = NULL;
-	FPresencePlugin = NULL;
+	FPresenceManager = NULL;
 	FRostersView = NULL;
 	FRostersModel = NULL;
 	FXmppUriQueries = NULL;
@@ -118,13 +118,13 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 			connect(FStatusIcons->instance(),SIGNAL(statusIconsChanged()),SLOT(onStatusIconsChanged()));
 	}
 
-	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IPresenceManager").value(0,NULL);
 	if (plugin)
 	{
-		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
-		if (FPresencePlugin)
+		FPresenceManager = qobject_cast<IPresenceManager *>(plugin->instance());
+		if (FPresenceManager)
 		{
-			connect(FPresencePlugin->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
+			connect(FPresenceManager->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
 				SLOT(onPresenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)));
 		}
 	}
@@ -675,7 +675,7 @@ void NormalMessageHandler::updateWindow(IMessageNormalWindow *AWindow) const
 		statusIcon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_NORMALMHANDLER_MESSAGE);
 	AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::StatusIcon,statusIcon);
 
-	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AWindow->streamJid()) : NULL;
+	IPresence *presence = FPresenceManager!=NULL ? FPresenceManager->findPresence(AWindow->streamJid()) : NULL;
 	IPresenceItem pitem = presence!=NULL ? presence->findItem(AWindow->contactJid()) : IPresenceItem();
 	AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::StatusText,pitem.status);
 
@@ -796,7 +796,7 @@ bool NormalMessageHandler::isAnyPresenceOpened(const QStringList &AStreams) cons
 {
 	foreach(const Jid &streamJid, AStreams)
 	{
-		IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
+		IPresence *presence = FPresenceManager!=NULL ? FPresenceManager->findPresence(streamJid) : NULL;
 		if (presence && presence->isOpen())
 			return true;
 	}

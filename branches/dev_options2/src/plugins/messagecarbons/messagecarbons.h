@@ -2,7 +2,7 @@
 #define MESSAGECARBONS_H
 
 #include <interfaces/ipluginmanager.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <interfaces/imessagecarbons.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/iservicediscovery.h>
@@ -46,7 +46,7 @@ protected slots:
 	void onXmppStreamClosed(IXmppStream *AXmppStream);
 	void onDiscoInfoReceived(const IDiscoInfo &AInfo);
 private:
-	IXmppStreams *FXmppStreams;
+	IXmppStreamManager *FXmppStreamManager;
 	IServiceDiscovery *FDiscovery;
 	IStanzaProcessor *FStanzaProcessor;
 	IMessageProcessor *FMessageProcessor;

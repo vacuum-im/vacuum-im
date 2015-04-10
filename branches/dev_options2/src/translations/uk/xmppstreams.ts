@@ -17,7 +17,7 @@
     </message>
 </context>
 <context>
-    <name>XmppStreams</name>
+    <name>XmppStreamManager</name>
     <message>
         <source>XMPP Streams Manager</source>
         <translation>Менеджер XMPP-потоків</translation>

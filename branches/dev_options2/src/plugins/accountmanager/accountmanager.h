@@ -5,7 +5,7 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/ioptionsmanager.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <interfaces/irostersview.h>
 
 class AccountsOptionsWidget;
@@ -63,9 +63,9 @@ protected slots:
 	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onResourceComboBoxEditFinished();
 private:
-	IXmppStreams *FXmppStreams;
 	IOptionsManager *FOptionsManager;
 	IRostersViewPlugin *FRostersViewPlugin;
+	IXmppStreamManager *FXmppStreamManager;
 private:
 	QMap<QUuid, IAccount *> FAccounts;
 };

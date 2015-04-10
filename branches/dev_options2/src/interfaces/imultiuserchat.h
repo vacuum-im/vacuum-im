@@ -5,11 +5,11 @@
 #include <interfaces/idataforms.h>
 #include <interfaces/irostersmodel.h>
 #include <interfaces/imessagewidgets.h>
-#include <utils/jid.h>
-#include <utils/menu.h>
-#include <utils/message.h>
-#include <utils/xmpperror.h>
 #include <utils/menubarchanger.h>
+#include <utils/xmpperror.h>
+#include <utils/message.h>
+#include <utils/menu.h>
+#include <utils/jid.h>
 
 #define MULTIUSERCHAT_UUID "{EB960F92-59A9-4322-A646-F9AB4913706C}"
 
@@ -75,21 +75,6 @@ struct IMultiUserListItem
 	QString notes;
 };
 
-class IMultiUser
-{
-public:
-	virtual QObject *instance() = 0;
-	virtual Jid roomJid() const =0;
-	virtual Jid contactJid() const =0;
-	virtual QString nickName() const =0;
-	virtual QString role() const =0;
-	virtual QString affiliation() const =0;
-	virtual QVariant data(int ARole) const =0;
-	virtual void setData(int ARole, const QVariant &AValue) =0;
-protected:
-	virtual void dataChanged(int ARole, const QVariant &ABefore, const QVariant &AAfter) =0;
-};
-
 struct IMultiUserChatHistory
 {
 	IMultiUserChatHistory() {
@@ -103,6 +88,21 @@ struct IMultiUserChatHistory
 	quint32 maxStanzas;
 	quint32 seconds;
 	QDateTime since;
+};
+
+class IMultiUser
+{
+public:
+	virtual QObject *instance() = 0;
+	virtual Jid roomJid() const =0;
+	virtual Jid contactJid() const =0;
+	virtual QString nickName() const =0;
+	virtual QString role() const =0;
+	virtual QString affiliation() const =0;
+	virtual QVariant data(int ARole) const =0;
+	virtual void setData(int ARole, const QVariant &AValue) =0;
+protected:
+	virtual void dataChanged(int ARole, const QVariant &ABefore, const QVariant &AAfter) =0;
 };
 
 class IMultiUserChat
@@ -205,7 +205,7 @@ protected:
 	virtual void privateChatWindowDestroyed(IMessageChatWindow *AWindow) =0;
 };
 
-class IMultiUserChatPlugin
+class IMultiUserChatManager
 {
 public:
 	virtual QObject *instance() = 0;
@@ -222,7 +222,6 @@ public:
 	virtual IRosterIndex *getMultiChatRosterIndex(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword) =0;
 	virtual void showJoinMultiChatDialog(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword) =0;
 protected:
-	virtual void roomNickReceived(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick) =0;
 	virtual void multiUserChatCreated(IMultiUserChat *AMultiChat) =0;
 	virtual void multiUserChatDestroyed(IMultiUserChat *AMultiChat) =0;
 	virtual void multiChatWindowCreated(IMultiUserChatWindow *AWindow) =0;
@@ -232,11 +231,12 @@ protected:
 	virtual void multiChatContextMenu(IMultiUserChatWindow *AWindow, Menu *AMenu) =0;
 	virtual void multiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu) =0;
 	virtual void multiUserToolTips(IMultiUserChatWindow *AWindow, IMultiUser *AUser, QMap<int,QString> &AToolTips) =0;
+	virtual void roomNickReceived(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick) =0;
 };
 
 Q_DECLARE_INTERFACE(IMultiUser,"Vacuum.Plugin.IMultiUser/1.0")
 Q_DECLARE_INTERFACE(IMultiUserChat,"Vacuum.Plugin.IMultiUserChat/1.6")
 Q_DECLARE_INTERFACE(IMultiUserChatWindow,"Vacuum.Plugin.IMultiUserChatWindow/1.3")
-Q_DECLARE_INTERFACE(IMultiUserChatPlugin,"Vacuum.Plugin.IMultiUserChatPlugin/1.6")
+Q_DECLARE_INTERFACE(IMultiUserChatManager,"Vacuum.Plugin.IMultiUserChatManager/1.6")
 
 #endif //IMULTIUSERCHAT_H

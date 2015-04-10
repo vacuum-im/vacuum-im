@@ -27,7 +27,7 @@ Annotations::Annotations()
 {
 	FPrivateStorage = NULL;
 	FRosterSearch = NULL;
-	FRosterPlugin = NULL;
+	FRosterManager = NULL;
 	FRostersModel = NULL;
 	FRostersViewPlugin = NULL;
 
@@ -71,13 +71,13 @@ bool Annotations::initConnections(IPluginManager *APluginManager, int &AInitOrde
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IRosterManager").value(0,NULL);
 	if (plugin)
 	{
-		FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
-		if (FRosterPlugin)
+		FRosterManager = qobject_cast<IRosterManager *>(plugin->instance());
+		if (FRosterManager)
 		{
-			connect(FRosterPlugin->instance(),SIGNAL(rosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)),
+			connect(FRosterManager->instance(),SIGNAL(rosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)),
 				SLOT(onRosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)));
 		}
 	}

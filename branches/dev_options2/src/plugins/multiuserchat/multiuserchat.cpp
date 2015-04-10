@@ -13,7 +13,7 @@
 #define MUC_IQ_TIMEOUT      30000
 #define MUC_LIST_TIMEOUT    60000
 
-MultiUserChat::MultiUserChat(IMultiUserChatPlugin *AChatPlugin, const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANickName, const QString &APassword, QObject *AParent) : QObject(AParent)
+MultiUserChat::MultiUserChat(IMultiUserChatManager *AChatPlugin, const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANickName, const QString &APassword, QObject *AParent) : QObject(AParent)
 {
 	FPresence = NULL;
 	FDataForms = NULL;
@@ -21,7 +21,7 @@ MultiUserChat::MultiUserChat(IMultiUserChatPlugin *AChatPlugin, const Jid &AStre
 	FStanzaProcessor = NULL;
 	FMessageProcessor = NULL;
 	FDiscovery = NULL;
-	FChatPlugin = AChatPlugin;
+	FMultiChatManager = AChatPlugin;
 
 	FMainUser = NULL;
 	FSHIPresence = -1;
@@ -764,7 +764,7 @@ bool MultiUserChat::destroyRoom(const QString &AReason)
 
 void MultiUserChat::initialize()
 {
-	IPlugin *plugin = FChatPlugin->pluginManager()->pluginInterface("IMessageProcessor").value(0,NULL);
+	IPlugin *plugin = FMultiChatManager->pluginManager()->pluginInterface("IMessageProcessor").value(0,NULL);
 	if (plugin)
 	{
 		FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
@@ -772,7 +772,7 @@ void MultiUserChat::initialize()
 			FMessageProcessor->insertMessageEditor(MEO_MULTIUSERCHAT,this);
 	}
 
-	plugin = FChatPlugin->pluginManager()->pluginInterface("IStanzaProcessor").value(0,NULL);
+	plugin = FMultiChatManager->pluginManager()->pluginInterface("IStanzaProcessor").value(0,NULL);
 	if (plugin)
 	{
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
@@ -796,13 +796,13 @@ void MultiUserChat::initialize()
 		}
 	}
 
-	plugin = FChatPlugin->pluginManager()->pluginInterface("IPresencePlugin").value(0,NULL);
+	plugin = FMultiChatManager->pluginManager()->pluginInterface("IPresenceManager").value(0,NULL);
 	if (plugin)
 	{
-		IPresencePlugin *presencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
-		if (presencePlugin)
+		IPresenceManager *presenceManager = qobject_cast<IPresenceManager *>(plugin->instance());
+		if (presenceManager)
 		{
-			FPresence = presencePlugin->findPresence(FStreamJid);
+			FPresence = presenceManager->findPresence(FStreamJid);
 			if (FPresence)
 			{
 				connect(FPresence->instance(),SIGNAL(changed(int, const QString &, int)),SLOT(onPresenceChanged(int, const QString &, int)));
@@ -810,13 +810,13 @@ void MultiUserChat::initialize()
 		}
 	}
 
-	plugin = FChatPlugin->pluginManager()->pluginInterface("IXmppStreams").value(0,NULL);
+	plugin = FMultiChatManager->pluginManager()->pluginInterface("IXmppStreamManager").value(0,NULL);
 	if (plugin)
 	{
-		IXmppStreams *xmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-		if (xmppStreams)
+		IXmppStreamManager *xmppStreamManager = qobject_cast<IXmppStreamManager *>(plugin->instance());
+		if (xmppStreamManager)
 		{
-			FXmppStream = xmppStreams->xmppStream(FStreamJid);
+			FXmppStream = xmppStreamManager->findXmppStream(FStreamJid);
 			if (FXmppStream)
 			{
 				connect(FXmppStream->instance(),SIGNAL(closed()),SLOT(onStreamClosed()));
@@ -825,13 +825,13 @@ void MultiUserChat::initialize()
 		}
 	}
 
-	plugin = FChatPlugin->pluginManager()->pluginInterface("IDataForms").value(0,NULL);
+	plugin = FMultiChatManager->pluginManager()->pluginInterface("IDataForms").value(0,NULL);
 	if (plugin)
 	{
 		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 	}
 
-	plugin = FChatPlugin->pluginManager()->pluginInterface("IServiceDiscovery").value(0,NULL);
+	plugin = FMultiChatManager->pluginManager()->pluginInterface("IServiceDiscovery").value(0,NULL);
 	if (plugin)
 	{
 		FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());

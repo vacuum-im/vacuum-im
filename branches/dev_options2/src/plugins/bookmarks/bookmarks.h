@@ -12,7 +12,7 @@
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/irostersmodel.h>
 #include <interfaces/irostersview.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/ipresencemanager.h>
 #include "editbookmarkdialog.h"
 #include "editbookmarksdialog.h"
 
@@ -100,14 +100,14 @@ protected slots:
 private:
 	IPrivateStorage *FPrivateStorage;
 	IAccountManager *FAccountManager;
-	IMultiUserChatPlugin *FMultiChatPlugin;
+	IMultiUserChatManager *FMultiChatManager;
 	IXmppUriQueries *FXmppUriQueries;
 	IServiceDiscovery *FDiscovery;
 	IOptionsManager *FOptionsManager;
 	IRostersModel *FRostersModel;
 	IRostersView *FRostersView;
 	IRostersViewPlugin *FRostersViewPlugin;
-	IPresencePlugin *FPresencePlugin;
+	IPresenceManager *FPresenceManager;
 private:
 	QMap<Jid, QList<IBookmark> > FBookmarks;
 	QMap<Jid, EditBookmarksDialog *> FDialogs;

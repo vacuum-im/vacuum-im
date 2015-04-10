@@ -41,10 +41,10 @@ static const QList<int> AvatarRosterKinds = QList<int>() << RIK_STREAM_ROOT << R
 Avatars::Avatars()
 {
 	FPluginManager = NULL;
-	FXmppStreams = NULL;
+	FXmppStreamManager = NULL;
 	FStanzaProcessor = NULL;
-	FVCardPlugin = NULL;
-	FPresencePlugin = NULL;
+	FVCardManager = NULL;
+	FPresenceManager = NULL;
 	FRostersModel = NULL;
 	FRostersViewPlugin = NULL;
 
@@ -73,14 +73,14 @@ bool Avatars::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 	Q_UNUSED(AInitOrder);
 	FPluginManager = APluginManager;
 
-	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
+	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreamManager").value(0,NULL);
 	if (plugin)
 	{
-		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-		if (FXmppStreams)
+		FXmppStreamManager = qobject_cast<IXmppStreamManager *>(plugin->instance());
+		if (FXmppStreamManager)
 		{
-			connect(FXmppStreams->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamOpened(IXmppStream *)));
-			connect(FXmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *)));
+			connect(FXmppStreamManager->instance(),SIGNAL(streamOpened(IXmppStream *)),SLOT(onXmppStreamOpened(IXmppStream *)));
+			connect(FXmppStreamManager->instance(),SIGNAL(streamClosed(IXmppStream *)),SLOT(onXmppStreamClosed(IXmppStream *)));
 		}
 	}
 
@@ -88,21 +88,21 @@ bool Avatars::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 	if (plugin)
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 
-	plugin = APluginManager->pluginInterface("IVCardPlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IVCardManager").value(0,NULL);
 	if (plugin)
 	{
-		FVCardPlugin = qobject_cast<IVCardPlugin *>(plugin->instance());
-		if (FVCardPlugin)
+		FVCardManager = qobject_cast<IVCardManager *>(plugin->instance());
+		if (FVCardManager)
 		{
-			connect(FVCardPlugin->instance(),SIGNAL(vcardReceived(const Jid &)),SLOT(onVCardChanged(const Jid &)));
-			connect(FVCardPlugin->instance(),SIGNAL(vcardPublished(const Jid &)),SLOT(onVCardChanged(const Jid &)));
+			connect(FVCardManager->instance(),SIGNAL(vcardReceived(const Jid &)),SLOT(onVCardChanged(const Jid &)));
+			connect(FVCardManager->instance(),SIGNAL(vcardPublished(const Jid &)),SLOT(onVCardChanged(const Jid &)));
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IPresenceManager").value(0,NULL);
 	if (plugin)
 	{
-		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
+		FPresenceManager = qobject_cast<IPresenceManager *>(plugin->instance());
 	}
 
 	plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
@@ -134,7 +134,7 @@ bool Avatars::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 	connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 
-	return FVCardPlugin!=NULL;
+	return FVCardManager!=NULL;
 }
 
 bool Avatars::initObjects()
@@ -209,7 +209,7 @@ bool Avatars::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &ASt
 					if (!updateVCardAvatar(contactJid,hash,false))
 					{
 						LOG_STRM_INFO(AStreamJid,QString("Requesting avatar form vCard, jid=%1").arg(contactJid.bare()));
-						FVCardPlugin->requestVCard(AStreamJid,contactJid.bare());
+						FVCardManager->requestVCard(AStreamJid,contactJid.bare());
 					}
 				}
 			}
@@ -230,7 +230,7 @@ bool Avatars::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &ASt
 					LOG_STRM_INFO(AStreamJid,QString("Resource %1 is stopped blocking avatar update notify mechanism").arg(contactJid.resource()));
 					FBlockingResources.remove(AStreamJid,contactJid);
 					if (!FBlockingResources.contains(AStreamJid))
-						FVCardPlugin->requestVCard(AStreamJid,contactJid.bare());
+						FVCardManager->requestVCard(AStreamJid,contactJid.bare());
 				}
 			}
 			else if (!iqUpdate.isNull())
@@ -423,7 +423,7 @@ bool Avatars::setAvatar(const Jid &AStreamJid, const QByteArray &AData)
 	QString format = getImageFormat(AData);
 	if (AData.isEmpty() || !format.isEmpty())
 	{
-		IVCard *vcard = FVCardPlugin!=NULL ? FVCardPlugin->getVCard(AStreamJid.bare()) : NULL;
+		IVCard *vcard = FVCardManager!=NULL ? FVCardManager->getVCard(AStreamJid.bare()) : NULL;
 		if (vcard)
 		{
 			if (!AData.isEmpty())
@@ -436,7 +436,7 @@ bool Avatars::setAvatar(const Jid &AStreamJid, const QByteArray &AData)
 				vcard->setValueForTags(VVN_PHOTO_VALUE,QString::null);
 				vcard->setValueForTags(VVN_PHOTO_TYPE,QString::null);
 			}
-			if (FVCardPlugin->publishVCard(AStreamJid,vcard))
+			if (FVCardManager->publishVCard(AStreamJid,vcard))
 			{
 				published = true;
 				LOG_STRM_INFO(AStreamJid,"Published self avatar in vCard");
@@ -563,9 +563,9 @@ bool Avatars::saveToFile(const QString &AFileName, const QByteArray &AData) cons
 
 QByteArray Avatars::loadAvatarFromVCard(const Jid &AContactJid) const
 {
-	if (FVCardPlugin)
+	if (FVCardManager)
 	{
-		QFile file(FVCardPlugin->vcardFileName(AContactJid.bare()));
+		QFile file(FVCardManager->vcardFileName(AContactJid.bare()));
 		if (file.open(QFile::ReadOnly))
 		{
 			QString xmlError;
@@ -592,7 +592,7 @@ QByteArray Avatars::loadAvatarFromVCard(const Jid &AContactJid) const
 
 void Avatars::updatePresence(const Jid &AStreamJid) const
 {
-	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
+	IPresence *presence = FPresenceManager!=NULL ? FPresenceManager->findPresence(AStreamJid) : NULL;
 	if (presence && presence->isOpen())
 		presence->setPresence(presence->show(),presence->status(),presence->priority());
 }
@@ -703,9 +703,9 @@ bool Avatars::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 	return !ASelected.isEmpty();
 }
 
-void Avatars::onStreamOpened(IXmppStream *AXmppStream)
+void Avatars::onXmppStreamOpened(IXmppStream *AXmppStream)
 {
-	if (FStanzaProcessor && FVCardPlugin)
+	if (FStanzaProcessor && FVCardManager)
 	{
 		IStanzaHandle shandle;
 		shandle.handler = this;
@@ -728,18 +728,18 @@ void Avatars::onStreamOpened(IXmppStream *AXmppStream)
 	}
 	FStreamAvatars.insert(AXmppStream->streamJid(),UNKNOWN_AVATAR);
 
-	if (FVCardPlugin)
+	if (FVCardManager)
 	{
-		if (FVCardPlugin->requestVCard(AXmppStream->streamJid(),AXmppStream->streamJid().bare()))
+		if (FVCardManager->requestVCard(AXmppStream->streamJid(),AXmppStream->streamJid().bare()))
 			LOG_STRM_INFO(AXmppStream->streamJid(),"Load self avatar from vCard request sent");
 		else
 			LOG_STRM_WARNING(AXmppStream->streamJid(),"Failed to send load self avatar from vCard");
 	}
 }
 
-void Avatars::onStreamClosed(IXmppStream *AXmppStream)
+void Avatars::onXmppStreamClosed(IXmppStream *AXmppStream)
 {
-	if (FStanzaProcessor && FVCardPlugin)
+	if (FStanzaProcessor && FVCardManager)
 	{
 		FStanzaProcessor->removeStanzaHandle(FSHIPresenceIn.take(AXmppStream->streamJid()));
 		FStanzaProcessor->removeStanzaHandle(FSHIPresenceOut.take(AXmppStream->streamJid()));

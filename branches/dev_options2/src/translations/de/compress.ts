@@ -2,26 +2,29 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="de" sourcelanguage="en">
 <context>
-    <name>CompressPlugin</name>
+    <name>CompressFeature</name>
     <message>
-        <source>Unsupported compression method</source>
-        <translation>Nicht unterstütze Kompressionsmethode</translation>
+        <source>Error code: %1</source>
+        <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Compression setup failed</source>
-        <translation>Kompressionssetup fehlgeschlagen</translation>
-    </message>
+</context>
+<context>
+    <name>CompressFeatureFactory</name>
     <message>
         <source>Stream Compression</source>
-        <translation>Datenstromkompression</translation>
+        <translation type="unfinished">Datenstromkompression</translation>
     </message>
     <message>
         <source>Allows to compress a stream of messages sent and received from the server</source>
-        <translation>Erlaubt das Komprimieren eines Nachrichten Datenstroms zum/vom Server</translation>
+        <translation type="unfinished">Erlaubt das Komprimieren eines Nachrichten Datenstroms zum/vom Server</translation>
     </message>
     <message>
-        <source>Enable data compression transferred between client and server</source>
-        <translation type="unfinished"></translation>
+        <source>Unsupported compression method</source>
+        <translation type="unfinished">Nicht unterstütze Kompressionsmethode</translation>
+    </message>
+    <message>
+        <source>Compression setup failed</source>
+        <translation type="unfinished">Kompressionssetup fehlgeschlagen</translation>
     </message>
     <message>
         <source>ZLib error</source>
@@ -37,17 +40,14 @@
     </message>
     <message>
         <source>Invalid or incomplete deflate data</source>
-        <translation>Falsche oder unvollständige Kompressionsdaten</translation>
+        <translation type="unfinished">Falsche oder unvollständige Kompressionsdaten</translation>
     </message>
     <message>
         <source>Invalid compression level</source>
-        <translation>Ungültiger Kompressionslevel</translation>
+        <translation type="unfinished">Ungültiger Kompressionslevel</translation>
     </message>
-</context>
-<context>
-    <name>Compression</name>
     <message>
-        <source>Error code: %1</source>
+        <source>Enable data compression transferred between client and server</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

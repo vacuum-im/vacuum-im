@@ -10,7 +10,7 @@
 #include <interfaces/imessageprocessor.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/istatusicons.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/ioptionsmanager.h>
 #include <utils/options.h>
 

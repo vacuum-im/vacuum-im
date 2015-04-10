@@ -17,8 +17,8 @@ MessageStyleManager::MessageStyleManager()
 {
 	FAvatars = NULL;
 	FStatusIcons = NULL;
-	FVCardPlugin = NULL;
-	FRosterPlugin = NULL;
+	FVCardManager = NULL;
+	FRosterManager = NULL;
 	FOptionsManager = NULL;
 }
 
@@ -58,20 +58,20 @@ bool MessageStyleManager::initConnections(IPluginManager *APluginManager, int &A
 		FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
 	}
 
-	plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IRosterManager").value(0,NULL);
 	if (plugin)
 	{
-		FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
+		FRosterManager = qobject_cast<IRosterManager *>(plugin->instance());
 	}
 
-	plugin = APluginManager->pluginInterface("IVCardPlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IVCardManager").value(0,NULL);
 	if (plugin)
 	{
-		FVCardPlugin = qobject_cast<IVCardPlugin *>(plugin->instance());
-		if (FVCardPlugin)
+		FVCardManager = qobject_cast<IVCardManager *>(plugin->instance());
+		if (FVCardManager)
 		{
-			connect(FVCardPlugin->instance(),SIGNAL(vcardReceived(const Jid &)),SLOT(onVCardChanged(const Jid &)));
-			connect(FVCardPlugin->instance(),SIGNAL(vcardPublished(const Jid &)),SLOT(onVCardChanged(const Jid &)));
+			connect(FVCardManager->instance(),SIGNAL(vcardReceived(const Jid &)),SLOT(onVCardChanged(const Jid &)));
+			connect(FVCardManager->instance(),SIGNAL(vcardPublished(const Jid &)),SLOT(onVCardChanged(const Jid &)));
 		}
 	}
 
@@ -190,7 +190,7 @@ QString MessageStyleManager::contactName(const Jid &AStreamJid, const Jid &ACont
 	{
 		if (!FStreamNames.contains(AStreamJid.bare()))
 		{
-			IVCard *vcard = FVCardPlugin!=NULL ? FVCardPlugin->getVCard(AStreamJid.bare()) : NULL;
+			IVCard *vcard = FVCardManager!=NULL ? FVCardManager->getVCard(AStreamJid.bare()) : NULL;
 			if (vcard)
 			{
 				name = vcard->value(VVN_NICKNAME);
@@ -209,8 +209,8 @@ QString MessageStyleManager::contactName(const Jid &AStreamJid, const Jid &ACont
 	}
 	else
 	{
-		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
-		name = roster!=NULL ? roster->rosterItem(AContactJid).name : QString::null;
+		IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(AStreamJid) : NULL;
+		name = roster!=NULL ? roster->findItem(AContactJid).name : QString::null;
 	}
 
 	if (name.isEmpty())
@@ -292,7 +292,7 @@ void MessageStyleManager::onVCardChanged(const Jid &AContactJid)
 {
 	if (FStreamNames.contains(AContactJid.bare()))
 	{
-		IVCard *vcard = FVCardPlugin!=NULL ? FVCardPlugin->getVCard(AContactJid) : NULL;
+		IVCard *vcard = FVCardManager!=NULL ? FVCardManager->getVCard(AContactJid) : NULL;
 		if (vcard)
 		{
 			FStreamNames.insert(AContactJid.bare(),vcard->value(VVN_NICKNAME));

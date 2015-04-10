@@ -53,7 +53,7 @@
 
 #define REJOIN_AFTER_KICK_MSEC      500
 
-MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMultiUserChat *AMultiChat)
+MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatManager *AChatPlugin, IMultiUserChat *AMultiChat)
 {
 	REPORT_VIEW;
 	ui.setupUi(this);
@@ -68,7 +68,7 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMul
 	FRecentContacts = NULL;
 	FStanzaProcessor = NULL;
 
-	FMultiChatPlugin = AChatPlugin;
+	FMultiChatManager = AChatPlugin;
 	FMultiChat = AMultiChat;
 	FMultiChat->instance()->setParent(this);
 	FMultiChat->setAutoPresence(true);
@@ -850,7 +850,7 @@ void MultiUserChatWindow::exitAndDestroy(const QString &AStatus, int AWaitClose)
 
 void MultiUserChatWindow::initialize()
 {
-	IPlugin *plugin = FMultiChatPlugin->pluginManager()->pluginInterface("IStatusIcons").value(0,NULL);
+	IPlugin *plugin = FMultiChatManager->pluginManager()->pluginInterface("IStatusIcons").value(0,NULL);
 	if (plugin)
 	{
 		FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
@@ -860,19 +860,19 @@ void MultiUserChatWindow::initialize()
 		}
 	}
 
-	plugin = FMultiChatPlugin->pluginManager()->pluginInterface("IStatusChanger").value(0,NULL);
+	plugin = FMultiChatManager->pluginManager()->pluginInterface("IStatusChanger").value(0,NULL);
 	if (plugin)
 	{
 		FStatusChanger = qobject_cast<IStatusChanger *>(plugin->instance());
 	}
 
-	plugin = FMultiChatPlugin->pluginManager()->pluginInterface("IDataForms").value(0,NULL);
+	plugin = FMultiChatManager->pluginManager()->pluginInterface("IDataForms").value(0,NULL);
 	if (plugin)
 	{
 		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 	}
 
-	plugin = FMultiChatPlugin->pluginManager()->pluginInterface("IMessageWidgets").value(0,NULL);
+	plugin = FMultiChatManager->pluginManager()->pluginInterface("IMessageWidgets").value(0,NULL);
 	if (plugin)
 	{
 		FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
@@ -884,7 +884,7 @@ void MultiUserChatWindow::initialize()
 		}
 	}
 
-	plugin = FMultiChatPlugin->pluginManager()->pluginInterface("IMessageProcessor").value(0,NULL);
+	plugin = FMultiChatManager->pluginManager()->pluginInterface("IMessageProcessor").value(0,NULL);
 	if (plugin)
 	{
 		FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
@@ -892,7 +892,7 @@ void MultiUserChatWindow::initialize()
 			FMessageProcessor->insertMessageHandler(MHO_MULTIUSERCHAT_GROUPCHAT,this);
 	}
 
-	plugin = FMultiChatPlugin->pluginManager()->pluginInterface("IMessageStyleManager").value(0,NULL);
+	plugin = FMultiChatManager->pluginManager()->pluginInterface("IMessageStyleManager").value(0,NULL);
 	if (plugin)
 	{
 		FMessageStyleManager = qobject_cast<IMessageStyleManager *>(plugin->instance());
@@ -903,7 +903,7 @@ void MultiUserChatWindow::initialize()
 		}
 	}
 
-	plugin = FMultiChatPlugin->pluginManager()->pluginInterface("IMessageArchiver").value(0,NULL);
+	plugin = FMultiChatManager->pluginManager()->pluginInterface("IMessageArchiver").value(0,NULL);
 	if (plugin)
 	{
 		FMessageArchiver = qobject_cast<IMessageArchiver *>(plugin->instance());
@@ -916,13 +916,13 @@ void MultiUserChatWindow::initialize()
 		}
 	}
 
-	plugin = FMultiChatPlugin->pluginManager()->pluginInterface("IRecentContacts").value(0,NULL);
+	plugin = FMultiChatManager->pluginManager()->pluginInterface("IRecentContacts").value(0,NULL);
 	if (plugin)
 	{
 		FRecentContacts = qobject_cast<IRecentContacts *>(plugin->instance());
 	}
 
-	plugin = FMultiChatPlugin->pluginManager()->pluginInterface("IStanzaProcessor").value(0,NULL);
+	plugin = FMultiChatManager->pluginManager()->pluginInterface("IStanzaProcessor").value(0,NULL);
 	if (plugin)
 	{
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
@@ -1265,7 +1265,7 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
 		parts.removeFirst();
 		Jid joinRoomJid = Jid::fromUserInput(parts.takeFirst() + "@" + FMultiChat->roomJid().domain());
 		if (joinRoomJid.isValid())
-			FMultiChatPlugin->showJoinMultiChatDialog(streamJid(),joinRoomJid,FMultiChat->nickName(),parts.join(" "));
+			FMultiChatManager->showJoinMultiChatDialog(streamJid(),joinRoomJid,FMultiChat->nickName(),parts.join(" "));
 		else
 			showMultiChatStatusMessage(tr("%1 is not valid room JID").arg(joinRoomJid.uBare()),IMessageStyleContentOptions::TypeNotification,IMessageStyleContentOptions::StatusError);
 		hasCommand = true;

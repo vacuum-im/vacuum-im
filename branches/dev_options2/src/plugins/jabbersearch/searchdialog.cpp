@@ -34,7 +34,7 @@ SearchDialog::SearchDialog(IJabberSearch *ASearch, IPluginManager *APluginManage
 	FDiscovery = NULL;
 	FCurrentForm = NULL;
 	FRosterChanger = NULL;
-	FVCardPlugin = NULL;
+	FVCardManager = NULL;
 
 	QToolBar *toolBar = new QToolBar(this);
 	toolBar->setIconSize(QSize(16,16));
@@ -203,9 +203,9 @@ void SearchDialog::initialize()
 	if (plugin)
 		FRosterChanger = qobject_cast<IRosterChanger *>(plugin->instance());
 
-	plugin = FPluginManager->pluginInterface("IVCardPlugin").value(0,NULL);
+	plugin = FPluginManager->pluginInterface("IVCardManager").value(0,NULL);
 	if (plugin)
-		FVCardPlugin = qobject_cast<IVCardPlugin *>(plugin->instance());
+		FVCardManager = qobject_cast<IVCardManager *>(plugin->instance());
 }
 
 void SearchDialog::createToolBarActions()
@@ -228,7 +228,7 @@ void SearchDialog::createToolBarActions()
 		connect(FAddContact,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 	}
 
-	if (FVCardPlugin)
+	if (FVCardManager)
 	{
 		FShowVCard = new Action(FToolBarChanger);
 		FShowVCard->setText(tr("vCard"));
@@ -336,7 +336,7 @@ void SearchDialog::onToolBarActionTriggered(bool)
 		}
 		else if (action == FShowVCard)
 		{
-			FVCardPlugin->showVCardDialog(FStreamJid,item.itemJid);
+			FVCardManager->showVCardDialog(FStreamJid,item.itemJid);
 		}
 	}
 }

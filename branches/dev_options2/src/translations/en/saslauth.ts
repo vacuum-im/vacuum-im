@@ -2,22 +2,22 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="en" sourcelanguage="en">
 <context>
-    <name>SASLPlugin</name>
+    <name>SASLFeatureFactory</name>
     <message>
         <source>SASL Authentication</source>
-        <translation>SASL Authentication</translation>
+        <translation type="unfinished">SASL Authentication</translation>
     </message>
     <message>
         <source>Allows to log in to Jabber server using SASL authentication</source>
-        <translation>Allows to log in to Jabber server using SASL authentication</translation>
+        <translation type="unfinished">Allows to log in to Jabber server using SASL authentication</translation>
     </message>
     <message>
         <source>Wrong SASL authentication response</source>
-        <translation>Wrong SASL authentication response</translation>
+        <translation type="unfinished">Wrong SASL authentication response</translation>
     </message>
     <message>
         <source>Invalid XMPP stream JID in SASL bind response</source>
-        <translation>Invalid XMPP stream JID in SASL bind response</translation>
+        <translation type="unfinished">Invalid XMPP stream JID in SASL bind response</translation>
     </message>
 </context>
 </TS>

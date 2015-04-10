@@ -6,8 +6,8 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imetacontacts.h>
 #include <interfaces/iprivatestorage.h>
-#include <interfaces/iroster.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/irostermanager.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/irostersmodel.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/istatusicons.h>
@@ -134,8 +134,7 @@ protected:
 	QList<IMetaContact> loadMetaContactsFromFile(const QString &AFileName) const;
 	void saveMetaContactsToFile(const QString &AFileName, const QList<IMetaContact> &AContacts) const;
 protected slots:
-	void onRosterAdded(IRoster *ARoster);
-	void onRosterRemoved(IRoster *ARoster);
+	void onRosterActiveChanged(IRoster *ARoster, bool AActive);
 	void onRosterStreamJidChanged(IRoster *ARoster, const Jid &ABefore);
 	void onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore);
 protected slots:
@@ -183,8 +182,8 @@ protected slots:
 private:
 	IPluginManager *FPluginManager;
 	IPrivateStorage *FPrivateStorage;
-	IRosterPlugin *FRosterPlugin;
-	IPresencePlugin *FPresencePlugin;
+	IRosterManager *FRosterManager;
+	IPresenceManager *FPresenceManager;
 	IRostersModel *FRostersModel;
 	IRostersView *FRostersView;
 	IRostersViewPlugin *FRostersViewPlugin;

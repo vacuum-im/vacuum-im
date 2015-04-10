@@ -3,8 +3,8 @@
 
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/irostersview.h>
-#include <interfaces/iroster.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/irostermanager.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/irostersmodel.h>
 #include <interfaces/ioptionsmanager.h>
@@ -83,7 +83,7 @@ protected slots:
 private:
 	IStatusIcons *FStatusIcons;
 	IRostersModel *FRostersModel;
-	IPresencePlugin *FPresencePlugin;
+	IPresenceManager *FPresenceManager;
 	IOptionsManager *FOptionsManager;
 	IAccountManager *FAccountManager;
 	IMainWindowPlugin *FMainWindowPlugin;

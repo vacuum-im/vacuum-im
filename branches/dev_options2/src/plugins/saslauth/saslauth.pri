@@ -1,11 +1,9 @@
-HEADERS = saslauth.h \
-          saslbind.h \
-          saslsession.h \
-          saslplugin.h
+HEADERS = saslauthfeature.h \
+          saslbindfeature.h \
+          saslsessionfeature.h \
+          saslfeaturefactory.h
 
-SOURCES = saslauth.cpp \
-          saslbind.cpp \
-          saslsession.cpp \
-          saslplugin.cpp
-
-
+SOURCES = saslauthfeature.cpp \
+          saslbindfeature.cpp \
+          saslsessionfeature.cpp \
+          saslfeaturefactory.cpp

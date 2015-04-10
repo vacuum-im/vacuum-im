@@ -10,7 +10,7 @@
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/imessagestylemanager.h>
 #include <interfaces/imessageprocessor.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/iprivatestorage.h>
@@ -20,7 +20,7 @@
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/idataforms.h>
 #include <interfaces/isessionnegotiation.h>
-#include <interfaces/iroster.h>
+#include <interfaces/irostermanager.h>
 #include "chatwindowmenu.h"
 #include "archiveviewwindow.h"
 #include "archivereplicator.h"
@@ -221,18 +221,18 @@ protected slots:
 	void onOptionsChanged(const OptionsNode &ANode);
 private:
 	IPluginManager *FPluginManager;
-	IXmppStreams *FXmppStreams;
+	IXmppStreamManager *FXmppStreamManager;
 	IStanzaProcessor *FStanzaProcessor;
 	IOptionsManager *FOptionsManager;
 	IPrivateStorage *FPrivateStorage;
 	IAccountManager *FAccountManager;
-	IRosterPlugin *FRosterPlugin;
+	IRosterManager *FRosterManager;
 	IRostersViewPlugin *FRostersViewPlugin;
 	IServiceDiscovery *FDiscovery;
 	IDataForms *FDataForms;
 	IMessageWidgets *FMessageWidgets;
 	ISessionNegotiation *FSessionNegotiation;
-	IMultiUserChatPlugin *FMultiUserChatPlugin;
+	IMultiUserChatManager *FMultiChatManager;
 private:
 	QMap<Jid,int> FSHIPrefs;
 	QMap<Jid,int> FSHIMessageIn;

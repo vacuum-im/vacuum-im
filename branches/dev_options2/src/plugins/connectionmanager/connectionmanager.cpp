@@ -22,7 +22,7 @@
 ConnectionManager::ConnectionManager()
 {
 	FPluginManager = NULL;
-	FXmppStreams = NULL;
+	FXmppStreamManager = NULL;
 	FAccountManager = NULL;
 	FRostersViewPlugin = NULL;
 	FOptionsManager = NULL;
@@ -77,10 +77,10 @@ bool ConnectionManager::initConnections(IPluginManager *APluginManager, int &AIn
 		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
 	}
 
-	plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IXmppStreamManager").value(0,NULL);
 	if (plugin)
 	{
-		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
+		FXmppStreamManager = qobject_cast<IXmppStreamManager *>(plugin->instance());
 	}
 
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
@@ -369,9 +369,9 @@ void ConnectionManager::updateConnectionSettings(IAccount *AAccount) const
 
 IXmppStream *ConnectionManager::findConnectionStream(IConnection *AConnection) const
 {
-	if (FXmppStreams && AConnection)
+	if (FXmppStreamManager && AConnection)
 	{
-		foreach(IXmppStream *stream, FXmppStreams->xmppStreams())
+		foreach(IXmppStream *stream, FXmppStreamManager->xmppStreams())
 			if (stream->connection() == AConnection)
 				return stream;
 	}
@@ -462,7 +462,7 @@ void ConnectionManager::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALab
 {
 	if (ALabelId == FEncryptedLabelId)
 	{
-		IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(AIndex->data(RDR_STREAM_JID).toString()) : NULL;
+		IXmppStream *stream = FXmppStreamManager!=NULL ? FXmppStreamManager->findXmppStream(AIndex->data(RDR_STREAM_JID).toString()) : NULL;
 		IConnection *connection = stream!=NULL ? stream->connection() : NULL;
 		if (connection && !connection->hostCertificate().isNull())
 		{

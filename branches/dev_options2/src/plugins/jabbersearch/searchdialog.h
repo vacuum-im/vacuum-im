@@ -7,7 +7,7 @@
 #include <interfaces/idataforms.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/irosterchanger.h>
-#include <interfaces/ivcard.h>
+#include <interfaces/ivcardmanager.h>
 #include "ui_searchdialog.h"
 
 class SearchDialog :
@@ -41,7 +41,7 @@ private:
 	IJabberSearch *FSearch;
 	IDataForms *FDataForms;
 	IServiceDiscovery *FDiscovery;
-	IVCardPlugin *FVCardPlugin;
+	IVCardManager *FVCardManager;
 	IRosterChanger *FRosterChanger;
 private:
 	Action *FDiscoInfo;

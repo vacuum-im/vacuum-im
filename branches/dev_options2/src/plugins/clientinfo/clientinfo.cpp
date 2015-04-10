@@ -48,8 +48,8 @@ static const QList<int> ClientInfoRosterKinds = QList<int>() << RIK_CONTACT << R
 ClientInfo::ClientInfo()
 {
 	FPluginManager = NULL;
-	FRosterPlugin = NULL;
-	FPresencePlugin = NULL;
+	FRosterManager = NULL;
+	FPresenceManager = NULL;
 	FStanzaProcessor = NULL;
 	FRostersViewPlugin = NULL;
 	FDiscovery = NULL;
@@ -89,23 +89,23 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &AInitOrder
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 	}
 
-	plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IRosterManager").value(0,NULL);
 	if (plugin)
 	{
-		FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
-		if (FRosterPlugin)
+		FRosterManager = qobject_cast<IRosterManager *>(plugin->instance());
+		if (FRosterManager)
 		{
-			connect(FRosterPlugin->instance(),SIGNAL(rosterRemoved(IRoster *)),SLOT(onRosterRemoved(IRoster *)));
+			connect(FRosterManager->instance(),SIGNAL(rosterActiveChanged(IRoster *, bool)),SLOT(onRosterActiveChanged(IRoster *, bool)));
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IPresenceManager").value(0,NULL);
 	if (plugin)
 	{
-		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
-		if (FPresencePlugin)
+		FPresenceManager = qobject_cast<IPresenceManager *>(plugin->instance());
+		if (FPresenceManager)
 		{
-			connect(FPresencePlugin->instance(),SIGNAL(contactStateChanged(const Jid &, const Jid &, bool)), SLOT(onContactStateChanged(const Jid &, const Jid &, bool)));
+			connect(FPresenceManager->instance(),SIGNAL(contactStateChanged(const Jid &, const Jid &, bool)), SLOT(onContactStateChanged(const Jid &, const Jid &, bool)));
 		}
 	}
 
@@ -380,7 +380,7 @@ bool ClientInfo::execDiscoFeature(const Jid &AStreamJid, const QString &AFeature
 
 Action *ClientInfo::createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent)
 {
-	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
+	IPresence *presence = FPresenceManager!=NULL ? FPresenceManager->findPresence(AStreamJid) : NULL;
 	if (presence && presence->isOpen())
 	{
 		if (AFeature == NS_JABBER_VERSION)
@@ -420,12 +420,12 @@ void ClientInfo::showClientInfo(const Jid &AStreamJid, const Jid &AContactJid, i
 			if (contactName.isEmpty())
 				contactName = FDiscovery!=NULL ? FDiscovery->discoInfo(AStreamJid,AContactJid).identity.value(0).name : AContactJid.domain();
 			
-			if (FRosterPlugin)
+			if (FRosterManager)
 			{
-				IRoster *roster = FRosterPlugin->findRoster(AStreamJid);
+				IRoster *roster = FRosterManager->findRoster(AStreamJid);
 				if (roster)
 				{
-					IRosterItem ritem = roster->rosterItem(AContactJid);
+					IRosterItem ritem = roster->findItem(AContactJid);
 					if (!ritem.name.isEmpty())
 						contactName = ritem.name;
 				}
@@ -710,7 +710,7 @@ void ClientInfo::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AInd
 		if (ClientInfoRosterKinds.contains(index->kind()))
 		{
 			Jid streamJid = index->data(RDR_STREAM_JID).toString();
-			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
+			IPresence *presence = FPresenceManager!=NULL ? FPresenceManager->findPresence(streamJid) : NULL;
 			if (presence && presence->isOpen())
 			{
 				int show = index->data(RDR_SHOW).toInt();
@@ -742,9 +742,10 @@ void ClientInfo::onClientInfoDialogClosed(const Jid &AContactJid)
 	FClientInfoDialogs.remove(AContactJid);
 }
 
-void ClientInfo::onRosterRemoved(IRoster *ARoster)
+void ClientInfo::onRosterActiveChanged(IRoster *ARoster, bool AActive)
 {
-	deleteSoftwareDialogs(ARoster->streamJid());
+	if (!AActive)
+		deleteSoftwareDialogs(ARoster->streamJid());
 }
 
 void ClientInfo::onDiscoInfoReceived(const IDiscoInfo &AInfo)

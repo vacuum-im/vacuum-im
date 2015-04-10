@@ -4,10 +4,10 @@
 #include <QDir>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iavatars.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <interfaces/istanzaprocessor.h>
-#include <interfaces/ivcard.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/ivcardmanager.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/irostersmodel.h>
 #include <utils/options.h>
@@ -72,8 +72,8 @@ protected:
 	bool updateIqAvatar(const Jid &AContactJid, const QString &AHash);
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 protected slots:
-	void onStreamOpened(IXmppStream *AXmppStream);
-	void onStreamClosed(IXmppStream *AXmppStream);
+	void onXmppStreamOpened(IXmppStream *AXmppStream);
+	void onXmppStreamClosed(IXmppStream *AXmppStream);
 	void onVCardChanged(const Jid &AContactJid);
 	void onRosterIndexInserted(IRosterIndex *AIndex);
 	void onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
@@ -87,10 +87,10 @@ protected slots:
 	void onOptionsChanged(const OptionsNode &ANode);
 private:
 	IPluginManager *FPluginManager;
-	IXmppStreams *FXmppStreams;
+	IXmppStreamManager *FXmppStreamManager;
 	IStanzaProcessor *FStanzaProcessor;
-	IVCardPlugin *FVCardPlugin;
-	IPresencePlugin *FPresencePlugin;
+	IVCardManager *FVCardManager;
+	IPresenceManager *FPresenceManager;
 	IRostersModel *FRostersModel;
 	IRostersViewPlugin *FRostersViewPlugin;
 private:

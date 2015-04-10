@@ -2,7 +2,7 @@
 
 #include <definitions/namespaces.h>
 #include <definitions/xmppfeatureorders.h>
-#include <definitions/xmppfeaturepluginorders.h>
+#include <definitions/xmppfeaturefactoryorders.h>
 #include <definitions/discofeaturehandlerorders.h>
 #include <definitions/dataformtypes.h>
 #include <definitions/resources.h>
@@ -23,10 +23,10 @@
 Registration::Registration()
 {
 	FDataForms = NULL;
-	FXmppStreams = NULL;
+	FXmppStreamManager = NULL;
 	FStanzaProcessor = NULL;
 	FDiscovery = NULL;
-	FPresencePlugin = NULL;
+	FPresenceManager = NULL;
 	FXmppUriQueries = NULL;
 }
 
@@ -68,10 +68,10 @@ bool Registration::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
 	}
 
-	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IPresenceManager").value(0,NULL);
 	if (plugin)
 	{
-		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
+		FPresenceManager = qobject_cast<IPresenceManager *>(plugin->instance());
 	}
 
 	plugin = APluginManager->pluginInterface("IXmppUriQueries").value(0,NULL);
@@ -80,10 +80,10 @@ bool Registration::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		FXmppUriQueries = qobject_cast<IXmppUriQueries *>(plugin->instance());
 	}
 
-	plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IXmppStreamManager").value(0,NULL);
 	if (plugin)
 	{
-		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
+		FXmppStreamManager = qobject_cast<IXmppStreamManager *>(plugin->instance());
 	}
 
 	return FStanzaProcessor!=NULL && FDataForms!=NULL;
@@ -95,10 +95,10 @@ bool Registration::initObjects()
 	XmppError::registerError(NS_INTERNAL_ERROR,IERR_REGISTER_INVALID_FIELDS,tr("Invalid registration fields"));
 	XmppError::registerError(NS_INTERNAL_ERROR,IERR_REGISTER_REJECTED_BY_USER,tr("Registration rejected by user"));
 
-	if (FXmppStreams)
+	if (FXmppStreamManager)
 	{
-		FXmppStreams->registerXmppFeature(XFO_REGISTER,NS_FEATURE_REGISTER);
-		FXmppStreams->registerXmppFeaturePlugin(XFPO_DEFAULT,NS_FEATURE_REGISTER,this);
+		FXmppStreamManager->registerXmppFeature(XFO_REGISTER,NS_FEATURE_REGISTER);
+		FXmppStreamManager->registerXmppFeatureFactory(XFFO_DEFAULT,NS_FEATURE_REGISTER,this);
 	}
 	if (FDiscovery)
 	{
@@ -176,7 +176,7 @@ bool Registration::execDiscoFeature(const Jid &AStreamJid, const QString &AFeatu
 
 Action *Registration::createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent)
 {
-	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
+	IPresence *presence = FPresenceManager!=NULL ? FPresenceManager->findPresence(AStreamJid) : NULL;
 	if (presence && presence->isOpen() && AFeature==NS_JABBER_REGISTER)
 	{
 		Menu *regMenu = new Menu(AParent);
@@ -403,7 +403,7 @@ QString Registration::sendRequestSubmit(const Jid &AStreamJid, const IRegisterSu
 
 QDialog *Registration::showRegisterDialog(const Jid &AStreamJid, const Jid &AServiceJid, int AOperation, QWidget *AParent)
 {
-	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
+	IPresence *presence = FPresenceManager!=NULL ? FPresenceManager->findPresence(AStreamJid) : NULL;
 	if (presence && presence->isOpen())
 	{
 		RegisterDialog *dialog = new RegisterDialog(this,FDataForms,AStreamJid,AServiceJid,AOperation,AParent);

@@ -3,8 +3,8 @@
 
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/iavatars.h>
-#include <interfaces/iroster.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/irostermanager.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/istatusicons.h>
 #include <interfaces/iaccountmanager.h>
 #include "ui_infowidget.h"

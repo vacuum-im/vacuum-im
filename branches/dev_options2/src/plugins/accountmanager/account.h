@@ -2,7 +2,7 @@
 #define ACCOUNT_H
 
 #include <interfaces/iaccountmanager.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <interfaces/ioptionsmanager.h>
 
 class Account :
@@ -12,7 +12,7 @@ class Account :
 	Q_OBJECT;
 	Q_INTERFACES(IAccount);
 public:
-	Account(IXmppStreams *AXmppStreams, const OptionsNode &AOptionsNode, QObject *AParent);
+	Account(IXmppStreamManager *AXmppStreams, const OptionsNode &AOptionsNode, QObject *AParent);
 	virtual QObject *instance() { return this; }
 	virtual QUuid accountId() const;
 	virtual Jid accountJid() const;
@@ -35,7 +35,7 @@ protected slots:
 	void onOptionsChanged(const OptionsNode &ANode);
 private:
 	IXmppStream *FXmppStream;
-	IXmppStreams *FXmppStreams;
+	IXmppStreamManager *FXmppStreamManager;
 private:
 	OptionsNode FOptionsNode;
 };

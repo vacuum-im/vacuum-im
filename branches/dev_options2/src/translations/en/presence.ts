@@ -9,14 +9,14 @@
     </message>
 </context>
 <context>
-    <name>PresencePlugin</name>
+    <name>PresenceManager</name>
     <message>
         <source>Presence Manager</source>
-        <translation>Presence Manager</translation>
+        <translation type="unfinished">Presence Manager</translation>
     </message>
     <message>
         <source>Allows other modules to obtain information about the status of contacts in the roster</source>
-        <translation>Allows other modules to obtain information about the status of contacts in the roster</translation>
+        <translation type="unfinished">Allows other modules to obtain information about the status of contacts in the roster</translation>
     </message>
 </context>
 </TS>

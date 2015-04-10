@@ -40,7 +40,7 @@
 
 FileTransfer::FileTransfer()
 {
-	FRosterPlugin = NULL;
+	FRosterManager = NULL;
 	FDiscovery = NULL;
 	FNotifications = NULL;
 	FFileManager = NULL;
@@ -83,10 +83,10 @@ bool FileTransfer::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		FDataManager = qobject_cast<IDataStreamsManager *>(plugin->instance());
 	}
 
-	plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IRosterManager").value(0,NULL);
 	if (plugin)
 	{
-		FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
+		FRosterManager = qobject_cast<IRosterManager *>(plugin->instance());
 	}
 
 	plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
@@ -587,8 +587,8 @@ bool FileTransfer::autoStartStream(IFileStream *AStream) const
 	{
 		if (!QFile::exists(AStream->fileName()))
 		{
-			IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStream->streamJid()) : NULL;
-			if (roster && roster->rosterItem(AStream->contactJid()).isValid)
+			IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(AStream->streamJid()) : NULL;
+			if (roster && roster->hasItem(AStream->contactJid()))
 				return AStream->startStream(Options::node(OPV_FILESTREAMS_DEFAULTMETHOD).value().toString());
 		}
 		else

@@ -22,7 +22,7 @@ ConsoleWidget::ConsoleWidget(IPluginManager *APluginManager, QWidget *AParent) :
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_CONSOLE,0,0,"windowIcon");
 
-	FXmppStreams = NULL;
+	FXmppStreamManager = NULL;
 	FStanzaProcessor = NULL;
 	
 	FSearchMoveCursor = false;
@@ -70,7 +70,7 @@ ConsoleWidget::ConsoleWidget(IPluginManager *APluginManager, QWidget *AParent) :
 
 ConsoleWidget::~ConsoleWidget()
 {
-	foreach(IXmppStream *stream, FXmppStreams->xmppStreams())
+	foreach(IXmppStream *stream, FXmppStreamManager->xmppStreams())
 		stream->removeXmppStanzaHandler(XSHO_CONSOLE,this);
 	if (!Options::isNull())
 		onOptionsClosed();
@@ -92,18 +92,18 @@ bool ConsoleWidget::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int
 
 void ConsoleWidget::initialize(IPluginManager *APluginManager)
 {
-	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
+	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreamManager").value(0,NULL);
 	if (plugin)
 	{
-		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-		if (FXmppStreams)
+		FXmppStreamManager = qobject_cast<IXmppStreamManager *>(plugin->instance());
+		if (FXmppStreamManager)
 		{
-			foreach(IXmppStream *stream, FXmppStreams->xmppStreams())
-				onStreamCreated(stream);
+			foreach(IXmppStream *stream, FXmppStreamManager->xmppStreams())
+				onXmppStreamCreated(stream);
 
-			connect(FXmppStreams->instance(), SIGNAL(created(IXmppStream *)), SLOT(onStreamCreated(IXmppStream *)));
-			connect(FXmppStreams->instance(), SIGNAL(jidChanged(IXmppStream *, const Jid &)), SLOT(onStreamJidChanged(IXmppStream *, const Jid &)));
-			connect(FXmppStreams->instance(), SIGNAL(streamDestroyed(IXmppStream *)), SLOT(onStreamDestroyed(IXmppStream *)));
+			connect(FXmppStreamManager->instance(), SIGNAL(streamCreated(IXmppStream *)), SLOT(onXmppStreamCreated(IXmppStream *)));
+			connect(FXmppStreamManager->instance(), SIGNAL(streamJidChanged(IXmppStream *, const Jid &)), SLOT(onXmppStreamJidChanged(IXmppStream *, const Jid &)));
+			connect(FXmppStreamManager->instance(), SIGNAL(streamDestroyed(IXmppStream *)), SLOT(onXmppStreamDestroyed(IXmppStream *)));
 		}
 	}
 
@@ -253,13 +253,13 @@ void ConsoleWidget::onRemoveConditionClicked()
 void ConsoleWidget::onSendXMLClicked()
 {
 	QDomDocument doc;
-	if (FXmppStreams!=NULL && doc.setContent(ui.tedSendXML->toPlainText(),true))
+	if (FXmppStreamManager!=NULL && doc.setContent(ui.tedSendXML->toPlainText(),true))
 	{
 		Stanza stanza(doc.documentElement());
 		if (stanza.isValid())
 		{
 			ui.tbrConsole->append("<b>"+tr("Start sending user stanza...")+"</b><br>");
-			foreach(IXmppStream *stream, FXmppStreams->xmppStreams())
+			foreach(IXmppStream *stream, FXmppStreamManager->xmppStreams())
 				if (ui.cmbStreamJid->currentIndex()==0 || stream->streamJid()==ui.cmbStreamJid->itemData(ui.cmbStreamJid->currentIndex()).toString())
 					stream->sendStanza(stanza);
 			ui.tbrConsole->append("<b>"+tr("User stanza sent.")+"</b><br>");
@@ -413,13 +413,13 @@ void ConsoleWidget::onTextSearchTextChanged(const QString &AText)
 	FSearchMoveCursor = true;
 }
 
-void ConsoleWidget::onStreamCreated(IXmppStream *AXmppStream)
+void ConsoleWidget::onXmppStreamCreated(IXmppStream *AXmppStream)
 {
 	ui.cmbStreamJid->addItem(AXmppStream->streamJid().uFull(),AXmppStream->streamJid().pFull());
 	AXmppStream->insertXmppStanzaHandler(XSHO_CONSOLE,this);
 }
 
-void ConsoleWidget::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore)
+void ConsoleWidget::onXmppStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore)
 {
 	int index = ui.cmbStreamJid->findData(ABefore.pFull());
 	if (index >= 0)
@@ -429,7 +429,7 @@ void ConsoleWidget::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABef
 	}
 }
 
-void ConsoleWidget::onStreamDestroyed(IXmppStream *AXmppStream)
+void ConsoleWidget::onXmppStreamDestroyed(IXmppStream *AXmppStream)
 {
 	ui.cmbStreamJid->removeItem(ui.cmbStreamJid->findData(AXmppStream->streamJid().pFull()));
 	AXmppStream->removeXmppStanzaHandler(XSHO_CONSOLE,this);

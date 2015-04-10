@@ -36,7 +36,7 @@ RostersViewPlugin::RostersViewPlugin()
 {
 	FStatusIcons = NULL;
 	FRostersModel = NULL;
-	FPresencePlugin = NULL;
+	FPresenceManager = NULL;
 	FOptionsManager = NULL;
 	FAccountManager = NULL;
 	FMainWindowPlugin = NULL;
@@ -98,10 +98,10 @@ bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &AIn
 		FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
 	}
 
-	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IPresenceManager").value(0,NULL);
 	if (plugin)
 	{
-		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
+		FPresenceManager = qobject_cast<IPresenceManager *>(plugin->instance());
 	}
 
 	plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
@@ -607,11 +607,11 @@ void RostersViewPlugin::onRostersViewClipboardMenu(const QList<IRosterIndex *> &
 			}
 
 			QStringList resources = index->data(RDR_RESOURCES).toStringList();
-			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(index->data(RDR_STREAM_JID).toString()) : NULL;
+			IPresence *presence = FPresenceManager!=NULL ? FPresenceManager->findPresence(index->data(RDR_STREAM_JID).toString()) : NULL;
 			foreach(const QString &resource, resources)
 			{
 				IPresenceItem pitem =presence!=NULL ? presence->findItem(resource) : IPresenceItem();
-				if (pitem.isValid)
+				if (!pitem.isNull())
 				{
 					if (!pitem.itemJid.resource().isEmpty())
 					{
@@ -721,12 +721,12 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 		{
 			AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_TOPLINE,"<hr>");
 
-			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AIndex->data(RDR_STREAM_JID).toString()) : NULL;
+			IPresence *presence = FPresenceManager!=NULL ? FPresenceManager->findPresence(AIndex->data(RDR_STREAM_JID).toString()) : NULL;
 			for(int resIndex=0; resIndex<10 && resIndex<resources.count(); resIndex++)
 			{
 				int orderShift = resIndex*100;
 				IPresenceItem pItem = presence!=NULL ? presence->findItem(resources.at(resIndex)) : IPresenceItem();
-				if (pItem.isValid)
+				if (!pItem.isNull())
 				{
 					QString resource = !pItem.itemJid.resource().isEmpty() ? pItem.itemJid.resource() : pItem.itemJid.uBare();
 					QString statusIcon = FStatusIcons!=NULL ? FStatusIcons->iconFileName(streamJid,pItem.itemJid) : QString::null;

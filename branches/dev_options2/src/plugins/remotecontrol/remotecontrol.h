@@ -5,7 +5,7 @@
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/icommands.h>
 #include <interfaces/istatuschanger.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/idataforms.h>
 #include <interfaces/ifilestreamsmanager.h>
@@ -56,7 +56,7 @@ private:
 	ICommands *FCommands;
 	IDataForms *FDataForms;
 	IStatusChanger *FStatusChanger;
-	IMultiUserChatPlugin *FMultiUserChatPlugin;
+	IMultiUserChatManager *FMultiChatManager;
 	IFileStreamsManager *FFileStreamManager;
 	IMessageProcessor *FMessageProcessor;
 	IStanzaProcessor *FStanzaProcessor;

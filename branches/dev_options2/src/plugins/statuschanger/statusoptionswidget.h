@@ -4,7 +4,7 @@
 #include <QPushButton>
 #include <QTableWidget>
 #include <QStyledItemDelegate>
-#include <interfaces/ipresence.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/istatuschanger.h>
 #include <interfaces/ioptionsmanager.h>
 

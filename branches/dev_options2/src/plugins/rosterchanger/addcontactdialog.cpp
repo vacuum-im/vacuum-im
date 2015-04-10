@@ -18,7 +18,7 @@ AddContactDialog::AddContactDialog(IRosterChanger *ARosterChanger, IPluginManage
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_RCHANGER_ADD_CONTACT,0,0,"windowIcon");
 
 	FRoster = NULL;
-	FVcardPlugin = NULL;
+	FVCardManager = NULL;
 	FMessageProcessor = NULL;
 	FResolving = false;
 
@@ -105,14 +105,14 @@ ToolBarChanger *AddContactDialog::toolBarChanger() const
 
 void AddContactDialog::initialize(IPluginManager *APluginManager)
 {
-	IPlugin *plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
+	IPlugin *plugin = APluginManager->pluginInterface("IRosterManager").value(0,NULL);
 	if (plugin)
 	{
-		IRosterPlugin *rosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
-		FRoster = rosterPlugin!=NULL ? rosterPlugin->findRoster(FStreamJid) : NULL;
+		IRosterManager *rosterManager = qobject_cast<IRosterManager *>(plugin->instance());
+		FRoster = rosterManager!=NULL ? rosterManager->findRoster(FStreamJid) : NULL;
 		if (FRoster)
 		{
-			ui.cmbGroup->addItems(FRoster->allGroups().toList());
+			ui.cmbGroup->addItems(FRoster->groups().toList());
 			ui.cmbGroup->model()->sort(0,Qt::AscendingOrder);
 			ui.cmbGroup->setCurrentIndex(-1);
 			ui.lblGroupDelim->setText(tr("* nested group delimiter - '%1'").arg(ROSTER_GROUP_DELIMITER));
@@ -141,11 +141,11 @@ void AddContactDialog::initialize(IPluginManager *APluginManager)
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IVCardPlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IVCardManager").value(0,NULL);
 	if (plugin)
 	{
-		FVcardPlugin = qobject_cast<IVCardPlugin *>(plugin->instance());
-		if (FVcardPlugin)
+		FVCardManager = qobject_cast<IVCardManager *>(plugin->instance());
+		if (FVCardManager)
 		{
 			FShowVCard = new Action(FToolBarChanger->toolBar());
 			FShowVCard->setText(tr("VCard"));
@@ -161,7 +161,7 @@ void AddContactDialog::initialize(IPluginManager *APluginManager)
 			FToolBarChanger->insertAction(FResolve,TBG_RCACD_ROSTERCHANGER);
 			connect(FResolve,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
-			connect(FVcardPlugin->instance(),SIGNAL(vcardReceived(const Jid &)),SLOT(onVCardReceived(const Jid &)));
+			connect(FVCardManager->instance(),SIGNAL(vcardReceived(const Jid &)),SLOT(onVCardReceived(const Jid &)));
 		}
 	}
 }
@@ -170,7 +170,7 @@ void AddContactDialog::onDialogAccepted()
 {
 	if (contactJid().isValid())
 	{
-		if (!FRoster->rosterItem(contactJid()).isValid)
+		if (!FRoster->hasItem(contactJid()))
 		{
 			QSet<QString> groups;
 			if (!group().isEmpty())
@@ -206,15 +206,15 @@ void AddContactDialog::onToolBarActionTriggered(bool)
 		}
 		else if (action == FShowVCard)
 		{
-			FVcardPlugin->showVCardDialog(FStreamJid,contactJid().bare());
+			FVCardManager->showVCardDialog(FStreamJid,contactJid().bare());
 		}
 		else if (action == FResolve)
 		{
 			FResolving = true;
-			if (FVcardPlugin->hasVCard(contactJid().bare()))
+			if (FVCardManager->hasVCard(contactJid().bare()))
 				onVCardReceived(contactJid());
 			else
-				FVcardPlugin->requestVCard(FStreamJid,contactJid());
+				FVCardManager->requestVCard(FStreamJid,contactJid());
 		}
 	}
 }
@@ -223,7 +223,7 @@ void AddContactDialog::onVCardReceived(const Jid &AContactJid)
 {
 	if (FResolving && (AContactJid && contactJid()))
 	{
-		IVCard *vcard = FVcardPlugin->getVCard(AContactJid.bare());
+		IVCard *vcard = FVCardManager->getVCard(AContactJid.bare());
 		if (vcard)
 		{
 			setNickName(vcard->value(VVN_NICKNAME));

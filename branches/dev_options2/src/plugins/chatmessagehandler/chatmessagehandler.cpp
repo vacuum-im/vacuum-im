@@ -44,8 +44,8 @@ ChatMessageHandler::ChatMessageHandler()
 	FMessageWidgets = NULL;
 	FMessageProcessor = NULL;
 	FMessageStyleManager = NULL;
-	FRosterPlugin = NULL;
-	FPresencePlugin = NULL;
+	FRosterManager = NULL;
+	FPresenceManager = NULL;
 	FMessageArchiver = NULL;
 	FRostersView = NULL;
 	FRostersModel = NULL;
@@ -124,24 +124,24 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &AI
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IRosterManager").value(0,NULL);
 	if (plugin)
 	{
-		FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
-		if (FRosterPlugin)
+		FRosterManager = qobject_cast<IRosterManager *>(plugin->instance());
+		if (FRosterManager)
 		{
-			connect(FRosterPlugin->instance(),SIGNAL(rosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)),
+			connect(FRosterManager->instance(),SIGNAL(rosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)),
 				SLOT(onRosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)));
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IPresenceManager").value(0,NULL);
 	if (plugin)
 	{
-		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
-		if (FPresencePlugin)
+		FPresenceManager = qobject_cast<IPresenceManager *>(plugin->instance());
+		if (FPresenceManager)
 		{
-			connect(FPresencePlugin->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
+			connect(FPresenceManager->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
 				SLOT(onPresenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)));
 		}
 	}
@@ -550,7 +550,7 @@ void ChatMessageHandler::updateWindow(IMessageChatWindow *AWindow)
 	QIcon statusIcon = FStatusIcons!=NULL ? FStatusIcons->iconByJid(AWindow->streamJid(),AWindow->contactJid()) : QIcon();
 	AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::StatusIcon,statusIcon);
 
-	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AWindow->streamJid()) : NULL;
+	IPresence *presence = FPresenceManager!=NULL ? FPresenceManager->findPresence(AWindow->streamJid()) : NULL;
 	IPresenceItem pitem = presence!=NULL ? presence->findItem(AWindow->contactJid()) : IPresenceItem();
 	AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::StatusText,pitem.status);
 
@@ -793,7 +793,7 @@ QMap<Jid, QList<Jid> > ChatMessageHandler::getSortedAddresses(const QMultiMap<Ji
 	foreach(const Jid &streamJid, AAddresses.uniqueKeys())
 	{
 		QList<Jid> contacts = AAddresses.values(streamJid);
-		IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
+		IPresence *presence = FPresenceManager!=NULL ? FPresenceManager->findPresence(streamJid) : NULL;
 		if (presence)
 		{
 			QList<IPresenceItem> pitemList;
@@ -805,7 +805,7 @@ QMap<Jid, QList<Jid> > ChatMessageHandler::getSortedAddresses(const QMultiMap<Ji
 			}
 
 			contacts.clear();
-			pitemList = FPresencePlugin->sortPresenceItems(pitemList);
+			pitemList = FPresenceManager->sortPresenceItems(pitemList);
 			foreach(const IPresenceItem &pitem, pitemList)
 				contacts.append(pitem.itemJid);
 		}

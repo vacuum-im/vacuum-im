@@ -17,30 +17,30 @@
     </message>
 </context>
 <context>
-    <name>XmppStreams</name>
+    <name>XmppStreamManager</name>
     <message>
         <source>XMPP Streams Manager</source>
-        <translation>XMPP Streams Manager</translation>
+        <translation type="unfinished">XMPP Streams Manager</translation>
     </message>
     <message>
         <source>Allows other modules to create XMPP streams and get access to them</source>
-        <translation>Allows other modules to create XMPP streams and get access to them</translation>
+        <translation type="unfinished">Allows other modules to create XMPP streams and get access to them</translation>
     </message>
     <message>
         <source>XMPP stream destroyed</source>
-        <translation>XMPP stream destroyed</translation>
+        <translation type="unfinished">XMPP stream destroyed</translation>
     </message>
     <message>
         <source>Secure connection is not established</source>
-        <translation>Secure connection is not established</translation>
+        <translation type="unfinished">Secure connection is not established</translation>
     </message>
     <message>
         <source>Connection closed unexpectedly</source>
-        <translation>Connection closed unexpectedly</translation>
+        <translation type="unfinished">Connection closed unexpectedly</translation>
     </message>
     <message>
         <source>Failed to start connection</source>
-        <translation>Failed to start connection</translation>
+        <translation type="unfinished">Failed to start connection</translation>
     </message>
 </context>
 </TS>

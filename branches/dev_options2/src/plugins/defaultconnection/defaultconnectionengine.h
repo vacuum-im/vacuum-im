@@ -4,7 +4,7 @@
 #include <QObjectCleanupHandler>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/idefaultconnection.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <interfaces/ioptionsmanager.h>
 #include "defaultconnection.h"
 #include "connectionoptionswidget.h"
@@ -44,7 +44,7 @@ protected slots:
 	void onConnectionSSLErrorsOccured(const QList<QSslError> &AErrors);
 	void onConnectionDestroyed();
 private:
-	IXmppStreams *FXmppStreams;
+	IXmppStreamManager *FXmppStreamManager;
 	IOptionsManager *FOptionsManager;
 	IConnectionManager *FConnectionManager;
 private:

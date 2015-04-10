@@ -2,14 +2,14 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="en" sourcelanguage="en">
 <context>
-    <name>IqAuthPlugin</name>
+    <name>IqAuthFeatureFactory</name>
     <message>
         <source>Query Authentication</source>
-        <translation>Query Authentication</translation>
+        <translation type="unfinished">Query Authentication</translation>
     </message>
     <message>
         <source>Allow you to log on the Jabber server without support SASL authentication</source>
-        <translation>Allow you to log on the Jabber server without support SASL authentication</translation>
+        <translation type="unfinished">Allow you to log on the Jabber server without support SASL authentication</translation>
     </message>
 </context>
 </TS>

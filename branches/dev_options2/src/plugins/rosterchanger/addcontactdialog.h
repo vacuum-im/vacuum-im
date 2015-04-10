@@ -5,8 +5,8 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessageprocessor.h>
 #include <interfaces/irosterchanger.h>
-#include <interfaces/iroster.h>
-#include <interfaces/ivcard.h>
+#include <interfaces/irostermanager.h>
+#include <interfaces/ivcardmanager.h>
 #include "ui_addcontactdialog.h"
 
 class AddContactDialog :
@@ -45,7 +45,7 @@ private:
 private:
 	IRoster *FRoster;
 	IMessageProcessor *FMessageProcessor;
-	IVCardPlugin *FVcardPlugin;
+	IVCardManager *FVCardManager;
 	IRosterChanger *FRosterChanger;
 private:
 	Action *FShowChat;

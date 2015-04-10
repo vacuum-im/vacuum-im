@@ -6,7 +6,7 @@
 #include <interfaces/isocksstreams.h>
 #include <interfaces/idatastreamsmanager.h>
 #include <interfaces/istanzaprocessor.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <interfaces/iconnectionmanager.h>
 #include <interfaces/idefaultconnection.h>
 #include <interfaces/iservicediscovery.h>
@@ -58,7 +58,7 @@ protected slots:
 	void onServerConnectionReadyRead();
 	void onServerConnectionDisconnected();
 private:
-	IXmppStreams *FXmppStreams;
+	IXmppStreamManager *FXmppStreamManager;
 	IDataStreamsManager *FDataManager;
 	IStanzaProcessor *FStanzaProcessor;
 	IServiceDiscovery *FDiscovery;

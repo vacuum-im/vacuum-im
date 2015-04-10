@@ -7,12 +7,12 @@
 #include <interfaces/imessageprocessor.h>
 #include <interfaces/imessagestylemanager.h>
 #include <interfaces/imessagearchiver.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/istatusicons.h>
 #include <interfaces/istatuschanger.h>
-#include <interfaces/iroster.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/irostermanager.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/irecentcontacts.h>
 #include <interfaces/istanzaprocessor.h>
 #include "edituserslistdialog.h"
@@ -45,7 +45,7 @@ class MultiUserChatWindow :
 	Q_OBJECT;
 	Q_INTERFACES(IMessageWindow IMultiUserChatWindow IMessageTabPage IStanzaHandler IMessageHandler IMessageEditSendHandler);
 public:
-	MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMultiUserChat *AMultiChat);
+	MultiUserChatWindow(IMultiUserChatManager *AChatPlugin, IMultiUserChat *AMultiChat);
 	~MultiUserChatWindow();
 	virtual QMainWindow *instance() { return this; }
 	//IMessageWindow
@@ -219,7 +219,7 @@ private:
 	IStatusIcons *FStatusIcons;
 	IStatusChanger *FStatusChanger;
 	IMultiUserChat *FMultiChat;
-	IMultiUserChatPlugin *FMultiChatPlugin;
+	IMultiUserChatManager *FMultiChatManager;
 	IRecentContacts *FRecentContacts;
 	IStanzaProcessor *FStanzaProcessor;
 private:

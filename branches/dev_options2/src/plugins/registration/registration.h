@@ -6,8 +6,8 @@
 #include <interfaces/idataforms.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/iservicediscovery.h>
-#include <interfaces/ipresence.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ipresencemanager.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <interfaces/ixmppuriqueries.h>
 #include "registerdialog.h"
 #include "registerfeature.h"
@@ -19,11 +19,11 @@ class Registration :
 	public IStanzaRequestOwner,
 	public IXmppUriHandler,
 	public IDiscoFeatureHandler,
-	public IXmppFeaturesPlugin,
+	public IXmppFeatureFactory,
 	public IDataLocalizer
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IRegistration IStanzaRequestOwner IXmppUriHandler IDiscoFeatureHandler IXmppFeaturesPlugin IDataLocalizer);
+	Q_INTERFACES(IPlugin IRegistration IStanzaRequestOwner IXmppUriHandler IDiscoFeatureHandler IXmppFeatureFactory IDataLocalizer);
 	friend class RegisterFeature;
 public:
 	Registration();
@@ -43,7 +43,7 @@ public:
 	//IDiscoFeatureHandler
 	virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
 	virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
-	//IXmppFeaturesPlugin
+	//IXmppFeatureFactory
 	virtual QList<QString> xmppFeatures() const;
 	virtual IXmppFeature *newXmppFeature(const QString &AFeatureNS, IXmppStream *AXmppStream);
 	//IDataLocalizer
@@ -57,7 +57,7 @@ public:
 	virtual QString sendRequestSubmit(const Jid &AStreamJid, const IRegisterSubmit &ASubmit);
 	virtual QDialog *showRegisterDialog(const Jid &AStreamJid, const Jid &AServiceJid, int AOperation, QWidget *AParent = NULL);
 signals:
-	//IXmppFeaturesPlugin
+	//IXmppFeatureFactory
 	void featureCreated(IXmppFeature *AStreamFeature);
 	void featureDestroyed(IXmppFeature *AStreamFeature);
 	//IRegistration
@@ -80,10 +80,10 @@ protected slots:
 	void onRegisterActionTriggered(bool);
 private:
 	IDataForms *FDataForms;
-	IXmppStreams *FXmppStreams;
+	IXmppStreamManager *FXmppStreamManager;
 	IStanzaProcessor *FStanzaProcessor;
 	IServiceDiscovery *FDiscovery;
-	IPresencePlugin *FPresencePlugin;
+	IPresenceManager *FPresenceManager;
 	IXmppUriQueries *FXmppUriQueries;
 private:
 	QList<QString> FSendRequests;

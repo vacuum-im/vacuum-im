@@ -1,2 +1,2 @@
-set(SOURCES compression.cpp compressplugin.cpp )
-set(HEADERS compressplugin.h compression.h )
+set(SOURCES compressfeaturefactory.cpp compressfeature.cpp )
+set(HEADERS compressfeaturefactory.h compressfeature.h )

@@ -42,9 +42,9 @@ static const QList<int> DragRosterKinds = QList<int>() << RIK_CONTACT << RIK_AGE
 RosterItemExchange::RosterItemExchange()
 {
 	FGateways = NULL;
-	FRosterPlugin = NULL;
+	FRosterManager = NULL;
 	FRosterChanger = NULL;
-	FPresencePlugin = NULL;
+	FPresenceManager = NULL;
 	FDiscovery = NULL;
 	FStanzaProcessor = NULL;
 	FOptionsManager = NULL;
@@ -74,10 +74,10 @@ void RosterItemExchange::pluginInfo(IPluginInfo *APluginInfo)
 bool RosterItemExchange::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
 	Q_UNUSED(AInitOrder);
-	IPlugin *plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
+	IPlugin *plugin = APluginManager->pluginInterface("IRosterManager").value(0,NULL);
 	if (plugin)
 	{
-		FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
+		FRosterManager = qobject_cast<IRosterManager *>(plugin->instance());
 	}
 
 	plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
@@ -92,10 +92,10 @@ bool RosterItemExchange::initConnections(IPluginManager *APluginManager, int &AI
 		FRosterChanger = qobject_cast<IRosterChanger *>(plugin->instance());
 	}
 
-	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IPresenceManager").value(0,NULL);
 	if (plugin)
 	{
-		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
+		FPresenceManager = qobject_cast<IPresenceManager *>(plugin->instance());
 	}
 
 	plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
@@ -139,7 +139,7 @@ bool RosterItemExchange::initConnections(IPluginManager *APluginManager, int &AI
 		FGateways = qobject_cast<IGateways *>(plugin->instance());
 	}
 
-	return FRosterPlugin!=NULL && FStanzaProcessor!=NULL;
+	return FRosterManager!=NULL && FStanzaProcessor!=NULL;
 }
 
 bool RosterItemExchange::initObjects()
@@ -446,7 +446,7 @@ QList<IRosterItem> RosterItemExchange::dragDataContacts(const QMimeData *AData) 
 				QList<Jid> totalContacts;
 				foreach(const Jid &streamJid, indexData.value(RDR_STREAMS).toStringList())
 				{
-					IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(streamJid) : NULL;
+					IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(streamJid) : NULL;
 					QList<IRosterItem> ritems = roster!=NULL ? roster->groupItems(indexData.value(RDR_GROUP).toString()) : QList<IRosterItem>();
 					for (QList<IRosterItem>::iterator it = ritems.begin(); it!=ritems.end(); ++it)
 					{
@@ -463,7 +463,6 @@ QList<IRosterItem> RosterItemExchange::dragDataContacts(const QMimeData *AData) 
 			else
 			{
 				IRosterItem ritem;
-				ritem.isValid = true;
 				ritem.itemJid = indexData.value(RDR_PREP_BARE_JID).toString();
 				ritem.name = indexData.value(RDR_NAME).toString();
 				contactList.append(ritem);
@@ -543,8 +542,8 @@ bool RosterItemExchange::insertDropActions(const Jid &AStreamJid, const Jid &ACo
 
 void RosterItemExchange::processRequest(const IRosterExchangeRequest &ARequest)
 {
-	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(ARequest.streamJid) : NULL;
-	if (roster && roster->rosterItem(ARequest.contactJid.bare()).isValid)
+	IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(ARequest.streamJid) : NULL;
+	if (roster && roster->hasItem(ARequest.contactJid))
 	{
 		bool isGateway = false;
 		bool isDirectory = false;
@@ -573,14 +572,14 @@ void RosterItemExchange::processRequest(const IRosterExchangeRequest &ARequest)
 			if (autoApprove && !isDirectory && isGateway && it->itemJid.pDomain()!=ARequest.contactJid.pDomain())
 				autoApprove = false;
 
-			IRosterItem ritem = roster->rosterItem(it->itemJid);
+			IRosterItem ritem = roster->findItem(it->itemJid);
 			if (!isGateway && !isDirectory && it->action!=ROSTEREXCHANGE_ACTION_ADD)
 			{
 				isForbidden = true;
 			}
 			else if (it->itemJid!=ARequest.streamJid.bare() && it->action==ROSTEREXCHANGE_ACTION_ADD)
 			{
-				if (!ritem.isValid)
+				if (ritem.isNull())
 					approveList.append(*it);
 #if QT_VERSION >= QT_VERSION_CHECK(4,6,0)
 				else if (!it->groups.isEmpty() && !ritem.groups.contains(it->groups))
@@ -589,11 +588,11 @@ void RosterItemExchange::processRequest(const IRosterExchangeRequest &ARequest)
 #endif
 					approveList.append(*it);
 			}
-			else if (ritem.isValid && it->action==ROSTEREXCHANGE_ACTION_DELETE)
+			else if (!ritem.isNull() && it->action==ROSTEREXCHANGE_ACTION_DELETE)
 			{
 				approveList.append(*it);
 			}
-			else if (ritem.isValid && it->action==ROSTEREXCHANGE_ACTION_MODIFY)
+			else if (!ritem.isNull() && it->action==ROSTEREXCHANGE_ACTION_MODIFY)
 			{
 				if (ritem.name!=it->name || ritem.groups!=it->groups)
 					approveList.append(*it);
@@ -676,7 +675,7 @@ void RosterItemExchange::notifyExchangeRequest(ExchangeApproveDialog *ADialog)
 
 bool RosterItemExchange::applyRequest(const IRosterExchangeRequest &ARequest, bool ASubscribe, bool ASilent)
 {
-	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(ARequest.streamJid) : NULL;
+	IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(ARequest.streamJid) : NULL;
 	if (roster && roster->isOpen())
 	{
 		LOG_STRM_INFO(ARequest.streamJid,QString("Applying roster exchange request from=%1, id=%2").arg(ARequest.contactJid.full(),ARequest.id));
@@ -684,10 +683,10 @@ bool RosterItemExchange::applyRequest(const IRosterExchangeRequest &ARequest, bo
 		bool applied = false;
 		for(QList<IRosterExchangeItem>::const_iterator it=ARequest.items.constBegin(); it!=ARequest.items.constEnd(); ++it)
 		{
-			IRosterItem ritem = roster->rosterItem(it->itemJid);
+			IRosterItem ritem = roster->findItem(it->itemJid);
 			if (it->action == ROSTEREXCHANGE_ACTION_ADD)
 			{
-				if (!ritem.isValid)
+				if (ritem.isNull())
 				{
 					applied = true;
 					roster->setItem(it->itemJid,it->name,it->groups);
@@ -709,7 +708,7 @@ bool RosterItemExchange::applyRequest(const IRosterExchangeRequest &ARequest, bo
 					roster->setItem(ritem.itemJid,ritem.name,ritem.groups+it->groups);
 				}
 			}
-			else if (ritem.isValid && it->action==ROSTEREXCHANGE_ACTION_DELETE)
+			else if (!ritem.isNull() && it->action==ROSTEREXCHANGE_ACTION_DELETE)
 			{
 				applied = true;
 				if (!it->groups.isEmpty())
@@ -717,7 +716,7 @@ bool RosterItemExchange::applyRequest(const IRosterExchangeRequest &ARequest, bo
 				else
 					roster->removeItem(ritem.itemJid);
 			}
-			else if (ritem.isValid && it->action==ROSTEREXCHANGE_ACTION_MODIFY)
+			else if (!ritem.isNull() && it->action==ROSTEREXCHANGE_ACTION_MODIFY)
 			{
 				if (ritem.name!=it->name || ritem.groups!=it->groups)
 				{

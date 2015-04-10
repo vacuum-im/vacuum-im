@@ -102,7 +102,7 @@ ArchiveViewWindow::ArchiveViewWindow(IPluginManager *APluginManager, IMessageArc
 
 	FStatusIcons = NULL;
 	FUrlProcessor = NULL;
-	FRosterPlugin = NULL;
+	FRosterManager = NULL;
 	FMetaContacts = NULL;
 	FMessageStyleManager = NULL;
 	FMessageProcessor = NULL;
@@ -266,14 +266,14 @@ void ArchiveViewWindow::setAddresses(const QMultiMap<Jid,Jid> &AAddresses)
 
 void ArchiveViewWindow::initialize(IPluginManager *APluginManager)
 {
-	IPlugin *plugin = APluginManager->pluginInterface("IRosterPlugin").value(0);
+	IPlugin *plugin = APluginManager->pluginInterface("IRosterManager").value(0);
 	if (plugin)
 	{
-		FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
-		if (FRosterPlugin)
+		FRosterManager = qobject_cast<IRosterManager *>(plugin->instance());
+		if (FRosterManager)
 		{
-			connect(FRosterPlugin->instance(),SIGNAL(rosterRemoved(IRoster *)),SLOT(onRosterRemoved(IRoster *)));
-			connect(FRosterPlugin->instance(),SIGNAL(rosterStreamJidChanged(IRoster *, const Jid &)),SLOT(onRosterStreamJidChanged(IRoster *, const Jid &)));
+			connect(FRosterManager->instance(),SIGNAL(rosterActiveChanged(IRoster *, bool)),SLOT(onRosterActiveChanged(IRoster *, bool)));
+			connect(FRosterManager->instance(),SIGNAL(rosterStreamJidChanged(IRoster *, const Jid &)),SLOT(onRosterStreamJidChanged(IRoster *, const Jid &)));
 		}
 	}
 
@@ -345,8 +345,8 @@ bool ArchiveViewWindow::isJidMatched(const Jid &ARequestWith, const Jid &AHeader
 
 QString ArchiveViewWindow::contactName(const Jid &AStreamJid, const Jid &AContactJid, bool AShowResource) const
 {
-	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
-	IRosterItem ritem = roster!=NULL ? roster->rosterItem(AContactJid) : IRosterItem();
+	IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(AStreamJid) : NULL;
+	IRosterItem ritem = roster!=NULL ? roster->findItem(AContactJid) : IRosterItem();
 	QString name = !ritem.name.isEmpty() ? ritem.name : AContactJid.uBare();
 	if (AShowResource && !AContactJid.resource().isEmpty())
 		name = name + "/" +AContactJid.resource();
@@ -1601,9 +1601,9 @@ void ArchiveViewWindow::onArchiveCollectionsRemoved(const QString &AId, const IA
 	}
 }
 
-void ArchiveViewWindow::onRosterRemoved(IRoster *ARoster)
+void ArchiveViewWindow::onRosterActiveChanged(IRoster *ARoster, bool AActive)
 {
-	if (FAddresses.contains(ARoster->streamJid()))
+	if (!AActive && FAddresses.contains(ARoster->streamJid()))
 	{
 		FAddresses.remove(ARoster->streamJid());
 		if (!FAddresses.isEmpty())

@@ -2,7 +2,7 @@
 #define CHATWINDOW_H
 
 #include <interfaces/imessagewidgets.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include "ui_chatwindow.h"
 
 class ChatWindow :

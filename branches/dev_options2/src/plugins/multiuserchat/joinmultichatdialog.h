@@ -2,7 +2,7 @@
 #define JOINMULTICHATDIALOG_H
 
 #include <interfaces/imultiuserchat.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include "ui_joinmultichatdialog.h"
 
 struct RoomParams {
@@ -19,7 +19,7 @@ class JoinMultiChatDialog :
 {
 	Q_OBJECT;
 public:
-	JoinMultiChatDialog(IMultiUserChatPlugin *AChatPlugin, const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword, QWidget *AParent = NULL);
+	JoinMultiChatDialog(IMultiUserChatManager *AChatPlugin, const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword, QWidget *AParent = NULL);
 	~JoinMultiChatDialog();
 protected:
 	void initialize();
@@ -33,15 +33,14 @@ protected slots:
 	void onResolveNickClicked();
 	void onDeleteHistoryClicked();
 	void onRoomNickReceived(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick);
-	void onStreamAdded(IXmppStream *AXmppStream);
-	void onStreamStateChanged(IXmppStream *AXmppStream);
-	void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore);
-	void onStreamRemoved(IXmppStream *AXmppStream);
+	void onXmppStreamStateChanged(IXmppStream *AXmppStream);
+	void onXmppStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore);
+	void onXmppStreamActiveChanged(IXmppStream *AXmppStream, bool AActive);
 private:
 	Ui::JoinMultiChatDialogClass ui;
 private:
-	IXmppStreams *FXmppStreams;
-	IMultiUserChatPlugin *FChatPlugin;
+	IXmppStreamManager *FXmppStreamManager;
+	IMultiUserChatManager *FMultiChatManager;
 private:
 	Jid FStreamJid;
 	QMap<Jid, RoomParams> FRecentRooms;

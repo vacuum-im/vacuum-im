@@ -6,7 +6,7 @@
 #include <QTableWidget>
 #include <QDialogButtonBox>
 #include <QStyledItemDelegate>
-#include <interfaces/ipresence.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/iautostatus.h>
 #include <interfaces/istatuschanger.h>
 

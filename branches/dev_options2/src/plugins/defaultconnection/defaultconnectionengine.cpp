@@ -10,7 +10,7 @@
 
 DefaultConnectionEngine::DefaultConnectionEngine()
 {
-	FXmppStreams = NULL;
+	FXmppStreamManager = NULL;
 	FOptionsManager = NULL;
 	FConnectionManager = NULL;
 }
@@ -40,10 +40,10 @@ bool DefaultConnectionEngine::initConnections(IPluginManager *APluginManager, in
 		FConnectionManager = qobject_cast<IConnectionManager *>(plugin->instance());
 	}
 
-	plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IXmppStreamManager").value(0,NULL);
 	if (plugin)
 	{
-		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
+		FXmppStreamManager = qobject_cast<IXmppStreamManager *>(plugin->instance());
 	}
 
 	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
@@ -132,9 +132,9 @@ void DefaultConnectionEngine::loadConnectionSettings(IConnection *AConnection, c
 
 IXmppStream *DefaultConnectionEngine::findConnectionStream(IConnection *AConnection) const
 {
-	if (FXmppStreams && AConnection)
+	if (FXmppStreamManager && AConnection)
 	{
-		foreach(IXmppStream *stream, FXmppStreams->xmppStreams())
+		foreach(IXmppStream *stream, FXmppStreamManager->xmppStreams())
 			if (stream->connection() == AConnection)
 				return stream;
 	}

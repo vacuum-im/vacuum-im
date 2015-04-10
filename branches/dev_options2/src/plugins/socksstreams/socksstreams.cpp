@@ -9,7 +9,7 @@
 
 SocksStreams::SocksStreams() : FServer(this)
 {
-	FXmppStreams = NULL;
+	FXmppStreamManager = NULL;
 	FDataManager = NULL;
 	FStanzaProcessor = NULL;
 	FDiscovery = NULL;
@@ -56,13 +56,13 @@ bool SocksStreams::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		FConnectionManager = qobject_cast<IConnectionManager *>(plugin->instance());
 	}
 
-	plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IXmppStreamManager").value(0,NULL);
 	if (plugin)
 	{
-		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-		if (FXmppStreams)
+		FXmppStreamManager = qobject_cast<IXmppStreamManager *>(plugin->instance());
+		if (FXmppStreamManager)
 		{
-			connect(FXmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onXmppStreamClosed(IXmppStream *)));
+			connect(FXmppStreamManager->instance(),SIGNAL(streamClosed(IXmppStream *)),SLOT(onXmppStreamClosed(IXmppStream *)));
 		}
 	}
 
@@ -211,7 +211,7 @@ QString SocksStreams::accountStreamProxy(const Jid &AStreamJid) const
 QNetworkProxy SocksStreams::accountNetworkProxy(const Jid &AStreamJid) const
 {
 	QNetworkProxy proxy(QNetworkProxy::NoProxy);
-	IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(AStreamJid) : NULL;
+	IXmppStream *stream = FXmppStreamManager!=NULL ? FXmppStreamManager->findXmppStream(AStreamJid) : NULL;
 	IDefaultConnection *connection = stream!=NULL ? qobject_cast<IDefaultConnection *>(stream->connection()->instance()) : NULL;
 	return connection!=NULL ? connection->proxy() : QNetworkProxy(QNetworkProxy::NoProxy);
 }

@@ -3,7 +3,7 @@
 
 #include <QObjectCleanupHandler>
 #include <interfaces/ipluginmanager.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <interfaces/imainwindow.h>
 #include "consolewidget.h"
 
@@ -30,7 +30,7 @@ protected slots:
 	void onShowXMLConsole(bool);
 private:
 	IPluginManager *FPluginManager;
-	IXmppStreams *FXmppStreams;
+	IXmppStreamManager *FXmppStreamManager;
 	IMainWindowPlugin *FMainWindowPlugin;
 private:
 	QObjectCleanupHandler FCleanupHandler;

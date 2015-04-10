@@ -21,7 +21,7 @@
 
 AccountManager::AccountManager()
 {
-	FXmppStreams = NULL;
+	FXmppStreamManager = NULL;
 	FOptionsManager = NULL;
 	FRostersViewPlugin = NULL;
 }
@@ -46,10 +46,10 @@ bool AccountManager::initConnections(IPluginManager *APluginManager, int &AInitO
 {
 	Q_UNUSED(AInitOrder);
 
-	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
+	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreamManager").value(0,NULL);
 	if (plugin)
 	{
-		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
+		FXmppStreamManager = qobject_cast<IXmppStreamManager *>(plugin->instance());
 	}
 
 	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
@@ -78,7 +78,7 @@ bool AccountManager::initConnections(IPluginManager *APluginManager, int &AInitO
 	connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 
-	return FXmppStreams!=NULL;
+	return FXmppStreamManager!=NULL;
 }
 
 bool AccountManager::initSettings()
@@ -210,7 +210,7 @@ IAccount *AccountManager::insertAccount(const OptionsNode &AOptions)
 	Jid streamJid = AOptions.value("streamJid").toString();
 	if (streamJid.isValid() && !streamJid.node().isEmpty() && findAccountByStream(streamJid)==NULL)
 	{
-		Account *account = new Account(FXmppStreams,AOptions,this);
+		Account *account = new Account(FXmppStreamManager,AOptions,this);
 		connect(account,SIGNAL(activeChanged(bool)),SLOT(onAccountActiveChanged(bool)));
 		connect(account,SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onAccountOptionsChanged(const OptionsNode &)));
 		FAccounts.insert(account->accountId(),account);

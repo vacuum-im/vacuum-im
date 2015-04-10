@@ -1,11 +1,11 @@
 #ifndef VCARD_H
 #define VCARD_H
 
-#include <interfaces/ivcard.h>
+#include <interfaces/ivcardmanager.h>
 
 #define VCARD_TAGNAME                   "vCard"
 
-class VCardPlugin;
+class VCardManager;
 
 class VCard :
 	public QObject,
@@ -14,7 +14,7 @@ class VCard :
 	Q_OBJECT;
 	Q_INTERFACES(IVCard);
 public:
-	VCard(VCardPlugin *APlugin, const Jid &AContactJid);
+	VCard(VCardManager *APlugin, const Jid &AContactJid);
 	~VCard();
 	virtual QObject *instance() { return this; }
 	virtual bool isValid() const;
@@ -45,7 +45,7 @@ protected slots:
 	void onVCardPublished(const Jid &AContactJid);
 	void onVCardError(const Jid &AContactJid, const XmppError &AError);
 private:
-	VCardPlugin *FVCardPlugin;
+	VCardManager *FVCardPlugin;
 private:
 	Jid FContactJid;
 	QDomDocument FDoc;

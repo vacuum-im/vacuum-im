@@ -50,7 +50,7 @@ DiscoItemsWindow::DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &ASt
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_SDISCOVERY_DISCOVER,0,0,"windowIcon");
 
 	FDataForms = NULL;
-	FVCardPlugin = NULL;
+	FVCardManager = NULL;
 	FRosterChanger = NULL;
 
 	FDiscovery = ADiscovery;
@@ -182,9 +182,9 @@ void DiscoItemsWindow::initialize()
 	if (plugin)
 		FRosterChanger = qobject_cast<IRosterChanger *>(plugin->instance());
 
-	plugin = FDiscovery->pluginManager()->pluginInterface("IVCardPlugin").value(0,NULL);
+	plugin = FDiscovery->pluginManager()->pluginInterface("IVCardManager").value(0,NULL);
 	if (plugin)
-		FVCardPlugin = qobject_cast<IVCardPlugin *>(plugin->instance());
+		FVCardManager = qobject_cast<IVCardManager *>(plugin->instance());
 
 	plugin = FDiscovery->pluginManager()->pluginInterface("IDataForms").value(0,NULL);
 	if (plugin)
@@ -246,7 +246,7 @@ void DiscoItemsWindow::updateToolBarActions()
 	FReloadCurrent->setEnabled(ui.trvItems->currentIndex().isValid());
 	FDiscoInfo->setEnabled(ui.trvItems->currentIndex().isValid());
 	FAddContact->setEnabled(FRosterChanger != NULL);
-	FShowVCard->setEnabled(FVCardPlugin != NULL);
+	FShowVCard->setEnabled(FVCardManager != NULL);
 }
 
 void DiscoItemsWindow::updateActionsBar()
@@ -387,7 +387,7 @@ void DiscoItemsWindow::onToolBarActionTriggered(bool)
 		if (index.isValid())
 		{
 			Jid itemJid = index.data(DIDR_JID).toString();
-			FVCardPlugin->showVCardDialog(FStreamJid,itemJid);
+			FVCardManager->showVCardDialog(FStreamJid,itemJid);
 		}
 	}
 }

@@ -573,14 +573,14 @@ int AppendCheckPage::nextId() const
 
 IXmppStream *AppendCheckPage::createXmppStream() const
 {
-	IXmppStreams *xmppStreams = PluginHelper::pluginInstance<IXmppStreams>();
+	IXmppStreamManager *xmppStreamManager = PluginHelper::pluginInstance<IXmppStreamManager>();
 	IConnectionManager *connManager = PluginHelper::pluginInstance<IConnectionManager>();
 	IConnectionEngine *connEngine = connManager!=NULL ? connManager->findConnectionEngine(field(WF_APPEND_CONN_ENGINE).toString()) : NULL;
-	if (xmppStreams!=NULL && connManager!=NULL && connEngine!=NULL)
+	if (xmppStreamManager!=NULL && connManager!=NULL && connEngine!=NULL)
 	{
 		Jid streamJid(field(WF_APPEND_NODE).toString(), field(WF_APPEND_DOMAIN).toString(), QString::null);
 
-		IXmppStream *xmppStream = xmppStreams->newXmppStream(streamJid);
+		IXmppStream *xmppStream = xmppStreamManager->createXmppStream(streamJid);
 		xmppStream->setEncryptionRequired(true);
 		connect(xmppStream->instance(),SIGNAL(opened()),SLOT(onXmppStreamOpened()));
 		connect(xmppStream->instance(),SIGNAL(error(const XmppError &)),SLOT(onXmppStreamError(const XmppError &)));
@@ -899,12 +899,12 @@ void RegisterRequestPage::setAccountPassword(const QString &APassword)
 
 IXmppStream *RegisterRequestPage::createXmppStream() const
 {
-	IXmppStreams *xmppStreams = PluginHelper::pluginInstance<IXmppStreams>();
+	IXmppStreamManager *xmppStreamManager = PluginHelper::pluginInstance<IXmppStreamManager>();
 	IConnectionManager *connManager = PluginHelper::pluginInstance<IConnectionManager>();
 	IConnectionEngine *connEngine = connManager!=NULL ? connManager->findConnectionEngine(field(WF_REGISTER_CONN_ENGINE).toString()) : NULL;
-	if (xmppStreams!=NULL && connManager!=NULL && connEngine!=NULL)
+	if (xmppStreamManager!=NULL && connManager!=NULL && connEngine!=NULL)
 	{
-		IXmppStream *xmppStream = xmppStreams->newXmppStream(field(WF_REGISTER_DOMAIN).toString());
+		IXmppStream *xmppStream = xmppStreamManager->createXmppStream(field(WF_REGISTER_DOMAIN).toString());
 		xmppStream->setEncryptionRequired(true);
 
 		IConnection *conn = connEngine->newConnection(ACCOUNT_CONNECTION_OPTIONS,xmppStream->instance());

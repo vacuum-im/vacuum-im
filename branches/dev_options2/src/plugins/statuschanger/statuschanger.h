@@ -7,8 +7,8 @@
 #include <QDateTime>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/istatuschanger.h>
-#include <interfaces/ipresence.h>
-#include <interfaces/iroster.h>
+#include <interfaces/ipresencemanager.h>
+#include <interfaces/irostermanager.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/irostersmodel.h>
@@ -105,12 +105,11 @@ protected:
 	void removeStatusNotification(IPresence *APresence);
 protected slots:
 	void onSetStatusByAction(bool);
-	void onPresenceAdded(IPresence *APresence);
+	void onPresenceActiveChanged(IPresence *APresence, bool AActive);
 	void onPresenceChanged(IPresence *APresence, int AShow, const QString &AStatus, int APriority);
-	void onPresenceRemoved(IPresence *APresence);
 	void onRosterOpened(IRoster *ARoster);
 	void onRosterClosed(IRoster *ARoster);
-	void onStreamJidChanged(const Jid &ABefore, const Jid &AAfter);
+	void onRosterStreamJidChanged(const Jid &ABefore, const Jid &AAfter);
 	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onDefaultStatusIconsChanged();
 	void onOptionsOpened();
@@ -124,8 +123,8 @@ protected slots:
 	void onNotificationActivated(int ANotifyId);
 private:
 	IPluginManager *FPluginManager;
-	IPresencePlugin *FPresencePlugin;
-	IRosterPlugin *FRosterPlugin;
+	IPresenceManager *FPresenceManager;
+	IRosterManager *FRosterManager;
 	IMainWindowPlugin *FMainWindowPlugin;
 	IRostersView *FRostersView;
 	IRostersViewPlugin *FRostersViewPlugin;

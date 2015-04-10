@@ -5,7 +5,7 @@ FORMS = joinmultichatdialog.ui \
         
 HEADERS = multiuser.h \
           multiuserchat.h \
-          multiuserchatplugin.h \
+          multiuserchatmanager.h \
           joinmultichatdialog.h \
           multiuserchatwindow.h \
           edituserslistdialog.h \
@@ -14,7 +14,7 @@ HEADERS = multiuser.h \
 
 SOURCES = multiuser.cpp \
           multiuserchat.cpp \
-          multiuserchatplugin.cpp \
+          multiuserchatmanager.cpp \
           joinmultichatdialog.cpp \
           multiuserchatwindow.cpp \
           edituserslistdialog.cpp \

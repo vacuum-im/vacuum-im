@@ -4,8 +4,8 @@
 #include <QRegExp>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/istatusicons.h>
-#include <interfaces/iroster.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/irostermanager.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/irostersmodel.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/imultiuserchat.h>
@@ -78,11 +78,11 @@ protected slots:
 	void onDefaultIconsetChanged();
 	void onSetCustomIconsetByAction(bool);
 private:
-	IRosterPlugin *FRosterPlugin;
-	IPresencePlugin *FPresencePlugin;
+	IRosterManager *FRosterManager;
+	IPresenceManager *FPresenceManager;
 	IRostersModel *FRostersModel;
 	IRostersViewPlugin *FRostersViewPlugin;
-	IMultiUserChatPlugin *FMultiUserChatPlugin;
+	IMultiUserChatManager *FMultiChatManager;
 	IOptionsManager *FOptionsManager;
 private:
 	Menu *FCustomIconMenu;

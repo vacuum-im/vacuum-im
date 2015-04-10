@@ -2,7 +2,7 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="uk" sourcelanguage="en">
 <context>
-    <name>RosterPlugin</name>
+    <name>RosterManager</name>
     <message>
         <source>Roster Manager</source>
         <translation>Менеджер ростеру</translation>

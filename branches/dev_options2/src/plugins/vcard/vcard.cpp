@@ -1,5 +1,5 @@
 #include "vcard.h"
-#include "vcardplugin.h"
+#include "vcardmanager.h"
 
 #include <QFile>
 #include <QBuffer>
@@ -9,7 +9,7 @@
 
 #define DEFAUL_IMAGE_FORMAT       "png"
 
-VCard::VCard(VCardPlugin *APlugin, const Jid &AContactJid) : QObject(APlugin)
+VCard::VCard(VCardManager *APlugin, const Jid &AContactJid) : QObject(APlugin)
 {
 	FContactJid = AContactJid;
 	FVCardPlugin = APlugin;

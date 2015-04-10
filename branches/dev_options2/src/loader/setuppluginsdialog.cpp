@@ -124,7 +124,7 @@ void SetupPluginsDialog::updatePlugins()
 		bool isLoaded = info!=NULL;
 		QString homePage = info!=NULL ? info->homePage.toString() : QString::null;
 
-		QStringList dependsOn, dependsFor, dependsFailed;
+		QStringList dependsOn, dependsFor;
 		if (info != NULL)
 		{
 			foreach(const QUuid &dependUid, FPluginManager->pluginDependencesOn(uuid))

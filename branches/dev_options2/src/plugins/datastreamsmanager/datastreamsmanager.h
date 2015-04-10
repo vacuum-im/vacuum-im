@@ -4,7 +4,7 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/idatastreamsmanager.h>
 #include <interfaces/idataforms.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/ioptionsmanager.h>
@@ -74,7 +74,7 @@ protected slots:
 	void onXmppStreamClosed(IXmppStream *AXmppStream);
 private:
 	IDataForms *FDataForms;
-	IXmppStreams *FXmppStreams;
+	IXmppStreamManager *FXmppStreamManager;
 	IServiceDiscovery *FDiscovery;
 	IStanzaProcessor *FStanzaProcessor;
 	IOptionsManager *FOptionsManager;

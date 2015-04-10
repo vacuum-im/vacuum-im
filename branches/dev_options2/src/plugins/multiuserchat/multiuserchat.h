@@ -5,9 +5,9 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessageprocessor.h>
 #include <interfaces/istanzaprocessor.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <interfaces/iservicediscovery.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/ipresencemanager.h>
 #include "multiuser.h"
 
 class MultiUserChat :
@@ -20,7 +20,7 @@ class MultiUserChat :
 	Q_OBJECT;
 	Q_INTERFACES(IMultiUserChat IStanzaHandler IStanzaRequestOwner IMessageEditor);
 public:
-	MultiUserChat(IMultiUserChatPlugin *AChatPlugin, const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANickName, const QString &APassword, QObject *AParent);
+	MultiUserChat(IMultiUserChatManager *AChatPlugin, const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANickName, const QString &APassword, QObject *AParent);
 	~MultiUserChat();
 	virtual QObject *instance() { return this; }
 	//IStanzaHandler
@@ -120,7 +120,7 @@ private:
 	IDataForms *FDataForms;
 	IXmppStream *FXmppStream;
 	IStanzaProcessor *FStanzaProcessor;
-	IMultiUserChatPlugin *FChatPlugin;
+	IMultiUserChatManager *FMultiChatManager;
 	IMessageProcessor *FMessageProcessor;
 	IServiceDiscovery *FDiscovery;
 private:

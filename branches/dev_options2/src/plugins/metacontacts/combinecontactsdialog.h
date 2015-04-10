@@ -2,7 +2,7 @@
 #define COMBINECONTACTSDIALOG_H
 
 #include <QDialog>
-#include <interfaces/iroster.h>
+#include <interfaces/irostermanager.h>
 #include <interfaces/iavatars.h>
 #include <interfaces/imetacontacts.h>
 #include <interfaces/ipluginmanager.h>
@@ -25,7 +25,7 @@ private:
 	Ui::CombineContactsDialog ui;
 private:
 	IAvatars *FAvatars;
-	IRosterPlugin *FRosterPlugin;
+	IRosterManager *FRosterManager;
 	IMetaContacts *FMetaContacts;
 private:
 	QUuid FMetaId;

@@ -26,10 +26,10 @@
 Commands::Commands()
 {
 	FDataForms = NULL;
-	FXmppStreams = NULL;
+	FXmppStreamManager = NULL;
 	FStanzaProcessor = NULL;
 	FDiscovery = NULL;
-	FPresencePlugin = NULL;
+	FPresenceManager = NULL;
 	FXmppUriQueries = NULL;
 }
 
@@ -65,14 +65,14 @@ bool Commands::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IXmppStreamManager").value(0,NULL);
 	if (plugin)
 	{
-		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-		if (FXmppStreams)
+		FXmppStreamManager = qobject_cast<IXmppStreamManager *>(plugin->instance());
+		if (FXmppStreamManager)
 		{
-			connect(FXmppStreams->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamOpened(IXmppStream *)));
-			connect(FXmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *)));
+			connect(FXmppStreamManager->instance(),SIGNAL(streamOpened(IXmppStream *)),SLOT(onXmppStreamOpened(IXmppStream *)));
+			connect(FXmppStreamManager->instance(),SIGNAL(streamClosed(IXmppStream *)),SLOT(onXmppStreamClosed(IXmppStream *)));
 		}
 	}
 
@@ -88,13 +88,13 @@ bool Commands::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 	}
 
-	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IPresenceManager").value(0,NULL);
 	if (plugin)
 	{
-		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
-		if (FPresencePlugin)
+		FPresenceManager = qobject_cast<IPresenceManager *>(plugin->instance());
+		if (FPresenceManager)
 		{
-			connect(FPresencePlugin->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
+			connect(FPresenceManager->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
 				SLOT(onPresenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)));
 		}
 	}
@@ -105,7 +105,7 @@ bool Commands::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 		FXmppUriQueries = qobject_cast<IXmppUriQueries *>(plugin->instance());
 	}
 
-	return FXmppStreams!=NULL && FStanzaProcessor!=NULL && FDataForms!=NULL;
+	return FXmppStreamManager!=NULL && FStanzaProcessor!=NULL && FDataForms!=NULL;
 }
 
 bool Commands::initObjects()
@@ -509,7 +509,7 @@ QList<ICommand> Commands::contactCommands(const Jid &AStreamJid, const Jid &ACon
 
 bool Commands::executeCommand(const Jid &AStreamJid, const Jid &ACommandJid, const QString &ANode)
 {
-	IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(AStreamJid) : NULL;
+	IXmppStream *stream = FXmppStreamManager!=NULL ? FXmppStreamManager->findXmppStream(AStreamJid) : NULL;
 	if (FDataForms && stream && stream->isOpen())
 	{
 		LOG_STRM_INFO(AStreamJid,QString("Executing command, server=%1, node=%2").arg(ACommandJid.full(),ANode));
@@ -544,7 +544,7 @@ void Commands::registerDiscoFeatures()
 	FDiscovery->insertDiscoFeature(dfeature);
 }
 
-void Commands::onStreamOpened(IXmppStream *AXmppStream)
+void Commands::onXmppStreamOpened(IXmppStream *AXmppStream)
 {
 	if (FStanzaProcessor)
 	{
@@ -558,7 +558,7 @@ void Commands::onStreamOpened(IXmppStream *AXmppStream)
 	}
 }
 
-void Commands::onStreamClosed(IXmppStream *AXmppStream)
+void Commands::onXmppStreamClosed(IXmppStream *AXmppStream)
 {
 	if (FStanzaProcessor)
 		FStanzaProcessor->removeStanzaHandle(FSHICommands.take(AXmppStream->streamJid()));

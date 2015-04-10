@@ -46,13 +46,13 @@
 ServiceDiscovery::ServiceDiscovery()
 {
 	FPluginManager = NULL;
-	FXmppStreams = NULL;
-	FRosterPlugin = NULL;
-	FPresencePlugin = NULL;
+	FXmppStreamManager = NULL;
+	FRosterManager = NULL;
+	FPresenceManager = NULL;
 	FStanzaProcessor = NULL;
 	FRostersView = NULL;
 	FRostersViewPlugin = NULL;
-	FMultiUserChatPlugin = NULL;
+	FMultiChatManager = NULL;
 	FTrayManager = NULL;
 	FMainWindowPlugin = NULL;
 	FStatusIcons = NULL;
@@ -90,14 +90,14 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &AIni
 	Q_UNUSED(AInitOrder);
 	FPluginManager = APluginManager;
 
-	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
+	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreamManager").value(0,NULL);
 	if (plugin)
 	{
-		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-		if (FXmppStreams)
+		FXmppStreamManager = qobject_cast<IXmppStreamManager *>(plugin->instance());
+		if (FXmppStreamManager)
 		{
-			connect(FXmppStreams->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onXmppStreamOpened(IXmppStream *)));
-			connect(FXmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onXmppStreamClosed(IXmppStream *)));
+			connect(FXmppStreamManager->instance(),SIGNAL(streamOpened(IXmppStream *)),SLOT(onXmppStreamOpened(IXmppStream *)));
+			connect(FXmppStreamManager->instance(),SIGNAL(streamClosed(IXmppStream *)),SLOT(onXmppStreamClosed(IXmppStream *)));
 		}
 	}
 
@@ -107,37 +107,37 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &AIni
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 	}
 
-	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IPresenceManager").value(0,NULL);
 	if (plugin)
 	{
-		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
-		if (FPresencePlugin)
+		FPresenceManager = qobject_cast<IPresenceManager *>(plugin->instance());
+		if (FPresenceManager)
 		{
-			connect(FPresencePlugin->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
+			connect(FPresenceManager->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
 				SLOT(onPresenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)));
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IRosterManager").value(0,NULL);
 	if (plugin)
 	{
-		FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
-		if (FRosterPlugin)
+		FRosterManager = qobject_cast<IRosterManager *>(plugin->instance());
+		if (FRosterManager)
 		{
-			connect(FRosterPlugin->instance(),SIGNAL(rosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)),
+			connect(FRosterManager->instance(),SIGNAL(rosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)),
 				SLOT(onRosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)));
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IMultiUserChatPlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IMultiUserChatManager").value(0,NULL);
 	if (plugin)
 	{
-		FMultiUserChatPlugin = qobject_cast<IMultiUserChatPlugin *>(plugin->instance());
-		if (FMultiUserChatPlugin)
+		FMultiChatManager = qobject_cast<IMultiUserChatManager *>(plugin->instance());
+		if (FMultiChatManager)
 		{
-			connect(FMultiUserChatPlugin->instance(),SIGNAL(multiUserChatCreated(IMultiUserChat *)),
+			connect(FMultiChatManager->instance(),SIGNAL(multiUserChatCreated(IMultiUserChat *)),
 				SLOT(onMultiUserChatCreated(IMultiUserChat *)));
-			connect(FMultiUserChatPlugin->instance(),SIGNAL(multiUserContextMenu(IMultiUserChatWindow *, IMultiUser *, Menu *)),
+			connect(FMultiChatManager->instance(),SIGNAL(multiUserContextMenu(IMultiUserChatWindow *, IMultiUser *, Menu *)),
 				SLOT(onMultiUserContextMenu(IMultiUserChatWindow *, IMultiUser *, Menu *)));
 		}
 	}
@@ -184,7 +184,7 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &AIni
 		FXmppUriQueries = qobject_cast<IXmppUriQueries *>(plugin->instance());
 	}
 
-	return FXmppStreams!=NULL && FStanzaProcessor!=NULL;
+	return FXmppStreamManager!=NULL && FStanzaProcessor!=NULL;
 }
 
 bool ServiceDiscovery::initObjects()
@@ -1276,8 +1276,8 @@ void ServiceDiscovery::onXmppStreamOpened(IXmppStream *AXmppStream)
 	requestDiscoInfo(AXmppStream->streamJid(),server);
 	requestDiscoItems(AXmppStream->streamJid(),server);
 
-	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AXmppStream->streamJid()) : NULL;
-	QList<IRosterItem> ritems = roster!=NULL ? roster->rosterItems() : QList<IRosterItem>();
+	IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(AXmppStream->streamJid()) : NULL;
+	QList<IRosterItem> ritems = roster!=NULL ? roster->items() : QList<IRosterItem>();
 	foreach(const IRosterItem &ritem, ritems)
 	{
 		if (ritem.itemJid.node().isEmpty())
@@ -1372,7 +1372,7 @@ void ServiceDiscovery::onMultiUserPresence(IMultiUser *AUser, int AShow, const Q
 	{
 		bool isSingleUser = true;
 		Jid userStreamJid = AUser->data(MUDR_STREAM_JID).toString();
-		foreach(IMultiUserChat *mchat, FMultiUserChatPlugin->multiUserChats())
+		foreach(IMultiUserChat *mchat, FMultiChatManager->multiUserChats())
 		{
 			IMultiUser *muser = mchat->userByNick(AUser->nickName());
 			if (muser!=NULL && muser!=AUser && mchat->roomJid()==AUser->roomJid() && mchat->streamJid()==userStreamJid)
@@ -1428,7 +1428,7 @@ void ServiceDiscovery::onRostersViewIndexContextMenu(const QList<IRosterIndex *>
 			int indexKind = index->kind();
 			Jid contactJid = indexKind!=RIK_STREAM_ROOT ? index->data(RDR_FULL_JID).toString() : streamJid.domain();
 
-			IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(streamJid) : NULL;
+			IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(streamJid) : NULL;
 
 			if (indexKind==RIK_STREAM_ROOT || indexKind==RIK_AGENT)
 			{
@@ -1446,7 +1446,7 @@ void ServiceDiscovery::onRostersViewIndexContextMenu(const QList<IRosterIndex *>
 			{
 				IDiscoInfo dinfo = discoInfo(streamJid,itemJid);
 
-				IRosterItem ritem = roster!=NULL ? roster->rosterItem(itemJid) : IRosterItem();
+				IRosterItem ritem = roster!=NULL ? roster->findItem(itemJid) : IRosterItem();
 				QString resName = (!ritem.name.isEmpty() ? ritem.name : itemJid.uBare()) + (!itemJid.resource().isEmpty() ? QString("/")+itemJid.resource() : QString::null);
 
 				// Many clients support version info but don`t show it in disco info
@@ -1549,7 +1549,7 @@ void ServiceDiscovery::onSelfCapsChanged()
 		if (myCaps.ver != newVer)
 		{
 			myCaps.ver = newVer;
-			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
+			IPresence *presence = FPresenceManager!=NULL ? FPresenceManager->findPresence(streamJid) : NULL;
 			if (presence && presence->isOpen())
 				presence->setPresence(presence->show(),presence->status(),presence->priority());
 		}

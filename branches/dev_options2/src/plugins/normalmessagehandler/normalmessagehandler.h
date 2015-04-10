@@ -11,8 +11,8 @@
 #include <interfaces/inotifications.h>
 #include <interfaces/istatusicons.h>
 #include <interfaces/irostersview.h>
-#include <interfaces/ipresence.h>
-#include <interfaces/iroster.h>
+#include <interfaces/ipresencemanager.h>
+#include <interfaces/irostermanager.h>
 #include <interfaces/iavatars.h>
 #include <interfaces/ixmppuriqueries.h>
 #include <interfaces/ioptionsmanager.h>
@@ -121,7 +121,7 @@ private:
 	IMessageStyleManager *FMessageStyleManager;
 	IStatusIcons *FStatusIcons;
 	INotifications *FNotifications;
-	IPresencePlugin *FPresencePlugin;
+	IPresenceManager *FPresenceManager;
 	IRostersView *FRostersView;
 	IRostersModel *FRostersModel;
 	IXmppUriQueries *FXmppUriQueries;

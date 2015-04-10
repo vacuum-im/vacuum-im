@@ -15,7 +15,7 @@ SubscriptionDialog::SubscriptionDialog(IRosterChanger *ARosterChanger, IPluginMa
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_RCHANGER_SUBSCRIBTION,0,0,"windowIcon");
 
 	FRoster = NULL;
-	FVcardPlugin = NULL;
+	FVCardManager = NULL;
 	FNotifications = NULL;
 	FMessageProcessor = NULL;
 
@@ -67,12 +67,12 @@ ToolBarChanger *SubscriptionDialog::toolBarChanger() const
 
 void SubscriptionDialog::initialize(IPluginManager *APluginManager)
 {
-	IPlugin *plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
+	IPlugin *plugin = APluginManager->pluginInterface("IRosterManager").value(0,NULL);
 	if (plugin)
 	{
-		IRosterPlugin *rosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
-		FRoster = rosterPlugin!=NULL ? rosterPlugin->findRoster(FStreamJid) : NULL;
-		if (FRoster && FRoster->rosterItem(FContactJid).isValid)
+		IRosterManager *rosterManager = qobject_cast<IRosterManager *>(plugin->instance());
+		FRoster = rosterManager!=NULL ? rosterManager->findRoster(FStreamJid) : NULL;
+		if (FRoster && FRoster->hasItem(FContactJid))
 		{
 			ui.rbtAddToRoster->setEnabled(false);
 			ui.rbtSendAndRequest->setChecked(true);
@@ -101,11 +101,11 @@ void SubscriptionDialog::initialize(IPluginManager *APluginManager)
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IVCardPlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IVCardManager").value(0,NULL);
 	if (plugin)
 	{
-		FVcardPlugin = qobject_cast<IVCardPlugin *>(plugin->instance());
-		if (FVcardPlugin)
+		FVCardManager = qobject_cast<IVCardManager *>(plugin->instance());
+		if (FVCardManager)
 		{
 			FShowVCard = new Action(FToolBarChanger->toolBar());
 			FShowVCard->setText(tr("VCard"));
@@ -163,7 +163,7 @@ void SubscriptionDialog::onToolBarActionTriggered( bool )
 		}
 		else if (action == FShowVCard)
 		{
-			FVcardPlugin->showVCardDialog(FStreamJid,FContactJid.bare());
+			FVCardManager->showVCardDialog(FStreamJid,FContactJid.bare());
 		}
 	}
 }

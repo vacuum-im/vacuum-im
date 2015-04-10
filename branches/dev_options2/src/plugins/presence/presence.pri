@@ -1,5 +1,5 @@
 HEADERS = presence.h \
-          presenceplugin.h 
+          presencemanager.h 
 
 SOURCES = presence.cpp \
-          presenceplugin.cpp
+          presencemanager.cpp

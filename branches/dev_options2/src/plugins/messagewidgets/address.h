@@ -2,7 +2,7 @@
 #define ADDRESS_H
 
 #include <interfaces/imessagewidgets.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/ipresencemanager.h>
 
 class Address : 
 	public QObject,
@@ -34,9 +34,9 @@ protected slots:
 	void onXmppStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore);
 	void onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore);
 private:
-	IXmppStreams *FXmppStreams;
+	IXmppStreamManager *FXmppStreamManager;
 	IMessageWidgets *FMessageWidgets;
-	IPresencePlugin *FPresencePlugin;
+	IPresenceManager *FPresenceManager;
 private:
 	Jid FStreamJid;
 	Jid FContactJid;

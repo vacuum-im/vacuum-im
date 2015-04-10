@@ -14,9 +14,9 @@
 #include <interfaces/istatusicons.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/irostersmodel.h>
-#include <interfaces/iroster.h>
-#include <interfaces/ipresence.h>
-#include <interfaces/ivcard.h>
+#include <interfaces/irostermanager.h>
+#include <interfaces/ipresencemanager.h>
+#include <interfaces/ivcardmanager.h>
 #include <interfaces/iavatars.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/istatuschanger.h>
@@ -115,8 +115,8 @@ private:
 	IMessageWidgets *FMessageWidgets;
 	IMessageProcessor *FMessageProcessor;
 	IMessageStyleManager *FMessageStyleManager;
-	IRosterPlugin *FRosterPlugin;
-	IPresencePlugin *FPresencePlugin;
+	IRosterManager *FRosterManager;
+	IPresenceManager *FPresenceManager;
 	IMessageArchiver *FMessageArchiver;
 	IRostersView *FRostersView;
 	IRostersModel *FRostersModel;

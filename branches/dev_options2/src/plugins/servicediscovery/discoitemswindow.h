@@ -7,7 +7,7 @@
 #include <QSortFilterProxyModel>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/irosterchanger.h>
-#include <interfaces/ivcard.h>
+#include <interfaces/ivcardmanager.h>
 #include "discoitemsmodel.h"
 #include "ui_discoitemswindow.h"
 
@@ -59,7 +59,7 @@ private:
 	Ui::DiscoItemsWindowClass ui;
 private:
 	IDataForms *FDataForms;
-	IVCardPlugin *FVCardPlugin;
+	IVCardManager *FVCardManager;
 	IRosterChanger *FRosterChanger;
 	IServiceDiscovery *FDiscovery;
 private:
