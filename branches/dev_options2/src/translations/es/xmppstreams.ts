@@ -4,14 +4,6 @@
 <context>
     <name>XmppStream</name>
     <message>
-        <source>Password request</source>
-        <translation>Solicitar contraseña</translation>
-    </message>
-    <message>
-        <source>Enter password for &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation>Entrar la contraseña para &lt;b&gt;%1&lt;/b&gt;</translation>
-    </message>
-    <message>
         <source>Connection not specified</source>
         <translation>Conexión sin definir</translation>
     </message>

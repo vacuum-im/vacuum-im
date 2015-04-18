@@ -155,7 +155,7 @@ Comprueba la configuración y vuelve a intentarlo.</translation>
     </message>
     <message>
         <source>Join conference</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Entrar a la sala</translation>
     </message>
     <message>
         <source>Ctrl+J</source>

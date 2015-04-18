@@ -26,7 +26,12 @@ signals:
 	void finished(bool ARestart);
 	void error(const XmppError &AError);
 	void featureDestroyed();
+protected:
+	void sendAuthRequest();
+protected slots:
+	void onXmppStreamPasswordProvided(const QString &APassword);
 private:
+	bool FPasswordRequested;
 	IXmppStream *FXmppStream;
 };
 

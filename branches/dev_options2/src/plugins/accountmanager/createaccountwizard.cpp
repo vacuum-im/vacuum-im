@@ -803,7 +803,6 @@ void RegisterRequestPage::initializePage()
 		conn->engine()->loadConnectionSettings(conn,ACCOUNT_CONNECTION_OPTIONS);
 
 		FXmppStream->setStreamJid(field(WF_REGISTER_DOMAIN).toString());
-		FXmppStream->setPassword("_not_empty_password_");
 
 		FRegisterId = FRegistration->startStreamRegistration(FXmppStream);
 	}

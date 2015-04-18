@@ -18,8 +18,8 @@ XmppStream::XmppStream(IXmppStreamManager *AXmppStreamManager, const Jid &AStrea
 	FEncrypt = true;
 	FNodeChanged = false;
 	FDomainChanged = false;
+	FPasswordRequested = false;
 	FConnection = NULL;
-	FPasswordDialog = NULL;
 	FStreamState = SS_OFFLINE;
 
 	FStreamJid = AStreamJid;
@@ -185,9 +185,6 @@ void XmppStream::setStreamJid(const Jid &AStreamJid)
 			Jid after = AStreamJid;
 			emit jidAboutToBeChanged(after);
 
-			if (before.pBare() != after.pBare())
-				FSessionPassword.clear();
-
 			FOfflineJid = after;
 			FStreamJid = after;
 			emit jidChanged(before);
@@ -217,6 +214,16 @@ void XmppStream::setStreamJid(const Jid &AStreamJid)
 	}
 }
 
+bool XmppStream::requestPassword()
+{
+	if (!FPasswordRequested)
+	{
+		LOG_STRM_DEBUG(streamJid(),QString("XMPP stream password request"));
+		emit passwordRequested(FPasswordRequested);
+	}
+	return FPasswordRequested;
+}
+
 QString XmppStream::password() const
 {
 	return FPassword;
@@ -226,34 +233,15 @@ void XmppStream::setPassword(const QString &APassword)
 {
 	if (FPassword != APassword)
 	{
-		if (!APassword.isEmpty())
-			FSessionPassword.clear();
 		FPassword = APassword;
+		LOG_STRM_DEBUG(streamJid(),"XMPP stream password changed");
 	}
-}
-
-QString XmppStream::getSessionPassword(bool AAskIfNeed)
-{
-	if (AAskIfNeed && FStreamState!=SS_ONLINE && FPassword.isEmpty() && FSessionPassword.isEmpty() && FPasswordMutex.tryLock())
+	if (FPasswordRequested)
 	{
-		LOG_STRM_INFO(streamJid(),"Requesting session password");
-
-		bool isActive = isKeepAliveTimerActive();
-		setKeepAliveTimerActive(false);
-
-		FPasswordDialog = new QInputDialog(NULL,Qt::Dialog);
-		FPasswordDialog->setWindowTitle(tr("Password request"));
-		FPasswordDialog->setLabelText(tr("Enter password for <b>%1</b>").arg(Qt::escape(FStreamJid.uBare())));
-		FPasswordDialog->setTextEchoMode(QLineEdit::Password);
-		if (FPasswordDialog->exec() == QDialog::Accepted)
-			FSessionPassword = FPasswordDialog->textValue();
-		FPasswordDialog->deleteLater();
-		FPasswordDialog = NULL;
-
-		setKeepAliveTimerActive(isActive);
-		FPasswordMutex.unlock();
+		FPasswordRequested = false;
+		LOG_STRM_DEBUG(streamJid(),"XMPP stream password provided");
+		QMetaObject::invokeMethod(this,"passwordProvided",Qt::QueuedConnection,Q_ARG(QString,APassword));
 	}
-	return !FSessionPassword.isEmpty() ? FSessionPassword : FPassword;
 }
 
 QString XmppStream::defaultLang() const
@@ -263,10 +251,10 @@ QString XmppStream::defaultLang() const
 
 void XmppStream::setDefaultLang(const QString &ADefLang)
 {
-	if (FStreamState == SS_OFFLINE)
+	if (FDefLang != ADefLang)
 	{
 		FDefLang = ADefLang;
-		LOG_STRM_DEBUG(streamJid(),QString("Default stream language changed to=%1").arg(ADefLang));
+		LOG_STRM_DEBUG(streamJid(),QString("Default XMPP stream language changed to=%1").arg(ADefLang));
 	}
 }
 
@@ -277,7 +265,7 @@ bool XmppStream::isEncryptionRequired() const
 
 void XmppStream::setEncryptionRequired(bool ARequire)
 {
-	if (FStreamState == SS_OFFLINE)
+	if (FEncrypt != ARequire)
 	{
 		FEncrypt = ARequire;
 		LOG_STRM_DEBUG(streamJid(),QString("XMPP stream encryption require changed to=%1").arg(ARequire));
@@ -492,8 +480,6 @@ void XmppStream::setStreamState(StreamState AState)
 	if (FStreamState != AState)
 	{
 		LOG_STRM_DEBUG(streamJid(),QString("XMPP stream state changed to=%1").arg(AState));
-		if (FPasswordDialog)
-			FPasswordDialog->reject();
 		FStreamState = AState;
 	}
 }
@@ -638,6 +624,7 @@ void XmppStream::onConnectionDisconnected()
 
 		FNodeChanged = false;
 		FDomainChanged = false;
+		FPasswordRequested = false;
 		FOnlineJid = Jid::null;
 	}
 }
@@ -683,10 +670,10 @@ void XmppStream::onFeatureFinished(bool ARestart)
 
 void XmppStream::onFeatureError(const XmppError &AError)
 {
-	if (AError.isSaslError() && AError.toSaslError().conditionCode()==XmppSaslError::EC_NOT_AUTHORIZED)
-		FSessionPassword = QString::null;
-	else if (AError.isStanzaError() && AError.toStanzaError().conditionCode()==XmppStanzaError::EC_NOT_AUTHORIZED)
-		FSessionPassword = QString::null;
+	//if (AError.isSaslError() && AError.toSaslError().conditionCode()==XmppSaslError::EC_NOT_AUTHORIZED)
+	//	FSessionPassword = QString::null;
+	//else if (AError.isStanzaError() && AError.toStanzaError().conditionCode()==XmppStanzaError::EC_NOT_AUTHORIZED)
+	//	FSessionPassword = QString::null;
 	abort(AError);
 }
 

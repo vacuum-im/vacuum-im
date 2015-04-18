@@ -8,7 +8,10 @@
 
 IqAuthFeature::IqAuthFeature(IXmppStream *AXmppStream) : QObject(AXmppStream->instance())
 {
+	FPasswordRequested = false;
+
 	FXmppStream = AXmppStream;
+	connect(FXmppStream->instance(),SIGNAL(passwordProvided(const QString &)),SLOT(onXmppStreamPasswordProvided(const QString &)));
 }
 
 IqAuthFeature::~IqAuthFeature()
@@ -34,7 +37,7 @@ bool IqAuthFeature::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int 
 				QDomElement reqElem = AStanza.firstElement("query",NS_JABBER_IQ_AUTH);
 				if (!reqElem.firstChildElement("digest").isNull())
 				{
-					QByteArray shaData = FXmppStream->streamId().toUtf8()+FXmppStream->getSessionPassword().toUtf8();
+					QByteArray shaData = FXmppStream->streamId().toUtf8()+FXmppStream->password().toUtf8();
 					QByteArray shaDigest = QCryptographicHash::hash(shaData,QCryptographicHash::Sha1).toHex();
 					query.appendChild(auth.createElement("digest")).appendChild(auth.createTextNode(shaDigest.toLower().trimmed()));
 					FXmppStream->sendStanza(auth);
@@ -44,7 +47,7 @@ bool IqAuthFeature::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int 
 				{
 					if (FXmppStream->connection()->isEncrypted())
 					{
-						query.appendChild(auth.createElement("password")).appendChild(auth.createTextNode(FXmppStream->getSessionPassword()));
+						query.appendChild(auth.createElement("password")).appendChild(auth.createTextNode(FXmppStream->password()));
 						FXmppStream->sendStanza(auth);
 						LOG_STRM_INFO(AXmppStream->streamJid(),"Username and plain text password sent");
 					}
@@ -106,12 +109,10 @@ bool IqAuthFeature::start(const QDomElement &AElem)
 	{
 		if (!xmppStream()->isEncryptionRequired() || xmppStream()->connection()->isEncrypted())
 		{
-			Stanza request("iq");
-			request.setType("get").setId("getIqAuth");
-			request.addElement("query",NS_JABBER_IQ_AUTH).appendChild(request.createElement("username")).appendChild(request.createTextNode(FXmppStream->streamJid().node()));
-			FXmppStream->insertXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
-			FXmppStream->sendStanza(request);
-			LOG_STRM_INFO(FXmppStream->streamJid(),"Authentication initialization request sent");
+			if (!FXmppStream->requestPassword())
+				sendAuthRequest();
+			else
+				FPasswordRequested = true;
 			return true;
 		}
 		else
@@ -125,4 +126,24 @@ bool IqAuthFeature::start(const QDomElement &AElem)
 	return false;
 }
 
+void IqAuthFeature::sendAuthRequest()
+{
+	Stanza request("iq");
+	request.setType("get").setId("getIqAuth");
+	request.addElement("query",NS_JABBER_IQ_AUTH).appendChild(request.createElement("username")).appendChild(request.createTextNode(FXmppStream->streamJid().pNode()));
 
+	FXmppStream->insertXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
+	FXmppStream->sendStanza(request);
+
+	LOG_STRM_INFO(FXmppStream->streamJid(),"Authentication initialization request sent");
+}
+
+void IqAuthFeature::onXmppStreamPasswordProvided(const QString &APassword)
+{
+	Q_UNUSED(APassword);
+	if (FPasswordRequested)
+	{
+		sendAuthRequest();
+		FPasswordRequested = false;
+	}
+}

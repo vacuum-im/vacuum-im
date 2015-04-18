@@ -26,10 +26,13 @@ signals:
 	void finished(bool ARestart);
 	void error(const XmppError &AError);
 	void featureDestroyed();
+protected:
+	void sendAuthRequest(const QStringList &AMechanisms);
+protected slots:
+	void onXmppStreamPasswordProvided(const QString &APassword);
 private:
 	IXmppStream *FXmppStream;
-private:
-	int FChallengeStep;
+	QStringList FMechanisms;
 };
 
 #endif // SASLAUTHFEATURE_H

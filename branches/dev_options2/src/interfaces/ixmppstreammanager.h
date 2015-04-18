@@ -61,11 +61,11 @@ public:
 	virtual bool isConnected() const =0;
 	virtual QString streamId() const =0;
 	virtual XmppError error() const =0;
-	virtual Jid streamJid() const=0;
+	virtual Jid streamJid() const =0;
 	virtual void setStreamJid(const Jid &AStreamJid) =0;
+	virtual bool requestPassword() =0;
 	virtual QString password() const =0;
 	virtual void setPassword(const QString &APassword) =0;
-	virtual QString getSessionPassword(bool AAskIfNeed = true) =0;
 	virtual QString defaultLang() const =0;
 	virtual void setDefaultLang(const QString &ADefLang) =0;
 	virtual bool isEncryptionRequired() const =0;
@@ -86,6 +86,8 @@ protected:
 	virtual void error(const XmppError &AError) =0;
 	virtual void jidAboutToBeChanged(const Jid &AAfter) =0;
 	virtual void jidChanged(const Jid &ABefore) =0;
+	virtual void passwordRequested(bool &AWait) =0;
+	virtual void passwordProvided(const QString &APassword) =0;
 	virtual void connectionChanged(IConnection *AConnection) =0;
 	virtual void dataHandlerInserted(int AOrder, IXmppDataHandler *AHandler) =0;
 	virtual void dataHandlerRemoved(int AOrder, IXmppDataHandler *AHandler) =0;

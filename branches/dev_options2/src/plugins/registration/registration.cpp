@@ -271,7 +271,6 @@ QString Registration::startStreamRegistration(IXmppStream *AXmppStream)
 		QString id = QUuid::createUuid().toString();
 		FStreamRegisterId.insert(AXmppStream,id);
 
-		AXmppStream->setPassword(id);
 		connect(AXmppStream->instance(),SIGNAL(opened()),SLOT(onXmppStreamOpened()));
 		connect(AXmppStream->instance(),SIGNAL(closed()),SLOT(onXmppStreamClosed()));
 		connect(AXmppStream->instance(),SIGNAL(error(const XmppError &)),SLOT(onXmppStreamError(const XmppError &)));

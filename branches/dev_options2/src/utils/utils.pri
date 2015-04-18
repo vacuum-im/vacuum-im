@@ -31,7 +31,8 @@ HEADERS  = utilsexport.h \
            boxwidget.h \
            splitterwidget.h \
            logger.h \
-           pluginhelper.h
+           pluginhelper.h \
+           passworddialog.h
 
 SOURCES  = jid.cpp \
            versionparser.cpp \
@@ -65,4 +66,5 @@ SOURCES  = jid.cpp \
            boxwidget.cpp \
            splitterwidget.cpp \
            logger.cpp \
-           pluginhelper.cpp
+           pluginhelper.cpp \
+           passworddialog.cpp

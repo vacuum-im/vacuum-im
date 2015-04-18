@@ -2,10 +2,8 @@
 #define XMPPSTREAM_H
 
 #include <QTimer>
-#include <QMutex>
 #include <QMultiMap>
 #include <QDomDocument>
-#include <QInputDialog>
 #include <interfaces/ixmppstreammanager.h>
 #include <interfaces/iconnectionmanager.h>
 #include "streamparser.h"
@@ -44,9 +42,9 @@ public:
 	virtual XmppError error() const;
 	virtual Jid streamJid() const;
 	virtual void setStreamJid(const Jid &AStreamJid);
+	virtual bool requestPassword();
 	virtual QString password() const;
 	virtual void setPassword(const QString &APassword);
-	virtual QString getSessionPassword(bool AAskIfNeed = true);
 	virtual QString defaultLang() const;
 	virtual void setDefaultLang(const QString &ADefLang);
 	virtual bool isEncryptionRequired() const;
@@ -67,6 +65,8 @@ signals:
 	void error(const XmppError &AError);
 	void jidAboutToBeChanged(const Jid &AAfter);
 	void jidChanged(const Jid &ABefore);
+	void passwordRequested(bool &AWait);
+	void passwordProvided(const QString &APassword);
 	void connectionChanged(IConnection *AConnection);
 	void dataHandlerInserted(int AOrder, IXmppDataHandler *AHandler);
 	void dataHandlerRemoved(int AOrder, IXmppDataHandler *AHandler);
@@ -109,6 +109,7 @@ private:
 	bool FEncrypt;
 	bool FNodeChanged;
 	bool FDomainChanged;
+	bool FPasswordRequested;
 	Jid FStreamJid;
 	Jid FOnlineJid;
 	Jid FOfflineJid;
@@ -119,10 +120,6 @@ private:
 	StreamParser FParser;
 	QTimer FKeepAliveTimer;
 	StreamState FStreamState;
-private:
-	QMutex FPasswordMutex;
-	QString FSessionPassword;
-	QInputDialog *FPasswordDialog;
 private:
 	QDomElement FServerFeatures;
 	QList<QString>	FAvailFeatures;
