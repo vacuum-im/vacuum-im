@@ -554,7 +554,7 @@ void StatusChanger::removeStatusItem(int AStatusId)
 
 QIcon StatusChanger::iconByShow(int AShow) const
 {
-	return FStatusIcons != NULL ? FStatusIcons->iconByStatus(AShow,QString::null,false) : QIcon();
+	return FStatusIcons!=NULL ? FStatusIcons->iconByStatus(AShow,QString::null,false) : QIcon();
 }
 
 QString StatusChanger::nameByShow(int AShow) const
@@ -1192,14 +1192,17 @@ void StatusChanger::onOptionsOpened()
 				createStatusActions(status.code);
 			}
 		}
-		else if (statusId > STATUS_NULL_ID && FStatusItems.contains(statusId))
+		else if (statusId>STATUS_NULL_ID && FStatusItems.contains(statusId))
 		{
 			StatusItem &status = FStatusItems[statusId];
 			status.text = soptions.hasValue("text") ? soptions.value("text").toString() : status.text;
 			status.priority = soptions.hasValue("priority") ? soptions.value("priority").toInt() : status.priority;
-			updateStatusActions(statusId);
 		}
 	}
+
+	// Standard statuses are not in settings on first startup
+	for (QMap<int, StatusItem>::const_iterator it=FStatusItems.constBegin(); it!=FStatusItems.constEnd() && it.key()<=STATUS_MAX_STANDART_ID; ++it)
+		updateStatusActions(it.key());
 
 	FModifyStatus->setChecked(Options::node(OPV_STATUSES_MODIFY).value().toBool());
 	setMainStatusId(Options::node(OPV_STATUSES_MAINSTATUS).value().toInt());
@@ -1236,9 +1239,7 @@ void StatusChanger::onOptionsClosed()
 void StatusChanger::onOptionsChanged(const OptionsNode &ANode)
 {
 	if (ANode.path() == OPV_STATUSES_MODIFY)
-	{
 		FModifyStatus->setChecked(ANode.value().toBool());
-	}
 }
 
 void StatusChanger::onProfileOpened(const QString &AProfile)
