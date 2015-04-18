@@ -4,12 +4,12 @@
 <context>
     <name>Account</name>
     <message>
-        <source>Password Request</source>
-        <translation>Запрос пароля</translation>
-    </message>
-    <message>
         <source>Enter password for account &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Введите пароль для аккаунта &lt;b&gt;%1&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Account Password</source>
+        <translation>Пароль аккаунта</translation>
     </message>
 </context>
 <context>

@@ -83,28 +83,28 @@
 <context>
     <name>EditProfilesDialogClass</name>
     <message>
-        <source>Edit Profiles</source>
-        <translation>Редагувати профіль</translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation>Додати</translation>
-    </message>
-    <message>
-        <source>Password</source>
-        <translation>Пароль</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Перейменувати</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>Видалити</translation>
-    </message>
-    <message>
         <source>Close</source>
         <translation>Закрити</translation>
+    </message>
+    <message>
+        <source>Add Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rename Profile</source>
+        <translation type="unfinished">Перейменувати Профіль</translation>
+    </message>
+    <message>
+        <source>Delete Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Profiles Settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -141,8 +141,8 @@
         <translation>Пароль:</translation>
     </message>
     <message>
-        <source>Profiles</source>
-        <translation>Профілі</translation>
+        <source>Settings...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

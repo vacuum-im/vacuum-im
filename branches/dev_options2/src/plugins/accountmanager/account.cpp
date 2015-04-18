@@ -134,7 +134,7 @@ void Account::onXmppStreamPasswordRequested(bool &AWait)
 		{
 			FPasswordDialog = new PasswordDialog();
 			FPasswordDialog->setAttribute(Qt::WA_DeleteOnClose);
-			FPasswordDialog->setWindowTitle(tr("Password Request"));
+			FPasswordDialog->setWindowTitle(tr("Account Password"));
 			FPasswordDialog->setLabelText(tr("Enter password for account <b>%1</b>").arg(Qt::escape(name())));
 			FPasswordDialog->setPassword(FXmppStream->password());
 			FPasswordDialog->setSavePassword(!password().isEmpty());

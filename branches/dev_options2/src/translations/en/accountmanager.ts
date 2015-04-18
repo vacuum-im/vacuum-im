@@ -4,11 +4,11 @@
 <context>
     <name>Account</name>
     <message>
-        <source>Password Request</source>
+        <source>Enter password for account &lt;b&gt;%1&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enter password for account &lt;b&gt;%1&lt;/b&gt;</source>
+        <source>Account Password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
