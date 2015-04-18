@@ -47,7 +47,7 @@ public:
 	virtual IRostersView *rostersView();
 	virtual void startRestoreExpandState();
 	virtual void restoreExpandState(const QModelIndex &AParent = QModelIndex());
-	virtual void registerExpandableRosterIndexKind(int AKind, int AUniqueRole);
+	virtual void registerExpandableRosterIndexKind(int AKind, int AUniqueRole, bool ADefaultExpanded = true);
 signals:
 	//IRosterDataHolder
 	void rosterDataChanged(IRosterIndex *AIndex, int ARole);
@@ -90,6 +90,7 @@ private:
 private:
 	bool FStartRestoreExpandState;
 	QMap<int, int> FExpandableKinds;
+	QMap<int, int> FExpandableDefaults;
 	QMap<QString, QHash<QString,bool> > FExpandStates;
 private:
 	bool FShowStatus;

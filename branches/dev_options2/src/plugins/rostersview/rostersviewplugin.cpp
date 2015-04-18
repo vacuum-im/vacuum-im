@@ -385,12 +385,13 @@ void RostersViewPlugin::restoreExpandState(const QModelIndex &AParent)
 	}
 }
 
-void RostersViewPlugin::registerExpandableRosterIndexKind(int AKind, int AUniqueRole)
+void RostersViewPlugin::registerExpandableRosterIndexKind(int AKind, int AUniqueRole, bool ADefaultExpanded)
 {
 	if (!FExpandableKinds.contains(AKind))
 	{
-		LOG_DEBUG(QString("Expandable roster index registered, kind=%1, role=%2").arg(AKind).arg(AUniqueRole));
+		LOG_DEBUG(QString("Expandable roster index registered, kind=%1, role=%2, default=%3").arg(AKind).arg(AUniqueRole).arg(ADefaultExpanded));
 		FExpandableKinds.insert(AKind,AUniqueRole);
+		FExpandableDefaults.insert(AKind,ADefaultExpanded);
 	}
 }
 
@@ -398,16 +399,14 @@ QString RostersViewPlugin::rootExpandId(const QModelIndex &AIndex) const
 {
 	QModelIndex index = AIndex;
 	while (index.parent().isValid())
-		index=index.parent();
+		index = index.parent();
 	return indexExpandId(index);
 }
 
 QString RostersViewPlugin::indexExpandId(const QModelIndex &AIndex) const
 {
 	int role = FExpandableKinds.value(AIndex.data(RDR_KIND).toInt());
-	if (role > 0)
-		return AIndex.data(role).toString();
-	return QString::null;
+	return role>0 ? AIndex.data(role).toString() : QString::null;
 }
 
 void RostersViewPlugin::loadExpandState(const QModelIndex &AIndex)
@@ -416,7 +415,8 @@ void RostersViewPlugin::loadExpandState(const QModelIndex &AIndex)
 	if (!indexId.isEmpty())
 	{
 		QString rootId = rootExpandId(AIndex);
-		bool isExpanded = FExpandStates.value(rootId).value(indexId,true);
+		bool defExpanded = FExpandableDefaults.value(AIndex.data(RDR_KIND).toInt(),true);
+		bool isExpanded = FExpandStates.value(rootId).value(indexId,defExpanded);
 		if (isExpanded && !FRostersView->isExpanded(AIndex))
 			FRostersView->expand(AIndex);
 		else if (!isExpanded && FRostersView->isExpanded(AIndex))
@@ -432,8 +432,10 @@ void RostersViewPlugin::saveExpandState(const QModelIndex &AIndex)
 		QString rootId = rootExpandId(AIndex);
 		if (!rootId.isEmpty())
 		{
-			if (!FRostersView->isExpanded(AIndex))
-				FExpandStates[rootId][indexId] = false;
+			bool expanded = FRostersView->isExpanded(AIndex);
+			bool defExpanded = FExpandableDefaults.value(AIndex.data(RDR_KIND).toInt(),true);
+			if (expanded != defExpanded)
+				FExpandStates[rootId][indexId] = expanded;
 			else
 				FExpandStates[rootId].remove(indexId);
 		}

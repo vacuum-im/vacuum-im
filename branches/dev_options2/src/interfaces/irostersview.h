@@ -176,7 +176,7 @@ public:
 	virtual IRostersView *rostersView() =0;
 	virtual void startRestoreExpandState() =0;
 	virtual void restoreExpandState(const QModelIndex &AParent = QModelIndex()) =0;
-	virtual void registerExpandableRosterIndexKind(int AKind, int AUniqueRole) =0;
+	virtual void registerExpandableRosterIndexKind(int AKind, int AUniqueRole, bool ADefaultExpanded = true) =0;
 };
 
 Q_DECLARE_INTERFACE(IRostersLabelHolder,"Vacuum.Plugin.IRostersLabelHolder/1.0");
