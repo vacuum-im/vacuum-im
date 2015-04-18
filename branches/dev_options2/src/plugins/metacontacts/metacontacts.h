@@ -134,13 +134,13 @@ protected:
 	QList<IMetaContact> loadMetaContactsFromFile(const QString &AFileName) const;
 	void saveMetaContactsToFile(const QString &AFileName, const QList<IMetaContact> &AContacts) const;
 protected slots:
+	void onRosterOpened(IRoster *ARoster);
 	void onRosterActiveChanged(IRoster *ARoster, bool AActive);
 	void onRosterStreamJidChanged(IRoster *ARoster, const Jid &ABefore);
 	void onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore);
 protected slots:
 	void onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore);
 protected slots:
-	void onPrivateStorageOpened(const Jid &AStreamJid);
 	void onPrivateStorageDataLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
 	void onPrivateStorageDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace);
 	void onPrivateStorageNotifyAboutToClose(const Jid &AStreamJid);

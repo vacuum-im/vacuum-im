@@ -93,7 +93,6 @@ bool MetaContacts::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		FPrivateStorage = qobject_cast<IPrivateStorage *>(plugin->instance());
 		if (FPrivateStorage)
 		{
-			connect(FPrivateStorage->instance(),SIGNAL(storageOpened(const Jid &)),SLOT(onPrivateStorageOpened(const Jid &)));
 			connect(FPrivateStorage->instance(),SIGNAL(dataLoaded(const QString &, const Jid &, const QDomElement &)),
 				SLOT(onPrivateStorageDataLoaded(const QString &, const Jid &, const QDomElement &)));
 			connect(FPrivateStorage->instance(),SIGNAL(dataChanged(const Jid &, const QString &, const QString &)),
@@ -109,6 +108,7 @@ bool MetaContacts::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		FRosterManager = qobject_cast<IRosterManager *>(plugin->instance());
 		if (FRosterManager)
 		{
+			connect(FRosterManager->instance(),SIGNAL(rosterOpened(IRoster *)),SLOT(onRosterOpened(IRoster *)));
 			connect(FRosterManager->instance(),SIGNAL(rosterActiveChanged(IRoster *, bool)),SLOT(onRosterActiveChanged(IRoster *, bool)));
 			connect(FRosterManager->instance(),SIGNAL(rosterStreamJidChanged(IRoster *, const Jid &)),SLOT(onRosterStreamJidChanged(IRoster *, const Jid &)));
 			connect(FRosterManager->instance(),SIGNAL(rosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)),
@@ -210,7 +210,8 @@ bool MetaContacts::initObjects()
 		FRostersView->insertClickHooker(RCHO_METACONTACTS,this);
 		FRostersView->insertEditHandler(REHO_METACONTACTS_RENAME,this);
 		FRostersView->insertProxyModel(FFilterProxyModel,RPO_METACONTACTS_FILTER);
-		FRostersViewPlugin->registerExpandableRosterIndexKind(RIK_METACONTACT,RDR_METACONTACT_ID);
+
+		FRostersViewPlugin->registerExpandableRosterIndexKind(RIK_METACONTACT,RDR_METACONTACT_ID,false);
 
 		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_COMBINECONTACTS,FRostersView->instance());
 		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_DESTROYMETACONTACT,FRostersView->instance());
@@ -1641,6 +1642,20 @@ void MetaContacts::saveMetaContactsToFile(const QString &AFileName, const QList<
 	}
 }
 
+void MetaContacts::onRosterOpened(IRoster *ARoster)
+{
+	QString id = FPrivateStorage!=NULL ? FPrivateStorage->loadData(ARoster->streamJid(),"storage",NS_STORAGE_METACONTACTS) : QString::null;
+	if (!id.isEmpty())
+	{
+		FLoadRequestId[ARoster->streamJid()] = id;
+		LOG_STRM_INFO(ARoster->streamJid(),"Load metacontacts from storage request sent");
+	}
+	else
+	{
+		LOG_STRM_WARNING(ARoster->streamJid(),"Failed to send load metacontacts from storage request");
+	}
+}
+
 void MetaContacts::onRosterActiveChanged(IRoster *ARoster, bool AActive)
 {
 	if (AActive)
@@ -1706,20 +1721,6 @@ void MetaContacts::onPresenceItemReceived(IPresence *APresence, const IPresenceI
 		QUuid metaId = FItemMetaId.value(APresence->streamJid()).value(AItem.itemJid.bare());
 		if (!metaId.isNull())
 			startUpdateMetaContact(APresence->streamJid(),metaId);
-	}
-}
-
-void MetaContacts::onPrivateStorageOpened(const Jid &AStreamJid)
-{
-	QString id = FPrivateStorage->loadData(AStreamJid,"storage",NS_STORAGE_METACONTACTS);
-	if (!id.isEmpty())
-	{
-		FLoadRequestId[AStreamJid] = id;
-		LOG_STRM_INFO(AStreamJid,"Load metacontacts from storage request sent");
-	}
-	else
-	{
-		LOG_STRM_WARNING(AStreamJid,"Failed to send load metacontacts from storage request");
 	}
 }
 
