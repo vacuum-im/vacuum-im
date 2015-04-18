@@ -133,17 +133,8 @@ void MainWindowPlugin::onApplicationShutdownStarted()
 
 void MainWindowPlugin::onShowMainWindowOnStart()
 {
-	if (FStartShowLoopCount >= 3)
-	{
-		if (Options::node(OPV_MAINWINDOW_SHOWONSTART).value().toBool())
-			FMainWindow->showWindow();
-		FStartShowLoopCount = 0;
-	}
-	else
-	{
-		FStartShowLoopCount++;
-		QTimer::singleShot(0,this,SLOT(onShowMainWindowOnStart()));
-	}
+	if (Options::node(OPV_MAINWINDOW_SHOWONSTART).value().toBool())
+		FMainWindow->showWindow();
 }
 
 void MainWindowPlugin::onShowMainWindowByAction(bool)

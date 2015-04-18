@@ -16,6 +16,7 @@
 #include <utils/logger.h>
 #include "account.h"
 #include "accountsoptionswidget.h"
+#include "createaccountwizard.h"
 
 #define ADR_ACCOUNT_ID              Action::DR_Parametr1
 
@@ -348,7 +349,9 @@ void AccountManager::onOptionsChanged(const OptionsNode &ANode)
 void AccountManager::onProfileOpened(const QString &AProfile)
 {
 	Q_UNUSED(AProfile);
-	foreach(IAccount *account, FAccounts)
+	if (FAccounts.isEmpty())
+		QTimer::singleShot(100,this,SLOT(onShowCreateAccountWizard()));
+	else foreach(IAccount *account, FAccounts)
 		account->setActive(account->optionsNode().value("active").toBool());
 }
 
@@ -357,13 +360,6 @@ void AccountManager::onProfileClosed(const QString &AProfile)
 	Q_UNUSED(AProfile);
 	foreach(IAccount *account, FAccounts)
 		account->setActive(false);
-}
-
-void AccountManager::onShowAccountOptions(bool)
-{
-	Action *action = qobject_cast<Action *>(sender());
-	if (action)
-		showAccountOptionsDialog(action->data(ADR_ACCOUNT_ID).toString());
 }
 
 void AccountManager::onAccountActiveChanged(bool AActive)
@@ -380,20 +376,20 @@ void AccountManager::onAccountOptionsChanged(const OptionsNode &ANode)
 		emit accountOptionsChanged(account, ANode);
 }
 
-void AccountManager::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
+void AccountManager::onShowAccountOptions(bool)
 {
-	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1 && AIndexes.first()->kind()==RIK_STREAM_ROOT)
+	Action *action = qobject_cast<Action *>(sender());
+	if (action)
+		showAccountOptionsDialog(action->data(ADR_ACCOUNT_ID).toString());
+}
+
+void AccountManager::onShowCreateAccountWizard()
+{
+	if (FOptionsManager && FOptionsManager->isOpened())
 	{
-		IAccount *account = findAccountByStream(Jid(AIndexes.first()->data(RDR_STREAM_JID).toString()));
-		if (account)
-		{
-			Action *action = new Action(AMenu);
-			action->setIcon(RSR_STORAGE_MENUICONS,MNI_ACCOUNT_CHANGE);
-			action->setText(tr("Modify account"));
-			action->setData(ADR_ACCOUNT_ID,account->accountId().toString());
-			connect(action,SIGNAL(triggered(bool)),SLOT(onShowAccountOptions(bool)));
-			AMenu->addAction(action,AG_RVCM_ACCOUNTMANAGER,true);
-		}
+		CreateAccountWizard *wizard = new CreateAccountWizard();
+		connect(FOptionsManager->instance(),SIGNAL(profileClosed(const QString &)),wizard,SLOT(reject()));
+		wizard->show();
 	}
 }
 
@@ -413,6 +409,23 @@ void AccountManager::onResourceComboBoxEditFinished()
 		else if (valIndex != combox->currentIndex())
 		{
 			combox->setCurrentIndex(valIndex);
+		}
+	}
+}
+
+void AccountManager::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
+{
+	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1 && AIndexes.first()->kind()==RIK_STREAM_ROOT)
+	{
+		IAccount *account = findAccountByStream(Jid(AIndexes.first()->data(RDR_STREAM_JID).toString()));
+		if (account)
+		{
+			Action *action = new Action(AMenu);
+			action->setIcon(RSR_STORAGE_MENUICONS,MNI_ACCOUNT_CHANGE);
+			action->setText(tr("Modify account"));
+			action->setData(ADR_ACCOUNT_ID,account->accountId().toString());
+			connect(action,SIGNAL(triggered(bool)),SLOT(onShowAccountOptions(bool)));
+			AMenu->addAction(action,AG_RVCM_ACCOUNTMANAGER,true);
 		}
 	}
 }

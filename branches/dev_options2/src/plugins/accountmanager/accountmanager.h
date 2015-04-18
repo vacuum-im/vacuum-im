@@ -57,11 +57,14 @@ protected slots:
 	void onOptionsChanged(const OptionsNode &ANode);
 	void onProfileOpened(const QString &AProfile);
 	void onProfileClosed(const QString &AProfile);
-	void onShowAccountOptions(bool);
+protected slots:
 	void onAccountActiveChanged(bool AActive);
 	void onAccountOptionsChanged(const OptionsNode &ANode);
-	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
+protected slots:
+	void onShowAccountOptions(bool);
+	void onShowCreateAccountWizard();
 	void onResourceComboBoxEditFinished();
+	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 private:
 	IOptionsManager *FOptionsManager;
 	IRostersViewPlugin *FRostersViewPlugin;
