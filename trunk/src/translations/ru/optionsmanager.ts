@@ -180,7 +180,7 @@
     </message>
     <message>
         <source>Auto run application on system startup</source>
-        <translation>Запускать приложение при включение компьютера</translation>
+        <translation>Запускать приложение при включении компьютера</translation>
     </message>
     <message>
         <source>Localization</source>
