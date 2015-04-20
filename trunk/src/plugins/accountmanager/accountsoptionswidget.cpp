@@ -10,17 +10,16 @@
 #include <definitions/optionvalues.h>
 #include <utils/pluginhelper.h>
 #include <utils/options.h>
-#include "accountmanager.h"
 #include "createaccountwizard.h"
 
-AccountsOptionsWidget::AccountsOptionsWidget(AccountManager *AManager, QWidget *AParent) : QWidget(AParent)
+AccountsOptionsWidget::AccountsOptionsWidget(IAccountManager *AAccountManager, QWidget *AParent) : QWidget(AParent)
 {
 	ui.setupUi(this);
 	setAcceptDrops(true);
 	
 	FDragItem = NULL;
 
-	FAccountManager = AManager;
+	FAccountManager = AAccountManager;
 	FStatusIcons = PluginHelper::pluginInstance<IStatusIcons>();
 	FOptionsManager = PluginHelper::pluginInstance<IOptionsManager>();
 

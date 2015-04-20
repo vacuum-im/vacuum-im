@@ -21,7 +21,7 @@ class AccountsOptionsWidget :
 	Q_OBJECT;
 	Q_INTERFACES(IOptionsDialogWidget);
 public:
-	AccountsOptionsWidget(AccountManager *AManager, QWidget *AParent);
+	AccountsOptionsWidget(IAccountManager *AAccountManager, QWidget *AParent);
 	~AccountsOptionsWidget();
 	virtual QWidget* instance() { return this; }
 public slots:
@@ -56,7 +56,7 @@ private:
 	Ui::AccountsOptionsClass ui;
 private:
 	IStatusIcons *FStatusIcons;
-	AccountManager *FAccountManager;
+	IAccountManager *FAccountManager;
 	IOptionsManager *FOptionsManager;
 private:
 	QPoint FDragStartPos;
