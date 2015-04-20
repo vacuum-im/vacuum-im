@@ -6,7 +6,7 @@
 #include <QTimer>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ibitsofbinary.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/iservicediscovery.h>
 
@@ -58,7 +58,7 @@ protected slots:
 	void onOfflineTimerTimeout();
 private:
 	IPluginManager *FPluginManager;
-	IXmppStreams *FXmppStreams;
+	IXmppStreamManager *FXmppStreamManager;
 	IStanzaProcessor *FStanzaProcessor;
 	IServiceDiscovery *FDiscovery;
 private:

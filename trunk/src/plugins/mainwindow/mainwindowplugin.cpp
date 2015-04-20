@@ -68,11 +68,9 @@ bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &AIni
 bool MainWindowPlugin::initObjects()
 {
 	Shortcuts::declareShortcut(SCT_GLOBAL_SHOWROSTER,tr("Show roster"),QKeySequence::UnknownKey,Shortcuts::GlobalShortcut);
-
-	Shortcuts::declareGroup(SCTG_MAINWINDOW,tr("Main window"),SGO_MAINWINDOW);
-	Shortcuts::declareShortcut(SCT_MAINWINDOW_CLOSEWINDOW,tr("Hide roster"),tr("Esc","Hide roster"));
-
-	Shortcuts::insertWidgetShortcut(SCT_MAINWINDOW_CLOSEWINDOW,FMainWindow);
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_CLOSEWINDOW,QString::null,tr("Esc","Close main window"));
+	
+	Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_CLOSEWINDOW,FMainWindow);
 
 	Action *quitAction = new Action(this);
 	quitAction->setText(tr("Quit"));
@@ -135,17 +133,8 @@ void MainWindowPlugin::onApplicationShutdownStarted()
 
 void MainWindowPlugin::onShowMainWindowOnStart()
 {
-	if (FStartShowLoopCount >= 3)
-	{
-		if (Options::node(OPV_MAINWINDOW_SHOWONSTART).value().toBool())
-			FMainWindow->showWindow();
-		FStartShowLoopCount = 0;
-	}
-	else
-	{
-		FStartShowLoopCount++;
-		QTimer::singleShot(0,this,SLOT(onShowMainWindowOnStart()));
-	}
+	if (Options::node(OPV_MAINWINDOW_SHOWONSTART).value().toBool())
+		FMainWindow->showWindow();
 }
 
 void MainWindowPlugin::onShowMainWindowByAction(bool)
@@ -159,7 +148,7 @@ void MainWindowPlugin::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	{
 		FMainWindow->showWindow();
 	}
-	else if (AWidget==FMainWindow && AId==SCT_MAINWINDOW_CLOSEWINDOW)
+	else if (AWidget==FMainWindow && AId==SCT_ROSTERVIEW_CLOSEWINDOW)
 	{
 		FMainWindow->closeWindow();
 	}

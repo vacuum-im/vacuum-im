@@ -5,6 +5,7 @@
 #include <utils/logger.h>
 #include <utils/iconstorage.h>
 #include <utils/imagemanager.h>
+#include <utils/pluginhelper.h>
 
 #define AVATAR_SIZE QSize(24,24)
 
@@ -13,18 +14,18 @@ static bool StringSizeLessThan(const QString &AValue1, const QString &AValue2)
 	return AValue1.size() < AValue2.size();
 }
 
-CombineContactsDialog::CombineContactsDialog(IPluginManager *APluginManager, IMetaContacts *AMetaContacts,
-	const QStringList &AStreams, const QStringList &AContacts, const QStringList &AMetas, QWidget *AParent) : QDialog(AParent)
+CombineContactsDialog::CombineContactsDialog(IMetaContacts *AMetaContacts, const QStringList &AStreams, const QStringList &AContacts, const QStringList &AMetas, QWidget *AParent) : QDialog(AParent)
 {
 	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_METACONTACTS_COMBINE,0,0,"windowIcon");
 
-	FAvatars = NULL;
-	FRosterPlugin = NULL;
 	FMetaContacts = AMetaContacts;
-	initialize(APluginManager);
+	connect(FMetaContacts->instance(),SIGNAL(metaContactsClosed(const Jid &)),SLOT(onMetaContactsClosed(const Jid &)));
+
+	FAvatars = PluginHelper::pluginInstance<IAvatars>();
+	FRosterManager = PluginHelper::pluginInstance<IRosterManager>();
 
 	if (!AStreams.isEmpty() && AStreams.count()==AContacts.count() && AContacts.count()==AMetas.count())
 	{
@@ -61,8 +62,8 @@ CombineContactsDialog::CombineContactsDialog(IPluginManager *APluginManager, IMe
 		ui.lwtContacts->setIconSize(AVATAR_SIZE);
 		for (QMultiMap<Jid, Jid>::const_iterator it = FMetaItems.constBegin(); it!=FMetaItems.constEnd(); ++it)
 		{
-			IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(it.key()) : NULL;
-			IRosterItem ritem = roster!=NULL ? roster->rosterItem(it.value()) : IRosterItem();
+			IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(it.key()) : NULL;
+			IRosterItem ritem = roster!=NULL ? roster->findItem(it.value()) : IRosterItem();
 			QString name = !ritem.name.isEmpty() ? ritem.name : ritem.itemJid.uBare();
 
 			QImage avatar = FAvatars!=NULL ? FAvatars->loadAvatarImage(FAvatars->avatarHash(it.value()),AVATAR_SIZE) : QImage();
@@ -111,24 +112,6 @@ CombineContactsDialog::CombineContactsDialog(IPluginManager *APluginManager, IMe
 	}
 
 	ui.lblNotice->setText(tr("The following <b>%n contact(s)</b> will be merged into metacontact:","",ui.lwtContacts->count()));
-}
-
-
-void CombineContactsDialog::initialize(IPluginManager *APluginManager)
-{
-	IPlugin *plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
-	if (plugin)
-	{
-		FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
-	}
-
-	plugin = APluginManager->pluginInterface("IAvatars").value(0,NULL);
-	if (plugin)
-	{
-		FAvatars = qobject_cast<IAvatars *>(plugin->instance());
-	}
-
-	connect(FMetaContacts->instance(),SIGNAL(metaContactsClosed(const Jid &)),SLOT(onMetaContactsClosed(const Jid &)));
 }
 
 void CombineContactsDialog::onDialogButtonsBoxAccepted()

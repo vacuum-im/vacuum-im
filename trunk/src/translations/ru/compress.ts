@@ -2,15 +2,14 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ru" sourcelanguage="en">
 <context>
-    <name>CompressPlugin</name>
+    <name>CompressFeature</name>
     <message>
-        <source>Unsupported compression method</source>
-        <translation>Неподдерживаемый метод сжатия</translation>
+        <source>Error code: %1</source>
+        <translation>Код ошибки: %1</translation>
     </message>
-    <message>
-        <source>Compression setup failed</source>
-        <translation>Инициализация сжатия завершена с ошибкой</translation>
-    </message>
+</context>
+<context>
+    <name>CompressFeatureFactory</name>
     <message>
         <source>Stream Compression</source>
         <translation>Сжатие XMPP потока</translation>
@@ -20,8 +19,12 @@
         <translation>Позволяет сжимать поток сообщений отправляемый и получаемый от сервера</translation>
     </message>
     <message>
-        <source>Enable data compression transferred between client and server</source>
-        <translation>Включить сжатие данных передаваемых между клиентом и сервером</translation>
+        <source>Unsupported compression method</source>
+        <translation>Неподдерживаемый метод сжатия</translation>
+    </message>
+    <message>
+        <source>Compression setup failed</source>
+        <translation>Инициализация сжатия завершена с ошибкой</translation>
     </message>
     <message>
         <source>ZLib error</source>
@@ -43,12 +46,9 @@
         <source>Invalid compression level</source>
         <translation>Неправильный уровень сжатия</translation>
     </message>
-</context>
-<context>
-    <name>Compression</name>
     <message>
-        <source>Error code: %1</source>
-        <translation>Код ошибки: %1</translation>
+        <source>Enable data compression transferred between client and server</source>
+        <translation>Включить сжатие данных передаваемых между клиентом и сервером</translation>
     </message>
 </context>
 </TS>

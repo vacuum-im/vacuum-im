@@ -246,7 +246,7 @@ QString ServerMessageArchive::engineDescription() const
 	return tr("History of conversations is stored on your jabber server");
 }
 
-IOptionsWidget *ServerMessageArchive::engineSettingsWidget(QWidget *AParent)
+IOptionsDialogWidget *ServerMessageArchive::engineSettingsWidget(QWidget *AParent)
 {
 	Q_UNUSED(AParent);
 	return NULL;

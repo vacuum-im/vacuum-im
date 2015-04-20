@@ -62,7 +62,7 @@
 MessageArchiver::MessageArchiver()
 {
 	FPluginManager = NULL;
-	FXmppStreams = NULL;
+	FXmppStreamManager = NULL;
 	FStanzaProcessor = NULL;
 	FOptionsManager = NULL;
 	FPrivateStorage = NULL;
@@ -72,8 +72,8 @@ MessageArchiver::MessageArchiver()
 	FDataForms = NULL;
 	FMessageWidgets = NULL;
 	FSessionNegotiation = NULL;
-	FRosterPlugin = NULL;
-	FMultiUserChatPlugin = NULL;
+	FRosterManager = NULL;
+	FMultiChatManager = NULL;
 }
 
 MessageArchiver::~MessageArchiver()
@@ -97,15 +97,15 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &AInit
 	Q_UNUSED(AInitOrder);
 	FPluginManager = APluginManager;
 
-	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
+	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreamManager").value(0,NULL);
 	if (plugin)
 	{
-		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-		if (FXmppStreams)
+		FXmppStreamManager = qobject_cast<IXmppStreamManager *>(plugin->instance());
+		if (FXmppStreamManager)
 		{
-			connect(FXmppStreams->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onXmppStreamOpened(IXmppStream *)));
-			connect(FXmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onXmppStreamClosed(IXmppStream *)));
-			connect(FXmppStreams->instance(),SIGNAL(aboutToClose(IXmppStream *)),SLOT(onXmppStreamAboutToClose(IXmppStream *)));
+			connect(FXmppStreamManager->instance(),SIGNAL(streamOpened(IXmppStream *)),SLOT(onXmppStreamOpened(IXmppStream *)));
+			connect(FXmppStreamManager->instance(),SIGNAL(streamClosed(IXmppStream *)),SLOT(onXmppStreamClosed(IXmppStream *)));
+			connect(FXmppStreamManager->instance(),SIGNAL(streamAboutToClose(IXmppStream *)),SLOT(onXmppStreamAboutToClose(IXmppStream *)));
 		}
 	}
 
@@ -140,6 +140,11 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &AInit
 	if (plugin)
 	{
 		FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
+		if (FAccountManager)
+		{
+			connect(FAccountManager->instance(),SIGNAL(accountInserted(IAccount *)),SLOT(onAccountInserted(IAccount *)));
+			connect(FAccountManager->instance(),SIGNAL(accountRemoved(IAccount *)),SLOT(onAccountRemoved(IAccount *)));
+		}
 	}
 
 	plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
@@ -194,19 +199,19 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &AInit
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IRosterManager").value(0,NULL);
 	if (plugin)
 	{
-		FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
+		FRosterManager = qobject_cast<IRosterManager *>(plugin->instance());
 	}
 
-	plugin = APluginManager->pluginInterface("IMultiUserChatPlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IMultiUserChatManager").value(0,NULL);
 	if (plugin)
 	{
-		FMultiUserChatPlugin = qobject_cast<IMultiUserChatPlugin *>(plugin->instance());
-		if (FMultiUserChatPlugin)
+		FMultiChatManager = qobject_cast<IMultiUserChatManager *>(plugin->instance());
+		if (FMultiChatManager)
 		{
-			connect(FMultiUserChatPlugin->instance(),SIGNAL(multiUserContextMenu(IMultiUserChatWindow *, IMultiUser *, Menu *)),
+			connect(FMultiChatManager->instance(),SIGNAL(multiUserContextMenu(IMultiUserChatWindow *, IMultiUser *, Menu *)),
 				SLOT(onMultiUserContextMenu(IMultiUserChatWindow *, IMultiUser *, Menu *)));
 		}
 	}
@@ -221,17 +226,12 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &AInit
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
 
-	return FXmppStreams!=NULL && FStanzaProcessor!=NULL;
+	return FXmppStreamManager!=NULL && FStanzaProcessor!=NULL;
 }
 
 bool MessageArchiver::initObjects()
 {
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SHOWHISTORY, tr("Show history"), tr("Ctrl+H","Show history"));
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_HISTORYENABLE, tr("Enable message archiving"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_HISTORYDISABLE, tr("Disable message archiving"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_HISTORYREQUIREOTR, tr("Start Off-The-Record session"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_HISTORYTERMINATEOTR, tr("Terminate Off-The-Record session"), QKeySequence::UnknownKey);
-
 	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SHOWHISTORY,tr("Show history"),tr("Ctrl+H","Show history"),Shortcuts::WidgetShortcut);
 
 	XmppError::registerError(NS_INTERNAL_ERROR,IERR_HISTORY_HEADERS_LOAD_ERROR,tr("Failed to load conversation headers"));
@@ -252,6 +252,12 @@ bool MessageArchiver::initObjects()
 	{
 		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_SHOWHISTORY,FRostersViewPlugin->rostersView()->instance());
 	}
+	if (FOptionsManager)
+	{
+		IOptionsDialogNode historyNode = { ONO_HISTORY, OPN_HISTORY, MNI_HISTORY, tr("History") };
+		FOptionsManager->insertOptionsDialogNode(historyNode);
+		FOptionsManager->insertOptionsDialogHolder(this);
+	}
 	return true;
 }
 
@@ -260,16 +266,11 @@ bool MessageArchiver::initSettings()
 	Options::setDefaultValue(OPV_HISTORY_ENGINE_ENABLED,true);
 	Options::setDefaultValue(OPV_HISTORY_ENGINE_REPLICATEAPPEND,true);
 	Options::setDefaultValue(OPV_HISTORY_ENGINE_REPLICATEREMOVE,true);
-	Options::setDefaultValue(OPV_HISTORY_STREAM_REPLICATE,false);
-	Options::setDefaultValue(OPV_HISTORY_STREAM_FORCEDIRECTARCHIVING,false);
 	Options::setDefaultValue(OPV_HISTORY_ARCHIVEVIEW_FONTPOINTSIZE,10);
 
-	if (FOptionsManager)
-	{
-		IOptionsDialogNode dnode = { ONO_HISTORY, OPN_HISTORY, tr("History"), MNI_HISTORY };
-		FOptionsManager->insertOptionsDialogNode(dnode);
-		FOptionsManager->insertOptionsHolder(this);
-	}
+	Options::setDefaultValue(OPV_ACCOUNT_HISTORYREPLICATE,false);
+	Options::setDefaultValue(OPV_ACCOUNT_HISTORYDUPLICATE,false);
+
 	return true;
 }
 
@@ -418,21 +419,60 @@ void MessageArchiver::stanzaRequestResult(const Jid &AStreamJid, const Stanza &A
 		emit requestFailed(AStanza.id(),err);
 }
 
-QMultiMap<int, IOptionsWidget *> MessageArchiver::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+QMultiMap<int, IOptionsDialogWidget *> MessageArchiver::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	QMultiMap<int, IOptionsWidget *>  widgets;
+	QMultiMap<int, IOptionsDialogWidget *>  widgets;
 	QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
-	if (nodeTree.count()==2 && nodeTree.at(0)==OPN_HISTORY)
+	if (nodeTree.count()==3 && nodeTree.at(0)==OPN_ACCOUNTS && nodeTree.at(2)=="History")
 	{
-		IAccount *account = FAccountManager!=NULL ? FAccountManager->accountById(nodeTree.at(1)) : NULL;
-		if (account && account->isActive() && isReady(account->xmppStream()->streamJid()))
+		IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountById(nodeTree.at(1)) : NULL;
+		if (account!=NULL && isReady(account->streamJid()))
 		{
-			widgets.insertMulti(OWO_HISTORY_STREAM, new ArchiveStreamOptions(this,account->xmppStream()->streamJid(),AParent));
+			OptionsNode options = account->optionsNode();
+			
+			widgets.insertMulti(OHO_ACCOUNTS_HISTORY_SERVERSETTINGS, FOptionsManager->newOptionsDialogHeader(tr("Archive preferences"),AParent));
+			widgets.insertMulti(OWO_ACCOUNTS_HISTORY_SERVERSETTINGS, new ArchiveAccountOptionsWidget(this,account->streamJid(),AParent));
+
+			int replCount = 0;
+			int manualCount = 0;
+			foreach(IArchiveEngine *engine, archiveEngines())
+			{
+				if (engine->isCapable(account->streamJid(),IArchiveEngine::ArchiveReplication))
+					replCount++;
+				else if (engine->isCapable(account->streamJid(),IArchiveEngine::ManualArchiving))
+					manualCount++;
+			}
+
+			if (replCount>0 && replCount+manualCount>1)
+			{
+				widgets.insertMulti(OHO_ACCOUNTS_HISTORY_REPLICATION,FOptionsManager->newOptionsDialogHeader(tr("Archive synchronization"),AParent));
+				widgets.insertMulti(OWO_ACCOUNTS_HISTORY_REPLICATION,FOptionsManager->newOptionsDialogWidget(options.node("history-replicate"),tr("Synchronize history between archives"),AParent));
+			}
+
+			if (isArchiveAutoSave(account->streamJid()))
+			{
+				widgets.insertMulti(OHO_ACCOUNTS_HISTORY_REPLICATION,FOptionsManager->newOptionsDialogHeader(tr("Archive synchronization"),AParent));
+				widgets.insertMulti(OWO_ACCOUNTS_HISTORY_DUPLICATION,FOptionsManager->newOptionsDialogWidget(options.node("history-duplicate"),tr("Duplicate messages in local archive (not recommended)"),AParent));
+			}
 		}
 	}
-	else if(ANodeId == OPN_HISTORY)
+	else if (ANodeId == OPN_HISTORY)
 	{
-		widgets.insertMulti(OWO_HISTORY_ENGINES, new ArchiveEnginesOptions(this,AParent));
+		int index = 0;
+		widgets.insertMulti(OHO_HISORY_ENGINES, FOptionsManager->newOptionsDialogHeader(tr("Used history archives"),AParent));
+		foreach(IArchiveEngine *engine, archiveEngines())
+		{
+			OptionsNode node = Options::node(OPV_HISTORY_ENGINE_ITEM,engine->engineId().toString()).node("enabled");
+			widgets.insertMulti(OWO_HISORY_ENGINE,FOptionsManager->newOptionsDialogWidget(node,engine->engineName(),AParent));
+
+			IOptionsDialogWidget *engineSettings = engine->engineSettingsWidget(AParent);
+			if (engineSettings)
+			{
+				widgets.insertMulti(OHO_HISTORY_ENGINNAME + index,FOptionsManager->newOptionsDialogHeader(engine->engineName(),AParent));
+				widgets.insertMulti(OWO_HISTORY_ENGINESETTINGS + index,engineSettings);
+				index += 10;
+			}
+		}
 	}
 	return widgets;
 }
@@ -673,7 +713,7 @@ bool MessageArchiver::isSupported(const Jid &AStreamJid, const QString &AFeature
 
 QWidget *MessageArchiver::showArchiveWindow(const QMultiMap<Jid,Jid> &AAddresses)
 {
-	ArchiveViewWindow *window = new ArchiveViewWindow(FPluginManager,this,AAddresses);
+	ArchiveViewWindow *window = new ArchiveViewWindow(this,AAddresses);
 	WidgetManager::showActivateRaiseWindow(window);
 	return window;
 }
@@ -686,6 +726,12 @@ QString MessageArchiver::prefsNamespace(const Jid &AStreamJid) const
 bool MessageArchiver::isArchivePrefsEnabled(const Jid &AStreamJid) const
 {
 	return isReady(AStreamJid) && (isSupported(AStreamJid,NS_ARCHIVE_PREF) || !isArchiveAutoSave(AStreamJid));
+}
+
+bool MessageArchiver::isArchiveReplicationEnabled(const Jid &AStreamJid) const
+{
+	IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(AStreamJid) : NULL;
+	return account!=NULL ? account->optionsNode().value("history-replicate").toBool() : false;
 }
 
 bool MessageArchiver::isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId) const
@@ -1002,7 +1048,7 @@ QString MessageArchiver::removeArchiveSessionPrefs(const Jid &AStreamJid, const 
 
 bool MessageArchiver::saveMessage(const Jid &AStreamJid, const Jid &AItemJid, const Message &AMessage)
 {
-	if (!isArchiveAutoSave(AStreamJid) || Options::node(OPV_HISTORY_STREAM_ITEM,AStreamJid.pBare()).value("force-direct-archiving").toBool())
+	if (!isArchiveAutoSave(AStreamJid) || isArchiveDuplicationEnabled(AStreamJid))
 	{
 		if (isArchivingAllowed(AStreamJid,AItemJid,AMessage.threadId()))
 		{
@@ -1021,7 +1067,7 @@ bool MessageArchiver::saveMessage(const Jid &AStreamJid, const Jid &AItemJid, co
 
 bool MessageArchiver::saveNote(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANote, const QString &AThreadId)
 {
-	if (!isArchiveAutoSave(AStreamJid) || Options::node(OPV_HISTORY_STREAM_ITEM,AStreamJid.pBare()).value("force-direct-archiving").toBool())
+	if (!isArchiveAutoSave(AStreamJid) || isArchiveDuplicationEnabled(AStreamJid))
 	{
 		if (isArchivingAllowed(AStreamJid,AItemJid,AThreadId))
 		{
@@ -1586,9 +1632,7 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
 			if (prefsDisabled)
 				setArchiveAutoSave(AStreamJid,prefs.autoSave);
 
-			openHistoryOptionsNode(AStreamJid);
 			emit archivePrefsOpened(AStreamJid);
-
 			processPendingMessages(AStreamJid);
 		}
 		else
@@ -2129,23 +2173,29 @@ void MessageArchiver::registerDiscoFeatures()
 	FDiscovery->insertDiscoFeature(dfeature);
 }
 
-void MessageArchiver::openHistoryOptionsNode(const Jid &AStreamJid)
+void MessageArchiver::openHistoryOptionsNode(const QUuid &AAccountId)
 {
-	IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
-	if (FOptionsManager && account)
+	if (FOptionsManager)
 	{
-		IOptionsDialogNode node = { ONO_HISTORY, OPN_HISTORY"." + account->accountId().toString(), account->name(), MNI_HISTORY };
-		FOptionsManager->insertOptionsDialogNode(node);
+		QString historyNodeId = QString(OPN_ACCOUNTS_HISTORY).replace("[id]",AAccountId.toString());
+		IOptionsDialogNode historyNode = { ONO_ACCOUNTS_HISTORY, historyNodeId, MNI_HISTORY, tr("History") };
+		FOptionsManager->insertOptionsDialogNode(historyNode);
 	}
 }
 
-void MessageArchiver::closeHistoryOptionsNode(const Jid &AStreamJid)
+void MessageArchiver::closeHistoryOptionsNode(const QUuid &AAccountId)
 {
-	IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
-	if (FOptionsManager && account)
+	if (FOptionsManager)
 	{
-		FOptionsManager->removeOptionsDialogNode(OPN_HISTORY"." + account->accountId().toString());
+		QString historyNodeId = QString(OPN_ACCOUNTS_HISTORY).replace("[id]",AAccountId.toString());
+		FOptionsManager->removeOptionsDialogNode(historyNodeId);
 	}
+}
+
+bool MessageArchiver::isArchiveDuplicationEnabled(const Jid &AStreamJid) const
+{
+	IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(AStreamJid) : NULL;
+	return account!=NULL ? account->optionsNode().value("history-duplicate").toBool() : false;
 }
 
 bool MessageArchiver::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
@@ -2330,10 +2380,10 @@ void MessageArchiver::notifyInChatWindow(const Jid &AStreamJid, const Jid &ACont
 	IMessageChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,AContactJid,true) : NULL;
 	if (window)
 	{
-		IMessageContentOptions options;
-		options.kind = IMessageContentOptions::KindStatus;
-		options.type |= IMessageContentOptions::TypeEvent;
-		options.direction = IMessageContentOptions::DirectionIn;
+		IMessageStyleContentOptions options;
+		options.kind = IMessageStyleContentOptions::KindStatus;
+		options.type |= IMessageStyleContentOptions::TypeEvent;
+		options.direction = IMessageStyleContentOptions::DirectionIn;
 		options.time = QDateTime::currentDateTime();
 		window->viewWidget()->appendText(AMessage,options);
 	}
@@ -2461,6 +2511,16 @@ void MessageArchiver::onSelfCollectionLoaded(const QString &AId, const IArchiveC
 	}
 }
 
+void MessageArchiver::onAccountInserted(IAccount *AAccount)
+{
+	openHistoryOptionsNode(AAccount->accountId());
+}
+
+void MessageArchiver::onAccountRemoved(IAccount *AAccount)
+{
+	closeHistoryOptionsNode(AAccount->accountId());
+}
+
 void MessageArchiver::onXmppStreamOpened(IXmppStream *AXmppStream)
 {
 	if (FStanzaProcessor)
@@ -2505,7 +2565,6 @@ void MessageArchiver::onXmppStreamClosed(IXmppStream *AXmppStream)
 	}
 
 	savePendingMessages(AXmppStream->streamJid());
-	closeHistoryOptionsNode(AXmppStream->streamJid());
 
 	FFeatures.remove(AXmppStream->streamJid());
 	FNamespaces.remove(AXmppStream->streamJid());
@@ -2750,9 +2809,13 @@ void MessageArchiver::onShowHistoryOptionsDialogByAction(bool)
 	if (FOptionsManager && FAccountManager && action)
 	{
 		Jid streamJid = action->data(ADR_STREAM_JID).toString();
-		IAccount *account = FAccountManager->accountByStream(streamJid);
+		IAccount *account = FAccountManager->findAccountByStream(streamJid);
 		if (account)
-			FOptionsManager->showOptionsDialog(OPN_HISTORY"." + account->accountId().toString());
+		{
+			QString rootId = OPN_ACCOUNTS"."+account->accountId().toString();
+			QString nodeId = QString(OPN_ACCOUNTS_HISTORY).replace("[id]",account->accountId().toString());
+			FOptionsManager->showOptionsDialog(nodeId, rootId);
+		}
 	}
 }
 
@@ -2826,7 +2889,7 @@ void MessageArchiver::onToolBarWidgetCreated(IMessageToolBarWidget *AWidget)
 	connect(action,SIGNAL(triggered(bool)),SLOT(onShowArchiveWindowByToolBarAction(bool)));
 	QToolButton *historyButton = AWidget->toolBarChanger()->insertAction(action,TBG_MWTBW_ARCHIVE_VIEW);
 
-	ChatWindowMenu *historyMenu = new ChatWindowMenu(this,FPluginManager,AWidget,AWidget->toolBarChanger()->toolBar());
+	ChatWindowMenu *historyMenu = new ChatWindowMenu(this,AWidget,AWidget->toolBarChanger()->toolBar());
 	historyButton->setMenu(historyMenu);
 	historyButton->setPopupMode(QToolButton::MenuButtonPopup);
 }

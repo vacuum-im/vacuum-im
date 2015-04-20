@@ -30,7 +30,7 @@ public:
 	//IRostersLabelHolder
 	virtual QList<quint32> rosterLabels(int AOrder, const IRosterIndex *AIndex) const;
 	virtual AdvancedDelegateItem rosterLabel(int AOrder, quint32 ALabelId, const IRosterIndex *AIndex) const;
-	//IRostersView
+	//IndexManagment
 	virtual IRostersModel *rostersModel() const;
 	virtual void setRostersModel(IRostersModel *AModel);
 	virtual bool repaintRosterIndex(IRosterIndex *AIndex);
@@ -128,7 +128,6 @@ protected:
 	void drawRow(QPainter *APainter, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex ) const;
 	//QAbstractItemView
 	bool viewportEvent(QEvent *AEvent);
-	void resizeEvent(QResizeEvent *AEvent);
 	bool edit(const QModelIndex &AIndex, EditTrigger ATrigger, QEvent *AEvent);
 	//QWidget
 	void paintEvent(QPaintEvent *AEvent);

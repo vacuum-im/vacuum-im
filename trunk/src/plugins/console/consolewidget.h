@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include <interfaces/ipluginmanager.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <interfaces/istanzaprocessor.h>
 #include "ui_consolewidget.h"
 
@@ -14,13 +14,12 @@ class ConsoleWidget :
 	Q_OBJECT;
 	Q_INTERFACES(IXmppStanzaHadler);
 public:
-	ConsoleWidget(IPluginManager *APluginManager, QWidget *AParent = NULL);
+	ConsoleWidget(QWidget *AParent = NULL);
 	~ConsoleWidget();
 	//IXmppStanzaHadler
 	virtual bool xmppStanzaIn(IXmppStream *AStream, Stanza &AStanza, int AOrder);
 	virtual bool xmppStanzaOut(IXmppStream *AStream, Stanza &AStanza, int AOrder);
 protected:
-	void initialize(IPluginManager *APluginManager);
 	void loadContext(const QUuid &AContextId);
 	void saveContext(const QUuid &AContextId);
 	void colorXml(QString &AXml) const;
@@ -42,16 +41,16 @@ protected slots:
 	void onTextSearchPreviousClicked();
 	void onTextSearchTextChanged(const QString &AText);
 protected slots:
-	void onStreamCreated(IXmppStream *AXmppStream);
-	void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore);
-	void onStreamDestroyed(IXmppStream *AXmppStream);
+	void onXmppStreamCreated(IXmppStream *AXmppStream);
+	void onXmppStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore);
+	void onXmppStreamDestroyed(IXmppStream *AXmppStream);
 	void onStanzaHandleInserted(int AHandleId, const IStanzaHandle &AHandle);
 	void onOptionsOpened();
 	void onOptionsClosed();
 private:
 	Ui::ConsoleWidgetClass ui;
 private:
-	IXmppStreams *FXmppStreams;
+	IXmppStreamManager *FXmppStreamManager;
 	IStanzaProcessor *FStanzaProcessor;
 private:
 	QUuid FContext;

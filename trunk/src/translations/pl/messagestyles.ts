@@ -2,232 +2,240 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="pl" sourcelanguage="en">
 <context>
-    <name>MessageStyles</name>
-    <message>
-        <source>Message Styles</source>
-        <translation>Style wiadomości</translation>
-    </message>
-    <message>
-        <source>d MMM yyyy hh:mm</source>
-        <translation>d MMM yyyy hh:mm</translation>
-    </message>
-    <message>
-        <source>d MMM hh:mm</source>
-        <translation>d MMM hh:mm</translation>
-    </message>
-    <message>
-        <source>hh:mm:ss</source>
-        <translation>hh:mm:ss</translation>
-    </message>
+    <name>MessageStyleManager</name>
     <message>
         <source>Message Styles Manager</source>
-        <translation>Menedżer stylów wiadomości</translation>
+        <translation type="unfinished">Menedżer stylów wiadomości</translation>
     </message>
     <message>
         <source>Allows to use different styles to display messages</source>
-        <translation>Pozwala na stosowanie różnych stylów wyświetlania wiadomości</translation>
+        <translation type="unfinished">Pozwala na stosowanie różnych stylów wyświetlania wiadomości</translation>
     </message>
     <message>
-        <source>Show date separators in chat window</source>
-        <translation>Pokaż separator daty w oknie rozmowy</translation>
+        <source>Messages styles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show date separators in message window</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>January</source>
-        <translation>Stycznia</translation>
+        <translation type="unfinished">Stycznia</translation>
     </message>
     <message>
         <source>February</source>
-        <translation>Lutego</translation>
+        <translation type="unfinished">Lutego</translation>
     </message>
     <message>
         <source>March</source>
-        <translation>Marca</translation>
+        <translation type="unfinished">Marca</translation>
     </message>
     <message>
         <source>April</source>
-        <translation>Kwietnia</translation>
+        <translation type="unfinished">Kwietnia</translation>
     </message>
     <message>
         <source>May</source>
-        <translation>Maja</translation>
+        <translation type="unfinished">Maja</translation>
     </message>
     <message>
         <source>June</source>
-        <translation>Czerwca</translation>
+        <translation type="unfinished">Czerwca</translation>
     </message>
     <message>
         <source>July</source>
-        <translation>Lipca</translation>
+        <translation type="unfinished">Lipca</translation>
     </message>
     <message>
         <source>August</source>
-        <translation>Sierpnia</translation>
+        <translation type="unfinished">Sierpnia</translation>
     </message>
     <message>
         <source>September</source>
-        <translation>Września</translation>
+        <translation type="unfinished">Września</translation>
     </message>
     <message>
         <source>October</source>
-        <translation>Października</translation>
+        <translation type="unfinished">Października</translation>
     </message>
     <message>
         <source>November</source>
-        <translation>Listopada</translation>
+        <translation type="unfinished">Listopada</translation>
     </message>
     <message>
         <source>December</source>
-        <translation>Grudnia</translation>
+        <translation type="unfinished">Grudnia</translation>
     </message>
     <message>
         <source>Monday</source>
-        <translation>Poniedziałek</translation>
+        <translation type="unfinished">Poniedziałek</translation>
     </message>
     <message>
         <source>Tuesday</source>
-        <translation>Wtorek</translation>
+        <translation type="unfinished">Wtorek</translation>
     </message>
     <message>
         <source>Wednesday</source>
-        <translation>Środa</translation>
+        <translation type="unfinished">Środa</translation>
     </message>
     <message>
         <source>Thursday</source>
-        <translation>Czwartek</translation>
+        <translation type="unfinished">Czwartek</translation>
     </message>
     <message>
         <source>Friday</source>
-        <translation>Piątek</translation>
+        <translation type="unfinished">Piątek</translation>
     </message>
     <message>
         <source>Saturday</source>
-        <translation>Sobota</translation>
+        <translation type="unfinished">Sobota</translation>
     </message>
     <message>
         <source>Sunday</source>
-        <translation>Niedziela</translation>
+        <translation type="unfinished">Niedziela</translation>
     </message>
     <message>
         <source>%1, %2 dd</source>
-        <translation>%1, dd %2</translation>
+        <translation type="unfinished">%1, dd %2</translation>
     </message>
     <message>
         <source>Today</source>
-        <translation>Dzisiaj</translation>
+        <translation type="unfinished">Dzisiaj</translation>
     </message>
     <message>
         <source>%1, %2 dd, yyyy</source>
-        <translation>%1, dd %2, yyyy</translation>
+        <translation type="unfinished">%1, dd %2, yyyy</translation>
+    </message>
+    <message>
+        <source>d MMM yyyy hh:mm</source>
+        <translation type="unfinished">d MMM yyyy hh:mm</translation>
+    </message>
+    <message>
+        <source>d MMM hh:mm</source>
+        <translation type="unfinished">d MMM hh:mm</translation>
+    </message>
+    <message>
+        <source>hh:mm:ss</source>
+        <translation type="unfinished">hh:mm:ss</translation>
     </message>
 </context>
 <context>
-    <name>StyleOptionsWidget</name>
+    <name>StyleEditOptionsDialog</name>
     <message>
-        <source>Chat</source>
-        <translation>Czat</translation>
+        <source>Preview</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Conference</source>
-        <translation>Konferencja</translation>
-    </message>
-    <message>
-        <source>The message with a error code %1 is received</source>
-        <translation>Odebrano wiadomość z błędem nr %1</translation>
-    </message>
-    <message>
-        <source>Error description</source>
-        <translation>Opis błędu</translation>
-    </message>
-    <message>
-        <source>Subject: Message subject</source>
-        <translation>Temat: Temat wiadomości</translation>
-    </message>
-    <message>
-        <source>Message body line 1</source>
-        <translation>Tekst wiadomości, wiersz 1</translation>
-    </message>
-    <message>
-        <source>Message body line 2</source>
-        <translation>Tekst wiadomości, wiersz 2</translation>
-    </message>
-    <message>
-        <source>Incoming history message</source>
-        <translation>Stare wiadomości przychodzące</translation>
-    </message>
-    <message>
-        <source>Incoming history consecutive message</source>
-        <translation>Stare, kolejne wiadomości przychodzące</translation>
-    </message>
-    <message>
-        <source>Incoming status message</source>
-        <translation>Status wiadomości przychodzącej</translation>
-    </message>
-    <message>
-        <source>Outgoing history message</source>
-        <translation>Stare wiadomości wychodzące</translation>
-    </message>
-    <message>
-        <source>Outgoing status message</source>
-        <translation>Status wiadomości wychodzącej</translation>
-    </message>
-    <message>
-        <source>Groupchat topic</source>
-        <translation>Temat konferencji</translation>
-    </message>
-    <message>
-        <source>Incoming message</source>
-        <translation>Wiadomość przychodząca</translation>
-    </message>
-    <message>
-        <source>Incoming event</source>
-        <translation>Zdarzenie przychodzące</translation>
-    </message>
-    <message>
-        <source>Incoming notification</source>
-        <translation>Powiadomienie przychodzące</translation>
-    </message>
-    <message>
-        <source>Incoming mention message</source>
-        <translation>Przychodząca wiadomość z uwagą na Twój temat</translation>
-    </message>
-    <message>
-        <source>Outgoing message</source>
-        <translation>Wiadomość wychodząca</translation>
-    </message>
-    <message>
-        <source>Outgoing consecutive message</source>
-        <translation>Stare, kolejne wiadomości wychodzące</translation>
+        <source>Message Style - %1 - %2</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Receiver</source>
-        <translation>Odbiorca</translation>
+        <translation type="unfinished">Odbiorca</translation>
     </message>
     <message>
         <source>Sender</source>
-        <translation>Nadawca</translation>
+        <translation type="unfinished">Nadawca</translation>
     </message>
     <message>
-        <source>Single</source>
-        <translation>Wiadomość</translation>
+        <source>The message with a error code %1 is received</source>
+        <translation type="unfinished">Odebrano wiadomość z błędem nr %1</translation>
     </message>
     <message>
-        <source>Headline</source>
-        <translation>Aktualności</translation>
+        <source>Error description</source>
+        <translation type="unfinished">Opis błędu</translation>
     </message>
     <message>
-        <source>Error</source>
-        <translation>Błąd</translation>
+        <source>Subject: Message subject</source>
+        <translation type="unfinished">Temat: Temat wiadomości</translation>
+    </message>
+    <message>
+        <source>Message body line 1</source>
+        <translation type="unfinished">Tekst wiadomości, wiersz 1</translation>
+    </message>
+    <message>
+        <source>Message body line 2</source>
+        <translation type="unfinished">Tekst wiadomości, wiersz 2</translation>
+    </message>
+    <message>
+        <source>Incoming history message</source>
+        <translation type="unfinished">Stare wiadomości przychodzące</translation>
+    </message>
+    <message>
+        <source>Incoming history consecutive message</source>
+        <translation type="unfinished">Stare, kolejne wiadomości przychodzące</translation>
+    </message>
+    <message>
+        <source>Incoming status message</source>
+        <translation type="unfinished">Status wiadomości przychodzącej</translation>
+    </message>
+    <message>
+        <source>Outgoing history message</source>
+        <translation type="unfinished">Stare wiadomości wychodzące</translation>
+    </message>
+    <message>
+        <source>Outgoing status message</source>
+        <translation type="unfinished">Status wiadomości wychodzącej</translation>
+    </message>
+    <message>
+        <source>Conference topic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incoming message</source>
+        <translation type="unfinished">Wiadomość przychodząca</translation>
+    </message>
+    <message>
+        <source>Incoming event</source>
+        <translation type="unfinished">Zdarzenie przychodzące</translation>
+    </message>
+    <message>
+        <source>Incoming notification</source>
+        <translation type="unfinished">Powiadomienie przychodzące</translation>
+    </message>
+    <message>
+        <source>Incoming mention message</source>
+        <translation type="unfinished">Przychodząca wiadomość z uwagą na Twój temat</translation>
+    </message>
+    <message>
+        <source>Outgoing message</source>
+        <translation type="unfinished">Wiadomość wychodząca</translation>
+    </message>
+    <message>
+        <source>Outgoing consecutive message</source>
+        <translation type="unfinished">Stare, kolejne wiadomości wychodzące</translation>
     </message>
 </context>
 <context>
-    <name>StyleOptionsWidgetClass</name>
+    <name>StyleSelectOptionsWidget</name>
     <message>
-        <source>Message type:</source>
-        <translation>Typ wiadomości:</translation>
+        <source>Chat:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Style engine:</source>
-        <translation>Styl:</translation>
+        <source>Conference:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Message:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Headline:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

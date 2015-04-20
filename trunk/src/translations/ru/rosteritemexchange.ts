@@ -65,10 +65,6 @@
         <source>When receiving roster modification request</source>
         <translation>При получении запроса изменения ростера</translation>
     </message>
-    <message>
-        <source>Automatically accept roster modifications from gateways and group services</source>
-        <translation>Автоматически принимать изменения ростера от транспортов и сервисов групп</translation>
-    </message>
     <message numerus="yes">
         <source>Send %n Contact(s)</source>
         <translation>
@@ -104,6 +100,14 @@
             <numerusform>Не удалось отправить %n контакта</numerusform>
             <numerusform>Не удалось отправить %n контактов</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Contacts list management</source>
+        <translation>Управление списком контактов</translation>
+    </message>
+    <message>
+        <source>Allow gateways and group services manage your contacts list</source>
+        <translation>Разрешить управлять вашим списком контактов транспортам и сервисам групп</translation>
     </message>
 </context>
 </TS>

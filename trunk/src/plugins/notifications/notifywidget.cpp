@@ -102,17 +102,17 @@ NotifyWidget::NotifyWidget(const INotification &ANotification)
 			cursor.insertText("...");
 		}
 
-		ui.ntbText->setHtml(TextManager::getDocumentBody(doc));
+		ui.ntbText->setAnimated(true);
 		ui.ntbText->setContentsMargins(0,0,0,0);
 		ui.ntbText->document()->setDocumentMargin(0);
 		ui.ntbText->setNetworkAccessManager(FNetworkManager);
+		ui.ntbText->setHtml(TextManager::getDocumentBody(doc));
 		ui.ntbText->setWordWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
 		ui.ntbText->setMaxHeight(ui.ntbText->fontMetrics().height()*MAX_TEXT_LINES + (ui.ntbText->frameWidth() + qRound(ui.ntbText->document()->documentMargin()))*2);
-		ui.ntbText->setAnimated(Options::node(OPV_NOTIFICATIONS_ANIMATIONENABLE).value().toBool());
 	}
 	else
 	{
-		ui.ntbText->setVisible(false);
+		ui.ntbText->setHtml(QString("<i>%1</i>").arg(tr("Message is empty or hidden")));
 	}
 
 	if (!ANotification.actions.isEmpty())

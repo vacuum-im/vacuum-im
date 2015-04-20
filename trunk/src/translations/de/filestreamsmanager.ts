@@ -35,10 +35,6 @@
         <translation>Dateiübertragungen</translation>
     </message>
     <message>
-        <source>File Transfer</source>
-        <translation>Dateiübertragung</translation>
-    </message>
-    <message>
         <source>Allows to initiate a thread for transferring files between two XMPP entities</source>
         <translation>Erlaubt das Anlegen von seperaten Übertragungen von Dateien zwischen zwei XMPP Endpunkten</translation>
     </message>
@@ -62,35 +58,36 @@
         <source>Data transmission terminated by remote user</source>
         <translation>Datenübertragen wurde vom anderen Benutzer abgebrochen</translation>
     </message>
+    <message>
+        <source>Ctrl+T</source>
+        <comment>Show file transfers</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File transfer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create separate folder for each sender</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default transfer method:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
-    <name>FileStreamsOptions</name>
+    <name>FileStreamsOptionsWidget</name>
     <message>
         <source>Select default directory</source>
-        <translation>Standardverzeichnis auswählen</translation>
+        <translation type="unfinished">Standardverzeichnis auswählen</translation>
     </message>
 </context>
 <context>
-    <name>FileStreamsOptionsClass</name>
+    <name>FileStreamsOptionsWidgetClass</name>
     <message>
-        <source>...</source>
-        <translation>...</translation>
-    </message>
-    <message>
-        <source>Default Downloads Directory:</source>
-        <translation>Standard Downloadverzeichnis:</translation>
-    </message>
-    <message>
-        <source>Default Data Stream:</source>
-        <translation>Standard Datenstrom:</translation>
-    </message>
-    <message>
-        <source>Acceptable Data Streams</source>
-        <translation>Akzeptierbare Datenströme</translation>
-    </message>
-    <message>
-        <source>Group downloads by sender</source>
-        <translation>Downloads nach Sender gruppieren</translation>
+        <source>Default directory:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -1,6 +1,6 @@
 HEADERS = roster.h \
-          rosterplugin.h
+          rostermanager.h
 
 SOURCES = roster.cpp \
-          rosterplugin.cpp
+          rostermanager.cpp
 

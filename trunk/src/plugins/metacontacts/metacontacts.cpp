@@ -47,8 +47,8 @@ MetaContacts::MetaContacts()
 {
 	FPluginManager = NULL;
 	FPrivateStorage = NULL;
-	FRosterPlugin = NULL;
-	FPresencePlugin = NULL;
+	FRosterManager = NULL;
+	FPresenceManager = NULL;
 	FRostersModel = NULL;
 	FRostersView = NULL;
 	FRostersViewPlugin = NULL;
@@ -93,7 +93,6 @@ bool MetaContacts::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		FPrivateStorage = qobject_cast<IPrivateStorage *>(plugin->instance());
 		if (FPrivateStorage)
 		{
-			connect(FPrivateStorage->instance(),SIGNAL(storageOpened(const Jid &)),SLOT(onPrivateStorageOpened(const Jid &)));
 			connect(FPrivateStorage->instance(),SIGNAL(dataLoaded(const QString &, const Jid &, const QDomElement &)),
 				SLOT(onPrivateStorageDataLoaded(const QString &, const Jid &, const QDomElement &)));
 			connect(FPrivateStorage->instance(),SIGNAL(dataChanged(const Jid &, const QString &, const QString &)),
@@ -103,27 +102,27 @@ bool MetaContacts::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IRosterManager").value(0,NULL);
 	if (plugin)
 	{
-		FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
-		if (FRosterPlugin)
+		FRosterManager = qobject_cast<IRosterManager *>(plugin->instance());
+		if (FRosterManager)
 		{
-			connect(FRosterPlugin->instance(),SIGNAL(rosterAdded(IRoster *)),SLOT(onRosterAdded(IRoster *)));
-			connect(FRosterPlugin->instance(),SIGNAL(rosterRemoved(IRoster *)),SLOT(onRosterRemoved(IRoster *)));
-			connect(FRosterPlugin->instance(),SIGNAL(rosterStreamJidChanged(IRoster *, const Jid &)),SLOT(onRosterStreamJidChanged(IRoster *, const Jid &)));
-			connect(FRosterPlugin->instance(),SIGNAL(rosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)),
+			connect(FRosterManager->instance(),SIGNAL(rosterOpened(IRoster *)),SLOT(onRosterOpened(IRoster *)));
+			connect(FRosterManager->instance(),SIGNAL(rosterActiveChanged(IRoster *, bool)),SLOT(onRosterActiveChanged(IRoster *, bool)));
+			connect(FRosterManager->instance(),SIGNAL(rosterStreamJidChanged(IRoster *, const Jid &)),SLOT(onRosterStreamJidChanged(IRoster *, const Jid &)));
+			connect(FRosterManager->instance(),SIGNAL(rosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)),
 				SLOT(onRosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)));
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IPresenceManager").value(0,NULL);
 	if (plugin)
 	{
-		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
-		if (FPresencePlugin)
+		FPresenceManager = qobject_cast<IPresenceManager *>(plugin->instance());
+		if (FPresenceManager)
 		{
-			connect(FPresencePlugin->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
+			connect(FPresenceManager->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
 				SLOT(onPresenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)));
 		}
 	}
@@ -191,14 +190,14 @@ bool MetaContacts::initConnections(IPluginManager *APluginManager, int &AInitOrd
 
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
 
-	return FRosterPlugin!=NULL && FPrivateStorage!=NULL;
+	return FRosterManager!=NULL && FPrivateStorage!=NULL;
 }
 
 bool MetaContacts::initObjects()
 {
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_COMBINECONTACTS,tr("Combine Contacts"),QKeySequence::UnknownKey,Shortcuts::WidgetShortcut);
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_DESTROYMETACONTACT,tr("Destroy Metacontact"),QKeySequence::UnknownKey,Shortcuts::WidgetShortcut);
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_DETACHFROMMETACONTACT,tr("Detach from Metacontact"),QKeySequence::UnknownKey,Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_COMBINECONTACTS,tr("Combine contacts"),tr("Ctrl+M","Combine contacts"),Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_DESTROYMETACONTACT,tr("Destroy metacontact"),QKeySequence::UnknownKey,Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_DETACHFROMMETACONTACT,tr("Detach from metacontact"),QKeySequence::UnknownKey,Shortcuts::WidgetShortcut);
 
 	if (FRostersModel)
 	{
@@ -211,7 +210,8 @@ bool MetaContacts::initObjects()
 		FRostersView->insertClickHooker(RCHO_METACONTACTS,this);
 		FRostersView->insertEditHandler(REHO_METACONTACTS_RENAME,this);
 		FRostersView->insertProxyModel(FFilterProxyModel,RPO_METACONTACTS_FILTER);
-		FRostersViewPlugin->registerExpandableRosterIndexKind(RIK_METACONTACT,RDR_METACONTACT_ID);
+
+		FRostersViewPlugin->registerExpandableRosterIndexKind(RIK_METACONTACT,RDR_METACONTACT_ID,false);
 
 		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_COMBINECONTACTS,FRostersView->instance());
 		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_DESTROYMETACONTACT,FRostersView->instance());
@@ -754,14 +754,14 @@ bool MetaContacts::setMetaContactGroups(const Jid &AStreamJid, const QUuid &AMet
 		{
 			if (meta.groups != AGroups)
 			{
-				IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
+				IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(AStreamJid) : NULL;
 				if (roster && roster->isOpen())
 				{
 					QSet<QString> newGroups = AGroups - meta.groups;
 					QSet<QString> oldGroups = meta.groups - AGroups;
 					foreach(const Jid &item, meta.items)
 					{
-						IRosterItem ritem = roster->rosterItem(item);
+						IRosterItem ritem = roster->findItem(item);
 						roster->setItem(ritem.itemJid,ritem.name,ritem.groups + newGroups - oldGroups);
 					}
 					LOG_STRM_INFO(AStreamJid,QString("Metacontact groups changed, metaId=%1, groups=%2").arg(AMetaId.toString()).arg(AGroups.count()));
@@ -912,7 +912,7 @@ MetaMergedContact MetaContacts::getMergedContact(const Jid &AStreamJid, const QU
 	meta.id = AMetaId;
 	if (!meta.presences.isEmpty())
 	{
-		meta.presence = FPresencePlugin!=NULL ? FPresencePlugin->sortPresenceItems(meta.presences.values()).value(0) : meta.presences.values().value(0);
+		meta.presence = FPresenceManager!=NULL ? FPresenceManager->sortPresenceItems(meta.presences.values()).value(0) : meta.presences.values().value(0);
 		meta.stream = meta.presences.key(meta.presence);
 		meta.itemJid = meta.presence.itemJid.bare();
 	}
@@ -1250,21 +1250,21 @@ void MetaContacts::updateMetaRecentItems(const Jid &AStreamJid, const QUuid &AMe
 
 bool MetaContacts::updateMetaContact(const Jid &AStreamJid, const IMetaContact &AMetaContact)
 {
-	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
+	IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(AStreamJid) : NULL;
 	if (roster!=NULL && !AMetaContact.isNull())
 	{
 		IMetaContact after = AMetaContact;
 		IMetaContact before = findMetaContact(AStreamJid,after.id);
 
 		QHash<Jid, QUuid> &itemMetaIdRef = FItemMetaId[AStreamJid];
-		IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
+		IPresence *presence = FPresenceManager!=NULL ? FPresenceManager->findPresence(AStreamJid) : NULL;
 
 		after.groups.clear();
 		after.presences.clear();
 		foreach(const Jid &itemJid, after.items)
 		{
-			IRosterItem rItem = roster->rosterItem(itemJid);
-			if (rItem.isValid && !itemJid.node().isEmpty())
+			IRosterItem rItem = roster->findItem(itemJid);
+			if (!rItem.isNull() && !itemJid.node().isEmpty())
 			{
 				if (!before.items.contains(itemJid))
 				{
@@ -1296,7 +1296,7 @@ bool MetaContacts::updateMetaContact(const Jid &AStreamJid, const IMetaContact &
 		if (after.name.isEmpty())
 			after.name = after.items.value(0).uBare();
 		if (!after.presences.isEmpty())
-			after.presences = FPresencePlugin->sortPresenceItems(after.presences);
+			after.presences = FPresenceManager->sortPresenceItems(after.presences);
 
 		if (after != before)
 		{
@@ -1365,9 +1365,9 @@ bool MetaContacts::isValidItem(const Jid &AStreamJid, const Jid &AItemJid) const
 {
 	if (AItemJid.isValid() && !AItemJid.node().isEmpty())
 	{
-		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
+		IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(AStreamJid) : NULL;
 		if (roster != NULL)
-			return roster->rosterItem(AItemJid).isValid;
+			return roster->hasItem(AItemJid);
 	}
 	return false;
 }
@@ -1491,7 +1491,7 @@ void MetaContacts::combineMetaItems(const QStringList &AStreams, const QStringLi
 {
 	if (isReadyStreams(AStreams))
 	{
-		CombineContactsDialog *dialog = new CombineContactsDialog(FPluginManager,this,AStreams,AContacts,AMetas);
+		CombineContactsDialog *dialog = new CombineContactsDialog(this,AStreams,AContacts,AMetas);
 		WidgetManager::showActivateRaiseWindow(dialog);
 	}
 }
@@ -1642,28 +1642,44 @@ void MetaContacts::saveMetaContactsToFile(const QString &AFileName, const QList<
 	}
 }
 
-void MetaContacts::onRosterAdded(IRoster *ARoster)
+void MetaContacts::onRosterOpened(IRoster *ARoster)
 {
-	FLoadStreams += ARoster->streamJid();
-	QTimer::singleShot(0,this,SLOT(onLoadContactsFromFileTimerTimeout()));
+	QString id = FPrivateStorage!=NULL ? FPrivateStorage->loadData(ARoster->streamJid(),"storage",NS_STORAGE_METACONTACTS) : QString::null;
+	if (!id.isEmpty())
+	{
+		FLoadRequestId[ARoster->streamJid()] = id;
+		LOG_STRM_INFO(ARoster->streamJid(),"Load metacontacts from storage request sent");
+	}
+	else
+	{
+		LOG_STRM_WARNING(ARoster->streamJid(),"Failed to send load metacontacts from storage request");
+	}
 }
 
-void MetaContacts::onRosterRemoved(IRoster *ARoster)
+void MetaContacts::onRosterActiveChanged(IRoster *ARoster, bool AActive)
 {
-	FSaveStreams -= ARoster->streamJid();
-	FLoadStreams -= ARoster->streamJid();
-	FUpdateMeta.remove(ARoster->streamJid());
-
-	FItemMetaId.remove(ARoster->streamJid());
-
-	QHash<QUuid, IMetaContact> metas = FMetaContacts.take(ARoster->streamJid());
-	foreach(const QUuid &metaId, metas.keys())
+	if (AActive)
 	{
-		updateMetaIndexes(ARoster->streamJid(),metaId);
-		updateMetaRecentItems(ARoster->streamJid(),metaId);
+		FLoadStreams += ARoster->streamJid();
+		QTimer::singleShot(0,this,SLOT(onLoadContactsFromFileTimerTimeout()));
 	}
+	else
+	{
+		FSaveStreams -= ARoster->streamJid();
+		FLoadStreams -= ARoster->streamJid();
+		FUpdateMeta.remove(ARoster->streamJid());
 
-	saveMetaContactsToFile(metaContactsFileName(ARoster->streamJid()),metas.values());
+		FItemMetaId.remove(ARoster->streamJid());
+
+		QHash<QUuid, IMetaContact> metas = FMetaContacts.take(ARoster->streamJid());
+		foreach(const QUuid &metaId, metas.keys())
+		{
+			updateMetaIndexes(ARoster->streamJid(),metaId);
+			updateMetaRecentItems(ARoster->streamJid(),metaId);
+		}
+
+		saveMetaContactsToFile(metaContactsFileName(ARoster->streamJid()),metas.values());
+	}
 }
 
 void MetaContacts::onRosterStreamJidChanged(IRoster *ARoster, const Jid &ABefore)
@@ -1705,20 +1721,6 @@ void MetaContacts::onPresenceItemReceived(IPresence *APresence, const IPresenceI
 		QUuid metaId = FItemMetaId.value(APresence->streamJid()).value(AItem.itemJid.bare());
 		if (!metaId.isNull())
 			startUpdateMetaContact(APresence->streamJid(),metaId);
-	}
-}
-
-void MetaContacts::onPrivateStorageOpened(const Jid &AStreamJid)
-{
-	QString id = FPrivateStorage->loadData(AStreamJid,"storage",NS_STORAGE_METACONTACTS);
-	if (!id.isEmpty())
-	{
-		FLoadRequestId[AStreamJid] = id;
-		LOG_STRM_INFO(AStreamJid,"Load metacontacts from storage request sent");
-	}
-	else
-	{
-		LOG_STRM_WARNING(AStreamJid,"Failed to send load metacontacts from storage request");
 	}
 }
 
@@ -2020,7 +2022,7 @@ void MetaContacts::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALab
 							metaItems[streamJid].append(jidToolTip);
 					}
 
-					IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
+					IPresence *presence = FPresenceManager!=NULL ? FPresenceManager->findPresence(streamJid) : NULL;
 					if (presence)
 					{
 						foreach(const IPresenceItem &pItem, presence->findItems(itemJid))
@@ -2051,7 +2053,7 @@ void MetaContacts::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALab
 				AToolTips.remove(RTTO_ROSTERSVIEW_INFO_JABBERID);
 			}
 
-			metaPresences = FPresencePlugin!=NULL ? FPresencePlugin->sortPresenceItems(metaPresences) : metaPresences;
+			metaPresences = FPresenceManager!=NULL ? FPresenceManager->sortPresenceItems(metaPresences) : metaPresences;
 			for (int resIndex=0; resIndex<10 && resIndex<metaPresences.count(); resIndex++)
 			{
 				AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_TOPLINE,"<hr>");

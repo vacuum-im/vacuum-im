@@ -2,23 +2,7 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="en" sourcelanguage="en">
 <context>
-    <name>MessageStyles</name>
-    <message>
-        <source>Message Styles</source>
-        <translation>Message Styles</translation>
-    </message>
-    <message>
-        <source>d MMM yyyy hh:mm</source>
-        <translation>d MMM yyyy hh:mm</translation>
-    </message>
-    <message>
-        <source>d MMM hh:mm</source>
-        <translation>d MMM hh:mm</translation>
-    </message>
-    <message>
-        <source>hh:mm:ss</source>
-        <translation>hh:mm:ss</translation>
-    </message>
+    <name>MessageStyleManager</name>
     <message>
         <source>Message Styles Manager</source>
         <translation>Message Styles Manager</translation>
@@ -28,8 +12,12 @@
         <translation>Allows to use different styles to display messages</translation>
     </message>
     <message>
-        <source>Show date separators in chat window</source>
-        <translation>Show date separators in chat window</translation>
+        <source>Messages styles</source>
+        <translation>Messages styles</translation>
+    </message>
+    <message>
+        <source>Show date separators in message window</source>
+        <translation>Show date separators in message window</translation>
     </message>
     <message>
         <source>January</source>
@@ -119,16 +107,36 @@
         <source>%1, %2 dd, yyyy</source>
         <translation>%1, %2 dd, yyyy</translation>
     </message>
-</context>
-<context>
-    <name>StyleOptionsWidget</name>
     <message>
-        <source>Chat</source>
-        <translation>Chat</translation>
+        <source>d MMM yyyy hh:mm</source>
+        <translation>d MMM yyyy hh:mm</translation>
     </message>
     <message>
-        <source>Conference</source>
-        <translation>Conference</translation>
+        <source>d MMM hh:mm</source>
+        <translation>d MMM hh:mm</translation>
+    </message>
+    <message>
+        <source>hh:mm:ss</source>
+        <translation>hh:mm:ss</translation>
+    </message>
+</context>
+<context>
+    <name>StyleEditOptionsDialog</name>
+    <message>
+        <source>Preview</source>
+        <translation>Preview</translation>
+    </message>
+    <message>
+        <source>Message Style - %1 - %2</source>
+        <translation>Message Style - %1 - %2</translation>
+    </message>
+    <message>
+        <source>Receiver</source>
+        <translation>Receiver</translation>
+    </message>
+    <message>
+        <source>Sender</source>
+        <translation>Sender</translation>
     </message>
     <message>
         <source>The message with a error code %1 is received</source>
@@ -171,8 +179,8 @@
         <translation>Outgoing status message</translation>
     </message>
     <message>
-        <source>Groupchat topic</source>
-        <translation>Groupchat topic</translation>
+        <source>Conference topic</source>
+        <translation>Conference topic</translation>
     </message>
     <message>
         <source>Incoming message</source>
@@ -198,36 +206,36 @@
         <source>Outgoing consecutive message</source>
         <translation>Outgoing consecutive message</translation>
     </message>
-    <message>
-        <source>Receiver</source>
-        <translation>Receiver</translation>
-    </message>
-    <message>
-        <source>Sender</source>
-        <translation>Sender</translation>
-    </message>
-    <message>
-        <source>Single</source>
-        <translation>Single</translation>
-    </message>
-    <message>
-        <source>Headline</source>
-        <translation>Headline</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation>Error</translation>
-    </message>
 </context>
 <context>
-    <name>StyleOptionsWidgetClass</name>
+    <name>StyleSelectOptionsWidget</name>
     <message>
-        <source>Message type:</source>
-        <translation>Message type:</translation>
+        <source>Chat:</source>
+        <translation>Chat:</translation>
     </message>
     <message>
-        <source>Style engine:</source>
-        <translation>Style engine:</translation>
+        <source>Conference:</source>
+        <translation>Conference:</translation>
+    </message>
+    <message>
+        <source>Message:</source>
+        <translation>Message:</translation>
+    </message>
+    <message>
+        <source>Headline:</source>
+        <translation>Headline:</translation>
+    </message>
+    <message>
+        <source>Error:</source>
+        <translation>Error:</translation>
+    </message>
+    <message>
+        <source>Unknown:</source>
+        <translation>Unknown:</translation>
+    </message>
+    <message>
+        <source>Settings...</source>
+        <translation>Settings...</translation>
     </message>
 </context>
 </TS>

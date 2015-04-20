@@ -5,6 +5,7 @@
 #include <definitions/actiongroups.h>
 #include <definitions/optionvalues.h>
 #include <definitions/optionnodes.h>
+#include <definitions/optionnodeorders.h>
 #include <definitions/optionwidgetorders.h>
 #include <definitions/rosterlabels.h>
 #include <definitions/rosterindexkinds.h>
@@ -18,6 +19,7 @@
 #include <definitions/version.h>
 #include <utils/options.h>
 #include <utils/logger.h>
+#include "statusoptionswidget.h"
 
 #define MAX_TEMP_STATUS_ID                  -10
 
@@ -27,8 +29,8 @@
 StatusChanger::StatusChanger()
 {
 	FPluginManager = NULL;
-	FPresencePlugin = NULL;
-	FRosterPlugin = NULL;
+	FPresenceManager = NULL;
+	FRosterManager = NULL;
 	FMainWindowPlugin = NULL;
 	FRostersView = NULL;
 	FRostersViewPlugin = NULL;
@@ -48,8 +50,6 @@ StatusChanger::StatusChanger()
 
 StatusChanger::~StatusChanger()
 {
-	if (!FEditStatusDialog.isNull())
-		FEditStatusDialog->reject();
 	if (!FModifyStatusDialog.isNull())
 		FModifyStatusDialog->reject();
 	delete FMainMenu;
@@ -72,26 +72,25 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
 	FPluginManager = APluginManager;
 	connect(APluginManager->instance(),SIGNAL(shutdownStarted()),SLOT(onApplicationShutdownStarted()));
 
-	IPlugin *plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
+	IPlugin *plugin = APluginManager->pluginInterface("IPresenceManager").value(0,NULL);
 	if (plugin)
 	{
-		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
-		if (FPresencePlugin)
+		FPresenceManager = qobject_cast<IPresenceManager *>(plugin->instance());
+		if (FPresenceManager)
 		{
-			connect(FPresencePlugin->instance(),SIGNAL(presenceAdded(IPresence *)),SLOT(onPresenceAdded(IPresence *)));
-			connect(FPresencePlugin->instance(),SIGNAL(presenceChanged(IPresence *, int, const QString &, int)),SLOT(onPresenceChanged(IPresence *, int, const QString &, int)));
-			connect(FPresencePlugin->instance(),SIGNAL(presenceRemoved(IPresence *)),SLOT(onPresenceRemoved(IPresence *)));
+			connect(FPresenceManager->instance(),SIGNAL(presenceActiveChanged(IPresence *, bool)),SLOT(onPresenceActiveChanged(IPresence *, bool)));
+			connect(FPresenceManager->instance(),SIGNAL(presenceChanged(IPresence *, int, const QString &, int)),SLOT(onPresenceChanged(IPresence *, int, const QString &, int)));
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IRosterManager").value(0,NULL);
 	if (plugin)
 	{
-		FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
-		if (FRosterPlugin)
+		FRosterManager = qobject_cast<IRosterManager *>(plugin->instance());
+		if (FRosterManager)
 		{
-			connect(FRosterPlugin->instance(),SIGNAL(rosterOpened(IRoster *)),SLOT(onRosterOpened(IRoster *)));
-			connect(FRosterPlugin->instance(),SIGNAL(rosterClosed(IRoster *)),SLOT(onRosterClosed(IRoster *)));
+			connect(FRosterManager->instance(),SIGNAL(rosterOpened(IRoster *)),SLOT(onRosterOpened(IRoster *)));
+			connect(FRosterManager->instance(),SIGNAL(rosterClosed(IRoster *)),SLOT(onRosterClosed(IRoster *)));
 		}
 	}
 
@@ -117,7 +116,7 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
 	{
 		FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
 		if (FRostersModel)
-			connect(FRostersModel->instance(),SIGNAL(streamJidChanged(const Jid &, const Jid &)),SLOT(onStreamJidChanged(const Jid &, const Jid &)));
+			connect(FRostersModel->instance(),SIGNAL(streamJidChanged(const Jid &, const Jid &)),SLOT(onRosterStreamJidChanged(const Jid &, const Jid &)));
 	}
 
 	plugin = APluginManager->pluginInterface("IAccountManager").value(0,NULL);
@@ -125,7 +124,7 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
 	{
 		FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
 		if (FAccountManager)
-			connect(FAccountManager->instance(),SIGNAL(changed(IAccount *, const OptionsNode &)),SLOT(onAccountOptionsChanged(IAccount *, const OptionsNode &)));
+			connect(FAccountManager->instance(),SIGNAL(accountOptionsChanged(IAccount *, const OptionsNode &)),SLOT(onAccountOptionsChanged(IAccount *, const OptionsNode &)));
 	}
 
 	plugin = APluginManager->pluginInterface("ITrayManager").value(0,NULL);
@@ -162,7 +161,7 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
 	connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 
-	return FPresencePlugin!=NULL;
+	return FPresenceManager!=NULL;
 }
 
 bool StatusChanger::initObjects()
@@ -176,19 +175,13 @@ bool StatusChanger::initObjects()
 	FMainMenu->addAction(FModifyStatus,AG_SCSM_STATUSCHANGER_ACTIONS,false);
 	connect(FModifyStatus,SIGNAL(triggered(bool)),SLOT(onModifyStatusAction(bool)));
 
-	Action *editStatus = new Action(FMainMenu);
-	editStatus->setText(tr("Edit Statuses"));
-	editStatus->setIcon(RSR_STORAGE_MENUICONS,MNI_SCHANGER_EDIT_STATUSES);
-	connect(editStatus,SIGNAL(triggered(bool)), SLOT(onEditStatusAction(bool)));
-	FMainMenu->addAction(editStatus,AG_SCSM_STATUSCHANGER_ACTIONS,false);
-
 	createDefaultStatus();
 	setMainStatusId(STATUS_OFFLINE);
 	updateMainMenu();
 	updateTrayToolTip();
 
 	if (FOptionsManager)
-		FOptionsManager->insertOptionsHolder(this);
+		FOptionsManager->insertOptionsDialogHolder(this);
 
 	if (FMainWindowPlugin)
 	{
@@ -234,14 +227,17 @@ bool StatusChanger::initSettings()
 	Options::setDefaultValue(OPV_STATUS_PRIORITY,0);
 	Options::setDefaultValue(OPV_STATUSES_MAINSTATUS,STATUS_ONLINE);
 	Options::setDefaultValue(OPV_STATUSES_MODIFY,false);
-	Options::setDefaultValue(OPV_ACCOUNT_AUTOCONNECT,false);
+
+	Options::setDefaultValue(OPV_ACCOUNT_AUTOCONNECT,true);
 	Options::setDefaultValue(OPV_ACCOUNT_AUTORECONNECT,true);
 	Options::setDefaultValue(OPV_ACCOUNT_STATUS_ISMAIN,true);
 	Options::setDefaultValue(OPV_ACCOUNT_STATUS_LASTONLINE,STATUS_MAIN_ID);
 
 	if (FOptionsManager)
 	{
-		FOptionsManager->insertOptionsHolder(this);
+		IOptionsDialogNode statusNode = { ONO_STATUSITEMS, OPN_STATUSITEMS, MNI_SCHANGER_EDIT_STATUSES, tr("Status") };
+		FOptionsManager->insertOptionsDialogNode(statusNode);
+		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 
 	return true;
@@ -253,15 +249,20 @@ bool StatusChanger::startPlugin()
 	return true;
 }
 
-QMultiMap<int, IOptionsWidget *> StatusChanger::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+QMultiMap<int, IOptionsDialogWidget *> StatusChanger::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	QMultiMap<int, IOptionsWidget *> widgets;
+	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
-	if (FOptionsManager && nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS)
+	if (nodeTree.count()==3 && nodeTree.at(0)==OPN_ACCOUNTS && nodeTree.at(2)=="Additional")
 	{
-		OptionsNode aoptions = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));
-		widgets.insertMulti(OWO_ACCOUNT_STATUS,FOptionsManager->optionsNodeWidget(aoptions.node("auto-connect"),tr("Auto connect on startup"),AParent));
-		widgets.insertMulti(OWO_ACCOUNT_STATUS,FOptionsManager->optionsNodeWidget(aoptions.node("auto-reconnect"),tr("Auto reconnect if disconnected"),AParent));
+		OptionsNode options = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));
+		widgets.insertMulti(OWO_ACCOUNTS_ADDITIONAL_AUTOCONNECT,FOptionsManager->newOptionsDialogWidget(options.node("auto-connect"),tr("Connect to server on startup"),AParent));
+		widgets.insertMulti(OWO_ACCOUNTS_ADDITIONAL_AUTORECONNECT,FOptionsManager->newOptionsDialogWidget(options.node("auto-reconnect"),tr("Reconnect to server on connection errors"),AParent));
+	}
+	else if (ANodeId == OPN_STATUSITEMS)
+	{
+		widgets.insertMulti(OHO_STATUS_ITEMS, FOptionsManager->newOptionsDialogHeader(tr("Standard and users statuses"), AParent));
+		widgets.insertMulti(OWO_STATUS_ITEMS, new StatusOptionsWidget(this,AParent));
 	}
 	return widgets;
 }
@@ -553,7 +554,7 @@ void StatusChanger::removeStatusItem(int AStatusId)
 
 QIcon StatusChanger::iconByShow(int AShow) const
 {
-	return FStatusIcons != NULL ? FStatusIcons->iconByStatus(AShow,QString::null,false) : QIcon();
+	return FStatusIcons!=NULL ? FStatusIcons->iconByStatus(AShow,QString::null,false) : QIcon();
 }
 
 QString StatusChanger::nameByShow(int AShow) const
@@ -742,7 +743,7 @@ void StatusChanger::createStreamMenu(IPresence *APresence)
 	if (!FStreamMenu.contains(APresence))
 	{
 		Jid streamJid = APresence->streamJid();
-		IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(streamJid) : NULL;
+		IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(streamJid) : NULL;
 
 		Menu *sMenu = new Menu(FMainMenu);
 		if (account)
@@ -852,7 +853,7 @@ void StatusChanger::updateTrayToolTip()
 		while (it != FCurrentStatus.constEnd())
 		{
 			IPresence *presence = it.key();
-			IAccount *account = FAccountManager->accountByStream(presence->streamJid());
+			IAccount *account = FAccountManager->findAccountByStream(presence->streamJid());
 			if (!trayToolTip.isEmpty())
 				trayToolTip+="\n";
 			trayToolTip += tr("%1 - %2").arg(account->name()).arg(statusItemName(it.value()));
@@ -903,7 +904,7 @@ void StatusChanger::removeConnectingLabel(IPresence *APresence)
 
 void StatusChanger::autoReconnect(IPresence *APresence)
 {
-	IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(APresence->streamJid()) : NULL;
+	IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(APresence->streamJid()) : NULL;
 	if (account && account->optionsNode().value("auto-reconnect").toBool())
 	{
 		int statusId = FLastOnlineStatus.value(APresence, STATUS_MAIN_ID);
@@ -970,7 +971,7 @@ void StatusChanger::insertStatusNotification(IPresence *APresence)
 			notify.typeId = NNT_CONNECTION_ERROR;
 			notify.data.insert(NDR_ICON,FStatusIcons!=NULL ? FStatusIcons->iconByStatus(IPresence::Error,QString::null,false) : QIcon());
 			notify.data.insert(NDR_POPUP_CAPTION, tr("Connection error"));
-			notify.data.insert(NDR_POPUP_TITLE,FAccountManager!=NULL ? FAccountManager->accountByStream(APresence->streamJid())->name() : APresence->streamJid().uFull());
+			notify.data.insert(NDR_POPUP_TITLE,FAccountManager!=NULL ? FAccountManager->findAccountByStream(APresence->streamJid())->name() : APresence->streamJid().uFull());
 			notify.data.insert(NDR_STREAM_JID,APresence->streamJid().full());
 			notify.data.insert(NDR_CONTACT_JID,APresence->streamJid().full());
 			notify.data.insert(NDR_POPUP_IMAGE, FNotifications->contactAvatar(APresence->streamJid()));
@@ -1007,27 +1008,60 @@ void StatusChanger::onSetStatusByAction(bool)
 	}
 }
 
-void StatusChanger::onPresenceAdded(IPresence *APresence)
+void StatusChanger::onPresenceActiveChanged(IPresence *APresence, bool AActive)
 {
-	if (FStreamMenu.count() == 1)
-		FStreamMenu.value(FStreamMenu.keys().first())->menuAction()->setVisible(true);
-
-	createStreamMenu(APresence);
-	setStreamStatusId(APresence,STATUS_OFFLINE);
-
-	if (FStreamMenu.count() == 1)
-		FStreamMenu.value(FStreamMenu.keys().first())->menuAction()->setVisible(false);
-
-	IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(APresence->streamJid()) : NULL;
-	if (account)
+	if (AActive)
 	{
-		if (account->optionsNode().value("status.is-main").toBool())
-			FMainStatusStreams += APresence;
-		FLastOnlineStatus.insert(APresence, account->optionsNode().value("status.last-online").toInt());
-	}
+		if (FStreamMenu.count() == 1)
+			FStreamMenu.value(FStreamMenu.keys().first())->menuAction()->setVisible(true);
 
-	updateStreamMenu(APresence);
-	updateMainMenu();
+		createStreamMenu(APresence);
+		setStreamStatusId(APresence,STATUS_OFFLINE);
+
+		if (FStreamMenu.count() == 1)
+			FStreamMenu.value(FStreamMenu.keys().first())->menuAction()->setVisible(false);
+
+		IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(APresence->streamJid()) : NULL;
+		if (account)
+		{
+			if (account->optionsNode().value("status.is-main").toBool())
+				FMainStatusStreams += APresence;
+			FLastOnlineStatus.insert(APresence, account->optionsNode().value("status.last-online").toInt());
+		}
+
+		updateStreamMenu(APresence);
+		updateMainMenu();
+	}
+	else
+	{
+		IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(APresence->streamJid()) : NULL;
+		if (account)
+		{
+			bool isMainStatus = FMainStatusStreams.contains(APresence);
+			account->optionsNode().setValue(isMainStatus,"status.is-main");
+			account->optionsNode().setValue(FLastOnlineStatus.value(APresence, STATUS_MAIN_ID),"status.last-online");
+		}
+
+		removeStatusNotification(APresence);
+		removeTempStatus(APresence);
+
+		FConnectStatus.remove(APresence);
+		removeConnectingLabel(APresence);
+
+		FFastReconnect -= APresence;
+		FMainStatusStreams -= APresence;
+		FMainStatusActions.remove(APresence);
+		FCurrentStatus.remove(APresence);
+		FLastOnlineStatus.remove(APresence);
+		FPendingReconnect.remove(APresence);
+		delete FStreamMenu.take(APresence);
+
+		if (FStreamMenu.count() == 1)
+			FStreamMenu.value(FStreamMenu.keys().first())->menuAction()->setVisible(false);
+
+		updateMainMenu();
+		updateTrayToolTip();
+	}
 }
 
 void StatusChanger::onPresenceChanged(IPresence *APresence, int AShow, const QString &AText, int APriority)
@@ -1064,40 +1098,9 @@ void StatusChanger::onPresenceChanged(IPresence *APresence, int AShow, const QSt
 	}
 }
 
-void StatusChanger::onPresenceRemoved(IPresence *APresence)
-{
-	IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(APresence->streamJid()) : NULL;
-	if (account)
-	{
-		bool isMainStatus = FMainStatusStreams.contains(APresence);
-		account->optionsNode().setValue(isMainStatus,"status.is-main");
-		account->optionsNode().setValue(FLastOnlineStatus.value(APresence, STATUS_MAIN_ID),"status.last-online");
-	}
-
-	removeStatusNotification(APresence);
-	removeTempStatus(APresence);
-
-	FConnectStatus.remove(APresence);
-	removeConnectingLabel(APresence);
-
-	FFastReconnect -= APresence;
-	FMainStatusStreams -= APresence;
-	FMainStatusActions.remove(APresence);
-	FCurrentStatus.remove(APresence);
-	FLastOnlineStatus.remove(APresence);
-	FPendingReconnect.remove(APresence);
-	delete FStreamMenu.take(APresence);
-
-	if (FStreamMenu.count() == 1)
-		FStreamMenu.value(FStreamMenu.keys().first())->menuAction()->setVisible(false);
-
-	updateMainMenu();
-	updateTrayToolTip();
-}
-
 void StatusChanger::onRosterOpened(IRoster *ARoster)
 {
-	IPresence *presence = FPresencePlugin->findPresence(ARoster->streamJid());
+	IPresence *presence = FPresenceManager->findPresence(ARoster->streamJid());
 	if (FConnectStatus.contains(presence))
 		setStreamStatus(presence->streamJid(), FConnectStatus.value(presence));
 	FPluginManager->delayShutdown();
@@ -1105,13 +1108,13 @@ void StatusChanger::onRosterOpened(IRoster *ARoster)
 
 void StatusChanger::onRosterClosed(IRoster *ARoster)
 {
-	IPresence *presence = FPresencePlugin->findPresence(ARoster->streamJid());
+	IPresence *presence = FPresenceManager->findPresence(ARoster->streamJid());
 	if (FConnectStatus.contains(presence))
 		setStreamStatus(presence->streamJid(), FConnectStatus.value(presence));
 	FPluginManager->continueShutdown();
 }
 
-void StatusChanger::onStreamJidChanged(const Jid &ABefore, const Jid &AAfter)
+void StatusChanger::onRosterStreamJidChanged(const Jid &ABefore, const Jid &AAfter)
 {
 	QMultiHash<int,QVariant> data;
 	data.insert(ADR_STREAMJID,ABefore.full());
@@ -1189,14 +1192,17 @@ void StatusChanger::onOptionsOpened()
 				createStatusActions(status.code);
 			}
 		}
-		else if (statusId > STATUS_NULL_ID && FStatusItems.contains(statusId))
+		else if (statusId>STATUS_NULL_ID && FStatusItems.contains(statusId))
 		{
 			StatusItem &status = FStatusItems[statusId];
 			status.text = soptions.hasValue("text") ? soptions.value("text").toString() : status.text;
 			status.priority = soptions.hasValue("priority") ? soptions.value("priority").toInt() : status.priority;
-			updateStatusActions(statusId);
 		}
 	}
+
+	// Standard statuses are not in settings on first startup
+	for (QMap<int, StatusItem>::const_iterator it=FStatusItems.constBegin(); it!=FStatusItems.constEnd() && it.key()<=STATUS_MAX_STANDART_ID; ++it)
+		updateStatusActions(it.key());
 
 	FModifyStatus->setChecked(Options::node(OPV_STATUSES_MODIFY).value().toBool());
 	setMainStatusId(Options::node(OPV_STATUSES_MAINSTATUS).value().toInt());
@@ -1204,7 +1210,6 @@ void StatusChanger::onOptionsOpened()
 
 void StatusChanger::onOptionsClosed()
 {
-	delete FEditStatusDialog;
 	delete FModifyStatusDialog;
 
 	QList<QString> oldNS = Options::node(OPV_STATUSES_ROOT).childNSpaces("status");
@@ -1234,9 +1239,7 @@ void StatusChanger::onOptionsClosed()
 void StatusChanger::onOptionsChanged(const OptionsNode &ANode)
 {
 	if (ANode.path() == OPV_STATUSES_MODIFY)
-	{
 		FModifyStatus->setChecked(ANode.value().toBool());
-	}
 }
 
 void StatusChanger::onProfileOpened(const QString &AProfile)
@@ -1244,7 +1247,7 @@ void StatusChanger::onProfileOpened(const QString &AProfile)
 	Q_UNUSED(AProfile);
 	foreach(IPresence *presence, FCurrentStatus.keys())
 	{
-		IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(presence->streamJid()) : NULL;
+		IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(presence->streamJid()) : NULL;
 		if (account!=NULL && account->optionsNode().value("auto-connect").toBool())
 		{
 			int statusId = !FMainStatusStreams.contains(presence) ? FLastOnlineStatus.value(presence, STATUS_MAIN_ID) : STATUS_MAIN_ID;
@@ -1289,19 +1292,6 @@ void StatusChanger::onReconnectTimer()
 		{
 			++it;
 		}
-	}
-}
-
-void StatusChanger::onEditStatusAction(bool)
-{
-	if (FEditStatusDialog.isNull())
-	{
-		FEditStatusDialog = new EditStatusDialog(this);
-		FEditStatusDialog->show();
-	}
-	else
-	{
-		FEditStatusDialog->show();
 	}
 }
 

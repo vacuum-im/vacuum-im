@@ -7,71 +7,65 @@
     <x>0</x>
     <y>0</y>
     <width>449</width>
-    <height>56</height>
+    <height>47</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <property name="margin">
     <number>0</number>
    </property>
    <item>
-    <widget class="QGroupBox" name="grbOptions">
-     <property name="title">
-      <string>Connection</string>
-     </property>
+    <widget class="QWidget" name="wdtSelectConnection" native="true">
      <layout class="QVBoxLayout">
       <property name="margin">
-       <number>5</number>
+       <number>0</number>
       </property>
       <item>
-       <widget class="QWidget" name="wdtSelectConnection" native="true">
-        <layout class="QVBoxLayout">
-         <property name="margin">
-          <number>0</number>
-         </property>
-         <item>
-          <layout class="QHBoxLayout">
-           <item>
-            <widget class="QLabel" name="lblConnection">
-             <property name="text">
-              <string>Connection:</string>
-             </property>
-             <property name="textFormat">
-              <enum>Qt::PlainText</enum>
-             </property>
-             <property name="buddy">
-              <cstring>cmbConnections</cstring>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QComboBox" name="cmbConnections">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <widget class="Line" name="line">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
-        </layout>
+       <layout class="QHBoxLayout" name="hblSelectConnectionLayout">
+        <item>
+         <widget class="QLabel" name="lblConnection">
+          <property name="text">
+           <string>Connection:</string>
+          </property>
+          <property name="textFormat">
+           <enum>Qt::PlainText</enum>
+          </property>
+          <property name="buddy">
+           <cstring>cmbConnections</cstring>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="cmbConnections">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="Line" name="frmHorizontalLine">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
+   <item>
+    <widget class="QWidget" name="wdtConnectionSettings" native="true"/>
+   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>cmbConnections</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

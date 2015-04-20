@@ -2,74 +2,30 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="uk" sourcelanguage="en">
 <context>
-    <name>SocksOptionsClass</name>
+    <name>SocksOptionsWidgetClass</name>
     <message>
-        <source>Disable direct connections</source>
-        <translation>Заборонити прямі підключення</translation>
+        <source>Use jabber-proxy on your server</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Port Forwarding</source>
-        <translation>Перенаправлення портів</translation>
+        <source>Use additional jabber-proxy:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Host:</source>
-        <translation>Хост:</translation>
+        <source>Allow direct incoming connections on port:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Port:</source>
-        <translation>Порт:</translation>
+        <source>Forward direct incoming connections to host:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Stream Proxy</source>
-        <translation>Проксі потоку</translation>
+        <source>Use account proxy settings for outgoing connections</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Add</source>
-        <translation>Додати</translation>
-    </message>
-    <message>
-        <source>Up</source>
-        <translation>Вгору</translation>
-    </message>
-    <message>
-        <source>Down</source>
-        <translation>Вниз</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>Видалити</translation>
-    </message>
-    <message>
-        <source>Connection Proxy</source>
-        <translation>Проксі підключення</translation>
-    </message>
-    <message>
-        <source>Use account connection proxy settings</source>
-        <translation>Використовувати настройки проксі з аккаунту</translation>
-    </message>
-    <message>
-        <source>Listening port:</source>
-        <translation>Порт, що прослуховується:</translation>
-    </message>
-    <message>
-        <source>Use proxy on account server</source>
-        <translation>Використовувати проксі на сервері аккаунту</translation>
-    </message>
-    <message>
-        <source>Outgoing Connections</source>
-        <translation>Вихідні з’єднання</translation>
-    </message>
-    <message>
-        <source>Connect timeout:</source>
-        <translation>Таймаут з’єднання:</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation>секунд</translation>
-    </message>
-    <message>
-        <source>Incoming Connections</source>
-        <translation>Вхідні з’єднання</translation>
+        <source>host:port</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

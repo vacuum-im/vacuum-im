@@ -2,6 +2,192 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ru" sourcelanguage="en">
 <context>
+    <name>ArchiveAccountOptionsWidget</name>
+    <message>
+        <source>Yes, if supported by server</source>
+        <translation>Да, если поддерживается сервером</translation>
+    </message>
+    <message>
+        <source>Yes, if other archive is not available</source>
+        <translation>Да, если другой архив недоступен</translation>
+    </message>
+    <message>
+        <source>No, do not save history on server</source>
+        <translation>Нет, не сохранять историю на сервере</translation>
+    </message>
+    <message>
+        <source>Yes, if local archive is available</source>
+        <translation>Да, если локальный архив доступен</translation>
+    </message>
+    <message>
+        <source>No, do not save history in local archive</source>
+        <translation>Нет, не сохранять историю в локальном архиве</translation>
+    </message>
+    <message>
+        <source>Yes, if available</source>
+        <translation>Да, если возможно</translation>
+    </message>
+    <message>
+        <source>Yes, if other replication method is not used</source>
+        <translation>Да, если не используется другой метод репликации</translation>
+    </message>
+    <message>
+        <source>No, do not copy local archive to the server</source>
+        <translation>Нет, не копировать локальных архив на сервер</translation>
+    </message>
+    <message>
+        <source>Save messages with formatting</source>
+        <translation>Сохранять сообщения с форматированием</translation>
+    </message>
+    <message>
+        <source>Save only messages text</source>
+        <translation>Сохранять только текст сообщений</translation>
+    </message>
+    <message>
+        <source>Do not save messages</source>
+        <translation>Не сохранять сообщения</translation>
+    </message>
+    <message>
+        <source>Allow Off-The-Record sessions</source>
+        <translation>Разрешать сессии Без-Записи-Истории</translation>
+    </message>
+    <message>
+        <source>Forbid Off-The-Record sessions</source>
+        <translation>Запрещать сессии Без-Записи-Истории</translation>
+    </message>
+    <message>
+        <source>Manually approve Off-The-Record sessions</source>
+        <translation>Подтверждать вручную сессии Без-Записи-Истории</translation>
+    </message>
+    <message>
+        <source>Waiting for host response...</source>
+        <translation>Ожидание ответа хоста...</translation>
+    </message>
+    <message>
+        <source>History preferences is not available</source>
+        <translation>Настройки истории недоступны</translation>
+    </message>
+    <message>
+        <source>Failed to save archive preferences: %1</source>
+        <translation>Не удалось сохранить настройки истории: %1</translation>
+    </message>
+    <message>
+        <source>New item preferences</source>
+        <translation>Настройки для контакта</translation>
+    </message>
+    <message>
+        <source>Enter item JID:</source>
+        <translation>Введите JID:</translation>
+    </message>
+    <message>
+        <source>Unacceptable item JID</source>
+        <translation>Некорректный JID</translation>
+    </message>
+    <message>
+        <source>&apos;%1&apos; is not valid JID or already exists</source>
+        <translation>%1 не является корректным JID или уже существует</translation>
+    </message>
+    <message>
+        <source>Preferences accepted</source>
+        <translation>Настройки сохранены</translation>
+    </message>
+</context>
+<context>
+    <name>ArchiveAccountOptionsWidgetClass</name>
+    <message>
+        <source>Auto archiving preferences</source>
+        <translation>Настройки архивирования на сервере</translation>
+    </message>
+    <message>
+        <source>Enable automatic archiving of messages on the server</source>
+        <translation>Включить автоматическое сохранение сообщений на сервере</translation>
+    </message>
+    <message>
+        <source>Archiving policy</source>
+        <translation>Политика архивирования</translation>
+    </message>
+    <message>
+        <source>Save history in a local archive?</source>
+        <translation>Сохранять историю в локальном архиве?</translation>
+    </message>
+    <message>
+        <source>Save history on server?</source>
+        <translation>Сохранять историю на сервере?</translation>
+    </message>
+    <message>
+        <source>Copy local archive to the server?</source>
+        <translation>Копировать локальный архив на сервер?</translation>
+    </message>
+    <message>
+        <source>Default archiving preferences</source>
+        <translation>Настройки по умолчанию</translation>
+    </message>
+    <message>
+        <source>Message archiving:</source>
+        <translation>Архивирование сообщений:</translation>
+    </message>
+    <message>
+        <source>Off-The-Record sessions:</source>
+        <translation>Сессии Без-Записи-Истории:</translation>
+    </message>
+    <message>
+        <source>Remove messages after, days:</source>
+        <translation>Удалять сообщения после, дней:</translation>
+    </message>
+    <message>
+        <source>(0 - do not remove)</source>
+        <translation>(0 - не удалять)</translation>
+    </message>
+    <message>
+        <source>Individual archiving preferences</source>
+        <translation>Индивидуальные настройки</translation>
+    </message>
+    <message>
+        <source>JID</source>
+        <translation>JID</translation>
+    </message>
+    <message>
+        <source>Contact identifier</source>
+        <translation>Идентификатор контакта</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>Сохранить</translation>
+    </message>
+    <message>
+        <source>Message archiving</source>
+        <translation>Архивирование сообщений</translation>
+    </message>
+    <message>
+        <source>OTR</source>
+        <translation>БЗИ</translation>
+    </message>
+    <message>
+        <source>Off-The-Record sessions </source>
+        <translation>Сессии Без-Записи-Истории</translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation>Удалить</translation>
+    </message>
+    <message>
+        <source>Remove messages after, days</source>
+        <translation>Удалять сообщения после, дней</translation>
+    </message>
+    <message>
+        <source>Exact</source>
+        <translation>Точно</translation>
+    </message>
+    <message>
+        <source>Settings are applied to contact which JID is exactly matches</source>
+        <translation>Настройки применяются для контактов чей JID в точности совпадает</translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation>Добавить</translation>
+    </message>
+</context>
+<context>
     <name>ArchiveDelegate</name>
     <message numerus="yes">
         <source>%n year(s)</source>
@@ -82,204 +268,6 @@
     <message>
         <source>Stream</source>
         <translation>Поток</translation>
-    </message>
-</context>
-<context>
-    <name>ArchiveStreamOptions</name>
-    <message>
-        <source>Waiting for host response...</source>
-        <translation>Ожидание ответа хоста...</translation>
-    </message>
-    <message>
-        <source>Preferences accepted</source>
-        <translation>Настройки сохранены</translation>
-    </message>
-    <message>
-        <source>New item preferences</source>
-        <translation>Настройки для контакта</translation>
-    </message>
-    <message>
-        <source>Enter item JID:</source>
-        <translation>Введите JID:</translation>
-    </message>
-    <message>
-        <source>Unacceptable item JID</source>
-        <translation>Некорректный JID</translation>
-    </message>
-    <message>
-        <source>&apos;%1&apos; is not valid JID or already exists</source>
-        <translation>%1 не является корректным JID или уже существует</translation>
-    </message>
-    <message>
-        <source>Yes, if supported by server</source>
-        <translation>Да, если поддерживается сервером</translation>
-    </message>
-    <message>
-        <source>Yes, if other archive is not available</source>
-        <translation>Да, если другой архив недоступен</translation>
-    </message>
-    <message>
-        <source>No, do not save history on server</source>
-        <translation>Нет, не сохранять историю на сервере</translation>
-    </message>
-    <message>
-        <source>Yes, if local archive is available</source>
-        <translation>Да, если локальный архив доступен</translation>
-    </message>
-    <message>
-        <source>No, do not save history in local archive</source>
-        <translation>Нет, не сохранять историю в локальном архиве</translation>
-    </message>
-    <message>
-        <source>Yes, if available</source>
-        <translation>Да, если возможно</translation>
-    </message>
-    <message>
-        <source>Yes, if other replication method is not used</source>
-        <translation>Да, если не используется другой метод репликации</translation>
-    </message>
-    <message>
-        <source>No, do not copy local archive to the server</source>
-        <translation>Нет, не копировать локальных архив на сервер</translation>
-    </message>
-    <message>
-        <source>Do not save messages</source>
-        <translation>Не сохранять сообщения</translation>
-    </message>
-    <message>
-        <source>Allow Off-The-Record sessions</source>
-        <translation>Разрешать сессии Без-Записи-Истории</translation>
-    </message>
-    <message>
-        <source>Forbid Off-The-Record sessions</source>
-        <translation>Запрещать сессии Без-Записи-Истории</translation>
-    </message>
-    <message>
-        <source>Manually approve Off-The-Record sessions</source>
-        <translation>Подтверждать вручную сессии Без-Записи-Истории</translation>
-    </message>
-    <message>
-        <source>History preferences is not available</source>
-        <translation>Настройки истории недоступны</translation>
-    </message>
-    <message>
-        <source>Failed to save archive preferences: %1</source>
-        <translation>Не удалось сохранить настройки истории: %1</translation>
-    </message>
-    <message>
-        <source>Save messages with formatting</source>
-        <translation>Сохранять сообщения с форматированием</translation>
-    </message>
-    <message>
-        <source>Save only messages text</source>
-        <translation>Сохранять только текст сообщений</translation>
-    </message>
-</context>
-<context>
-    <name>ArchiveStreamOptionsClass</name>
-    <message>
-        <source>Auto Archiving Preferences</source>
-        <translation>Настройки автоматического сохранения</translation>
-    </message>
-    <message>
-        <source>Enable automatic archiving of messages on the server</source>
-        <translation>Включить автоматическое сохранение сообщений на сервере</translation>
-    </message>
-    <message>
-        <source>Archiving Policy</source>
-        <translation>Политика архивирования</translation>
-    </message>
-    <message>
-        <source>Save history on server?</source>
-        <translation>Сохранять историю на сервере?</translation>
-    </message>
-    <message>
-        <source>Save history in a local archive?</source>
-        <translation>Сохранять историю в локальном архиве?</translation>
-    </message>
-    <message>
-        <source>Copy local archive to the server?</source>
-        <translation>Копировать локальный архив на сервер?</translation>
-    </message>
-    <message>
-        <source>Default Archiving Preferences</source>
-        <translation>Настройки по умолчанию</translation>
-    </message>
-    <message>
-        <source>Message archiving:</source>
-        <translation>Архивирование сообщений:</translation>
-    </message>
-    <message>
-        <source>Off-The-Record sessions:</source>
-        <translation>Сессии Без-Записи-Истории:</translation>
-    </message>
-    <message>
-        <source>Remove messages after, days:</source>
-        <translation>Удалять сообщения после, дней:</translation>
-    </message>
-    <message>
-        <source>(0 - do not remove)</source>
-        <translation>(0 - не удалять)</translation>
-    </message>
-    <message>
-        <source>Individual Archiving Preferences</source>
-        <translation>Индивидуальные настройки</translation>
-    </message>
-    <message>
-        <source>JID</source>
-        <translation>JID</translation>
-    </message>
-    <message>
-        <source>Contact identifier</source>
-        <translation>Идентификатор контакта</translation>
-    </message>
-    <message>
-        <source>Save</source>
-        <translation>Сохранить</translation>
-    </message>
-    <message>
-        <source>Message archiving</source>
-        <translation>Архивирование сообщений</translation>
-    </message>
-    <message>
-        <source>OTR</source>
-        <translation>БЗИ</translation>
-    </message>
-    <message>
-        <source>Off-The-Record sessions </source>
-        <translation>Сессии Без-Записи-Истории</translation>
-    </message>
-    <message>
-        <source>Remove</source>
-        <translation>Удалить</translation>
-    </message>
-    <message>
-        <source>Remove messages after, days</source>
-        <translation>Удалять сообщения после, дней</translation>
-    </message>
-    <message>
-        <source>Exact</source>
-        <translation>Точно</translation>
-    </message>
-    <message>
-        <source>Settings are applied to contact which JID is exactly matches</source>
-        <translation>Настройки применяются для контактов чей JID в точности совпадает</translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation>Добавить</translation>
-    </message>
-    <message>
-        <source>Duplicate messages in local archive (not recommended)</source>
-        <translation>Дублировать сообщения в локальном архиве (не рекомендуется)</translation>
-    </message>
-    <message>
-        <source>Replication Preferences</source>
-        <translation>Настройки репликации</translation>
-    </message>
-    <message>
-        <source>Synchronize history between archives</source>
-        <translation>Синхронизировать историю между архивами</translation>
     </message>
 </context>
 <context>
@@ -509,25 +497,6 @@
     </message>
 </context>
 <context>
-    <name>EngineWidget</name>
-    <message>
-        <source>Enabled</source>
-        <translation>Включено</translation>
-    </message>
-    <message>
-        <source>Disable</source>
-        <translation>Выключить</translation>
-    </message>
-    <message>
-        <source>Enable</source>
-        <translation>Включить</translation>
-    </message>
-    <message>
-        <source>Disabled</source>
-        <translation>Выключено</translation>
-    </message>
-</context>
-<context>
     <name>MessageArchiver</name>
     <message>
         <source>History</source>
@@ -623,10 +592,6 @@
         <translation>Ctrl+H</translation>
     </message>
     <message>
-        <source>Terminate Off-The-Record session</source>
-        <translation>Завершить сессию без записи истории</translation>
-    </message>
-    <message>
         <source>Allows to save the history of communications</source>
         <translation>Позволяет сохранять историю общения</translation>
     </message>
@@ -653,18 +618,6 @@
     <message>
         <source>Use Default Options</source>
         <translation>Использовать настройки по умолчанию</translation>
-    </message>
-    <message>
-        <source>Enable message archiving</source>
-        <translation>Включить архивирование сообщений</translation>
-    </message>
-    <message>
-        <source>Disable message archiving</source>
-        <translation>Выключить архивирование сообщений</translation>
-    </message>
-    <message>
-        <source>Start Off-The-Record session</source>
-        <translation>Начать сессию Без-Записи-Истории</translation>
     </message>
     <message>
         <source>Off-The-Record session not ready, please wait...</source>
@@ -701,6 +654,26 @@
     <message>
         <source>Failed to load archive modifications</source>
         <translation>Не удалось загрузить список изменений в архиве</translation>
+    </message>
+    <message>
+        <source>Archive preferences</source>
+        <translation>Настройки истории</translation>
+    </message>
+    <message>
+        <source>Archive synchronization</source>
+        <translation>Синхронизация истории</translation>
+    </message>
+    <message>
+        <source>Synchronize history between archives</source>
+        <translation>Синхронизировать историю между архивами</translation>
+    </message>
+    <message>
+        <source>Duplicate messages in local archive (not recommended)</source>
+        <translation>Дублировать сообщения в локальном архиве (не рекомендуется)</translation>
+    </message>
+    <message>
+        <source>Used history archives</source>
+        <translation>Используемые архивы истории</translation>
     </message>
 </context>
 </TS>

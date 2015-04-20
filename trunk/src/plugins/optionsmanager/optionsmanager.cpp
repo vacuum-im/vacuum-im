@@ -1,5 +1,6 @@
 #include "optionsmanager.h"
 
+#include <QLocale>
 #include <QProcess>
 #include <QSettings>
 #include <QFileInfo>
@@ -15,10 +16,8 @@
 #include <definitions/optionnodeorders.h>
 #include <definitions/optionwidgetorders.h>
 #include <definitions/version.h>
-#include <definitions/shortcuts.h>
 #include <utils/widgetmanager.h>
 #include <utils/filestorage.h>
-#include <utils/shortcuts.h>
 #include <utils/action.h>
 #include <utils/logger.h>
 
@@ -91,9 +90,6 @@ bool OptionsManager::initConnections(IPluginManager *APluginManager, int &AInitO
 
 bool OptionsManager::initObjects()
 {
-	Shortcuts::declareShortcut(SCT_APP_CHANGEPROFILE, tr("Show change profile dialog"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
-	Shortcuts::declareShortcut(SCT_APP_SHOWOPTIONS, tr("Show options dialog"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
-
 	FProfilesDir.setPath(FPluginManager->homePath());
 	if (!FProfilesDir.exists(DIR_PROFILES))
 		FProfilesDir.mkdir(DIR_PROFILES);
@@ -102,13 +98,11 @@ bool OptionsManager::initObjects()
 	FChangeProfileAction = new Action(this);
 	FChangeProfileAction->setText(tr("Change Profile"));
 	FChangeProfileAction->setIcon(RSR_STORAGE_MENUICONS,MNI_OPTIONS_PROFILES);
-	FChangeProfileAction->setShortcutId(SCT_APP_CHANGEPROFILE);
 	connect(FChangeProfileAction,SIGNAL(triggered(bool)),SLOT(onChangeProfileByAction(bool)));
 
 	FShowOptionsDialogAction = new Action(this);
 	FShowOptionsDialogAction->setText(tr("Options"));
 	FShowOptionsDialogAction->setIcon(RSR_STORAGE_MENUICONS,MNI_OPTIONS_DIALOG);
-	FShowOptionsDialogAction->setShortcutId(SCT_APP_SHOWOPTIONS);
 	FShowOptionsDialogAction->setEnabled(false);
 	connect(FShowOptionsDialogAction,SIGNAL(triggered(bool)),SLOT(onShowOptionsDialogByAction(bool)));
 
@@ -129,14 +123,19 @@ bool OptionsManager::initObjects()
 
 bool OptionsManager::initSettings()
 {
-	Options::setDefaultValue(OPV_MISC_AUTOSTART, false);
+	Options::setDefaultValue(OPV_COMMON_AUTOSTART,false);
+	Options::setDefaultValue(OPV_COMMON_LANGUAGE,QString());
 
 	if (profiles().count() == 0)
 		addProfile(DEFAULT_PROFILE, QString::null);
 
-	IOptionsDialogNode dnode = { ONO_MISC, OPN_MISC, tr("Misc"), MNI_OPTIONS_DIALOG };
-	insertOptionsDialogNode(dnode);
-	insertOptionsHolder(this);
+	IOptionsDialogNode commonNode = { ONO_COMMON, OPN_COMMON, MNI_OPTIONS_DIALOG, tr("Common") };
+	insertOptionsDialogNode(commonNode);
+
+	IOptionsDialogNode appearanceNode = { ONO_APPEARANCE, OPN_APPEARANCE, MNI_OPTIONS_APPEARANCE, tr("Appearance") };
+	insertOptionsDialogNode(appearanceNode);
+
+	insertOptionsDialogHolder(this);
 
 	return true;
 }
@@ -156,16 +155,41 @@ bool OptionsManager::startPlugin()
 	return true;
 }
 
-QMultiMap<int, IOptionsWidget *> OptionsManager::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+QMultiMap<int, IOptionsDialogWidget *> OptionsManager::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	QMultiMap<int, IOptionsWidget *> widgets;
-	if (ANodeId == OPN_MISC)
+	QMultiMap<int, IOptionsDialogWidget *> widgets;
+	if (ANodeId == OPN_COMMON)
 	{
+		widgets.insertMulti(OHO_COMMON_SETTINGS, newOptionsDialogHeader(tr("Common settings"),AParent));
 #ifdef Q_WS_WIN
-		widgets.insertMulti(OWO_MISC_AUTOSTART, optionsNodeWidget(Options::node(OPV_MISC_AUTOSTART), tr("Auto run on system startup"), AParent));
+		widgets.insertMulti(OWO_COMMON_AUTOSTART, newOptionsDialogWidget(Options::node(OPV_COMMON_AUTOSTART), tr("Auto run application on system startup"), AParent));
 #else
 		Q_UNUSED(AParent);
 #endif
+
+		widgets.insertMulti(OHO_COMMON_LOCALIZATION, newOptionsDialogHeader(tr("Localization"),AParent));
+
+		QDir localeDir(QApplication::applicationDirPath());
+		localeDir.cd(TRANSLATIONS_DIR);
+
+		QComboBox *langCombox = new QComboBox(AParent);
+		langCombox->addItem(tr("<System Language>"),QString());
+		foreach(QString name, localeDir.entryList(QDir::Dirs,QDir::LocaleAware))
+		{
+			QLocale locale(name);
+			if (locale.language() != QLocale::C)
+			{
+				QString langName = locale.nativeLanguageName();
+				QString countryName = locale.nativeCountryName();
+				if (!langName.isEmpty() && !countryName.isEmpty())
+				{
+					langName[0] = langName[0].toUpper();
+					countryName[0] = countryName[0].toUpper();
+					langCombox->addItem(QString("%1 (%2)").arg(langName,countryName),locale.name());
+				}
+			}
+		}
+		widgets.insertMulti(OWO_COMMON_LANGUAGE,newOptionsDialogWidget(Options::node(OPV_COMMON_LANGUAGE),tr("Language:"),langCombox,AParent));
 	}
 	return widgets;
 }
@@ -476,26 +500,26 @@ QDialog *OptionsManager::showEditProfilesDialog(QWidget *AParent)
 	return FEditProfilesDialog;
 }
 
-QList<IOptionsHolder *> OptionsManager::optionsHolders() const
+QList<IOptionsDialogHolder *> OptionsManager::optionsDialogHolders() const
 {
 	return FOptionsHolders;
 }
 
-void OptionsManager::insertOptionsHolder(IOptionsHolder *AHolder)
+void OptionsManager::insertOptionsDialogHolder(IOptionsDialogHolder *AHolder)
 {
 	if (!FOptionsHolders.contains(AHolder))
 	{
 		FOptionsHolders.append(AHolder);
-		emit optionsHolderInserted(AHolder);
+		emit optionsDialogHolderInserted(AHolder);
 	}
 }
 
-void OptionsManager::removeOptionsHolder(IOptionsHolder *AHolder)
+void OptionsManager::removeOptionsDialogHolder(IOptionsDialogHolder *AHolder)
 {
 	if (FOptionsHolders.contains(AHolder))
 	{
 		FOptionsHolders.removeAll(AHolder);
-		emit optionsHolderRemoved(AHolder);
+		emit optionsDialogHolderRemoved(AHolder);
 	}
 }
 
@@ -528,30 +552,36 @@ void OptionsManager::removeOptionsDialogNode(const QString &ANodeId)
 	}
 }
 
-QDialog *OptionsManager::showOptionsDialog(const QString &ANodeId, QWidget *AParent)
+QDialog *OptionsManager::showOptionsDialog(const QString &ANodeId, const QString &ARootId, QWidget *AParent)
 {
 	if (isOpened())
 	{
-		if (FOptionsDialog.isNull())
+		QPointer<OptionsDialog> &dialog = FOptionDialogs[ARootId];
+		if (dialog.isNull())
 		{
-			FOptionsDialog = new OptionsDialog(this,AParent);
-			connect(FOptionsDialog,SIGNAL(applied()),SLOT(onOptionsDialogApplied()),Qt::QueuedConnection);
+			dialog = new OptionsDialog(this,ARootId,AParent);
+			connect(dialog,SIGNAL(applied()),SLOT(onOptionsDialogApplied()),Qt::QueuedConnection);
 		}
-		FOptionsDialog->showNode(ANodeId);
-		FOptionsDialog->showNode(ANodeId.isNull() ? Options::node(OPV_MISC_OPTIONS_DIALOG_LASTNODE).value().toString() : ANodeId);
-		WidgetManager::showActivateRaiseWindow(FOptionsDialog);
+		dialog->showNode(ANodeId.isNull() ? Options::fileValue("options.dialog.last-node",ARootId).toString() : ANodeId);
+		WidgetManager::showActivateRaiseWindow(dialog);
+		return dialog;
 	}
-	return FOptionsDialog;
+	return NULL;
 }
 
-IOptionsWidget *OptionsManager::optionsHeaderWidget(const QString &ACaption, QWidget *AParent) const
+IOptionsDialogWidget *OptionsManager::newOptionsDialogHeader(const QString &ACaption, QWidget *AParent) const
 {
-	return new OptionsHeader(ACaption,AParent);
+	return new OptionsDialogHeader(ACaption,AParent);
 }
 
-IOptionsWidget *OptionsManager::optionsNodeWidget(const OptionsNode &ANode, const QString &ACaption, QWidget *AParent) const
+IOptionsDialogWidget *OptionsManager::newOptionsDialogWidget(const OptionsNode &ANode, const QString &ACaption, QWidget *AParent) const
 {
-	return new OptionsWidget(ANode, ACaption, AParent);
+	return new OptionsDialogWidget(ANode, ACaption, AParent);
+}
+
+IOptionsDialogWidget *OptionsManager::newOptionsDialogWidget(const OptionsNode &ANode, const QString &ACaption, QWidget *AEditor, QWidget *AParent) const
+{
+	return new OptionsDialogWidget(ANode,ACaption,AEditor,AParent);
 }
 
 void OptionsManager::closeProfile()
@@ -562,11 +592,7 @@ void OptionsManager::closeProfile()
 		emit profileClosed(currentProfile());
 
 		FAutoSaveTimer.stop();
-		if (!FOptionsDialog.isNull())
-		{
-			FOptionsDialog->reject();
-			delete FOptionsDialog;
-		}
+		qDeleteAll(FOptionDialogs);
 		FShowOptionsDialogAction->setEnabled(false);
 
 		Options::setOptions(QDomDocument(), QString::null, QByteArray());
@@ -748,18 +774,22 @@ void OptionsManager::updateOptionDefaults(const QMap<QString, QVariant> &AOption
 
 void OptionsManager::onOptionsChanged(const OptionsNode &ANode)
 {
-	if (ANode.path() == OPV_MISC_AUTOSTART)
+	if (ANode.path() == OPV_COMMON_AUTOSTART)
 	{
 #ifdef Q_WS_WIN
 		QSettings reg("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
 		if (ANode.value().toBool())
-			reg.setValue(CLIENT_NAME, QDir::toNativeSeparators(QApplication::applicationFilePath()));
+			reg.setValue(CLIENT_NAME, QApplication::arguments().join(" "));
 		else
 			reg.remove(CLIENT_NAME);
-		//Remove old client name
-		reg.remove("Vacuum IM");
 #endif
 	}
+	else if (ANode.path() == OPV_COMMON_LANGUAGE)
+	{
+		QLocale locale(ANode.value().toString());
+		FPluginManager->setLocale(locale.language(),locale.country());
+	}
+
 	LOG_DEBUG(QString("Options node value changed, node=%1, value=%2").arg(ANode.path(),ANode.value().toString()));
 }
 

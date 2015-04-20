@@ -9,6 +9,7 @@
 #include <QContextMenuEvent>
 #include <definitions/toolbargroups.h>
 #include <utils/textmanager.h>
+#include <utils/pluginhelper.h>
 
 #define ADR_STREAM_JID           Action::DR_StreamJid
 #define ADR_CONTACT_JID          Action::DR_Parametr1
@@ -19,6 +20,8 @@ InfoWidget::InfoWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow
 
 	FWindow = AWindow;
 	FMessageWidgets = AMessageWidgets;
+
+	FAvatars = PluginHelper::pluginInstance<IAvatars>();
 
 	FAddressMenuVisible = false;
 	ui.lblAvatar->setVisible(false);
@@ -46,7 +49,6 @@ InfoWidget::InfoWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow
 	FAddressMenu = new Menu(this);
 	connect(FAddressMenu,SIGNAL(aboutToShow()),SLOT(onAddressMenuAboutToShow()));
 
-	initialize();
 	onUpdateInfoToolBarVisibility();
 }
 
@@ -135,15 +137,6 @@ void InfoWidget::setFieldValue(int AField, const QVariant &AValue)
 ToolBarChanger *InfoWidget::infoToolBarChanger() const
 {
 	return FInfoToolBar;
-}
-
-void InfoWidget::initialize()
-{
-	FAvatars = NULL;
-
-	IPlugin *plugin = FMessageWidgets->pluginManager()->pluginInterface("IAvatars").value(0);
-	if (plugin)
-		FAvatars = qobject_cast<IAvatars *>(plugin->instance());
 }
 
 void InfoWidget::updateFieldView(int AField)

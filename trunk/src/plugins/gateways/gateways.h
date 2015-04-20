@@ -6,11 +6,11 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/igateways.h>
 #include <interfaces/istanzaprocessor.h>
-#include <interfaces/iroster.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/irostermanager.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/irosterchanger.h>
 #include <interfaces/irostersview.h>
-#include <interfaces/ivcard.h>
+#include <interfaces/ivcardmanager.h>
 #include <interfaces/iprivatestorage.h>
 #include <interfaces/istatusicons.h>
 #include <interfaces/iregistraton.h>
@@ -69,13 +69,12 @@ protected slots:
 	void onKeepActionTriggered(bool);
 	void onChangeActionTriggered(bool);
 	void onRemoveActionTriggered(bool);
-	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
 	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onPresenceOpened(IPresence *APresence);
 	void onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline);
 	void onPresenceClosed(IPresence *APresence);
-	void onPresenceRemoved(IPresence *APresence);
+	void onPresenceActiveChanged(IPresence *APresence, bool AActive);
 	void onRosterOpened(IRoster *ARoster);
 	void onRosterSubscriptionReceived(IRoster *ARoster, const Jid &AItemJid, int ASubsType, const QString &AText);
 	void onRosterStreamJidAboutToBeChanged(IRoster *ARoster, const Jid &AAfter);
@@ -92,11 +91,11 @@ protected slots:
 private:
 	IServiceDiscovery *FDiscovery;
 	IStanzaProcessor *FStanzaProcessor;
-	IRosterPlugin *FRosterPlugin;
-	IPresencePlugin *FPresencePlugin;
+	IRosterManager *FRosterManager;
+	IPresenceManager *FPresenceManager;
 	IRosterChanger *FRosterChanger;
 	IRostersViewPlugin *FRostersViewPlugin;
-	IVCardPlugin *FVCardPlugin;
+	IVCardManager *FVCardManager;
 	IPrivateStorage *FPrivateStorage;
 	IStatusIcons *FStatusIcons;
 	IRegistration *FRegistration;

@@ -4,13 +4,13 @@
 #include <QDir>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iavatars.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <interfaces/istanzaprocessor.h>
-#include <interfaces/ivcard.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/ivcardmanager.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/irostersmodel.h>
-#include <interfaces/ioptionsmanager.h>
+#include <utils/options.h>
 
 class Avatars :
 	public QObject,
@@ -19,11 +19,10 @@ class Avatars :
 	public IStanzaHandler,
 	public IStanzaRequestOwner,
 	public IRosterDataHolder,
-	public IRostersLabelHolder,
-	public IOptionsHolder
+	public IRostersLabelHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IAvatars IStanzaHandler IRosterDataHolder IRostersLabelHolder IStanzaRequestOwner IOptionsHolder);
+	Q_INTERFACES(IPlugin IAvatars IStanzaHandler IRosterDataHolder IRostersLabelHolder IStanzaRequestOwner);
 public:
 	Avatars();
 	~Avatars();
@@ -46,8 +45,6 @@ public:
 	//IRostersLabelHolder
 	virtual QList<quint32> rosterLabels(int AOrder, const IRosterIndex *AIndex) const;
 	virtual AdvancedDelegateItem rosterLabel(int AOrder, quint32 ALabelId, const IRosterIndex *AIndex) const;
-	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//IAvatars
 	virtual QString avatarHash(const Jid &AContactJid) const;
 	virtual bool hasAvatar(const QString &AHash) const;
@@ -75,8 +72,8 @@ protected:
 	bool updateIqAvatar(const Jid &AContactJid, const QString &AHash);
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 protected slots:
-	void onStreamOpened(IXmppStream *AXmppStream);
-	void onStreamClosed(IXmppStream *AXmppStream);
+	void onXmppStreamOpened(IXmppStream *AXmppStream);
+	void onXmppStreamClosed(IXmppStream *AXmppStream);
 	void onVCardChanged(const Jid &AContactJid);
 	void onRosterIndexInserted(IRosterIndex *AIndex);
 	void onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
@@ -90,13 +87,12 @@ protected slots:
 	void onOptionsChanged(const OptionsNode &ANode);
 private:
 	IPluginManager *FPluginManager;
-	IXmppStreams *FXmppStreams;
+	IXmppStreamManager *FXmppStreamManager;
 	IStanzaProcessor *FStanzaProcessor;
-	IVCardPlugin *FVCardPlugin;
-	IPresencePlugin *FPresencePlugin;
+	IVCardManager *FVCardManager;
+	IPresenceManager *FPresenceManager;
 	IRostersModel *FRostersModel;
 	IRostersViewPlugin *FRostersViewPlugin;
-	IOptionsManager *FOptionsManager;
 private:
 	QMap<Jid, int> FSHIPresenceIn;
 	QMap<Jid, int> FSHIPresenceOut;
@@ -109,17 +105,15 @@ private:
 private:
 	QSize FAvatarSize;
 	bool FAvatarsVisible;
-	bool FShowEmptyAvatars;
-	bool FShowGrayAvatars;
 	QMap<Jid, QString> FCustomPictures;
 private:
 	quint32 FAvatarLabelId;
 	QDir FAvatarsDir;
 	QImage FEmptyAvatar;
-	QImage FGrayEmptyAvatar;
+	QImage FEmptyGrayAvatar;
 	QMap<Jid, QString> FStreamAvatars;
 	mutable QHash<QString, QMap<QSize,QImage> > FAvatarImages;
-	mutable QHash<QString, QMap<QSize,QImage> > FGrayAvatarImages;
+	mutable QHash<QString, QMap<QSize,QImage> > FAvatarGrayImages;
 };
 
 #endif // AVATARS_H

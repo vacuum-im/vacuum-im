@@ -28,10 +28,6 @@
         <translation>Ya existe un flujo de dato con el mismo ID</translation>
     </message>
     <message>
-        <source>Data Streams</source>
-        <translation>Flujos de dato</translation>
-    </message>
-    <message>
         <source>&lt;Default Profile&gt;</source>
         <translation>&lt;Perfil por defecto&gt;</translation>
     </message>
@@ -47,43 +43,13 @@
         <source>Invalid stream initiation response</source>
         <translation>Respuesta de iniciación de flujo inválida</translation>
     </message>
-</context>
-<context>
-    <name>DataStreamsOptions</name>
     <message>
-        <source>Add Profile</source>
-        <translation>Añadir perfil</translation>
+        <source>Data Transfer</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enter profile name:</source>
-        <translation>Entrar el nombre del perfil:</translation>
-    </message>
-    <message>
-        <source>Delete Profile</source>
-        <translation>Eliminar perfil</translation>
-    </message>
-    <message>
-        <source>Do you really want to delete a current data streams profile?</source>
-        <translation>¿Realmente deseas eliminar el perfil actual de flujo de datos?</translation>
-    </message>
-</context>
-<context>
-    <name>DataStreamsOptionsClass</name>
-    <message>
-        <source>Data Streams Profiles</source>
-        <translation>Perfiles de flujos de dato</translation>
-    </message>
-    <message>
-        <source>Profile:</source>
-        <translation>Perfil:</translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation>Añadir</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>Eliminar</translation>
+        <source>Transfer method %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

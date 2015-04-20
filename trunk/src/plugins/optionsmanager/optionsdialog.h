@@ -22,7 +22,7 @@ class OptionsDialog :
 {
 	Q_OBJECT;
 public:
-	OptionsDialog(IOptionsManager *AOptionsManager, QWidget *AParent = NULL);
+	OptionsDialog(IOptionsManager *AOptionsManager, const QString &ARootId = QString::null, QWidget *AParent = NULL);
 	~OptionsDialog();
 public:
 	void showNode(const QString &ANodeId);
@@ -31,13 +31,13 @@ signals:
 	void reseted();
 protected:
 	QWidget *createNodeWidget(const QString &ANodeId);
-	QStandardItem *createNodeItem(const QString &ANodeId);
+	QStandardItem *getNodeModelItem(const QString &ANodeId);
 	bool canExpandVertically(const QWidget *AWidget) const;
 protected slots:
+	void onOptionsWidgetModified();
 	void onOptionsDialogNodeInserted(const IOptionsDialogNode &ANode);
 	void onOptionsDialogNodeRemoved(const IOptionsDialogNode &ANode);
 	void onCurrentItemChanged(const QModelIndex &ACurrent, const QModelIndex &APrevious);
-	void onOptionsWidgetModified();
 	void onDialogButtonClicked(QAbstractButton *AButton);
 private:
 	Ui::OptionsDialogClass ui;
@@ -47,6 +47,7 @@ private:
 	QStandardItemModel *FItemsModel;
 	SortFilterProxyModel *FProxyModel;
 private:
+	QString FRootNodeId;
 	QObjectCleanupHandler FCleanupHandler;
 	QMap<QString, QStandardItem *> FNodeItems;
 	QMap<QStandardItem *, QWidget *> FItemWidgets;

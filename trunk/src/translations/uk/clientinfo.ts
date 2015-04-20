@@ -60,16 +60,16 @@
         <translation>Час простою</translation>
     </message>
     <message>
-        <source>Share information about OS version</source>
-        <translation>Показувати інформацію про версію ОС</translation>
-    </message>
-    <message>
         <source>XMPP Ping</source>
         <translation>Пінг</translation>
     </message>
     <message>
         <source>Supports the exchanging of the application-level pings over XML streams</source>
         <translation>Підтримує обмін ping-ами на рівні програми через XMPP-з&apos;єднання</translation>
+    </message>
+    <message>
+        <source>Share information about your OS version</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

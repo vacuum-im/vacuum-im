@@ -2,11 +2,8 @@
 
 #include <definitions/namespaces.h>
 #include <definitions/xmppfeatureorders.h>
-#include <definitions/xmppfeaturepluginorders.h>
+#include <definitions/xmppfeaturefactoryorders.h>
 #include <definitions/discofeaturehandlerorders.h>
-#include <definitions/optionvalues.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionwidgetorders.h>
 #include <definitions/dataformtypes.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
@@ -19,19 +16,17 @@
 
 #define REGISTRATION_TIMEOUT    30000
 
-#define ADR_StreamJid           Action::DR_StreamJid
-#define ADR_ServiceJid          Action::DR_Parametr1
-#define ADR_Operation           Action::DR_Parametr2
+#define ADR_STREAM_JID          Action::DR_StreamJid
+#define ADR_SERVICE_JID         Action::DR_Parametr1
+#define ADR_OPERATION           Action::DR_Parametr2
 
 Registration::Registration()
 {
 	FDataForms = NULL;
-	FXmppStreams = NULL;
+	FXmppStreamManager = NULL;
 	FStanzaProcessor = NULL;
 	FDiscovery = NULL;
-	FPresencePlugin = NULL;
-	FOptionsManager = NULL;
-	FAccountManager = NULL;
+	FPresenceManager = NULL;
 	FXmppUriQueries = NULL;
 }
 
@@ -73,10 +68,10 @@ bool Registration::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
 	}
 
-	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IPresenceManager").value(0,NULL);
 	if (plugin)
 	{
-		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
+		FPresenceManager = qobject_cast<IPresenceManager *>(plugin->instance());
 	}
 
 	plugin = APluginManager->pluginInterface("IXmppUriQueries").value(0,NULL);
@@ -85,22 +80,10 @@ bool Registration::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		FXmppUriQueries = qobject_cast<IXmppUriQueries *>(plugin->instance());
 	}
 
-	plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IXmppStreamManager").value(0,NULL);
 	if (plugin)
 	{
-		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-	}
-
-	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
-	if (plugin)
-	{
-		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
-	}
-
-	plugin = APluginManager->pluginInterface("IAccountManager").value(0,NULL);
-	if (plugin)
-	{
-		FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
+		FXmppStreamManager = qobject_cast<IXmppStreamManager *>(plugin->instance());
 	}
 
 	return FStanzaProcessor!=NULL && FDataForms!=NULL;
@@ -108,14 +91,14 @@ bool Registration::initConnections(IPluginManager *APluginManager, int &AInitOrd
 
 bool Registration::initObjects()
 {
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_REGISTER_INVALID_FORM,tr("Invalid registration form"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_REGISTER_INVALID_DIALOG,tr("Invalid registration dialog"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_REGISTER_UNSUPPORTED,tr("Registration is not supported"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_REGISTER_INVALID_FIELDS,tr("Invalid registration fields"));
 	XmppError::registerError(NS_INTERNAL_ERROR,IERR_REGISTER_REJECTED_BY_USER,tr("Registration rejected by user"));
 
-	if (FXmppStreams)
+	if (FXmppStreamManager)
 	{
-		FXmppStreams->registerXmppFeature(XFO_REGISTER,NS_FEATURE_REGISTER);
-		FXmppStreams->registerXmppFeaturePlugin(XFPO_DEFAULT,NS_FEATURE_REGISTER,this);
+		FXmppStreamManager->registerXmppFeature(XFO_REGISTER,NS_FEATURE_REGISTER);
+		FXmppStreamManager->registerXmppFeatureFactory(XFFO_DEFAULT,NS_FEATURE_REGISTER,this);
 	}
 	if (FDiscovery)
 	{
@@ -135,74 +118,25 @@ bool Registration::initObjects()
 
 bool Registration::initSettings()
 {
-	Options::setDefaultValue(OPV_ACCOUNT_REGISTER,false);
-	if (FOptionsManager)
-	{
-		FOptionsManager->insertOptionsHolder(this);
-	}
 	return true;
 }
 
 void Registration::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 {
-	Q_UNUSED(AStreamJid);
 	XmppStanzaError err = AStanza.type()!="result" ? XmppStanzaError(AStanza) : XmppStanzaError::null;
 
 	if (FSendRequests.contains(AStanza.id()))
 	{
-		QDomElement query = AStanza.firstElement("query",NS_JABBER_REGISTER);
-
-		QDomElement formElem = query.firstChildElement("x");
-		while (!formElem.isNull() && (formElem.namespaceURI()!=NS_JABBER_DATA || formElem.attribute("type",DATAFORM_TYPE_FORM)!=DATAFORM_TYPE_FORM))
-			formElem = formElem.nextSiblingElement("x");
-
-		if (AStanza.type()=="result" || !formElem.isNull())
+		QDomElement queryElem = AStanza.firstElement("query",NS_JABBER_REGISTER);
+		IRegisterFields fields = readFields(AStanza.from(),queryElem);
+		if (AStanza.type()=="result" || (fields.fieldMask & IRegisterFields::Form)>0)
 		{
 			LOG_STRM_INFO(AStreamJid,QString("Registration fields loaded, from=%1, id=%2").arg(AStanza.from(),AStanza.id()));
-
-			IRegisterFields fields;
-			fields.fieldMask = 0;
-			fields.registered = !query.firstChildElement("registered").isNull();
-			fields.serviceJid = AStanza.from();
-			fields.instructions = query.firstChildElement("instructions").text();
-			if (!query.firstChildElement("username").isNull())
-			{
-				fields.fieldMask += IRegisterFields::Username;
-				fields.username = query.firstChildElement("username").text();
-			}
-			else if (!query.firstChildElement("name").isNull())
-			{
-				fields.fieldMask += IRegisterFields::Username;
-				fields.username = query.firstChildElement("name").text();
-			}
-			if (!query.firstChildElement("password").isNull())
-			{
-				fields.fieldMask += IRegisterFields::Password;
-				fields.password = query.firstChildElement("password").text();
-			}
-			if (!query.firstChildElement("email").isNull())
-			{
-				fields.fieldMask += IRegisterFields::Email;
-				fields.email = query.firstChildElement("email").text();
-			}
-			fields.key = query.firstChildElement("key").text();
-
-			if (FDataForms)
-				fields.form = FDataForms->dataForm(formElem);
-
-			QDomElement oob = query.firstChildElement("x");
-			while (!oob.isNull() && oob.namespaceURI()!=NS_JABBER_OOB)
-				oob = oob.nextSiblingElement("x");
-			if (!oob.isNull())
-			{
-				fields.fieldMask += IRegisterFields::URL;
-				fields.url = oob.firstChildElement("url").text();
-			}
 			emit registerFields(AStanza.id(),fields);
 		}
 		else
 		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to load registration fields from=%1, id=%2").arg(AStanza.from(),AStanza.id()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to load registration fields from=%1, id=%2: %3").arg(AStanza.from(),AStanza.id(),err.condition()));
 			emit registerError(AStanza.id(),err);
 		}
 		FSendRequests.removeAll(AStanza.id());
@@ -212,7 +146,7 @@ void Registration::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 		if (AStanza.type()=="result")
 		{
 			LOG_STRM_INFO(AStreamJid,QString("Registration submit accepted, from=%1, id=%2").arg(AStanza.from(),AStanza.id()));
-			emit registerSuccessful(AStanza.id());
+			emit registerSuccess(AStanza.id());
 		}
 		else
 		{
@@ -227,31 +161,22 @@ bool Registration::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, co
 {
 	Q_UNUSED(AParams);
 	if (AAction == "register")
-	{
-		showRegisterDialog(AStreamJid,AContactJid,IRegistration::Register,NULL);
-		return true;
-	}
+		return showRegisterDialog(AStreamJid,AContactJid,IRegistration::Register,NULL)!=NULL;
 	else if (AAction == "unregister")
-	{
-		showRegisterDialog(AStreamJid,AContactJid,IRegistration::Unregister,NULL);
-		return true;
-	}
+		return showRegisterDialog(AStreamJid,AContactJid,IRegistration::Unregister,NULL)!=NULL;
 	return false;
 }
 
 bool Registration::execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo)
 {
 	if (AFeature == NS_JABBER_REGISTER)
-	{
-		showRegisterDialog(AStreamJid,ADiscoInfo.contactJid,IRegistration::Register,NULL);
-		return true;
-	}
+		return showRegisterDialog(AStreamJid,ADiscoInfo.contactJid,IRegistration::Register,NULL)!=NULL;
 	return false;
 }
 
 Action *Registration::createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent)
 {
-	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
+	IPresence *presence = FPresenceManager!=NULL ? FPresenceManager->findPresence(AStreamJid) : NULL;
 	if (presence && presence->isOpen() && AFeature==NS_JABBER_REGISTER)
 	{
 		Menu *regMenu = new Menu(AParent);
@@ -261,27 +186,27 @@ Action *Registration::createDiscoFeatureAction(const Jid &AStreamJid, const QStr
 		Action *action = new Action(regMenu);
 		action->setText(tr("Register"));
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_REGISTRATION);
-		action->setData(ADR_StreamJid,AStreamJid.full());
-		action->setData(ADR_ServiceJid,ADiscoInfo.contactJid.full());
-		action->setData(ADR_Operation,IRegistration::Register);
+		action->setData(ADR_STREAM_JID,AStreamJid.full());
+		action->setData(ADR_SERVICE_JID,ADiscoInfo.contactJid.full());
+		action->setData(ADR_OPERATION,IRegistration::Register);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onRegisterActionTriggered(bool)));
 		regMenu->addAction(action,AG_DEFAULT,false);
 
 		action = new Action(regMenu);
 		action->setText(tr("Unregister"));
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_REGISTRATION_REMOVE);
-		action->setData(ADR_StreamJid,AStreamJid.full());
-		action->setData(ADR_ServiceJid,ADiscoInfo.contactJid.full());
-		action->setData(ADR_Operation,IRegistration::Unregister);
+		action->setData(ADR_STREAM_JID,AStreamJid.full());
+		action->setData(ADR_SERVICE_JID,ADiscoInfo.contactJid.full());
+		action->setData(ADR_OPERATION,IRegistration::Unregister);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onRegisterActionTriggered(bool)));
 		regMenu->addAction(action,AG_DEFAULT,false);
 
 		action = new Action(regMenu);
 		action->setText(tr("Change password"));
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_REGISTRATION_CHANGE);
-		action->setData(ADR_StreamJid,AStreamJid.full());
-		action->setData(ADR_ServiceJid,ADiscoInfo.contactJid.full());
-		action->setData(ADR_Operation,IRegistration::ChangePassword);
+		action->setData(ADR_STREAM_JID,AStreamJid.full());
+		action->setData(ADR_SERVICE_JID,ADiscoInfo.contactJid.full());
+		action->setData(ADR_OPERATION,IRegistration::ChangePassword);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onRegisterActionTriggered(bool)));
 		regMenu->addAction(action,AG_DEFAULT,false);
 
@@ -297,31 +222,21 @@ QList<QString> Registration::xmppFeatures() const
 
 IXmppFeature *Registration::newXmppFeature(const QString &AFeatureNS, IXmppStream *AXmppStream)
 {
-	if (AFeatureNS == NS_FEATURE_REGISTER)
+	if (AFeatureNS==NS_FEATURE_REGISTER && FStreamRegisterId.contains(AXmppStream) && !FStreamFeatures.contains(AXmppStream))
 	{
-		IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AXmppStream->streamJid()) : NULL;
-		if (account && account->optionsNode().value("register-on-server").toBool())
-		{
-			LOG_STRM_INFO(AXmppStream->streamJid(),"Registration XMPP stream feature created");
-			IXmppFeature *feature = new RegisterStream(FDataForms, AXmppStream);
-			connect(feature->instance(),SIGNAL(featureDestroyed()),SLOT(onXmppFeatureDestroyed()));
-			emit featureCreated(feature);
-			account->optionsNode().setValue(false,"register-on-server");
-			return feature;
-		}
+		LOG_INFO(QString("XMPP account registration feature created, server=%1").arg(AXmppStream->streamJid().pDomain()));
+
+		RegisterFeature *feature = new RegisterFeature(AXmppStream);
+		connect(feature->instance(),SIGNAL(registerFields(const IRegisterFields &)),SLOT(onXmppFeatureFields(const IRegisterFields &)));
+		connect(feature->instance(),SIGNAL(finished(bool)),SLOT(onXmppFeatureFinished(bool)));
+		connect(feature->instance(),SIGNAL(featureDestroyed()),SLOT(onXmppFeatureDestroyed()));
+
+		FStreamFeatures.insert(AXmppStream,feature);
+		emit featureCreated(feature);
+
+		return feature;
 	}
 	return NULL;
-}
-
-QMultiMap<int, IOptionsWidget *> Registration::optionsWidgets(const QString &ANodeId, QWidget *AParent)
-{
-	QMultiMap<int, IOptionsWidget *> widgets;
-	QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
-	if (FOptionsManager && nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS)
-	{
-		widgets.insertMulti(OWO_ACCOUNT_REGISTER, FOptionsManager->optionsNodeWidget(Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1)).node("register-on-server"),tr("Register new account on server"),AParent));
-	}
-	return widgets;
 }
 
 IDataFormLocale Registration::dataFormLocale(const QString &AFormType)
@@ -347,6 +262,39 @@ IDataFormLocale Registration::dataFormLocale(const QString &AFormType)
 	return locale;
 }
 
+QString Registration::startStreamRegistration(IXmppStream *AXmppStream)
+{
+	if (AXmppStream!=NULL && !FStreamRegisterId.contains(AXmppStream) && AXmppStream->open())
+	{
+		LOG_INFO(QString("XMPP account registration started, server=%1").arg(AXmppStream->streamJid().pDomain()));
+
+		QString id = QUuid::createUuid().toString();
+		FStreamRegisterId.insert(AXmppStream,id);
+
+		connect(AXmppStream->instance(),SIGNAL(opened()),SLOT(onXmppStreamOpened()));
+		connect(AXmppStream->instance(),SIGNAL(closed()),SLOT(onXmppStreamClosed()));
+		connect(AXmppStream->instance(),SIGNAL(error(const XmppError &)),SLOT(onXmppStreamError(const XmppError &)));
+
+		return id;
+	}
+	else if (AXmppStream != NULL)
+	{
+		LOG_ERROR(QString("Failed to create XMPP account registration feature, server=%1").arg(AXmppStream->streamJid().pDomain()));
+	}
+	return QString::null;
+}
+
+QString Registration::submitStreamRegistration(IXmppStream *AXmppStream, const IRegisterSubmit &ASubmit)
+{
+	RegisterFeature *feature = FStreamFeatures.value(AXmppStream);
+	if (feature != NULL)
+	{
+		if (feature->sendSubmit(ASubmit))
+			return FStreamRegisterId.value(feature->xmppStream());
+	}
+	return QString::null;
+}
+
 QString Registration::sendRegisterRequest(const Jid &AStreamJid, const Jid &AServiceJid)
 {
 	if (FStanzaProcessor && AStreamJid.isValid() && AServiceJid.isValid())
@@ -356,14 +304,18 @@ QString Registration::sendRegisterRequest(const Jid &AStreamJid, const Jid &ASer
 		request.addElement("query",NS_JABBER_REGISTER);
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,REGISTRATION_TIMEOUT))
 		{
-			LOG_STRM_INFO(AStreamJid,QString("Registration fields request sent, to=%1, id=%2").arg(AStreamJid.full(),request.id()));
+			LOG_STRM_INFO(AStreamJid,QString("Registration register request sent, to=%1, id=%2").arg(AStreamJid.full(),request.id()));
 			FSendRequests.append(request.id());
 			return request.id();
 		}
 		else
 		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to send registration fields request, to=%1, id=%2").arg(AServiceJid.full(),request.id()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to send registration register request, to=%1, id=%2").arg(AServiceJid.full(),request.id()));
 		}
+	}
+	else if (FStanzaProcessor)
+	{
+		REPORT_ERROR("Failed to send registration register request: Invalid parameters");
 	}
 	return QString::null;
 }
@@ -377,14 +329,18 @@ QString Registration::sendUnregisterRequest(const Jid &AStreamJid, const Jid &AS
 		request.addElement("query",NS_JABBER_REGISTER).appendChild(request.createElement("remove"));
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,REGISTRATION_TIMEOUT))
 		{
-			LOG_STRM_INFO(AStreamJid,QString("Unregistration submit request sent, to=%1, id=%2").arg(AStreamJid.full(),request.id()));
+			LOG_STRM_INFO(AStreamJid,QString("Registration unregister request sent, to=%1, id=%2").arg(AStreamJid.full(),request.id()));
 			FSubmitRequests.append(request.id());
 			return request.id();
 		}
 		else
 		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to send unregistration submit request, to=%1").arg(AStreamJid.full()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to send registration unregister request, to=%1").arg(AStreamJid.full()));
 		}
+	}
+	else if (FStanzaProcessor)
+	{
+		REPORT_ERROR("Failed to send registration unregister request: Invalid parameters");
 	}
 	return QString::null;
 }
@@ -400,40 +356,31 @@ QString Registration::sendChangePasswordRequest(const Jid &AStreamJid, const Jid
 		elem.appendChild(request.createElement("password")).appendChild(request.createTextNode(APassword));
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,REGISTRATION_TIMEOUT))
 		{
-			LOG_STRM_INFO(AStreamJid,QString("Change password registration submit request sent, to=%1, id=%2").arg(AServiceJid.full(),request.id()));
+			LOG_STRM_INFO(AStreamJid,QString("Registration change password request sent, to=%1, id=%2").arg(AServiceJid.full(),request.id()));
 			FSubmitRequests.append(request.id());
 			return request.id();
 		}
 		else
 		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to send change password registration submit request, to=%1").arg(AServiceJid.full()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to send registration change password request, to=%1").arg(AServiceJid.full()));
 		}
+	}
+	else if (FStanzaProcessor)
+	{
+		REPORT_ERROR("Failed to send registration change password request: Invalid parameters");
 	}
 	return QString::null;
 }
 
-QString Registration::sendSubmit(const Jid &AStreamJid, const IRegisterSubmit &ASubmit)
+QString Registration::sendRequestSubmit(const Jid &AStreamJid, const IRegisterSubmit &ASubmit)
 {
 	if (FStanzaProcessor && AStreamJid.isValid())
 	{
 		Stanza request("iq");
 		request.setTo(ASubmit.serviceJid.full()).setType("set").setId(FStanzaProcessor->newId());
-		QDomElement query = request.addElement("query",NS_JABBER_REGISTER);
-		if (ASubmit.form.type.isEmpty())
-		{
-			if (!ASubmit.username.isEmpty())
-				query.appendChild(request.createElement("username")).appendChild(request.createTextNode(ASubmit.username));
-			if (!ASubmit.password.isEmpty())
-				query.appendChild(request.createElement("password")).appendChild(request.createTextNode(ASubmit.password));
-			if (!ASubmit.email.isEmpty())
-				query.appendChild(request.createElement("email")).appendChild(request.createTextNode(ASubmit.email));
-			if (!ASubmit.key.isEmpty())
-				query.appendChild(request.createElement("key")).appendChild(request.createTextNode(ASubmit.key));
-		}
-		else if (FDataForms)
-		{
-			FDataForms->xmlForm(ASubmit.form,query);
-		}
+
+		QDomElement queryElem = request.addElement("query",NS_JABBER_REGISTER);
+		writeSubmit(queryElem,ASubmit);
 
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,REGISTRATION_TIMEOUT))
 		{
@@ -446,20 +393,24 @@ QString Registration::sendSubmit(const Jid &AStreamJid, const IRegisterSubmit &A
 			LOG_STRM_WARNING(AStreamJid,QString("Failed to send registration submit request, to=%1, id=%2").arg(ASubmit.serviceJid.full(),request.id()));
 		}
 	}
+	else if (FStanzaProcessor)
+	{
+		REPORT_ERROR("Failed to send registration submit request: Invalid parameters");
+	}
 	return QString::null;
 }
 
-bool Registration::showRegisterDialog(const Jid &AStreamJid, const Jid &AServiceJid, int AOperation, QWidget *AParent)
+QDialog *Registration::showRegisterDialog(const Jid &AStreamJid, const Jid &AServiceJid, int AOperation, QWidget *AParent)
 {
-	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
+	IPresence *presence = FPresenceManager!=NULL ? FPresenceManager->findPresence(AStreamJid) : NULL;
 	if (presence && presence->isOpen())
 	{
 		RegisterDialog *dialog = new RegisterDialog(this,FDataForms,AStreamJid,AServiceJid,AOperation,AParent);
 		connect(presence->instance(),SIGNAL(closed()),dialog,SLOT(reject()));
 		dialog->show();
-		return true;
+		return dialog;
 	}
-	return false;
+	return NULL;
 }
 
 void Registration::registerDiscoFeatures()
@@ -473,25 +424,177 @@ void Registration::registerDiscoFeatures()
 	FDiscovery->insertDiscoFeature(dfeature);
 }
 
-void Registration::onRegisterActionTriggered(bool)
+IRegisterFields Registration::readFields(const Jid &AServiceJid, const QDomElement &AQuery) const
 {
-	Action *action = qobject_cast<Action *>(sender());
-	if (action)
+	IRegisterFields fields;
+	fields.serviceJid = AServiceJid;
+	fields.registered = !AQuery.firstChildElement("registered").isNull();
+	fields.instructions = AQuery.firstChildElement("instructions").text();
+	fields.key = AQuery.firstChildElement("key").text();
+
+	fields.fieldMask = 0;
+	if (!AQuery.firstChildElement("username").isNull())
 	{
-		Jid streamJid = action->data(ADR_StreamJid).toString();
-		Jid serviceJid = action->data(ADR_ServiceJid).toString();
-		int operation = action->data(ADR_Operation).toInt();
-		showRegisterDialog(streamJid,serviceJid,operation,NULL);
+		fields.fieldMask |= IRegisterFields::Username;
+		fields.username = AQuery.firstChildElement("username").text();
+	}
+	else if (!AQuery.firstChildElement("name").isNull())
+	{
+		fields.fieldMask |= IRegisterFields::Username;
+		fields.username = AQuery.firstChildElement("name").text();
+	}
+	if (!AQuery.firstChildElement("password").isNull())
+	{
+		fields.fieldMask |= IRegisterFields::Password;
+		fields.password = AQuery.firstChildElement("password").text();
+	}
+	if (!AQuery.firstChildElement("email").isNull())
+	{
+		fields.fieldMask |= IRegisterFields::Email;
+		fields.email = AQuery.firstChildElement("email").text();
+	}
+
+	QDomElement oob = AQuery.firstChildElement("x");
+	while (!oob.isNull())
+	{
+		if (oob.namespaceURI() == NS_JABBER_OOB)
+		{
+			fields.fieldMask |= IRegisterFields::Redirect;
+			fields.redirect = oob.firstChildElement("url").text();
+			break;
+		}
+		oob = oob.nextSiblingElement("x");
+	}
+
+	QDomElement formElem = AQuery.firstChildElement("x");
+	while (FDataForms!=NULL && !formElem.isNull())
+	{
+		if (formElem.namespaceURI()==NS_JABBER_DATA && formElem.attribute("type",DATAFORM_TYPE_FORM)==DATAFORM_TYPE_FORM)
+		{
+			fields.fieldMask |= IRegisterFields::Form;
+			fields.form = FDataForms->dataForm(formElem);
+			break;
+		}
+		formElem = formElem.nextSiblingElement("x");
+	}
+
+	return fields;
+}
+
+bool Registration::writeSubmit(QDomElement &AQuery, const IRegisterSubmit &ASubmit) const
+{
+	if ((ASubmit.fieldMask & IRegisterFields::Form) == 0)
+	{
+		QDomDocument doc = AQuery.ownerDocument();
+		if (ASubmit.fieldMask & IRegisterFields::Username)
+			AQuery.appendChild(doc.createElement("username")).appendChild(doc.createTextNode(ASubmit.username));
+		if (ASubmit.fieldMask & IRegisterFields::Password)
+			AQuery.appendChild(doc.createElement("password")).appendChild(doc.createTextNode(ASubmit.password));
+		if (ASubmit.fieldMask & IRegisterFields::Email)
+			AQuery.appendChild(doc.createElement("email")).appendChild(doc.createTextNode(ASubmit.email));
+		if (!ASubmit.key.isEmpty())
+			AQuery.appendChild(doc.createElement("key")).appendChild(doc.createTextNode(ASubmit.key));
+		return true;
+	}
+	else if (FDataForms)
+	{
+		FDataForms->xmlForm(ASubmit.form,AQuery);
+		return true;
+	}
+	return false;
+}
+
+void Registration::onXmppFeatureFields(const IRegisterFields &AFields)
+{
+	RegisterFeature *feature = qobject_cast<RegisterFeature *>(sender());
+	if (feature != NULL)
+	{
+		QString registerId = FStreamRegisterId.value(feature->xmppStream());
+		emit registerFields(registerId,AFields);
+	}
+}
+
+void Registration::onXmppFeatureFinished(bool ARestart)
+{
+	Q_UNUSED(ARestart);
+	RegisterFeature *feature = qobject_cast<RegisterFeature *>(sender());
+	if (feature != NULL)
+	{
+		IRegisterSubmit submit = feature->sentSubmit();
+		QString username = submit.username;
+		QString password = submit.password;
+		if (FDataForms && (submit.fieldMask & IRegisterFields::Form)>0)
+		{
+			username = FDataForms->fieldValue("username",submit.form.fields).toString();
+			password = FDataForms->fieldValue("password",submit.form.fields).toString();
+		}
+
+		IXmppStream *xmppStream = feature->xmppStream();
+		xmppStream->setStreamJid(Jid(username,submit.serviceJid.domain(),"Registration"));
+		xmppStream->setPassword(password);
 	}
 }
 
 void Registration::onXmppFeatureDestroyed()
 {
-	IXmppFeature *feature = qobject_cast<IXmppFeature *>(sender());
+	RegisterFeature *feature = qobject_cast<RegisterFeature *>(sender());
 	if (feature)
 	{
-		LOG_STRM_INFO(feature->xmppStream()->streamJid(),"Registration XMPP stream feature destroyed");
+		LOG_INFO(QString("XMPP account registration feature destroyed, server=%1").arg(feature->xmppStream()->streamJid().pDomain()));
 		emit featureDestroyed(feature);
+	}
+}
+
+void Registration::onXmppStreamOpened()
+{
+	IXmppStream *xmppStream = qobject_cast<IXmppStream *>(sender());
+	if (FStreamRegisterId.contains(xmppStream))
+	{
+		QString registerId = FStreamRegisterId.value(xmppStream);
+		if (FStreamFeatures.contains(xmppStream))
+			emit registerSuccess(registerId);
+		else
+			emit registerError(registerId,XmppError(IERR_REGISTER_UNSUPPORTED));
+		xmppStream->close();
+	}
+}
+
+void Registration::onXmppStreamClosed()
+{
+	IXmppStream *xmppStream = qobject_cast<IXmppStream *>(sender());
+	if (xmppStream)
+	{
+		disconnect(xmppStream->instance());
+		FStreamFeatures.remove(xmppStream);
+		FStreamRegisterId.remove(xmppStream);
+	}
+}
+
+void Registration::onXmppStreamError(const XmppError &AError)
+{
+	IXmppStream *xmppStream = qobject_cast<IXmppStream *>(sender());
+	if (FStreamRegisterId.contains(xmppStream))
+	{
+		QString registerId = FStreamRegisterId.value(xmppStream);
+		RegisterFeature *feature = FStreamFeatures.value(xmppStream);
+		if (feature!=NULL && feature->isFinished())
+			emit registerSuccess(registerId);
+		else if (feature!=NULL || AError.errorNs()!=NS_XMPP_SASL_ERROR)
+			emit registerError(registerId,AError);
+		else
+			emit registerError(registerId,XmppError(IERR_REGISTER_UNSUPPORTED));
+	}
+}
+
+void Registration::onRegisterActionTriggered(bool)
+{
+	Action *action = qobject_cast<Action *>(sender());
+	if (action)
+	{
+		Jid streamJid = action->data(ADR_STREAM_JID).toString();
+		Jid serviceJid = action->data(ADR_SERVICE_JID).toString();
+		int operation = action->data(ADR_OPERATION).toInt();
+		showRegisterDialog(streamJid,serviceJid,operation,NULL);
 	}
 }
 

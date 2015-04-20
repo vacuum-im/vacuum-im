@@ -53,15 +53,17 @@ public:
 	//ISocksStream
 	virtual int connectTimeout() const;
 	virtual void setConnectTimeout(int ATimeout);
-	virtual bool isDirectConnectionsDisabled() const;
-	virtual void setDirectConnectionsDisabled(bool ADisabled);
-	virtual QString forwardHost() const;
-	virtual quint16 forwardPort() const;
-	virtual void setForwardAddress(const QString &AHost, quint16 APort);
+	virtual bool isDirectConnectionEnabled() const;
+	virtual void setDirectConnectionEnabled(bool AEnabled);
+	virtual bool isDerectConnectionForwardEnabled() const;
+	virtual void setDirectConnectionForwardEnabled(bool AEnabled);
+	virtual QString directConnectionForwardHost() const;
+	virtual quint16 directConnectionForwardPort() const;
+	virtual void setDirectConnectionForwardAddress(const QString &AHost, quint16 APort);
 	virtual QNetworkProxy networkProxy() const;
 	virtual void setNetworkProxy(const QNetworkProxy &AProxy);
-	virtual QList<QString> proxyList() const;
-	virtual void setProxyList(const QList<QString> &AProxyList);
+	virtual QList<QString> streamProxyList() const;
+	virtual void setStreamProxyList(const QList<QString> &AProxyList);
 signals:
 	void stateChanged(int AState);
 	void propertiesChanged();
@@ -110,7 +112,8 @@ private:
 	QString FStreamId;
 private:
 	int FConnectTimeout;
-	bool FDirectConnectDisabled;
+	bool FDirectEnabled;
+	bool FForwardEnabled;
 	QString FForwardHost;
 	quint16 FForwardPort;
 	QList<QString> FProxyList;

@@ -48,8 +48,8 @@ public:
 	virtual IPlugin *pluginInstance(const QUuid &AUuid) const =0;
 	virtual QList<IPlugin *> pluginInterface(const QString &AInterface = QString::null) const =0;
 	virtual const IPluginInfo *pluginInfo(const QUuid &AUuid) const =0;
-	virtual QList<QUuid> pluginDependencesOn(const QUuid &AUuid) const =0;
-	virtual QList<QUuid> pluginDependencesFor(const QUuid &AUuid) const =0;
+	virtual QSet<QUuid> pluginDependencesOn(const QUuid &AUuid) const =0;
+	virtual QSet<QUuid> pluginDependencesFor(const QUuid &AUuid) const =0;
 public slots:
 	virtual void quit() =0;
 	virtual void restart() =0;
@@ -61,6 +61,6 @@ protected:
 };
 
 Q_DECLARE_INTERFACE(IPlugin,"Vacuum.Core.IPlugin/1.0")
-Q_DECLARE_INTERFACE(IPluginManager,"Vacuum.Core.IPluginManager/1.1")
+Q_DECLARE_INTERFACE(IPluginManager,"Vacuum.Core.IPluginManager/1.2")
 
 #endif

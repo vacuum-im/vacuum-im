@@ -1,10 +1,9 @@
-FORMS = editstatusdialog.ui \
-        modifystatusdialog.ui 
+FORMS = modifystatusdialog.ui
 
 HEADERS = statuschanger.h \
-          editstatusdialog.h \
-          modifystatusdialog.h 
+          modifystatusdialog.h \
+          statusoptionswidget.h
 
 SOURCES = statuschanger.cpp \
-          editstatusdialog.cpp \
-          modifystatusdialog.cpp 
+          modifystatusdialog.cpp \
+          statusoptionswidget.cpp

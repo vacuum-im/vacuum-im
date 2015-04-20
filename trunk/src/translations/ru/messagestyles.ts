@@ -2,23 +2,7 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ru" sourcelanguage="en">
 <context>
-    <name>MessageStyles</name>
-    <message>
-        <source>Message Styles</source>
-        <translation>Стили сообщений</translation>
-    </message>
-    <message>
-        <source>d MMM yyyy hh:mm</source>
-        <translation>d MMM yyyy hh:mm</translation>
-    </message>
-    <message>
-        <source>d MMM hh:mm</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>hh:mm:ss</source>
-        <translation>hh:mm:ss</translation>
-    </message>
+    <name>MessageStyleManager</name>
     <message>
         <source>Message Styles Manager</source>
         <translation>Диспетчер стилей сообщений</translation>
@@ -28,8 +12,12 @@
         <translation>Позволяет использовать различные стили для отображения сообщений</translation>
     </message>
     <message>
-        <source>Show date separators in chat window</source>
-        <translation>Показывать разделители дат в окне чата</translation>
+        <source>Messages styles</source>
+        <translation>Стили сообщений</translation>
+    </message>
+    <message>
+        <source>Show date separators in message window</source>
+        <translation>Показывать разделители дат в окнах сообщений</translation>
     </message>
     <message>
         <source>January</source>
@@ -119,16 +107,36 @@
         <source>%1, %2 dd, yyyy</source>
         <translation>%1, dd %2, yyyy</translation>
     </message>
-</context>
-<context>
-    <name>StyleOptionsWidget</name>
     <message>
-        <source>Chat</source>
-        <translation>Чат</translation>
+        <source>d MMM yyyy hh:mm</source>
+        <translation>d MMM yyyy hh:mm</translation>
     </message>
     <message>
-        <source>Conference</source>
-        <translation>Конференция</translation>
+        <source>d MMM hh:mm</source>
+        <translation>d MMM hh:mm</translation>
+    </message>
+    <message>
+        <source>hh:mm:ss</source>
+        <translation>hh:mm:ss</translation>
+    </message>
+</context>
+<context>
+    <name>StyleEditOptionsDialog</name>
+    <message>
+        <source>Preview</source>
+        <translation>Предпросмотр</translation>
+    </message>
+    <message>
+        <source>Message Style - %1 - %2</source>
+        <translation>Стить сообщения - %1 - %2</translation>
+    </message>
+    <message>
+        <source>Receiver</source>
+        <translation>Получатель</translation>
+    </message>
+    <message>
+        <source>Sender</source>
+        <translation>Отправитель</translation>
     </message>
     <message>
         <source>The message with a error code %1 is received</source>
@@ -171,7 +179,7 @@
         <translation>Исходящее статус-сообщение</translation>
     </message>
     <message>
-        <source>Groupchat topic</source>
+        <source>Conference topic</source>
         <translation>Тема конференции</translation>
     </message>
     <message>
@@ -198,36 +206,36 @@
         <source>Outgoing consecutive message</source>
         <translation>Исходящее последовательное сообщение</translation>
     </message>
-    <message>
-        <source>Receiver</source>
-        <translation>Получатель</translation>
-    </message>
-    <message>
-        <source>Sender</source>
-        <translation>Отправитель</translation>
-    </message>
-    <message>
-        <source>Single</source>
-        <translation>Сообщение</translation>
-    </message>
-    <message>
-        <source>Headline</source>
-        <translation>Новость</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation>Ошибка</translation>
-    </message>
 </context>
 <context>
-    <name>StyleOptionsWidgetClass</name>
+    <name>StyleSelectOptionsWidget</name>
     <message>
-        <source>Message type:</source>
-        <translation>Тип сообщения:</translation>
+        <source>Chat:</source>
+        <translation>Чат:</translation>
     </message>
     <message>
-        <source>Style engine:</source>
-        <translation>Тип стиля:</translation>
+        <source>Conference:</source>
+        <translation>Конференция:</translation>
+    </message>
+    <message>
+        <source>Message:</source>
+        <translation>Сообщение:</translation>
+    </message>
+    <message>
+        <source>Headline:</source>
+        <translation>Новость:</translation>
+    </message>
+    <message>
+        <source>Error:</source>
+        <translation>Ошибка:</translation>
+    </message>
+    <message>
+        <source>Unknown:</source>
+        <translation>Неизвестно:</translation>
+    </message>
+    <message>
+        <source>Settings...</source>
+        <translation>Настройки...</translation>
     </message>
 </context>
 </TS>

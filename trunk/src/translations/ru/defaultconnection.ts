@@ -20,10 +20,6 @@
         <translation>Разрешать только доверенные</translation>
     </message>
     <message>
-        <source>Auto Select</source>
-        <translation>Выбрать автоматически</translation>
-    </message>
-    <message>
         <source>TLSv1</source>
         <translation>TLSv1</translation>
     </message>
@@ -34,6 +30,10 @@
     <message>
         <source>SSLv2</source>
         <translation>SSLv2</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>Автоматически</translation>
     </message>
 </context>
 <context>
@@ -51,23 +51,31 @@
         <translation>Использовать устаревшее SSL подключение</translation>
     </message>
     <message>
-        <source>Certificate check mode:</source>
-        <translation>Режим проверки сертификата:</translation>
-    </message>
-    <message>
         <source>SSL Protocol:</source>
         <translation>SSL протокол:</translation>
     </message>
+    <message>
+        <source>Certificate:</source>
+        <translation>Сертификат:</translation>
+    </message>
 </context>
 <context>
-    <name>DefaultConnectionPlugin</name>
+    <name>DefaultConnectionEngine</name>
+    <message>
+        <source>Default Connection</source>
+        <translation>Стандартное подключение</translation>
+    </message>
     <message>
         <source>Allows to set a standard TCP connection to Jabber server</source>
         <translation>Позволяет установить стандартное TCP подключение к серверу</translation>
     </message>
     <message>
-        <source>Default Connection</source>
-        <translation>Стандартное соединение</translation>
+        <source>Host certificate is not in trusted list</source>
+        <translation>Сертификат хоста не находится в списке доверенных</translation>
+    </message>
+    <message>
+        <source>Name: %1</source>
+        <translation>Имя: %1</translation>
     </message>
     <message>
         <source>Organization: %1</source>
@@ -88,30 +96,6 @@
     <message>
         <source>State/Province: %1</source>
         <translation>Штат/Провинция: %1</translation>
-    </message>
-    <message>
-        <source>SSL Authentication Error</source>
-        <translation>Ошибка SSL авторизации</translation>
-    </message>
-    <message>
-        <source>Disconnect</source>
-        <translation>Отключиться</translation>
-    </message>
-    <message>
-        <source>Connect Once</source>
-        <translation>Подключиться один раз</translation>
-    </message>
-    <message>
-        <source>Connect Always</source>
-        <translation>Подключаться всегда</translation>
-    </message>
-    <message>
-        <source>Connection to &lt;b&gt;%1&lt;/b&gt; can not be considered completely safe due to errors in servers certificate check:</source>
-        <translation>Подключение к &lt;b&gt;%1&lt;/b&gt; не может считаться полностью безопасным из-за ошибок при проверке сетификата сервера:</translation>
-    </message>
-    <message>
-        <source>Name: %1</source>
-        <translation>Имя: %1</translation>
     </message>
     <message>
         <source>Certificate holder:</source>
@@ -138,8 +122,24 @@
         <translation>Серийный номер: %1</translation>
     </message>
     <message>
-        <source>Host certificate is not in trusted list</source>
-        <translation>Сертификат хоста не находится в списке доверенных</translation>
+        <source>SSL Authentication Error</source>
+        <translation>Ошибка SSL авторизации</translation>
+    </message>
+    <message>
+        <source>Connection to &lt;b&gt;%1&lt;/b&gt; can not be considered completely safe due to errors in servers certificate check:</source>
+        <translation>Подключение к &lt;b&gt;%1&lt;/b&gt; не может считаться полностью безопасным из-за ошибок при проверке сетификата сервера:</translation>
+    </message>
+    <message>
+        <source>Disconnect</source>
+        <translation>Отключиться</translation>
+    </message>
+    <message>
+        <source>Connect Once</source>
+        <translation>Подключиться один раз</translation>
+    </message>
+    <message>
+        <source>Connect Always</source>
+        <translation>Подключаться всегда</translation>
     </message>
 </context>
 </TS>

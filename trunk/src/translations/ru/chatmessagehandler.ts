@@ -41,14 +41,6 @@
         <translation>Return</translation>
     </message>
     <message>
-        <source>Clear window</source>
-        <translation>Очистить окно</translation>
-    </message>
-    <message>
-        <source>Load messages from history in new chat windows</source>
-        <translation>Загружать предыдущие сообщения при открытии окна чата</translation>
-    </message>
-    <message>
         <source>When receiving new chat message</source>
         <translation>При получении нового чат сообщения</translation>
     </message>
@@ -67,10 +59,6 @@
     <message>
         <source>&lt;Absent&gt;</source>
         <translation>&lt;Отсутствует&gt;</translation>
-    </message>
-    <message>
-        <source>When receiving new chat message in current chat window</source>
-        <translation>При получении нового сообщения в активное окно чата</translation>
     </message>
 </context>
 </TS>

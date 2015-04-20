@@ -28,10 +28,6 @@
         <translation>Stream with same ID already exists</translation>
     </message>
     <message>
-        <source>Data Streams</source>
-        <translation>Data Streams</translation>
-    </message>
-    <message>
         <source>&lt;Default Profile&gt;</source>
         <translation>&lt;Default Profile&gt;</translation>
     </message>
@@ -47,43 +43,13 @@
         <source>Invalid stream initiation response</source>
         <translation>Invalid stream initiation response</translation>
     </message>
-</context>
-<context>
-    <name>DataStreamsOptions</name>
     <message>
-        <source>Add Profile</source>
-        <translation>Add Profile</translation>
+        <source>Data Transfer</source>
+        <translation>Data Transfer</translation>
     </message>
     <message>
-        <source>Enter profile name:</source>
-        <translation>Enter profile name:</translation>
-    </message>
-    <message>
-        <source>Delete Profile</source>
-        <translation>Delete Profile</translation>
-    </message>
-    <message>
-        <source>Do you really want to delete a current data streams profile?</source>
-        <translation>Do you really want to delete a current data streams profile?</translation>
-    </message>
-</context>
-<context>
-    <name>DataStreamsOptionsClass</name>
-    <message>
-        <source>Data Streams Profiles</source>
-        <translation>Data Streams Profiles</translation>
-    </message>
-    <message>
-        <source>Profile:</source>
-        <translation>Profile:</translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation>Add</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>Delete</translation>
+        <source>Transfer method %1</source>
+        <translation>Transfer method %1</translation>
     </message>
 </context>
 </TS>

@@ -45,13 +45,14 @@ protected:
 	virtual void sslErrorsOccured(const QList<QSslError> &AErrors) =0;
 };
 
-class IDefaultConnectionPlugin
+class IDefaultConnectionEngine :
+	public IConnectionEngine
 {
 public:
 	virtual QObject *instance() =0;
 };
 
 Q_DECLARE_INTERFACE(IDefaultConnection,"Vacuum.Plugin.IDefaultConnection/1.2")
-Q_DECLARE_INTERFACE(IDefaultConnectionPlugin,"Vacuum.Plugin.IDefaultConnectionPlugin/1.2")
+Q_DECLARE_INTERFACE(IDefaultConnectionEngine,"Vacuum.Plugin.IDefaultConnectionEngine/1.3")
 
 #endif // IDEFAULTCONNECTION_H

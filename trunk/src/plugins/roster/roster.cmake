@@ -1,2 +1,2 @@
-set(SOURCES roster.cpp rosterplugin.cpp )
-set(HEADERS roster.h rosterplugin.h )
+set(SOURCES roster.cpp rostermanager.cpp )
+set(HEADERS roster.h rostermanager.h )

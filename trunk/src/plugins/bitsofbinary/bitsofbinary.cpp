@@ -22,7 +22,7 @@
 BitsOfBinary::BitsOfBinary()
 {
 	FPluginManager = NULL;
-	FXmppStreams = NULL;
+	FXmppStreamManager = NULL;
 	FStanzaProcessor = NULL;
 	FDiscovery = NULL;
 
@@ -57,12 +57,12 @@ bool BitsOfBinary::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 	}
 	
-	plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IXmppStreamManager").value(0,NULL);
 	if (plugin)
 	{
-		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-		if (FXmppStreams)
-			connect(FXmppStreams->instance(),SIGNAL(created(IXmppStream *)),SLOT(onXmppStreamCreated(IXmppStream *)));
+		FXmppStreamManager = qobject_cast<IXmppStreamManager *>(plugin->instance());
+		if (FXmppStreamManager)
+			connect(FXmppStreamManager->instance(),SIGNAL(streamCreated(IXmppStream *)),SLOT(onXmppStreamCreated(IXmppStream *)));
 	}
 
 	plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
@@ -71,7 +71,7 @@ bool BitsOfBinary::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
 	}
 
-	return FStanzaProcessor!=NULL && FXmppStreams!=NULL;
+	return FStanzaProcessor!=NULL && FXmppStreamManager!=NULL;
 }
 
 bool BitsOfBinary::initObjects()

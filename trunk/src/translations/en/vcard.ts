@@ -231,36 +231,23 @@
     </message>
 </context>
 <context>
-    <name>VCardPlugin</name>
-    <message>
-        <source>Allows to obtain personal contact information</source>
-        <translation>Allows to obtain personal contact information</translation>
-    </message>
-    <message>
-        <source>Supports the requesting of the personal contact information</source>
-        <translation>Supports the requesting of the personal contact information</translation>
-    </message>
+    <name>VCardManager</name>
     <message>
         <source>Visit Card Manager</source>
         <translation>Visit Card Manager</translation>
     </message>
     <message>
-        <source>Show Profile</source>
-        <translation>Show Profile</translation>
+        <source>Allows to obtain personal contact information</source>
+        <translation>Allows to obtain personal contact information</translation>
+    </message>
+    <message>
+        <source>Show contact profile</source>
+        <translation>Show contact profile</translation>
     </message>
     <message>
         <source>Ctrl+I</source>
-        <comment>Show Profile</comment>
-        <translatorcomment>Показать личные данные</translatorcomment>
+        <comment>Show contact profile</comment>
         <translation>Ctrl+I</translation>
-    </message>
-    <message>
-        <source>Contact Profile</source>
-        <translation>Contact Profile</translation>
-    </message>
-    <message>
-        <source>Edit Profile</source>
-        <translation>Edit Profile</translation>
     </message>
     <message>
         <source>User Profile</source>
@@ -269,6 +256,22 @@
     <message>
         <source>Restrict maximum vCard images size</source>
         <translation>Restrict maximum vCard images size</translation>
+    </message>
+    <message>
+        <source>Contact Profile</source>
+        <translation>Contact Profile</translation>
+    </message>
+    <message>
+        <source>Supports the requesting of the personal contact information</source>
+        <translation>Supports the requesting of the personal contact information</translation>
+    </message>
+    <message>
+        <source>Show Profile</source>
+        <translation>Show Profile</translation>
+    </message>
+    <message>
+        <source>Edit Profile</source>
+        <translation>Edit Profile</translation>
     </message>
 </context>
 </TS>

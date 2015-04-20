@@ -23,7 +23,7 @@ protected:
 	void doChangePassword();
 protected slots:
 	void onRegisterFields(const QString &AId, const IRegisterFields &AFields);
-	void onRegisterSuccessful(const QString &AId);
+	void onRegisterSuccess(const QString &AId);
 	void onRegisterError(const QString &AId, const XmppError &AError);
 	void onDialogButtonsClicked(QAbstractButton *AButton);
 private:

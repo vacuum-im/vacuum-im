@@ -3,10 +3,13 @@
 
 // AccountManager
 #define OPV_ACCOUNT_ROOT                                "accounts"
+#define OPV_ACCOUNT_DEFAULTRESOURCE                     "accounts.default-resource"
 #define OPV_ACCOUNT_ITEM                                "accounts.account"
+#define OPV_ACCOUNT_ORDER                               "accounts.account.order"
 #define OPV_ACCOUNT_NAME                                "accounts.account.name"
 #define OPV_ACCOUNT_ACTIVE                              "accounts.account.active"
 #define OPV_ACCOUNT_STREAMJID                           "accounts.account.streamJid"
+#define OPV_ACCOUNT_RESOURCE                            "accounts.account.resource"
 #define OPV_ACCOUNT_PASSWORD                            "accounts.account.password"
 #define OPV_ACCOUNT_REQUIREENCRYPTION                   "accounts.account.require-encryption"
 // ConnectionManager
@@ -19,8 +22,6 @@
 #define OPV_ACCOUNT_CONNECTION_SSLPROTOCOL              "accounts.account.connection.ssl-protocol"
 #define OPV_ACCOUNT_CONNECTION_USELEGACYSSL             "accounts.account.connection.use-legacy-ssl"
 #define OPV_ACCOUNT_CONNECTION_CERTVERIFYMODE           "accounts.account.connection.cert-verify-mode"
-// Registration
-#define OPV_ACCOUNT_REGISTER                            "accounts.account.register-on-server"
 // StatusChanger
 #define OPV_ACCOUNT_AUTOCONNECT                         "accounts.account.auto-connect"
 #define OPV_ACCOUNT_AUTORECONNECT                       "accounts.account.auto-reconnect"
@@ -30,6 +31,9 @@
 #define OPV_ACCOUNT_IGNOREAUTOJOIN                      "accounts.account.ignore-autojoin"
 // Compress
 #define OPV_ACCOUNT_STREAMCOMPRESS                      "accounts.account.stream-compress"
+// MessageArchiver
+#define OPV_ACCOUNT_HISTORYREPLICATE                    "accounts.account.history-replicate"
+#define OPV_ACCOUNT_HISTORYDUPLICATE                    "accounts.account.history-duplicate"
 
 // BirthdayReminder
 #define OPV_BIRTHDAYREMINDER_STARTTIME                  "birthdayreminder.start-time"
@@ -56,13 +60,14 @@
 // SocksStreams
 #define OPV_DATASTREAMS_SOCKSLISTENPORT                 "datastreams.socks-listen-port"
 #define OPV_DATASTREAMS_METHOD_CONNECTTIMEOUT           "datastreams.settings-profile.method.connect-timeout"
-#define OPV_DATASTREAMS_METHOD_DISABLEDIRECT            "datastreams.settings-profile.method.disable-direct-connections"
-#define OPV_DATASTREAMS_METHOD_FORWARDHOST              "datastreams.settings-profile.method.forward-host"
-#define OPV_DATASTREAMS_METHOD_FORWARDPORT              "datastreams.settings-profile.method.forward-port"
+#define OPV_DATASTREAMS_METHOD_ENABLEDIRECT             "datastreams.settings-profile.method.enable-direct-connections"
+#define OPV_DATASTREAMS_METHOD_ENABLEFORWARD            "datastreams.settings-profile.method.enable-forward-direct"
+#define OPV_DATASTREAMS_METHOD_FORWARDADDRESS           "datastreams.settings-profile.method.forward-direct-address"
 #define OPV_DATASTREAMS_METHOD_USEACCOUNTSTREAMPROXY    "datastreams.settings-profile.method.use-account-stream-proxy"
-#define OPV_DATASTREAMS_METHOD_STREAMPROXYLIST          "datastreams.settings-profile.method.stream-proxy-list"
+#define OPV_DATASTREAMS_METHOD_USEUSERSTREAMPROXY       "datastreams.settings-profile.method.use-user-stream-proxy"
+#define OPV_DATASTREAMS_METHOD_USERSTREAMPROXY          "datastreams.settings-profile.method.user-stream-proxy"
 #define OPV_DATASTREAMS_METHOD_USEACCOUNTNETPROXY       "datastreams.settings-profile.method.use-account-network-proxy"
-#define OPV_DATASTREAMS_METHOD_NETWORKPROXY             "datastreams.settings-profile.method.network-proxy"
+#define OPV_DATASTREAMS_METHOD_USERNETWORKPROXY         "datastreams.settings-profile.method.user-network-proxy"
 
 // FileStreamsManager
 #define OPV_FILESTREAMS_DEFAULTDIR                      "filestreams.default-dir"
@@ -73,20 +78,19 @@
 #define OPV_FILETRANSFER_ROOT                           "filestreams.filetransfer"
 #define OPV_FILETRANSFER_AUTORECEIVE                    "filestreams.filetransfer.autoreceive"
 #define OPV_FILETRANSFER_HIDEONSTART                    "filestreams.filetransfer.hide-dialog-on-start"
-#define OPV_FILETRANSFER_REMOVEONFINISH                 "filestreams.filetransfer.remove-stream-on-finish"
 
 // MainWindow
 #define OPV_MAINWINDOW_SHOWONSTART                      "mainwindow.show-on-start"
 
 // MessageWidgets
 #define OPV_MESSAGES_ROOT                               "messages"
+#define OPV_MESSAGES_LOADHISTORY                        "messages.load-history"
 #define OPV_MESSAGES_SHOWSTATUS                         "messages.show-status"
 #define OPV_MESSAGES_ARCHIVESTATUS                      "messages.archive-status"
 #define OPV_MESSAGES_EDITORAUTORESIZE                   "messages.editor-auto-resize"
 #define OPV_MESSAGES_EDITORMINIMUMLINES                 "messages.editor-minimum-lines"
 #define OPV_MESSAGES_CLEANCHATTIMEOUT                   "messages.clean-chat-timeout"
 #define OPV_MESSAGES_COMBINEWITHROSTER                  "messages.combine-with-roster"
-#define OPV_MESSAGES_SHOWTABSINCOMBINEDMODE             "messages.show-tabs-in-combined-mode"
 #define OPV_MESSAGES_TABWINDOWS_ROOT                    "messages.tab-windows"
 #define OPV_MESSAGES_TABWINDOWS_ENABLE                  "messages.tab-windows.enable"
 #define OPV_MESSAGES_TABWINDOWS_DEFAULT                 "messages.tab-windows.default"
@@ -94,15 +98,11 @@
 #define OPV_MESSAGES_TABWINDOW_NAME                     "messages.tab-windows.window.name"
 #define OPV_MESSAGES_TABWINDOW_TABSCLOSABLE             "messages.tab-windows.window.tabs-closable"
 #define OPV_MESSAGES_TABWINDOW_TABSBOTTOM               "messages.tab-windows.window.tabs-bottom"
-#define OPV_MESSAGES_TABWINDOW_SHOWINDICES              "messages.tab-windows.window.show-indices"
-#define OPV_MESSAGES_TABWINDOW_REMOVETABSONCLOSE        "messages.tab-windows.window.remove-tabs-on-close"
 // Emoticons
-#define OPV_MESSAGES_EMOTICONS                          "messages.emoticons"
+#define OPV_MESSAGES_EMOTICONS_ICONSET                  "messages.emoticons.iconset"
 #define OPV_MESSAGES_EMOTICONS_MAXINMESSAGE             "messages.emoticons.max-in-message"
 // ChatStates
 #define OPV_MESSAGES_CHATSTATESENABLED                  "messages.chatstates-enabled"
-// ChatMessageHandler
-#define OPV_MESSAGES_LOAD_HISTORY                       "messages.load-chat-history"
 // NormalMessageHandler
 #define OPV_MESSAGES_UNNOTIFYALLNORMAL                  "messages.unnotify-all-normal-messages"
 // MessageStyles
@@ -118,7 +118,7 @@
 #define OPV_MUC_GROUPCHAT_ARCHIVESTATUS                 "muc.groupchat.archive-status"
 #define OPV_MUC_GROUPCHAT_REJOINAFTERKICK               "muc.groupchat.rejoin-after-kick"
 #define OPV_MUC_GROUPCHAT_QUITONWINDOWCLOSE             "muc.groupchat.quit-on-window-close"
-#define OPV_MUC_GROUPCHAT_BASHAPPEND                    "muc.groupchat.bash-append"
+#define OPV_MUC_GROUPCHAT_REFERENUMERATION              "muc.groupchat.refer-enumeration"
 #define OPV_MUC_GROUPCHAT_NICKNAMESUFIX                 "muc.groupchat.nickname-sufix"
 // Bookmarks
 #define OPV_MUC_GROUPCHAT_SHOWAUTOJOINED                "muc.groupchat.show-auto-joined"
@@ -128,54 +128,55 @@
 #define OPV_HISTORY_ENGINE_ENABLED                      "history.engine.enabled"
 #define OPV_HISTORY_ENGINE_REPLICATEAPPEND              "history.engine.replicate-append"
 #define OPV_HISTORY_ENGINE_REPLICATEREMOVE              "history.engine.replicate-remove"
-#define OPV_HISTORY_STREAM_ITEM                         "history.stream"
-#define OPV_HISTORY_STREAM_REPLICATE                    "history.stream.replicate"
-#define OPV_HISTORY_STREAM_FORCEDIRECTARCHIVING         "history.stream.force-direct-archiving"
 #define OPV_HISTORY_ARCHIVEVIEW_FONTPOINTSIZE           "history.archiveview.font-point-size"
 // FileMessageArchive
-#define OPV_FILEARCHIVE_HOMEPATH                        "filearchive.home-path"
-#define OPV_FILEARCHIVE_FORCEDATABASESYNC               "filearchive.force-database-sync"
-#define OPV_FILEARCHIVE_COLLECTION_MINSIZE              "filearchive.collection.min-size"
-#define OPV_FILEARCHIVE_COLLECTION_MAXSIZE              "filearchive.collection.max-size"
-#define OPV_FILEARCHIVE_COLLECTION_CRITICALSIZE         "filearchive.collection.critical-size"
+#define OPV_FILEARCHIVE_HOMEPATH                        "history.file-archive.home-path"
+#define OPV_FILEARCHIVE_DATABASESYNC                    "history.file-archive.database-sync"
+#define OPV_FILEARCHIVE_COLLECTION_MINSIZE              "history.file-archive.collection.min-size"
+#define OPV_FILEARCHIVE_COLLECTION_MAXSIZE              "history.file-archive.collection.max-size"
+#define OPV_FILEARCHIVE_COLLECTION_CRITICALSIZE         "history.file-archive.collection.critical-size"
 // ServerMessageArchive
-#define OPV_SERVERARCHIVE_MAXUPLOADSIZE                 "serverarchive.max-upload-size"
+#define OPV_SERVERARCHIVE_MAXUPLOADSIZE                 "history.server-archive.max-upload-size"
 
-// MessageStyles
+// MessageStyleManager
 #define OPV_MESSAGESTYLE_ROOT                           "message-styles"
 #define OPV_MESSAGESTYLE_MTYPE_ITEM                     "message-styles.message-type"
 #define OPV_MESSAGESTYLE_CONTEXT_ITEM                   "message-styles.message-type.context"
-#define OPV_MESSAGESTYLE_STYLE_TYPE                     "message-styles.message-type.context.style-type"
-#define OPV_MESSAGESTYLE_STYLE_ITEM                     "message-styles.message-type.context.style"
-// AdiumMessageStyle
-#define OPV_MESSAGESTYLE_STYLE_ID                       "message-styles.message-type.context.style.style-id"
-#define OPV_MESSAGESTYLE_STYLE_VARIANT                  "message-styles.message-type.context.style.variant"
-#define OPV_MESSAGESTYLE_STYLE_FONTFAMILY               "message-styles.message-type.context.style.font-family"
-#define OPV_MESSAGESTYLE_STYLE_FONTSIZE                 "message-styles.message-type.context.style.font-size"
-#define OPV_MESSAGESTYLE_STYLE_BGCOLOR                  "message-styles.message-type.context.style.bg-color"
-#define OPV_MESSAGESTYLE_STYLE_BGIMAGEFILE              "message-styles.message-type.context.style.bg-image-file"
-#define OPV_MESSAGESTYLE_STYLE_BGIMAGELAYOUT            "message-styles.message-type.context.style.bg-image-layout"
-#define OPV_MESSAGESTYLE_STYLE_ANIMATIONENABLE          "message-styles.message-type.context.style.animation-enable"
+#define OPV_MESSAGESTYLE_CONTEXT_ENGINEID               "message-styles.message-type.context.engine-id"
+#define OPV_MESSAGESTYLE_ENGINE_ITEM                    "message-styles.message-type.context.engine"
+#define OPV_MESSAGESTYLE_ENGINE_STYLEID                 "message-styles.message-type.context.engine.style-id"
+#define OPV_MESSAGESTYLE_STYLE_ITEM                     "message-styles.message-type.context.engine.style"
+// IMessageStyleEngine
+#define OPV_MESSAGESTYLE_STYLE_VARIANT                  "message-styles.message-type.context.engine.style.variant"
+#define OPV_MESSAGESTYLE_STYLE_FONTFAMILY               "message-styles.message-type.context.engine.style.font-family"
+#define OPV_MESSAGESTYLE_STYLE_FONTSIZE                 "message-styles.message-type.context.engine.style.font-size"
+#define OPV_MESSAGESTYLE_STYLE_BGCOLOR                  "message-styles.message-type.context.engine.style.bg-color"
+#define OPV_MESSAGESTYLE_STYLE_BGIMAGEFILE              "message-styles.message-type.context.engine.style.bg-image-file"
+#define OPV_MESSAGESTYLE_STYLE_BGIMAGELAYOUT            "message-styles.message-type.context.engine.style.bg-image-layout"
 
 // OptionsManager
-#define OPV_MISC_ROOT                                   "misc"
-#define OPV_MISC_AUTOSTART                              "misc.autostart"
-#define OPV_MISC_SHAREOSVERSION                         "misc.share-os-version"
-#define OPV_MISC_STATISTICTS_ENABLED                    "misc.statistics-enabled"
-#define OPV_MISC_OPTIONS_DIALOG_LASTNODE                "misc.options.dialog.last-node"
+#define OPV_COMMON_ROOT                                 "common"
+#define OPV_COMMON_LANGUAGE                             "common.language"
+#define OPV_COMMON_AUTOSTART                            "common.autostart"
+// ClintInfo
+#define OPV_COMMON_SHAREOSVERSION                       "common.share-os-version"
+// Statistics
+#define OPV_COMMON_STATISTICTS_ENABLED                  "common.statistics-enabled"
 // VCardPlugin
-#define OPV_MISC_RESTRICT_VCARD_IMAGES_SIZE             "misc.restrict-vcard-images-size"
+#define OPV_COMMON_RESTRICT_VCARD_IMAGES_SIZE           "common.restrict-vcard-images-size"
 
 // Notifications
 #define OPV_NOTIFICATIONS_ROOT                          "notifications"
-#define OPV_NOTIFICATIONS_EXPANDGROUP                   "notifications.expand-groups"
-#define OPV_NOTIFICATIONS_NOSOUNDIFDND                  "notifications.no-sound-if-dnd"
-#define OPV_NOTIFICATIONS_POPUPTIMEOUT                  "notifications.popup-timeout"
+#define OPV_NOTIFICATIONS_SILENTIFDND                   "notifications.silent-if-dnd"
+#define OPV_NOTIFICATIONS_SILENTIFAWAY                  "notifications.silent-if-away"
+#define OPV_NOTIFICATIONS_NATIVEPOPUPS                  "notifications.native-popups"
+#define OPV_NOTIFICATIONS_FORCESOUND                    "notifications.force-sound"
+#define OPV_NOTIFICATIONS_HIDEMESSAGE                   "notifications.hide-message"
+#define OPV_NOTIFICATIONS_EXPANDGROUPS                  "notifications.expand-groups"
 #define OPV_NOTIFICATIONS_SOUNDCOMMAND                  "notifications.sound-command"
+#define OPV_NOTIFICATIONS_POPUPTIMEOUT                  "notifications.popup-timeout"
 #define OPV_NOTIFICATIONS_TYPEKINDS_ITEM                "notifications.type-kinds.type"
 #define OPV_NOTIFICATIONS_KINDENABLED_ITEM              "notifications.kind-enabled.kind"
-#define OPV_NOTIFICATIONS_ANIMATIONENABLE               "notifications.animation-enable"
-#define OPV_NOTIFICATIONS_TRY_NATIVE_POPUPS             "notifications.try-native-popups"
 
 // ConnectionManager
 #define OPV_PROXY_ROOT                                  "proxy"
@@ -190,26 +191,20 @@
 
 // RostersView
 #define OPV_ROSTER_ROOT                                 "roster"
+#define OPV_ROSTER_VIEWMODE                             "roster.view-mode"
+#define OPV_ROSTER_SORTMODE                             "roster.sort-mode"
 #define OPV_ROSTER_SHOWOFFLINE                          "roster.show-offline"
 #define OPV_ROSTER_SHOWRESOURCE                         "roster.show-resource"
-#define OPV_ROSTER_SORTBYSTATUS                         "roster.sort-by-status"
-#define OPV_ROSTER_HIDESCROLLBAR                        "roster.always-hide-scrollbar"
+#define OPV_ROSTER_HIDESCROLLBAR                        "roster.hide-scrollbar"
 #define OPV_ROSTER_MERGESTREAMS                         "roster.merge-streams"
-#define OPV_ROSTER_SHOWMERGEDSTREAMS                    "roster.show-merged-streams"
 // RosterChanger
 #define OPV_ROSTER_AUTOSUBSCRIBE                        "roster.auto-subscribe"
 #define OPV_ROSTER_AUTOUNSUBSCRIBE                      "roster.auto-unsubscribe"
-// Avatars
-#define OPV_ROSTER_AVATARS_SHOW                         "roster.avatars.show"
-#define OPV_ROSTER_AVATARS_SHOWEMPTY                    "roster.avatars.show-empty"
-#define OPV_ROSTER_AVATARS_SHOWGRAY                     "roster.avatars.show-gray"
 // RosterSearch
 #define OPV_ROSTER_SEARCH_ENABLED                       "roster.search.enabled"
 #define OPV_ROSTER_SEARCH_FIELDEBANLED                  "roster.search.field-enabled"
 // RosterItemExchange
 #define OPV_ROSTER_EXCHANGE_AUTOAPPROVEENABLED          "roster.exchange.auto-approve-enabled"
-//StatusChanger
-#define OPV_ROSTER_SHOWSTATUSTEXT                       "roster.show-status-text"
 //RecentContact
 #define OPV_ROSTER_RECENT_ALWAYSSHOWOFFLINE             "roster.recent.always-show-offline"
 #define OPV_ROSTER_RECENT_HIDEINACTIVEITEMS             "roster.recent.hide-inactive-items"
@@ -233,6 +228,8 @@
 #define OPV_STATUS_PRIORITY                             "statuses.status.priority"
 // AutoStatus
 #define OPV_AUTOSTARTUS_ROOT                            "statuses.autostatus"
+#define OPV_AUTOSTARTUS_AWAYRULE                        "statuses.autostatus.away-rule"
+#define OPV_AUTOSTARTUS_OFFLINERULE                     "statuses.autostatus.offline-rule"
 #define OPV_AUTOSTARTUS_RULE_ITEM                       "statuses.autostatus.rule"
 #define OPV_AUTOSTARTUS_RULE_ENABLED                    "statuses.autostatus.rule.enabled"
 #define OPV_AUTOSTARTUS_RULE_TIME                       "statuses.autostatus.rule.time"

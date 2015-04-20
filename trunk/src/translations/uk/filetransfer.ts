@@ -60,18 +60,6 @@
         <translation>Підтримує передачу файлу іншому контакту</translation>
     </message>
     <message>
-        <source>Automatically receive files from contacts in roster</source>
-        <translation>Автоматично приймати файли від контактів в ростері</translation>
-    </message>
-    <message>
-        <source>Hide dialog after transfer started</source>
-        <translation>Ховати діалог після початку передачі</translation>
-    </message>
-    <message>
-        <source>Automatically remove finished transfers</source>
-        <translation>Автоматично видаляти завершені передачі</translation>
-    </message>
-    <message>
         <source>File &apos;%1&apos; successfully sent.</source>
         <translation>Файл &apos;%1&apos; успішно надісланий.</translation>
     </message>
@@ -94,6 +82,19 @@
     <message>
         <source>Data transmission terminated</source>
         <translation>Передача даних перервана</translation>
+    </message>
+    <message>
+        <source>Ctrl+S</source>
+        <comment>Send file</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically receive files from authorized contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide file transfer dialog after transfer started</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -246,12 +247,8 @@
         <translation>Статус:</translation>
     </message>
     <message>
-        <source>Profile:</source>
-        <translation>Профіль:</translation>
-    </message>
-    <message>
-        <source>Select data stream and settings profile</source>
-        <translation>Виберіть потік даних і профіль налаштуванням</translation>
+        <source>Method:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

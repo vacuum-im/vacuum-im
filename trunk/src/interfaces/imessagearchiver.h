@@ -194,7 +194,7 @@ public:
 	virtual QUuid engineId() const =0;
 	virtual QString engineName() const =0;
 	virtual QString engineDescription() const =0;
-	virtual IOptionsWidget *engineSettingsWidget(QWidget *AParent) = 0;
+	virtual IOptionsDialogWidget *engineSettingsWidget(QWidget *AParent) = 0;
 	virtual quint32 capabilities(const Jid &AStreamJid = Jid::null) const =0;
 	virtual bool isCapable(const Jid &AStreamJid, quint32 ACapability) const =0;
 	virtual int capabilityOrder(quint32 ACapability, const Jid &AStreamJid = Jid::null) const =0;
@@ -230,6 +230,7 @@ public:
 	//Archive Preferences
 	virtual QString prefsNamespace(const Jid &AStreamJid) const =0;
 	virtual bool isArchivePrefsEnabled(const Jid &AStreamJid) const =0;
+	virtual bool isArchiveReplicationEnabled(const Jid &AStreamJid) const =0;
 	virtual bool isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId) const =0;
 	virtual IArchiveStreamPrefs archivePrefs(const Jid &AStreamJid) const =0;
 	virtual IArchiveItemPrefs archiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId = QString::null) const =0;
@@ -279,7 +280,7 @@ protected:
 };
 
 Q_DECLARE_INTERFACE(IArchiveHandler,"Vacuum.Plugin.IArchiveHandler/1.1")
-Q_DECLARE_INTERFACE(IArchiveEngine,"Vacuum.Plugin.IArchiveEngine/1.2")
-Q_DECLARE_INTERFACE(IMessageArchiver,"Vacuum.Plugin.IMessageArchiver/1.3")
+Q_DECLARE_INTERFACE(IArchiveEngine,"Vacuum.Plugin.IArchiveEngine/1.3")
+Q_DECLARE_INTERFACE(IMessageArchiver,"Vacuum.Plugin.IMessageArchiver/1.4")
 
 #endif // IMESSAGEARCHIVER_H

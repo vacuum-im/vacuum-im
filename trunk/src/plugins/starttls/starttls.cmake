@@ -1,2 +1,2 @@
-set(SOURCES starttls.cpp starttlsplugin.cpp )
-set(HEADERS starttls.h starttlsplugin.h )
+set(SOURCES starttlsfeature.cpp starttlsfeaturefactory.cpp )
+set(HEADERS starttlsfeature.h starttlsfeaturefactory.h )

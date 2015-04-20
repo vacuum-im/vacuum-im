@@ -1,9 +1,9 @@
 FORMS = connectionoptionswidget.ui
 
 HEADERS = defaultconnection.h \
-          defaultconnectionplugin.h \
+          defaultconnectionengine.h \
           connectionoptionswidget.h
 
 SOURCES = defaultconnection.cpp \
-          defaultconnectionplugin.cpp \
+          defaultconnectionengine.cpp \
           connectionoptionswidget.cpp

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<icondef>
+  <icon>
+    <key>account</key>
+    <object mime="image/png">account.png</object>
+  </icon>
+  <icon>
+    <key>accountList</key>
+    <object mime="image/png">accountlist.png</object>
+  </icon>
+  <icon>
+    <key>accountChange</key>
+    <object mime="image/png">accountchange.png</object>
+  </icon>
+  <icon>
+    <key>accountMove</key>
+    <object mime="image/png">accountmove.png</object>
+  </icon>
+</icondef>

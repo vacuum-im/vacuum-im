@@ -41,14 +41,6 @@
         <translation>Return</translation>
     </message>
     <message>
-        <source>Clear window</source>
-        <translation>Lösche Fensterinhalt</translation>
-    </message>
-    <message>
-        <source>Load messages from history in new chat windows</source>
-        <translation>Lade Nachrichtenhistorie in neuen Chat Fenstern</translation>
-    </message>
-    <message>
         <source>When receiving new chat message</source>
         <translation>Wenn neue Chat Nachricht empfangen</translation>
     </message>
@@ -66,10 +58,6 @@
     </message>
     <message>
         <source>&lt;Absent&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>When receiving new chat message in current chat window</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

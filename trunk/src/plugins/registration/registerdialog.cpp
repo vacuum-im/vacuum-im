@@ -28,8 +28,8 @@ RegisterDialog::RegisterDialog(IRegistration *ARegistration, IDataForms *ADataFo
 
 	connect(ARegistration->instance(),SIGNAL(registerFields(const QString &, const IRegisterFields &)),
 		SLOT(onRegisterFields(const QString &, const IRegisterFields &)));
-	connect(ARegistration->instance(),SIGNAL(registerSuccessful(const QString &)),
-		SLOT(onRegisterSuccessful(const QString &)));
+	connect(ARegistration->instance(),SIGNAL(registerSuccess(const QString &)),
+		SLOT(onRegisterSuccess(const QString &)));
 	connect(ARegistration->instance(),SIGNAL(registerError(const QString &, const XmppError &)),
 		SLOT(onRegisterError(const QString &, const XmppError &)));
 	connect(ui.dbbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonsClicked(QAbstractButton *)));
@@ -119,12 +119,12 @@ void RegisterDialog::onRegisterFields(const QString &AId, const IRegisterFields 
 	if (FRequestId == AId)
 	{
 		resetDialog();
-
-		FSubmit.fieldMask = AFields.fieldMask;
 		FSubmit.key = AFields.key;
 
-		if (!AFields.form.type.isEmpty())
+		if (AFields.fieldMask & IRegisterFields::Form)
 		{
+			FSubmit.fieldMask = IRegisterFields::Form;
+
 			FCurrentForm = FDataForms->formWidget(AFields.form,ui.spgDataForm);
 			if (!AFields.form.title.isEmpty())
 				setWindowTitle(AFields.form.title);
@@ -133,6 +133,8 @@ void RegisterDialog::onRegisterFields(const QString &AId, const IRegisterFields 
 		}
 		else
 		{
+			FSubmit.fieldMask = AFields.fieldMask;
+
 			if (!AFields.instructions.isEmpty())
 				ui.lblInstuctions->setText(AFields.instructions);
 
@@ -149,11 +151,12 @@ void RegisterDialog::onRegisterFields(const QString &AId, const IRegisterFields 
 
 			ui.stwForm->setCurrentWidget(ui.spgForm);
 		}
+
 		ui.dbbButtons->setStandardButtons(QDialogButtonBox::Ok|QDialogButtonBox::Cancel);
 	}
 }
 
-void RegisterDialog::onRegisterSuccessful(const QString &AId)
+void RegisterDialog::onRegisterSuccess(const QString &AId)
 {
 	if (FRequestId == AId)
 	{
@@ -192,13 +195,17 @@ void RegisterDialog::onDialogButtonsClicked(QAbstractButton *AButton)
 				FSubmit.password = ui.lnePassword->text();
 				FSubmit.email = ui.lneEMail->text();
 				FSubmit.form = FCurrentForm!=NULL ? FDataForms->dataSubmit(FCurrentForm->userDataForm()) : IDataForm();
-				FRequestId = FRegistration->sendSubmit(FStreamJid,FSubmit);
+				FRequestId = FRegistration->sendRequestSubmit(FStreamJid,FSubmit);
 			}
 		}
 		else if (FOperation == IRegistration::Unregister)
+		{
 			FRequestId = FRegistration->sendUnregisterRequest(FStreamJid,FServiceJid);
+		}
 		else if (FOperation == IRegistration::ChangePassword)
+		{
 			FRequestId = FRegistration->sendChangePasswordRequest(FStreamJid,FServiceJid,ui.lneUserName->text(),ui.lnePassword->text());
+		}
 
 		resetDialog();
 		if (!FRequestId.isEmpty())

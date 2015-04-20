@@ -16,7 +16,6 @@ public:
 	virtual Jid contactJid() const;
 	virtual QString node() const;
 protected:
-	void initialize();
 	void updateWindow();
 	void requestDiscoInfo();
 protected slots:

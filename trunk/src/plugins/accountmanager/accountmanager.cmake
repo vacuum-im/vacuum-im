@@ -1,3 +1,3 @@
-set(SOURCES accountoptions.cpp accountmanager.cpp accountsoptions.cpp account.cpp )
-set(HEADERS accountoptions.h account.h accountmanager.h accountsoptions.h )
-set(UIS accountoptions.ui accountsoptions.ui )
+set(SOURCES accountitemwidget.cpp accountsoptionswidget.cpp createaccountwizard.cpp account.cpp accountmanager.cpp)
+set(HEADERS accountitemwidget.h accountsoptionswidget.h createaccountwizard.h account.h accountmanager.h)
+set(UIS accountitemwidget.ui accountsoptionswidget.ui)

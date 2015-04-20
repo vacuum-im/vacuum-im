@@ -2,6 +2,41 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="en" sourcelanguage="en">
 <context>
+    <name>AutoRulesOptionsDialog</name>
+    <message>
+        <source>Auto Status Rules</source>
+        <translation>Auto Status Rules</translation>
+    </message>
+    <message>
+        <source>Time</source>
+        <translation>Time</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation>Status</translation>
+    </message>
+    <message>
+        <source>Text</source>
+        <translation>Text</translation>
+    </message>
+    <message>
+        <source>Priority</source>
+        <translation>Priority</translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation>Add</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>Delete</translation>
+    </message>
+    <message>
+        <source>Auto status</source>
+        <translation>Auto status</translation>
+    </message>
+</context>
+<context>
     <name>AutoStatus</name>
     <message>
         <source>Auto status</source>
@@ -16,23 +51,31 @@
         <translation>Allows to change the status in accordance with the time of inactivity</translation>
     </message>
     <message>
-        <source>Auto status &apos;Away&apos; due to inactivity for more than #(m) minutes</source>
-        <translation>Auto status &apos;Away&apos; due to inactivity for more than #(m) minutes</translation>
+        <source>Automatic change of status</source>
+        <translation>Automatic change of status</translation>
+    </message>
+    <message>
+        <source>Auto status due to inactivity for more than #(m) minutes</source>
+        <translation>Auto status due to inactivity for more than #(m) minutes</translation>
+    </message>
+    <message>
+        <source>Disconnected due to inactivity for more than #(m) minutes</source>
+        <translation>Disconnected due to inactivity for more than #(m) minutes</translation>
     </message>
 </context>
 <context>
-    <name>StatusOptionsWidget</name>
+    <name>AutoStatusOptionsWidget</name>
     <message>
-        <source>Time</source>
-        <translation>Time</translation>
+        <source>Auto status due to inactivity for more than #(m) minutes</source>
+        <translation>Auto status due to inactivity for more than #(m) minutes</translation>
     </message>
     <message>
-        <source>Status</source>
-        <translation>Status</translation>
+        <source>Disconnected due to inactivity for more than #(m) minutes</source>
+        <translation>Disconnected due to inactivity for more than #(m) minutes</translation>
     </message>
     <message>
-        <source>Text</source>
-        <translation>Text</translation>
+        <source>Auto Status</source>
+        <translation>Auto Status</translation>
     </message>
     <message>
         <source>You can insert date and time into auto status text:</source>
@@ -151,35 +194,39 @@
         <translation>Example:</translation>
     </message>
     <message>
-        <source>Auto Status</source>
-        <translation>Auto Status</translation>
-    </message>
-    <message>
         <source>   Status is set to &apos;away&apos; at %(hh:mm:ss), because of idle from $(hh:mm:ss) for #(mm) minutes and #(ss) seconds</source>
         <translation>   Status is set to &apos;away&apos; at %(hh:mm:ss), because of idle from $(hh:mm:ss) for #(mm) minutes and #(ss) seconds</translation>
     </message>
     <message>
-        <source>Priority</source>
-        <translation>Priority</translation>
-    </message>
-    <message>
-        <source>Auto status</source>
-        <translation>Auto status</translation>
+        <source>Show all rules for the automatic change of status...</source>
+        <translation>Show all rules for the automatic change of status...</translation>
     </message>
 </context>
 <context>
-    <name>StatusOptionsWidgetClass</name>
+    <name>AutoStatusOptionsWidgetClass</name>
     <message>
-        <source>Add</source>
-        <translation>Add</translation>
+        <source>Change status to</source>
+        <translation>Change status to</translation>
     </message>
     <message>
-        <source>Delete</source>
-        <translation>Delete</translation>
+        <source>after</source>
+        <translation>after</translation>
     </message>
     <message>
-        <source>Help</source>
-        <translation>Help</translation>
+        <source> minutes</source>
+        <translation> minutes</translation>
+    </message>
+    <message>
+        <source>of inactivity with message:</source>
+        <translation>of inactivity with message:</translation>
+    </message>
+    <message>
+        <source>Automatically disconnect after</source>
+        <translation>Automatically disconnect after</translation>
+    </message>
+    <message>
+        <source>of inactivity</source>
+        <translation>of inactivity</translation>
     </message>
 </context>
 </TS>

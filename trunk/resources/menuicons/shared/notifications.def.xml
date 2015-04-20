@@ -20,4 +20,16 @@
     <key>notificationsSoundOff</key>
     <object mime="image/png">notificationssoundoff.png</object>
   </icon>
+  <icon>
+    <key>notificationsSoundPlay</key>
+    <object mime="image/png">notificationssoundplay.png</object>
+  </icon>
+  <icon>
+    <key>notificationsPopupWindow</key>
+    <object mime="image/png">notificationspopupwindow.png</object>
+  </icon>
+  <icon>
+    <key>notificationsShowMinimized</key>
+    <object mime="image/png">notificationsshowminimized.png</object>
+  </icon>
 </icondef>

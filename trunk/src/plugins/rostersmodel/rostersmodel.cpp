@@ -12,8 +12,8 @@ static const QList<int> ContactsCacheRosterKinds = QList<int>() << RIK_CONTACT <
 
 RostersModel::RostersModel()
 {
-	FRosterPlugin = NULL;
-	FPresencePlugin = NULL;
+	FRosterManager = NULL;
+	FPresenceManager = NULL;
 	FAccountManager = NULL;
 
 	FLayout = LayoutSeparately;
@@ -47,28 +47,28 @@ void RostersModel::pluginInfo(IPluginInfo *APluginInfo)
 bool RostersModel::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
 	Q_UNUSED(AInitOrder);
-	IPlugin *plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
+	IPlugin *plugin = APluginManager->pluginInterface("IRosterManager").value(0,NULL);
 	if (plugin)
 	{
-		FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
-		if (FRosterPlugin)
+		FRosterManager = qobject_cast<IRosterManager *>(plugin->instance());
+		if (FRosterManager)
 		{
-			connect(FRosterPlugin->instance(),SIGNAL(rosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)),
+			connect(FRosterManager->instance(),SIGNAL(rosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)),
 				SLOT(onRosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)));
-			connect(FRosterPlugin->instance(),SIGNAL(rosterStreamJidChanged(IRoster *, const Jid &)),
+			connect(FRosterManager->instance(),SIGNAL(rosterStreamJidChanged(IRoster *, const Jid &)),
 				SLOT(onRosterStreamJidChanged(IRoster *, const Jid &)));
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IPresenceManager").value(0,NULL);
 	if (plugin)
 	{
-		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
-		if (FPresencePlugin)
+		FPresenceManager = qobject_cast<IPresenceManager *>(plugin->instance());
+		if (FPresenceManager)
 		{
-			connect(FPresencePlugin->instance(),SIGNAL(presenceChanged(IPresence *, int, const QString &, int)),
+			connect(FPresenceManager->instance(),SIGNAL(presenceChanged(IPresence *, int, const QString &, int)),
 				SLOT(onPresenceChanged(IPresence *, int , const QString &, int)));
-			connect(FPresencePlugin->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
+			connect(FPresenceManager->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
 				SLOT(onPresenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)));
 		}
 	}
@@ -79,8 +79,7 @@ bool RostersModel::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
 		if (FAccountManager)
 		{
-			connect(FAccountManager->instance(),SIGNAL(shown(IAccount *)),SLOT(onAccountShown(IAccount *)));
-			connect(FAccountManager->instance(),SIGNAL(hidden(IAccount *)),SLOT(onAccountHidden(IAccount *)));
+			connect(FAccountManager->instance(),SIGNAL(accountActiveChanged(IAccount *, bool)),SLOT(onAccountActiveChanged(IAccount *, bool)));
 		}
 	}
 
@@ -130,7 +129,7 @@ QVariant RostersModel::rosterData(int AOrder, const IRosterIndex *AIndex, int AR
 				{
 					if (AIndex->kind() == RIK_GROUP)
 					{
-						IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(streamJid) : NULL;
+						IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(streamJid) : NULL;
 						if (roster && roster->hasGroup(group))
 							groupStreams.append(streamJid.pFull());
 					}
@@ -173,9 +172,9 @@ IRosterIndex *RostersModel::addStream(const Jid &AStreamJid)
 	IRosterIndex *sindex = streamIndex(AStreamJid);
 	if (sindex == NULL)
 	{
-		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
-		IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
-		IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
+		IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(AStreamJid) : NULL;
+		IPresence *presence = FPresenceManager!=NULL ? FPresenceManager->findPresence(AStreamJid) : NULL;
+		IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(AStreamJid) : NULL;
 
 		if (roster || presence)
 		{
@@ -195,6 +194,7 @@ IRosterIndex *RostersModel::addStream(const Jid &AStreamJid)
 			if (account)
 			{
 				sindex->setData(account->name(),RDR_NAME);
+				sindex->setData(account->optionsNode().value("order").toInt(),RDR_SORT_ORDER);
 				connect(account->instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onAccountOptionsChanged(const OptionsNode &)));
 			}
 
@@ -216,7 +216,7 @@ IRosterIndex *RostersModel::addStream(const Jid &AStreamJid)
 			if (roster)
 			{
 				IRosterItem empty;
-				foreach(const IRosterItem &ritem, roster->rosterItems())
+				foreach(const IRosterItem &ritem, roster->items())
 					onRosterItemReceived(roster,ritem,empty);
 			}
 		}
@@ -235,7 +235,7 @@ void RostersModel::removeStream(const Jid &AStreamJid)
 	{
 		LOG_STRM_INFO(AStreamJid,QString("Removing stream from model"));
 
-		IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
+		IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(AStreamJid) : NULL;
 		if (account)
 			disconnect(account->instance(),SIGNAL(optionsChanged(const OptionsNode &)),this,SLOT(onAccountOptionsChanged(const OptionsNode &)));
 
@@ -688,27 +688,29 @@ void RostersModel::onAdvancedItemDataChanged(QStandardItem *AItem, int ARole)
 		emit indexDataChanged(static_cast<RosterIndex *>(AItem),ARole);
 }
 
-void RostersModel::onAccountShown(IAccount *AAccount)
-{
-	if (AAccount->isActive())
-		addStream(AAccount->xmppStream()->streamJid());
-}
-
-void RostersModel::onAccountHidden(IAccount *AAccount)
-{
-	if (AAccount->isActive())
-		removeStream(AAccount->xmppStream()->streamJid());
-}
-
 void RostersModel::onAccountOptionsChanged(const OptionsNode &ANode)
 {
 	IAccount *account = qobject_cast<IAccount *>(sender());
-	if (account && account->optionsNode().childPath(ANode)=="name")
+	if (account!=NULL && account->optionsNode().childPath(ANode)=="name")
 	{
-		IRosterIndex *sindex = streamIndex(account->xmppStream()->streamJid());
+		IRosterIndex *sindex = streamIndex(account->streamJid());
 		if (sindex)
 			sindex->setData(account->name(),RDR_NAME);
 	}
+	else if (account && account->optionsNode().childPath(ANode)=="order")
+	{
+		IRosterIndex *sindex = streamIndex(account->streamJid());
+		if (sindex)
+			sindex->setData(ANode.value().toInt(),RDR_SORT_ORDER);
+	}
+}
+
+void RostersModel::onAccountActiveChanged(IAccount *AAccount, bool AActive)
+{
+	if (AActive)
+		addStream(AAccount->streamJid());
+	else
+		removeStream(AAccount->streamJid());
 }
 
 void RostersModel::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore)
@@ -748,8 +750,8 @@ void RostersModel::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AIt
 			QSet<QString> newGroups = itemGroups - curGroups;
 			QSet<QString> oldGroups = curGroups - itemGroups;
 
-			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(ARoster->streamJid()) : NULL;
-			QList<IPresenceItem> pitemList = presence!=NULL ? FPresencePlugin->sortPresenceItems(presence->findItems(AItem.itemJid)) : QList<IPresenceItem>();
+			IPresence *presence = FPresenceManager!=NULL ? FPresenceManager->findPresence(ARoster->streamJid()) : NULL;
+			QList<IPresenceItem> pitemList = presence!=NULL ? FPresenceManager->sortPresenceItems(presence->findItems(AItem.itemJid)) : QList<IPresenceItem>();
 			
 			QStringList resources;
 			foreach(const IPresenceItem &pitem, pitemList)
@@ -791,7 +793,7 @@ void RostersModel::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AIt
 					IPresenceItem pitem = pitemList.value(0);
 					
 					IRosterIndex *itemIndex = newRosterIndex(itemKind);
-					if (pitem.isValid)
+					if (!pitem.isNull())
 					{
 						itemIndex->setData(pitem.itemJid.full(),RDR_FULL_JID);
 						itemIndex->setData(pitem.itemJid.pFull(),RDR_PREP_FULL_JID);
@@ -807,7 +809,7 @@ void RostersModel::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AIt
 					itemIndex->setData(AItem.itemJid.pBare(),RDR_PREP_BARE_JID);
 					itemIndex->setData(AItem.name,RDR_NAME);
 					itemIndex->setData(AItem.subscription,RDR_SUBSCRIBTION);
-					itemIndex->setData(AItem.ask,RDR_SUBSCRIPTION_ASK);
+					itemIndex->setData(AItem.subscriptionAsk,RDR_SUBSCRIPTION_ASK);
 					itemIndex->setData(group,RDR_GROUP);
 
 					itemIndex->setData(pitem.show,RDR_SHOW);
@@ -821,7 +823,7 @@ void RostersModel::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AIt
 				{
 					itemIndex->setData(AItem.name,RDR_NAME);
 					itemIndex->setData(AItem.subscription,RDR_SUBSCRIBTION);
-					itemIndex->setData(AItem.ask,RDR_SUBSCRIPTION_ASK);
+					itemIndex->setData(AItem.subscriptionAsk,RDR_SUBSCRIPTION_ASK);
 					itemList.append(itemIndex);
 				}
 			}
@@ -886,7 +888,7 @@ void RostersModel::onPresenceItemReceived(IPresence *APresence, const IPresenceI
 			itemKind = RIK_MY_RESOURCE;
 
 		QList<IRosterIndex *> itemList = findContactIndexes(APresence->streamJid(),AItem.itemJid);
-		QList<IPresenceItem> pitemList = FPresencePlugin->sortPresenceItems(APresence->findItems(AItem.itemJid));
+		QList<IPresenceItem> pitemList = FPresenceManager->sortPresenceItems(APresence->findItems(AItem.itemJid));
 		
 		if (itemKind == RIK_MY_RESOURCE)
 		{

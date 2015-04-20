@@ -2,6 +2,7 @@
 
 #include <QSet>
 #include <QChar>
+#include <QComboBox>
 #include <QMimeData>
 #include <QTextBlock>
 #include <definitions/resources.h>
@@ -14,6 +15,7 @@
 #include <definitions/optionwidgetorders.h>
 #include <definitions/messagewriterorders.h>
 #include <definitions/messageeditcontentshandlerorders.h>
+#include <utils/iconsetdelegate.h>
 #include <utils/iconstorage.h>
 #include <utils/options.h>
 #include <utils/logger.h>
@@ -89,13 +91,11 @@ bool Emoticons::initObjects()
 bool Emoticons::initSettings()
 {
 	Options::setDefaultValue(OPV_MESSAGES_EMOTICONS_MAXINMESSAGE,20);
-	Options::setDefaultValue(OPV_MESSAGES_EMOTICONS,QStringList() << DEFAULT_ICONSET);
+	Options::setDefaultValue(OPV_MESSAGES_EMOTICONS_ICONSET,QStringList() << DEFAULT_ICONSET);
 
 	if (FOptionsManager)
 	{
-		IOptionsDialogNode dnode = { ONO_EMOTICONS, OPN_EMOTICONS, tr("Emoticons"), MNI_EMOTICONS };
-		FOptionsManager->insertOptionsDialogNode(dnode);
-		FOptionsManager->insertOptionsHolder(this);
+		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 	return true;
 }
@@ -114,12 +114,32 @@ void Emoticons::writeMessageToText(int AOrder, Message &AMessage, QTextDocument 
 		replaceTextToImage(ADocument);
 }
 
-QMultiMap<int, IOptionsWidget *> Emoticons::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+QMultiMap<int, IOptionsDialogWidget *> Emoticons::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	QMultiMap<int, IOptionsWidget *> widgets;
-	if (ANodeId == OPN_EMOTICONS)
+	QMultiMap<int, IOptionsDialogWidget *> widgets;
+	if (ANodeId == OPN_APPEARANCE)
 	{
-		widgets.insertMulti(OWO_EMOTICONS, new EmoticonsOptions(this,AParent));
+		QComboBox *cmbEmoticons = new QComboBox(AParent);
+		cmbEmoticons->setItemDelegate(new IconsetDelegate(cmbEmoticons));
+
+		int index = 1;
+		cmbEmoticons->addItem(tr("Do not convert text smiles to images"),QStringList());
+		foreach(const QString &iconset, IconStorage::availSubStorages(RSR_STORAGE_EMOTICONS))
+		{
+			IconStorage *storage = new IconStorage(RSR_STORAGE_EMOTICONS,iconset);
+			cmbEmoticons->addItem(storage->getIcon(storage->fileKeys().value(0)),storage->storageProperty(FILE_STORAGE_NAME,iconset),QStringList()<<iconset);
+
+			cmbEmoticons->setItemData(index,storage->storage(),IconsetDelegate::IDR_STORAGE);
+			cmbEmoticons->setItemData(index,storage->subStorage(),IconsetDelegate::IDR_SUBSTORAGE);
+			cmbEmoticons->setItemData(index,true,IconsetDelegate::IDR_HIDE_STORAGE_NAME);
+
+			index++;
+
+			delete storage;
+		}
+
+		widgets.insertMulti(OHO_APPEARANCE_MESSAGES,FOptionsManager->newOptionsDialogHeader(tr("Message windows"),AParent));
+		widgets.insertMulti(OWO_APPEARANCE_EMOTICONS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_EMOTICONS_ICONSET),tr("Smiles:"),cmbEmoticons,AParent));
 	}
 	return widgets;
 }
@@ -182,7 +202,7 @@ bool Emoticons::messageEditContentsChanged(int AOrder, IMessageEditWidget *AWidg
 
 QList<QString> Emoticons::activeIconsets() const
 {
-	QList<QString> iconsets = Options::node(OPV_MESSAGES_EMOTICONS).value().toStringList();
+	QList<QString> iconsets = Options::node(OPV_MESSAGES_EMOTICONS_ICONSET).value().toStringList();
 	for (QList<QString>::iterator it = iconsets.begin(); it != iconsets.end(); )
 	{
 		if (!FStorages.contains(*it))
@@ -206,45 +226,48 @@ QString Emoticons::keyByUrl(const QUrl &AUrl) const
 QMap<int, QString> Emoticons::findTextEmoticons(const QTextDocument *ADocument, int AStartPos, int ALength) const
 {
 	QMap<int,QString> emoticons;
-	QTextBlock block = ADocument->findBlock(AStartPos);
-	int stopPos = ALength < 0 ? ADocument->characterCount() : AStartPos+ALength;
-	while (block.isValid() && block.position()<stopPos)
+	if (!FUrlByKey.isEmpty())
 	{
-		for (QTextBlock::iterator it = block.begin(); !it.atEnd(); ++it)
+		QTextBlock block = ADocument->findBlock(AStartPos);
+		int stopPos = ALength < 0 ? ADocument->characterCount() : AStartPos+ALength;
+		while (block.isValid() && block.position()<stopPos)
 		{
-			QTextFragment fragment = it.fragment();
-			if (fragment.length()>0 && fragment.position()<stopPos)
+			for (QTextBlock::iterator it = block.begin(); !it.atEnd(); ++it)
 			{
-				bool searchStarted = true;
-				QString searchText = fragment.text();
-				for (int keyPos=0; keyPos<searchText.length(); keyPos++)
+				QTextFragment fragment = it.fragment();
+				if (fragment.length()>0 && fragment.position()<stopPos)
 				{
-					searchStarted = searchStarted || searchText.at(keyPos).isSpace();
-					if (searchStarted && !searchText.at(keyPos).isSpace())
+					bool searchStarted = true;
+					QString searchText = fragment.text();
+					for (int keyPos=0; keyPos<searchText.length(); keyPos++)
 					{
-						int keyLength = 0;
-						const EmoticonTreeItem *item = &FRootTreeItem;
-						while (item && keyLength<=searchText.length()-keyPos && fragment.position()+keyPos+keyLength<=stopPos)
+						searchStarted = searchStarted || searchText.at(keyPos).isSpace();
+						if (searchStarted && !searchText.at(keyPos).isSpace())
 						{
-							const QChar nextChar = keyPos+keyLength<searchText.length() ? searchText.at(keyPos+keyLength) : QChar(' ');
-							if (!item->url.isEmpty() && nextChar.isSpace())
+							int keyLength = 0;
+							const EmoticonTreeItem *item = &FRootTreeItem;
+							while (item && keyLength<=searchText.length()-keyPos && fragment.position()+keyPos+keyLength<=stopPos)
 							{
-								emoticons.insert(fragment.position()+keyPos,searchText.mid(keyPos,keyLength));
-								keyPos += keyLength-1;
-								item = NULL;
+								const QChar nextChar = keyPos+keyLength<searchText.length() ? searchText.at(keyPos+keyLength) : QChar(' ');
+								if (!item->url.isEmpty() && nextChar.isSpace())
+								{
+									emoticons.insert(fragment.position()+keyPos,searchText.mid(keyPos,keyLength));
+									keyPos += keyLength-1;
+									item = NULL;
+								}
+								else
+								{
+									keyLength++;
+									item = item->childs.value(nextChar);
+								}
 							}
-							else
-							{
-								keyLength++;
-								item = item->childs.value(nextChar);
-							}
+							searchStarted = false;
 						}
-						searchStarted = false;
 					}
 				}
 			}
+			block = block.next();
 		}
-		block = block.next();
 	}
 	return emoticons;
 }
@@ -252,21 +275,24 @@ QMap<int, QString> Emoticons::findTextEmoticons(const QTextDocument *ADocument, 
 QMap<int, QString> Emoticons::findImageEmoticons(const QTextDocument *ADocument, int AStartPos, int ALength) const
 {
 	QMap<int,QString> emoticons;
-	QTextBlock block = ADocument->findBlock(AStartPos);
-	int stopPos = ALength < 0 ? ADocument->characterCount() : AStartPos+ALength;
-	while (block.isValid() && block.position()<stopPos)
+	if (!FKeyByUrl.isEmpty())
 	{
-		for (QTextBlock::iterator it = block.begin(); !it.atEnd() && it.fragment().position()<stopPos; ++it)
+		QTextBlock block = ADocument->findBlock(AStartPos);
+		int stopPos = ALength < 0 ? ADocument->characterCount() : AStartPos+ALength;
+		while (block.isValid() && block.position()<stopPos)
 		{
-			const QTextFragment fragment = it.fragment();
-			if (fragment.charFormat().isImageFormat())
+			for (QTextBlock::iterator it = block.begin(); !it.atEnd() && it.fragment().position()<stopPos; ++it)
 			{
-				QString key = FKeyByUrl.value(fragment.charFormat().toImageFormat().name());
-				if (!key.isEmpty() && fragment.length()==1)
-					emoticons.insert(fragment.position(),key);
+				const QTextFragment fragment = it.fragment();
+				if (fragment.charFormat().isImageFormat())
+				{
+					QString key = FKeyByUrl.value(fragment.charFormat().toImageFormat().name());
+					if (!key.isEmpty() && fragment.length()==1)
+						emoticons.insert(fragment.position(),key);
+				}
 			}
+			block = block.next();
 		}
-		block = block.next();
 	}
 	return emoticons;
 }
@@ -277,7 +303,7 @@ void Emoticons::createIconsetUrls()
 	FKeyByUrl.clear();
 	clearTreeItem(&FRootTreeItem);
 
-	foreach(const QString &substorage, Options::node(OPV_MESSAGES_EMOTICONS).value().toStringList())
+	foreach(const QString &substorage, Options::node(OPV_MESSAGES_EMOTICONS_ICONSET).value().toStringList())
 	{
 		IconStorage *storage = FStorages.value(substorage);
 		if (storage)
@@ -411,7 +437,7 @@ int Emoticons::replaceImageToText(QTextDocument *ADocument, int AStartPos, int A
 SelectIconMenu *Emoticons::createSelectIconMenu(const QString &ASubStorage, QWidget *AParent)
 {
 	SelectIconMenu *menu = new SelectIconMenu(ASubStorage, AParent);
-	connect(menu->instance(),SIGNAL(iconSelected(const QString &, const QString &)), SLOT(onIconSelected(const QString &, const QString &)));
+	connect(menu->instance(),SIGNAL(iconSelected(const QString &, const QString &)), SLOT(onSelectIconMenuSelected(const QString &, const QString &)));
 	connect(menu->instance(),SIGNAL(destroyed(QObject *)),SLOT(onSelectIconMenuDestroyed(QObject *)));
 	return menu;
 }
@@ -489,7 +515,7 @@ void Emoticons::onToolBarWidgetDestroyed(QObject *AObject)
 	}
 }
 
-void Emoticons::onIconSelected(const QString &ASubStorage, const QString &AIconKey)
+void Emoticons::onSelectIconMenuSelected(const QString &ASubStorage, const QString &AIconKey)
 {
 	Q_UNUSED(ASubStorage);
 	SelectIconMenu *menu = qobject_cast<SelectIconMenu *>(sender());
@@ -548,18 +574,18 @@ void Emoticons::onSelectIconMenuDestroyed(QObject *AObject)
 
 void Emoticons::onOptionsOpened()
 {
-	onOptionsChanged(Options::node(OPV_MESSAGES_EMOTICONS));
+	onOptionsChanged(Options::node(OPV_MESSAGES_EMOTICONS_ICONSET));
 	onOptionsChanged(Options::node(OPV_MESSAGES_EMOTICONS_MAXINMESSAGE));
 }
 
 void Emoticons::onOptionsChanged(const OptionsNode &ANode)
 {
-	if (ANode.path() == OPV_MESSAGES_EMOTICONS)
+	if (ANode.path() == OPV_MESSAGES_EMOTICONS_ICONSET)
 	{
 		QList<QString> oldStorages = FStorages.keys();
 		QList<QString> availStorages = IconStorage::availSubStorages(RSR_STORAGE_EMOTICONS);
 
-		foreach(const QString &substorage, Options::node(OPV_MESSAGES_EMOTICONS).value().toStringList())
+		foreach(const QString &substorage, Options::node(OPV_MESSAGES_EMOTICONS_ICONSET).value().toStringList())
 		{
 			if (availStorages.contains(substorage))
 			{

@@ -1,17 +1,18 @@
-FORMS = editprofilesdialog.ui \
-        logindialog.ui \
-        optionsdialog.ui
+FORMS = optionsdialog.ui \
+        editprofilesdialog.ui \
+        logindialog.ui
+        
 
 HEADERS = optionsmanager.h \
-          optionswidget.h \
-          optionsheader.h \
+          optionsdialog.h \
+          optionsdialogwidget.h \
+          optionsdialogheader.h \
           editprofilesdialog.h \
-          logindialog.h \
-          optionsdialog.h
+          logindialog.h
 
 SOURCES = optionsmanager.cpp \
-          optionswidget.cpp \
-          optionsheader.cpp \
+          optionsdialog.cpp \
+          optionsdialogwidget.cpp \
+          optionsdialogheader.cpp \
           editprofilesdialog.cpp \
-          logindialog.cpp \
-          optionsdialog.cpp
+          logindialog.cpp

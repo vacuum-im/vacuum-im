@@ -22,12 +22,12 @@ public:
 signals:
 	void dialogDestroyed();
 protected:
+	qint64 minPosition() const;
+	qint64 maxPosition() const;
+	qint64 curPosition() const;
+	int curPercentPosition() const;
 	bool acceptFileName(const QString &AFile);
 	QString sizeName(qint64 ABytes) const;
-	inline qint64 minPosition() const;
-	inline qint64 maxPosition() const;
-	inline qint64 curPosition() const;
-	inline int curPercentPosition() const;
 protected slots:
 	void onStreamStateChanged();
 	void onStreamSpeedChanged();
@@ -35,9 +35,6 @@ protected slots:
 	void onStreamDestroyed();
 	void onFileButtonClicked(bool);
 	void onDialogButtonClicked(QAbstractButton *AButton);
-	void onMethodSettingsChanged(int AIndex);
-	void onSettingsProfileInserted(const QUuid &AProfileId, const QString &AName);
-	void onSettingsProfileRemoved(const QUuid &AProfileId);
 private:
 	Ui::StreamDialogClass ui;
 private:
@@ -45,8 +42,6 @@ private:
 	IFileTransfer *FFileTransfer;
 	IFileStreamsManager *FFileManager;
 	IDataStreamsManager *FDataManager;
-private:
-	QMap<QCheckBox *, QString> FMethodButtons;
 };
 
 #endif // STREAMDIALOG_H

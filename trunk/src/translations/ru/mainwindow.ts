@@ -20,16 +20,8 @@
         <translation>Позволяет другим модулям размещать свои виджеты в главном окне</translation>
     </message>
     <message>
-        <source>Main window</source>
-        <translation>Основное окно</translation>
-    </message>
-    <message>
-        <source>Hide roster</source>
-        <translation>Спрятать список контактов</translation>
-    </message>
-    <message>
         <source>Esc</source>
-        <comment>Hide roster</comment>
+        <comment>Close main window</comment>
         <translation>Esc</translation>
     </message>
 </context>

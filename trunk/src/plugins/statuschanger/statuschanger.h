@@ -7,8 +7,8 @@
 #include <QDateTime>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/istatuschanger.h>
-#include <interfaces/ipresence.h>
-#include <interfaces/iroster.h>
+#include <interfaces/ipresencemanager.h>
+#include <interfaces/irostermanager.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/irostersmodel.h>
@@ -17,7 +17,6 @@
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/istatusicons.h>
 #include <interfaces/inotifications.h>
-#include "editstatusdialog.h"
 #include "modifystatusdialog.h"
 
 struct StatusItem {
@@ -37,10 +36,10 @@ class StatusChanger :
 	public QObject,
 	public IPlugin,
 	public IStatusChanger,
-	public IOptionsHolder
+	public IOptionsDialogHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IStatusChanger IOptionsHolder);
+	Q_INTERFACES(IPlugin IStatusChanger IOptionsDialogHolder);
 public:
 	StatusChanger();
 	~StatusChanger();
@@ -53,7 +52,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin();
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IStatusChanger
 	virtual Menu *statusMenu() const;
 	virtual Menu *streamMenu(const Jid &AStreamJid) const;
@@ -106,12 +105,11 @@ protected:
 	void removeStatusNotification(IPresence *APresence);
 protected slots:
 	void onSetStatusByAction(bool);
-	void onPresenceAdded(IPresence *APresence);
+	void onPresenceActiveChanged(IPresence *APresence, bool AActive);
 	void onPresenceChanged(IPresence *APresence, int AShow, const QString &AStatus, int APriority);
-	void onPresenceRemoved(IPresence *APresence);
 	void onRosterOpened(IRoster *ARoster);
 	void onRosterClosed(IRoster *ARoster);
-	void onStreamJidChanged(const Jid &ABefore, const Jid &AAfter);
+	void onRosterStreamJidChanged(const Jid &ABefore, const Jid &AAfter);
 	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onDefaultStatusIconsChanged();
 	void onOptionsOpened();
@@ -120,14 +118,13 @@ protected slots:
 	void onProfileOpened(const QString &AProfile);
 	void onApplicationShutdownStarted();
 	void onReconnectTimer();
-	void onEditStatusAction(bool);
 	void onModifyStatusAction(bool);
 	void onAccountOptionsChanged(IAccount *AAccount, const OptionsNode &ANode);
 	void onNotificationActivated(int ANotifyId);
 private:
 	IPluginManager *FPluginManager;
-	IPresencePlugin *FPresencePlugin;
-	IRosterPlugin *FRosterPlugin;
+	IPresenceManager *FPresenceManager;
+	IRosterManager *FRosterManager;
 	IMainWindowPlugin *FMainWindowPlugin;
 	IRostersView *FRostersView;
 	IRostersViewPlugin *FRostersViewPlugin;
@@ -154,7 +151,6 @@ private:
 	QMap<IPresence *, int> FTempStatus;
 	QMap<IPresence *, int> FNotifyId;
 	QMap<IPresence *, QPair<QDateTime,int> > FPendingReconnect;
-	QPointer<EditStatusDialog> FEditStatusDialog;
 	QPointer<ModifyStatusDialog> FModifyStatusDialog;
 };
 

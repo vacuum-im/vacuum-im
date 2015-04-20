@@ -16,4 +16,8 @@
     <key>optionsEditProfiles</key>
     <object mime="image/png">optionseditprofiles.png</object>
   </icon>
+  <icon>
+    <key>optionsAppearance</key>
+    <object mime="image/png">optionsappearance.png</object>
+  </icon>
 </icondef>

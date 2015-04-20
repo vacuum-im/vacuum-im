@@ -13,7 +13,7 @@
     </message>
 </context>
 <context>
-    <name>AdiumMessageStylePlugin</name>
+    <name>AdiumMessageStyleEngine</name>
     <message>
         <source>Adium Message Style</source>
         <translation>Adium стиль сообщений</translation>
@@ -23,8 +23,8 @@
         <translation>Позволяет использовать Adium стиль оформления сообщений</translation>
     </message>
     <message>
-        <source>Adium Style</source>
-        <translation>Adium стиль</translation>
+        <source>Adium</source>
+        <translation>Adium</translation>
     </message>
 </context>
 <context>
@@ -65,44 +65,48 @@
         <source>Image Files (*.png *.jpg *.bmp *.gif)</source>
         <translation>Файлы изображений (*.png *.jpg *.bmp *.gif)</translation>
     </message>
+    <message>
+        <source>Parameters</source>
+        <translation>Параметры</translation>
+    </message>
+    <message>
+        <source>Background</source>
+        <translation>Фон</translation>
+    </message>
 </context>
 <context>
     <name>AdiumOptionsWidgetClass</name>
     <message>
-        <source>Message Style:</source>
-        <translation>Стиль:</translation>
-    </message>
-    <message>
         <source>Variant:</source>
         <translation>Вариант:</translation>
-    </message>
-    <message>
-        <source>Text Font:</source>
-        <translation>Шрифт:</translation>
-    </message>
-    <message>
-        <source>Set Font...</source>
-        <translation>Шрифт...</translation>
-    </message>
-    <message>
-        <source>Default</source>
-        <translation>Сбросить</translation>
-    </message>
-    <message>
-        <source>Background:</source>
-        <translation>Фон:</translation>
     </message>
     <message>
         <source>Color:</source>
         <translation>Цвет:</translation>
     </message>
     <message>
-        <source>Set Image...</source>
-        <translation>Изображение...</translation>
-    </message>
-    <message>
         <source>Layout:</source>
         <translation>Расположение:</translation>
+    </message>
+    <message>
+        <source>Font:</source>
+        <translation>Шрифт:</translation>
+    </message>
+    <message>
+        <source>Change...</source>
+        <translation>Изменить...</translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation>Сбросить</translation>
+    </message>
+    <message>
+        <source>Image:</source>
+        <translation>Изображение:</translation>
+    </message>
+    <message>
+        <source>not set</source>
+        <translation>не установлено</translation>
     </message>
 </context>
 </TS>

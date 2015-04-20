@@ -60,18 +60,6 @@
         <translation>Obsługa wysyłki pliku do innego kontaktu</translation>
     </message>
     <message>
-        <source>Automatically receive files from contacts in roster</source>
-        <translation>Automatycznie pobieraj pliki od kontaktów w rosterze</translation>
-    </message>
-    <message>
-        <source>Hide dialog after transfer started</source>
-        <translation>Zamknij okno transferu kiedy zacznie się pobieranie</translation>
-    </message>
-    <message>
-        <source>Automatically remove finished transfers</source>
-        <translation>Automatycznie usuń ukończone transfery</translation>
-    </message>
-    <message>
         <source>File &apos;%1&apos; successfully sent.</source>
         <translation>Plik &apos;%1&apos; został przesłany.</translation>
     </message>
@@ -94,6 +82,19 @@
     <message>
         <source>Data transmission terminated</source>
         <translation>Połączenie zostało przerwane</translation>
+    </message>
+    <message>
+        <source>Ctrl+S</source>
+        <comment>Send file</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically receive files from authorized contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide file transfer dialog after transfer started</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -246,12 +247,8 @@
         <translation>Status:</translation>
     </message>
     <message>
-        <source>Profile:</source>
-        <translation>Profil:</translation>
-    </message>
-    <message>
-        <source>Select data stream and settings profile</source>
-        <translation>Wybierz strumień danych oraz profil ustawień</translation>
+        <source>Method:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

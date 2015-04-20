@@ -9,18 +9,18 @@
 #include <utils/options.h>
 #include <utils/logger.h>
 
-XmppStream::XmppStream(IXmppStreams *AXmppStreams, const Jid &AStreamJid) : QObject(AXmppStreams->instance())
+XmppStream::XmppStream(IXmppStreamManager *AXmppStreamManager, const Jid &AStreamJid) : QObject(AXmppStreamManager->instance())
 {
-	FXmppStreams = AXmppStreams;
+	FXmppStreamManager = AXmppStreamManager;
 
 	FReady = false;
 	FClosed = true;
 	FEncrypt = true;
 	FNodeChanged = false;
 	FDomainChanged = false;
+	FPasswordRequested = false;
 	FConnection = NULL;
 	FStreamState = SS_OFFLINE;
-	FPasswordDialog = NULL;
 
 	FStreamJid = AStreamJid;
 	FOfflineJid = FStreamJid;
@@ -52,7 +52,6 @@ bool XmppStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOr
 			if (VersionParser(AStanza.element().attribute("version","0.0")) < VersionParser(1,0))
 			{
 				Stanza stanza("stream:features");
-				stanza.addElement("register",NS_FEATURE_REGISTER);
 				stanza.addElement("auth",NS_FEATURE_IQAUTH);
 				xmppStanzaIn(AXmppStream, stanza, AOrder);
 			}
@@ -61,7 +60,7 @@ bool XmppStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOr
 		else if (FStreamState==SS_FEATURES && AStanza.element().nodeName()=="stream:features")
 		{
 			FServerFeatures = AStanza.element().cloneNode(true).toElement();
-			FAvailFeatures = FXmppStreams->xmppFeatures();
+			FAvailFeatures = FXmppStreamManager->xmppFeatures();
 			processFeatures();
 			return true;
 		}
@@ -174,41 +173,55 @@ Jid XmppStream::streamJid() const
 	return FStreamJid;
 }
 
-void XmppStream::setStreamJid(const Jid &AJid)
+void XmppStream::setStreamJid(const Jid &AStreamJid)
 {
-	if (FStreamState==SS_OFFLINE && FStreamJid!=AJid)
+	if (FStreamJid!=AStreamJid && AStreamJid.isValid())
 	{
-		LOG_STRM_INFO(streamJid(),QString("Changing offline XMPP stream JID, from=%1, to=%2").arg(FOfflineJid.full(),AJid.full()));
+		if (FStreamState==SS_OFFLINE || FStreamJid.node().isEmpty())
+		{
+			LOG_STRM_INFO(streamJid(),QString("Changing offline XMPP stream JID, from=%1, to=%2").arg(FOfflineJid.full(),AStreamJid.full()));
 
-		Jid before = FStreamJid;
-		Jid after = AJid;
-		emit jidAboutToBeChanged(after);
+			Jid before = FStreamJid;
+			Jid after = AStreamJid;
+			emit jidAboutToBeChanged(after);
 
-		if (before.pBare() != after.pBare())
-			FSessionPassword.clear();
+			FOfflineJid = after;
+			FStreamJid = after;
+			emit jidChanged(before);
+		}
+		else if (FStreamState == SS_FEATURES)
+		{
+			LOG_STRM_INFO(streamJid(),QString("Changing online XMPP stream JID, from=%1, to=%2").arg(FOnlineJid.full(),AStreamJid.full()));
 
-		FOfflineJid = after;
-		FStreamJid = after;
-		emit jidChanged(before);
+			Jid before = FStreamJid;
+			Jid after(FStreamJid.node(),FStreamJid.domain(),AStreamJid.resource());
+			emit jidAboutToBeChanged(after);
+
+			FOnlineJid = AStreamJid;
+			FStreamJid = after;
+			FNodeChanged = FOnlineJid.pNode()!=FOfflineJid.pNode();
+			FDomainChanged = FOnlineJid.pDomain()!=FOfflineJid.pDomain();
+			emit jidChanged(before);
+		}
+		else
+		{
+			LOG_STRM_WARNING(streamJid(),QString("Failed to change stream jid to=%1: Wrong stream state").arg(AStreamJid.full()));
+		}
 	}
-	else if (FStreamState==SS_FEATURES && FStreamJid!=AJid)
+	else if (!AStreamJid.isValid())
 	{
-		LOG_STRM_INFO(streamJid(),QString("Changing online XMPP stream JID, from=%1, to=%2").arg(FOnlineJid.full(),AJid.full()));
-		
-		Jid before = FStreamJid;
-		Jid after(FStreamJid.node(),FStreamJid.domain(),AJid.resource());
-		emit jidAboutToBeChanged(after);
+		REPORT_ERROR("Failed to change stream jid: Invalid parameters");
+	}
+}
 
-		FOnlineJid = AJid;
-		FStreamJid = after;
-		FNodeChanged = FOnlineJid.pNode()!=FOfflineJid.pNode();
-		FDomainChanged = FOnlineJid.pDomain()!=FOfflineJid.pDomain();
-		emit jidChanged(before);
-	}
-	else if (FStreamJid != AJid)
+bool XmppStream::requestPassword()
+{
+	if (!FPasswordRequested)
 	{
-		LOG_STRM_WARNING(streamJid(),QString("Failed to change stream jid to=%1: Wrong stream state").arg(AJid.full()));
+		LOG_STRM_DEBUG(streamJid(),QString("XMPP stream password request"));
+		emit passwordRequested(FPasswordRequested);
 	}
+	return FPasswordRequested;
 }
 
 QString XmppStream::password() const
@@ -218,40 +231,17 @@ QString XmppStream::password() const
 
 void XmppStream::setPassword(const QString &APassword)
 {
-	if (FStreamState == SS_OFFLINE)
+	if (FPassword != APassword)
 	{
-		if (!APassword.isEmpty())
-			FSessionPassword.clear();
 		FPassword = APassword;
+		LOG_STRM_DEBUG(streamJid(),"XMPP stream password changed");
 	}
-	else
+	if (FPasswordRequested)
 	{
-		LOG_STRM_WARNING(streamJid(),"Failed to change XMPP stream password: Stream is not offline");
+		FPasswordRequested = false;
+		LOG_STRM_DEBUG(streamJid(),"XMPP stream password provided");
+		QMetaObject::invokeMethod(this,"passwordProvided",Qt::QueuedConnection,Q_ARG(QString,APassword));
 	}
-}
-
-QString XmppStream::getSessionPassword(bool AAskIfNeed)
-{
-	if (AAskIfNeed && FStreamState!=SS_ONLINE && FPassword.isEmpty() && FSessionPassword.isEmpty() && FPasswordMutex.tryLock())
-	{
-		LOG_STRM_INFO(streamJid(),"Requesting session password");
-
-		bool isActive = isKeepAliveTimerActive();
-		setKeepAliveTimerActive(false);
-
-		FPasswordDialog = new QInputDialog(NULL,Qt::Dialog);
-		FPasswordDialog->setWindowTitle(tr("Password request"));
-		FPasswordDialog->setLabelText(tr("Enter password for <b>%1</b>").arg(Qt::escape(FStreamJid.uBare())));
-		FPasswordDialog->setTextEchoMode(QLineEdit::Password);
-		if (FPasswordDialog->exec() == QDialog::Accepted)
-			FSessionPassword = FPasswordDialog->textValue();
-		FPasswordDialog->deleteLater();
-		FPasswordDialog = NULL;
-
-		setKeepAliveTimerActive(isActive);
-		FPasswordMutex.unlock();
-	}
-	return !FSessionPassword.isEmpty() ? FSessionPassword : FPassword;
 }
 
 QString XmppStream::defaultLang() const
@@ -261,10 +251,10 @@ QString XmppStream::defaultLang() const
 
 void XmppStream::setDefaultLang(const QString &ADefLang)
 {
-	if (FStreamState == SS_OFFLINE)
+	if (FDefLang != ADefLang)
 	{
 		FDefLang = ADefLang;
-		LOG_STRM_DEBUG(streamJid(),QString("Default stream language changed to=%1").arg(ADefLang));
+		LOG_STRM_DEBUG(streamJid(),QString("Default XMPP stream language changed to=%1").arg(ADefLang));
 	}
 }
 
@@ -275,7 +265,7 @@ bool XmppStream::isEncryptionRequired() const
 
 void XmppStream::setEncryptionRequired(bool ARequire)
 {
-	if (FStreamState == SS_OFFLINE)
+	if (FEncrypt != ARequire)
 	{
 		FEncrypt = ARequire;
 		LOG_STRM_DEBUG(streamJid(),QString("XMPP stream encryption require changed to=%1").arg(ARequire));
@@ -460,7 +450,7 @@ void XmppStream::processFeatures()
 		QDomElement featureElem = FServerFeatures.firstChildElement();
 		while (!featureElem.isNull() && featureElem.namespaceURI()!=featureNS)
 			featureElem = featureElem.nextSiblingElement();
-		started = featureElem.namespaceURI()==featureNS ? startFeature(featureNS, featureElem) : false;
+		started = !featureElem.isNull() ? startFeature(featureNS, featureElem) : false;
 	}
 	if (!started)
 	{
@@ -490,8 +480,6 @@ void XmppStream::setStreamState(StreamState AState)
 	if (FStreamState != AState)
 	{
 		LOG_STRM_DEBUG(streamJid(),QString("XMPP stream state changed to=%1").arg(AState));
-		if (FPasswordDialog)
-			FPasswordDialog->reject();
 		FStreamState = AState;
 	}
 }
@@ -499,9 +487,9 @@ void XmppStream::setStreamState(StreamState AState)
 bool XmppStream::startFeature(const QString &AFeatureNS, const QDomElement &AFeatureElem)
 {
 	LOG_STRM_DEBUG(streamJid(),QString("Starting XMPP stream feature=%1").arg(AFeatureNS));
-	foreach(IXmppFeaturesPlugin *plugin, FXmppStreams->xmppFeaturePlugins(AFeatureNS))
+	foreach(IXmppFeatureFactory *factory, FXmppStreamManager->xmppFeatureFactories(AFeatureNS))
 	{
-		IXmppFeature *feature = plugin->newXmppFeature(AFeatureNS, this);
+		IXmppFeature *feature = factory->newXmppFeature(AFeatureNS, this);
 		if (feature && feature->start(AFeatureElem))
 		{
 			FActiveFeatures.append(feature);
@@ -636,6 +624,7 @@ void XmppStream::onConnectionDisconnected()
 
 		FNodeChanged = false;
 		FDomainChanged = false;
+		FPasswordRequested = false;
 		FOnlineJid = Jid::null;
 	}
 }
@@ -681,10 +670,10 @@ void XmppStream::onFeatureFinished(bool ARestart)
 
 void XmppStream::onFeatureError(const XmppError &AError)
 {
-	if (AError.isSaslError() && AError.toSaslError().conditionCode()==XmppSaslError::EC_NOT_AUTHORIZED)
-		FSessionPassword = QString::null;
-	else if (AError.isStanzaError() && AError.toStanzaError().conditionCode()==XmppStanzaError::EC_NOT_AUTHORIZED)
-		FSessionPassword = QString::null;
+	//if (AError.isSaslError() && AError.toSaslError().conditionCode()==XmppSaslError::EC_NOT_AUTHORIZED)
+	//	FSessionPassword = QString::null;
+	//else if (AError.isStanzaError() && AError.toStanzaError().conditionCode()==XmppStanzaError::EC_NOT_AUTHORIZED)
+	//	FSessionPassword = QString::null;
 	abort(AError);
 }
 

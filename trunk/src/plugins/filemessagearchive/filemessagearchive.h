@@ -11,7 +11,7 @@
 #include "fileworker.h"
 #include "databaseworker.h"
 #include "databasesynchronizer.h"
-#include "filearchiveoptions.h"
+#include "filearchiveoptionswidget.h"
 
 class FileMessageArchive : 
 	public QObject,
@@ -35,7 +35,7 @@ public:
 	virtual QUuid engineId() const;
 	virtual QString engineName() const;
 	virtual QString engineDescription() const;
-	virtual IOptionsWidget *engineSettingsWidget(QWidget *AParent);
+	virtual IOptionsDialogWidget *engineSettingsWidget(QWidget *AParent);
 	virtual quint32 capabilities(const Jid &AStreamJid = Jid::null) const;
 	virtual bool isCapable(const Jid &AStreamJid, quint32 ACapability) const;
 	virtual int capabilityOrder(quint32 ACapability, const Jid &AStreamJid = Jid::null) const;
@@ -106,8 +106,7 @@ protected slots:
 protected slots:
 	void onOptionsOpened();
 	void onOptionsClosed();
-	void onAccountShown(IAccount *AAccount);
-	void onAccountHidden(IAccount *AAccount);
+	void onAccountActiveChanged(IAccount *AAccount, bool AActive);
 	void onDiscoInfoReceived(const IDiscoInfo &AInfo);
 private:
 	IPluginManager *FPluginManager;

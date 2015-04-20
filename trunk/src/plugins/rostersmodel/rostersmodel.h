@@ -3,8 +3,8 @@
 
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/irostersmodel.h>
-#include <interfaces/iroster.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/irostermanager.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/iaccountmanager.h>
 #include "rootindex.h"
 #include "rosterindex.h"
@@ -84,9 +84,8 @@ protected slots:
 	void onAdvancedItemRemoving(QStandardItem *AItem);
 	void onAdvancedItemDataChanged(QStandardItem *AItem, int ARole);
 protected slots:
-	void onAccountShown(IAccount *AAccount);
-	void onAccountHidden(IAccount *AAccount);
 	void onAccountOptionsChanged(const OptionsNode &ANode);
+	void onAccountActiveChanged(IAccount *AAccount, bool AActive);
 	void onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore);
 	void onRosterStreamJidChanged(IRoster *ARoster, const Jid &ABefore);
 	void onPresenceChanged(IPresence *APresence, int AShow, const QString &AStatus, int APriority);
@@ -94,8 +93,8 @@ protected slots:
 private:
 	friend class RosterIndex;
 private:
-	IRosterPlugin *FRosterPlugin;
-	IPresencePlugin *FPresencePlugin;
+	IRosterManager *FRosterManager;
+	IPresenceManager *FPresenceManager;
 	IAccountManager *FAccountManager;
 private:
 	StreamsLayout FLayout;

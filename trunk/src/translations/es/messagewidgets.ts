@@ -39,22 +39,6 @@
         <translation>Ventana con pestaña</translation>
     </message>
     <message>
-        <source>Enable tab windows</source>
-        <translation>Habilitar ventanas con pestaña</translation>
-    </message>
-    <message>
-        <source>Show status changes in chat windows</source>
-        <translation>Mostrar cambios de estado en las ventanas de chat</translation>
-    </message>
-    <message>
-        <source>Auto resize input field</source>
-        <translation>Cambiar automáticamente el tamaño del campo de entrada</translation>
-    </message>
-    <message>
-        <source>Save status messages to history</source>
-        <translation>Guardar los mensajes de estado en el historial</translation>
-    </message>
-    <message>
         <source>Tab window</source>
         <translation>Ventana con pestaña</translation>
     </message>
@@ -75,26 +59,6 @@
         <translation>Pestaña anterior</translation>
     </message>
     <message>
-        <source>Set tabs closable</source>
-        <translation>Permitir que las pestañas puedan ser cerradas</translation>
-    </message>
-    <message>
-        <source>Show tabs at bottom</source>
-        <translation>Mostrar pestañas en la parte inferior</translation>
-    </message>
-    <message>
-        <source>Rename tab window</source>
-        <translation>Renombrar la ventana con pestañas</translation>
-    </message>
-    <message>
-        <source>Delete tab window</source>
-        <translation>Eliminar la ventana con pestañas</translation>
-    </message>
-    <message>
-        <source>Use as default tab window</source>
-        <translation>Usar como ventana de pestañas principal por defecto</translation>
-    </message>
-    <message>
         <source>Alt+%1</source>
         <comment>Show tab</comment>
         <translation>Alt+%1</translation>
@@ -102,28 +66,6 @@
     <message>
         <source>Message windows</source>
         <translation>Ventana de mensajes</translation>
-    </message>
-    <message>
-        <source>Chat window</source>
-        <translation>Ventana de chat</translation>
-    </message>
-    <message>
-        <source>Send message</source>
-        <translation>Enviar mensajes</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <comment>Send message</comment>
-        <translation>Return</translation>
-    </message>
-    <message>
-        <source>Message window</source>
-        <translation>Ventana de mensaje</translation>
-    </message>
-    <message>
-        <source>Ctrl+Return</source>
-        <comment>Send message</comment>
-        <translation>Ctrl+Return</translation>
     </message>
     <message>
         <source>Edit next message</source>
@@ -149,21 +91,9 @@
         <translation>Ctrl+W</translation>
     </message>
     <message>
-        <source>Show tabs indices</source>
-        <translation>Mostrar los índices de las pestañas</translation>
-    </message>
-    <message>
-        <source>Close tab window</source>
-        <translation>Cerrar la ventana con pestañas</translation>
-    </message>
-    <message>
         <source>Esc</source>
         <comment>Close tab window</comment>
         <translation>Esc</translation>
-    </message>
-    <message>
-        <source>Close message window</source>
-        <translation>Cerrar la ventana de mensajes</translation>
     </message>
     <message>
         <source>Esc</source>
@@ -205,39 +135,67 @@
         <translation>google.com</translation>
     </message>
     <message>
-        <source>Combine/Split with message windows</source>
-        <translation>Combinar/Dividir con ventanas de mensajes</translation>
-    </message>
-    <message>
-        <source>Combine message windows with contact-list</source>
-        <translation>Combinar las ventanas de mensajes con la lista de contacto</translation>
-    </message>
-    <message>
-        <source>Show tabs in combined message windows with contact-list mode</source>
-        <translation>Mostrar pestañas cuando los mensajes y la lista de contactos aparezcan en la misma ventana</translation>
-    </message>
-    <message>
         <source>Quote Selected Text</source>
         <translation>Citar el texto seleccionado</translation>
     </message>
-</context>
-<context>
-    <name>MessengerOptionsClass</name>
     <message>
-        <source>Minimum input field lines:</source>
-        <translation>Cantidad mínima de líneas en el campo de entrada:</translation>
+        <source>Message window view</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Clean chat windows after closing in </source>
-        <translation>Limpiar la ventana de chat después de cerrarla</translation>
+        <source>Load last messages from history</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source> minutes</source>
-        <translation>minutos</translation>
+        <source>Show message windows together with contacts list</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>(0 - do not clean)</source>
-        <translation>(0 - no cerrar)</translation>
+        <source>Show message windows in tab window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically resize messages input field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minimum number of lines in messages input field:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Message window behavior</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show contacts status changes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save contacts status messages in history</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+Q</source>
+        <comment>Quote selected text</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send chat message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Return</source>
+        <comment>Send chat message</comment>
+        <translation type="unfinished">Return</translation>
+    </message>
+    <message>
+        <source>Send single message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+Return</source>
+        <comment>Send single message</comment>
+        <translation type="unfinished">Ctrl+Return</translation>
     </message>
 </context>
 <context>

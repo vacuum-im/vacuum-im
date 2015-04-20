@@ -13,6 +13,7 @@
 #include <definitions/optionvalues.h>
 #include <definitions/messagedataroles.h>
 #include <utils/widgetmanager.h>
+#include <utils/pluginhelper.h>
 #include <utils/textmanager.h>
 #include <utils/iconstorage.h>
 #include <utils/logger.h>
@@ -90,7 +91,7 @@ bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex 
 	return leftType < rightType;
 }
 
-ArchiveViewWindow::ArchiveViewWindow(IPluginManager *APluginManager, IMessageArchiver *AArchiver, const QMultiMap<Jid,Jid> &AAddresses, QWidget *AParent) : QMainWindow(AParent)
+ArchiveViewWindow::ArchiveViewWindow(IMessageArchiver *AArchiver, const QMultiMap<Jid,Jid> &AAddresses, QWidget *AParent) : QMainWindow(AParent)
 {
 	REPORT_VIEW;
 	ui.setupUi(this);
@@ -100,14 +101,19 @@ ArchiveViewWindow::ArchiveViewWindow(IPluginManager *APluginManager, IMessageArc
 	FFocusWidget = NULL;
 	FArchiver = AArchiver;
 
-	FStatusIcons = NULL;
-	FUrlProcessor = NULL;
-	FRosterPlugin = NULL;
-	FMetaContacts = NULL;
-	FMessageStyles = NULL;
-	FMessageProcessor = NULL;
-	FFileMessageArchive = NULL;
-	initialize(APluginManager);
+	FRosterManager = PluginHelper::pluginInstance<IRosterManager>();
+	if (FRosterManager)
+	{
+		connect(FRosterManager->instance(),SIGNAL(rosterActiveChanged(IRoster *, bool)),SLOT(onRosterActiveChanged(IRoster *, bool)));
+		connect(FRosterManager->instance(),SIGNAL(rosterStreamJidChanged(IRoster *, const Jid &)),SLOT(onRosterStreamJidChanged(IRoster *, const Jid &)));
+	}
+	
+	FStatusIcons = PluginHelper::pluginInstance<IStatusIcons>();
+	FUrlProcessor = PluginHelper::pluginInstance<IUrlProcessor>();
+	FMetaContacts = PluginHelper::pluginInstance<IMetaContacts>();
+	FMessageProcessor = PluginHelper::pluginInstance<IMessageProcessor>();
+	FFileMessageArchive = PluginHelper::pluginInstance<IFileMessageArchive>();
+	FMessageStyleManager = PluginHelper::pluginInstance<IMessageStyleManager>();
 
 	FHeaderActionLabel = new QLabel(ui.trvHeaders);
 	QPalette pal = FHeaderActionLabel->palette();
@@ -264,44 +270,6 @@ void ArchiveViewWindow::setAddresses(const QMultiMap<Jid,Jid> &AAddresses)
 	}
 }
 
-void ArchiveViewWindow::initialize(IPluginManager *APluginManager)
-{
-	IPlugin *plugin = APluginManager->pluginInterface("IRosterPlugin").value(0);
-	if (plugin)
-	{
-		FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
-		if (FRosterPlugin)
-		{
-			connect(FRosterPlugin->instance(),SIGNAL(rosterRemoved(IRoster *)),SLOT(onRosterRemoved(IRoster *)));
-			connect(FRosterPlugin->instance(),SIGNAL(rosterStreamJidChanged(IRoster *, const Jid &)),SLOT(onRosterStreamJidChanged(IRoster *, const Jid &)));
-		}
-	}
-
-	plugin = APluginManager->pluginInterface("IMetaContacts").value(0);
-	if (plugin)
-		FMetaContacts = qobject_cast<IMetaContacts *>(plugin->instance());
-
-	plugin = APluginManager->pluginInterface("IMessageProcessor").value(0);
-	if (plugin)
-		FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
-	
-	plugin = APluginManager->pluginInterface("IMessageStyles").value(0,NULL);
-	if (plugin)
-		FMessageStyles = qobject_cast<IMessageStyles *>(plugin->instance());
-
-	plugin = APluginManager->pluginInterface("IStatusIcons").value(0);
-	if (plugin)
-		FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
-
-	plugin = APluginManager->pluginInterface("IUrlProcessor").value(0);
-	if (plugin)
-		FUrlProcessor = qobject_cast<IUrlProcessor *>(plugin->instance());
-
-	plugin = APluginManager->pluginInterface("IFileMessageArchive").value(0);
-	if (plugin)
-		FFileMessageArchive = qobject_cast<IFileMessageArchive *>(plugin->instance());
-}
-
 void ArchiveViewWindow::reset()
 {
 	clearHeaders();
@@ -345,8 +313,8 @@ bool ArchiveViewWindow::isJidMatched(const Jid &ARequestWith, const Jid &AHeader
 
 QString ArchiveViewWindow::contactName(const Jid &AStreamJid, const Jid &AContactJid, bool AShowResource) const
 {
-	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
-	IRosterItem ritem = roster!=NULL ? roster->rosterItem(AContactJid) : IRosterItem();
+	IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(AStreamJid) : NULL;
+	IRosterItem ritem = roster!=NULL ? roster->findItem(AContactJid) : IRosterItem();
 	QString name = !ritem.name.isEmpty() ? ritem.name : AContactJid.uBare();
 	if (AShowResource && !AContactJid.resource().isEmpty())
 		name = name + "/" +AContactJid.resource();
@@ -836,10 +804,10 @@ void ArchiveViewWindow::showCollection(const ArchiveCollection &ACollection)
 			for (int i=0; !FViewOptions.isGroupChat && i<ACollection.body.messages.count(); i++)
 				FViewOptions.isGroupChat = ACollection.body.messages.at(i).type()==Message::GroupChat;
 
-		if (FMessageStyles)
+		if (FMessageStyleManager)
 		{
-			IMessageStyleOptions soptions = FMessageStyles->styleOptions(FViewOptions.isGroupChat ? Message::GroupChat : Message::Chat);
-			FViewOptions.style = FViewOptions.isGroupChat ? FMessageStyles->styleForOptions(soptions) : NULL;
+			IMessageStyleOptions soptions = FMessageStyleManager->styleOptions(FViewOptions.isGroupChat ? Message::GroupChat : Message::Chat);
+			FViewOptions.style = FViewOptions.isGroupChat ? FMessageStyleManager->styleForOptions(soptions) : NULL;
 		}
 		else
 		{
@@ -854,14 +822,14 @@ void ArchiveViewWindow::showCollection(const ArchiveCollection &ACollection)
 	FViewOptions.lastSenderId = QString::null;
 
 	if (!FViewOptions.isPrivateChat)
-		FViewOptions.senderName = Qt::escape(FMessageStyles!=NULL ? FMessageStyles->contactName(ACollection.header.stream,ACollection.header.with) : contactName(ACollection.header.stream,ACollection.header.with));
+		FViewOptions.senderName = Qt::escape(FMessageStyleManager!=NULL ? FMessageStyleManager->contactName(ACollection.header.stream,ACollection.header.with) : contactName(ACollection.header.stream,ACollection.header.with));
 	else
 		FViewOptions.senderName = Qt::escape(ACollection.header.with.resource());
-	FViewOptions.selfName = Qt::escape(FMessageStyles!=NULL ? FMessageStyles->contactName(ACollection.header.stream) : ACollection.header.stream.uBare());
+	FViewOptions.selfName = Qt::escape(FMessageStyleManager!=NULL ? FMessageStyleManager->contactName(ACollection.header.stream) : ACollection.header.stream.uBare());
 
 	QString html = showInfo(ACollection);
 
-	IMessageContentOptions options;
+	IMessageStyleContentOptions options;
 	QList<Message>::const_iterator messageIt = ACollection.body.messages.constBegin();
 	QMultiMap<QDateTime,QString>::const_iterator noteIt = ACollection.body.notes.constBegin();
 	while (noteIt!=ACollection.body.notes.constEnd() || messageIt!=ACollection.body.messages.constEnd())
@@ -871,28 +839,28 @@ void ArchiveViewWindow::showCollection(const ArchiveCollection &ACollection)
 			int direction = messageIt->data(MDR_MESSAGE_DIRECTION).toInt();
 			Jid senderJid = direction==IMessageProcessor::DirectionIn ? messageIt->from() : ACollection.header.stream;
 
-			options.type = IMessageContentOptions::TypeEmpty;
-			options.kind = IMessageContentOptions::KindMessage;
+			options.type = IMessageStyleContentOptions::TypeEmpty;
+			options.kind = IMessageStyleContentOptions::KindMessage;
 			options.senderId = senderJid.full();
 			options.time = messageIt->dateTime();
-			options.timeFormat = FMessageStyles!=NULL ? FMessageStyles->timeFormat(options.time,ACollection.header.start) : QString::null;
+			options.timeFormat = FMessageStyleManager!=NULL ? FMessageStyleManager->timeFormat(options.time,ACollection.header.start) : QString::null;
 
 			if (FViewOptions.isGroupChat)
 			{
-				options.type |= IMessageContentOptions::TypeGroupchat;
-				options.direction = IMessageContentOptions::DirectionIn;
+				options.type |= IMessageStyleContentOptions::TypeGroupchat;
+				options.direction = IMessageStyleContentOptions::DirectionIn;
 				options.senderName = Qt::escape(!senderJid.resource().isEmpty() ? senderJid.resource() : senderJid.uNode());
 				options.senderColor = FViewOptions.style!=NULL ? FViewOptions.style->senderColor(options.senderName) : "blue";
 			}
 			else if (direction == IMessageProcessor::DirectionIn)
 			{
-				options.direction = IMessageContentOptions::DirectionIn;
+				options.direction = IMessageStyleContentOptions::DirectionIn;
 				options.senderName = FViewOptions.senderName;
 				options.senderColor = "blue";
 			}
 			else
 			{
-				options.direction = IMessageContentOptions::DirectionOut;
+				options.direction = IMessageStyleContentOptions::DirectionOut;
 				options.senderName = FViewOptions.selfName;
 				options.senderColor = "red";
 			}
@@ -902,12 +870,12 @@ void ArchiveViewWindow::showCollection(const ArchiveCollection &ACollection)
 		}
 		else if (noteIt != ACollection.body.notes.constEnd())
 		{
-			options.kind = IMessageContentOptions::KindStatus;
-			options.type = IMessageContentOptions::TypeEmpty;
+			options.kind = IMessageStyleContentOptions::KindStatus;
+			options.type = IMessageStyleContentOptions::TypeEmpty;
 			options.senderId = QString::null;
 			options.senderName = QString::null;
 			options.time = noteIt.key();
-			options.timeFormat = FMessageStyles!=NULL ? FMessageStyles->timeFormat(options.time,ACollection.header.start) : QString::null;
+			options.timeFormat = FMessageStyleManager!=NULL ? FMessageStyleManager->timeFormat(options.time,ACollection.header.start) : QString::null;
 
 			html += showNote(*noteIt,options);
 			++noteIt;
@@ -990,7 +958,7 @@ QString ArchiveViewWindow::showInfo(const ArchiveCollection &ACollection)
 	return html;
 }
 
-QString ArchiveViewWindow::showNote(const QString &ANote, const IMessageContentOptions &AOptions)
+QString ArchiveViewWindow::showNote(const QString &ANote, const IMessageStyleContentOptions &AOptions)
 {
 	static const QString statusTmpl =
 		"<table width='100%' cellpadding='0' cellspacing='0' style='margin-top:5px;'>"
@@ -1011,7 +979,7 @@ QString ArchiveViewWindow::showNote(const QString &ANote, const IMessageContentO
 	return html;
 }
 
-QString ArchiveViewWindow::showMessage(const Message &AMessage, const IMessageContentOptions &AOptions)
+QString ArchiveViewWindow::showMessage(const Message &AMessage, const IMessageStyleContentOptions &AOptions)
 {
 	QString html;
 	bool meMessage = false;
@@ -1601,9 +1569,9 @@ void ArchiveViewWindow::onArchiveCollectionsRemoved(const QString &AId, const IA
 	}
 }
 
-void ArchiveViewWindow::onRosterRemoved(IRoster *ARoster)
+void ArchiveViewWindow::onRosterActiveChanged(IRoster *ARoster, bool AActive)
 {
-	if (FAddresses.contains(ARoster->streamJid()))
+	if (!AActive && FAddresses.contains(ARoster->streamJid()))
 	{
 		FAddresses.remove(ARoster->streamJid());
 		if (!FAddresses.isEmpty())
