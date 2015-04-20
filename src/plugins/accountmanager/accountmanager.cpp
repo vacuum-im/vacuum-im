@@ -1,7 +1,6 @@
 #include "accountmanager.h"
 
 #include <QLineEdit>
-#include <QComboBox>
 #include <definitions/actiongroups.h>
 #include <definitions/optionnodes.h>
 #include <definitions/optionvalues.h>

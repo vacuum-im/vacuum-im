@@ -1,7 +1,7 @@
 #ifndef ACCOUNTMANAGER_H
 #define ACCOUNTMANAGER_H
 
-#include <QPointer>
+#include <QComboBox>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/ioptionsmanager.h>
