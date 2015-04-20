@@ -198,52 +198,5 @@
         <source>Supports the displaying of the jabber identifiers with disallowed characters</source>
         <translation>Підтримує перегляд джаббер ідентифікаторів з забороненими символами</translation>
     </message>
-    <message>
-        <source>Service discovery window</source>
-        <translation>Вікно огляду сервісів</translation>
-    </message>
-    <message>
-        <source>Move back</source>
-        <translation>Піти назад</translation>
-    </message>
-    <message>
-        <source>Move forward</source>
-        <translation>Піти вперед</translation>
-    </message>
-    <message>
-        <source>Discover item</source>
-        <translation>Переглянути </translation>
-    </message>
-    <message>
-        <source>Reload items</source>
-        <translation>Перезавантажити </translation>
-    </message>
-    <message>
-        <source>Show discovery info</source>
-        <translation>Показати оглядову інформацію </translation>
-    </message>
-    <message>
-        <source>Add item to roster</source>
-        <translation>Додати до ростеру</translation>
-    </message>
-    <message>
-        <source>Close discovery window</source>
-        <translation>Закрити вікно оглядової інформації</translation>
-    </message>
-    <message>
-        <source>Esc</source>
-        <comment>Close discovery window</comment>
-        <translation>Esc</translation>
-    </message>
-    <message>
-        <source>Show Profile</source>
-        <translation>Показати особисті дані</translation>
-    </message>
-    <message>
-        <source>Ctrl+I</source>
-        <comment>Show Profile</comment>
-        <translatorcomment>Показать личные данные</translatorcomment>
-        <translation>Ctrl+I</translation>
-    </message>
 </context>
 </TS>

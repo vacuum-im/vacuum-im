@@ -1,2 +1,2 @@
-set(SOURCES presence.cpp presenceplugin.cpp )
-set(HEADERS presenceplugin.h presence.h )
+set(SOURCES presence.cpp presencemanager.cpp )
+set(HEADERS presencemanager.h presence.h )

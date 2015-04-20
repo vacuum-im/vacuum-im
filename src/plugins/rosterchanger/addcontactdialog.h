@@ -5,8 +5,8 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessageprocessor.h>
 #include <interfaces/irosterchanger.h>
-#include <interfaces/iroster.h>
-#include <interfaces/ivcard.h>
+#include <interfaces/irostermanager.h>
+#include <interfaces/ivcardmanager.h>
 #include "ui_addcontactdialog.h"
 
 class AddContactDialog :
@@ -16,7 +16,7 @@ class AddContactDialog :
 	Q_OBJECT;
 	Q_INTERFACES(IAddContactDialog);
 public:
-	AddContactDialog(IRosterChanger *ARosterChanger, IPluginManager *APluginManager, const Jid &AStreamJid, QWidget *AParent = NULL);
+	AddContactDialog(IRosterChanger *ARosterChanger, const Jid &AStreamJid, QWidget *AParent = NULL);
 	~AddContactDialog();
 	//IAddContactDialog
 	virtual QDialog *instance() { return this; }
@@ -35,7 +35,7 @@ public:
 signals:
 	void dialogDestroyed();
 protected:
-	void initialize(IPluginManager *APluginManager);
+	void initialize();
 protected slots:
 	void onDialogAccepted();
 	void onToolBarActionTriggered(bool);
@@ -45,7 +45,7 @@ private:
 private:
 	IRoster *FRoster;
 	IMessageProcessor *FMessageProcessor;
-	IVCardPlugin *FVcardPlugin;
+	IVCardManager *FVCardManager;
 	IRosterChanger *FRosterChanger;
 private:
 	Action *FShowChat;

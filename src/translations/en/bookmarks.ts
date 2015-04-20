@@ -12,18 +12,6 @@
         <translation>Allows to create bookmarks at the jabber conference and web pages</translation>
     </message>
     <message>
-        <source>Edit bookmark</source>
-        <translation>Edit bookmark</translation>
-    </message>
-    <message>
-        <source>Disable autojoin to conferences</source>
-        <translation>Disable autojoin to conferences</translation>
-    </message>
-    <message>
-        <source>Automatically show window of conferences connected at startup</source>
-        <translation>Automatically show window of conferences connected at startup</translation>
-    </message>
-    <message>
         <source>Edit Bookmarks</source>
         <translation>Edit Bookmarks</translation>
     </message>
@@ -50,6 +38,18 @@
     <message>
         <source>Join to Conference at Startup</source>
         <translation>Join to Conference at Startup</translation>
+    </message>
+    <message>
+        <source>Conferences</source>
+        <translation>Conferences</translation>
+    </message>
+    <message>
+        <source>Disable auto join to conferences on this computer</source>
+        <translation>Disable auto join to conferences on this computer</translation>
+    </message>
+    <message>
+        <source>Show windows of auto joined conferences at startup</source>
+        <translation>Show windows of auto joined conferences at startup</translation>
     </message>
 </context>
 <context>

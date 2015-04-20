@@ -43,17 +43,5 @@
         <source>Allows to set and display avatars</source>
         <translation>Позволяет устанавливать и отображать аватары</translation>
     </message>
-    <message>
-        <source>Show avatars</source>
-        <translation>Показывать аватары</translation>
-    </message>
-    <message>
-        <source>Show empty avatars</source>
-        <translation>Показывать пустые аватары</translation>
-    </message>
-    <message>
-        <source>Show grayscaled avatars for offline contacts</source>
-        <translation>Показывать аватары отключенных контактов серыми</translation>
-    </message>
 </context>
 </TS>

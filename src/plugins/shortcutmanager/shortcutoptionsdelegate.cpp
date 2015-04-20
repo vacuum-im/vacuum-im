@@ -13,15 +13,10 @@ ShortcutOptionsDelegate::ShortcutOptionsDelegate(QObject *AParent) : QStyledItem
 	delete editor;
 }
 
-ShortcutOptionsDelegate::~ShortcutOptionsDelegate()
-{
-
-}
-
 QWidget *ShortcutOptionsDelegate::createEditor(QWidget *AParent, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
 {
 	Q_UNUSED(AOption);
-	if (AIndex.data(MDR_SHORTCUTID).isValid())
+	if (AIndex.data(SDR_SHORTCUTID).isValid())
 	{
 		QLineEdit *editor = new QLineEdit(AParent);
 		editor->installEventFilter(FFilter);
@@ -36,7 +31,7 @@ void ShortcutOptionsDelegate::setEditorData(QWidget *AEditor, const QModelIndex 
 	QLineEdit *editor = qobject_cast<QLineEdit *>(AEditor);
 	if (editor)
 	{
-		QKeySequence key = qvariant_cast<QKeySequence>(AIndex.data(MDR_ACTIVE_KEYSEQUENCE));
+		QKeySequence key = qvariant_cast<QKeySequence>(AIndex.data(SDR_ACTIVE_KEYSEQUENCE));
 		editor->setText(key.toString(QKeySequence::NativeText));
 	}
 }
@@ -48,7 +43,7 @@ void ShortcutOptionsDelegate::setModelData(QWidget *AEditor, QAbstractItemModel 
 	{
 		QKeySequence key = QKeySequence(editor->text());
 		AModel->setData(AIndex,key.toString(QKeySequence::NativeText),Qt::DisplayRole);
-		AModel->setData(AIndex,key,MDR_ACTIVE_KEYSEQUENCE);
+		AModel->setData(AIndex,key,SDR_ACTIVE_KEYSEQUENCE);
 	}
 }
 

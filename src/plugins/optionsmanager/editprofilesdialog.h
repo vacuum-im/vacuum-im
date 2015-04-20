@@ -11,20 +11,21 @@ class EditProfilesDialog :
 {
 	Q_OBJECT;
 public:
-	EditProfilesDialog(IOptionsManager *AOptionsManager, QWidget *AParent);
+	EditProfilesDialog(IOptionsManager *AOptionsManager, QWidget *AParent = NULL);
 	~EditProfilesDialog();
 protected slots:
 	void onAddProfileClicked();
 	void onPasswordProfileClicked();
 	void onRenameProfileClicked();
 	void onRemoveProfileClicked();
+protected slots:
 	void onProfileAdded(const QString &AProfile);
 	void onProfileRenamed(const QString &AProfile,const QString &ANewName);
 	void onProfileRemoved(const QString &AProfile);
 private:
 	Ui::EditProfilesDialogClass ui;
 private:
-	IOptionsManager *FManager;
+	IOptionsManager *FOptionsManager;
 };
 
 #endif // EDITPROFILESDIALOG_H

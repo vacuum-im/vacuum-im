@@ -5,8 +5,8 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iprivacylists.h>
 #include <interfaces/istanzaprocessor.h>
-#include <interfaces/ixmppstreams.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/ixmppstreammanager.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/imultiuserchat.h>
 #include "editlistsdialog.h"
@@ -110,13 +110,13 @@ protected slots:
 	void onEditListsDialogDestroyed(const Jid &AStreamJid);
 	void onMultiUserChatCreated(IMultiUserChat *AMultiChat);
 private:
-	IXmppStreams *FXmppStreams;
+	IXmppStreamManager *FXmppStreamManager;
 	IRostersModel *FRostersModel;
 	IRostersView *FRostersView;
 	IRostersViewPlugin *FRostersViewPlugin;
 	IStanzaProcessor *FStanzaProcessor;
-	IRosterPlugin *FRosterPlugin;
-	IPresencePlugin *FPresencePlugin;
+	IRosterManager *FRosterManager;
+	IPresenceManager *FPresenceManager;
 private:
 	QMap<Jid,int> FSHIPrivacy;
 	QMap<Jid,int> FSHIRosterIn;

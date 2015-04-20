@@ -40,7 +40,7 @@
 
 FileTransfer::FileTransfer()
 {
-	FRosterPlugin = NULL;
+	FRosterManager = NULL;
 	FDiscovery = NULL;
 	FNotifications = NULL;
 	FFileManager = NULL;
@@ -83,10 +83,10 @@ bool FileTransfer::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		FDataManager = qobject_cast<IDataStreamsManager *>(plugin->instance());
 	}
 
-	plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IRosterManager").value(0,NULL);
 	if (plugin)
 	{
-		FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
+		FRosterManager = qobject_cast<IRosterManager *>(plugin->instance());
 	}
 
 	plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
@@ -139,15 +139,12 @@ bool FileTransfer::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
 	}
 
-	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
-
 	return FFileManager!=NULL && FDataManager!=NULL;
 }
 
 bool FileTransfer::initObjects()
 {
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SENDFILE, tr("Send file"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SENDFILE, tr("Send file"), QKeySequence::UnknownKey, Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SENDFILE, tr("Send file"), tr("Ctrl+S","Send file"));
 
 	XmppError::registerError(NS_INTERNAL_ERROR,IERR_FILETRANSFER_TRANSFER_NOT_STARTED,tr("Failed to start file transfer"));
 	XmppError::registerError(NS_INTERNAL_ERROR,IERR_FILETRANSFER_TRANSFER_TERMINATED,tr("Data transmission terminated"));
@@ -174,7 +171,6 @@ bool FileTransfer::initObjects()
 	if (FRostersViewPlugin)
 	{
 		FRostersViewPlugin->rostersView()->insertDragDropHandler(this);
-		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_SENDFILE,FRostersViewPlugin->rostersView()->instance());
 	}
 	if (FMessageWidgets)
 	{
@@ -187,23 +183,21 @@ bool FileTransfer::initSettings()
 {
 	Options::setDefaultValue(OPV_FILETRANSFER_AUTORECEIVE,false);
 	Options::setDefaultValue(OPV_FILETRANSFER_HIDEONSTART,false);
-	Options::setDefaultValue(OPV_FILETRANSFER_REMOVEONFINISH,false);
 
 	if (FOptionsManager)
 	{
-		FOptionsManager->insertOptionsHolder(this);
+		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 	return true;
 }
 
-QMultiMap<int, IOptionsWidget *> FileTransfer::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+QMultiMap<int, IOptionsDialogWidget *> FileTransfer::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	QMultiMap<int, IOptionsWidget *> widgets;
-	if (FOptionsManager && ANodeId == OPN_FILETRANSFER)
+	QMultiMap<int, IOptionsDialogWidget *> widgets;
+	if (FOptionsManager && ANodeId==OPN_DATATRANSFER)
 	{
-		widgets.insertMulti(OWO_FILETRANSFER,FOptionsManager->optionsNodeWidget(Options::node(OPV_FILETRANSFER_AUTORECEIVE),tr("Automatically receive files from contacts in roster"),AParent));
-		widgets.insertMulti(OWO_FILETRANSFER,FOptionsManager->optionsNodeWidget(Options::node(OPV_FILETRANSFER_HIDEONSTART),tr("Hide dialog after transfer started"),AParent));
-		widgets.insertMulti(OWO_FILETRANSFER,FOptionsManager->optionsNodeWidget(Options::node(OPV_FILETRANSFER_REMOVEONFINISH),tr("Automatically remove finished transfers"),AParent));
+		widgets.insertMulti(OWO_DATATRANSFER_AUTORECEIVE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_FILETRANSFER_AUTORECEIVE),tr("Automatically receive files from authorized contacts"),AParent));
+		widgets.insertMulti(OWO_DATATRANSFER_HIDEONSTART,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_FILETRANSFER_HIDEONSTART),tr("Hide file transfer dialog after transfer started"),AParent));
 	}
 	return widgets;
 }
@@ -455,9 +449,11 @@ IFileStream *FileTransfer::sendFile(const Jid &AStreamJid, const Jid &AContactJi
 			LOG_STRM_INFO(AStreamJid,QString("Send file stream created, to=%1, sid=%2").arg(AContactJid.full(),stream->streamId()));
 			stream->setFileName(AFileName);
 			stream->setFileDescription(AFileDesc);
+
 			StreamDialog *dialog = getStreamDialog(stream);
 			dialog->setSelectableMethods(Options::node(OPV_FILESTREAMS_ACCEPTABLEMETHODS).value().toStringList());
 			dialog->show();
+
 			return stream;
 		}
 		else
@@ -570,10 +566,10 @@ void FileTransfer::notifyStream(IFileStream *AStream, bool ANewStream)
 			IMessageChatWindow *window = FMessageWidgets->findChatWindow(AStream->streamJid(),AStream->contactJid());
 			if (window)
 			{
-				IMessageContentOptions options;
-				options.kind = IMessageContentOptions::KindStatus;
-				options.type |= IMessageContentOptions::TypeEvent;
-				options.direction = IMessageContentOptions::DirectionIn;
+				IMessageStyleContentOptions options;
+				options.kind = IMessageStyleContentOptions::KindStatus;
+				options.type |= IMessageStyleContentOptions::TypeEvent;
+				options.direction = IMessageStyleContentOptions::DirectionIn;
 				options.time = QDateTime::currentDateTime();
 				window->viewWidget()->appendText(note,options);
 			}
@@ -591,8 +587,8 @@ bool FileTransfer::autoStartStream(IFileStream *AStream) const
 	{
 		if (!QFile::exists(AStream->fileName()))
 		{
-			IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStream->streamJid()) : NULL;
-			if (roster && roster->rosterItem(AStream->contactJid()).isValid)
+			IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(AStream->streamJid()) : NULL;
+			if (roster && roster->hasItem(AStream->contactJid()))
 				return AStream->startStream(Options::node(OPV_FILESTREAMS_DEFAULTMETHOD).value().toString());
 		}
 		else
@@ -714,11 +710,6 @@ void FileTransfer::onStreamStateChanged()
 			if (Options::node(OPV_FILETRANSFER_HIDEONSTART).value().toBool() && FStreamDialog.contains(stream->streamId()))
 				FStreamDialog.value(stream->streamId())->close();
 		}
-		else if (stream->streamState() == IFileStream::Finished)
-		{
-			if (Options::node(OPV_FILETRANSFER_REMOVEONFINISH).value().toBool())
-				QTimer::singleShot(REMOVE_FINISHED_TIMEOUT, stream->instance(), SLOT(deleteLater()));
-		}
 		notifyStream(stream);
 	}
 }
@@ -809,21 +800,6 @@ void FileTransfer::onToolBarWidgetDestroyed(QObject *AObject)
 	foreach(IMessageToolBarWidget *widget, FToolBarActions.keys())
 		if (qobject_cast<QObject *>(widget->instance()) == AObject)
 			FToolBarActions.remove(widget);
-}
-
-void FileTransfer::onShortcutActivated(const QString &AId, QWidget *AWidget)
-{
-	if (FRostersViewPlugin && AWidget==FRostersViewPlugin->rostersView()->instance())
-	{
-		QList<IRosterIndex *> indexes = FRostersViewPlugin->rostersView()->selectedRosterIndexes();
-		if (AId==SCT_ROSTERVIEW_SENDFILE && indexes.count()==1)
-		{
-			Jid streamJid = indexes.first()->data(RDR_STREAM_JID).toString();
-			Jid contactJid = indexes.first()->data(RDR_FULL_JID).toString();
-			if (isSupported(streamJid,contactJid))
-				sendFile(streamJid,contactJid);
-		}
-	}
 }
 
 Q_EXPORT_PLUGIN2(plg_filetransfer, FileTransfer);

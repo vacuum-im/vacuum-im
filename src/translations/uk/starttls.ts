@@ -2,7 +2,7 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="uk" sourcelanguage="en">
 <context>
-    <name>StartTLSPlugin</name>
+    <name>StartTLSFeatureFactory</name>
     <message>
         <source>StartTLS</source>
         <translation>StartTLS</translation>
@@ -12,16 +12,16 @@
         <translation>Дозволяє встановлювати захищене з&apos;єднання з сервером після підключення</translation>
     </message>
     <message>
+        <source>Failed to begin StartTLS handshake</source>
+        <translation>Не вдалося запустити ініціалізацію StartTLS</translation>
+    </message>
+    <message>
         <source>Wrong StartTLS negotiation response</source>
         <translation>Невірна відповідь при ініціалізації StartTLS</translation>
     </message>
     <message>
         <source>StartTLS negotiation failed</source>
         <translation>Ініціалізація StartTLS завершилась з помилкою</translation>
-    </message>
-    <message>
-        <source>Failed to begin StartTLS handshake</source>
-        <translation>Не вдалося запустити ініціалізацію StartTLS</translation>
     </message>
 </context>
 </TS>

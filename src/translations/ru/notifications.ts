@@ -28,16 +28,8 @@
         <translation>Включить/Выключить звук уведомлений</translation>
     </message>
     <message>
-        <source>Remove all notifications</source>
-        <translation>Удалить все уведомления</translation>
-    </message>
-    <message>
         <source>Expand contact groups in roster</source>
         <translation>Раскрывать группы контакта в контакт-листе</translation>
-    </message>
-    <message>
-        <source>Disable sounds when status is &apos;Do not disturb&apos;</source>
-        <translation>Отключать звуки, когда установлен статус &apos;Не беспокоить&apos;</translation>
     </message>
     <message>
         <source>Activate notification</source>
@@ -48,70 +40,70 @@
         <translation>Активировать уведомление</translation>
     </message>
     <message>
-        <source>Enable animation in notification pop-up</source>
-        <translation>Разрешить анимацию во всплывающем окне</translation>
-    </message>
-    <message>
         <source>Use native popup notifications if available</source>
         <translation>Использовать системные всплывающие уведомления если доступны</translation>
     </message>
-</context>
-<context>
-    <name>NotifyOptionsWidget</name>
     <message>
-        <source>Display a notification in your roster</source>
-        <translation>Показывать уведомление в контакт-листе</translation>
+        <source>Disable sounds and popup windows if status is &apos;Away&apos;</source>
+        <translation>Отключить звуки и всплывающие окна, когда установлен статус &apos;Ушел&apos;</translation>
     </message>
     <message>
-        <source>Display a notification in popup window</source>
-        <translation>Показывать уведомление во всплывающем окне</translation>
+        <source>Disable sounds and popup windows if status is &apos;Do not disturb&apos;</source>
+        <translation>Отключить звуки и всплывающие окна, когда установлен статус &apos;Не беспокоить&apos;</translation>
     </message>
     <message>
-        <source>Display a notification in tray</source>
-        <translation>Показывать уведомление в трее</translation>
+        <source>Play notification sound when received a message in the active window</source>
+        <translation>Проигрывать звук уведомления при получении сообщения в активное окно</translation>
     </message>
     <message>
-        <source>Display a notification in tray context menu</source>
-        <translation>Показывать уведомление в контекстном меню трея</translation>
-    </message>
-    <message>
-        <source>Play sound at the notification</source>
-        <translation>Проигрывать звук уведомления</translation>
-    </message>
-    <message>
-        <source>Highlight the corresponding window in the taskbar</source>
-        <translation>Подсвечивать соответствующее окно в панели задач</translation>
-    </message>
-    <message>
-        <source>Display a notification in tab</source>
-        <translation>Показывать уведомление во вкладке</translation>
-    </message>
-    <message>
-        <source>Show the corresponding window minimized in the taskbar</source>
-        <translation>Показывать соответствующее окно свернутым в панели задач</translation>
-    </message>
-    <message>
-        <source>Immediately activate the notification</source>
-        <translation>Сразу активировать уведомление</translation>
-    </message>
-    <message>
-        <source>Allowed types of notifications</source>
-        <translation>Разрешенные типы уведомлений</translation>
-    </message>
-</context>
-<context>
-    <name>NotifyOptionsWidgetClass</name>
-    <message>
-        <source>Time to display a pop-up window (0 - always visible):</source>
-        <translation>Время отображения всплывающего окна (0 - не закрывать):</translation>
+        <source>Do not show the message body in the popup window</source>
+        <translation>Не отображать текст сообщения во всплывающем окне</translation>
     </message>
     <message>
         <source> seconds</source>
         <translation> секунд</translation>
     </message>
     <message>
-        <source>Restore Defaults</source>
-        <translation>Сбросить по умолчанию</translation>
+        <source>Time to display a pop-up window (0 - always visible):</source>
+        <translation>Время отображения всплывающего окна (0 - не закрывать):</translation>
+    </message>
+    <message>
+        <source>System command to play sound:</source>
+        <translation>Системная комманда для проигрывания звука:</translation>
+    </message>
+    <message>
+        <source>Notification kinds</source>
+        <translation>Способы уведомления</translation>
+    </message>
+    <message>
+        <source>Highlight the corresponding window in the taskbar</source>
+        <translation>Подсвечивать соответствующее окно в панели задач</translation>
+    </message>
+</context>
+<context>
+    <name>NotifyKindOptionsWidget</name>
+    <message>
+        <source>Event</source>
+        <translation>Событие</translation>
+    </message>
+    <message>
+        <source>Play sound at the notification</source>
+        <translation>Проигрывать звук уведомления</translation>
+    </message>
+    <message>
+        <source>Display a notification in popup window</source>
+        <translation>Показывать уведомление во всплывающем окне</translation>
+    </message>
+    <message>
+        <source>Show the corresponding window minimized in the taskbar</source>
+        <translation>Показывать соответствующее окно свернутым в панели задач</translation>
+    </message>
+</context>
+<context>
+    <name>NotifyWidget</name>
+    <message>
+        <source>Message is empty or hidden</source>
+        <translation>Сообщение пустое или скрыто</translation>
     </message>
 </context>
 </TS>

@@ -51,10 +51,7 @@ public:
 	virtual QString methodName() const =0;
 	virtual QString methodDescription() const =0;
 	virtual IDataStreamSocket *dataStreamSocket(const QString &ASocketId, const Jid &AStreamJid, const Jid &AContactJid, IDataStreamSocket::StreamKind AKind, QObject *AParent = NULL) =0;
-	virtual IOptionsWidget *methodSettingsWidget(const OptionsNode &ANode, bool AReadOnly, QWidget *AParent) =0;
-	virtual IOptionsWidget *methodSettingsWidget(IDataStreamSocket *ASocket, bool AReadOnly, QWidget *AParent) =0;
-	virtual void saveMethodSettings(IOptionsWidget *AWidget, OptionsNode ANode = OptionsNode::null) =0;
-	virtual void loadMethodSettings(IDataStreamSocket *ASocket, IOptionsWidget *AWidget) =0;
+	virtual IOptionsDialogWidget *methodSettingsWidget(const OptionsNode &ANode, QWidget *AParent) =0;
 	virtual void loadMethodSettings(IDataStreamSocket *ASocket, const OptionsNode &ANode) =0;
 protected:
 	virtual void socketCreated(IDataStreamSocket *ASocket) =0;
@@ -75,19 +72,23 @@ class IDataStreamsManager
 {
 public:
 	virtual QObject *instance() =0;
+	// Methods
 	virtual QList<QString> methods() const =0;
 	virtual IDataStreamMethod *method(const QString &AMethodNS) const =0;
 	virtual void insertMethod(IDataStreamMethod *AMethod) =0;
 	virtual void removeMethod(IDataStreamMethod *AMethod) =0;
+	// Profiles
 	virtual QList<QString> profiles() const =0;
 	virtual IDataStreamProfile *profile(const QString &AProfileNS) =0;
 	virtual void insertProfile(IDataStreamProfile *AProfile) =0;
 	virtual void removeProfile(IDataStreamProfile *AProfile) =0;
+	// Settings
 	virtual QList<QUuid> settingsProfiles() const =0;
-	virtual QString settingsProfileName(const QUuid &AProfileId) const =0;
-	virtual OptionsNode settingsProfileNode(const QUuid &AProfileId, const QString &AMethodNS) const =0;
-	virtual void insertSettingsProfile(const QUuid &AProfileId, const QString &AName) =0;
-	virtual void removeSettingsProfile(const QUuid &AProfileId) =0;
+	virtual QString settingsProfileName(const QUuid &ASettingsId) const =0;
+	virtual OptionsNode settingsProfileNode(const QUuid &ASettingsId, const QString &AMethodNS) const =0;
+	virtual void insertSettingsProfile(const QUuid &ASettingsId, const QString &AName) =0;
+	virtual void removeSettingsProfile(const QUuid &ASettingsId) =0;
+	// Streams
 	virtual bool initStream(const Jid &AStreamJid, const Jid &AContactJid, const QString &AStreamId, const QString &AProfileNS, const QList<QString> &AMethods, int ATimeout =0) =0;
 	virtual bool acceptStream(const QString &AStreamId, const QString &AMethodNS) =0;
 	virtual bool rejectStream(const QString &AStreamId, const XmppStanzaError &AError) =0;
@@ -96,13 +97,13 @@ protected:
 	virtual void methodRemoved(IDataStreamMethod *AMethod) =0;
 	virtual void profileInserted(IDataStreamProfile *AProfile) =0;
 	virtual void profileRemoved(IDataStreamProfile *AProfile) =0;
-	virtual void settingsProfileInserted(const QUuid &AProfileId, const QString &AName) =0;
-	virtual void settingsProfileRemoved(const QUuid &AProfileId) =0;
+	virtual void settingsProfileInserted(const QUuid &ASettingsId) =0;
+	virtual void settingsProfileRemoved(const QUuid &ASettingsId) =0;
 };
 
 Q_DECLARE_INTERFACE(IDataStreamSocket,"Vacuum.Plugin.IDataStreamSocket/1.1")
-Q_DECLARE_INTERFACE(IDataStreamMethod,"Vacuum.Plugin.IDataStreamMethod/1.0")
+Q_DECLARE_INTERFACE(IDataStreamMethod,"Vacuum.Plugin.IDataStreamMethod/1.1")
 Q_DECLARE_INTERFACE(IDataStreamProfile,"Vacuum.Plugin.IDataStreamProfile/1.1")
-Q_DECLARE_INTERFACE(IDataStreamsManager,"Vacuum.Plugin.IDataStreamsManager/1.1")
+Q_DECLARE_INTERFACE(IDataStreamsManager,"Vacuum.Plugin.IDataStreamsManager/1.2")
 
 #endif  //IDATASTREAMSMANAGER_H

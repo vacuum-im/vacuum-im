@@ -19,6 +19,7 @@
 #include <definitions/statisticsparams.h>
 #include <utils/widgetmanager.h>
 #include <utils/systemmanager.h>
+#include <utils/pluginhelper.h>
 #include <utils/filestorage.h>
 #include <utils/shortcuts.h>
 #include <utils/action.h>
@@ -85,11 +86,14 @@ PluginManager::PluginManager(QApplication *AParent) : QObject(AParent)
 
 	connect(AParent,SIGNAL(aboutToQuit()),SLOT(onApplicationAboutToQuit()));
 	connect(AParent,SIGNAL(commitDataRequest(QSessionManager &)),SLOT(onApplicationCommitDataRequested(QSessionManager &)));
+
+	PluginHelper::setPluginManager(this);
 }
 
 PluginManager::~PluginManager()
 {
 	Logger::closeLog();
+	PluginHelper::setPluginManager(NULL);
 }
 
 QString PluginManager::version() const
@@ -155,42 +159,39 @@ const IPluginInfo *PluginManager::pluginInfo(const QUuid &AUuid) const
 	return FPluginItems.contains(AUuid) ? FPluginItems.value(AUuid).info : NULL;
 }
 
-QList<QUuid> PluginManager::pluginDependencesOn(const QUuid &AUuid) const
+QSet<QUuid> PluginManager::pluginDependencesOn(const QUuid &AUuid) const
 {
 	static QStack<QUuid> deepStack;
 	deepStack.push(AUuid);
 
-	QList<QUuid> plugins;
-	QHash<QUuid, PluginItem>::const_iterator it = FPluginItems.constBegin();
-	while (it != FPluginItems.constEnd())
+	QSet<QUuid> plugins;
+	for (QHash<QUuid, PluginItem>::const_iterator it = FPluginItems.constBegin(); it!=FPluginItems.constEnd(); ++it)
 	{
 		if (!deepStack.contains(it.key()) && it.value().info->dependences.contains(AUuid))
 		{
 			plugins += pluginDependencesOn(it.key());
-			plugins.append(it.key());
+			plugins += it.key();
 		}
-		++it;
 	}
 
 	deepStack.pop();
 	return plugins;
 }
 
-QList<QUuid> PluginManager::pluginDependencesFor(const QUuid &AUuid) const
+QSet<QUuid> PluginManager::pluginDependencesFor(const QUuid &AUuid) const
 {
 	static QStack<QUuid> deepStack;
 	deepStack.push(AUuid);
 
-	QList<QUuid> plugins;
+	QSet<QUuid> plugins;
 	if (FPluginItems.contains(AUuid))
 	{
-		QList<QUuid> dependences = FPluginItems.value(AUuid).info->dependences;
-		foreach(const QUuid &depend, dependences)
+		foreach(const QUuid &depend, FPluginItems.value(AUuid).info->dependences)
 		{
 			if (!deepStack.contains(depend) && FPluginItems.contains(depend))
 			{
-				plugins.append(depend);
 				plugins += pluginDependencesFor(depend);
+				plugins += depend;
 			}
 		}
 	}
@@ -865,21 +866,18 @@ void PluginManager::createMenuActions()
 		Action *aboutQt = new Action(mainWindowPlugin->mainWindow()->mainMenu());
 		aboutQt->setText(tr("About Qt"));
 		aboutQt->setIcon(RSR_STORAGE_MENUICONS,MNI_PLUGINMANAGER_ABOUT_QT);
-		aboutQt->setShortcutId(SCT_APP_ABOUTQT);
 		connect(aboutQt,SIGNAL(triggered()),QApplication::instance(),SLOT(aboutQt()));
 		mainWindowPlugin->mainWindow()->mainMenu()->addAction(aboutQt,AG_MMENU_PLUGINMANAGER_ABOUT);
 
 		Action *about = new Action(mainWindowPlugin->mainWindow()->mainMenu());
 		about->setText(tr("About the program"));
 		about->setIcon(RSR_STORAGE_MENUICONS,MNI_PLUGINMANAGER_ABOUT);
-		about->setShortcutId(SCT_APP_ABOUTPROGRAM);
 		connect(about,SIGNAL(triggered()),SLOT(onShowAboutBoxDialog()));
 		mainWindowPlugin->mainWindow()->mainMenu()->addAction(about,AG_MMENU_PLUGINMANAGER_ABOUT);
 
 		Action *pluginsDialog = new Action(mainWindowPlugin->mainWindow()->mainMenu());
 		pluginsDialog->setText(tr("Setup plugins"));
 		pluginsDialog->setIcon(RSR_STORAGE_MENUICONS, MNI_PLUGINMANAGER_SETUP);
-		pluginsDialog->setShortcutId(SCT_APP_SETUPPLUGINS);
 		connect(pluginsDialog,SIGNAL(triggered(bool)),SLOT(onShowSetupPluginsDialog(bool)));
 		mainWindowPlugin->mainWindow()->mainMenu()->addAction(pluginsDialog,AG_MMENU_PLUGINMANAGER_SETUP,true);
 	}
@@ -887,12 +885,8 @@ void PluginManager::createMenuActions()
 
 void PluginManager::declareShortcuts()
 {
-	Shortcuts::declareGroup(SCTG_GLOBAL, tr("Global"), SGO_GLOBAL);
-
-	Shortcuts::declareGroup(SCTG_APPLICATION, tr("Application"), SGO_APPLICATION);
-	Shortcuts::declareShortcut(SCT_APP_ABOUTQT, tr("Show information about Qt"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
-	Shortcuts::declareShortcut(SCT_APP_ABOUTPROGRAM, tr("Show information about client"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
-	Shortcuts::declareShortcut(SCT_APP_SETUPPLUGINS, tr("Show setup plugins dialog"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
+	Shortcuts::declareGroup(SCTG_GLOBAL, tr("Global shortcuts"), SGO_GLOBAL);
+	Shortcuts::declareGroup(SCTG_APPLICATION, tr("Application shortcuts"), SGO_APPLICATION);
 }
 
 void PluginManager::onApplicationAboutToQuit()

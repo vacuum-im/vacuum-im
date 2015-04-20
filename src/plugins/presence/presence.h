@@ -1,9 +1,9 @@
 #ifndef PRESENCE_H
 #define PRESENCE_H
 
-#include <interfaces/ipresence.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/istanzaprocessor.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 
 class Presence :
 	public QObject,
@@ -30,20 +30,23 @@ public:
 	virtual bool setPriority(int APriority);
 	virtual bool setPresence(int AShow, const QString &AStatus, int APriority);
 	virtual bool sendPresence(const Jid &AContactJid, int AShow, const QString &AStatus, int APriority);
+	virtual QList<Jid> itemsJid() const;
+	virtual QList<IPresenceItem> items() const;
 	virtual IPresenceItem findItem(const Jid &AItemFullJid) const;
-	virtual QList<IPresenceItem> findItems(const Jid &AItemBareJid = Jid::null) const;
+	virtual QList<IPresenceItem> findItems(const Jid &AItemBareJid) const;
 signals:
 	void opened();
+	void closed();
+	void aboutToClose(int AShow, const QString &AStatus);
 	void changed(int AShow, const QString &AStatus, int APriority);
 	void itemReceived(const IPresenceItem &AItem, const IPresenceItem &ABefore);
 	void directSent(const Jid &AContactJid, int AShow, const QString &AStatus, int APriority);
-	void aboutToClose(int AShow, const QString &AStatus);
-	void closed();
+	void presenceDestroyed();
 protected:
-	void clearItems();
+	void clearPresenceItems();
 protected slots:
-	void onStreamError(const XmppError &AError);
-	void onStreamClosed();
+	void onXmppStreamError(const XmppError &AError);
+	void onXmppStreamClosed();
 private:
 	IXmppStream *FXmppStream;
 	IStanzaProcessor *FStanzaProcessor;
@@ -54,7 +57,7 @@ private:
 private:
 	bool FOpened;
 	int FSHIPresence;
-	QHash<Jid, IPresenceItem> FItems;
+	QHash<Jid, QMap<QString, IPresenceItem> > FItems;
 };
 
 #endif // PRESENCE_H

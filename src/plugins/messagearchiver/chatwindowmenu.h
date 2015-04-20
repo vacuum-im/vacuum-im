@@ -12,16 +12,14 @@ class ChatWindowMenu :
 {
 	Q_OBJECT;
 public:
-	ChatWindowMenu(IMessageArchiver *AArchiver, IPluginManager *APluginManager, IMessageToolBarWidget *AToolBarWidget, QWidget *AParent);
+	ChatWindowMenu(IMessageArchiver *AArchiver, IMessageToolBarWidget *AToolBarWidget, QWidget *AParent);
 	~ChatWindowMenu();
 	Jid streamJid() const;
 	Jid contactJid() const;
 protected:
-	void initialize(IPluginManager *APluginManager);
-	void createActions();
-protected:
 	bool isOTRStanzaSession(const IStanzaSession &ASession) const;
 	void restoreSessionPrefs(const Jid &AContactJid);
+	void createActions();
 	void updateMenu();
 protected slots:
 	void onActionTriggered(bool);

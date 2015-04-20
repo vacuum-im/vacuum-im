@@ -10,7 +10,7 @@
 #include <utils/iconstorage.h>
 #include <utils/logger.h>
 
-VCardDialog::VCardDialog(IVCardPlugin *AVCardPlugin, const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent) : QDialog(AParent)
+VCardDialog::VCardDialog(IVCardManager *AVCardPlugin, const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent) : QDialog(AParent)
 {
 	REPORT_VIEW;
 	ui.setupUi(this);
@@ -20,7 +20,7 @@ VCardDialog::VCardDialog(IVCardPlugin *AVCardPlugin, const Jid &AStreamJid, cons
 
 	FContactJid = AContactJid;
 	FStreamJid = AStreamJid;
-	FVCardPlugin = AVCardPlugin;
+	FVCardManager = AVCardPlugin;
 
 	FSaveClicked = false;
 
@@ -35,7 +35,7 @@ VCardDialog::VCardDialog(IVCardPlugin *AVCardPlugin, const Jid &AStreamJid, cons
 	ui.btbButtons->addButton(tr("Reload"),QDialogButtonBox::ResetRole);
 	connect(ui.btbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonClicked(QAbstractButton *)));
 
-	FVCard = FVCardPlugin->getVCard(FContactJid);
+	FVCard = FVCardManager->getVCard(FContactJid);
 	connect(FVCard->instance(),SIGNAL(vcardUpdated()),SLOT(onVCardUpdated()));
 	connect(FVCard->instance(),SIGNAL(vcardPublished()),SLOT(onVCardPublished()));
 	connect(FVCard->instance(),SIGNAL(vcardError(const XmppError &)),SLOT(onVCardError(const XmppError &)));

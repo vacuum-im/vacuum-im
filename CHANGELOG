@@ -15,9 +15,12 @@ LEGEND
   [+] Added option to set host certificate check mode
   [+] Added ability to store additional trusted CA certificates in resources/cacertificates
   [+] Added ability to select SSL negotiation protocol
+  [+] Added wizard to help in creating new accounts
   [*] Increased speed of access to local message history
   [*] Added workarounds for facebook XMPP server
   [*] History view windows is made more convenient
+  [*] Redesigned setup plugins dialog
+  [*] Redesigned options dialog
   [-] The application may fail in some cases after unsuccessful Stanza-session initialization
   [-] In private chats history of communication are loaded even if the relevant setting has been disabled
   [-] When changing the nickname in the conference the nickname was not changed in the active conferences menu in the roster window
@@ -79,10 +82,10 @@ v1.1.0
   [+] Changes of contact status and entry/exit of participants in conference are stored in the history
   [+] Added support for arbitrary forms of registration when registering an account on the server
   [+] Added sticking of some windows to the edges of the screen under Windows.
-  [*} Changed the format of the qoutes design
+  [*] Changed the format of the qoutes design
   [*] Server side archive preferences support is not longer required for retrieving messages history from server
   [*] Added ability to switch between tabs by shortkeys Alt+Number
-  [*} Added ability to clear chat window
+  [*] Added ability to clear chat window
   [*] Added ability to optionaly display of status changes and entry/exit of users in conferences
   [*] Added ability to search for contacts in the roster by the group name
   [*] Added support for older versions of the message history protocol, when the time of message was stored in seconds from the beginning of the conversation

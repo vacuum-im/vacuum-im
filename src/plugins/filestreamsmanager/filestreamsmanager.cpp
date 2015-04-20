@@ -2,6 +2,7 @@
 
 #include <QSet>
 #include <QDir>
+#include <QComboBox>
 #include <QDesktopServices>
 #include <definitions/namespaces.h>
 #include <definitions/menuicons.h>
@@ -81,7 +82,7 @@ bool FileStreamsManager::initConnections(IPluginManager *APluginManager, int &AI
 
 bool FileStreamsManager::initObjects()
 {
-	Shortcuts::declareShortcut(SCT_APP_SHOWFILETRANSFERS,tr("Show file transfers"),QKeySequence::UnknownKey,Shortcuts::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_APP_SHOWFILETRANSFERS,tr("Show file transfers"),tr("Ctrl+T","Show file transfers"),Shortcuts::ApplicationShortcut);
 
 	XmppError::registerError(NS_INTERNAL_ERROR,IERR_FILESTREAMS_STREAM_FILE_IO_ERROR,tr("File input/output error"));
 	XmppError::registerError(NS_INTERNAL_ERROR,IERR_FILESTREAMS_STREAM_FILE_SIZE_CHANGED,tr("File size unexpectedly changed"));
@@ -116,24 +117,35 @@ bool FileStreamsManager::initSettings()
 	QStringList availMethods = FDataManager!=NULL ? FDataManager->methods() : QStringList();
 	Options::setDefaultValue(OPV_FILESTREAMS_DEFAULTDIR,QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation));
 	Options::setDefaultValue(OPV_FILESTREAMS_GROUPBYSENDER,false);
-	Options::setDefaultValue(OPV_FILESTREAMS_DEFAULTMETHOD,availMethods.contains(NS_SOCKS5_BYTESTREAMS) ? QString(NS_SOCKS5_BYTESTREAMS) : QString::null);
+	Options::setDefaultValue(OPV_FILESTREAMS_DEFAULTMETHOD,NS_SOCKS5_BYTESTREAMS);
 	Options::setDefaultValue(OPV_FILESTREAMS_ACCEPTABLEMETHODS,availMethods);
 
 	if (FOptionsManager)
 	{
-		IOptionsDialogNode fileNode = { ONO_FILETRANSFER, OPN_FILETRANSFER, tr("File Transfer"), MNI_FILESTREAMSMANAGER };
-		FOptionsManager->insertOptionsDialogNode(fileNode);
-		FOptionsManager->insertOptionsHolder(this);
+		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 	return true;
 }
 
-QMultiMap<int, IOptionsWidget *> FileStreamsManager::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+QMultiMap<int, IOptionsDialogWidget *> FileStreamsManager::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	QMultiMap<int, IOptionsWidget *> widgets;
-	if (FDataManager && ANodeId == OPN_FILETRANSFER)
+	QMultiMap<int, IOptionsDialogWidget *> widgets;
+	if (FOptionsManager && ANodeId==OPN_DATATRANSFER)
 	{
-		widgets.insertMulti(OWO_FILESTREAMSMANAGER, new FileStreamsOptions(FDataManager, this, AParent));
+		widgets.insertMulti(OHO_DATATRANSFER_FILETRANSFER, FOptionsManager->newOptionsDialogHeader(tr("File transfer"),AParent));
+		widgets.insertMulti(OWO_DATATRANSFER_FILESTREAMS, new FileStreamsOptionsWidget(this,AParent));
+		widgets.insertMulti(OWO_DATATRANSFER_GROUPBYSENDER,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_FILESTREAMS_GROUPBYSENDER),tr("Create separate folder for each sender"),AParent));
+
+		if (FDataManager)
+		{
+			QComboBox *cmbDefaultMethod = new QComboBox(AParent);
+			foreach(const QString &methodId, FDataManager->methods())
+			{
+				IDataStreamMethod *method = FDataManager->method(methodId);
+				cmbDefaultMethod->addItem(method->methodName(), method->methodNS());
+			}
+			widgets.insertMulti(OWO_DATATRANSFER_DEFAULTMETHOD,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_FILESTREAMS_DEFAULTMETHOD),tr("Default transfer method:"),cmbDefaultMethod,AParent));
+		}
 	}
 	return widgets;
 }

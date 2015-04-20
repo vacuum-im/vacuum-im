@@ -11,7 +11,7 @@
 
 MessageProcessor::MessageProcessor()
 {
-	FXmppStreams = NULL;
+	FXmppStreamManager = NULL;
 	FStanzaProcessor = NULL;
 	FNotifications = NULL;
 }
@@ -35,15 +35,14 @@ void MessageProcessor::pluginInfo(IPluginInfo *APluginInfo)
 bool MessageProcessor::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
 	Q_UNUSED(AInitOrder);
-	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
+	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreamManager").value(0,NULL);
 	if (plugin)
 	{
-		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-		if (FXmppStreams)
+		FXmppStreamManager = qobject_cast<IXmppStreamManager *>(plugin->instance());
+		if (FXmppStreamManager)
 		{
-			connect(FXmppStreams->instance(),SIGNAL(added(IXmppStream *)),SLOT(onXmppStreamAdded(IXmppStream *)));
-			connect(FXmppStreams->instance(),SIGNAL(removed(IXmppStream *)),SLOT(onXmppStreamRemoved(IXmppStream *)));
-			connect(FXmppStreams->instance(),SIGNAL(jidChanged(IXmppStream *, const Jid &)),SLOT(onXmppStreamJidChanged(IXmppStream *, const Jid &)));
+			connect(FXmppStreamManager->instance(),SIGNAL(streamActiveChanged(IXmppStream *, bool)),SLOT(onXmppStreamActiveChanged(IXmppStream *, bool)));
+			connect(FXmppStreamManager->instance(),SIGNAL(streamJidChanged(IXmppStream *, const Jid &)),SLOT(onXmppStreamJidChanged(IXmppStream *, const Jid &)));
 		}
 	}
 
@@ -64,7 +63,7 @@ bool MessageProcessor::initConnections(IPluginManager *APluginManager, int &AIni
 		}
 	}
 
-	return FStanzaProcessor!=NULL && FXmppStreams!=NULL;
+	return FStanzaProcessor!=NULL && FXmppStreamManager!=NULL;
 }
 
 bool MessageProcessor::initObjects()
@@ -403,14 +402,12 @@ void MessageProcessor::onNotificationRemoved(int ANotifyId)
 		removeMessageNotify(FNotifyId2MessageId.value(ANotifyId));
 }
 
-void MessageProcessor::onXmppStreamAdded(IXmppStream *AXmppStream)
+void MessageProcessor::onXmppStreamActiveChanged(IXmppStream *AXmppStream, bool AActive)
 {
-	appendActiveStream(AXmppStream->streamJid());
-}
-
-void MessageProcessor::onXmppStreamRemoved(IXmppStream *AXmppStream)
-{
-	removeActiveStream(AXmppStream->streamJid());
+	if (AActive)
+		appendActiveStream(AXmppStream->streamJid());
+	else
+		removeActiveStream(AXmppStream->streamJid());
 }
 
 void MessageProcessor::onXmppStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore)

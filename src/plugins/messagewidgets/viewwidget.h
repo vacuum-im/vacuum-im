@@ -27,9 +27,9 @@ public:
 	virtual QWidget *styleWidget() const;
 	virtual IMessageStyle *messageStyle() const;
 	virtual void setMessageStyle(IMessageStyle *AStyle, const IMessageStyleOptions &AOptions);
-	virtual void appendHtml(const QString &AHtml, const IMessageContentOptions &AOptions);
-	virtual void appendText(const QString &AText, const IMessageContentOptions &AOptions);
-	virtual void appendMessage(const Message &AMessage, const IMessageContentOptions &AOptions);
+	virtual void appendHtml(const QString &AHtml, const IMessageStyleContentOptions &AOptions);
+	virtual void appendText(const QString &AText, const IMessageStyleContentOptions &AOptions);
+	virtual void appendMessage(const Message &AMessage, const IMessageStyleContentOptions &AOptions);
 	virtual void contextMenuForView(const QPoint &APosition, Menu *AMenu);
 	virtual QTextDocumentFragment selection() const;
 	virtual QTextCharFormat textFormatAt(const QPoint &APosition) const;
@@ -37,7 +37,7 @@ public:
 signals:
 	void urlClicked(const QUrl &AUrl);
 	void viewContextMenu(const QPoint &APosition, Menu *AMenu);
-	void contentAppended(const QString &AHtml, const IMessageContentOptions &AOptions);
+	void contentAppended(const QString &AHtml, const IMessageStyleContentOptions &AOptions);
 	void messageStyleOptionsChanged(const IMessageStyleOptions &AOptions, bool ACleared);
 	void messageStyleChanged(IMessageStyle *ABefore, const IMessageStyleOptions &AOptions);
 protected:
@@ -51,7 +51,7 @@ protected slots:
 	void onMessageStyleUrlClicked(QWidget *AWidget, const QUrl &AUrl);
 	void onMessageStyleWidgetCustomContextMenuRequested(const QPoint &APosition);
 	void onMessageStyleOptionsChanged(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean);
-	void onMessageStyleContentAppended(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions);
+	void onMessageStyleContentAppended(QWidget *AWidget, const QString &AHtml, const IMessageStyleContentOptions &AOptions);
 private:
 	Ui::ViewWidgetClass ui;
 private:

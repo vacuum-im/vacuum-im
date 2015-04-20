@@ -16,10 +16,6 @@
         <translation>Pozwala na dodawanie komentarzy do kontaktów na liście kontaktów</translation>
     </message>
     <message>
-        <source>Edit annotation</source>
-        <translation>Edytuj komentarz</translation>
-    </message>
-    <message>
         <source>&lt;b&gt;Annotation:&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>

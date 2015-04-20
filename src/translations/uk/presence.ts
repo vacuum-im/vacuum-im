@@ -9,7 +9,7 @@
     </message>
 </context>
 <context>
-    <name>PresencePlugin</name>
+    <name>PresenceManager</name>
     <message>
         <source>Presence Manager</source>
         <translation>Менеджер присутності</translation>

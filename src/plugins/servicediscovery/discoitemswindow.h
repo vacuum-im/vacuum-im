@@ -7,7 +7,7 @@
 #include <QSortFilterProxyModel>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/irosterchanger.h>
-#include <interfaces/ivcard.h>
+#include <interfaces/ivcardmanager.h>
 #include "discoitemsmodel.h"
 #include "ui_discoitemswindow.h"
 
@@ -42,7 +42,6 @@ signals:
 public:
 	QMenu *createPopupMenu();
 protected:
-	void initialize();
 	void createToolBarActions();
 	void updateToolBarActions();
 	void updateActionsBar();
@@ -59,7 +58,7 @@ private:
 	Ui::DiscoItemsWindowClass ui;
 private:
 	IDataForms *FDataForms;
-	IVCardPlugin *FVCardPlugin;
+	IVCardManager *FVCardManager;
 	IRosterChanger *FRosterChanger;
 	IServiceDiscovery *FDiscovery;
 private:

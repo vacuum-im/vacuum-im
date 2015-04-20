@@ -3,7 +3,7 @@
 
 #include <QDialog>
 #include <interfaces/istatuschanger.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/ipresencemanager.h>
 #include "ui_modifystatusdialog.h"
 
 class ModifyStatusDialog :

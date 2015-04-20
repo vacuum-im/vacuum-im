@@ -231,36 +231,23 @@
     </message>
 </context>
 <context>
-    <name>VCardPlugin</name>
-    <message>
-        <source>Allows to obtain personal contact information</source>
-        <translation>Позволяет получать личную информацию о контакте</translation>
-    </message>
-    <message>
-        <source>Supports the requesting of the personal contact information</source>
-        <translation>Поддерживает запросы личной информации о контакте</translation>
-    </message>
+    <name>VCardManager</name>
     <message>
         <source>Visit Card Manager</source>
         <translation>Менеджер визитных карточек</translation>
     </message>
     <message>
-        <source>Show Profile</source>
-        <translation>Показать личные данные</translation>
+        <source>Allows to obtain personal contact information</source>
+        <translation>Позволяет получать личную информацию о контакте</translation>
+    </message>
+    <message>
+        <source>Show contact profile</source>
+        <translation>Показать личные данные контакта</translation>
     </message>
     <message>
         <source>Ctrl+I</source>
-        <comment>Show Profile</comment>
-        <translatorcomment>Показать личные данные</translatorcomment>
+        <comment>Show contact profile</comment>
         <translation>Ctrl+I</translation>
-    </message>
-    <message>
-        <source>Contact Profile</source>
-        <translation>Личные данные контакта</translation>
-    </message>
-    <message>
-        <source>Edit Profile</source>
-        <translation>Редактировать личные данные</translation>
     </message>
     <message>
         <source>User Profile</source>
@@ -269,6 +256,22 @@
     <message>
         <source>Restrict maximum vCard images size</source>
         <translation>Ограничивать максимальный размер изображений в vCard-е</translation>
+    </message>
+    <message>
+        <source>Contact Profile</source>
+        <translation>Личные данные контакта</translation>
+    </message>
+    <message>
+        <source>Supports the requesting of the personal contact information</source>
+        <translation>Поддерживает запросы личной информации о контакте</translation>
+    </message>
+    <message>
+        <source>Show Profile</source>
+        <translation>Показать личные данные</translation>
+    </message>
+    <message>
+        <source>Edit Profile</source>
+        <translation>Редактировать личные данные</translation>
     </message>
 </context>
 </TS>

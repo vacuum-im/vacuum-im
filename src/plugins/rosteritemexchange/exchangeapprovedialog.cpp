@@ -84,7 +84,7 @@ QString ExchangeApproveDialog::groupSetToString(const QSet<QString> &AGroups) co
 
 QString ExchangeApproveDialog::contactName(const Jid &AContactJid, bool AWithJid) const
 {
-	IRosterItem ritem = FRoster->rosterItem(AContactJid);
+	IRosterItem ritem = FRoster->findItem(AContactJid);
 	QString name = !ritem.name.isEmpty() ? ritem.name : AContactJid.uBare();
 	if (AWithJid && !ritem.name.isEmpty())
 		name = QString("%1 <%2>").arg(name,AContactJid.uBare());
@@ -96,10 +96,10 @@ void ExchangeApproveDialog::appendRequestItems(const QList<IRosterExchangeItem> 
 	for (QList<IRosterExchangeItem>::const_iterator it=AItems.constBegin(); it!=AItems.constEnd(); ++it)
 	{
 		QString actionText;
-		IRosterItem ritem = FRoster->rosterItem(it->itemJid);
+		IRosterItem ritem = FRoster->findItem(it->itemJid);
 		if (it->action == ROSTEREXCHANGE_ACTION_ADD)
 		{
-			if (!ritem.isValid)
+			if (ritem.isNull())
 			{
 				if (it->groups.isEmpty())
 					actionText = tr("Add new contact '%1 <%2>'").arg(it->name,it->itemJid.uBare());
@@ -112,7 +112,7 @@ void ExchangeApproveDialog::appendRequestItems(const QList<IRosterExchangeItem> 
 				actionText = tr("Copy contact '%1' to the group: %2").arg(contactName(it->itemJid),groupSetToString(it->groups-ritem.groups));
 			}
 		}
-		else if (ritem.isValid && it->action == ROSTEREXCHANGE_ACTION_DELETE)
+		else if (!ritem.isNull() && it->action == ROSTEREXCHANGE_ACTION_DELETE)
 		{
 			QSet<QString> oldGroups = it->groups;
 			oldGroups.intersect(ritem.groups);
@@ -121,7 +121,7 @@ void ExchangeApproveDialog::appendRequestItems(const QList<IRosterExchangeItem> 
 			else
 				actionText = tr("Remove contact '%1' from the group: %2").arg(contactName(it->itemJid),groupSetToString(oldGroups));
 		}
-		else if (ritem.isValid && it->action == ROSTEREXCHANGE_ACTION_MODIFY)
+		else if (!ritem.isNull() && it->action == ROSTEREXCHANGE_ACTION_MODIFY)
 		{
 			QSet<QString> newGroups = it->groups - ritem.groups;
 			QSet<QString> oldGroups = ritem.groups - it->groups;

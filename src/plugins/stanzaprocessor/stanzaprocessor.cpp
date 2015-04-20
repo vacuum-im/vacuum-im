@@ -6,7 +6,7 @@
 
 StanzaProcessor::StanzaProcessor()
 {
-	FXmppStreams = NULL;
+	FXmppStreamManager = NULL;
 }
 
 StanzaProcessor::~StanzaProcessor()
@@ -27,19 +27,19 @@ void StanzaProcessor::pluginInfo(IPluginInfo *APluginInfo)
 bool StanzaProcessor::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
 	Q_UNUSED(AInitOrder);
-	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
+	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreamManager").value(0,NULL);
 	if (plugin)
 	{
-		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-		if (FXmppStreams)
+		FXmppStreamManager = qobject_cast<IXmppStreamManager *>(plugin->instance());
+		if (FXmppStreamManager)
 		{
-			connect(FXmppStreams->instance(), SIGNAL(created(IXmppStream *)),SLOT(onStreamCreated(IXmppStream *)));
-			connect(FXmppStreams->instance(), SIGNAL(jidChanged(IXmppStream *, const Jid &)),SLOT(onStreamJidChanged(IXmppStream *, const Jid &)));
-			connect(FXmppStreams->instance(), SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *)));
-			connect(FXmppStreams->instance(), SIGNAL(streamDestroyed(IXmppStream *)),SLOT(onStreamDestroyed(IXmppStream *)));
+			connect(FXmppStreamManager->instance(), SIGNAL(streamCreated(IXmppStream *)),SLOT(onStreamCreated(IXmppStream *)));
+			connect(FXmppStreamManager->instance(), SIGNAL(streamJidChanged(IXmppStream *, const Jid &)),SLOT(onStreamJidChanged(IXmppStream *, const Jid &)));
+			connect(FXmppStreamManager->instance(), SIGNAL(streamClosed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *)));
+			connect(FXmppStreamManager->instance(), SIGNAL(streamDestroyed(IXmppStream *)),SLOT(onStreamDestroyed(IXmppStream *)));
 		}
 	}
-	return FXmppStreams!=NULL;
+	return FXmppStreamManager!=NULL;
 }
 
 //IXmppStanzaHandler
@@ -87,7 +87,7 @@ bool StanzaProcessor::sendStanzaOut(const Jid &AStreamJid, Stanza &AStanza)
 {
 	if (!processStanza(AStreamJid,AStanza,IStanzaHandle::DirectionOut))
 	{
-		IXmppStream *stream = FXmppStreams->xmppStream(AStreamJid);
+		IXmppStream *stream = FXmppStreamManager->findXmppStream(AStreamJid);
 		if (stream && stream->sendStanza(AStanza)>=0)
 		{
 			emit stanzaSent(AStreamJid, AStanza);

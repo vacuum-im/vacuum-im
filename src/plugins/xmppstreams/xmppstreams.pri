@@ -1,8 +1,8 @@
-HEADERS = xmppstreams.h \
+HEADERS = xmppstreammanager.h \
           xmppstream.h \
           streamparser.h
 
-SOURCES = xmppstreams.cpp \
+SOURCES = xmppstreammanager.cpp \
           xmppstream.cpp \
           streamparser.cpp
 

@@ -13,15 +13,15 @@ class DataMediaWidget :
 	Q_INTERFACES(IDataMediaWidget);
 public:
 	DataMediaWidget(IDataForms *ADataForms, const IDataMedia &AMedia, QWidget *AParent);
-	~DataMediaWidget();
 	virtual QWidget *instance() { return this; }
 	virtual IDataMedia media() const;
 	virtual IDataMediaURI mediaUri() const;
 signals:
 	void mediaShown();
 	void mediaError(const XmppError &AError);
-protected:
+protected slots:
 	void loadUri();
+protected:
 	bool updateWidget(const IDataMediaURI &AUri, const QByteArray &AData);
 protected slots:
 	void onUrlLoaded(const QUrl &AUrl, const QByteArray &AData);

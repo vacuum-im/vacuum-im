@@ -144,14 +144,275 @@ Comprueba la configuración y vuelve a intentarlo.</translation>
     </message>
 </context>
 <context>
-    <name>MultiUserChatPlugin</name>
+    <name>MultiUserChatManager</name>
+    <message>
+        <source>Multi-User Conferences</source>
+        <translation>Salas multiusuario</translation>
+    </message>
+    <message>
+        <source>Allows to use Jabber multi-user conferences</source>
+        <translation>Permite el uso de salas Jabber multiusuario</translation>
+    </message>
+    <message>
+        <source>Join conference</source>
+        <translation type="unfinished">Entrar a la sala</translation>
+    </message>
+    <message>
+        <source>Ctrl+J</source>
+        <comment>Join conference</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When receiving an invitation to the conference</source>
+        <translation>Al recibir una invitación a la sala</translation>
+    </message>
+    <message>
+        <source>When receiving a new private message in conference</source>
+        <translation>Al recibir un nuevo mensaje privado en la sala</translation>
+    </message>
+    <message>
+        <source>When receiving a new message in conference</source>
+        <translation>Al recibir un nuevo mensaje en la sala</translation>
+    </message>
+    <message>
+        <source>When referring to you at the conference</source>
+        <translation>Al alguien referirse a ti en la sala</translation>
+    </message>
     <message>
         <source>Conferences</source>
         <translation>Salas</translation>
     </message>
     <message>
-        <source>Join conference</source>
-        <translation>Unirse a la sala</translation>
+        <source>Show users connections and disconnections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show users status changes</source>
+        <translation>Mostrar los cambios de estado de los usuarios</translation>
+    </message>
+    <message>
+        <source>Save users status messages in history</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Leave the conference when window closed</source>
+        <translation>Abandonar la sala al cerrar la ventana</translation>
+    </message>
+    <message>
+        <source>Automatically rejoin to conference after kick</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a user to refer by enumeration in the input field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Register in conference</source>
+        <translation>Inscribirse en la sala</translation>
+    </message>
+    <message>
+        <source>Allow this person to register with the room?</source>
+        <translation>¿Permitir a esta persona inscribirse en la sala?</translation>
+    </message>
+    <message>
+        <source>EMail Address</source>
+        <translation>Dirección E-mail</translation>
+    </message>
+    <message>
+        <source>Rules and Notes</source>
+        <translation>Reglas y notas</translation>
+    </message>
+    <message>
+        <source>Given Name</source>
+        <translation>Nombre</translation>
+    </message>
+    <message>
+        <source>Family Name</source>
+        <translation>Apellido</translation>
+    </message>
+    <message>
+        <source>Desired Nickname</source>
+        <translation>Apodo deseado</translation>
+    </message>
+    <message>
+        <source>Your URL</source>
+        <translation>Tu enlace</translation>
+    </message>
+    <message>
+        <source>Request for voice</source>
+        <translation>Solicitar voz</translation>
+    </message>
+    <message>
+        <source>Requested Role</source>
+        <translation>Rol solicitado</translation>
+    </message>
+    <message>
+        <source>User ID</source>
+        <translation>ID del usuario</translation>
+    </message>
+    <message>
+        <source>Room Nickname</source>
+        <translation>Apodo de la sala</translation>
+    </message>
+    <message>
+        <source>Grant Voice?</source>
+        <translation>¿Dar &apos;voz&apos;?</translation>
+    </message>
+    <message>
+        <source>Configure conference</source>
+        <translation>Configurar sala</translation>
+    </message>
+    <message>
+        <source>Maximum Number of History Messages Returned by Room</source>
+        <translation>Número máximo de mensajes del historial devueltos por la sala</translation>
+    </message>
+    <message>
+        <source>Allow Occupants to Send Private Messages?</source>
+        <translation>¿Permitir a los ocupantes enviar mensajes privados?</translation>
+    </message>
+    <message>
+        <source>Allow Occupants to Invite Others?</source>
+        <translation>¿Permitir a los ocupantes invitar a otros?</translation>
+    </message>
+    <message>
+        <source>Allow Occupants to Change Subject?</source>
+        <translation>¿Permitir a los ocupantes cambiar el tema?</translation>
+    </message>
+    <message>
+        <source>Enable Logging of Room Conversations?</source>
+        <translation>¿Habilitar el registro de las salas de conversaciones?</translation>
+    </message>
+    <message>
+        <source>Affiliations that May Retrieve Member List</source>
+        <translation>Afiliaciones que pueden obtener la lista de miembros</translation>
+    </message>
+    <message>
+        <source>XMPP URI of Associated Publish-Subscribe Node</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Natural Language for Room Discussions</source>
+        <translation>Idioma principal que se habla en la sala</translation>
+    </message>
+    <message>
+        <source>Maximum Number of Room Occupants</source>
+        <translation>Número máximo de usuarios de la sala</translation>
+    </message>
+    <message>
+        <source>Make Room Members-Only?</source>
+        <translation>¿Hacer la sala solo para miembros?</translation>
+    </message>
+    <message>
+        <source>Make Room Moderated?</source>
+        <translation>¿Hacer la sala moderada?</translation>
+    </message>
+    <message>
+        <source>Password is Required to Enter?</source>
+        <translation>¿Se requiere contraseña para entrar?</translation>
+    </message>
+    <message>
+        <source>Make Room Persistent?</source>
+        <translation>¿Hacer la sala persistente?</translation>
+    </message>
+    <message>
+        <source>Roles for which Presence is Broadcasted</source>
+        <translation>Roles a los que el estado de presencia es enviado</translation>
+    </message>
+    <message>
+        <source>Allow Public Searching for Room?</source>
+        <translation>¿Hacer la sala pública?</translation>
+    </message>
+    <message>
+        <source>Full List of Room Administrators</source>
+        <translation>Lista completa de los administradores de la sala</translation>
+    </message>
+    <message>
+        <source>Description of Room</source>
+        <translation>Descripción de la sala</translation>
+    </message>
+    <message>
+        <source>Natural-Language Room Name</source>
+        <translation>Nombre de la sala</translation>
+    </message>
+    <message>
+        <source>Full List of Room Owners</source>
+        <translation>Lista completa de los propietarios de la sala</translation>
+    </message>
+    <message>
+        <source>The Room Password</source>
+        <translation>Contraseña de la sala</translation>
+    </message>
+    <message>
+        <source>Affiliations that May Discover Real JIDs of Occupants</source>
+        <translation>Afiliaciones que pueden descubrir el verdadero JID de los usuarios</translation>
+    </message>
+    <message>
+        <source>Make Participants List Public?</source>
+        <translation>¿Hacer pública la lista de participantes?</translation>
+    </message>
+    <message>
+        <source>Make all Occupants as Participants?</source>
+        <translation>¿Hacer a todos los ocupantes participantes?</translation>
+    </message>
+    <message>
+        <source>Allow Occupants to Query Other Occupants?</source>
+        <translation>¿Permitir a los usuarios de la sala hacer consultas a otros?</translation>
+    </message>
+    <message>
+        <source>Allow Visitors to Send Status Text in Presence Updates?</source>
+        <translation>¿Permitir a los visitantes enviar textos en las actualizaciones de estados de presencia?</translation>
+    </message>
+    <message>
+        <source>Make this Room CAPTCHA Protected?</source>
+        <translation>¿Se requiere CAPTCHA parar entrar?</translation>
+    </message>
+    <message>
+        <source>Do not Request CAPTCHA for Followed Jabber ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow Login Only With Registered Nickname?</source>
+        <translation>¿Permitir solo la entrada de apodos registrados?</translation>
+    </message>
+    <message>
+        <source>Allow Occupants to Change Nicknames?</source>
+        <translation>¿Permitir a los ocupantes cambiar de apodo?</translation>
+    </message>
+    <message>
+        <source>Allow Users to Register with the Room?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Conference information</source>
+        <translation>Información de la sala</translation>
+    </message>
+    <message>
+        <source>Contact JID</source>
+        <translation>JID del contacto</translation>
+    </message>
+    <message>
+        <source>Natural Language for Room</source>
+        <translation>Idioma principal que se habla en la sala</translation>
+    </message>
+    <message>
+        <source>LDAP Group</source>
+        <translation>Grupo LDAP</translation>
+    </message>
+    <message>
+        <source>URL for Archived Discussion Logs</source>
+        <translation>Enlace a las trazas archivadas de la sala</translation>
+    </message>
+    <message>
+        <source>Current Number of Occupants in Room</source>
+        <translation>Número actual de usuarios en la sala</translation>
+    </message>
+    <message>
+        <source>Current Subject or Discussion Topic in Room</source>
+        <translation>Asunto o tema actual de la sala</translation>
+    </message>
+    <message>
+        <source>The Room Subject Can be Modified by Participants?</source>
+        <translation>¿Pueden los usuarios de la sala cambiar el tema de esta?</translation>
     </message>
     <message>
         <source>You are invited to the conference %1</source>
@@ -172,6 +433,10 @@ Comprueba la configuración y vuelve a intentarlo.</translation>
     <message>
         <source>Invite</source>
         <translation>Invitar</translation>
+    </message>
+    <message>
+        <source>Supports the multi-user conferences</source>
+        <translation>Soporta salas multiusuario</translation>
     </message>
     <message>
         <source>Hidden room</source>
@@ -278,276 +543,6 @@ Comprueba la configuración y vuelve a intentarlo.</translation>
         <translation>%1 de %2</translation>
     </message>
     <message>
-        <source>Decline invite</source>
-        <translation>Rechazar invitación</translation>
-    </message>
-    <message>
-        <source>Enter a reason</source>
-        <translation>Insertar una razón</translation>
-    </message>
-    <message>
-        <source>Invite user</source>
-        <translation>Invitar usuario</translation>
-    </message>
-    <message>
-        <source>Register in conference</source>
-        <translation>Inscribirse en la sala</translation>
-    </message>
-    <message>
-        <source>Allow this person to register with the room?</source>
-        <translation>¿Permitir a esta persona inscribirse en la sala?</translation>
-    </message>
-    <message>
-        <source>Desired Nickname</source>
-        <translation>Apodo deseado</translation>
-    </message>
-    <message>
-        <source>Your URL</source>
-        <translation>Tu enlace</translation>
-    </message>
-    <message>
-        <source>EMail Address</source>
-        <translation>Dirección E-mail</translation>
-    </message>
-    <message>
-        <source>Rules and Notes</source>
-        <translation>Reglas y notas</translation>
-    </message>
-    <message>
-        <source>Configure conference</source>
-        <translation>Configurar sala</translation>
-    </message>
-    <message>
-        <source>Allow Occupants to Invite Others?</source>
-        <translation>¿Permitir a los ocupantes invitar a otros?</translation>
-    </message>
-    <message>
-        <source>Allow Occupants to Change Subject?</source>
-        <translation>¿Permitir a los ocupantes cambiar el tema?</translation>
-    </message>
-    <message>
-        <source>Enable Logging of Room Conversations?</source>
-        <translation>¿Habilitar el registro de las salas de conversaciones?</translation>
-    </message>
-    <message>
-        <source>Natural Language for Room Discussions</source>
-        <translation>Idioma principal que se habla en la sala</translation>
-    </message>
-    <message>
-        <source>Maximum Number of Room Occupants</source>
-        <translation>Número máximo de usuarios de la sala</translation>
-    </message>
-    <message>
-        <source>Make Room Members-Only?</source>
-        <translation>¿Hacer la sala solo para miembros?</translation>
-    </message>
-    <message>
-        <source>Make Room Moderated?</source>
-        <translation>¿Hacer la sala moderada?</translation>
-    </message>
-    <message>
-        <source>Password is Required to Enter?</source>
-        <translation>¿Se requiere contraseña para entrar?</translation>
-    </message>
-    <message>
-        <source>Make Room Persistent?</source>
-        <translation>¿Hacer la sala persistente?</translation>
-    </message>
-    <message>
-        <source>Allow Public Searching for Room?</source>
-        <translation>¿Hacer la sala pública?</translation>
-    </message>
-    <message>
-        <source>Description of Room</source>
-        <translation>Descripción de la sala</translation>
-    </message>
-    <message>
-        <source>Natural-Language Room Name</source>
-        <translation>Nombre de la sala</translation>
-    </message>
-    <message>
-        <source>Full List of Room Owners</source>
-        <translation>Lista completa de los propietarios de la sala</translation>
-    </message>
-    <message>
-        <source>The Room Password</source>
-        <translation>Contraseña de la sala</translation>
-    </message>
-    <message>
-        <source>Affiliations that May Discover Real JIDs of Occupants</source>
-        <translation>Afiliaciones que pueden descubrir el verdadero JID de los usuarios</translation>
-    </message>
-    <message>
-        <source>Conference information</source>
-        <translation>Información de la sala</translation>
-    </message>
-    <message>
-        <source>Contact JID</source>
-        <translation>JID del contacto</translation>
-    </message>
-    <message>
-        <source>Natural Language for Room</source>
-        <translation>Idioma principal que se habla en la sala</translation>
-    </message>
-    <message>
-        <source>LDAP Group</source>
-        <translation>Grupo LDAP</translation>
-    </message>
-    <message>
-        <source>URL for Archived Discussion Logs</source>
-        <translation>Enlace a las trazas archivadas de la sala</translation>
-    </message>
-    <message>
-        <source>Current Number of Occupants in Room</source>
-        <translation>Número actual de usuarios en la sala</translation>
-    </message>
-    <message>
-        <source>Current Subject or Discussion Topic in Room</source>
-        <translation>Asunto o tema actual de la sala</translation>
-    </message>
-    <message>
-        <source>The Room Subject Can be Modified by Participants?</source>
-        <translation>¿Pueden los usuarios de la sala cambiar el tema de esta?</translation>
-    </message>
-    <message>
-        <source>Request for voice</source>
-        <translation>Solicitar voz</translation>
-    </message>
-    <message>
-        <source>Requested Role</source>
-        <translation>Rol solicitado</translation>
-    </message>
-    <message>
-        <source>User ID</source>
-        <translation>ID del usuario</translation>
-    </message>
-    <message>
-        <source>Room Nickname</source>
-        <translation>Apodo de la sala</translation>
-    </message>
-    <message>
-        <source>Grant Voice?</source>
-        <translation>¿Dar &apos;voz&apos;?</translation>
-    </message>
-    <message>
-        <source>Multi-User Conferences</source>
-        <translation>Salas multiusuario</translation>
-    </message>
-    <message>
-        <source>Allows to use Jabber multi-user conferences</source>
-        <translation>Permite el uso de salas Jabber multiusuario</translation>
-    </message>
-    <message>
-        <source>Supports the multi-user conferences</source>
-        <translation>Soporta salas multiusuario</translation>
-    </message>
-    <message>
-        <source>Leave all hidden conferences</source>
-        <translation>Abandonar todas las salas ocultas</translation>
-    </message>
-    <message>
-        <source>Show all hidden conferences</source>
-        <translation>Mostrar todas las salas ocultas</translation>
-    </message>
-    <message>
-        <source>Show users connections/disconnections</source>
-        <translation>Mostrar las conexiones/desconexiones de los usuarios</translation>
-    </message>
-    <message>
-        <source>Show users status changes</source>
-        <translation>Mostrar los cambios de estado de los usuarios</translation>
-    </message>
-    <message>
-        <source>Save status messages to history</source>
-        <translation>Guardar los mensajes de estado en el historial</translation>
-    </message>
-    <message>
-        <source>Multi-user chat window</source>
-        <translation>Ventana de chat multiusuario</translation>
-    </message>
-    <message>
-        <source>Send message</source>
-        <translation>Enviar mensaje</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <comment>Send message</comment>
-        <translation>Return</translation>
-    </message>
-    <message>
-        <source>Clear window</source>
-        <translation>Limpiar ventana</translation>
-    </message>
-    <message>
-        <source>Change nick</source>
-        <translation>Cambiar apodo</translation>
-    </message>
-    <message>
-        <source>Change topic</source>
-        <translation>Cambiar tema</translation>
-    </message>
-    <message>
-        <source>Setup conference</source>
-        <translation>Configurar sala</translation>
-    </message>
-    <message>
-        <source>Enter the conference</source>
-        <translation>Entrar a la sala</translation>
-    </message>
-    <message>
-        <source>Leave the conference</source>
-        <translation>Abandonar la sala</translation>
-    </message>
-    <message>
-        <source>Ctrl+Q</source>
-        <comment>Leave the conference</comment>
-        <translation>Ctrl+Q</translation>
-    </message>
-    <message>
-        <source>I&apos;m too busy right now</source>
-        <translation>Estoy demasiado ocupado ahora mismo</translation>
-    </message>
-    <message>
-        <source>When receiving an invitation to the conference</source>
-        <translation>Al recibir una invitación a la sala</translation>
-    </message>
-    <message>
-        <source>When receiving a new private message in conference</source>
-        <translation>Al recibir un nuevo mensaje privado en la sala</translation>
-    </message>
-    <message>
-        <source>When referring to you at the conference</source>
-        <translation>Al alguien referirse a ti en la sala</translation>
-    </message>
-    <message>
-        <source>When receiving a new message in conference</source>
-        <translation>Al recibir un nuevo mensaje en la sala</translation>
-    </message>
-    <message>
-        <source>Add this suffix when referring to the user:</source>
-        <translation>Añadir este sufijo al referirse a un usuario:</translation>
-    </message>
-    <message>
-        <source>Leave the conference when window closed</source>
-        <translation>Abandonar la sala al cerrar la ventana</translation>
-    </message>
-    <message>
-        <source>Enter conference</source>
-        <translation>Entrar a la sala</translation>
-    </message>
-    <message>
-        <source>Exit conference</source>
-        <translation>Abandonar la sala</translation>
-    </message>
-    <message>
-        <source>Rejoin in conference after kick</source>
-        <translation>Entrar automáticamente a la sala luego de ser expulsado</translation>
-    </message>
-    <message>
-        <source>Select the user to refer without menu</source>
-        <translation>Seleccionar el usuario al cual referirse sin menú</translation>
-    </message>
-    <message>
         <source>Enter</source>
         <translation>Entrar</translation>
     </message>
@@ -560,76 +555,24 @@ Comprueba la configuración y vuelve a intentarlo.</translation>
         <translation>Abrir diálogo de conferencia</translation>
     </message>
     <message>
+        <source>I&apos;m too busy right now</source>
+        <translation>Estoy demasiado ocupado ahora mismo</translation>
+    </message>
+    <message>
+        <source>Decline invite</source>
+        <translation>Rechazar invitación</translation>
+    </message>
+    <message>
+        <source>Enter a reason</source>
+        <translation>Insertar una razón</translation>
+    </message>
+    <message>
         <source>Please, enter this conference!</source>
         <translation>¡Por favor, entra a esta sala!</translation>
     </message>
     <message>
-        <source>Given Name</source>
-        <translation>Nombre</translation>
-    </message>
-    <message>
-        <source>Family Name</source>
-        <translation>Apellido</translation>
-    </message>
-    <message>
-        <source>Maximum Number of History Messages Returned by Room</source>
-        <translation>Número máximo de mensajes del historial devueltos por la sala</translation>
-    </message>
-    <message>
-        <source>Affiliations that May Retrieve Member List</source>
-        <translation>Afiliaciones que pueden obtener la lista de miembros</translation>
-    </message>
-    <message>
-        <source>XMPP URI of Associated Publish-Subscribe Node</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Roles for which Presence is Broadcasted</source>
-        <translation>Roles a los que el estado de presencia es enviado</translation>
-    </message>
-    <message>
-        <source>Full List of Room Administrators</source>
-        <translation>Lista completa de los administradores de la sala</translation>
-    </message>
-    <message>
-        <source>Make Participants List Public?</source>
-        <translation>¿Hacer pública la lista de participantes?</translation>
-    </message>
-    <message>
-        <source>Allow Occupants to Send Private Messages?</source>
-        <translation>¿Permitir a los ocupantes enviar mensajes privados?</translation>
-    </message>
-    <message>
-        <source>Allow Occupants to Query Other Occupants?</source>
-        <translation>¿Permitir a los usuarios de la sala hacer consultas a otros?</translation>
-    </message>
-    <message>
-        <source>Allow Visitors to Send Status Text in Presence Updates?</source>
-        <translation>¿Permitir a los visitantes enviar textos en las actualizaciones de estados de presencia?</translation>
-    </message>
-    <message>
-        <source>Allow Login Only With Registered Nickname?</source>
-        <translation>¿Permitir solo la entrada de apodos registrados?</translation>
-    </message>
-    <message>
-        <source>Allow Occupants to Change Nicknames?</source>
-        <translation>¿Permitir a los ocupantes cambiar de apodo?</translation>
-    </message>
-    <message>
-        <source>Allow Users to Register with the Room?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Make all Occupants as Participants?</source>
-        <translation>¿Hacer a todos los ocupantes participantes?</translation>
-    </message>
-    <message>
-        <source>Make this Room CAPTCHA Protected?</source>
-        <translation>¿Se requiere CAPTCHA parar entrar?</translation>
-    </message>
-    <message>
-        <source>Do not Request CAPTCHA for Followed Jabber ID</source>
-        <translation type="unfinished"></translation>
+        <source>Invite user</source>
+        <translation>Invitar usuario</translation>
     </message>
 </context>
 <context>

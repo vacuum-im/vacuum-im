@@ -6,10 +6,11 @@
 #include <definitions/vcardvaluenames.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
+#include <utils/pluginhelper.h>
 #include <utils/action.h>
 #include <utils/logger.h>
 
-AddContactDialog::AddContactDialog(IRosterChanger *ARosterChanger, IPluginManager *APluginManager, const Jid &AStreamJid, QWidget *AParent) : QDialog(AParent)
+AddContactDialog::AddContactDialog(IRosterChanger *ARosterChanger, const Jid &AStreamJid, QWidget *AParent) : QDialog(AParent)
 {
 	REPORT_VIEW;
 	ui.setupUi(this);
@@ -17,13 +18,10 @@ AddContactDialog::AddContactDialog(IRosterChanger *ARosterChanger, IPluginManage
 	setWindowTitle(tr("Add contact - %1").arg(AStreamJid.uBare()));
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_RCHANGER_ADD_CONTACT,0,0,"windowIcon");
 
-	FRoster = NULL;
-	FVcardPlugin = NULL;
-	FMessageProcessor = NULL;
 	FResolving = false;
 
-	FRosterChanger = ARosterChanger;
 	FStreamJid = AStreamJid;
+	FRosterChanger = ARosterChanger;
 
 	QToolBar *toolBar = new QToolBar(this);
 	toolBar->setIconSize(QSize(16,16));
@@ -32,10 +30,10 @@ AddContactDialog::AddContactDialog(IRosterChanger *ARosterChanger, IPluginManage
 
 	setSubscriptionMessage(tr("Please, authorize me to your presence."));
 
-	initialize(APluginManager);
-
 	connect(ui.dbbButtons,SIGNAL(accepted()),SLOT(onDialogAccepted()));
 	connect(ui.dbbButtons,SIGNAL(rejected()),SLOT(reject()));
+
+	initialize();
 }
 
 AddContactDialog::~AddContactDialog()
@@ -103,66 +101,54 @@ ToolBarChanger *AddContactDialog::toolBarChanger() const
 	return FToolBarChanger;
 }
 
-void AddContactDialog::initialize(IPluginManager *APluginManager)
+void AddContactDialog::initialize()
 {
-	IPlugin *plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
-	if (plugin)
+	IRosterManager *rosterManager = PluginHelper::pluginInstance<IRosterManager>();
+	FRoster = rosterManager!=NULL ? rosterManager->findRoster(FStreamJid) : NULL;
+	if (FRoster)
 	{
-		IRosterPlugin *rosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
-		FRoster = rosterPlugin!=NULL ? rosterPlugin->findRoster(FStreamJid) : NULL;
-		if (FRoster)
-		{
-			ui.cmbGroup->addItems(FRoster->allGroups().toList());
-			ui.cmbGroup->model()->sort(0,Qt::AscendingOrder);
-			ui.cmbGroup->setCurrentIndex(-1);
-			ui.lblGroupDelim->setText(tr("* nested group delimiter - '%1'").arg(ROSTER_GROUP_DELIMITER));
-		}
+		ui.cmbGroup->addItems(FRoster->groups().toList());
+		ui.cmbGroup->model()->sort(0,Qt::AscendingOrder);
+		ui.cmbGroup->setCurrentIndex(-1);
+		ui.lblGroupDelim->setText(tr("* nested group delimiter - '%1'").arg(ROSTER_GROUP_DELIMITER));
 	}
 
-	plugin = APluginManager->pluginInterface("IMessageProcessor").value(0,NULL);
-	if (plugin)
+	FMessageProcessor = PluginHelper::pluginInstance<IMessageProcessor>();
+	if (FMessageProcessor)
 	{
-		FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
-		if (FMessageProcessor)
-		{
-			FShowChat = new Action(FToolBarChanger->toolBar());
-			FShowChat->setText(tr("Chat"));
-			FShowChat->setToolTip(tr("Open chat window"));
-			FShowChat->setIcon(RSR_STORAGE_MENUICONS,MNI_CHATMHANDLER_MESSAGE);
-			FToolBarChanger->insertAction(FShowChat,TBG_RCACD_ROSTERCHANGER);
-			connect(FShowChat,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
+		FShowChat = new Action(FToolBarChanger->toolBar());
+		FShowChat->setText(tr("Chat"));
+		FShowChat->setToolTip(tr("Open chat window"));
+		FShowChat->setIcon(RSR_STORAGE_MENUICONS,MNI_CHATMHANDLER_MESSAGE);
+		FToolBarChanger->insertAction(FShowChat,TBG_RCACD_ROSTERCHANGER);
+		connect(FShowChat,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
-			FSendMessage = new Action(FToolBarChanger->toolBar());
-			FSendMessage->setText(tr("Message"));
-			FSendMessage->setToolTip(tr("Send Message"));
-			FSendMessage->setIcon(RSR_STORAGE_MENUICONS,MNI_NORMALMHANDLER_MESSAGE);
-			FToolBarChanger->insertAction(FSendMessage,TBG_RCACD_ROSTERCHANGER);
-			connect(FSendMessage,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
-		}
+		FSendMessage = new Action(FToolBarChanger->toolBar());
+		FSendMessage->setText(tr("Message"));
+		FSendMessage->setToolTip(tr("Send Message"));
+		FSendMessage->setIcon(RSR_STORAGE_MENUICONS,MNI_NORMALMHANDLER_MESSAGE);
+		FToolBarChanger->insertAction(FSendMessage,TBG_RCACD_ROSTERCHANGER);
+		connect(FSendMessage,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 	}
 
-	plugin = APluginManager->pluginInterface("IVCardPlugin").value(0,NULL);
-	if (plugin)
+	FVCardManager = PluginHelper::pluginInstance<IVCardManager>();
+	if (FVCardManager)
 	{
-		FVcardPlugin = qobject_cast<IVCardPlugin *>(plugin->instance());
-		if (FVcardPlugin)
-		{
-			FShowVCard = new Action(FToolBarChanger->toolBar());
-			FShowVCard->setText(tr("VCard"));
-			FShowVCard->setToolTip(tr("Show VCard"));
-			FShowVCard->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
-			FToolBarChanger->insertAction(FShowVCard,TBG_RCACD_ROSTERCHANGER);
-			connect(FShowVCard,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
+		FShowVCard = new Action(FToolBarChanger->toolBar());
+		FShowVCard->setText(tr("VCard"));
+		FShowVCard->setToolTip(tr("Show VCard"));
+		FShowVCard->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
+		FToolBarChanger->insertAction(FShowVCard,TBG_RCACD_ROSTERCHANGER);
+		connect(FShowVCard,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
-			FResolve = new Action(FToolBarChanger->toolBar());
-			FResolve->setText(tr("Nick"));
-			FResolve->setToolTip(tr("Resolve nick name"));
-			FResolve->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_RESOLVE);
-			FToolBarChanger->insertAction(FResolve,TBG_RCACD_ROSTERCHANGER);
-			connect(FResolve,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
+		FResolve = new Action(FToolBarChanger->toolBar());
+		FResolve->setText(tr("Nick"));
+		FResolve->setToolTip(tr("Resolve nick name"));
+		FResolve->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_RESOLVE);
+		FToolBarChanger->insertAction(FResolve,TBG_RCACD_ROSTERCHANGER);
+		connect(FResolve,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
-			connect(FVcardPlugin->instance(),SIGNAL(vcardReceived(const Jid &)),SLOT(onVCardReceived(const Jid &)));
-		}
+		connect(FVCardManager->instance(),SIGNAL(vcardReceived(const Jid &)),SLOT(onVCardReceived(const Jid &)));
 	}
 }
 
@@ -170,7 +156,7 @@ void AddContactDialog::onDialogAccepted()
 {
 	if (contactJid().isValid())
 	{
-		if (!FRoster->rosterItem(contactJid()).isValid)
+		if (!FRoster->hasItem(contactJid()))
 		{
 			QSet<QString> groups;
 			if (!group().isEmpty())
@@ -206,15 +192,15 @@ void AddContactDialog::onToolBarActionTriggered(bool)
 		}
 		else if (action == FShowVCard)
 		{
-			FVcardPlugin->showVCardDialog(FStreamJid,contactJid().bare());
+			FVCardManager->showVCardDialog(FStreamJid,contactJid().bare());
 		}
 		else if (action == FResolve)
 		{
 			FResolving = true;
-			if (FVcardPlugin->hasVCard(contactJid().bare()))
+			if (FVCardManager->hasVCard(contactJid().bare()))
 				onVCardReceived(contactJid());
 			else
-				FVcardPlugin->requestVCard(FStreamJid,contactJid());
+				FVCardManager->requestVCard(FStreamJid,contactJid());
 		}
 	}
 }
@@ -223,7 +209,7 @@ void AddContactDialog::onVCardReceived(const Jid &AContactJid)
 {
 	if (FResolving && (AContactJid && contactJid()))
 	{
-		IVCard *vcard = FVcardPlugin->getVCard(AContactJid.bare());
+		IVCard *vcard = FVCardManager->getVCard(AContactJid.bare());
 		if (vcard)
 		{
 			setNickName(vcard->value(VVN_NICKNAME));

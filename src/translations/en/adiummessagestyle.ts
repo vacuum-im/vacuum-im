@@ -13,7 +13,7 @@
     </message>
 </context>
 <context>
-    <name>AdiumMessageStylePlugin</name>
+    <name>AdiumMessageStyleEngine</name>
     <message>
         <source>Adium Message Style</source>
         <translation>Adium Message Style</translation>
@@ -23,8 +23,8 @@
         <translation>Allows to use a Adium style in message design</translation>
     </message>
     <message>
-        <source>Adium Style</source>
-        <translation>Adium Style</translation>
+        <source>Adium</source>
+        <translation>Adium</translation>
     </message>
 </context>
 <context>
@@ -65,44 +65,48 @@
         <source>Image Files (*.png *.jpg *.bmp *.gif)</source>
         <translation>Image Files (*.png *.jpg *.bmp *.gif)</translation>
     </message>
+    <message>
+        <source>Parameters</source>
+        <translation>Parameters</translation>
+    </message>
+    <message>
+        <source>Background</source>
+        <translation>Background</translation>
+    </message>
 </context>
 <context>
     <name>AdiumOptionsWidgetClass</name>
     <message>
-        <source>Message Style:</source>
-        <translation>Message Style:</translation>
-    </message>
-    <message>
         <source>Variant:</source>
         <translation>Variant:</translation>
-    </message>
-    <message>
-        <source>Text Font:</source>
-        <translation>Text Font:</translation>
-    </message>
-    <message>
-        <source>Set Font...</source>
-        <translation>Set Font...</translation>
-    </message>
-    <message>
-        <source>Default</source>
-        <translation>Default</translation>
-    </message>
-    <message>
-        <source>Background:</source>
-        <translation>Background:</translation>
     </message>
     <message>
         <source>Color:</source>
         <translation>Color:</translation>
     </message>
     <message>
-        <source>Set Image...</source>
-        <translation>Set Image...</translation>
-    </message>
-    <message>
         <source>Layout:</source>
         <translation>Layout:</translation>
+    </message>
+    <message>
+        <source>Font:</source>
+        <translation>Font:</translation>
+    </message>
+    <message>
+        <source>Change...</source>
+        <translation>Change...</translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation>Reset</translation>
+    </message>
+    <message>
+        <source>Image:</source>
+        <translation>Image:</translation>
+    </message>
+    <message>
+        <source>not set</source>
+        <translation>not set</translation>
     </message>
 </context>
 </TS>

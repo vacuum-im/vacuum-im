@@ -18,7 +18,7 @@ JabberSearch::JabberSearch()
 	FPluginManager = NULL;
 	FStanzaProcessor = NULL;
 	FDiscovery = NULL;
-	FPresencePlugin = NULL;
+	FPresenceManager = NULL;
 	FDataForms = NULL;
 }
 
@@ -54,10 +54,10 @@ bool JabberSearch::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
 	}
 
-	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IPresenceManager").value(0,NULL);
 	if (plugin)
 	{
-		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
+		FPresenceManager = qobject_cast<IPresenceManager *>(plugin->instance());
 	}
 
 	plugin = APluginManager->pluginInterface("IDataForms").value(0,NULL);
@@ -279,10 +279,10 @@ QString JabberSearch::sendSubmit(const Jid &AStreamJid, const ISearchSubmit &ASu
 
 void JabberSearch::showSearchDialog(const Jid &AStreamJid, const Jid &AServiceJid, QWidget *AParent)
 {
-	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
+	IPresence *presence = FPresenceManager!=NULL ? FPresenceManager->findPresence(AStreamJid) : NULL;
 	if (presence && presence->isOpen())
 	{
-		SearchDialog *dialog = new SearchDialog(this,FPluginManager,AStreamJid,AServiceJid,AParent);
+		SearchDialog *dialog = new SearchDialog(this,AStreamJid,AServiceJid,AParent);
 		connect(presence->instance(),SIGNAL(closed()),dialog,SLOT(reject()));
 		dialog->show();
 	}

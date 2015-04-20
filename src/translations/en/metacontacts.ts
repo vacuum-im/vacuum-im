@@ -62,8 +62,21 @@
         <translation>%1 - Chat</translation>
     </message>
     <message>
-        <source>Combine Contacts</source>
-        <translation>Combine Contacts</translation>
+        <source>Combine contacts</source>
+        <translation>Combine contacts</translation>
+    </message>
+    <message>
+        <source>Ctrl+M</source>
+        <comment>Combine contacts</comment>
+        <translation>Ctrl+M</translation>
+    </message>
+    <message>
+        <source>Destroy metacontact</source>
+        <translation>Destroy metacontact</translation>
+    </message>
+    <message>
+        <source>Detach from metacontact</source>
+        <translation>Detach from metacontact</translation>
     </message>
 </context>
 </TS>

@@ -19,7 +19,6 @@
 #include <definitions/rosteredithandlerorders.h>
 #include <utils/advanceditemdelegate.h>
 #include <utils/textmanager.h>
-#include <utils/shortcuts.h>
 #include <utils/options.h>
 #include <utils/logger.h>
 #include <utils/menu.h>
@@ -41,14 +40,14 @@ Bookmarks::Bookmarks()
 {
 	FPrivateStorage = NULL;
 	FAccountManager = NULL;
-	FMultiChatPlugin = NULL;
+	FMultiChatManager = NULL;
 	FXmppUriQueries = NULL;
 	FDiscovery = NULL;
 	FOptionsManager = NULL;
 	FRostersModel = NULL;
 	FRostersView = NULL;
 	FRostersViewPlugin = NULL;
-	FPresencePlugin = NULL;
+	FPresenceManager = NULL;
 }
 
 Bookmarks::~Bookmarks()
@@ -95,13 +94,13 @@ bool Bookmarks::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 		FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
 	}
 
-	plugin = APluginManager->pluginInterface("IMultiUserChatPlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IMultiUserChatManager").value(0,NULL);
 	if (plugin)
 	{
-		FMultiChatPlugin = qobject_cast<IMultiUserChatPlugin *>(plugin->instance());
-		if (FMultiChatPlugin)
+		FMultiChatManager = qobject_cast<IMultiUserChatManager *>(plugin->instance());
+		if (FMultiChatManager)
 		{
-			connect(FMultiChatPlugin->instance(),SIGNAL(multiChatWindowCreated(IMultiUserChatWindow *)),
+			connect(FMultiChatManager->instance(),SIGNAL(multiChatWindowCreated(IMultiUserChatWindow *)),
 				SLOT(onMultiChatWindowCreated(IMultiUserChatWindow *)));
 		}
 	}
@@ -152,13 +151,13 @@ bool Bookmarks::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0, NULL);
+	plugin = APluginManager->pluginInterface("IPresenceManager").value(0, NULL);
 	if (plugin)
 	{
-		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
-		if (FPresencePlugin)
+		FPresenceManager = qobject_cast<IPresenceManager *>(plugin->instance());
+		if (FPresenceManager)
 		{
-			connect(FPresencePlugin->instance(),SIGNAL(presenceOpened(IPresence *)),SLOT(onPresenceOpened(IPresence *)));
+			connect(FPresenceManager->instance(),SIGNAL(presenceOpened(IPresence *)),SLOT(onPresenceOpened(IPresence *)));
 		}
 	}
 
@@ -169,11 +168,9 @@ bool Bookmarks::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 
 bool Bookmarks::initObjects()
 {
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_MUC_BOOKMARK, tr("Edit bookmark"), QKeySequence::UnknownKey);
-
 	if (FOptionsManager)
 	{
-		FOptionsManager->insertOptionsHolder(this);
+		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 
 	if (FRostersModel)
@@ -196,20 +193,21 @@ bool Bookmarks::initSettings()
 	return true;
 }
 
-QMultiMap<int, IOptionsWidget *> Bookmarks::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+QMultiMap<int, IOptionsDialogWidget *> Bookmarks::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	QMultiMap<int, IOptionsWidget *> widgets;
-	QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
+	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	if (FOptionsManager)
 	{
-		if (nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS)
+		QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
+		if (nodeTree.count()==3 && nodeTree.at(0)==OPN_ACCOUNTS && nodeTree.at(2)=="Additional")
 		{
-			OptionsNode aoptions = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));
-			widgets.insertMulti(OWO_ACCOUNT_BOOKMARKS, FOptionsManager->optionsNodeWidget(aoptions.node("ignore-autojoin"),tr("Disable autojoin to conferences"),AParent));
+			OptionsNode options = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));
+			widgets.insertMulti(OHO_ACCOUNTS_ADDITIONAL_CONFERENCES, FOptionsManager->newOptionsDialogHeader(tr("Conferences"),AParent));
+			widgets.insertMulti(OWO_ACCOUNTS_ADDITIONAL_DISABLEAUTOJOIN, FOptionsManager->newOptionsDialogWidget(options.node("ignore-autojoin"),tr("Disable auto join to conferences on this computer"),AParent));
 		}
-		else if (ANodeId == OPN_CONFERENCES)
+		else if (ANodeId == OPN_MESSAGES)
 		{
-			widgets.insertMulti(OWO_CONFERENCES_SHOWAUTOJOINED, FOptionsManager->optionsNodeWidget(Options::node(OPV_MUC_GROUPCHAT_SHOWAUTOJOINED),tr("Automatically show window of conferences connected at startup"),AParent));
+			widgets.insertMulti(OWO_MESSAGES_MUC_SHOWAUTOJOINED, FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_GROUPCHAT_SHOWAUTOJOINED),tr("Show windows of auto joined conferences at startup"),AParent));
 		}
 	}
 	return widgets;
@@ -392,7 +390,7 @@ void Bookmarks::showEditBookmarksDialog(const Jid &AStreamJid)
 
 void Bookmarks::updateConferenceIndexes(const Jid &AStreamJid)
 {
-	if (FMultiChatPlugin)
+	if (FMultiChatManager)
 	{
 		QSet<IBookmark> newBookmarks = FBookmarks.value(AStreamJid).toSet();
 		QSet<IBookmark> curBookarks = FBookmarkIndexes.value(AStreamJid).values().toSet();
@@ -402,7 +400,7 @@ void Bookmarks::updateConferenceIndexes(const Jid &AStreamJid)
 		{
 			if (bookmark.type == IBookmark::Conference)
 			{
-				IRosterIndex *index = FMultiChatPlugin->getMultiChatRosterIndex(AStreamJid,bookmark.conference.roomJid,bookmark.conference.nick,bookmark.conference.password);
+				IRosterIndex *index = FMultiChatManager->getMultiChatRosterIndex(AStreamJid,bookmark.conference.roomJid,bookmark.conference.nick,bookmark.conference.password);
 				FBookmarkIndexes[AStreamJid].insert(index,bookmark);
 				emit rosterDataChanged(index,RDR_NAME);
 				emit rosterDataChanged(index,RDR_MUC_NICK);
@@ -413,7 +411,7 @@ void Bookmarks::updateConferenceIndexes(const Jid &AStreamJid)
 		foreach(const IBookmark &bookmark, removeBookmarks)
 		{
 			IRosterIndex *index = FBookmarkIndexes.value(AStreamJid).key(bookmark);
-			IMultiUserChatWindow *window = FMultiChatPlugin->findMultiChatWindow(AStreamJid,bookmark.conference.roomJid);
+			IMultiUserChatWindow *window = FMultiChatManager->findMultiChatWindow(AStreamJid,bookmark.conference.roomJid);
 			if (window == NULL)
 				FRostersModel->removeRosterIndex(index);
 			FBookmarkIndexes[AStreamJid].remove(index);
@@ -534,10 +532,10 @@ void Bookmarks::renameBookmark(const Jid &AStreamJid, const IBookmark &ABookmark
 
 void Bookmarks::autoStartBookmarks(const Jid &AStreamJid) const
 {
-	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
+	IPresence *presence = FPresenceManager!=NULL ? FPresenceManager->findPresence(AStreamJid) : NULL;
 	if (presence!=NULL && presence->isOpen() && isReady(AStreamJid))
 	{
-		IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
+		IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(AStreamJid) : NULL;
 		if (account==NULL || !account->optionsNode().value("ignore-autojoin").toBool())
 		{
 			LOG_STRM_INFO(AStreamJid,"Auto joining bookmark conferences");
@@ -546,7 +544,7 @@ void Bookmarks::autoStartBookmarks(const Jid &AStreamJid) const
 			{
 				if (bookmark.type==IBookmark::Conference && bookmark.conference.autojoin)
 				{
-					if (showAutoJoined && FMultiChatPlugin && FMultiChatPlugin->findMultiChatWindow(AStreamJid,bookmark.conference.roomJid)==NULL)
+					if (showAutoJoined && FMultiChatManager && FMultiChatManager->findMultiChatWindow(AStreamJid,bookmark.conference.roomJid)==NULL)
 						startBookmark(AStreamJid,bookmark,true);
 					else
 						startBookmark(AStreamJid,bookmark,false);
@@ -561,9 +559,9 @@ void Bookmarks::startBookmark(const Jid &AStreamJid, const IBookmark &ABookmark,
 	if (isValidBookmark(ABookmark))
 	{
 		LOG_STRM_INFO(AStreamJid,QString("Starting bookmark, name=%1").arg(ABookmark.name));
-		if (FMultiChatPlugin && ABookmark.type==IBookmark::Conference)
+		if (FMultiChatManager && ABookmark.type==IBookmark::Conference)
 		{
-			IMultiUserChatWindow *window = FMultiChatPlugin->getMultiChatWindow(AStreamJid,ABookmark.conference.roomJid,ABookmark.conference.nick,ABookmark.conference.password);
+			IMultiUserChatWindow *window = FMultiChatManager->getMultiChatWindow(AStreamJid,ABookmark.conference.roomJid,ABookmark.conference.nick,ABookmark.conference.password);
 			if (window)
 			{
 				if (AShowWindow)
@@ -793,7 +791,6 @@ void Bookmarks::onMultiChatWindowCreated(IMultiUserChatWindow *AWindow)
 	Action *action = new Action(AWindow->instance());
 	action->setText(tr("Edit Bookmark"));
 	action->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_EDIT);
-	action->setShortcutId(SCT_MESSAGEWINDOWS_MUC_BOOKMARK);
 	connect(action,SIGNAL(triggered(bool)),SLOT(onMultiChatWindowAddBookmarkActionTriggered(bool)));
 	AWindow->toolBarWidget()->toolBarChanger()->insertAction(action,TBG_MCWTBW_BOOKMARKS);
 }
@@ -882,9 +879,9 @@ void Bookmarks::onRenameBookmarkActionTriggered(bool)
 		if (index >= 0)
 		{
 			bool editInRoster = false;
-			if (FRostersView && FMultiChatPlugin)
+			if (FRostersView && FMultiChatManager)
 			{
-				IRosterIndex *mucIndex = FMultiChatPlugin->findMultiChatRosterIndex(streamJid,bookmark.conference.roomJid);
+				IRosterIndex *mucIndex = FMultiChatManager->findMultiChatRosterIndex(streamJid,bookmark.conference.roomJid);
 				if (mucIndex)
 					editInRoster = FRostersView->editRosterIndex(mucIndex,RDR_NAME);
 			}

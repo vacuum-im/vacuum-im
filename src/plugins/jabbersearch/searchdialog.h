@@ -2,12 +2,11 @@
 #define SEARCHDIALOG_H
 
 #include <QDialog>
-#include <interfaces/ipluginmanager.h>
 #include <interfaces/ijabbersearch.h>
 #include <interfaces/idataforms.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/irosterchanger.h>
-#include <interfaces/ivcard.h>
+#include <interfaces/ivcardmanager.h>
 #include "ui_searchdialog.h"
 
 class SearchDialog :
@@ -15,7 +14,7 @@ class SearchDialog :
 {
 	Q_OBJECT;
 public:
-	SearchDialog(IJabberSearch *ASearch, IPluginManager *APluginManager, const Jid &AStreamJid, const Jid &AServiceJid, QWidget *AParent = NULL);
+	SearchDialog(IJabberSearch *ASearch, const Jid &AStreamJid, const Jid &AServiceJid, QWidget *AParent = NULL);
 	~SearchDialog();
 public:
 	virtual Jid streamJid() const;
@@ -26,7 +25,6 @@ protected:
 	void requestFields();
 	void requestResult();
 	bool setDataForm(const IDataForm &AForm);
-	void initialize();
 	void createToolBarActions();
 protected slots:
 	void onSearchFields(const QString &AId, const ISearchFields &AFields);
@@ -37,11 +35,10 @@ protected slots:
 private:
 	Ui::SearchDialogClass ui;
 private:
-	IPluginManager *FPluginManager;
 	IJabberSearch *FSearch;
 	IDataForms *FDataForms;
 	IServiceDiscovery *FDiscovery;
-	IVCardPlugin *FVCardPlugin;
+	IVCardManager *FVCardManager;
 	IRosterChanger *FRosterChanger;
 private:
 	Action *FDiscoInfo;

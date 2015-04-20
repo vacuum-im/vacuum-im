@@ -13,18 +13,18 @@
     </message>
 </context>
 <context>
-    <name>AdiumMessageStylePlugin</name>
+    <name>AdiumMessageStyleEngine</name>
     <message>
         <source>Adium Message Style</source>
-        <translation>Mensajes al estilo Adium</translation>
+        <translation type="unfinished">Mensajes al estilo Adium</translation>
     </message>
     <message>
         <source>Allows to use a Adium style in message design</source>
-        <translation>Permite el uso de mensajes diseñados al estilo Adium</translation>
+        <translation type="unfinished">Permite el uso de mensajes diseñados al estilo Adium</translation>
     </message>
     <message>
-        <source>Adium Style</source>
-        <translation>Estilo Adium</translation>
+        <source>Adium</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -65,44 +65,48 @@
         <source>Image Files (*.png *.jpg *.bmp *.gif)</source>
         <translation>Archivos de imagen (*.png *.jpg *.bmp *.gif)</translation>
     </message>
+    <message>
+        <source>Parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Background</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AdiumOptionsWidgetClass</name>
     <message>
-        <source>Message Style:</source>
-        <translation>Estilo:</translation>
-    </message>
-    <message>
         <source>Variant:</source>
         <translation>Variante:</translation>
-    </message>
-    <message>
-        <source>Text Font:</source>
-        <translation>Fuente del texto:</translation>
-    </message>
-    <message>
-        <source>Set Font...</source>
-        <translation>Establecer fuente...</translation>
-    </message>
-    <message>
-        <source>Default</source>
-        <translation>Por defecto</translation>
-    </message>
-    <message>
-        <source>Background:</source>
-        <translation>Fondo:</translation>
     </message>
     <message>
         <source>Color:</source>
         <translation>Color:</translation>
     </message>
     <message>
-        <source>Set Image...</source>
-        <translation>Establecer imagen...</translation>
-    </message>
-    <message>
         <source>Layout:</source>
         <translation>Ubicación:</translation>
+    </message>
+    <message>
+        <source>Font:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>not set</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

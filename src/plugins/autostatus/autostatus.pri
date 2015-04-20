@@ -1,7 +1,9 @@
-FORMS = statusoptionswidget.ui
+FORMS = autostatusoptionswidget.ui
 
 HEADERS = autostatus.h \
-          statusoptionswidget.h
+          autostatusoptionswidget.h \
+          autorulesoptionsdialog.h
 
 SOURCES = autostatus.cpp \
-          statusoptionswidget.cpp
+          autostatusoptionswidget.cpp \
+          autorulesoptionsdialog.cpp

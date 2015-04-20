@@ -1,3 +1,2 @@
-set(SOURCES iconsoptionswidget.cpp statusicons.cpp )
-set(HEADERS statusicons.h iconsoptionswidget.h )
-set(UIS iconsoptionswidget.ui )
+set(SOURCES statusicons.cpp )
+set(HEADERS statusicons.h )

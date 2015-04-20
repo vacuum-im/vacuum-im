@@ -18,10 +18,10 @@ protected:
 
 class ShortcutOptionsWidget : 
 	public QWidget,
-	public IOptionsWidget
+	public IOptionsDialogWidget
 {
 	Q_OBJECT;
-	Q_INTERFACES(IOptionsWidget);
+	Q_INTERFACES(IOptionsDialogWidget);
 public:
 	ShortcutOptionsWidget(QWidget *AParent);
 	~ShortcutOptionsWidget();

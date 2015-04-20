@@ -20,6 +20,8 @@ set(HEADERS "action.h"
             "filecookiejar.h"
             "boxwidget.h"
             "splitterwidget.h"
-            "logger.h")
+            "logger.h"
+            "pluginhelper.h"
+            "passworddialog.h")
 
 qt4_wrap_cpp(MOC_SOURCES ${HEADERS})

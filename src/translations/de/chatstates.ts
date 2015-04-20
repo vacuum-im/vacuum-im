@@ -24,16 +24,16 @@
         <translation>Stellt die Möglichkeit bereit, Informationen über die Aktivität des Benutzers im Chat auszutauschen</translation>
     </message>
     <message>
-        <source>Send chat state notifications</source>
-        <translation>Sende Chat Status Informationen</translation>
-    </message>
-    <message>
         <source>When contact is typing the message for you</source>
         <translation>Wenn der Kontakt eine Nachricht für sie schreibt</translation>
     </message>
     <message>
         <source>Typing a message...</source>
         <translation>Schreibt eine Nachricht ...</translation>
+    </message>
+    <message>
+        <source>Send notifications of your chat activity</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

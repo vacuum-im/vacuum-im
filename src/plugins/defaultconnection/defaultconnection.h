@@ -12,7 +12,7 @@ class DefaultConnection :
 	Q_OBJECT;
 	Q_INTERFACES(IConnection IDefaultConnection);
 public:
-	DefaultConnection(IConnectionPlugin *APlugin, QObject *AParent);
+	DefaultConnection(IConnectionEngine *AEngine, QObject *AParent);
 	~DefaultConnection();
 	//IConnection
 	virtual QObject *instance() { return this; }
@@ -25,7 +25,7 @@ public:
 	virtual void abortConnection(const XmppError &AError);
 	virtual qint64 write(const QByteArray &AData);
 	virtual QByteArray read(qint64 ABytes);
-	virtual IConnectionPlugin *ownerPlugin() const;
+	virtual IConnectionEngine *engine() const;
 	virtual QSslCertificate hostCertificate() const;
 	//IDefaultConnection
 	virtual void ignoreSslErrors();
@@ -70,7 +70,7 @@ protected slots:
 	void onSocketError(QAbstractSocket::SocketError AError);
 	void onSocketDisconnected();
 private:
-	IConnectionPlugin *FPlugin;
+	IConnectionEngine *FEngine;
 private:
 	QJDns FDns;
 	int FSrvQueryId;

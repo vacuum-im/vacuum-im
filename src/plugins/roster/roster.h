@@ -1,9 +1,9 @@
 #ifndef ROSTER_H
 #define ROSTER_H
 
-#include <interfaces/iroster.h>
+#include <interfaces/irostermanager.h>
 #include <interfaces/istanzaprocessor.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 
 class Roster :
 	public QObject,
@@ -30,9 +30,11 @@ public:
 	virtual IXmppStream *xmppStream() const;
 	virtual bool isOpen() const;
 	virtual QString groupDelimiter() const;
-	virtual IRosterItem rosterItem(const Jid &AItemJid) const;
-	virtual QList<IRosterItem> rosterItems() const;
-	virtual QSet<QString> allGroups() const;
+	virtual QList<Jid> itemsJid() const;
+	virtual QList<IRosterItem> items() const;
+	virtual bool hasItem(const Jid &AItemJid) const;
+	virtual IRosterItem findItem(const Jid &AItemJid) const;
+	virtual QSet<QString> groups() const;
 	virtual bool hasGroup(const QString &AGroup) const;
 	virtual QSet<QString> itemGroups(const Jid &AItemJid) const;
 	virtual QList<IRosterItem> groupItems(const QString &AGroup) const;
@@ -58,12 +60,13 @@ public:
 	virtual void removeGroup(const QString &AGroup);
 signals:
 	void opened();
+	void closed();
 	void itemReceived(const IRosterItem &ARosterItem, const IRosterItem &ABefore);
 	void subscriptionSent(const Jid &AItemJid, int ASubsType, const QString &AText);
 	void subscriptionReceived(const Jid &AItemJid, int ASubsType, const QString &AText);
-	void closed();
 	void streamJidAboutToBeChanged(const Jid &AAfter);
 	void streamJidChanged(const Jid &ABefore);
+	void rosterDestroyed();
 protected:
 	void clearRosterItems();
 	void requestRosterItems();
@@ -72,10 +75,10 @@ protected:
 	void processItemsElement(const QDomElement &AItemsElem, bool ACompleteRoster);
 	QString replaceGroupDelimiter(const QString &AGroup, const QString &AFrom, const QString &ATo) const;
 protected slots:
-	void onStreamOpened();
-	void onStreamClosed();
-	void onStreamJidAboutToBeChanged(const Jid &AAfter);
-	void onStreamJidChanged(const Jid &ABefore);
+	void onXmppStreamOpened();
+	void onXmppStreamClosed();
+	void onXmppStreamJidAboutToBeChanged(const Jid &AAfter);
+	void onXmppStreamJidChanged(const Jid &ABefore);
 private:
 	IXmppStream *FXmppStream;
 	IStanzaProcessor *FStanzaProcessor;
@@ -90,7 +93,7 @@ private:
 	QString FRosterVer;
 	QString FGroupDelim;
 	QSet<Jid> FSubscriptionRequests;
-	QHash<Jid, IRosterItem> FRosterItems;
+	QHash<Jid, IRosterItem> FItems;
 };
 
 #endif //ROSTER_H

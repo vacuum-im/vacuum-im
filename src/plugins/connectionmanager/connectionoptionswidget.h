@@ -2,6 +2,7 @@
 #define CONNECTIONOPTIONSWIDGET_H
 
 #include <QWidget>
+#include <QVBoxLayout>
 #include <interfaces/iconnectionmanager.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/ioptionsmanager.h>
@@ -12,10 +13,10 @@ class ConnectionManager;
 
 class ConnectionOptionsWidget :
 	public QWidget,
-	public IOptionsWidget
+	public IOptionsDialogWidget
 {
 	Q_OBJECT;
-	Q_INTERFACES(IOptionsWidget);
+	Q_INTERFACES(IOptionsDialogWidget);
 public:
 	ConnectionOptionsWidget(IConnectionManager *AManager, const OptionsNode &ANode, QWidget *AParent);
 	~ConnectionOptionsWidget();
@@ -28,7 +29,7 @@ signals:
 	void childApply();
 	void childReset();
 protected:
-	void setPluginById(const QString &APluginId);
+	void setEngineById(const QString &AEngineId);
 protected slots:
 	void onComboConnectionsChanged(int AIndex);
 private:
@@ -36,9 +37,10 @@ private:
 private:
 	Ui::ConnectionOptionsWidgetClass ui;
 private:
-	QString FPluginId;
+	QString FEngineId;
 	OptionsNode FOptions;
-	IOptionsWidget *FPluginSettings;
+	QVBoxLayout *FEngineLayout;
+	IOptionsDialogWidget *FEngineSettings;
 };
 
 #endif // CONNECTIONOPTIONSWIDGET_H

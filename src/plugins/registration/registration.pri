@@ -2,8 +2,8 @@ FORMS = registerdialog.ui
 
 HEADERS = registration.h \
           registerdialog.h \
-          registerstream.h
+          registerfeature.h
 
 SOURCES = registration.cpp \
           registerdialog.cpp \
-          registerstream.cpp
+          registerfeature.cpp

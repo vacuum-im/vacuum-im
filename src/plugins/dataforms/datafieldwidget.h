@@ -18,9 +18,12 @@ class TextEdit :
 	Q_OBJECT;
 public:
 	TextEdit(QWidget *AParent) : QTextEdit(AParent) {}
-	~TextEdit() {}
-	virtual QSize sizeHint() const { return minimumSizeHint(); }
-	virtual QSize minimumSizeHint() const { return QSize(100, fontMetrics().lineSpacing()*5); }
+	QSize sizeHint() const {
+		return minimumSizeHint();
+	}
+	QSize minimumSizeHint() const {
+		return QSize(100, fontMetrics().lineSpacing()*5);
+	}
 };
 
 class ListWidget :
@@ -29,9 +32,12 @@ class ListWidget :
 	Q_OBJECT;
 public:
 	ListWidget(QWidget *AParent) : QListWidget(AParent) {};
-	~ListWidget() {};
-	virtual QSize sizeHint() const { return minimumSizeHint(); }
-	virtual QSize minimumSizeHint() const { return QSize(100, fontMetrics().lineSpacing()*5); }
+	QSize sizeHint() const {
+		return minimumSizeHint();
+	}
+	QSize minimumSizeHint() const {
+		return QSize(100, fontMetrics().lineSpacing()*5);
+	}
 };
 
 class DataFieldWidget :
@@ -42,21 +48,21 @@ class DataFieldWidget :
 	Q_INTERFACES(IDataFieldWidget);
 public:
 	DataFieldWidget(IDataForms *ADataForms, const IDataField &AField, bool AReadOnly, QWidget *AParent);
-	~DataFieldWidget();
 	virtual QWidget *instance() { return this; }
-	virtual bool isReadOnly() const { return FReadOnly; }
+	virtual bool isReadOnly() const;
+	virtual IDataField dataField() const;
 	virtual IDataField userDataField() const;
-	virtual const IDataField &dataField() const { return FField; }
 	virtual QVariant value() const;
 	virtual void setValue(const QVariant &AValue);
 	virtual IDataMediaWidget *mediaWidget() const;
 signals:
+	void changed();
 	void focusIn(Qt::FocusReason AReason);
 	void focusOut(Qt::FocusReason AReason);
 protected:
 	void appendLabel(const QString &AText, QWidget *ABuddy);
 protected:
-	virtual bool eventFilter(QObject *AObject, QEvent *AEvent);
+	bool eventFilter(QObject *AObject, QEvent *AEvent);
 private:
 	IDataForms *FDataForms;
 	IDataMediaWidget *FMediaWidget;

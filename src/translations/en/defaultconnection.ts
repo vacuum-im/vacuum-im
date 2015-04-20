@@ -20,10 +20,6 @@
         <translation>Allow only trusted</translation>
     </message>
     <message>
-        <source>Auto Select</source>
-        <translation>Auto Select</translation>
-    </message>
-    <message>
         <source>TLSv1</source>
         <translation>TLSv1</translation>
     </message>
@@ -34,6 +30,10 @@
     <message>
         <source>SSLv2</source>
         <translation>SSLv2</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>Auto</translation>
     </message>
 </context>
 <context>
@@ -51,23 +51,31 @@
         <translation>Use legacy SSL connection</translation>
     </message>
     <message>
-        <source>Certificate check mode:</source>
-        <translation>Certificate check mode:</translation>
-    </message>
-    <message>
         <source>SSL Protocol:</source>
         <translation>SSL Protocol:</translation>
     </message>
+    <message>
+        <source>Certificate:</source>
+        <translation>Certificate:</translation>
+    </message>
 </context>
 <context>
-    <name>DefaultConnectionPlugin</name>
+    <name>DefaultConnectionEngine</name>
+    <message>
+        <source>Default Connection</source>
+        <translation>Default Connection</translation>
+    </message>
     <message>
         <source>Allows to set a standard TCP connection to Jabber server</source>
         <translation>Allows to set a standard TCP connection to Jabber server</translation>
     </message>
     <message>
-        <source>Default Connection</source>
-        <translation>Default Connection</translation>
+        <source>Host certificate is not in trusted list</source>
+        <translation>Host certificate is not in trusted list</translation>
+    </message>
+    <message>
+        <source>Name: %1</source>
+        <translation>Name: %1</translation>
     </message>
     <message>
         <source>Organization: %1</source>
@@ -88,30 +96,6 @@
     <message>
         <source>State/Province: %1</source>
         <translation>State/Province: %1</translation>
-    </message>
-    <message>
-        <source>SSL Authentication Error</source>
-        <translation>SSL Authentication Error</translation>
-    </message>
-    <message>
-        <source>Disconnect</source>
-        <translation>Disconnect</translation>
-    </message>
-    <message>
-        <source>Connect Once</source>
-        <translation>Connect Once</translation>
-    </message>
-    <message>
-        <source>Connect Always</source>
-        <translation>Connect Always</translation>
-    </message>
-    <message>
-        <source>Connection to &lt;b&gt;%1&lt;/b&gt; can not be considered completely safe due to errors in servers certificate check:</source>
-        <translation>Connection to &lt;b&gt;%1&lt;/b&gt; can not be considered completely safe due to errors in servers certificate check:</translation>
-    </message>
-    <message>
-        <source>Name: %1</source>
-        <translation>Name: %1</translation>
     </message>
     <message>
         <source>Certificate holder:</source>
@@ -138,8 +122,24 @@
         <translation>Serial number: %1</translation>
     </message>
     <message>
-        <source>Host certificate is not in trusted list</source>
-        <translation>Host certificate is not in trusted list</translation>
+        <source>SSL Authentication Error</source>
+        <translation>SSL Authentication Error</translation>
+    </message>
+    <message>
+        <source>Connection to &lt;b&gt;%1&lt;/b&gt; can not be considered completely safe due to errors in servers certificate check:</source>
+        <translation>Connection to &lt;b&gt;%1&lt;/b&gt; can not be considered completely safe due to errors in servers certificate check:</translation>
+    </message>
+    <message>
+        <source>Disconnect</source>
+        <translation>Disconnect</translation>
+    </message>
+    <message>
+        <source>Connect Once</source>
+        <translation>Connect Once</translation>
+    </message>
+    <message>
+        <source>Connect Always</source>
+        <translation>Connect Always</translation>
     </message>
 </context>
 </TS>

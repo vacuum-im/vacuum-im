@@ -20,10 +20,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Auto Select</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>TLSv1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -33,6 +29,10 @@
     </message>
     <message>
         <source>SSLv2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -51,67 +51,51 @@
         <translation>Użyj starszego połączenia SSL</translation>
     </message>
     <message>
-        <source>Certificate check mode:</source>
+        <source>SSL Protocol:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>SSL Protocol:</source>
+        <source>Certificate:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>DefaultConnectionPlugin</name>
-    <message>
-        <source>Allows to set a standard TCP connection to Jabber server</source>
-        <translation>Pozwala na ustawienie standardowego połączenia TCP z serwerem</translation>
-    </message>
+    <name>DefaultConnectionEngine</name>
     <message>
         <source>Default Connection</source>
-        <translation>Domyślne połączenie</translation>
+        <translation type="unfinished">Domyślne połączenie</translation>
     </message>
     <message>
-        <source>Organization: %1</source>
-        <translation>Organizacja: %1</translation>
+        <source>Allows to set a standard TCP connection to Jabber server</source>
+        <translation type="unfinished">Pozwala na ustawienie standardowego połączenia TCP z serwerem</translation>
     </message>
     <message>
-        <source>Subunit: %1</source>
-        <translation>Zakład: %1</translation>
-    </message>
-    <message>
-        <source>Country: %1</source>
-        <translation>Kraj: %1</translation>
-    </message>
-    <message>
-        <source>Locality: %1</source>
-        <translation>Rejon: %1</translation>
-    </message>
-    <message>
-        <source>State/Province: %1</source>
-        <translation>Stan/Prowincja: %1</translation>
-    </message>
-    <message>
-        <source>SSL Authentication Error</source>
-        <translation>Błąd autoryzacji SSL</translation>
-    </message>
-    <message>
-        <source>Disconnect</source>
-        <translation>Rozłącz</translation>
-    </message>
-    <message>
-        <source>Connect Once</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Connect Always</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Connection to &lt;b&gt;%1&lt;/b&gt; can not be considered completely safe due to errors in servers certificate check:</source>
+        <source>Host certificate is not in trusted list</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Name: %1</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Organization: %1</source>
+        <translation type="unfinished">Organizacja: %1</translation>
+    </message>
+    <message>
+        <source>Subunit: %1</source>
+        <translation type="unfinished">Zakład: %1</translation>
+    </message>
+    <message>
+        <source>Country: %1</source>
+        <translation type="unfinished">Kraj: %1</translation>
+    </message>
+    <message>
+        <source>Locality: %1</source>
+        <translation type="unfinished">Rejon: %1</translation>
+    </message>
+    <message>
+        <source>State/Province: %1</source>
+        <translation type="unfinished">Stan/Prowincja: %1</translation>
     </message>
     <message>
         <source>Certificate holder:</source>
@@ -138,7 +122,23 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Host certificate is not in trusted list</source>
+        <source>SSL Authentication Error</source>
+        <translation type="unfinished">Błąd autoryzacji SSL</translation>
+    </message>
+    <message>
+        <source>Connection to &lt;b&gt;%1&lt;/b&gt; can not be considered completely safe due to errors in servers certificate check:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disconnect</source>
+        <translation type="unfinished">Rozłącz</translation>
+    </message>
+    <message>
+        <source>Connect Once</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect Always</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -20,10 +20,6 @@
         <translation>Permitir solo de confianza</translation>
     </message>
     <message>
-        <source>Auto Select</source>
-        <translation>Seleccionar automáticamente</translation>
-    </message>
-    <message>
         <source>TLSv1</source>
         <translation>TLSv1</translation>
     </message>
@@ -34,6 +30,10 @@
     <message>
         <source>SSLv2</source>
         <translation>SSLv2</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -51,95 +51,95 @@
         <translation>Usar conexión de SSL legado</translation>
     </message>
     <message>
-        <source>Certificate check mode:</source>
-        <translation>Modo de comprobación de certificado:</translation>
+        <source>SSL Protocol:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>SSL Protocol:</source>
+        <source>Certificate:</source>
         <translation>Protocolo SSL:</translation>
     </message>
 </context>
 <context>
-    <name>DefaultConnectionPlugin</name>
-    <message>
-        <source>Allows to set a standard TCP connection to Jabber server</source>
-        <translation>Permite establecer una conexión TCP estándar con el servidor Jabber</translation>
-    </message>
+    <name>DefaultConnectionEngine</name>
     <message>
         <source>Default Connection</source>
-        <translation>Conexión por defecto</translation>
+        <translation type="unfinished">Conexión por defecto</translation>
     </message>
     <message>
-        <source>Organization: %1</source>
-        <translation>Organización: %1</translation>
-    </message>
-    <message>
-        <source>Subunit: %1</source>
-        <translation>Subdivisión: %1</translation>
-    </message>
-    <message>
-        <source>Country: %1</source>
-        <translation>País: %1</translation>
-    </message>
-    <message>
-        <source>Locality: %1</source>
-        <translation>Ubicación: %1</translation>
-    </message>
-    <message>
-        <source>State/Province: %1</source>
-        <translation>Estado/Provincia: %1</translation>
-    </message>
-    <message>
-        <source>SSL Authentication Error</source>
-        <translation>Error de autenticación SSL</translation>
-    </message>
-    <message>
-        <source>Disconnect</source>
-        <translation>Desconectar</translation>
-    </message>
-    <message>
-        <source>Connect Once</source>
-        <translation>Conectar una vez</translation>
-    </message>
-    <message>
-        <source>Connect Always</source>
-        <translation>Conectar siempre</translation>
-    </message>
-    <message>
-        <source>Connection to &lt;b&gt;%1&lt;/b&gt; can not be considered completely safe due to errors in servers certificate check:</source>
-        <translation>Conectar a &lt;b&gt;%1&lt;/b&gt; no podría considerarse completamente seguro debido a errores en la comprobación de certificados de los servidores:</translation>
-    </message>
-    <message>
-        <source>Name: %1</source>
-        <translation>Nombre: %1</translation>
-    </message>
-    <message>
-        <source>Certificate holder:</source>
-        <translation>Certificado expedido:</translation>
-    </message>
-    <message>
-        <source>Certificate issuer:</source>
-        <translation>Certificado emitido:</translation>
-    </message>
-    <message>
-        <source>Certificate details:</source>
-        <translation>Detalles del certificado:</translation>
-    </message>
-    <message>
-        <source>Effective from: %1</source>
-        <translation>Válido desde: %1</translation>
-    </message>
-    <message>
-        <source>Expired at: %1</source>
-        <translation>Válido hasta: %1</translation>
-    </message>
-    <message>
-        <source>Serial number: %1</source>
-        <translation>Número de serie: %1</translation>
+        <source>Allows to set a standard TCP connection to Jabber server</source>
+        <translation type="unfinished">Permite establecer una conexión TCP estándar con el servidor Jabber</translation>
     </message>
     <message>
         <source>Host certificate is not in trusted list</source>
-        <translation>El certificado del host no está en la lista de confianza</translation>
+        <translation type="unfinished">El certificado del host no está en la lista de confianza</translation>
+    </message>
+    <message>
+        <source>Name: %1</source>
+        <translation type="unfinished">Nombre: %1</translation>
+    </message>
+    <message>
+        <source>Organization: %1</source>
+        <translation type="unfinished">Organización: %1</translation>
+    </message>
+    <message>
+        <source>Subunit: %1</source>
+        <translation type="unfinished">Subdivisión: %1</translation>
+    </message>
+    <message>
+        <source>Country: %1</source>
+        <translation type="unfinished">País: %1</translation>
+    </message>
+    <message>
+        <source>Locality: %1</source>
+        <translation type="unfinished">Ubicación: %1</translation>
+    </message>
+    <message>
+        <source>State/Province: %1</source>
+        <translation type="unfinished">Estado/Provincia: %1</translation>
+    </message>
+    <message>
+        <source>Certificate holder:</source>
+        <translation type="unfinished">Certificado expedido:</translation>
+    </message>
+    <message>
+        <source>Certificate issuer:</source>
+        <translation type="unfinished">Certificado emitido:</translation>
+    </message>
+    <message>
+        <source>Certificate details:</source>
+        <translation type="unfinished">Detalles del certificado:</translation>
+    </message>
+    <message>
+        <source>Effective from: %1</source>
+        <translation type="unfinished">Válido desde: %1</translation>
+    </message>
+    <message>
+        <source>Expired at: %1</source>
+        <translation type="unfinished">Válido hasta: %1</translation>
+    </message>
+    <message>
+        <source>Serial number: %1</source>
+        <translation type="unfinished">Número de serie: %1</translation>
+    </message>
+    <message>
+        <source>SSL Authentication Error</source>
+        <translation type="unfinished">Error de autenticación SSL</translation>
+    </message>
+    <message>
+        <source>Connection to &lt;b&gt;%1&lt;/b&gt; can not be considered completely safe due to errors in servers certificate check:</source>
+        <translation type="unfinished">Conectar a &lt;b&gt;%1&lt;/b&gt; no podría considerarse completamente seguro debido a errores en la comprobación de certificados de los servidores:</translation>
+    </message>
+    <message>
+        <source>Disconnect</source>
+        <translation type="unfinished">Desconectar</translation>
+    </message>
+    <message>
+        <source>Connect Once</source>
+        <translation type="unfinished">Conectar una vez</translation>
+    </message>
+    <message>
+        <source>Connect Always</source>
+        <translation type="unfinished">Conectar siempre</translation>
     </message>
 </context>
 </TS>

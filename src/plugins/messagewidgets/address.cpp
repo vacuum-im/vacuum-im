@@ -1,16 +1,26 @@
 #include "address.h"
 
 #include <QSet>
+#include <utils/pluginhelper.h>
 
 Address::Address(IMessageWidgets *AMessageWidgets, const Jid &AStreamJid, const Jid &AContactJid, QObject *AParent) : QObject(AParent)
 {
 	FAutoAddresses = false;
 
-	FXmppStreams = NULL;
-	FPresencePlugin = NULL;
 	FMessageWidgets = AMessageWidgets;
 
-	initialize();
+	FXmppStreamManager = PluginHelper::pluginInstance<IXmppStreamManager>();
+	if (FXmppStreamManager)
+	{
+		connect(FXmppStreamManager->instance(),SIGNAL(streamJidChanged(IXmppStream *, const Jid &)),SLOT(onXmppStreamJidChanged(IXmppStream *, const Jid &)));
+	}
+
+	FPresenceManager = PluginHelper::pluginInstance<IPresenceManager>();
+	if (FPresenceManager)
+	{
+		connect(FPresenceManager->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
+			SLOT(onPresenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)));
+	}
 
 	appendAddress(AStreamJid,AContactJid);
 	setAddress(AStreamJid,AContactJid);
@@ -111,38 +121,14 @@ void Address::removeAddress(const Jid &AStreamJid, const Jid &AContactJid)
 	}
 }
 
-void Address::initialize()
-{
-	IPlugin *plugin = FMessageWidgets->pluginManager()->pluginInterface("IXmppStreams").value(0,NULL);
-	if (plugin)
-	{
-		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-		if (FXmppStreams)
-		{
-			connect(FXmppStreams->instance(),SIGNAL(jidChanged(IXmppStream *, const Jid &)),SLOT(onXmppStreamJidChanged(IXmppStream *, const Jid &)));
-		}
-	}
-
-	plugin = FMessageWidgets->pluginManager()->pluginInterface("IPresencePlugin").value(0,NULL);
-	if (plugin)
-	{
-		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
-		if (FPresencePlugin)
-		{
-			connect(FPresencePlugin->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
-				SLOT(onPresenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)));
-		}
-	}
-}
-
 bool Address::updateAutoAddresses(bool AEmit)
 {
 	bool changed = false;
-	if (FAutoAddresses && FPresencePlugin)
+	if (FAutoAddresses && FPresenceManager)
 	{
 		for (QMap<Jid, QMultiMap<Jid,Jid> >::iterator streamIt=FAddresses.begin(); streamIt!=FAddresses.end(); ++streamIt)
 		{
-			IPresence *presence = FPresencePlugin->findPresence(streamIt.key());
+			IPresence *presence = FPresenceManager->findPresence(streamIt.key());
 			foreach(const Jid &contact, streamIt->keys())
 			{
 				QList<IPresenceItem> pitemList = presence!=NULL ? presence->findItems(contact) : QList<IPresenceItem>();

@@ -6,8 +6,8 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iprivatestorage.h>
 #include <interfaces/istanzaprocessor.h>
-#include <interfaces/ixmppstreams.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/ixmppstreammanager.h>
+#include <interfaces/ipresencemanager.h>
 
 class PrivateStorage :
 	public QObject,
@@ -58,13 +58,13 @@ protected:
 	QDomElement loadOptionsElement(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace) const;
 	void removeOptionsElement(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace) const;
 protected slots:
-	void onStreamOpened(IXmppStream *AXmppStream);
-	void onStreamAboutToClose(IXmppStream *AXmppStream);
-	void onStreamClosed(IXmppStream *AXmppStream);
+	void onXmppStreamOpened(IXmppStream *AXmppStream);
+	void onXmppStreamAboutToClose(IXmppStream *AXmppStream);
+	void onXmppStreamClosed(IXmppStream *AXmppStream);
 	void onPresenceAboutToClose(IPresence *APresence, int AShow, const QString &AStatus);
 private:
-	IXmppStreams *FXmppStreams;
-	IPresencePlugin *FPresencePlugin;
+	IXmppStreamManager *FXmppStreamManager;
+	IPresenceManager *FPresenceManager;
 	IStanzaProcessor *FStanzaProcessor;
 private:
 	int FSHINotifyDataChanged;

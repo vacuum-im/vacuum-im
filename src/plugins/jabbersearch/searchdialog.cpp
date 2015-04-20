@@ -8,6 +8,7 @@
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <utils/toolbarchanger.h>
+#include <utils/pluginhelper.h>
 #include <utils/logger.h>
 
 enum {
@@ -18,23 +19,23 @@ enum {
 	COL_EMAIL
 };
 
-SearchDialog::SearchDialog(IJabberSearch *ASearch, IPluginManager *APluginManager, const Jid &AStreamJid, const Jid &AServiceJid, QWidget *AParent) : QDialog(AParent)
+SearchDialog::SearchDialog(IJabberSearch *ASearch, const Jid &AStreamJid, const Jid &AServiceJid, QWidget *AParent) : QDialog(AParent)
 {
 	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_JSEARCH,0,0,"windowIcon");
 
-	FPluginManager = APluginManager;
 	FSearch = ASearch;
 	FStreamJid = AStreamJid;
 	FServiceJid = AServiceJid;
 
-	FDataForms = NULL;
-	FDiscovery = NULL;
 	FCurrentForm = NULL;
-	FRosterChanger = NULL;
-	FVCardPlugin = NULL;
+
+	FDataForms = PluginHelper::pluginInstance<IDataForms>();
+	FDiscovery = PluginHelper::pluginInstance<IServiceDiscovery>();
+	FRosterChanger = PluginHelper::pluginInstance<IRosterChanger>();
+	FVCardManager = PluginHelper::pluginInstance<IVCardManager>();
 
 	QToolBar *toolBar = new QToolBar(this);
 	toolBar->setIconSize(QSize(16,16));
@@ -50,9 +51,7 @@ SearchDialog::SearchDialog(IJabberSearch *ASearch, IPluginManager *APluginManage
 	connect(FSearch->instance(),SIGNAL(searchError(const QString &, const XmppError &)),SLOT(onSearchError(const QString &, const XmppError &)));
 	connect(ui.dbbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonClicked(QAbstractButton *)));
 
-	initialize();
 	createToolBarActions();
-
 	requestFields();
 }
 
@@ -189,25 +188,6 @@ bool SearchDialog::setDataForm(const IDataForm &AForm)
 	return false;
 }
 
-void SearchDialog::initialize()
-{
-	IPlugin *plugin = FPluginManager->pluginInterface("IDataForms").value(0,NULL);
-	if (plugin)
-		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
-
-	plugin = FPluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
-	if (plugin)
-		FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
-
-	plugin = FPluginManager->pluginInterface("IRosterChanger").value(0,NULL);
-	if (plugin)
-		FRosterChanger = qobject_cast<IRosterChanger *>(plugin->instance());
-
-	plugin = FPluginManager->pluginInterface("IVCardPlugin").value(0,NULL);
-	if (plugin)
-		FVCardPlugin = qobject_cast<IVCardPlugin *>(plugin->instance());
-}
-
 void SearchDialog::createToolBarActions()
 {
 	if (FDiscovery)
@@ -228,7 +208,7 @@ void SearchDialog::createToolBarActions()
 		connect(FAddContact,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 	}
 
-	if (FVCardPlugin)
+	if (FVCardManager)
 	{
 		FShowVCard = new Action(FToolBarChanger);
 		FShowVCard->setText(tr("vCard"));
@@ -336,7 +316,7 @@ void SearchDialog::onToolBarActionTriggered(bool)
 		}
 		else if (action == FShowVCard)
 		{
-			FVCardPlugin->showVCardDialog(FStreamJid,item.itemJid);
+			FVCardManager->showVCardDialog(FStreamJid,item.itemJid);
 		}
 	}
 }

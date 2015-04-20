@@ -2,7 +2,7 @@
 #define IPRIVACYLISTS_H
 
 #include <QDialog>
-#include <interfaces/iroster.h>
+#include <interfaces/irostermanager.h>
 #include <utils/jid.h>
 #include <utils/xmpperror.h>
 

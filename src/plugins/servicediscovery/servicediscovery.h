@@ -9,10 +9,10 @@
 #include <QMultiMap>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iservicediscovery.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <interfaces/istanzaprocessor.h>
-#include <interfaces/iroster.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/irostermanager.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/imainwindow.h>
@@ -80,7 +80,6 @@ public:
 	virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
 	virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
 	//IServiceDiscovery
-	virtual IPluginManager *pluginManager() const;
 	virtual bool isReady(const Jid &AStreamJid) const;
 	virtual IDiscoInfo selfDiscoInfo(const Jid &AStreamJid, const QString &ANode = QString::null) const;
 	virtual void showDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent = NULL);
@@ -163,13 +162,13 @@ protected slots:
 	void onSelfCapsChanged();
 private:
 	IPluginManager *FPluginManager;
-	IXmppStreams *FXmppStreams;
-	IRosterPlugin *FRosterPlugin;
-	IPresencePlugin *FPresencePlugin;
+	IXmppStreamManager *FXmppStreamManager;
+	IRosterManager *FRosterManager;
+	IPresenceManager *FPresenceManager;
 	IStanzaProcessor *FStanzaProcessor;
 	IRostersView *FRostersView;
 	IRostersViewPlugin *FRostersViewPlugin;
-	IMultiUserChatPlugin *FMultiUserChatPlugin;
+	IMultiUserChatManager *FMultiChatManager;
 	ITrayManager *FTrayManager;
 	IMainWindowPlugin *FMainWindowPlugin;
 	IStatusIcons *FStatusIcons;

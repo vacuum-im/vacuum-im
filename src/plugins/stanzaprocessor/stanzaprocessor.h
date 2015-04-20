@@ -6,7 +6,7 @@
 #include <QDomDocument>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/istanzaprocessor.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 
 struct StanzaRequest {
 	StanzaRequest() {
@@ -74,7 +74,7 @@ protected slots:
 	void onStanzaRequestOwnerDestroyed(QObject *AOwner);
 	void onStanzaHandlerDestroyed(QObject *AHandler);
 private:
-	IXmppStreams *FXmppStreams;
+	IXmppStreamManager *FXmppStreamManager;
 private:
 	QMap<int, IStanzaHandle> FHandles;
 	QMap<QString, StanzaRequest> FRequests;

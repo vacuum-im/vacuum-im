@@ -1,8 +1,7 @@
-FORMS = archivestreamoptions.ui \
+FORMS = archiveaccountoptionswidget.ui \
         archiveviewwindow.ui
 
-HEADERS = archivestreamoptions.h \ 
-          archiveenginesoptions.h\
+HEADERS = archiveaccountoptionswidget.h \ 
           chatwindowmenu.h \
           archiveviewtreeview.h \
           archiveviewwindow.h \
@@ -10,8 +9,7 @@ HEADERS = archivestreamoptions.h \
           archivereplicator.h \
           replicateworker.h
           
-SOURCES = archivestreamoptions.cpp \
-          archiveenginesoptions.cpp \
+SOURCES = archiveaccountoptionswidget.cpp \
           chatwindowmenu.cpp \
           archiveviewtreeview.cpp \
           archiveviewwindow.cpp \

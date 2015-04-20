@@ -60,18 +60,6 @@
         <translation>Поддерживает передачу файла другому контакту</translation>
     </message>
     <message>
-        <source>Automatically receive files from contacts in roster</source>
-        <translation>Автоматически принимать файлы от контактов в ростере</translation>
-    </message>
-    <message>
-        <source>Hide dialog after transfer started</source>
-        <translation>Прятать диалог после начала передачи</translation>
-    </message>
-    <message>
-        <source>Automatically remove finished transfers</source>
-        <translation>Автоматически удалять завершённые передачи</translation>
-    </message>
-    <message>
         <source>File &apos;%1&apos; successfully sent.</source>
         <translation>Файл &apos;%1&apos; успешно передан.</translation>
     </message>
@@ -94,6 +82,19 @@
     <message>
         <source>Data transmission terminated</source>
         <translation>Передача данных прервана</translation>
+    </message>
+    <message>
+        <source>Ctrl+S</source>
+        <comment>Send file</comment>
+        <translation>Ctrl+S</translation>
+    </message>
+    <message>
+        <source>Automatically receive files from authorized contacts</source>
+        <translation>Автоматически принимать файлы от авторизованных контактов</translation>
+    </message>
+    <message>
+        <source>Hide file transfer dialog after transfer started</source>
+        <translation>Скрывать окно передачи файлов после начала передачи</translation>
     </message>
 </context>
 <context>
@@ -246,12 +247,8 @@
         <translation>Статус:</translation>
     </message>
     <message>
-        <source>Profile:</source>
-        <translation>Профиль:</translation>
-    </message>
-    <message>
-        <source>Select data stream and settings profile</source>
-        <translation>Выберите поток данных и профиль настроек</translation>
+        <source>Method:</source>
+        <translation>Метод:</translation>
     </message>
 </context>
 </TS>

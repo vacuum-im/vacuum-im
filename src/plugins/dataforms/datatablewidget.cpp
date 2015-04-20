@@ -39,12 +39,7 @@ DataTableWidget::DataTableWidget(IDataForms *ADataForms, const IDataTable &ATabl
 	connect(this,SIGNAL(currentCellChanged(int,int,int,int)),SIGNAL(changed(int,int,int,int)));
 }
 
-DataTableWidget::~DataTableWidget()
-{
-
-}
-
-const IDataTable &DataTableWidget::dataTable() const
+IDataTable DataTableWidget::dataTable() const
 {
 	return FTable;
 }

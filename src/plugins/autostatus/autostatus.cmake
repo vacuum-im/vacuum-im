@@ -1,3 +1,3 @@
-set(SOURCES autostatus.cpp statusoptionswidget.cpp )
-set(HEADERS statusoptionswidget.h autostatus.h )
-set(UIS statusoptionswidget.ui )
+set(SOURCES autostatus.cpp autostatusoptionswidget.cpp autorulesoptionsdialog.cpp )
+set(HEADERS autostatusoptionswidget.h autostatus.h autorulesoptionsdialog.h )
+set(UIS autostatusoptionswidget.ui )

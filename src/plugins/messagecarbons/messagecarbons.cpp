@@ -13,7 +13,7 @@
 
 MessageCarbons::MessageCarbons()
 {
-	FXmppStreams = NULL;
+	FXmppStreamManager = NULL;
 	FDiscovery = NULL;
 	FStanzaProcessor = NULL;
 	FMessageProcessor = NULL;
@@ -39,14 +39,14 @@ void MessageCarbons::pluginInfo(IPluginInfo *APluginInfo)
 bool MessageCarbons::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
 	Q_UNUSED(AInitOrder);
-	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
+	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreamManager").value(0,NULL);
 	if (plugin)
 	{
-		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-		if (FXmppStreams)
+		FXmppStreamManager = qobject_cast<IXmppStreamManager *>(plugin->instance());
+		if (FXmppStreamManager)
 		{
-			connect(FXmppStreams->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onXmppStreamOpened(IXmppStream *)));
-			connect(FXmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onXmppStreamClosed(IXmppStream *)));
+			connect(FXmppStreamManager->instance(),SIGNAL(streamOpened(IXmppStream *)),SLOT(onXmppStreamOpened(IXmppStream *)));
+			connect(FXmppStreamManager->instance(),SIGNAL(streamClosed(IXmppStream *)),SLOT(onXmppStreamClosed(IXmppStream *)));
 		}
 	}
 
@@ -70,7 +70,7 @@ bool MessageCarbons::initConnections(IPluginManager *APluginManager, int &AInitO
 		FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
 	}
 
-	return FXmppStreams!=NULL && FStanzaProcessor!=NULL && FDiscovery!=NULL;
+	return FXmppStreamManager!=NULL && FStanzaProcessor!=NULL && FDiscovery!=NULL;
 }
 
 bool MessageCarbons::initObjects()
