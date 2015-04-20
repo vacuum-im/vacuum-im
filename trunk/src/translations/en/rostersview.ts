@@ -27,10 +27,6 @@
         <translation>Show/Hide disconnected contacts</translation>
     </message>
     <message>
-        <source>Show disconnected contact</source>
-        <translation>Show disconnected contact</translation>
-    </message>
-    <message>
         <source>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</source>
         <translation>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</translation>
     </message>
@@ -71,10 +67,6 @@
         <translation>Contacts list</translation>
     </message>
     <message>
-        <source>Show contact of all accounts in common list</source>
-        <translation>Show contact of all accounts in common list</translation>
-    </message>
-    <message>
         <source>Show contact resource with highest priority</source>
         <translation>Show contact resource with highest priority</translation>
     </message>
@@ -113,6 +105,14 @@
     <message>
         <source>Contact-List</source>
         <translation>Contact-List</translation>
+    </message>
+    <message>
+        <source>Show disconnected contacts</source>
+        <translation>Show disconnected contacts</translation>
+    </message>
+    <message>
+        <source>Show contacts of all accounts in common list</source>
+        <translation>Show contacts of all accounts in common list</translation>
     </message>
 </context>
 </TS>

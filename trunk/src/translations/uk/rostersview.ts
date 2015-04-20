@@ -27,10 +27,6 @@
         <translation>Показати/Сховати відключені контакти</translation>
     </message>
     <message>
-        <source>Show disconnected contact</source>
-        <translation>Показувати відключені контакти</translation>
-    </message>
-    <message>
         <source>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</source>
         <translation>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</translation>
     </message>
@@ -71,10 +67,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show contact of all accounts in common list</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Show contact resource with highest priority</source>
         <translation type="unfinished"></translation>
     </message>
@@ -112,6 +104,14 @@
     </message>
     <message>
         <source>Contact-List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show disconnected contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show contacts of all accounts in common list</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

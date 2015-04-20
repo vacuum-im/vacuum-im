@@ -197,8 +197,8 @@ QMultiMap<int, IOptionsDialogWidget *> RostersViewPlugin::optionsDialogWidgets(c
 	if (FOptionsManager && ANodeId == OPN_ROSTERVIEW)
 	{
 		widgets.insertMulti(OHO_ROSTER_VIEW, FOptionsManager->newOptionsDialogHeader(tr("Contacts list"),AParent));
-		widgets.insertMulti(OWO_ROSTER_SHOWOFFLINE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_SHOWOFFLINE),tr("Show disconnected contact"),AParent));
-		widgets.insertMulti(OWO_ROSTER_MERGESTREAMS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_MERGESTREAMS),tr("Show contact of all accounts in common list"),AParent));
+		widgets.insertMulti(OWO_ROSTER_SHOWOFFLINE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_SHOWOFFLINE),tr("Show disconnected contacts"),AParent));
+		widgets.insertMulti(OWO_ROSTER_MERGESTREAMS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_MERGESTREAMS),tr("Show contacts of all accounts in common list"),AParent));
 		widgets.insertMulti(OWO_ROSTER_SHOWRESOURCE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_SHOWRESOURCE),tr("Show contact resource with highest priority"),AParent));
 		widgets.insertMulti(OWO_ROSTER_HIDESCROLLBAR,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_HIDESCROLLBAR),tr("Hide scroll bars in contact list window"),AParent));
 
