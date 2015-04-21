@@ -64,10 +64,10 @@ void AutoStatusOptionsWidget::reset()
 		IAutoStatusRule rule = FAutoStatus->ruleValue(awayId);
 		awayId = awayShows.contains(rule.show) ? awayId : QUuid();
 	}
-	else foreach(const QUuid &id, availRules)
+	for (QList<QUuid>::const_iterator it=availRules.constBegin(); !availRules.contains(awayId) && it!=availRules.constEnd(); ++it)
 	{
-		IAutoStatusRule rule = FAutoStatus->ruleValue(id);
-		awayId = awayShows.contains(rule.show) ? id : QUuid();
+		IAutoStatusRule rule = FAutoStatus->ruleValue(*it);
+		awayId = awayShows.contains(rule.show) ? *it : QUuid();
 	}
 	if (!availRules.contains(awayId))
 	{
@@ -76,10 +76,9 @@ void AutoStatusOptionsWidget::reset()
 		awayRule.show = IPresence::Away;
 		awayRule.priority = 20;
 		awayRule.text = tr("Auto status due to inactivity for more than #(m) minutes");
-		
 		awayId = FAutoStatus->insertRule(awayRule);
-		Options::node(OPV_AUTOSTARTUS_AWAYRULE).setValue(awayId.toString());
 	}
+	Options::node(OPV_AUTOSTARTUS_AWAYRULE).setValue(awayId.toString());
 	
 	QUuid offlineId = Options::node(OPV_AUTOSTARTUS_OFFLINERULE).value().toString();
 	if (availRules.contains(offlineId))
@@ -87,10 +86,10 @@ void AutoStatusOptionsWidget::reset()
 		IAutoStatusRule rule = FAutoStatus->ruleValue(offlineId);
 		offlineId = offlineShows.contains(rule.show) ? offlineId : QUuid();
 	}
-	else foreach(const QUuid &id, availRules)
+	for (QList<QUuid>::const_iterator it=availRules.constBegin(); !availRules.contains(offlineId) && it!=availRules.constEnd(); ++it)
 	{
-		IAutoStatusRule rule = FAutoStatus->ruleValue(id);
-		offlineId = offlineShows.contains(rule.show) ? id : QUuid();
+		IAutoStatusRule rule = FAutoStatus->ruleValue(*it);
+		offlineId = offlineShows.contains(rule.show) ? *it : QUuid();
 	}
 	if (!availRules.contains(offlineId))
 	{
@@ -99,10 +98,9 @@ void AutoStatusOptionsWidget::reset()
 		offlineRule.show = IPresence::Offline;
 		offlineRule.priority = 0;
 		offlineRule.text = tr("Disconnected due to inactivity for more than #(m) minutes");
-
 		offlineId = FAutoStatus->insertRule(offlineRule);
-		Options::node(OPV_AUTOSTARTUS_OFFLINERULE).setValue(offlineId.toString());
 	}
+	Options::node(OPV_AUTOSTARTUS_OFFLINERULE).setValue(offlineId.toString());
 
 	IAutoStatusRule awayRule = FAutoStatus->ruleValue(awayId);
 	awayRule.time = awayRule.time>0 ? awayRule.time : 10*60;
