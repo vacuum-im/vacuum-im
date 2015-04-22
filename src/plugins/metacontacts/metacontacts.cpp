@@ -1634,7 +1634,7 @@ void MetaContacts::saveMetaContactsToFile(const QString &AFileName, const QList<
 		QDomElement storageElem = doc.appendChild(doc.createElementNS(NS_STORAGE_METACONTACTS,"storage")).toElement();
 		saveMetaContactsToXML(storageElem,AContacts);
 		file.write(doc.toByteArray());
-		file.flush();
+		file.close();
 	}
 	else
 	{
