@@ -696,8 +696,8 @@ IArchiveHeader FileMessageArchive::saveFileCollection(const Jid &AStreamJid, con
 			QDomDocument doc;
 			QDomElement chatElem = doc.appendChild(doc.createElement("chat")).toElement();
 			FArchiver->collectionToElement(collection,chatElem,ARCHIVE_SAVE_MESSAGE);
-			file.write(doc.toByteArray(2));
-			file.flush();
+			file.write(doc.toByteArray());
+			file.close();
 
 			saveModification(AStreamJid,collection.header,IArchiveModification::Changed);
 			return collection.header;
@@ -940,7 +940,7 @@ void FileMessageArchive::saveGatewayType(const QString &ADomain, const QString &
 		gateway << "\n";
 
 		file.write(gateway.join(" ").toUtf8());
-		file.flush();
+		file.close();
 
 		FGatewayTypes.insert(ADomain,AType);
 	}

@@ -1079,7 +1079,7 @@ bool ServiceDiscovery::saveCapsInfo(const IDiscoInfo &AInfo) const
 				if (file.open(QIODevice::WriteOnly|QIODevice::Truncate))
 				{
 					file.write(doc.toByteArray());
-					file.flush();
+					file.close();
 				}
 				else
 				{

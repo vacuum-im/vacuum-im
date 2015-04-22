@@ -451,7 +451,7 @@ void Roster::saveRosterItems(const QString &AFileName) const
 	{
 		LOG_STRM_INFO(streamJid(),QString("Roster items saved to file=%1").arg(AFileName));
 		file.write(xml.toByteArray());
-		file.flush();
+		file.close();
 	}
 	else
 	{

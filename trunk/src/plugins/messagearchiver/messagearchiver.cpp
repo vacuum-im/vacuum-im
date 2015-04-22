@@ -1724,7 +1724,7 @@ void MessageArchiver::savePendingMessages(const Jid &AStreamJid)
 		{
 			LOG_STRM_INFO(AStreamJid,QString("Pending messages saved, count=%1").arg(messages.count()));
 			file.write(doc.toByteArray());
-			file.flush();
+			file.close();
 		}
 		else
 		{

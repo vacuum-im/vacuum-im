@@ -346,8 +346,8 @@ void PluginManager::saveSettings()
 		QFile file(homeDir.absoluteFilePath(FILE_PLUGINS_SETTINGS));
 		if (file.open(QFile::WriteOnly|QFile::Truncate))
 		{
-			file.write(FPluginsSetup.toString(3).toUtf8());
-			file.flush();
+			file.write(FPluginsSetup.toByteArray());
+			file.close();
 		}
 		else
 		{

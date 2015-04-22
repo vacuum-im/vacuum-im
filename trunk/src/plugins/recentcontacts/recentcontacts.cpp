@@ -1056,7 +1056,7 @@ void RecentContacts::saveItemsToFile(const QString &AFileName, const QList<IRece
 		QDomElement itemsElem = doc.appendChild(doc.createElementNS(PSN_RECENTCONTACTS,PST_RECENTCONTACTS)).toElement();
 		saveItemsToXML(itemsElem,AItems,false);
 		file.write(doc.toByteArray());
-		file.flush();
+		file.close();
 	}
 	else
 	{

@@ -291,7 +291,7 @@ void ConnectionManager::addTrustedCaCertificate(const QSslCertificate &ACertific
 			{
 				LOG_INFO(QString("Saved trusted CA certificate to file=%1").arg(file.fileName()));
 				file.write(ACertificate.toPem());
-				file.flush();
+				file.close();
 			}
 			else
 			{

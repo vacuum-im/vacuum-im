@@ -651,8 +651,8 @@ bool OptionsManager::saveProfile(const QString &AProfile, const QDomDocument &AP
 	if (file.open(QFile::WriteOnly|QFile::Truncate))
 	{
 		LOG_INFO(QString("Profile options saved, profile=%1").arg(AProfile));
-		file.write(AProfileDoc.toString(2).toUtf8());
-		file.flush();
+		file.write(AProfileDoc.toByteArray());
+		file.close();
 		return true;
 	}
 	else
@@ -670,7 +670,7 @@ bool OptionsManager::saveCurrentProfileOptions() const
 		if (file.open(QIODevice::WriteOnly|QIODevice::Truncate))
 		{
 			LOG_DEBUG(QString("Current profile options saved, profile=%1").arg(FProfile));
-			file.write(FProfileOptions.toString(2).toUtf8());
+			file.write(FProfileOptions.toByteArray());
 			file.close();
 			return true;
 		}

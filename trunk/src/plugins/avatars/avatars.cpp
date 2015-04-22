@@ -550,7 +550,7 @@ bool Avatars::saveToFile(const QString &AFileName, const QByteArray &AData) cons
 		if (file.open(QFile::WriteOnly|QFile::Truncate))
 		{
 			file.write(AData);
-			file.flush();
+			file.close();
 			return true;
 		}
 		else
