@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.0" language="pl" sourcelanguage="en">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="pl" sourcelanguage="en" version="2.0">
 <context>
     <name>EditUsersListDialog</name>
     <message>
@@ -140,439 +138,439 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
     </message>
     <message>
         <source>Your nick was changed by server to &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>MultiUserChatManager</name>
     <message>
         <source>Multi-User Conferences</source>
-        <translation type="unfinished">Konferencje z wieloma uczestnikami</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Allows to use Jabber multi-user conferences</source>
-        <translation type="unfinished">Umożliwia korzystanie z konferencji z wieloma uczestnikami Jabbera</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Join conference</source>
-        <translation type="unfinished">Dołącz do konferencji</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Ctrl+J</source>
         <comment>Join conference</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>When receiving an invitation to the conference</source>
-        <translation type="unfinished">Jeśli otrzymasz zaproszenie na konferencję</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>When receiving a new private message in conference</source>
-        <translation type="unfinished">Gdy nowa wiadomość w konferencji</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>When receiving a new message in conference</source>
-        <translation type="unfinished">Po otrzymaniu nowej wiadomości w konferencji</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>When referring to you at the conference</source>
-        <translation type="unfinished">Odnosząc się do Ciebie na konferencji</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Conferences</source>
-        <translation type="unfinished">Konferencje</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Show users connections and disconnections</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Show users status changes</source>
-        <translation type="unfinished">Pokazuj zmiany statusów użytkowników</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Save users status messages in history</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Leave the conference when window closed</source>
-        <translation type="unfinished">Opuszczaj konferencje przy zamknięciu okna</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Automatically rejoin to conference after kick</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Select a user to refer by enumeration in the input field</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Register in conference</source>
-        <translation type="unfinished">Zarejestruj się na konferencję</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Allow this person to register with the room?</source>
-        <translation type="unfinished">Czy ten użytkownik może dołączyc do konferencji?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>EMail Address</source>
-        <translation type="unfinished">Adres E-mail</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Rules and Notes</source>
-        <translation type="unfinished">Warunki i komentarze</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Given Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Family Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Desired Nickname</source>
-        <translation type="unfinished">Pożądany nick</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Your URL</source>
-        <translation type="unfinished">Twój URL</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Request for voice</source>
-        <translation type="unfinished">Prośba o prawo &apos;głosu&apos;</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Requested Role</source>
-        <translation type="unfinished">Oczekiwana rola</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>User ID</source>
-        <translation type="unfinished">ID użytkownika</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Room Nickname</source>
-        <translation type="unfinished">Nick w pokoju</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Grant Voice?</source>
-        <translation type="unfinished">Nadać prawo &apos;głosu&apos;?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Configure conference</source>
-        <translation type="unfinished">Ustawienia konferencji</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Maximum Number of History Messages Returned by Room</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Allow Occupants to Send Private Messages?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Allow Occupants to Invite Others?</source>
-        <translation type="unfinished">Umożliwić użytkownikom wysyłanie zaproszeń?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Allow Occupants to Change Subject?</source>
-        <translation type="unfinished">Umożlwiić użytkownikom zmianę tematu?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Enable Logging of Room Conversations?</source>
-        <translation type="unfinished">Włączyć rejestrowanie rozmów w pokoju?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Affiliations that May Retrieve Member List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>XMPP URI of Associated Publish-Subscribe Node</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Natural Language for Room Discussions</source>
-        <translation type="unfinished">Podstawowy język rozmowy w pokoju</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Maximum Number of Room Occupants</source>
-        <translation type="unfinished">Maksymalna liczba użytkowników pokoju</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Make Room Members-Only?</source>
-        <translation type="unfinished">Pokój tylko dla zarejestrowanych użytkowników?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Make Room Moderated?</source>
-        <translation type="unfinished">Ustawić pokój jako moderowany?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Password is Required to Enter?</source>
-        <translation type="unfinished">Pokój z dostępem na hasło?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Make Room Persistent?</source>
-        <translation type="unfinished">Pokój ma być stały?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Roles for which Presence is Broadcasted</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Allow Public Searching for Room?</source>
-        <translation type="unfinished">Pokój ma być możliwy do znalezienia poprzez wyszukiwanie?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Full List of Room Administrators</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Description of Room</source>
-        <translation type="unfinished">Opis pokoju</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Natural-Language Room Name</source>
-        <translation type="unfinished">Nazwa pokoju</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Full List of Room Owners</source>
-        <translation type="unfinished">Pełny spis właścicieli pokoju</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The Room Password</source>
-        <translation type="unfinished">Hasło do pokoju</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Affiliations that May Discover Real JIDs of Occupants</source>
-        <translation type="unfinished">Uczynić widzialnymi prawdziwe JID użytkowników</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Make Participants List Public?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Make all Occupants as Participants?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Allow Occupants to Query Other Occupants?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Allow Visitors to Send Status Text in Presence Updates?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Make this Room CAPTCHA Protected?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Do not Request CAPTCHA for Followed Jabber ID</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Allow Login Only With Registered Nickname?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Allow Occupants to Change Nicknames?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Allow Users to Register with the Room?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Conference information</source>
-        <translation type="unfinished">Informacje o konferencji</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Contact JID</source>
-        <translation type="unfinished">JID kontaktu</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Natural Language for Room</source>
-        <translation type="unfinished">Podstawowy język w pokoju</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>LDAP Group</source>
-        <translation type="unfinished">Grupa LDAP</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>URL for Archived Discussion Logs</source>
-        <translation type="unfinished">URL do archiwizowania protokołów wiadomości</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Current Number of Occupants in Room</source>
-        <translation type="unfinished">Aktualna liczba użytkowników pokoju</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Current Subject or Discussion Topic in Room</source>
-        <translation type="unfinished">Aktualny temat dyskusji w pokoju</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The Room Subject Can be Modified by Participants?</source>
-        <translation type="unfinished">Temat w pokoju może być zmieniany przez użytkowników?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>You are invited to the conference %1</source>
-        <translation type="unfinished">Zostałeś zaproszony na konferencję %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Invitation received</source>
-        <translation type="unfinished">Otrzymano zaproszenia</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>You are invited to the conference %1 by %2.&lt;br&gt;Reason: %3</source>
-        <translation type="unfinished">Zostałeś zaproszony na konferencję %1 przez %2.&lt;br&gt;Powód: %3</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Do you want to join this conference?</source>
-        <translation type="unfinished">Chcesz dołączyc do tej konferencji?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Invite</source>
-        <translation type="unfinished">Zaproś</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Supports the multi-user conferences</source>
-        <translation type="unfinished">Obsługa konferencji z wieloma uczestnikami</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Hidden room</source>
-        <translation type="unfinished">Ukryty pokój</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>A room that cannot be found by any user through normal means such as searching and service discovery</source>
-        <translation type="unfinished">Pokój nie może zostać wykryty przez żadnego użytkownika za pomocą zwykłych środków, takich jak poszukiwanie i wykrywanie usług</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Members-only room</source>
-        <translation type="unfinished">Pokój tylko dla uczestników</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>A room that a user cannot enter without being on the member list</source>
-        <translation type="unfinished">Pokój, do którego nie można wejść jeśli nie jest się na liście uczestników</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Moderated room</source>
-        <translation type="unfinished">Pokój moderowany</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>A room in which only those with &apos;voice&apos; may send messages to all occupants</source>
-        <translation type="unfinished">Pokój, w którym tylko uczestnik z prawem &apos;głosu&apos; może wysyłać wiadomości do wszystkich użytkowników</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Non-anonymous room</source>
-        <translation type="unfinished">Pokój nie anonimowy</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>A room in which an occupant&apos;s full JID is exposed to all other occupants</source>
-        <translation type="unfinished">Pokój, w którym JID każdego uczestnika mogą widzieć wszyscy uczestnicy</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Open room</source>
-        <translation type="unfinished">Pokój otwarty</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>A room that anyone may enter without being on the member list</source>
-        <translation type="unfinished">Pokój, do którego może wejść każdy, niebędąc na liście uczestników</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Password-protected room</source>
-        <translation type="unfinished">Pokój, który jest chroniony hasłem</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>A room that a user cannot enter without first providing the correct password</source>
-        <translation type="unfinished">Pokój, do którego można wejść tylko po podaniu prawidłowego hasła</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Persistent room</source>
-        <translation type="unfinished">Pokój stały</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>A room that is not destroyed if the last occupant exits</source>
-        <translation type="unfinished">Pokój, który nie jest niszczony po odejściu ostatniego uczestnika konferencji</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Public room</source>
-        <translation type="unfinished">Pokój publiczny</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>A room that can be found by any user through normal means such as searching and service discovery</source>
-        <translation type="unfinished">Pokój który może zostać wykryty przez każdego użytkownika za pomocą zwykłych środków, takich jak poszukiwanie i wykrywanie usług</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Semi-anonymous room</source>
-        <translation type="unfinished">Pokój półanonimowy</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>A room in which an occupant&apos;s full JID can be discovered by room admins only</source>
-        <translation type="unfinished">Pokój, w którym JID każdego uczestnika jest widziany tylko przez administratorów tego pokoju</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Temporary room</source>
-        <translation type="unfinished">Pokój tymczasowy</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>A room that is destroyed if the last occupant exits</source>
-        <translation type="unfinished">Pokój, który jest niszczony zaraz po odejściu ostatniego uczestnika konferencji</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Unmoderated room</source>
-        <translation type="unfinished">Pokój niemoderowany</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>A room in which any occupant is allowed to send messages to all occupants</source>
-        <translation type="unfinished">Pokój, w którym każdy uczestnik może wysłać wiadomość do każdego uczestnika</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Unsecured room</source>
-        <translation type="unfinished">Pokój niezabezpieczony</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>A room that anyone is allowed to enter without first providing the correct password</source>
-        <translation type="unfinished">Pokój, do którego można wejść bez podania prawidłowego hasła</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Invite to</source>
-        <translation type="unfinished">Zaproś do</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>%1 from %2</source>
-        <translation type="unfinished">%1 od %2</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Enter</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Exit</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Open Conference Dialog</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>I&apos;m too busy right now</source>
-        <translation type="unfinished">Jestem teraz zbyt zajęty</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Decline invite</source>
-        <translation type="unfinished">Odrzuć zaproszenie</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Enter a reason</source>
-        <translation type="unfinished">Podaj powód</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Please, enter this conference!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Invite user</source>
-        <translation type="unfinished">Zaproś użytkownika</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -867,131 +865,131 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
     </message>
     <message>
         <source>Enter</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Exit</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Open Chat Dialog</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Kick User</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Ban User</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Change Nick</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Change Topic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Invite to Conference</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Request Voice</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Clear Conference Window</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Edit Ban List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Edit Members List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Edit Administrators List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Edit Owners List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Configure Conference</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Destroy Conference</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Enter conference</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Exit conference</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Clear Chat Window</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Enter your new nick name in conference %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Enter new topic for conference %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Please, enter this conference!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Destroying conference</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>&lt;b&gt;Role:&lt;/b&gt; %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>&lt;b&gt;Affiliation:&lt;/b&gt; %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>&lt;b&gt;Status:&lt;/b&gt; %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>This room is non-anonymous</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>You entered into the room</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>You left the room</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Room now shows unavailable members</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Room now does not show unavailable members</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>

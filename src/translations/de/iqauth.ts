@@ -1,15 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.0" language="de" sourcelanguage="en">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" sourcelanguage="en" version="2.0">
 <context>
     <name>IqAuthFeatureFactory</name>
     <message>
         <source>Query Authentication</source>
-        <translation type="unfinished">Authentifizierung anfragen</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Allow you to log on the Jabber server without support SASL authentication</source>
-        <translation type="unfinished">Erlaubt Ihnen sich am Jabber-Server ohne SASL anzumelden</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>

@@ -1,241 +1,239 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.0" language="uk" sourcelanguage="en">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="uk" sourcelanguage="en" version="2.0">
 <context>
     <name>MessageStyleManager</name>
     <message>
         <source>Message Styles Manager</source>
-        <translation type="unfinished">Менеджер стилів повідомлень</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Allows to use different styles to display messages</source>
-        <translation type="unfinished">Дозволяє використовувати різні стилі для перегляду повідомлень</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Messages styles</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Show date separators in message window</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>January</source>
-        <translation type="unfinished">Січня</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>February</source>
-        <translation type="unfinished">Лютого</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>March</source>
-        <translation type="unfinished">Березня</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>April</source>
-        <translation type="unfinished">Квітня</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>May</source>
-        <translation type="unfinished">Травня</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>June</source>
-        <translation type="unfinished">Червня</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>July</source>
-        <translation type="unfinished">Липня</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>August</source>
-        <translation type="unfinished">Серпня</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>September</source>
-        <translation type="unfinished">Вересня</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>October</source>
-        <translation type="unfinished">Жовтня</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>November</source>
-        <translation type="unfinished">Листопада</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>December</source>
-        <translation type="unfinished">Грудня</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Monday</source>
-        <translation type="unfinished">Понеділок</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Tuesday</source>
-        <translation type="unfinished">Вівторок</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Wednesday</source>
-        <translation type="unfinished">Середа</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Thursday</source>
-        <translation type="unfinished">Четвер</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Friday</source>
-        <translation type="unfinished">П’ятниця</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Saturday</source>
-        <translation type="unfinished">Субота</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Sunday</source>
-        <translation type="unfinished">Неділя</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>%1, %2 dd</source>
-        <translation type="unfinished">%1, dd %2</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Today</source>
-        <translation type="unfinished">Сьогодні</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>%1, %2 dd, yyyy</source>
-        <translation type="unfinished">%1, dd %2, yyyy</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>d MMM yyyy hh:mm</source>
-        <translation type="unfinished">d MMM yyyy hh:mm</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>d MMM hh:mm</source>
-        <translation type="unfinished">d MMM hh:mm</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>hh:mm:ss</source>
-        <translation type="unfinished">hh:mm:ss</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>StyleEditOptionsDialog</name>
     <message>
         <source>Preview</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Message Style - %1 - %2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Receiver</source>
-        <translation type="unfinished">Отримувач</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Sender</source>
-        <translation type="unfinished">Відправник</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The message with a error code %1 is received</source>
-        <translation type="unfinished">Отримано повідомлення з кодом помилки №%1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Error description</source>
-        <translation type="unfinished">Опис помилки</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Subject: Message subject</source>
-        <translation type="unfinished">Тема: Тема повідомлення</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Message body line 1</source>
-        <translation type="unfinished">Тіло повідомлення, рядок 1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Message body line 2</source>
-        <translation type="unfinished">Тіло повідомлення, рядок 2</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Incoming history message</source>
-        <translation type="unfinished">Вхідне старе повідомлення</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Incoming history consecutive message</source>
-        <translation type="unfinished">Вхідне старе послідовне повідомлення</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Incoming status message</source>
-        <translation type="unfinished">Вхідне статус-повідомлення</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Outgoing history message</source>
-        <translation type="unfinished">Вихідне старе повідомлення</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Outgoing status message</source>
-        <translation type="unfinished">Вихідне статус-повідомлення</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Conference topic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Incoming message</source>
-        <translation type="unfinished">Вхідне повідомлення</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Incoming event</source>
-        <translation type="unfinished">Вхідна подія</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Incoming notification</source>
-        <translation type="unfinished">Вхідне сповіщення</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Incoming mention message</source>
-        <translation type="unfinished">Вхідне повідомлення з звертанням</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Outgoing message</source>
-        <translation type="unfinished">Вихідне повідомлення</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Outgoing consecutive message</source>
-        <translation type="unfinished">Вихідне послідовне повідомлення</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>StyleSelectOptionsWidget</name>
     <message>
         <source>Chat:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Conference:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Message:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Headline:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Error:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Unknown:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>
