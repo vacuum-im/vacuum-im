@@ -61,10 +61,6 @@
         <translation>&lt;b&gt;Получено сообщение с ошибкой&lt;/b&gt;</translation>
     </message>
     <message>
-        <source>Mark all single messages from user as read when you read the first one</source>
-        <translation>Пометить прочитанными все одиночные сообщения от пользователя при прочтении первого</translation>
-    </message>
-    <message>
         <source>Send</source>
         <translation>Отправить</translation>
     </message>
@@ -91,6 +87,10 @@
     <message>
         <source>Send as Chat Message</source>
         <translation>Отправить как чат сообщение</translation>
+    </message>
+    <message>
+        <source>Consider all single contacts messages as read when read the first</source>
+        <translation>Считать прочитанными все одиночные сообщения контакта при прочтении первого</translation>
     </message>
 </context>
 </TS>

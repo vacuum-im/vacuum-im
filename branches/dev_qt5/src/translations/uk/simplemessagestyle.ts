@@ -13,18 +13,18 @@
     </message>
 </context>
 <context>
-    <name>SimpleMessageStylePlugin</name>
+    <name>SimpleMessageStyleEngine</name>
     <message>
         <source>Simple Message Style</source>
-        <translation>Спрощений стиль повідомлень</translation>
+        <translation type="unfinished">Спрощений стиль повідомлень</translation>
     </message>
     <message>
         <source>Allows to use a simplified style in message design</source>
-        <translation>Дозволяє використовувати спрощений стиль оформлення повідомлень</translation>
+        <translation type="unfinished">Дозволяє використовувати спрощений стиль оформлення повідомлень</translation>
     </message>
     <message>
-        <source>Simple Style</source>
-        <translation>Простий стиль</translation>
+        <source>Simple</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -45,44 +45,44 @@
         <source>Image Files (*.png *.jpg *.bmp *.gif)</source>
         <translation>Файли зображень  (*.png *.jpg *.bmp *.gif)</translation>
     </message>
+    <message>
+        <source>Parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Background</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SimpleOptionsWidgetClass</name>
     <message>
-        <source>Message Style:</source>
-        <translation>Стиль:</translation>
-    </message>
-    <message>
         <source>Variant:</source>
         <translation>Варіант:</translation>
-    </message>
-    <message>
-        <source>Text Font:</source>
-        <translation>Шрифт:</translation>
-    </message>
-    <message>
-        <source>Set Font...</source>
-        <translation>Шрифт...</translation>
-    </message>
-    <message>
-        <source>Default</source>
-        <translation>Скинути</translation>
-    </message>
-    <message>
-        <source>Background:</source>
-        <translation>Фон:</translation>
     </message>
     <message>
         <source>Color:</source>
         <translation>Колір:</translation>
     </message>
     <message>
-        <source>Set Image...</source>
-        <translation>Зображення...</translation>
+        <source>Font:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable animation (may be slow)</source>
-        <translation>Дозволити анімацію (може сповільнювати роботу)</translation>
+        <source>Change...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>not set</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

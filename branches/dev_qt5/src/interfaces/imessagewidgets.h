@@ -6,9 +6,9 @@
 #include <QTreeView>
 #include <QTextBrowser>
 #include <QTextDocument>
-#include <interfaces/ipluginmanager.h>
 #include <interfaces/imainwindow.h>
-#include <interfaces/imessagestyles.h>
+#include <interfaces/ipluginmanager.h>
+#include <interfaces/imessagestylemanager.h>
 #include <utils/jid.h>
 #include <utils/menu.h>
 #include <utils/action.h>
@@ -85,9 +85,9 @@ public:
 	virtual QWidget *styleWidget() const =0;
 	virtual IMessageStyle *messageStyle() const =0;
 	virtual void setMessageStyle(IMessageStyle *AStyle, const IMessageStyleOptions &AOptions) =0;
-	virtual void appendHtml(const QString &AHtml, const IMessageContentOptions &AOptions) =0;
-	virtual void appendText(const QString &AText, const IMessageContentOptions &AOptions) =0;
-	virtual void appendMessage(const Message &AMessage, const IMessageContentOptions &AOptions) =0;
+	virtual void appendHtml(const QString &AHtml, const IMessageStyleContentOptions &AOptions) =0;
+	virtual void appendText(const QString &AText, const IMessageStyleContentOptions &AOptions) =0;
+	virtual void appendMessage(const Message &AMessage, const IMessageStyleContentOptions &AOptions) =0;
 	virtual void contextMenuForView(const QPoint &APosition, Menu *AMenu) =0;
 	virtual QTextDocumentFragment selection() const =0;
 	virtual QTextCharFormat textFormatAt(const QPoint &APosition) const =0;
@@ -95,7 +95,7 @@ public:
 protected:
 	virtual void urlClicked(const QUrl &AUrl) =0;
 	virtual void viewContextMenu(const QPoint &APosition, Menu *AMenu) =0;
-	virtual void contentAppended(const QString &AHtml, const IMessageContentOptions &AOptions) =0;
+	virtual void contentAppended(const QString &AHtml, const IMessageStyleContentOptions &AOptions) =0;
 	virtual void messageStyleOptionsChanged(const IMessageStyleOptions &AOptions, bool ACleared) =0;
 	virtual void messageStyleChanged(IMessageStyle *ABefore, const IMessageStyleOptions &AOptions) =0;
 };
@@ -358,7 +358,6 @@ class IMessageWidgets
 {
 public:
 	virtual QObject *instance() = 0;
-	virtual IPluginManager *pluginManager() const =0;
 	virtual IMessageAddress *newAddress(const Jid &AStreamJid, const Jid &AContactJid, QObject *AParent) =0;
 	virtual IMessageInfoWidget *newInfoWidget(IMessageWindow *AWindow, QWidget *AParent) =0;
 	virtual IMessageViewWidget *newViewWidget(IMessageWindow *AWindow, QWidget *AParent) =0;
@@ -419,7 +418,7 @@ protected:
 Q_DECLARE_INTERFACE(IMessageAddress,"Vacuum.Plugin.IMessageAddress/1.0")
 Q_DECLARE_INTERFACE(IMessageWidget,"Vacuum.Plugin.IMessageWidget/1.0")
 Q_DECLARE_INTERFACE(IMessageInfoWidget,"Vacuum.Plugin.IMessageInfoWidget/1.2")
-Q_DECLARE_INTERFACE(IMessageViewWidget,"Vacuum.Plugin.IMessageViewWidget/1.4")
+Q_DECLARE_INTERFACE(IMessageViewWidget,"Vacuum.Plugin.IMessageViewWidget/1.5")
 Q_DECLARE_INTERFACE(IMessageEditWidget,"Vacuum.Plugin.IMessageEditWidget/1.4")
 Q_DECLARE_INTERFACE(IMessageReceiversWidget,"Vacuum.Plugin.IMessageReceiversWidget/1.3")
 Q_DECLARE_INTERFACE(IMessageMenuBarWidget,"Vacuum.Plugin.IMessageMenuBarWidget/1.1")
@@ -435,6 +434,6 @@ Q_DECLARE_INTERFACE(IMessageViewDropHandler,"Vacuum.Plugin.IMessageViewDropHandl
 Q_DECLARE_INTERFACE(IMessageViewUrlHandler,"Vacuum.Plugin.IMessageViewUrlHandler/1.2")
 Q_DECLARE_INTERFACE(IMessageEditSendHandler,"QIP.Plugin.IMessageEditSendHandler/1.0")
 Q_DECLARE_INTERFACE(IMessageEditContentsHandler,"Vacuum.Plugin.IMessageEditContentsHandler/1.3")
-Q_DECLARE_INTERFACE(IMessageWidgets,"Vacuum.Plugin.IMessageWidgets/1.11")
+Q_DECLARE_INTERFACE(IMessageWidgets,"Vacuum.Plugin.IMessageWidgets/1.12")
 
 #endif // IMESSAGEWIDGETS_H

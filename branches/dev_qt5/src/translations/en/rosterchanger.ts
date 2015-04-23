@@ -146,14 +146,6 @@
         <translation>Add contact</translation>
     </message>
     <message>
-        <source>Subscribe contact</source>
-        <translation>Subscribe contact</translation>
-    </message>
-    <message>
-        <source>Unsubscribe contact</source>
-        <translation>Unsubscribe contact</translation>
-    </message>
-    <message>
         <source>Subscribe for contact presence</source>
         <translation>Subscribe for contact presence</translation>
     </message>
@@ -178,14 +170,6 @@
         <translation>Allows to edit roster</translation>
     </message>
     <message>
-        <source>Auto accept subscription requests</source>
-        <translation>Auto accept subscription requests</translation>
-    </message>
-    <message>
-        <source>Auto unsubscribe contacts</source>
-        <translation>Auto unsubscribe contacts</translation>
-    </message>
-    <message>
         <source>Ins</source>
         <comment>Add contact</comment>
         <translation>Ins</translation>
@@ -204,18 +188,8 @@
         <translation>Remove contact/group from group</translation>
     </message>
     <message>
-        <source>Del</source>
-        <comment>Remove contact/group from group</comment>
-        <translation>Del</translation>
-    </message>
-    <message>
         <source>Remove contact/group from roster</source>
         <translation>Remove contact/group from roster</translation>
-    </message>
-    <message>
-        <source>Shift+Del</source>
-        <comment>Remove contact/group from roster</comment>
-        <translation>Shift+Del</translation>
     </message>
     <message>
         <source>When receiving authorization request</source>
@@ -335,6 +309,23 @@
     <message>
         <source>In this Group</source>
         <translation>In this Group</translation>
+    </message>
+    <message>
+        <source>Contacts list management</source>
+        <translation>Contacts list management</translation>
+    </message>
+    <message>
+        <source>Automatically accept all subscription requests</source>
+        <translation>Automatically accept all subscription requests</translation>
+    </message>
+    <message>
+        <source>Remove subscription when you was deleted from contacts list</source>
+        <translation>Remove subscription when you was deleted from contacts list</translation>
+    </message>
+    <message>
+        <source>Del</source>
+        <comment>Remove contact/group from roster</comment>
+        <translation>Del</translation>
     </message>
 </context>
 <context>

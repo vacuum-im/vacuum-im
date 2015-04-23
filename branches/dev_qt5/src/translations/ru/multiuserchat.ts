@@ -144,14 +144,275 @@ Check values and try again</source>
     </message>
 </context>
 <context>
-    <name>MultiUserChatPlugin</name>
+    <name>MultiUserChatManager</name>
+    <message>
+        <source>Multi-User Conferences</source>
+        <translation>Многопользовательские конференции</translation>
+    </message>
+    <message>
+        <source>Allows to use Jabber multi-user conferences</source>
+        <translation>Позволяет использовать многопользовательские джаббер конференции</translation>
+    </message>
+    <message>
+        <source>Join conference</source>
+        <translation>Войти в конференцию</translation>
+    </message>
+    <message>
+        <source>Ctrl+J</source>
+        <comment>Join conference</comment>
+        <translation>Ctrl+J</translation>
+    </message>
+    <message>
+        <source>When receiving an invitation to the conference</source>
+        <translation>При получении приглашения в конференцию</translation>
+    </message>
+    <message>
+        <source>When receiving a new private message in conference</source>
+        <translation>При получении нового личного сообщения в конференции</translation>
+    </message>
+    <message>
+        <source>When receiving a new message in conference</source>
+        <translation>При получении нового сообщения в конференции</translation>
+    </message>
+    <message>
+        <source>When referring to you at the conference</source>
+        <translation>При обращении к Вам в конференции</translation>
+    </message>
     <message>
         <source>Conferences</source>
         <translation>Конференции</translation>
     </message>
     <message>
-        <source>Join conference</source>
-        <translation>Войти в конференцию</translation>
+        <source>Show users connections and disconnections</source>
+        <translation>Показывать подключения и отключения пользователей</translation>
+    </message>
+    <message>
+        <source>Show users status changes</source>
+        <translation>Показывать изменения статусов пользователей</translation>
+    </message>
+    <message>
+        <source>Save users status messages in history</source>
+        <translation>Сохранять статусные сообщения пользователей в истории</translation>
+    </message>
+    <message>
+        <source>Leave the conference when window closed</source>
+        <translation>Выходить из конференции при закрытии окна</translation>
+    </message>
+    <message>
+        <source>Automatically rejoin to conference after kick</source>
+        <translation>Автоматически переподключаться к конференции после кика</translation>
+    </message>
+    <message>
+        <source>Select a user to refer by enumeration in the input field</source>
+        <translation>Выбирать пользователя для обращения перебором в поле ввода</translation>
+    </message>
+    <message>
+        <source>Register in conference</source>
+        <translation>Зарегистрироваться в конференции</translation>
+    </message>
+    <message>
+        <source>Allow this person to register with the room?</source>
+        <translation>Разрешить этому посетителю зарегистрироваться в комнате?</translation>
+    </message>
+    <message>
+        <source>EMail Address</source>
+        <translation>Адрес E-mail</translation>
+    </message>
+    <message>
+        <source>Rules and Notes</source>
+        <translation>Правила и заметки</translation>
+    </message>
+    <message>
+        <source>Given Name</source>
+        <translation>Имя</translation>
+    </message>
+    <message>
+        <source>Family Name</source>
+        <translation>Фамилия</translation>
+    </message>
+    <message>
+        <source>Desired Nickname</source>
+        <translation>Желаемый ник</translation>
+    </message>
+    <message>
+        <source>Your URL</source>
+        <translation>Ваш URL</translation>
+    </message>
+    <message>
+        <source>Request for voice</source>
+        <translation>Запрос &apos;голоса&apos;</translation>
+    </message>
+    <message>
+        <source>Requested Role</source>
+        <translation>Запрошенный тип</translation>
+    </message>
+    <message>
+        <source>User ID</source>
+        <translation>ID пользователя</translation>
+    </message>
+    <message>
+        <source>Room Nickname</source>
+        <translation>Ник в комнате</translation>
+    </message>
+    <message>
+        <source>Grant Voice?</source>
+        <translation>Предоставить &apos;голос&apos;?</translation>
+    </message>
+    <message>
+        <source>Configure conference</source>
+        <translation>Настройка конференции</translation>
+    </message>
+    <message>
+        <source>Maximum Number of History Messages Returned by Room</source>
+        <translation>Максимальное количество сообщений истории возвращаемое комнатой</translation>
+    </message>
+    <message>
+        <source>Allow Occupants to Send Private Messages?</source>
+        <translation>Разрешить пользователям посылать приватные сообщения?</translation>
+    </message>
+    <message>
+        <source>Allow Occupants to Invite Others?</source>
+        <translation>Разрешить пользователям посылать приглашения?</translation>
+    </message>
+    <message>
+        <source>Allow Occupants to Change Subject?</source>
+        <translation>Разрешить пользователям менять тему?</translation>
+    </message>
+    <message>
+        <source>Enable Logging of Room Conversations?</source>
+        <translation>Включить протоколирование разговоров комнаты?</translation>
+    </message>
+    <message>
+        <source>Affiliations that May Retrieve Member List</source>
+        <translation>Участники, которые могу получить список членов комнаты</translation>
+    </message>
+    <message>
+        <source>XMPP URI of Associated Publish-Subscribe Node</source>
+        <translation>XMPP URI ассоциированного Publish-Subscribe узла</translation>
+    </message>
+    <message>
+        <source>Natural Language for Room Discussions</source>
+        <translation>Основной язык общения в комнате</translation>
+    </message>
+    <message>
+        <source>Maximum Number of Room Occupants</source>
+        <translation>Максимальное количество пользователей в комнате</translation>
+    </message>
+    <message>
+        <source>Make Room Members-Only?</source>
+        <translation>Сделать комнату только для участников?</translation>
+    </message>
+    <message>
+        <source>Make Room Moderated?</source>
+        <translation>Сделать комнату модерируемой?</translation>
+    </message>
+    <message>
+        <source>Password is Required to Enter?</source>
+        <translation>Сделать комнату защищённой паролем?</translation>
+    </message>
+    <message>
+        <source>Make Room Persistent?</source>
+        <translation>Сделать комнату постоянной?</translation>
+    </message>
+    <message>
+        <source>Roles for which Presence is Broadcasted</source>
+        <translation>Участники, котрым будут транслироваться сообщения о присутствии</translation>
+    </message>
+    <message>
+        <source>Allow Public Searching for Room?</source>
+        <translation>Сделать комнату видимой всем?</translation>
+    </message>
+    <message>
+        <source>Full List of Room Administrators</source>
+        <translation>Полный список администраторов комнаты</translation>
+    </message>
+    <message>
+        <source>Description of Room</source>
+        <translation>Описание комнаты</translation>
+    </message>
+    <message>
+        <source>Natural-Language Room Name</source>
+        <translation>Название комнаты</translation>
+    </message>
+    <message>
+        <source>Full List of Room Owners</source>
+        <translation>Полный список владельцев комнаты</translation>
+    </message>
+    <message>
+        <source>The Room Password</source>
+        <translation>Пароль комнаты</translation>
+    </message>
+    <message>
+        <source>Affiliations that May Discover Real JIDs of Occupants</source>
+        <translation>Участники, которым виден реальный JID пользователей</translation>
+    </message>
+    <message>
+        <source>Make Participants List Public?</source>
+        <translation>Сделать список участников комнаты публичным?</translation>
+    </message>
+    <message>
+        <source>Make all Occupants as Participants?</source>
+        <translation>Сделать всех пользователей участниками?</translation>
+    </message>
+    <message>
+        <source>Allow Occupants to Query Other Occupants?</source>
+        <translation>Разрешить пользователям отправлять запросы другим пользователям?</translation>
+    </message>
+    <message>
+        <source>Allow Visitors to Send Status Text in Presence Updates?</source>
+        <translation>Разрешить гостям вставлять текст статуса в сообщения о присутствии?</translation>
+    </message>
+    <message>
+        <source>Make this Room CAPTCHA Protected?</source>
+        <translation>Сделать комнату защищенной CAPTCHA?</translation>
+    </message>
+    <message>
+        <source>Do not Request CAPTCHA for Followed Jabber ID</source>
+        <translation>Не показывать CAPTCHA для следующего списка Jabber ID</translation>
+    </message>
+    <message>
+        <source>Allow Login Only With Registered Nickname?</source>
+        <translation>Разрешить вход только с зарегистрированным ником?</translation>
+    </message>
+    <message>
+        <source>Allow Occupants to Change Nicknames?</source>
+        <translation>Разрешить пользователям менять ник?</translation>
+    </message>
+    <message>
+        <source>Allow Users to Register with the Room?</source>
+        <translation>Разрешить пользователям регистрироваться в комнате?</translation>
+    </message>
+    <message>
+        <source>Conference information</source>
+        <translation>Информация о конференции</translation>
+    </message>
+    <message>
+        <source>Contact JID</source>
+        <translation>Контактный JID</translation>
+    </message>
+    <message>
+        <source>Natural Language for Room</source>
+        <translation>Основной язык общения в комнате</translation>
+    </message>
+    <message>
+        <source>LDAP Group</source>
+        <translation>Группа LDAP</translation>
+    </message>
+    <message>
+        <source>URL for Archived Discussion Logs</source>
+        <translation>URL для архива протоколов общения</translation>
+    </message>
+    <message>
+        <source>Current Number of Occupants in Room</source>
+        <translation>Текущее количество пользователей в комнате</translation>
+    </message>
+    <message>
+        <source>Current Subject or Discussion Topic in Room</source>
+        <translation>Текущая тема в комнате</translation>
+    </message>
+    <message>
+        <source>The Room Subject Can be Modified by Participants?</source>
+        <translation>Тема комнаты может меняться пользователями?</translation>
     </message>
     <message>
         <source>You are invited to the conference %1</source>
@@ -172,6 +433,10 @@ Check values and try again</source>
     <message>
         <source>Invite</source>
         <translation>Пригласить</translation>
+    </message>
+    <message>
+        <source>Supports the multi-user conferences</source>
+        <translation>Поддерживает многопользовательские конференции</translation>
     </message>
     <message>
         <source>Hidden room</source>
@@ -278,276 +543,6 @@ Check values and try again</source>
         <translation>%1 от %2</translation>
     </message>
     <message>
-        <source>Decline invite</source>
-        <translation>Отклонить приглашение</translation>
-    </message>
-    <message>
-        <source>Enter a reason</source>
-        <translation>Введите причину</translation>
-    </message>
-    <message>
-        <source>Invite user</source>
-        <translation>Пригласить пользователя</translation>
-    </message>
-    <message>
-        <source>Register in conference</source>
-        <translation>Зарегистрироваться в конференции</translation>
-    </message>
-    <message>
-        <source>Allow this person to register with the room?</source>
-        <translation>Разрешить этому посетителю зарегистрироваться в комнате?</translation>
-    </message>
-    <message>
-        <source>Desired Nickname</source>
-        <translation>Желаемый ник</translation>
-    </message>
-    <message>
-        <source>Your URL</source>
-        <translation>Ваш URL</translation>
-    </message>
-    <message>
-        <source>EMail Address</source>
-        <translation>Адрес E-mail</translation>
-    </message>
-    <message>
-        <source>Rules and Notes</source>
-        <translation>Правила и заметки</translation>
-    </message>
-    <message>
-        <source>Configure conference</source>
-        <translation>Настройка конференции</translation>
-    </message>
-    <message>
-        <source>Allow Occupants to Invite Others?</source>
-        <translation>Разрешить пользователям посылать приглашения?</translation>
-    </message>
-    <message>
-        <source>Allow Occupants to Change Subject?</source>
-        <translation>Разрешить пользователям менять тему?</translation>
-    </message>
-    <message>
-        <source>Enable Logging of Room Conversations?</source>
-        <translation>Включить протоколирование разговоров комнаты?</translation>
-    </message>
-    <message>
-        <source>Natural Language for Room Discussions</source>
-        <translation>Основной язык общения в комнате</translation>
-    </message>
-    <message>
-        <source>Maximum Number of Room Occupants</source>
-        <translation>Максимальное количество пользователей в комнате</translation>
-    </message>
-    <message>
-        <source>Make Room Members-Only?</source>
-        <translation>Сделать комнату только для участников?</translation>
-    </message>
-    <message>
-        <source>Make Room Moderated?</source>
-        <translation>Сделать комнату модерируемой?</translation>
-    </message>
-    <message>
-        <source>Password is Required to Enter?</source>
-        <translation>Сделать комнату защищённой паролем?</translation>
-    </message>
-    <message>
-        <source>Make Room Persistent?</source>
-        <translation>Сделать комнату постоянной?</translation>
-    </message>
-    <message>
-        <source>Allow Public Searching for Room?</source>
-        <translation>Сделать комнату видимой всем?</translation>
-    </message>
-    <message>
-        <source>Description of Room</source>
-        <translation>Описание комнаты</translation>
-    </message>
-    <message>
-        <source>Natural-Language Room Name</source>
-        <translation>Название комнаты</translation>
-    </message>
-    <message>
-        <source>Full List of Room Owners</source>
-        <translation>Полный список владельцев комнаты</translation>
-    </message>
-    <message>
-        <source>The Room Password</source>
-        <translation>Пароль комнаты</translation>
-    </message>
-    <message>
-        <source>Affiliations that May Discover Real JIDs of Occupants</source>
-        <translation>Участники, которым виден реальный JID пользователей</translation>
-    </message>
-    <message>
-        <source>Conference information</source>
-        <translation>Информация о конференции</translation>
-    </message>
-    <message>
-        <source>Contact JID</source>
-        <translation>Контактный JID</translation>
-    </message>
-    <message>
-        <source>Natural Language for Room</source>
-        <translation>Основной язык общения в комнате</translation>
-    </message>
-    <message>
-        <source>LDAP Group</source>
-        <translation>Группа LDAP</translation>
-    </message>
-    <message>
-        <source>URL for Archived Discussion Logs</source>
-        <translation>URL для архива протоколов общения</translation>
-    </message>
-    <message>
-        <source>Current Number of Occupants in Room</source>
-        <translation>Текущее количество пользователей в комнате</translation>
-    </message>
-    <message>
-        <source>Current Subject or Discussion Topic in Room</source>
-        <translation>Текущая тема в комнате</translation>
-    </message>
-    <message>
-        <source>The Room Subject Can be Modified by Participants?</source>
-        <translation>Тема комнаты может меняться пользователями?</translation>
-    </message>
-    <message>
-        <source>Request for voice</source>
-        <translation>Запрос &apos;голоса&apos;</translation>
-    </message>
-    <message>
-        <source>Requested Role</source>
-        <translation>Запрошенный тип</translation>
-    </message>
-    <message>
-        <source>User ID</source>
-        <translation>ID пользователя</translation>
-    </message>
-    <message>
-        <source>Room Nickname</source>
-        <translation>Ник в комнате</translation>
-    </message>
-    <message>
-        <source>Grant Voice?</source>
-        <translation>Предоставить &apos;голос&apos;?</translation>
-    </message>
-    <message>
-        <source>Multi-User Conferences</source>
-        <translation>Многопользовательские конференции</translation>
-    </message>
-    <message>
-        <source>Allows to use Jabber multi-user conferences</source>
-        <translation>Позволяет использовать многопользовательские джаббер конференции</translation>
-    </message>
-    <message>
-        <source>Supports the multi-user conferences</source>
-        <translation>Поддерживает многопользовательские конференции</translation>
-    </message>
-    <message>
-        <source>Leave all hidden conferences</source>
-        <translation>Покинуть все скрытые конференции</translation>
-    </message>
-    <message>
-        <source>Show all hidden conferences</source>
-        <translation>Показать все скрытые конференции</translation>
-    </message>
-    <message>
-        <source>Show users connections/disconnections</source>
-        <translation>Показывать подключения/отключения пользователей</translation>
-    </message>
-    <message>
-        <source>Show users status changes</source>
-        <translation>Показывать изменения статусов пользователей</translation>
-    </message>
-    <message>
-        <source>Save status messages to history</source>
-        <translation>Сохранять статусные сообщения в истории</translation>
-    </message>
-    <message>
-        <source>Multi-user chat window</source>
-        <translation>Окно конференции</translation>
-    </message>
-    <message>
-        <source>Send message</source>
-        <translation>Отправить сообщение</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <comment>Send message</comment>
-        <translation>Return</translation>
-    </message>
-    <message>
-        <source>Clear window</source>
-        <translation>Очистить окно</translation>
-    </message>
-    <message>
-        <source>Change nick</source>
-        <translation>Изменить ник</translation>
-    </message>
-    <message>
-        <source>Change topic</source>
-        <translation>Изменить тему</translation>
-    </message>
-    <message>
-        <source>Setup conference</source>
-        <translation>Настроить комнату</translation>
-    </message>
-    <message>
-        <source>Enter the conference</source>
-        <translation>Войти в комнату</translation>
-    </message>
-    <message>
-        <source>Leave the conference</source>
-        <translation>Выйти из комнаты</translation>
-    </message>
-    <message>
-        <source>Ctrl+Q</source>
-        <comment>Leave the conference</comment>
-        <translation>Ctrl+Q</translation>
-    </message>
-    <message>
-        <source>I&apos;m too busy right now</source>
-        <translation>Я слишком занят сейчас</translation>
-    </message>
-    <message>
-        <source>When receiving an invitation to the conference</source>
-        <translation>При получении приглашения в конференцию</translation>
-    </message>
-    <message>
-        <source>When receiving a new private message in conference</source>
-        <translation>При получении нового личного сообщения в конференции</translation>
-    </message>
-    <message>
-        <source>When referring to you at the conference</source>
-        <translation>При обращении к Вам в конференции</translation>
-    </message>
-    <message>
-        <source>When receiving a new message in conference</source>
-        <translation>При получении нового сообщения в конференции</translation>
-    </message>
-    <message>
-        <source>Add this suffix when referring to the user:</source>
-        <translation>Добавлять этот суффикс при обращении к пользователю:</translation>
-    </message>
-    <message>
-        <source>Leave the conference when window closed</source>
-        <translation>Выходить из конференции при закрытии окна</translation>
-    </message>
-    <message>
-        <source>Enter conference</source>
-        <translation>Войти в конференцию</translation>
-    </message>
-    <message>
-        <source>Exit conference</source>
-        <translation>Выйти из конференции</translation>
-    </message>
-    <message>
-        <source>Rejoin in conference after kick</source>
-        <translation>Автоматически перезаходить в конференцию после кика</translation>
-    </message>
-    <message>
-        <source>Select the user to refer without menu</source>
-        <translation>Выбирать пользователя для обращения без меню</translation>
-    </message>
-    <message>
         <source>Enter</source>
         <translation>Войти</translation>
     </message>
@@ -560,76 +555,24 @@ Check values and try again</source>
         <translation>Открыть диалог конференции</translation>
     </message>
     <message>
+        <source>I&apos;m too busy right now</source>
+        <translation>Я слишком занят сейчас</translation>
+    </message>
+    <message>
+        <source>Decline invite</source>
+        <translation>Отклонить приглашение</translation>
+    </message>
+    <message>
+        <source>Enter a reason</source>
+        <translation>Введите причину</translation>
+    </message>
+    <message>
         <source>Please, enter this conference!</source>
         <translation>Пожалуйста, войдите в эту конференцию!</translation>
     </message>
     <message>
-        <source>Given Name</source>
-        <translation>Имя</translation>
-    </message>
-    <message>
-        <source>Family Name</source>
-        <translation>Фамилия</translation>
-    </message>
-    <message>
-        <source>Maximum Number of History Messages Returned by Room</source>
-        <translation>Максимальное количество сообщений истории возвращаемое комнатой</translation>
-    </message>
-    <message>
-        <source>Affiliations that May Retrieve Member List</source>
-        <translation>Участники, которые могу получить список членов комнаты</translation>
-    </message>
-    <message>
-        <source>XMPP URI of Associated Publish-Subscribe Node</source>
-        <translation>XMPP URI ассоциированного Publish-Subscribe узла</translation>
-    </message>
-    <message>
-        <source>Roles for which Presence is Broadcasted</source>
-        <translation>Участники, котрым будут транслироваться сообщения о присутствии</translation>
-    </message>
-    <message>
-        <source>Full List of Room Administrators</source>
-        <translation>Полный список администраторов комнаты</translation>
-    </message>
-    <message>
-        <source>Make Participants List Public?</source>
-        <translation>Сделать список участников комнаты публичным?</translation>
-    </message>
-    <message>
-        <source>Allow Occupants to Send Private Messages?</source>
-        <translation>Разрешить пользователям посылать приватные сообщения?</translation>
-    </message>
-    <message>
-        <source>Allow Occupants to Query Other Occupants?</source>
-        <translation>Разрешить пользователям отправлять запросы другим пользователям?</translation>
-    </message>
-    <message>
-        <source>Allow Visitors to Send Status Text in Presence Updates?</source>
-        <translation>Разрешить гостям вставлять текст статуса в сообщения о присутствии?</translation>
-    </message>
-    <message>
-        <source>Allow Login Only With Registered Nickname?</source>
-        <translation>Разрешить вход только с зарегистрированным ником?</translation>
-    </message>
-    <message>
-        <source>Allow Occupants to Change Nicknames?</source>
-        <translation>Разрешить пользователям менять ник?</translation>
-    </message>
-    <message>
-        <source>Allow Users to Register with the Room?</source>
-        <translation>Разрешить пользователям регистрироваться в комнате?</translation>
-    </message>
-    <message>
-        <source>Make all Occupants as Participants?</source>
-        <translation>Сделать всех пользователей участниками?</translation>
-    </message>
-    <message>
-        <source>Make this Room CAPTCHA Protected?</source>
-        <translation>Сделать комнату защищенной CAPTCHA?</translation>
-    </message>
-    <message>
-        <source>Do not Request CAPTCHA for Followed Jabber ID</source>
-        <translation>Не показывать CAPTCHA для следующего списка Jabber ID</translation>
+        <source>Invite user</source>
+        <translation>Пригласить пользователя</translation>
     </message>
 </context>
 <context>

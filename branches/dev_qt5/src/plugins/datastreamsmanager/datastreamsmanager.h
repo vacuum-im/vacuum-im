@@ -4,11 +4,10 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/idatastreamsmanager.h>
 #include <interfaces/idataforms.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/ioptionsmanager.h>
-#include "datastreamsoptions.h"
 
 struct StreamParams {
 	Jid streamJid;
@@ -24,10 +23,10 @@ class DataStreamsManger :
 	public IDataStreamsManager,
 	public IStanzaHandler,
 	public IStanzaRequestOwner,
-	public IOptionsHolder
+	public IOptionsDialogHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IDataStreamsManager IStanzaHandler IStanzaRequestOwner IOptionsHolder);
+	Q_INTERFACES(IPlugin IDataStreamsManager IStanzaHandler IStanzaRequestOwner IOptionsDialogHolder);
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IDataStreamsManager");
 public:
 	DataStreamsManger();
@@ -41,7 +40,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IStanzaHandler
 	virtual bool stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept);
 	//IStanzaRequestOwner
@@ -56,10 +55,10 @@ public:
 	virtual void insertProfile(IDataStreamProfile *AProfile);
 	virtual void removeProfile(IDataStreamProfile *AProfile);
 	virtual QList<QUuid> settingsProfiles() const;
-	virtual QString settingsProfileName(const QUuid &AProfileId) const;
-	virtual OptionsNode settingsProfileNode(const QUuid &AProfileId, const QString &AMethodNS) const;
-	virtual void insertSettingsProfile(const QUuid &AProfileId, const QString &AName);
-	virtual void removeSettingsProfile(const QUuid &AProfileId);
+	virtual QString settingsProfileName(const QUuid &ASettingsId) const;
+	virtual OptionsNode settingsProfileNode(const QUuid &ASettingsId, const QString &AMethodNS) const;
+	virtual void insertSettingsProfile(const QUuid &ASettingsId, const QString &AName);
+	virtual void removeSettingsProfile(const QUuid &ASettingsId);
 	virtual bool initStream(const Jid &AStreamJid, const Jid &AContactJid, const QString &AStreamId, const QString &AProfileNS, const QList<QString> &AMethods, int ATimeout =0);
 	virtual bool acceptStream(const QString &AStreamId, const QString &AMethodNS);
 	virtual bool rejectStream(const QString &AStreamId, const XmppStanzaError &AError);
@@ -68,21 +67,20 @@ signals:
 	void methodRemoved(IDataStreamMethod *AMethod);
 	void profileInserted(IDataStreamProfile *AProfile);
 	void profileRemoved(IDataStreamProfile *AProfile);
-	void settingsProfileInserted(const QUuid &AProfileId, const QString &AName);
-	void settingsProfileRemoved(const QUuid &AProfileId);
+	void settingsProfileInserted(const QUuid &ASettingsId);
+	void settingsProfileRemoved(const QUuid &ASettingsId);
 protected:
-	virtual QString streamIdByRequestId(const QString &ARequestId) const;
+	QString streamIdByRequestId(const QString &ARequestId) const;
 protected slots:
 	void onXmppStreamClosed(IXmppStream *AXmppStream);
 private:
 	IDataForms *FDataForms;
-	IXmppStreams *FXmppStreams;
+	IXmppStreamManager *FXmppStreamManager;
 	IServiceDiscovery *FDiscovery;
 	IStanzaProcessor *FStanzaProcessor;
 	IOptionsManager *FOptionsManager;
 private:
 	int FSHIInitStream;
-private:
 	QMap<QString, StreamParams> FStreams;
 	QMap<QString, IDataStreamMethod *> FMethods;
 	QMap<QString, IDataStreamProfile *> FProfiles;

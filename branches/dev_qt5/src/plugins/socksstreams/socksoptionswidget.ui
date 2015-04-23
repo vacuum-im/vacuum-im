@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SocksOptionsWidgetClass</class>
+ <widget class="QWidget" name="SocksOptionsWidgetClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>388</width>
+    <height>140</height>
+   </rect>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QCheckBox" name="chbUseAccountStreamProxy">
+     <property name="text">
+      <string>Use jabber-proxy on your server</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QCheckBox" name="chbUseUserStreamProxy">
+       <property name="text">
+        <string>Use additional jabber-proxy:</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="lneUserStreamProxy"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QCheckBox" name="chbEnableDirect">
+       <property name="text">
+        <string>Allow direct incoming connections on port:</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="spbListenPort">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>65535</number>
+       </property>
+       <property name="value">
+        <number>8010</number>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QCheckBox" name="chbEnableForwardDirect">
+       <property name="text">
+        <string>Forward direct incoming connections to host:</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="lneForwardDirectAddress">
+       <property name="placeholderText">
+        <string>host:port</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="chbUseAccountNetworkProxy">
+     <property name="text">
+      <string>Use account proxy settings for outgoing connections</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="wdtNetworkProxySettings" native="true"/>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>chbEnableDirect</tabstop>
+  <tabstop>spbListenPort</tabstop>
+  <tabstop>chbEnableForwardDirect</tabstop>
+  <tabstop>lneForwardDirectAddress</tabstop>
+  <tabstop>chbUseUserStreamProxy</tabstop>
+  <tabstop>lneUserStreamProxy</tabstop>
+  <tabstop>chbUseAccountNetworkProxy</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>chbUseAccountNetworkProxy</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>wdtNetworkProxySettings</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>302</x>
+     <y>123</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>302</x>
+     <y>139</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chbEnableForwardDirect</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>lneForwardDirectAddress</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>144</x>
+     <y>46</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>318</x>
+     <y>48</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chbEnableDirect</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spbListenPort</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>195</x>
+     <y>18</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>283</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chbUseUserStreamProxy</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>lneUserStreamProxy</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>109</x>
+     <y>97</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>209</x>
+     <y>99</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

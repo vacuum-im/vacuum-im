@@ -35,10 +35,6 @@
         <translation>Transferencia de archivos</translation>
     </message>
     <message>
-        <source>File Transfer</source>
-        <translation>Transferencia de archivo</translation>
-    </message>
-    <message>
         <source>Allows to initiate a thread for transferring files between two XMPP entities</source>
         <translation>Permite iniciar un flujo de transferencia de archivo entre dos entidades XMPP</translation>
     </message>
@@ -62,35 +58,36 @@
         <source>Data transmission terminated by remote user</source>
         <translation>Transmisión de datos terminada por el usuario remoto</translation>
     </message>
+    <message>
+        <source>Ctrl+T</source>
+        <comment>Show file transfers</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File transfer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create separate folder for each sender</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default transfer method:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
-    <name>FileStreamsOptions</name>
+    <name>FileStreamsOptionsWidget</name>
     <message>
         <source>Select default directory</source>
-        <translation>Elegir directorio por defecto</translation>
+        <translation type="unfinished">Elegir directorio por defecto</translation>
     </message>
 </context>
 <context>
-    <name>FileStreamsOptionsClass</name>
+    <name>FileStreamsOptionsWidgetClass</name>
     <message>
-        <source>...</source>
-        <translation>...</translation>
-    </message>
-    <message>
-        <source>Default Downloads Directory:</source>
-        <translation>Directorio de descargas por defecto:</translation>
-    </message>
-    <message>
-        <source>Default Data Stream:</source>
-        <translation>Flujo de datos por defecto:</translation>
-    </message>
-    <message>
-        <source>Acceptable Data Streams</source>
-        <translation>Flujos de dato permitidos</translation>
-    </message>
-    <message>
-        <source>Group downloads by sender</source>
-        <translation>Agrupar descargas por remitente</translation>
+        <source>Default directory:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

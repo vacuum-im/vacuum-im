@@ -22,7 +22,7 @@ DataStreamsManger::DataStreamsManger()
 {
 	FDataForms = NULL;
 	FDiscovery = NULL;
-	FXmppStreams = NULL;
+	FXmppStreamManager = NULL;
 	FStanzaProcessor = NULL;
 	FOptionsManager = NULL;
 
@@ -61,13 +61,13 @@ bool DataStreamsManger::initConnections(IPluginManager *APluginManager, int &AIn
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 	}
 
-	plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IXmppStreamManager").value(0,NULL);
 	if (plugin)
 	{
-		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-		if (FXmppStreams)
+		FXmppStreamManager = qobject_cast<IXmppStreamManager *>(plugin->instance());
+		if (FXmppStreamManager)
 		{
-			connect(FXmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onXmppStreamClosed(IXmppStream *)));
+			connect(FXmppStreamManager->instance(),SIGNAL(streamClosed(IXmppStream *)),SLOT(onXmppStreamClosed(IXmppStream *)));
 		}
 	}
 
@@ -125,19 +125,25 @@ bool DataStreamsManger::initSettings()
 
 	if (FOptionsManager)
 	{
-		IOptionsDialogNode dnode = { ONO_DATASTREAMS, OPN_DATASTREAMS, tr("Data Streams"), MNI_DATASTREAMSMANAGER };
-		FOptionsManager->insertOptionsDialogNode(dnode);
-		FOptionsManager->insertOptionsHolder(this);
+		IOptionsDialogNode dataNode = { ONO_DATATRANSFER, OPN_DATATRANSFER, MNI_DATASTREAMSMANAGER, tr("Data Transfer") };
+		FOptionsManager->insertOptionsDialogNode(dataNode);
+		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 	return true;
 }
 
-QMultiMap<int, IOptionsWidget *> DataStreamsManger::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+QMultiMap<int, IOptionsDialogWidget *> DataStreamsManger::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	QMultiMap<int, IOptionsWidget *> widgets;
-	if (ANodeId == OPN_DATASTREAMS)
+	QMultiMap<int, IOptionsDialogWidget *> widgets;
+	if (FOptionsManager && ANodeId==OPN_DATATRANSFER)
 	{
-		widgets.insertMulti(OWO_DATASTREAMS, new DataStreamsOptions(this,AParent));
+		int index = 0;
+		foreach(IDataStreamMethod *method, FMethods)
+		{
+			widgets.insertMulti(OHO_DATATRANSFER_METHODNAME + index, FOptionsManager->newOptionsDialogHeader(tr("Transfer method %1").arg(method->methodName()),AParent));
+			widgets.insertMulti(OWO_DATATRANSFER_METHODSETTINGS + index, method->methodSettingsWidget(settingsProfileNode(QUuid(),method->methodNS()),AParent));
+			index += 10;
+		}
 	}
 	return widgets;
 }
@@ -342,27 +348,29 @@ QList<QUuid> DataStreamsManger::settingsProfiles() const
 	QList<QUuid> sprofiles;
 	sprofiles.append(QUuid().toString());
 	foreach(const QString &sprofile, Options::node(OPV_DATASTREAMS_ROOT).childNSpaces("settings-profile"))
+	{
 		if (!sprofiles.contains(sprofile))
 			sprofiles.append(sprofile);
+	}
 	return sprofiles;
 }
 
-QString DataStreamsManger::settingsProfileName(const QUuid &AProfileId) const
+QString DataStreamsManger::settingsProfileName(const QUuid &ASettingsId) const
 {
-	return Options::node(OPV_DATASTREAMS_SPROFILE_ITEM,AProfileId.toString()).value("name").toString();
+	return Options::node(OPV_DATASTREAMS_SPROFILE_ITEM,ASettingsId.toString()).value("name").toString();
 }
 
-OptionsNode DataStreamsManger::settingsProfileNode(const QUuid &AProfileId, const QString &AMethodNS) const
+OptionsNode DataStreamsManger::settingsProfileNode(const QUuid &ASettingsId, const QString &AMethodNS) const
 {
-	return Options::node(OPV_DATASTREAMS_SPROFILE_ITEM,AProfileId.toString()).node("method",AMethodNS);
+	return Options::node(OPV_DATASTREAMS_SPROFILE_ITEM,ASettingsId.toString()).node("method",AMethodNS);
 }
 
-void DataStreamsManger::insertSettingsProfile(const QUuid &AProfileId, const QString &AName)
+void DataStreamsManger::insertSettingsProfile(const QUuid &ASettingsId, const QString &AName)
 {
-	if (!AProfileId.isNull() && !AName.isEmpty())
+	if (!ASettingsId.isNull() && !AName.isEmpty())
 	{
-		Options::node(OPV_DATASTREAMS_SPROFILE_ITEM,AProfileId.toString()).setValue(AName,"name");
-		emit settingsProfileInserted(AProfileId, AName);
+		Options::node(OPV_DATASTREAMS_SPROFILE_ITEM,ASettingsId.toString()).setValue(AName,"name");
+		emit settingsProfileInserted(ASettingsId);
 	}
 }
 

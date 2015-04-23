@@ -4,30 +4,33 @@
 #include <QHash>
 #include <QPainter>
 #include <QModelIndex>
-#include <QItemDelegate>
+#include <QStyledItemDelegate>
 #include "utilsexport.h"
 #include "iconstorage.h"
 
-enum IconsetDataRoles {
-	IDR_STORAGE_NAME        = Qt::UserRole,
-	IDR_STORAGE_SUBDIR,
-	IDR_ICON_ROWS,
-	IDR_HIDE_ICONSET_NAME
-};
-
 class UTILS_EXPORT IconsetDelegate :
-	public QItemDelegate
+	public QStyledItemDelegate
 {
 public:
+	enum DataRole {
+		IDR_STORAGE             = Qt::UserRole + 128,
+		IDR_SUBSTORAGE,
+		IDR_ICON_ROW_COUNT,
+		IDR_HIDE_STORAGE_NAME
+	};
+public:
 	IconsetDelegate(QObject *AParent = NULL);
-	virtual ~IconsetDelegate();
+	~IconsetDelegate();
 	virtual void paint(QPainter *APainter, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
 	virtual QSize sizeHint(const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
 protected:
-	virtual void drawBackground(QPainter *APainter, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
 	virtual bool editorEvent(QEvent *AEvent, QAbstractItemModel *AModel, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex);
 protected:
-	void uniqueKeys(IconStorage *AStorage, QList<QString> &AKeys) const;
+	void drawBackground(QPainter *APainter, const QStyleOptionViewItemV4 &AIndexOption) const;
+	void drawFocusRect(QPainter *APainter, const QStyleOptionViewItemV4 &AIndexOption, const QRect &ARect) const;
+	QRect checkButtonRect(const QStyleOptionViewItemV4 &AIndexOption, const QRect &ABounding, const QVariant &AValue) const;
+	void drawCheckButton(QPainter *APainter, const QStyleOptionViewItemV4 &AIndexOption, const QRect &ARect, Qt::CheckState AState) const;
+	QStyleOptionViewItemV4 indexStyleOption(const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
 private:
 	mutable QHash<QString, QHash<QString, IconStorage *> > FStorages;
 };

@@ -39,7 +39,7 @@
 
 ChatStates::ChatStates()
 {
-	FPresencePlugin = NULL;
+	FPresenceManager = NULL;
 	FMessageWidgets = NULL;
 	FStanzaProcessor = NULL;
 	FOptionsManager = NULL;
@@ -48,7 +48,7 @@ ChatStates::ChatStates()
 	FDataForms = NULL;
 	FNotifications = NULL;
 	FSessionNegotiation = NULL;
-	FMultiUserChatPlugin = NULL;
+	FMultiChatManager = NULL;
 
 	FUpdateTimer.setSingleShot(false);
 	FUpdateTimer.setInterval(5000);
@@ -92,16 +92,16 @@ bool ChatStates::initConnections(IPluginManager *APluginManager, int &AInitOrder
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 	}
 
-	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0);
+	plugin = APluginManager->pluginInterface("IPresenceManager").value(0);
 	if (plugin)
 	{
-		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
-		if (FPresencePlugin)
+		FPresenceManager = qobject_cast<IPresenceManager *>(plugin->instance());
+		if (FPresenceManager)
 		{
-			connect(FPresencePlugin->instance(),SIGNAL(presenceOpened(IPresence *)),SLOT(onPresenceOpened(IPresence *)));
-			connect(FPresencePlugin->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
+			connect(FPresenceManager->instance(),SIGNAL(presenceOpened(IPresence *)),SLOT(onPresenceOpened(IPresence *)));
+			connect(FPresenceManager->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
 				SLOT(onPresenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)));
-			connect(FPresencePlugin->instance(),SIGNAL(presenceClosed(IPresence *)),SLOT(onPresenceClosed(IPresence *)));
+			connect(FPresenceManager->instance(),SIGNAL(presenceClosed(IPresence *)),SLOT(onPresenceClosed(IPresence *)));
 		}
 	}
 
@@ -138,13 +138,13 @@ bool ChatStates::initConnections(IPluginManager *APluginManager, int &AInitOrder
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IMultiUserChatPlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IMultiUserChatManager").value(0,NULL);
 	if (plugin)
 	{
-		FMultiUserChatPlugin = qobject_cast<IMultiUserChatPlugin *>(plugin->instance());
-		if (FMultiUserChatPlugin)
+		FMultiChatManager = qobject_cast<IMultiUserChatManager *>(plugin->instance());
+		if (FMultiChatManager)
 		{
-			connect(FMultiUserChatPlugin->instance(),SIGNAL(multiUserChatCreated(IMultiUserChat *)),
+			connect(FMultiChatManager->instance(),SIGNAL(multiUserChatCreated(IMultiUserChat *)),
 				SLOT(onMultiUserChatCreated(IMultiUserChat *)));
 		}
 	}
@@ -159,7 +159,7 @@ bool ChatStates::initConnections(IPluginManager *APluginManager, int &AInitOrder
 	connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 
-	return FPresencePlugin!=NULL && FMessageWidgets!=NULL && FStanzaProcessor!=NULL;
+	return FPresenceManager!=NULL && FMessageWidgets!=NULL && FStanzaProcessor!=NULL;
 }
 
 bool ChatStates::initObjects()
@@ -195,7 +195,7 @@ bool ChatStates::initSettings()
 
 	if (FOptionsManager)
 	{
-		FOptionsManager->insertOptionsHolder(this);
+		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 	return true;
 }
@@ -220,12 +220,12 @@ bool ChatStates::archiveMessageEdit(int AOrder, const Jid &AStreamJid, Message &
 	return false;
 }
 
-QMultiMap<int, IOptionsWidget *> ChatStates::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+QMultiMap<int, IOptionsDialogWidget *> ChatStates::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	QMultiMap<int, IOptionsWidget *> widgets;
-	if (FOptionsManager && ANodeId == OPN_MESSAGES)
+	QMultiMap<int, IOptionsDialogWidget *> widgets;
+	if (FOptionsManager && ANodeId==OPN_MESSAGES)
 	{
-		widgets.insertMulti(OWO_MESSAGES_CHATSTATES, FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_CHATSTATESENABLED),tr("Send chat state notifications"),AParent));
+		widgets.insertMulti(OWO_MESSAGES_CHATSTATESENABLED, FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_CHATSTATESENABLED),tr("Send notifications of your chat activity"),AParent));
 	}
 	return widgets;
 }

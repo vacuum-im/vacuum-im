@@ -6,8 +6,8 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iclientinfo.h>
 #include <interfaces/istanzaprocessor.h>
-#include <interfaces/iroster.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/irostermanager.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/imainwindow.h>
@@ -46,14 +46,14 @@ class ClientInfo :
 	public QObject,
 	public IPlugin,
 	public IClientInfo,
-	public IOptionsHolder,
+	public IOptionsDialogHolder,
 	public IStanzaHandler,
 	public IStanzaRequestOwner,
 	public IDataLocalizer,
 	public IDiscoFeatureHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IClientInfo IOptionsHolder IStanzaHandler IStanzaRequestOwner IDataLocalizer IDiscoFeatureHandler);
+	Q_INTERFACES(IPlugin IClientInfo IOptionsDialogHolder IStanzaHandler IStanzaRequestOwner IDataLocalizer IDiscoFeatureHandler);
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IClientInfo");
 public:
 	ClientInfo();
@@ -67,7 +67,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin();
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IStanzaHandler
 	virtual bool stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept);
 	//IStanzaRequestOwner
@@ -112,13 +112,13 @@ protected slots:
 	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onClientInfoActionTriggered(bool);
 	void onClientInfoDialogClosed(const Jid &AContactJid);
-	void onRosterRemoved(IRoster *ARoster);
+	void onRosterActiveChanged(IRoster *ARoster, bool AActive);
 	void onDiscoInfoReceived(const IDiscoInfo &AInfo);
 	void onOptionsChanged(const OptionsNode &ANode);
 private:
 	IPluginManager *FPluginManager;
-	IRosterPlugin *FRosterPlugin;
-	IPresencePlugin *FPresencePlugin;
+	IRosterManager *FRosterManager;
+	IPresenceManager *FPresenceManager;
 	IStanzaProcessor *FStanzaProcessor;
 	IRostersViewPlugin *FRostersViewPlugin;
 	IServiceDiscovery *FDiscovery;

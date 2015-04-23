@@ -61,10 +61,6 @@
         <translation>&lt;b&gt;Se ha recibido un mensaje con errores&lt;/b&gt;</translation>
     </message>
     <message>
-        <source>Mark all single messages from user as read when you read the first one</source>
-        <translation>Marcar como leídos todos los mensajes individuales del usuario al leer el primero</translation>
-    </message>
-    <message>
         <source>Send</source>
         <translation>Enviar</translation>
     </message>
@@ -91,6 +87,10 @@
     <message>
         <source>Send as Chat Message</source>
         <translation>Enviar como mensaje de chat</translation>
+    </message>
+    <message>
+        <source>Consider all single contacts messages as read when read the first</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

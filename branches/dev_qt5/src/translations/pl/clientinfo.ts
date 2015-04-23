@@ -60,16 +60,16 @@
         <translation>Czas bezczynności</translation>
     </message>
     <message>
-        <source>Share information about OS version</source>
-        <translation>Udostępniaj informację o wersji systemu</translation>
-    </message>
-    <message>
         <source>XMPP Ping</source>
         <translation>XMPP Ping</translation>
     </message>
     <message>
         <source>Supports the exchanging of the application-level pings over XML streams</source>
         <translation>Obsługa pingów na poziomie aplikacji z wykorzystaniem protokołu XMPP</translation>
+    </message>
+    <message>
+        <source>Share information about your OS version</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

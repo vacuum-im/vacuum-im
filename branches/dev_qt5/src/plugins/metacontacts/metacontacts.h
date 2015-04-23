@@ -6,8 +6,8 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imetacontacts.h>
 #include <interfaces/iprivatestorage.h>
-#include <interfaces/iroster.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/irostermanager.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/irostersmodel.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/istatusicons.h>
@@ -135,14 +135,13 @@ protected:
 	QList<IMetaContact> loadMetaContactsFromFile(const QString &AFileName) const;
 	void saveMetaContactsToFile(const QString &AFileName, const QList<IMetaContact> &AContacts) const;
 protected slots:
-	void onRosterAdded(IRoster *ARoster);
-	void onRosterRemoved(IRoster *ARoster);
+	void onRosterOpened(IRoster *ARoster);
+	void onRosterActiveChanged(IRoster *ARoster, bool AActive);
 	void onRosterStreamJidChanged(IRoster *ARoster, const Jid &ABefore);
 	void onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore);
 protected slots:
 	void onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore);
 protected slots:
-	void onPrivateStorageOpened(const Jid &AStreamJid);
 	void onPrivateStorageDataLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
 	void onPrivateStorageDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace);
 	void onPrivateStorageNotifyAboutToClose(const Jid &AStreamJid);
@@ -184,8 +183,8 @@ protected slots:
 private:
 	IPluginManager *FPluginManager;
 	IPrivateStorage *FPrivateStorage;
-	IRosterPlugin *FRosterPlugin;
-	IPresencePlugin *FPresencePlugin;
+	IRosterManager *FRosterManager;
+	IPresenceManager *FPresenceManager;
 	IRostersModel *FRostersModel;
 	IRostersView *FRostersView;
 	IRostersViewPlugin *FRostersViewPlugin;

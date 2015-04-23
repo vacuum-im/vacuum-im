@@ -5,9 +5,9 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessageprocessor.h>
 #include <interfaces/istanzaprocessor.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <interfaces/iservicediscovery.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/ipresencemanager.h>
 #include "multiuser.h"
 
 class MultiUserChat :
@@ -20,7 +20,7 @@ class MultiUserChat :
 	Q_OBJECT;
 	Q_INTERFACES(IMultiUserChat IStanzaHandler IStanzaRequestOwner IMessageEditor);
 public:
-	MultiUserChat(IMultiUserChatPlugin *AChatPlugin, const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANickName, const QString &APassword, QObject *AParent);
+	MultiUserChat(IMultiUserChatManager *AMultiChatManager, const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANickName, const QString &APassword, QObject *AParent);
 	~MultiUserChat();
 	virtual QObject *instance() { return this; }
 	//IStanzaHandler
@@ -105,7 +105,6 @@ signals:
 	void configFormRejected(const XmppError &AError);
 	void roomDestroyed(const QString &AReason);
 protected:
-	void initialize();
 	bool processMessage(const Stanza &AStanza);
 	bool processPresence(const Stanza &AStanza);
 	void closeChat(int AShow, const QString &AStatus);
@@ -113,14 +112,14 @@ protected slots:
 	void onUserDataChanged(int ARole, const QVariant &ABefore, const QVariant &AAfter);
 	void onPresenceChanged(int AShow, const QString &AStatus, int APriority);
 	void onDiscoveryInfoReceived(const IDiscoInfo &AInfo);
-	void onStreamClosed();
-	void onStreamJidChanged(const Jid &ABefore);
+	void onXmppStreamClosed();
+	void onXmppStreamJidChanged(const Jid &ABefore);
 private:
 	IPresence *FPresence;
 	IDataForms *FDataForms;
 	IXmppStream *FXmppStream;
 	IStanzaProcessor *FStanzaProcessor;
-	IMultiUserChatPlugin *FChatPlugin;
+	IMultiUserChatManager *FMultiChatManager;
 	IMessageProcessor *FMessageProcessor;
 	IServiceDiscovery *FDiscovery;
 private:

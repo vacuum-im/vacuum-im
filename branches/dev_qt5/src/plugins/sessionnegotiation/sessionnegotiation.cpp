@@ -34,7 +34,7 @@ SessionNegotiation::SessionNegotiation()
 	FDataForms = NULL;
 	FStanzaProcessor = NULL;
 	FDiscovery = NULL;
-	FPresencePlugin = NULL;
+	FPresenceManager = NULL;
 	FNotifications = NULL;
 }
 
@@ -69,15 +69,15 @@ bool SessionNegotiation::initConnections(IPluginManager *APluginManager, int &AI
 		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 	}
 
-	plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IXmppStreamManager").value(0,NULL);
 	if (plugin)
 	{
-		IXmppStreams *xmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-		if (xmppStreams)
+		IXmppStreamManager *xmppStreamManager = qobject_cast<IXmppStreamManager *>(plugin->instance());
+		if (xmppStreamManager)
 		{
-			connect(xmppStreams->instance(), SIGNAL(opened(IXmppStream *)), SLOT(onXmppStreamOpened(IXmppStream *)));
-			connect(xmppStreams->instance(), SIGNAL(aboutToClose(IXmppStream *)), SLOT(onXmppStreamAboutToClose(IXmppStream *)));
-			connect(xmppStreams->instance(), SIGNAL(closed(IXmppStream *)), SLOT(onXmppStreamClosed(IXmppStream *)));
+			connect(xmppStreamManager->instance(), SIGNAL(streamOpened(IXmppStream *)), SLOT(onXmppStreamOpened(IXmppStream *)));
+			connect(xmppStreamManager->instance(), SIGNAL(streamAboutToClose(IXmppStream *)), SLOT(onXmppStreamAboutToClose(IXmppStream *)));
+			connect(xmppStreamManager->instance(), SIGNAL(streamClosed(IXmppStream *)), SLOT(onXmppStreamClosed(IXmppStream *)));
 		}
 	}
 
@@ -91,13 +91,13 @@ bool SessionNegotiation::initConnections(IPluginManager *APluginManager, int &AI
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IPresenceManager").value(0,NULL);
 	if (plugin)
 	{
-		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
-		if (FPresencePlugin)
+		FPresenceManager = qobject_cast<IPresenceManager *>(plugin->instance());
+		if (FPresenceManager)
 		{
-			connect(FPresencePlugin->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
+			connect(FPresenceManager->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
 				SLOT(onPresenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)));
 		}
 	}

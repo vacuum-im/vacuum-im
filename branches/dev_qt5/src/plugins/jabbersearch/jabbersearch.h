@@ -6,7 +6,7 @@
 #include <interfaces/idataforms.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/iservicediscovery.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/ipresencemanager.h>
 #include "searchdialog.h"
 
 class JabberSearch :
@@ -54,7 +54,7 @@ private:
 	IPluginManager *FPluginManager;
 	IStanzaProcessor *FStanzaProcessor;
 	IServiceDiscovery *FDiscovery;
-	IPresencePlugin *FPresencePlugin;
+	IPresenceManager *FPresenceManager;
 	IDataForms *FDataForms;
 private:
 	QList<QString> FRequests;

@@ -12,7 +12,7 @@
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/irostersmodel.h>
 #include <interfaces/irostersview.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/ipresencemanager.h>
 #include "editbookmarkdialog.h"
 #include "editbookmarksdialog.h"
 
@@ -20,13 +20,13 @@ class Bookmarks :
 	public QObject,
 	public IPlugin,
 	public IBookmarks,
-	public IOptionsHolder,
+	public IOptionsDialogHolder,
 	public IRosterDataHolder,
 	public IRostersEditHandler,
 	public AdvancedDelegateEditProxy
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IBookmarks IOptionsHolder IRosterDataHolder IRostersEditHandler);
+	Q_INTERFACES(IPlugin IBookmarks IOptionsDialogHolder IRosterDataHolder IRostersEditHandler);
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IBookmarks");
 public:
 	Bookmarks();
@@ -40,7 +40,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IRosterDataHolder
 	virtual QList<int> rosterDataRoles(int AOrder) const;
 	virtual QVariant rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const;
@@ -101,14 +101,14 @@ protected slots:
 private:
 	IPrivateStorage *FPrivateStorage;
 	IAccountManager *FAccountManager;
-	IMultiUserChatPlugin *FMultiChatPlugin;
+	IMultiUserChatManager *FMultiChatManager;
 	IXmppUriQueries *FXmppUriQueries;
 	IServiceDiscovery *FDiscovery;
 	IOptionsManager *FOptionsManager;
 	IRostersModel *FRostersModel;
 	IRostersView *FRostersView;
 	IRostersViewPlugin *FRostersViewPlugin;
-	IPresencePlugin *FPresencePlugin;
+	IPresenceManager *FPresenceManager;
 private:
 	QMap<Jid, QList<IBookmark> > FBookmarks;
 	QMap<Jid, EditBookmarksDialog *> FDialogs;

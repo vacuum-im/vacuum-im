@@ -48,6 +48,13 @@ DataFormWidget::DataFormWidget(IDataForms *ADataForms, const IDataForm &AForm, Q
 	{
 		IDataFieldWidget *fwidget = FDataForms->fieldWidget(field,!FForm.type.isEmpty() && FForm.type!=DATAFORM_TYPE_FORM,this);
 		fwidget->instance()->setVisible(false);
+		if (fwidget->mediaWidget() != NULL)
+		{
+			IDataMediaWidget *mwidget = fwidget->mediaWidget();
+			connect(mwidget->instance(),SIGNAL(mediaShown()),SLOT(onFieldMediaShown()));
+			connect(mwidget->instance(),SIGNAL(mediaError(const XmppError &)),SLOT(onFieldMediaError(const XmppError &)));
+		}
+		connect(fwidget->instance(),SIGNAL(changed()),SLOT(onFieldChanged()));
 		connect(fwidget->instance(),SIGNAL(focusIn(Qt::FocusReason)),SLOT(onFieldFocusIn(Qt::FocusReason)));
 		connect(fwidget->instance(),SIGNAL(focusOut(Qt::FocusReason)),SLOT(onFieldFocusOut(Qt::FocusReason)));
 		FFieldWidgets.append(fwidget);
@@ -124,11 +131,6 @@ DataFormWidget::DataFormWidget(IDataForms *ADataForms, const IDataForm &AForm, Q
 			scroll->setWidget(pwidget);
 		}
 	}
-}
-
-DataFormWidget::~DataFormWidget()
-{
-
 }
 
 bool DataFormWidget::checkForm(bool AAllowInvalid) const
@@ -243,6 +245,29 @@ bool DataFormWidget::insertLayout(const IDataLayout &ALayout, QWidget *AWidget)
 		}
 	}
 	return stretch;
+}
+
+void DataFormWidget::onFieldMediaShown()
+{
+	IDataMediaWidget *mwidget = qobject_cast<IDataMediaWidget *>(sender());
+	IDataFieldWidget *fwidget = mwidget!=NULL ? qobject_cast<IDataFieldWidget *>(mwidget->instance()->parentWidget()) : NULL;
+	if (fwidget)
+		emit fieldMediaShown(fwidget);
+}
+
+void DataFormWidget::onFieldMediaError(const XmppError &AError)
+{
+	IDataMediaWidget *mwidget = qobject_cast<IDataMediaWidget *>(sender());
+	IDataFieldWidget *fwidget = mwidget!=NULL ? qobject_cast<IDataFieldWidget *>(mwidget->instance()->parentWidget()) : NULL;
+	if (fwidget)
+		emit fieldMediaError(fwidget,AError);
+}
+
+void DataFormWidget::onFieldChanged()
+{
+	IDataFieldWidget *fwidget = qobject_cast<IDataFieldWidget *>(sender());
+	if (fwidget)
+		fieldChanged(fwidget);
 }
 
 void DataFormWidget::onFieldFocusIn(Qt::FocusReason AReason)

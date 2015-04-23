@@ -44,7 +44,7 @@ NormalWindow::NormalWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJ
 
 	FEditWidget = FMessageWidgets->newEditWidget(this,ui.spwMessageBox);
 	FEditWidget->setEditToolBarVisible(false);
-	FEditWidget->setSendShortcutId(SCT_MESSAGEWINDOWS_NORMAL_SENDMESSAGE);
+	FEditWidget->setSendShortcutId(SCT_MESSAGEWINDOWS_SENDNORMALMESSAGE);
 	ui.spwMessageBox->insertWidget(MNWW_EDITWIDGET,FEditWidget->instance(),100);
 
 	FToolBarWidget = FMessageWidgets->newToolBarWidget(this,ui.spwMessageBox);

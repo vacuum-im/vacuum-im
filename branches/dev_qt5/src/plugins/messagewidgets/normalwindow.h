@@ -3,8 +3,8 @@
 
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/imessageprocessor.h>
-#include <interfaces/ixmppstreams.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/ixmppstreammanager.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/istatusicons.h>
 #include "ui_normalwindow.h"
 

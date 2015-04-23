@@ -39,22 +39,6 @@
         <translation>Окно  со вкладками</translation>
     </message>
     <message>
-        <source>Enable tab windows</source>
-        <translation>Использовать окна со вкладками</translation>
-    </message>
-    <message>
-        <source>Show status changes in chat windows</source>
-        <translation>Показывать изменения статуса в окне чата</translation>
-    </message>
-    <message>
-        <source>Auto resize input field</source>
-        <translation>Автоматически изменять размер поля ввода</translation>
-    </message>
-    <message>
-        <source>Save status messages to history</source>
-        <translation>Сохранять статусные сообщения в истории</translation>
-    </message>
-    <message>
         <source>Tab window</source>
         <translation>Окно со вкладками</translation>
     </message>
@@ -75,26 +59,6 @@
         <translation>Предыдущая вкладка</translation>
     </message>
     <message>
-        <source>Set tabs closable</source>
-        <translation>Сделать вкладки закрываемыми</translation>
-    </message>
-    <message>
-        <source>Show tabs at bottom</source>
-        <translation>Показывать вкладки внизу</translation>
-    </message>
-    <message>
-        <source>Rename tab window</source>
-        <translation>Переименовать окно со вкладками</translation>
-    </message>
-    <message>
-        <source>Delete tab window</source>
-        <translation>Удалить окно со вкладками</translation>
-    </message>
-    <message>
-        <source>Use as default tab window</source>
-        <translation>Использовать как основное окно со вкладками</translation>
-    </message>
-    <message>
         <source>Alt+%1</source>
         <comment>Show tab</comment>
         <translation>Alt+%1</translation>
@@ -102,28 +66,6 @@
     <message>
         <source>Message windows</source>
         <translation>Окна сообщений</translation>
-    </message>
-    <message>
-        <source>Chat window</source>
-        <translation>Окно чата</translation>
-    </message>
-    <message>
-        <source>Send message</source>
-        <translation>Отправить сообщение</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <comment>Send message</comment>
-        <translation>Return</translation>
-    </message>
-    <message>
-        <source>Message window</source>
-        <translation>Окно сообщения</translation>
-    </message>
-    <message>
-        <source>Ctrl+Return</source>
-        <comment>Send message</comment>
-        <translation>Ctrl+Return</translation>
     </message>
     <message>
         <source>Edit next message</source>
@@ -149,21 +91,9 @@
         <translation>Ctrl+W</translation>
     </message>
     <message>
-        <source>Show tabs indices</source>
-        <translation>Показывать номера вкладок</translation>
-    </message>
-    <message>
-        <source>Close tab window</source>
-        <translation>Закрыть окно со вкладками</translation>
-    </message>
-    <message>
         <source>Esc</source>
         <comment>Close tab window</comment>
         <translation>Esc</translation>
-    </message>
-    <message>
-        <source>Close message window</source>
-        <translation>Закрыть окно сообщений</translation>
     </message>
     <message>
         <source>Esc</source>
@@ -205,39 +135,67 @@
         <translation>google.ru</translation>
     </message>
     <message>
-        <source>Combine/Split with message windows</source>
-        <translation>Объединить/Разделить с окнами сообщений</translation>
-    </message>
-    <message>
-        <source>Combine message windows with contact-list</source>
-        <translation>Объединить окна сообщений с контакт-листом</translation>
-    </message>
-    <message>
-        <source>Show tabs in combined message windows with contact-list mode</source>
-        <translation>Показывать вкладки в режиме объединения окон сообщений с контакт-листом</translation>
-    </message>
-    <message>
         <source>Quote Selected Text</source>
         <translation>Цитировать выделенный текст</translation>
     </message>
-</context>
-<context>
-    <name>MessengerOptionsClass</name>
     <message>
-        <source>Minimum input field lines:</source>
-        <translation>Минимальное число строк в поле ввода:</translation>
+        <source>Message window view</source>
+        <translation>Вид окна сообщений</translation>
     </message>
     <message>
-        <source>Clean chat windows after closing in </source>
-        <translation>Очищать окна чата после закрытия через</translation>
+        <source>Load last messages from history</source>
+        <translation>Загружать последние сообщения из истории</translation>
     </message>
     <message>
-        <source> minutes</source>
-        <translation> минут</translation>
+        <source>Show message windows together with contacts list</source>
+        <translation>Отображать окна сообщений совместно со списком контактов</translation>
     </message>
     <message>
-        <source>(0 - do not clean)</source>
-        <translation>(0 - не очищать)</translation>
+        <source>Show message windows in tab window</source>
+        <translation>Отображать окна сообщений в окне со вкладками</translation>
+    </message>
+    <message>
+        <source>Automatically resize messages input field</source>
+        <translation>Автоматически изменять размер поля ввода сообщений</translation>
+    </message>
+    <message>
+        <source>Minimum number of lines in messages input field:</source>
+        <translation>Минимальное число строк в поле воода сообщений:</translation>
+    </message>
+    <message>
+        <source>Message window behavior</source>
+        <translation>Поведение окна сообщений</translation>
+    </message>
+    <message>
+        <source>Show contacts status changes</source>
+        <translation>Показывать изменения статуса контактов</translation>
+    </message>
+    <message>
+        <source>Save contacts status messages in history</source>
+        <translation>Сохранять статусные сообщения контактов в истории</translation>
+    </message>
+    <message>
+        <source>Ctrl+Q</source>
+        <comment>Quote selected text</comment>
+        <translation>Ctrl+Q</translation>
+    </message>
+    <message>
+        <source>Send chat message</source>
+        <translation>Отправить чат сообщение</translation>
+    </message>
+    <message>
+        <source>Return</source>
+        <comment>Send chat message</comment>
+        <translation>Return</translation>
+    </message>
+    <message>
+        <source>Send single message</source>
+        <translation>Отправить одиночное сообщение</translation>
+    </message>
+    <message>
+        <source>Ctrl+Return</source>
+        <comment>Send single message</comment>
+        <translation>Ctrl+Return</translation>
     </message>
 </context>
 <context>

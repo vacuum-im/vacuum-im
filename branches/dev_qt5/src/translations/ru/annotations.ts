@@ -16,10 +16,6 @@
         <translation>Позволяет добавлять комментарии к контактам в ростере</translation>
     </message>
     <message>
-        <source>Edit annotation</source>
-        <translation>Редактировать комментарий</translation>
-    </message>
-    <message>
         <source>&lt;b&gt;Annotation:&lt;/b&gt;</source>
         <translation>&lt;b&gt;Комментарий:&lt;/b&gt;</translation>
     </message>

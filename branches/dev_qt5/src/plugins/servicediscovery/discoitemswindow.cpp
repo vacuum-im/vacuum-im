@@ -7,14 +7,14 @@
 #include <definitions/discoitemdataroles.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
-#include <definitions/shortcuts.h>
 #include <utils/widgetmanager.h>
+#include <utils/pluginhelper.h>
 #include <utils/options.h>
 #include <utils/action.h>
 #include <utils/logger.h>
 
 // SortFilterProxyModel
-SortFilterProxyModel::SortFilterProxyModel(QObject *AParent) :QSortFilterProxyModel(AParent)
+SortFilterProxyModel::SortFilterProxyModel(QObject *AParent) : QSortFilterProxyModel(AParent)
 {
 
 }
@@ -50,16 +50,15 @@ DiscoItemsWindow::DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &ASt
 	setWindowTitle(tr("Service Discovery - %1").arg(AStreamJid.uFull()));
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_SDISCOVERY_DISCOVER,0,0,"windowIcon");
 
-	FDataForms = NULL;
-	FVCardPlugin = NULL;
-	FRosterChanger = NULL;
-
-	FDiscovery = ADiscovery;
 	FCurrentStep = -1;
 	FStreamJid = AStreamJid;
 
+	FDiscovery = ADiscovery;
+	FDataForms = PluginHelper::pluginInstance<IDataForms>();
+	FVCardManager = PluginHelper::pluginInstance<IVCardManager>();
+	FRosterChanger = PluginHelper::pluginInstance<IRosterChanger>();
+
 	Action *closeAction = new Action(this);
-	closeAction->setShortcutId(SCT_DISCOWINDOW_CLOSEWINDOW);
 	connect(closeAction,SIGNAL(triggered()),SLOT(close()));
 	addAction(closeAction);
 
@@ -110,7 +109,6 @@ DiscoItemsWindow::DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &ASt
 	connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
 	connect(FDiscovery->instance(),SIGNAL(discoItemsReceived(const IDiscoItems &)),SLOT(onDiscoItemsReceived(const IDiscoItems &)));
 
-	initialize();
 	createToolBarActions();
 
 	if (!restoreGeometry(Options::fileValue("servicediscovery.itemswindow.geometry",FStreamJid.pBare()).toByteArray()))
@@ -173,24 +171,9 @@ void DiscoItemsWindow::discover(const Jid &AContactJid, const QString &ANode)
 	emit discoverChanged(AContactJid,ANode);
 }
 
-QMenu * DiscoItemsWindow::createPopupMenu()
+QMenu *DiscoItemsWindow::createPopupMenu()
 {
 	return NULL;
-}
-
-void DiscoItemsWindow::initialize()
-{
-	IPlugin *plugin = FDiscovery->pluginManager()->pluginInterface("IRosterChanger").value(0,NULL);
-	if (plugin)
-		FRosterChanger = qobject_cast<IRosterChanger *>(plugin->instance());
-
-	plugin = FDiscovery->pluginManager()->pluginInterface("IVCardPlugin").value(0,NULL);
-	if (plugin)
-		FVCardPlugin = qobject_cast<IVCardPlugin *>(plugin->instance());
-
-	plugin = FDiscovery->pluginManager()->pluginInterface("IDataForms").value(0,NULL);
-	if (plugin)
-		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 }
 
 void DiscoItemsWindow::createToolBarActions()
@@ -198,49 +181,42 @@ void DiscoItemsWindow::createToolBarActions()
 	FMoveBack = new Action(FToolBarChanger);
 	FMoveBack->setText(tr("Back"));
 	FMoveBack->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_ARROW_LEFT);
-	FMoveBack->setShortcutId(SCT_DISCOWINDOW_BACK);
 	FToolBarChanger->insertAction(FMoveBack,TBG_DIWT_DISCOVERY_NAVIGATE);
 	connect(FMoveBack,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
 	FMoveForward = new Action(FToolBarChanger);
 	FMoveForward->setText(tr("Forward"));
 	FMoveForward->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_ARROW_RIGHT);
-	FMoveForward->setShortcutId(SCT_DISCOWINDOW_BACK);
 	FToolBarChanger->insertAction(FMoveForward,TBG_DIWT_DISCOVERY_NAVIGATE);
 	connect(FMoveForward,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
 	FDiscoverCurrent = new Action(FToolBarChanger);
 	FDiscoverCurrent->setText(tr("Discover"));
 	FDiscoverCurrent->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_DISCOVER);
-	FDiscoverCurrent->setShortcutId(SCT_DISCOWINDOW_DISCOVER);
 	FToolBarChanger->insertAction(FDiscoverCurrent,TBG_DIWT_DISCOVERY_DEFACTIONS);
 	connect(FDiscoverCurrent,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
 	FReloadCurrent = new Action(FToolBarChanger);
 	FReloadCurrent->setText(tr("Reload"));
 	FReloadCurrent->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_RELOAD);
-	FReloadCurrent->setShortcutId(SCT_DISCOWINDOW_RELOAD);
 	FToolBarChanger->insertAction(FReloadCurrent,TBG_DIWT_DISCOVERY_DEFACTIONS);
 	connect(FReloadCurrent,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
 	FDiscoInfo = new Action(FToolBarChanger);
 	FDiscoInfo->setText(tr("Disco info"));
 	FDiscoInfo->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_DISCOINFO);
-	FDiscoInfo->setShortcutId(SCT_DISCOWINDOW_SHOWDISCOINFO);
 	FToolBarChanger->insertAction(FDiscoInfo,TBG_DIWT_DISCOVERY_ACTIONS);
 	connect(FDiscoInfo,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
 	FAddContact = new Action(FToolBarChanger);
 	FAddContact->setText(tr("Add Contact"));
 	FAddContact->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_ADD_CONTACT);
-	FAddContact->setShortcutId(SCT_DISCOWINDOW_ADDCONTACT);
 	FToolBarChanger->insertAction(FAddContact,TBG_DIWT_DISCOVERY_ACTIONS);
 	connect(FAddContact,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
 	FShowVCard = new Action(FToolBarChanger);
 	FShowVCard->setText(tr("vCard"));
 	FShowVCard->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
-	FShowVCard->setShortcutId(SCT_DISCOWINDOW_SHOWVCARD);
 	FToolBarChanger->insertAction(FShowVCard,TBG_DIWT_DISCOVERY_ACTIONS);
 	connect(FShowVCard,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
@@ -255,7 +231,7 @@ void DiscoItemsWindow::updateToolBarActions()
 	FReloadCurrent->setEnabled(ui.trvItems->currentIndex().isValid());
 	FDiscoInfo->setEnabled(ui.trvItems->currentIndex().isValid());
 	FAddContact->setEnabled(FRosterChanger != NULL);
-	FShowVCard->setEnabled(FVCardPlugin != NULL);
+	FShowVCard->setEnabled(FVCardManager != NULL);
 }
 
 void DiscoItemsWindow::updateActionsBar()
@@ -396,7 +372,7 @@ void DiscoItemsWindow::onToolBarActionTriggered(bool)
 		if (index.isValid())
 		{
 			Jid itemJid = index.data(DIDR_JID).toString();
-			FVCardPlugin->showVCardDialog(FStreamJid,itemJid);
+			FVCardManager->showVCardDialog(FStreamJid,itemJid);
 		}
 	}
 }

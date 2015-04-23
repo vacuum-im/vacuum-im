@@ -2,7 +2,7 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en" sourcelanguage="en">
 <context>
-    <name>SASLPlugin</name>
+    <name>SASLFeatureFactory</name>
     <message>
         <source>SASL Authentication</source>
         <translation>SASL Authentication</translation>

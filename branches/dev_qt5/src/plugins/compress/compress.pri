@@ -1,5 +1,5 @@
-HEADERS = compressplugin.h \
-          compression.h
+HEADERS = compressfeaturefactory.h \
+          compressfeature.h
 
-SOURCES = compressplugin.cpp \
-          compression.cpp
+SOURCES = compressfeaturefactory.cpp \
+          compressfeature.cpp

@@ -1,7 +1,9 @@
-FORMS = styleoptionswidget.ui
+FORMS = styleeditoptionsdialog.ui
 
-HEADERS = messagestyles.h \
-          styleoptionswidget.h
+HEADERS = messagestylemanager.h \
+          styleeditoptionsdialog.h \
+          styleselectoptionswidget.h
 
-SOURCES = messagestyles.cpp \
-          styleoptionswidget.cpp
+SOURCES = messagestylemanager.cpp \
+          styleeditoptionsdialog.cpp \
+          styleselectoptionswidget.cpp

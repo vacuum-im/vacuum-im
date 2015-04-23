@@ -92,7 +92,6 @@ class IServiceDiscovery
 {
 public:
 	virtual QObject *instance() =0;
-	virtual IPluginManager *pluginManager() const =0;
 	virtual bool isReady(const Jid &AStreamJid) const =0;
 	virtual IDiscoInfo selfDiscoInfo(const Jid &AStreamJid, const QString &ANode = QString::null) const =0;
 	virtual void showDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent = NULL) =0;
@@ -143,6 +142,6 @@ protected:
 Q_DECLARE_INTERFACE(IDiscoHandler,"Vacuum.Plugin.IDiscoHandler/1.0")
 Q_DECLARE_INTERFACE(IDiscoFeatureHandler,"Vacuum.Plugin.IDiscoFeatureHandler/1.0")
 Q_DECLARE_INTERFACE(IDiscoItemsWindow,"Vacuum.Plugin.IDiscoItemsWindow/1.1")
-Q_DECLARE_INTERFACE(IServiceDiscovery,"Vacuum.Plugin.IServiceDiscovery/1.3")
+Q_DECLARE_INTERFACE(IServiceDiscovery,"Vacuum.Plugin.IServiceDiscovery/1.4")
 
 #endif

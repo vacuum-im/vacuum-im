@@ -100,8 +100,7 @@ bool FileMessageArchive::initConnections(IPluginManager *APluginManager, int &AI
 		FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
 		if (FAccountManager)
 		{
-			connect(FAccountManager->instance(),SIGNAL(shown(IAccount *)),SLOT(onAccountShown(IAccount *)));
-			connect(FAccountManager->instance(),SIGNAL(hidden(IAccount *)),SLOT(onAccountHidden(IAccount *)));
+			connect(FAccountManager->instance(),SIGNAL(accountActiveChanged(IAccount *, bool)),SLOT(onAccountActiveChanged(IAccount *, bool)));
 		}
 	}
 
@@ -128,7 +127,7 @@ bool FileMessageArchive::initObjects()
 bool FileMessageArchive::initSettings()
 {
 	Options::setDefaultValue(OPV_FILEARCHIVE_HOMEPATH,QString());
-	Options::setDefaultValue(OPV_FILEARCHIVE_FORCEDATABASESYNC,false);
+	Options::setDefaultValue(OPV_FILEARCHIVE_DATABASESYNC,true);
 	Options::setDefaultValue(OPV_FILEARCHIVE_COLLECTION_MINSIZE,1*1024);
 	Options::setDefaultValue(OPV_FILEARCHIVE_COLLECTION_MAXSIZE,20*1024);
 	Options::setDefaultValue(OPV_FILEARCHIVE_COLLECTION_CRITICALSIZE,25*1024);
@@ -156,9 +155,9 @@ QString FileMessageArchive::engineDescription() const
 	return tr("History of conversations is stored in local files");
 }
 
-IOptionsWidget *FileMessageArchive::engineSettingsWidget(QWidget *AParent)
+IOptionsDialogWidget *FileMessageArchive::engineSettingsWidget(QWidget *AParent)
 {
-	return new FileArchiveOptions(FPluginManager,AParent);
+	return new FileArchiveOptionsWidget(FPluginManager,AParent);
 }
 
 quint32 FileMessageArchive::capabilities(const Jid &AStreamJid) const
@@ -697,8 +696,8 @@ IArchiveHeader FileMessageArchive::saveFileCollection(const Jid &AStreamJid, con
 			QDomDocument doc;
 			QDomElement chatElem = doc.appendChild(doc.createElement("chat")).toElement();
 			FArchiver->collectionToElement(collection,chatElem,ARCHIVE_SAVE_MESSAGE);
-			file.write(doc.toByteArray(2));
-			file.flush();
+			file.write(doc.toByteArray());
+			file.close();
 
 			saveModification(AStreamJid,collection.header,IArchiveModification::Changed);
 			return collection.header;
@@ -941,7 +940,7 @@ void FileMessageArchive::saveGatewayType(const QString &ADomain, const QString &
 		gateway << "\n";
 
 		file.write(gateway.join(" ").toUtf8());
-		file.flush();
+		file.close();
 
 		FGatewayTypes.insert(ADomain,AType);
 	}
@@ -967,7 +966,7 @@ bool FileMessageArchive::startDatabaseSync(const Jid &AStreamJid, bool AForce)
 			FDatabaseSyncWorker->startSync(AStreamJid);
 			return true;
 		}
-		if (Options::node(OPV_FILEARCHIVE_FORCEDATABASESYNC).value().toBool())
+		if (Options::node(OPV_FILEARCHIVE_DATABASESYNC).value().toBool())
 		{
 			LOG_STRM_INFO(AStreamJid,"Database synchronization started");
 			FDatabaseSyncWorker->startSync(AStreamJid);
@@ -1371,10 +1370,10 @@ void FileMessageArchive::onOptionsClosed()
 	FArchiveHomePath = FPluginManager->homePath();
 }
 
-void FileMessageArchive::onAccountShown(IAccount *AAccount)
+void FileMessageArchive::onAccountActiveChanged(IAccount *AAccount, bool AActive)
 {
 	Jid bareStreamJid = AAccount->streamJid().bare();
-	if (!FDatabaseProperties.contains(bareStreamJid))
+	if (AActive && !FDatabaseProperties.contains(bareStreamJid))
 	{
 		DatabaseTaskOpenDatabase *task = new DatabaseTaskOpenDatabase(bareStreamJid,databaseArchiveFile(bareStreamJid));
 		if (FDatabaseWorker->startTask(task))
@@ -1387,15 +1386,11 @@ void FileMessageArchive::onAccountShown(IAccount *AAccount)
 			LOG_STRM_WARNING(AAccount->streamJid(),"Failed to open database: Task not started");
 		}
 	}
-}
-
-void FileMessageArchive::onAccountHidden(IAccount *AAccount)
-{
-	Jid bareStreamJid = AAccount->streamJid().bare();
-	if (FDatabaseProperties.contains(bareStreamJid))
+	else if (!AActive && FDatabaseProperties.contains(bareStreamJid))
 	{
 		emit databaseAboutToClose(bareStreamJid);
 		setDatabaseProperty(bareStreamJid,FADP_DATABASE_NOT_CLOSED,"false");
+
 		DatabaseTaskCloseDatabase *task = new DatabaseTaskCloseDatabase(bareStreamJid);
 		if (FDatabaseWorker->startTask(task))
 		{

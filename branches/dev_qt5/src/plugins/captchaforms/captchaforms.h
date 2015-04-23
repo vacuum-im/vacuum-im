@@ -4,7 +4,7 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/icaptchaforms.h>
 #include <interfaces/idataforms.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <interfaces/inotifications.h>
 #include <interfaces/istanzaprocessor.h>
 
@@ -62,15 +62,15 @@ protected:
 protected:
 	bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:
-	void onStreamOpened(IXmppStream *AXmppStream);
-	void onStreamClosed(IXmppStream *AXmppStream);
+	void onXmppStreamOpened(IXmppStream *AXmppStream);
+	void onXmppStreamClosed(IXmppStream *AXmppStream);
 	void onChallengeDialogAccepted();
 	void onChallengeDialogRejected();
 	void onNotificationActivated(int ANotifyId);
 	void onNotificationRemoved(int ANotifyId);
 private:
 	IDataForms *FDataForms;
-	IXmppStreams *FXmppStreams;
+	IXmppStreamManager *FXmppStreamManager;
 	INotifications *FNotifications;
 	IStanzaProcessor *FStanzaProcessor;
 private:

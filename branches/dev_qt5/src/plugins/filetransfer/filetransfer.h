@@ -10,7 +10,7 @@
 #include <interfaces/ifilestreamsmanager.h>
 #include <interfaces/idatastreamsmanager.h>
 #include <interfaces/iservicediscovery.h>
-#include <interfaces/iroster.h>
+#include <interfaces/irostermanager.h>
 #include <interfaces/inotifications.h>
 #include <interfaces/imessagearchiver.h>
 #include <interfaces/imessagewidgets.h>
@@ -22,14 +22,14 @@ class FileTransfer :
 	public QObject,
 	public IPlugin,
 	public IFileTransfer,
-	public IOptionsHolder,
+	public IOptionsDialogHolder,
 	public IDiscoFeatureHandler,
 	public IRostersDragDropHandler,
 	public IMessageViewDropHandler,
 	public IFileStreamsHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IFileTransfer IOptionsHolder IDiscoFeatureHandler  IRostersDragDropHandler IMessageViewDropHandler IFileStreamsHandler);
+	Q_INTERFACES(IPlugin IFileTransfer IOptionsDialogHolder IDiscoFeatureHandler  IRostersDragDropHandler IMessageViewDropHandler IFileStreamsHandler);
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IFileTransfer");
 public:
 	FileTransfer();
@@ -43,7 +43,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IDiscoFeatureHandler
 	virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
 	virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
@@ -88,9 +88,8 @@ protected slots:
 	void onToolBarWidgetCreated(IMessageToolBarWidget *AWidget);
 	void onToolBarWidgetAddressChanged(const Jid &AStreamBefore, const Jid &AContactBefore);
 	void onToolBarWidgetDestroyed(QObject *AObject);
-	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 private:
-	IRosterPlugin *FRosterPlugin;
+	IRosterManager *FRosterManager;
 	IServiceDiscovery *FDiscovery;
 	INotifications *FNotifications;
 	IDataStreamsManager *FDataManager;

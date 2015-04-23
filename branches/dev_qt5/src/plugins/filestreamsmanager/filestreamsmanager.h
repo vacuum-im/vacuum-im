@@ -10,17 +10,17 @@
 #include <interfaces/ioptionsmanager.h>
 #include "filestream.h"
 #include "filestreamswindow.h"
-#include "filestreamsoptions.h"
+#include "filestreamsoptionswidget.h"
 
 class FileStreamsManager :
 	public QObject,
 	public IPlugin,
 	public IFileStreamsManager,
 	public IDataStreamProfile,
-	public IOptionsHolder
+	public IOptionsDialogHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IOptionsHolder IFileStreamsManager IDataStreamProfile);
+	Q_INTERFACES(IPlugin IOptionsDialogHolder IFileStreamsManager IDataStreamProfile);
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IFileStreamsManager");
 public:
 	FileStreamsManager();
@@ -34,7 +34,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IDataStreamProfile
 	virtual QString profileNS() const;
 	virtual bool requestDataStream(const QString &AStreamId, Stanza &ARequest) const;

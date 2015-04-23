@@ -10,7 +10,7 @@ ConnectionOptionsWidget::ConnectionOptionsWidget(IConnectionManager *AManager, c
 	FOptions = ANode;
 	FProxySettings = NULL;
 
-	ui.cmbSslProtocol->addItem(tr("Auto Select"),QSsl::SecureProtocols);
+	ui.cmbSslProtocol->addItem(tr("Auto"),QSsl::SecureProtocols);
 	ui.cmbSslProtocol->addItem(tr("TLSv1.0"),QSsl::TlsV1_0);
 	ui.cmbSslProtocol->addItem(tr("TLSv1.1"),QSsl::TlsV1_0);
 	ui.cmbSslProtocol->addItem(tr("TLSv1.2"),QSsl::TlsV1_0);

@@ -3,8 +3,8 @@
 
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/irostersview.h>
-#include <interfaces/iroster.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/irostermanager.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/irostersmodel.h>
 #include <interfaces/ioptionsmanager.h>
@@ -17,12 +17,12 @@ class RostersViewPlugin :
 	public QObject,
 	public IPlugin,
 	public IRostersViewPlugin,
-	public IOptionsHolder,
+	public IOptionsDialogHolder,
 	public IRosterDataHolder,
 	public IRostersLabelHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IRostersViewPlugin IOptionsHolder IRosterDataHolder IRostersLabelHolder);
+	Q_INTERFACES(IPlugin IRostersViewPlugin IOptionsDialogHolder IRosterDataHolder IRostersLabelHolder);
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IRostersViewPlugin");
 public:
 	RostersViewPlugin();
@@ -36,7 +36,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IRosterDataHolder
 	virtual QList<int> rosterDataRoles(int AOrder) const;
 	virtual QVariant rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const;
@@ -48,7 +48,7 @@ public:
 	virtual IRostersView *rostersView();
 	virtual void startRestoreExpandState();
 	virtual void restoreExpandState(const QModelIndex &AParent = QModelIndex());
-	virtual void registerExpandableRosterIndexKind(int AKind, int AUniqueRole);
+	virtual void registerExpandableRosterIndexKind(int AKind, int AUniqueRole, bool ADefaultExpanded = true);
 signals:
 	//IRosterDataHolder
 	void rosterDataChanged(IRosterIndex *AIndex, int ARole);
@@ -81,22 +81,21 @@ protected slots:
 	void onOptionsChanged(const OptionsNode &ANode);
 	void onCopyToClipboardActionTriggered(bool);
 	void onShowOfflineContactsAction(bool AChecked);
-	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 private:
 	IStatusIcons *FStatusIcons;
 	IRostersModel *FRostersModel;
-	IPresencePlugin *FPresencePlugin;
+	IPresenceManager *FPresenceManager;
 	IOptionsManager *FOptionsManager;
 	IAccountManager *FAccountManager;
 	IMainWindowPlugin *FMainWindowPlugin;
 private:
 	bool FStartRestoreExpandState;
 	QMap<int, int> FExpandableKinds;
+	QMap<int, int> FExpandableDefaults;
 	QMap<QString, QHash<QString,bool> > FExpandStates;
 private:
 	bool FShowStatus;
 	bool FShowResource;
-	bool FShowMergedStreams;
 	Action *FShowOfflineAction;
 	RostersView *FRostersView;
 	QAbstractItemModel *FLastModel;

@@ -5,7 +5,7 @@
 #include <interfaces/ipepmanager.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/iservicediscovery.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 
 class PEPManager : 
 	public QObject,
@@ -40,7 +40,7 @@ private slots:
 	void onXmppStreamClosed(IXmppStream *AXmppStream);
 	void onPEPHandlerDestroyed(QObject *AHandler);
 private:
-	IXmppStreams *FXmppStreams;
+	IXmppStreamManager *FXmppStreamManager;
 	IServiceDiscovery *FDiscovery;
 	IStanzaProcessor *FStanzaProcessor;
 private:

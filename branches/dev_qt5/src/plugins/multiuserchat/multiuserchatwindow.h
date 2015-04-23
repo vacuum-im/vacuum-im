@@ -5,14 +5,14 @@
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/imessageprocessor.h>
-#include <interfaces/imessagestyles.h>
+#include <interfaces/imessagestylemanager.h>
 #include <interfaces/imessagearchiver.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/istatusicons.h>
 #include <interfaces/istatuschanger.h>
-#include <interfaces/iroster.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/irostermanager.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/irecentcontacts.h>
 #include <interfaces/istanzaprocessor.h>
 #include "edituserslistdialog.h"
@@ -28,7 +28,7 @@ struct WindowStatus {
 
 struct WindowContent {
 	QString html;
-	IMessageContentOptions options;
+	IMessageStyleContentOptions options;
 };
 
 struct UserStatus {
@@ -45,7 +45,7 @@ class MultiUserChatWindow :
 	Q_OBJECT;
 	Q_INTERFACES(IMessageWindow IMultiUserChatWindow IMessageTabPage IStanzaHandler IMessageHandler IMessageEditSendHandler);
 public:
-	MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMultiUserChat *AMultiChat);
+	MultiUserChatWindow(IMultiUserChatManager *AChatPlugin, IMultiUserChat *AMultiChat);
 	~MultiUserChatWindow();
 	virtual QMainWindow *instance() { return this; }
 	//IMessageWindow
@@ -112,7 +112,6 @@ signals:
 	void privateChatWindowCreated(IMessageChatWindow *AWindow);
 	void privateChatWindowDestroyed(IMessageChatWindow *AWindow);
 protected:
-	void initialize();
 	void connectMultiChatSignals();
 	void createMessageWidgets();
 	void createStaticRoomActions();
@@ -140,7 +139,7 @@ protected:
 protected:
 	IMessageChatWindow *getPrivateChatWindow(const Jid &AContactJid);
 	void setPrivateChatMessageStyle(IMessageChatWindow *AWindow);
-	void fillPrivateChatContentOptions(IMessageChatWindow *AWindow, IMessageContentOptions &AOptions) const;
+	void fillPrivateChatContentOptions(IMessageChatWindow *AWindow, IMessageStyleContentOptions &AOptions) const;
 	void showPrivateChatStatusMessage(IMessageChatWindow *AWindow, const QString &AMessage, int AStatus=0, const QDateTime &ATime=QDateTime::currentDateTime());
 	void showPrivateChatMessage(IMessageChatWindow *AWindow, const Message &AMessage);
 	void requestPrivateChatHistory(IMessageChatWindow *AWindow);
@@ -180,7 +179,7 @@ protected slots:
 	void onMultiChatEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bool &AHooked);
 	void onMultiChatHorizontalSplitterMoved(int APos, int AIndex);
 	void onMultiChatUserItemDoubleClicked(const QModelIndex &AIndex);
-	void onMultiChatContentAppended(const QString &AHtml, const IMessageContentOptions &AOptions);
+	void onMultiChatContentAppended(const QString &AHtml, const IMessageStyleContentOptions &AOptions);
 	void onMultiChatMessageStyleOptionsChanged(const IMessageStyleOptions &AOptions, bool ACleared);
 protected slots:
 	void onPrivateChatWindowActivated();
@@ -190,7 +189,7 @@ protected slots:
 	void onPrivateChatContextMenuRequested(Menu *AMenu);
 	void onPrivateChatToolTipsRequested(QMap<int,QString> &AToolTips);
 	void onPrivateChatNotifierActiveNotifyChanged(int ANotifyId);
-	void onPrivateChatContentAppended(const QString &AHtml, const IMessageContentOptions &AOptions);
+	void onPrivateChatContentAppended(const QString &AHtml, const IMessageStyleContentOptions &AOptions);
 	void onPrivateChatMessageStyleOptionsChanged(const IMessageStyleOptions &AOptions, bool ACleared);
 protected slots:
 	void onRoomActionTriggered(bool);
@@ -213,13 +212,13 @@ private:
 private:
 	IMessageWidgets *FMessageWidgets;
 	IMessageProcessor *FMessageProcessor;
-	IMessageStyles *FMessageStyles;
+	IMessageStyleManager *FMessageStyleManager;
 	IMessageArchiver *FMessageArchiver;
 	IDataForms *FDataForms;
 	IStatusIcons *FStatusIcons;
 	IStatusChanger *FStatusChanger;
 	IMultiUserChat *FMultiChat;
-	IMultiUserChatPlugin *FMultiChatPlugin;
+	IMultiUserChatManager *FMultiChatManager;
 	IRecentContacts *FRecentContacts;
 	IStanzaProcessor *FStanzaProcessor;
 private:

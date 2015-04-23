@@ -6,8 +6,11 @@
 #include <QFileDialog>
 #include <QImageReader>
 #include <QCryptographicHash>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
 #include <definitions/namespaces.h>
 #include <definitions/actiongroups.h>
+#include <definitions/optionvalues.h>
 #include <definitions/stanzahandlerorders.h>
 #include <definitions/rosterlabels.h>
 #include <definitions/rosterindexkinds.h>
@@ -15,15 +18,9 @@
 #include <definitions/rosterdataholderorders.h>
 #include <definitions/rostertooltiporders.h>
 #include <definitions/rosterlabelholderorders.h>
-#include <definitions/optionvalues.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionwidgetorders.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
 #include <definitions/vcardvaluenames.h>
 #include <utils/imagemanager.h>
 #include <utils/iconstorage.h>
-#include <utils/options.h>
 #include <utils/logger.h>
 
 #define DIR_AVATARS               "avatars"
@@ -44,18 +41,15 @@ static const QList<int> AvatarRosterKinds = QList<int>() << RIK_STREAM_ROOT << R
 Avatars::Avatars()
 {
 	FPluginManager = NULL;
-	FXmppStreams = NULL;
+	FXmppStreamManager = NULL;
 	FStanzaProcessor = NULL;
-	FVCardPlugin = NULL;
-	FPresencePlugin = NULL;
+	FVCardManager = NULL;
+	FPresenceManager = NULL;
 	FRostersModel = NULL;
 	FRostersViewPlugin = NULL;
-	FOptionsManager = NULL;
 
 	FAvatarLabelId = 0;
 	FAvatarsVisible = false;
-	FShowEmptyAvatars = true;
-	FShowGrayAvatars = true;
 	FAvatarSize = QSize(32,32);
 }
 
@@ -79,14 +73,14 @@ bool Avatars::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 	Q_UNUSED(AInitOrder);
 	FPluginManager = APluginManager;
 
-	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
+	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreamManager").value(0,NULL);
 	if (plugin)
 	{
-		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-		if (FXmppStreams)
+		FXmppStreamManager = qobject_cast<IXmppStreamManager *>(plugin->instance());
+		if (FXmppStreamManager)
 		{
-			connect(FXmppStreams->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamOpened(IXmppStream *)));
-			connect(FXmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *)));
+			connect(FXmppStreamManager->instance(),SIGNAL(streamOpened(IXmppStream *)),SLOT(onXmppStreamOpened(IXmppStream *)));
+			connect(FXmppStreamManager->instance(),SIGNAL(streamClosed(IXmppStream *)),SLOT(onXmppStreamClosed(IXmppStream *)));
 		}
 	}
 
@@ -94,21 +88,21 @@ bool Avatars::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 	if (plugin)
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 
-	plugin = APluginManager->pluginInterface("IVCardPlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IVCardManager").value(0,NULL);
 	if (plugin)
 	{
-		FVCardPlugin = qobject_cast<IVCardPlugin *>(plugin->instance());
-		if (FVCardPlugin)
+		FVCardManager = qobject_cast<IVCardManager *>(plugin->instance());
+		if (FVCardManager)
 		{
-			connect(FVCardPlugin->instance(),SIGNAL(vcardReceived(const Jid &)),SLOT(onVCardChanged(const Jid &)));
-			connect(FVCardPlugin->instance(),SIGNAL(vcardPublished(const Jid &)),SLOT(onVCardChanged(const Jid &)));
+			connect(FVCardManager->instance(),SIGNAL(vcardReceived(const Jid &)),SLOT(onVCardChanged(const Jid &)));
+			connect(FVCardManager->instance(),SIGNAL(vcardPublished(const Jid &)),SLOT(onVCardChanged(const Jid &)));
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IPresenceManager").value(0,NULL);
 	if (plugin)
 	{
-		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
+		FPresenceManager = qobject_cast<IPresenceManager *>(plugin->instance());
 	}
 
 	plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
@@ -136,17 +130,11 @@ bool Avatars::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
-	if (plugin)
-	{
-		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
-	}
-
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 	connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 
-	return FVCardPlugin!=NULL;
+	return FVCardManager!=NULL;
 }
 
 bool Avatars::initObjects()
@@ -179,13 +167,6 @@ bool Avatars::initObjects()
 
 bool Avatars::initSettings()
 {
-	Options::setDefaultValue(OPV_ROSTER_AVATARS_SHOW,true);
-	Options::setDefaultValue(OPV_ROSTER_AVATARS_SHOWEMPTY,true);
-	Options::setDefaultValue(OPV_ROSTER_AVATARS_SHOWGRAY,true);
-
-	if (FOptionsManager)
-		FOptionsManager->insertOptionsHolder(this);
-
 	return true;
 }
 
@@ -228,7 +209,7 @@ bool Avatars::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &ASt
 					if (!updateVCardAvatar(contactJid,hash,false))
 					{
 						LOG_STRM_INFO(AStreamJid,QString("Requesting avatar form vCard, jid=%1").arg(contactJid.bare()));
-						FVCardPlugin->requestVCard(AStreamJid,contactJid.bare());
+						FVCardManager->requestVCard(AStreamJid,contactJid.bare());
 					}
 				}
 			}
@@ -249,7 +230,7 @@ bool Avatars::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &ASt
 					LOG_STRM_INFO(AStreamJid,QString("Resource %1 is stopped blocking avatar update notify mechanism").arg(contactJid.resource()));
 					FBlockingResources.remove(AStreamJid,contactJid);
 					if (!FBlockingResources.contains(AStreamJid))
-						FVCardPlugin->requestVCard(AStreamJid,contactJid.bare());
+						FVCardManager->requestVCard(AStreamJid,contactJid.bare());
 				}
 			}
 			else if (!iqUpdate.isNull())
@@ -354,10 +335,10 @@ QVariant Avatars::rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) 
 		{
 		case RDR_AVATAR_IMAGE:
 			{
-				bool gray = FShowGrayAvatars && (AIndex->data(RDR_SHOW).toInt()==IPresence::Offline || AIndex->data(RDR_SHOW).toInt()==IPresence::Error);
+				bool gray = AIndex->data(RDR_SHOW).toInt()==IPresence::Offline || AIndex->data(RDR_SHOW).toInt()==IPresence::Error;
 				QImage avatar = loadAvatarImage(avatarHash(AIndex->data(RDR_FULL_JID).toString()), FAvatarSize, gray);
-				if (avatar.isNull() && FShowEmptyAvatars)
-					avatar = gray ? FGrayEmptyAvatar : FEmptyAvatar;
+				if (avatar.isNull())
+					avatar = gray ? FEmptyGrayAvatar : FEmptyAvatar;
 				return avatar;
 			}
 		case RDR_AVATAR_HASH:
@@ -388,18 +369,6 @@ AdvancedDelegateItem Avatars::rosterLabel(int AOrder, quint32 ALabelId, const IR
 {
 	Q_UNUSED(AOrder); Q_UNUSED(AIndex);
 	return FRostersViewPlugin->rostersView()->registeredLabel(ALabelId);
-}
-
-QMultiMap<int, IOptionsWidget *> Avatars::optionsWidgets(const QString &ANodeId, QWidget *AParent)
-{
-	QMultiMap<int, IOptionsWidget *> widgets;
-	if (FOptionsManager && ANodeId == OPN_ROSTER)
-	{
-		widgets.insertMulti(OWO_ROSTER_AVATARS, FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_AVATARS_SHOW),tr("Show avatars"),AParent));
-		widgets.insertMulti(OWO_ROSTER_AVATARS, FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_AVATARS_SHOWEMPTY),tr("Show empty avatars"),AParent));
-		widgets.insertMulti(OWO_ROSTER_AVATARS, FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_AVATARS_SHOWGRAY),tr("Show grayscaled avatars for offline contacts"),AParent));
-	}
-	return widgets;
 }
 
 QString Avatars::avatarHash(const Jid &AContactJid) const
@@ -454,7 +423,7 @@ bool Avatars::setAvatar(const Jid &AStreamJid, const QByteArray &AData)
 	QString format = getImageFormat(AData);
 	if (AData.isEmpty() || !format.isEmpty())
 	{
-		IVCard *vcard = FVCardPlugin!=NULL ? FVCardPlugin->getVCard(AStreamJid.bare()) : NULL;
+		IVCard *vcard = FVCardManager!=NULL ? FVCardManager->getVCard(AStreamJid.bare()) : NULL;
 		if (vcard)
 		{
 			if (!AData.isEmpty())
@@ -467,7 +436,7 @@ bool Avatars::setAvatar(const Jid &AStreamJid, const QByteArray &AData)
 				vcard->setValueForTags(VVN_PHOTO_VALUE,QString::null);
 				vcard->setValueForTags(VVN_PHOTO_TYPE,QString::null);
 			}
-			if (FVCardPlugin->publishVCard(AStreamJid,vcard))
+			if (FVCardManager->publishVCard(AStreamJid,vcard))
 			{
 				published = true;
 				LOG_STRM_INFO(AStreamJid,"Published self avatar in vCard");
@@ -513,7 +482,7 @@ QString Avatars::setCustomPictire(const Jid &AContactJid, const QByteArray &ADat
 
 QImage Avatars::emptyAvatarImage(const QSize &AMaxSize, bool AGray) const
 {
-	QImage image = AGray ? FGrayEmptyAvatar : FEmptyAvatar;
+	QImage image = AGray ? FEmptyGrayAvatar : FEmptyAvatar;
 	if (AMaxSize.isValid() && (image.height()>AMaxSize.height() || image.width()>AMaxSize.width()))
 		image = image.scaled(AMaxSize,Qt::KeepAspectRatio,Qt::SmoothTransformation);
 	return image;
@@ -525,7 +494,7 @@ QImage Avatars::loadAvatarImage(const QString &AHash, const QSize &AMaxSize, boo
 	QString fileName = avatarFileName(AHash);
 	if (!fileName.isEmpty() && QFile::exists(fileName))
 	{
-		QMap<QSize,QImage> &images = AGray ? FGrayAvatarImages[AHash] : FAvatarImages[AHash];
+		QMap<QSize,QImage> &images = AGray ? FAvatarGrayImages[AHash] : FAvatarImages[AHash];
 		if (!images.contains(AMaxSize))
 		{
 			if (image.load(fileName))
@@ -581,7 +550,7 @@ bool Avatars::saveToFile(const QString &AFileName, const QByteArray &AData) cons
 		if (file.open(QFile::WriteOnly|QFile::Truncate))
 		{
 			file.write(AData);
-			file.flush();
+			file.close();
 			return true;
 		}
 		else
@@ -594,9 +563,9 @@ bool Avatars::saveToFile(const QString &AFileName, const QByteArray &AData) cons
 
 QByteArray Avatars::loadAvatarFromVCard(const Jid &AContactJid) const
 {
-	if (FVCardPlugin)
+	if (FVCardManager)
 	{
-		QFile file(FVCardPlugin->vcardFileName(AContactJid.bare()));
+		QFile file(FVCardManager->vcardFileName(AContactJid.bare()));
 		if (file.open(QFile::ReadOnly))
 		{
 			QString xmlError;
@@ -623,7 +592,7 @@ QByteArray Avatars::loadAvatarFromVCard(const Jid &AContactJid) const
 
 void Avatars::updatePresence(const Jid &AStreamJid) const
 {
-	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
+	IPresence *presence = FPresenceManager!=NULL ? FPresenceManager->findPresence(AStreamJid) : NULL;
 	if (presence && presence->isOpen())
 		presence->setPresence(presence->show(),presence->status(),presence->priority());
 }
@@ -734,9 +703,9 @@ bool Avatars::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 	return !ASelected.isEmpty();
 }
 
-void Avatars::onStreamOpened(IXmppStream *AXmppStream)
+void Avatars::onXmppStreamOpened(IXmppStream *AXmppStream)
 {
-	if (FStanzaProcessor && FVCardPlugin)
+	if (FStanzaProcessor && FVCardManager)
 	{
 		IStanzaHandle shandle;
 		shandle.handler = this;
@@ -759,18 +728,18 @@ void Avatars::onStreamOpened(IXmppStream *AXmppStream)
 	}
 	FStreamAvatars.insert(AXmppStream->streamJid(),UNKNOWN_AVATAR);
 
-	if (FVCardPlugin)
+	if (FVCardManager)
 	{
-		if (FVCardPlugin->requestVCard(AXmppStream->streamJid(),AXmppStream->streamJid().bare()))
+		if (FVCardManager->requestVCard(AXmppStream->streamJid(),AXmppStream->streamJid().bare()))
 			LOG_STRM_INFO(AXmppStream->streamJid(),"Load self avatar from vCard request sent");
 		else
 			LOG_STRM_WARNING(AXmppStream->streamJid(),"Failed to send load self avatar from vCard");
 	}
 }
 
-void Avatars::onStreamClosed(IXmppStream *AXmppStream)
+void Avatars::onXmppStreamClosed(IXmppStream *AXmppStream)
 {
-	if (FStanzaProcessor && FVCardPlugin)
+	if (FStanzaProcessor && FVCardManager)
 	{
 		FStanzaProcessor->removeStanzaHandle(FSHIPresenceIn.take(AXmppStream->streamJid()));
 		FStanzaProcessor->removeStanzaHandle(FSHIPresenceOut.take(AXmppStream->streamJid()));
@@ -915,7 +884,7 @@ void Avatars::onClearAvatarByAction(bool)
 void Avatars::onIconStorageChanged()
 {
 	FEmptyAvatar = QImage(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->fileFullName(MNI_AVATAR_EMPTY)).scaled(FAvatarSize,Qt::KeepAspectRatio,Qt::FastTransformation);
-	FGrayEmptyAvatar = ImageManager::opacitized(ImageManager::grayscaled(FEmptyAvatar));
+	FEmptyGrayAvatar = ImageManager::opacitized(ImageManager::grayscaled(FEmptyAvatar));
 }
 
 void Avatars::onOptionsOpened()
@@ -932,9 +901,7 @@ void Avatars::onOptionsOpened()
 			++it;
 	}
 
-	onOptionsChanged(Options::node(OPV_ROSTER_AVATARS_SHOW));
-	onOptionsChanged(Options::node(OPV_ROSTER_AVATARS_SHOWEMPTY));
-	onOptionsChanged(Options::node(OPV_ROSTER_AVATARS_SHOWGRAY));
+	onOptionsChanged(Options::node(OPV_ROSTER_VIEWMODE));
 }
 
 void Avatars::onOptionsClosed()
@@ -952,20 +919,10 @@ void Avatars::onOptionsClosed()
 
 void Avatars::onOptionsChanged(const OptionsNode &ANode)
 {
-	if (ANode.path() == OPV_ROSTER_AVATARS_SHOW)
+	if (ANode.path() == OPV_ROSTER_VIEWMODE)
 	{
-		FAvatarsVisible = ANode.value().toBool();
+		FAvatarsVisible = ANode.value().toInt() == IRostersView::ViewFull;
 		emit rosterLabelChanged(FAvatarLabelId,NULL);
-	}
-	else if (ANode.path() == OPV_ROSTER_AVATARS_SHOWEMPTY)
-	{
-		FShowEmptyAvatars = ANode.value().toBool();
-		updateDataHolder();
-	}
-	else if (ANode.path() == OPV_ROSTER_AVATARS_SHOWGRAY)
-	{
-		FShowGrayAvatars = ANode.value().toBool();
-		updateDataHolder();
 	}
 }
 

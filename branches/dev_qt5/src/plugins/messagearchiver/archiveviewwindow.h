@@ -8,11 +8,11 @@
 #include <QSortFilterProxyModel>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagearchiver.h>
-#include <interfaces/iroster.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/irostermanager.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/imetacontacts.h>
 #include <interfaces/istatusicons.h>
-#include <interfaces/imessagestyles.h>
+#include <interfaces/imessagestylemanager.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/imessageprocessor.h>
 #include <interfaces/ifilemessagearchive.h>
@@ -72,14 +72,12 @@ class ArchiveViewWindow :
 {
 	Q_OBJECT;
 public:
-	ArchiveViewWindow(IPluginManager *APluginManager, IMessageArchiver *AArchiver, const QMultiMap<Jid,Jid> &AAddresses, QWidget *AParent = NULL);
+	ArchiveViewWindow(IMessageArchiver *AArchiver, const QMultiMap<Jid,Jid> &AAddresses, QWidget *AParent = NULL);
 	~ArchiveViewWindow();
 	QMultiMap<Jid,Jid> addresses() const;
 	void setAddresses(const QMultiMap<Jid,Jid> &AAddresses);
 protected:
-	void initialize(IPluginManager *APluginManager);
 	void reset();
-protected:
 	Jid gatewayJid(const Jid &AContactJid) const;
 	bool isConferencePrivateChat(const Jid &AWith) const;
 	bool isJidMatched(const Jid &ARequestWith, const Jid &AHeaderWith) const;
@@ -116,8 +114,8 @@ protected:
 	ArchiveHeader loadingCollectionHeader() const;
 	void showCollection(const ArchiveCollection &ACollection);
 	QString showInfo(const ArchiveCollection &ACollection);
-	QString showNote(const QString &ANote, const IMessageContentOptions &AOptions);
-	QString showMessage(const Message &AMessage, const IMessageContentOptions &AOptions);
+	QString showNote(const QString &ANote, const IMessageStyleContentOptions &AOptions);
+	QString showMessage(const Message &AMessage, const IMessageStyleContentOptions &AOptions);
 protected slots:
 	void onArchiveSearchStart();
 	void onTextHilightTimerTimeout();
@@ -144,7 +142,7 @@ protected slots:
 	void onArchiveCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection);
 	void onArchiveCollectionsRemoved(const QString &AId, const IArchiveRequest &ARequest);
 protected slots:
-	void onRosterRemoved(IRoster *ARoster);
+	void onRosterActiveChanged(IRoster *ARoster, bool AActive);
 	void onRosterStreamJidChanged(IRoster *ARoster, const Jid &ABefore);
 private:
 	Ui::ArchiveViewWindowClass ui;
@@ -152,11 +150,11 @@ private:
 	IMessageArchiver *FArchiver;
 	IStatusIcons *FStatusIcons;
 	IMetaContacts *FMetaContacts;
-	IRosterPlugin *FRosterPlugin;
+	IRosterManager *FRosterManager;
 	IUrlProcessor *FUrlProcessor;
-	IMessageStyles *FMessageStyles;
 	IMessageProcessor *FMessageProcessor;
 	IFileMessageArchive *FFileMessageArchive;
+	IMessageStyleManager *FMessageStyleManager;
 private:
 	QLabel *FExportLabel;
 	QLabel *FHeaderActionLabel;

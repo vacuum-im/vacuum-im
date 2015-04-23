@@ -41,14 +41,6 @@
         <translation>Return</translation>
     </message>
     <message>
-        <source>Clear window</source>
-        <translation>Clear window</translation>
-    </message>
-    <message>
-        <source>Load messages from history in new chat windows</source>
-        <translation>Load messages from history in new chat windows</translation>
-    </message>
-    <message>
         <source>When receiving new chat message</source>
         <translation>When receiving new chat message</translation>
     </message>
@@ -67,10 +59,6 @@
     <message>
         <source>&lt;Absent&gt;</source>
         <translation>&lt;Absent&gt;</translation>
-    </message>
-    <message>
-        <source>When receiving new chat message in current chat window</source>
-        <translation>When receiving new chat message in current chat window</translation>
     </message>
 </context>
 </TS>

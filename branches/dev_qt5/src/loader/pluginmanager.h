@@ -48,8 +48,8 @@ public:
 	virtual IPlugin* pluginInstance(const QUuid &AUuid) const;
 	virtual QList<IPlugin *> pluginInterface(const QString &AInterface = QString::null) const;
 	virtual const IPluginInfo *pluginInfo(const QUuid &AUuid) const;
-	virtual QList<QUuid> pluginDependencesOn(const QUuid &AUuid) const;
-	virtual QList<QUuid> pluginDependencesFor(const QUuid &AUuid) const;
+	virtual QSet<QUuid> pluginDependencesOn(const QUuid &AUuid) const;
+	virtual QSet<QUuid> pluginDependencesFor(const QUuid &AUuid) const;
 public slots:
 	virtual void quit();
 	virtual void restart();

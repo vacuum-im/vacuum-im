@@ -181,7 +181,7 @@ void HunspellChecker::savePersonalDict(const QString &AWord)
 		{
 			file.write(AWord.toUtf8());
 			file.write("\n");
-			file.flush();
+			file.close();
 		}
 		else
 		{

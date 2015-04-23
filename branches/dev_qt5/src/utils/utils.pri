@@ -30,7 +30,9 @@ HEADERS  = utilsexport.h \
            filecookiejar.h \
            boxwidget.h \
            splitterwidget.h \
-           logger.h
+           logger.h \
+           pluginhelper.h \
+           passworddialog.h
 
 SOURCES  = jid.cpp \
            versionparser.cpp \
@@ -63,7 +65,9 @@ SOURCES  = jid.cpp \
            filecookiejar.cpp \
            boxwidget.cpp \
            splitterwidget.cpp \
-           logger.cpp
+           logger.cpp \
+           pluginhelper.cpp \
+           passworddialog.cpp
 
 unix:!mac:!haiku {
   HEADERS += x11info.h

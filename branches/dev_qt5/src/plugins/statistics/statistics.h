@@ -15,10 +15,10 @@ class Statistics :
 	public QObject,
 	public IPlugin,
 	public IStatistics,
-	public IOptionsHolder
+	public IOptionsDialogHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IStatistics IOptionsHolder);
+	Q_INTERFACES(IPlugin IStatistics IOptionsDialogHolder);
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.Statistics");
 public:
 	Statistics();
@@ -32,7 +32,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	// IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	// IStatistics
 	virtual QUuid profileId() const;
 	virtual bool isValidHit(const IStatisticsHit &AHit) const;

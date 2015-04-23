@@ -2,25 +2,21 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ru" sourcelanguage="en">
 <context>
-    <name>FileArchiveOptions</name>
+    <name>FileArchiveOptionsClass</name>
     <message>
-        <source>Select the location for the file archive</source>
-        <translation>Выберите расположение для файлового архива</translation>
+        <source>Synchronize archive database at startup</source>
+        <translation>Синхронизировать базу данных истории при каждом запуске</translation>
+    </message>
+    <message>
+        <source>Move history to:</source>
+        <translation>Переместить историю в:</translation>
     </message>
 </context>
 <context>
-    <name>FileArchiveOptionsClass</name>
+    <name>FileArchiveOptionsWidget</name>
     <message>
-        <source>Change the location of the file archive (restart required)</source>
-        <translation>Изменить расположение файлового архива (требуется перезапуск)</translation>
-    </message>
-    <message>
-        <source>Location:</source>
-        <translation>Расположение:</translation>
-    </message>
-    <message>
-        <source>Update archive database at startup</source>
-        <translation>Обновлять базу данных архива при старте</translation>
+        <source>Select the location for the file archive</source>
+        <translation>Выберите расположение для файлового архива</translation>
     </message>
 </context>
 <context>

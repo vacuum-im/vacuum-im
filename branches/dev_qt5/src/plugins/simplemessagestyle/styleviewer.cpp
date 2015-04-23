@@ -6,6 +6,7 @@
 
 StyleViewer::StyleViewer(QWidget *AParent) : AnimatedTextBrowser(AParent)
 {
+	setAnimated(true);
 	setOpenLinks(false);
 	setAcceptDrops(false);
 	setUndoRedoEnabled(false);

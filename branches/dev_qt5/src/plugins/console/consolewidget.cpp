@@ -8,6 +8,7 @@
 #include <definitions/menuicons.h>
 #include <definitions/xmppstanzahandlerorders.h>
 #include <utils/widgetmanager.h>
+#include <utils/pluginhelper.h>
 #include <utils/iconstorage.h>
 #include <utils/options.h>
 #include <utils/logger.h>
@@ -15,20 +16,40 @@
 #define MAX_HILIGHT_ITEMS            10
 #define TEXT_SEARCH_TIMEOUT          500
 
-ConsoleWidget::ConsoleWidget(IPluginManager *APluginManager, QWidget *AParent) : QWidget(AParent)
+ConsoleWidget::ConsoleWidget(QWidget *AParent) : QWidget(AParent)
 {
 	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_CONSOLE,0,0,"windowIcon");
 
-	FXmppStreams = NULL;
-	FStanzaProcessor = NULL;
-	
 	FSearchMoveCursor = false;
 
 	ui.cmbStreamJid->addItem(tr("<All Streams>"));
-	initialize(APluginManager);
+
+	FXmppStreamManager = PluginHelper::pluginInstance<IXmppStreamManager>();
+	if (FXmppStreamManager)
+	{
+		foreach(IXmppStream *stream, FXmppStreamManager->xmppStreams())
+			onXmppStreamCreated(stream);
+
+		connect(FXmppStreamManager->instance(), SIGNAL(streamCreated(IXmppStream *)), SLOT(onXmppStreamCreated(IXmppStream *)));
+		connect(FXmppStreamManager->instance(), SIGNAL(streamJidChanged(IXmppStream *, const Jid &)), SLOT(onXmppStreamJidChanged(IXmppStream *, const Jid &)));
+		connect(FXmppStreamManager->instance(), SIGNAL(streamDestroyed(IXmppStream *)), SLOT(onXmppStreamDestroyed(IXmppStream *)));
+	}
+
+	FStanzaProcessor = PluginHelper::pluginInstance<IStanzaProcessor>();
+	if (FStanzaProcessor)
+	{
+		foreach(int shandleId, FStanzaProcessor->stanzaHandles())
+			onStanzaHandleInserted(shandleId,FStanzaProcessor->stanzaHandle(shandleId));
+
+		connect(FStanzaProcessor->instance(),SIGNAL(stanzaHandleInserted(int, const IStanzaHandle &)),SLOT(onStanzaHandleInserted(int, const IStanzaHandle &)));
+		ui.cmbCondition->clearEditText();
+	}
+
+	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
+	connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
 
 	if (!Options::isNull())
 		onOptionsOpened();
@@ -70,7 +91,7 @@ ConsoleWidget::ConsoleWidget(IPluginManager *APluginManager, QWidget *AParent) :
 
 ConsoleWidget::~ConsoleWidget()
 {
-	foreach(IXmppStream *stream, FXmppStreams->xmppStreams())
+	foreach(IXmppStream *stream, FXmppStreamManager->xmppStreams())
 		stream->removeXmppStanzaHandler(XSHO_CONSOLE,this);
 	if (!Options::isNull())
 		onOptionsClosed();
@@ -88,40 +109,6 @@ bool ConsoleWidget::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int
 	if (AOrder == XSHO_CONSOLE)
 		showElement(AXmppStream,AStanza.element(),true);
 	return false;
-}
-
-void ConsoleWidget::initialize(IPluginManager *APluginManager)
-{
-	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
-	if (plugin)
-	{
-		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-		if (FXmppStreams)
-		{
-			foreach(IXmppStream *stream, FXmppStreams->xmppStreams())
-				onStreamCreated(stream);
-
-			connect(FXmppStreams->instance(), SIGNAL(created(IXmppStream *)), SLOT(onStreamCreated(IXmppStream *)));
-			connect(FXmppStreams->instance(), SIGNAL(jidChanged(IXmppStream *, const Jid &)), SLOT(onStreamJidChanged(IXmppStream *, const Jid &)));
-			connect(FXmppStreams->instance(), SIGNAL(streamDestroyed(IXmppStream *)), SLOT(onStreamDestroyed(IXmppStream *)));
-		}
-	}
-
-	plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
-	if (plugin)
-	{
-		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
-		if (FStanzaProcessor)
-		{
-			foreach(int shandleId, FStanzaProcessor->stanzaHandles())
-				onStanzaHandleInserted(shandleId,FStanzaProcessor->stanzaHandle(shandleId));
-			connect(FStanzaProcessor->instance(),SIGNAL(stanzaHandleInserted(int, const IStanzaHandle &)),SLOT(onStanzaHandleInserted(int, const IStanzaHandle &)));
-			ui.cmbCondition->clearEditText();
-		}
-	}
-
-	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
-	connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
 }
 
 void ConsoleWidget::loadContext(const QUuid &AContextId)
@@ -248,13 +235,13 @@ void ConsoleWidget::onRemoveConditionClicked()
 void ConsoleWidget::onSendXMLClicked()
 {
 	QDomDocument doc;
-	if (FXmppStreams!=NULL && doc.setContent(ui.tedSendXML->toPlainText(),true))
+	if (FXmppStreamManager!=NULL && doc.setContent(ui.tedSendXML->toPlainText(),true))
 	{
 		Stanza stanza(doc.documentElement());
 		if (stanza.isValid())
 		{
 			ui.tbrConsole->append("<b>"+tr("Start sending user stanza...")+"</b><br>");
-			foreach(IXmppStream *stream, FXmppStreams->xmppStreams())
+			foreach(IXmppStream *stream, FXmppStreamManager->xmppStreams())
 				if (ui.cmbStreamJid->currentIndex()==0 || stream->streamJid()==ui.cmbStreamJid->itemData(ui.cmbStreamJid->currentIndex()).toString())
 					stream->sendStanza(stanza);
 			ui.tbrConsole->append("<b>"+tr("User stanza sent.")+"</b><br>");
@@ -408,13 +395,13 @@ void ConsoleWidget::onTextSearchTextChanged(const QString &AText)
 	FSearchMoveCursor = true;
 }
 
-void ConsoleWidget::onStreamCreated(IXmppStream *AXmppStream)
+void ConsoleWidget::onXmppStreamCreated(IXmppStream *AXmppStream)
 {
 	ui.cmbStreamJid->addItem(AXmppStream->streamJid().uFull(),AXmppStream->streamJid().pFull());
 	AXmppStream->insertXmppStanzaHandler(XSHO_CONSOLE,this);
 }
 
-void ConsoleWidget::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore)
+void ConsoleWidget::onXmppStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore)
 {
 	int index = ui.cmbStreamJid->findData(ABefore.pFull());
 	if (index >= 0)
@@ -424,7 +411,7 @@ void ConsoleWidget::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABef
 	}
 }
 
-void ConsoleWidget::onStreamDestroyed(IXmppStream *AXmppStream)
+void ConsoleWidget::onXmppStreamDestroyed(IXmppStream *AXmppStream)
 {
 	ui.cmbStreamJid->removeItem(ui.cmbStreamJid->findData(AXmppStream->streamJid().pFull()));
 	AXmppStream->removeXmppStanzaHandler(XSHO_CONSOLE,this);

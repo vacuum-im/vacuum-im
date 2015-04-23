@@ -28,10 +28,6 @@
         <translation>Strumień z takim samym ID już istnieje</translation>
     </message>
     <message>
-        <source>Data Streams</source>
-        <translation>Strumienie danych</translation>
-    </message>
-    <message>
         <source>&lt;Default Profile&gt;</source>
         <translation>&lt;Profil domyślny&gt;</translation>
     </message>
@@ -47,43 +43,13 @@
         <source>Invalid stream initiation response</source>
         <translation>Błędna odpowiedź przy tworzeniu strumienia</translation>
     </message>
-</context>
-<context>
-    <name>DataStreamsOptions</name>
     <message>
-        <source>Add Profile</source>
-        <translation>Dodaj profil</translation>
+        <source>Data Transfer</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enter profile name:</source>
-        <translation>Wprowadź nazwę profilu:</translation>
-    </message>
-    <message>
-        <source>Delete Profile</source>
-        <translation>Usuń profil</translation>
-    </message>
-    <message>
-        <source>Do you really want to delete a current data streams profile?</source>
-        <translation>Jesteś pewien, że chcesz usunąć bieżący profil?</translation>
-    </message>
-</context>
-<context>
-    <name>DataStreamsOptionsClass</name>
-    <message>
-        <source>Data Streams Profiles</source>
-        <translation>Profile strumieni danych</translation>
-    </message>
-    <message>
-        <source>Profile:</source>
-        <translation>Profil:</translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation>Dodaj</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>Usuń</translation>
+        <source>Transfer method %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

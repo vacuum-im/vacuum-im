@@ -1,13 +1,13 @@
 FORMS = vcarddialog.ui \
         edititemdialog.ui
 
-HEADERS = vcardplugin.h \
+HEADERS = vcardmanager.h \
           vcard.h \
           prixmapframe.h \
           vcarddialog.h \
           edititemdialog.h
 
-SOURCES = vcardplugin.cpp \
+SOURCES = vcardmanager.cpp \
           vcard.cpp \
           prixmapframe.cpp \
           vcarddialog.cpp \

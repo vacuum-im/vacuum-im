@@ -1,2 +1,2 @@
-set(SOURCES saslsession.cpp saslbind.cpp saslauth.cpp saslplugin.cpp )
-set(HEADERS saslsession.h saslauth.h saslbind.h saslplugin.h )
+set(SOURCES saslsessionfeature.cpp saslbindfeature.cpp saslauthfeature.cpp saslfeaturefactory.cpp )
+set(HEADERS saslsessionfeature.h saslauthfeature.h saslbindfeature.h saslfeaturefactory.h )

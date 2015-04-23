@@ -4,9 +4,9 @@
 #include <QTimer>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ibirthdayreminder.h>
-#include <interfaces/ivcard.h>
-#include <interfaces/iroster.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/ivcardmanager.h>
+#include <interfaces/irostermanager.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/iavatars.h>
 #include <interfaces/inotifications.h>
 #include <interfaces/irostersmodel.h>
@@ -52,9 +52,9 @@ protected slots:
 	void onOptionsClosed();
 private:
 	IAvatars *FAvatars;
-	IVCardPlugin *FVCardPlugin;
-	IRosterPlugin *FRosterPlugin;
-	IPresencePlugin *FPresencePlugin;
+	IVCardManager *FVCardManager;
+	IRosterManager *FRosterManager;
+	IPresenceManager *FPresenceManager;
 	IRostersModel *FRostersModel;
 	INotifications *FNotifications;
 	IRostersViewPlugin *FRostersViewPlugin;

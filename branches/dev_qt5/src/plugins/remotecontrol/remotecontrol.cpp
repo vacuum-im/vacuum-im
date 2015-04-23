@@ -47,7 +47,7 @@ RemoteControl::RemoteControl()
 {
 	FCommands = NULL;
 	FStatusChanger = NULL;
-	FMultiUserChatPlugin = NULL;
+	FMultiChatManager = NULL;
 	FDataForms = NULL;
 	FFileStreamManager = NULL;
 	FMessageProcessor = NULL;
@@ -94,10 +94,10 @@ bool RemoteControl::initConnections(IPluginManager *APluginManager, int &AInitOr
 		FStatusChanger = qobject_cast<IStatusChanger *>(plugin->instance());
 	}
 	
-	plugin = APluginManager->pluginInterface("IMultiUserChatPlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IMultiUserChatManager").value(0,NULL);
 	if (plugin)
 	{
-		FMultiUserChatPlugin = qobject_cast<IMultiUserChatPlugin *>(plugin->instance());
+		FMultiChatManager = qobject_cast<IMultiUserChatManager *>(plugin->instance());
 	}
 	
 	plugin = APluginManager->pluginInterface("IFileStreamsManager").value(0,NULL);
@@ -138,7 +138,7 @@ bool RemoteControl::initObjects()
 			FCommands->insertServer(COMMAND_NODE_SET_STATUS, this);
 			FCommands->insertServer(COMMAND_NODE_SET_MAIN_STATUS, this);
 		}
-		if (FDataForms && FMultiUserChatPlugin)
+		if (FDataForms && FMultiChatManager)
 		{
 			FCommands->insertServer(COMMAND_NODE_LEAVE_MUC, this);
 		}
@@ -387,7 +387,7 @@ bool RemoteControl::processSetStatus(const ICommandRequest &ARequest)
 
 bool RemoteControl::processLeaveMUC(const ICommandRequest &ARequest)
 {
-	if (FCommands && FDataForms && FMultiUserChatPlugin)
+	if (FCommands && FDataForms && FMultiChatManager)
 	{
 		ICommandResult result = FCommands->prepareResult(ARequest);
 		if (ARequest.action==COMMAND_ACTION_EXECUTE && ARequest.form.fields.isEmpty())
@@ -410,7 +410,7 @@ bool RemoteControl::processLeaveMUC(const ICommandRequest &ARequest)
 			field.required = true;
 
 			IDataOption opt;
-			foreach(IMultiUserChat* muc, FMultiUserChatPlugin->multiUserChats())
+			foreach(IMultiUserChat* muc, FMultiChatManager->multiUserChats())
 			{
 				if (muc->isConnected() && muc->streamJid()==ARequest.streamJid)
 				{
@@ -445,7 +445,7 @@ bool RemoteControl::processLeaveMUC(const ICommandRequest &ARequest)
 			{
 				foreach(const QString &roomJid, ARequest.form.fields.value(index).value.toStringList())
 				{
-					IMultiUserChatWindow *window = FMultiUserChatPlugin->findMultiChatWindow(ARequest.streamJid, roomJid);
+					IMultiUserChatWindow *window = FMultiChatManager->findMultiChatWindow(ARequest.streamJid, roomJid);
 					if (window != NULL)
 						window->exitAndDestroy(tr("Remote command to leave"));
 				}
@@ -724,7 +724,7 @@ QList<Message> RemoteControl::notifiedMessages(const Jid &AStreamJid, const Jid 
 			{
 				if (message.type()!=Message::Error && !message.body().isEmpty())
 				{
-					if (FMultiUserChatPlugin==NULL || FMultiUserChatPlugin->findMultiUserChat(AStreamJid,Jid(message.from()).bare())==NULL)
+					if (FMultiChatManager==NULL || FMultiChatManager->findMultiUserChat(AStreamJid,Jid(message.from()).bare())==NULL)
 					{
 						if (AContactJid.isEmpty() || AContactJid==message.from())
 							messages.append(message);

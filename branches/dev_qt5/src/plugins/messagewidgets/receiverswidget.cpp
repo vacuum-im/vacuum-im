@@ -9,6 +9,7 @@
 #include <definitions/rosterindexkinds.h>
 #include <definitions/rosterindexkindorders.h>
 #include <utils/advanceditemdelegate.h>
+#include <utils/pluginhelper.h>
 #include <utils/options.h>
 
 #define ADR_ITEMS                  Action::DR_Parametr1
@@ -88,12 +89,32 @@ ReceiversWidget::ReceiversWidget(IMessageWidgets *AMessageWidgets, IMessageWindo
 	FWindow = AWindow;
 	FMessageWidgets = AMessageWidgets;
 
-	FStatusIcons = NULL;
-	FRostersModel = NULL;
-	FRosterPlugin = NULL;
-	FPresencePlugin = NULL;
-	FAccountManager = NULL;
-	FMessageProcessor = NULL;
+	FPresenceManager = PluginHelper::pluginInstance<IPresenceManager>();
+	if (FPresenceManager)
+	{
+		connect(FPresenceManager->instance(),SIGNAL(presenceOpened(IPresence *)),SLOT(onPresenceOpened(IPresence *)));
+		connect(FPresenceManager->instance(),SIGNAL(presenceClosed(IPresence *)),SLOT(onPresenceClosed(IPresence *)));
+		connect(FPresenceManager->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
+			SLOT(onPresenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)));
+	}
+
+	FRosterManager = PluginHelper::pluginInstance<IRosterManager>();
+	if (FRosterManager)
+	{
+		connect(FRosterManager->instance(),SIGNAL(rosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)),
+			SLOT(onRosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)));
+	}
+
+	FMessageProcessor = PluginHelper::pluginInstance<IMessageProcessor>();
+	if (FMessageProcessor)
+	{
+		connect(FMessageProcessor->instance(),SIGNAL(activeStreamAppended(const Jid &)),SLOT(onActiveStreamAppended(const Jid &)));
+		connect(FMessageProcessor->instance(),SIGNAL(activeStreamRemoved(const Jid &)),SLOT(onActiveStreamRemoved(const Jid &)));
+	}
+
+	FStatusIcons = PluginHelper::pluginInstance<IStatusIcons>();
+	FRostersModel = PluginHelper::pluginInstance<IRostersModel>();
+	FAccountManager = PluginHelper::pluginInstance<IAccountManager>();
 
 	AdvancedItemDelegate *itemDelegate = new AdvancedItemDelegate(this);
 	itemDelegate->setItemsRole(RDR_LABEL_ITEMS);
@@ -114,7 +135,6 @@ ReceiversWidget::ReceiversWidget(IMessageWidgets *AMessageWidgets, IMessageWindo
 	FSelectionSignalTimer.setInterval(0);
 	connect(&FSelectionSignalTimer,SIGNAL(timeout()),SIGNAL(addressSelectionChanged()));
 
-	initialize();
 	qRegisterMetaType< QList<QStandardItem *> >("QList<QStandardItem *>");
 
 	foreach(const Jid &streamJid, FMessageProcessor!=NULL ? FMessageProcessor->activeStreams() : QList<Jid>())
@@ -305,60 +325,14 @@ void ReceiversWidget::clearSelection()
 
 void ReceiversWidget::initialize()
 {
-	IPlugin *plugin = FMessageWidgets->pluginManager()->pluginInterface("IPresencePlugin").value(0,NULL);
-	if (plugin)
-	{
-		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
-		if (FPresencePlugin)
-		{
-			connect(FPresencePlugin->instance(),SIGNAL(presenceOpened(IPresence *)),SLOT(onPresenceOpened(IPresence *)));
-			connect(FPresencePlugin->instance(),SIGNAL(presenceClosed(IPresence *)),SLOT(onPresenceClosed(IPresence *)));
-			connect(FPresencePlugin->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
-				SLOT(onPresenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)));
-		}
-	}
-
-	plugin = FMessageWidgets->pluginManager()->pluginInterface("IRosterPlugin").value(0,NULL);
-	if (plugin)
-	{
-		FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
-		if (FRosterPlugin)
-		{
-			connect(FRosterPlugin->instance(),SIGNAL(rosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)),
-				SLOT(onRosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)));
-		}
-	}
-
-	plugin = FMessageWidgets->pluginManager()->pluginInterface("IMessageProcessor").value(0,NULL);
-	if (plugin)
-	{
-		FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
-		if (FMessageProcessor)
-		{
-			connect(FMessageProcessor->instance(),SIGNAL(activeStreamAppended(const Jid &)),SLOT(onActiveStreamAppended(const Jid &)));
-			connect(FMessageProcessor->instance(),SIGNAL(activeStreamRemoved(const Jid &)),SLOT(onActiveStreamRemoved(const Jid &)));
-		}
-	}
-
-	plugin = FMessageWidgets->pluginManager()->pluginInterface("IStatusIcons").value(0,NULL);
-	if (plugin)
-		FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
-
-	plugin = FMessageWidgets->pluginManager()->pluginInterface("IRostersModel").value(0,NULL);
-	if (plugin)
-		FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
-
-	plugin = FMessageWidgets->pluginManager()->pluginInterface("IAccountManager").value(0,NULL);
-	if (plugin)
-		FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
 }
 
 void ReceiversWidget::createStreamItems(const Jid &AStreamJid)
 {
 	if (getStreamItem(AStreamJid))
 	{
-		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
-		foreach(const IRosterItem &ritem, roster!=NULL ? roster->rosterItems() : QList<IRosterItem>())
+		IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(AStreamJid) : NULL;
+		foreach(const IRosterItem &ritem, roster!=NULL ? roster->items() : QList<IRosterItem>())
 			onRosterItemReceived(roster,ritem,IRosterItem());
 	}
 }
@@ -400,7 +374,7 @@ QStandardItem *ReceiversWidget::getStreamItem(const Jid &AStreamJid)
 		streamItem->setBackground(ui.trvReceivers->palette().color(QPalette::Active, QPalette::Dark));
 		streamItem->setForeground(ui.trvReceivers->palette().color(QPalette::Active, QPalette::BrightText));
 
-		IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
+		IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(AStreamJid) : NULL;
 		streamItem->setText(account!=NULL ? account->name() : AStreamJid.uBare());
 
 		FModel->invisibleRootItem()->appendRow(streamItem);
@@ -510,8 +484,8 @@ void ReceiversWidget::updateCheckState(QStandardItem *AItem)
 
 void ReceiversWidget::updateContactItemsPresence(const Jid &AStreamJid, const Jid &AContactJid)
 {
-	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
-	IPresenceItem pitem = presence!=NULL ? FPresencePlugin->sortPresenceItems(presence->findItems(AContactJid.bare())).value(0) : IPresenceItem();
+	IPresence *presence = FPresenceManager!=NULL ? FPresenceManager->findPresence(AStreamJid) : NULL;
+	IPresenceItem pitem = presence!=NULL ? FPresenceManager->sortPresenceItems(presence->findItems(AContactJid)).value(0) : IPresenceItem();
 	foreach(QStandardItem *contactItem, findContactItems(AStreamJid,AContactJid))
 	{
 		contactItem->setData(pitem.show,RDR_SHOW);
@@ -879,14 +853,14 @@ void ReceiversWidget::onViewModelRowsInserted(const QModelIndex &AParent, int AS
 
 void ReceiversWidget::onActiveStreamAppended(const Jid &AStreamJid)
 {
-	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
+	IPresence *presence = FPresenceManager!=NULL ? FPresenceManager->findPresence(AStreamJid) : NULL;
 	if (presence && presence->isOpen())
 		onPresenceOpened(presence);
 }
 
 void ReceiversWidget::onActiveStreamRemoved(const Jid &AStreamJid)
 {
-	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
+	IPresence *presence = FPresenceManager!=NULL ? FPresenceManager->findPresence(AStreamJid) : NULL;
 	if (presence)
 		onPresenceClosed(presence);
 }

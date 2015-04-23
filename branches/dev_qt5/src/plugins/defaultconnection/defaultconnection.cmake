@@ -1,3 +1,3 @@
-set(SOURCES connectionoptionswidget.cpp defaultconnection.cpp defaultconnectionplugin.cpp )
-set(HEADERS defaultconnection.h defaultconnectionplugin.h connectionoptionswidget.h )
+set(SOURCES connectionoptionswidget.cpp defaultconnection.cpp defaultconnectionengine.cpp)
+set(HEADERS connectionoptionswidget.h defaultconnection.h defaultconnectionengine.h)
 set(UIS connectionoptionswidget.ui )

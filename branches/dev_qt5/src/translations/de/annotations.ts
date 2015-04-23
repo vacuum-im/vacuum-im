@@ -16,10 +16,6 @@
         <translation>Erlaubt das Hinzufügen von Kommentaren zu Kontakten im Roster</translation>
     </message>
     <message>
-        <source>Edit annotation</source>
-        <translation>Bearbeite Kommentar</translation>
-    </message>
-    <message>
         <source>&lt;b&gt;Annotation:&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>

@@ -16,10 +16,6 @@
         <translation>Permite añadir comentarios a los contactos en la lista</translation>
     </message>
     <message>
-        <source>Edit annotation</source>
-        <translation>Editar comentario</translation>
-    </message>
-    <message>
         <source>&lt;b&gt;Annotation:&lt;/b&gt;</source>
         <translation>&lt;b&gt;Comentario&lt;/b&gt;</translation>
     </message>

@@ -28,10 +28,6 @@
         <translation>Потік з таким ID уже існує</translation>
     </message>
     <message>
-        <source>Data Streams</source>
-        <translation>Потоки даних</translation>
-    </message>
-    <message>
         <source>&lt;Default Profile&gt;</source>
         <translation>&lt;Основний профіль&gt;</translation>
     </message>
@@ -47,43 +43,13 @@
         <source>Invalid stream initiation response</source>
         <translation>Невірна відповідь на запит ініціалізації потоку</translation>
     </message>
-</context>
-<context>
-    <name>DataStreamsOptions</name>
     <message>
-        <source>Add Profile</source>
-        <translation>Додати профіль</translation>
+        <source>Data Transfer</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enter profile name:</source>
-        <translation>Введіть ім&apos;я профілю:</translation>
-    </message>
-    <message>
-        <source>Delete Profile</source>
-        <translation>Видалити профіль</translation>
-    </message>
-    <message>
-        <source>Do you really want to delete a current data streams profile?</source>
-        <translation>Ви дійсно хочете видалити поточний профіль потоків даних?</translation>
-    </message>
-</context>
-<context>
-    <name>DataStreamsOptionsClass</name>
-    <message>
-        <source>Data Streams Profiles</source>
-        <translation>Профілі потоків даних</translation>
-    </message>
-    <message>
-        <source>Profile:</source>
-        <translation>Профіль:</translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation>Додати</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>Видалити</translation>
+        <source>Transfer method %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

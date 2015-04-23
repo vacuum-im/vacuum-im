@@ -4,10 +4,10 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/icommands.h>
 #include <interfaces/idataforms.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/iservicediscovery.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/ixmppuriqueries.h>
 #include "commanddialog.h"
 
@@ -68,8 +68,8 @@ signals:
 protected:
 	void registerDiscoFeatures();
 protected slots:
-	void onStreamOpened(IXmppStream *AXmppStream);
-	void onStreamClosed(IXmppStream *AXmppStream);
+	void onXmppStreamOpened(IXmppStream *AXmppStream);
+	void onXmppStreamClosed(IXmppStream *AXmppStream);
 	void onDiscoInfoReceived(const IDiscoInfo &AInfo);
 	void onDiscoInfoRemoved(const IDiscoInfo &AInfo);
 	void onDiscoItemsReceived(const IDiscoItems &AItems);
@@ -78,10 +78,10 @@ protected slots:
 	void onRequestActionTriggered(bool);
 private:
 	IDataForms *FDataForms;
-	IXmppStreams *FXmppStreams;
+	IXmppStreamManager *FXmppStreamManager;
 	IStanzaProcessor *FStanzaProcessor;
 	IServiceDiscovery *FDiscovery;
-	IPresencePlugin *FPresencePlugin;
+	IPresenceManager *FPresenceManager;
 	IXmppUriQueries *FXmppUriQueries;
 private:
 	QList<QString> FRequests;

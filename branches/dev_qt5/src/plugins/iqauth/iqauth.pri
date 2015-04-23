@@ -1,4 +1,5 @@
-HEADERS = iqauth.h
+HEADERS = iqauthfeaturefactory.h \
+          iqauthfeature.h
 
-SOURCES = iqauth.cpp
-
+SOURCES = iqauthfeaturefactory.cpp \
+          iqauthfeature.cpp

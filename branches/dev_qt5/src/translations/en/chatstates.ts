@@ -24,16 +24,16 @@
         <translation>Supports the exchanging of the information about the user&apos;s activity in the chat</translation>
     </message>
     <message>
-        <source>Send chat state notifications</source>
-        <translation>Send chat state notifications</translation>
-    </message>
-    <message>
         <source>When contact is typing the message for you</source>
         <translation>When contact is typing the message for you</translation>
     </message>
     <message>
         <source>Typing a message...</source>
         <translation>Typing a message...</translation>
+    </message>
+    <message>
+        <source>Send notifications of your chat activity</source>
+        <translation>Send notifications of your chat activity</translation>
     </message>
 </context>
 <context>

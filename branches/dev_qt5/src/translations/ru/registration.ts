@@ -56,13 +56,6 @@
     </message>
 </context>
 <context>
-    <name>RegisterStream</name>
-    <message>
-        <source>Registration on %1</source>
-        <translation>Регистрация на %1</translation>
-    </message>
-</context>
-<context>
     <name>Registration</name>
     <message>
         <source>Registration</source>
@@ -79,10 +72,6 @@
     <message>
         <source>Change password</source>
         <translation>Изменить пароль</translation>
-    </message>
-    <message>
-        <source>Register new account on server</source>
-        <translation>Зарегистрировать новый аккаунт на сервере</translation>
     </message>
     <message>
         <source>Registration Form</source>
@@ -149,16 +138,16 @@
         <translation>Ваша Web страница</translation>
     </message>
     <message>
-        <source>Invalid registration form</source>
-        <translation>Неверная форма регистрации</translation>
-    </message>
-    <message>
-        <source>Invalid registration dialog</source>
-        <translation>Неверный диалог регистрации</translation>
-    </message>
-    <message>
         <source>Registration rejected by user</source>
         <translation>Регистрация отменена пользователем</translation>
+    </message>
+    <message>
+        <source>Registration is not supported</source>
+        <translation>Регистрация не поддерживается</translation>
+    </message>
+    <message>
+        <source>Invalid registration fields</source>
+        <translation>Неверные поля регистрации</translation>
     </message>
 </context>
 </TS>

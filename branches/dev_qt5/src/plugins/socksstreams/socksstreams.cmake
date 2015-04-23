@@ -1,3 +1,3 @@
-set(SOURCES socksoptions.cpp socksstream.cpp socksstreams.cpp )
-set(HEADERS socksstreams.h socksstream.h socksoptions.h )
-set(UIS socksoptions.ui )
+set(SOURCES socksoptionswidget.cpp socksstream.cpp socksstreams.cpp )
+set(HEADERS socksstreams.h socksstream.h socksoptionswidget.h )
+set(UIS socksoptionswidget.ui )

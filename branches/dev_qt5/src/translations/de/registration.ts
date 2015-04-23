@@ -56,13 +56,6 @@
     </message>
 </context>
 <context>
-    <name>RegisterStream</name>
-    <message>
-        <source>Registration on %1</source>
-        <translation>Registrierung auf %1</translation>
-    </message>
-</context>
-<context>
     <name>Registration</name>
     <message>
         <source>Registration</source>
@@ -79,10 +72,6 @@
     <message>
         <source>Change password</source>
         <translation>Passwort ändern</translation>
-    </message>
-    <message>
-        <source>Register new account on server</source>
-        <translation>Neues Konto auf dem Server registrieren</translation>
     </message>
     <message>
         <source>Registration Form</source>
@@ -149,16 +138,16 @@
         <translation>Ihre Web-Seite</translation>
     </message>
     <message>
-        <source>Invalid registration form</source>
-        <translation>Ungültiges Registrierungsformular</translation>
-    </message>
-    <message>
-        <source>Invalid registration dialog</source>
-        <translation>Ungültiger Registrierungsdialog</translation>
-    </message>
-    <message>
         <source>Registration rejected by user</source>
         <translation>Registrierung durch benutzer zurückgewiesen</translation>
+    </message>
+    <message>
+        <source>Registration is not supported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid registration fields</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

@@ -12,9 +12,8 @@
 
 ConsolePlugin::ConsolePlugin()
 {
-	FPluginManager = NULL;
-	FXmppStreams = NULL;
 	FMainWindowPlugin = NULL;
+	FXmppStreamManager = NULL;
 }
 
 ConsolePlugin::~ConsolePlugin()
@@ -36,12 +35,10 @@ void ConsolePlugin::pluginInfo(IPluginInfo *APluginInfo)
 bool ConsolePlugin::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
 	Q_UNUSED(AInitOrder);
-	FPluginManager = APluginManager;
-
-	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
+	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreamManager").value(0,NULL);
 	if (plugin)
 	{
-		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
+		FXmppStreamManager = qobject_cast<IXmppStreamManager *>(plugin->instance());
 	}
 
 	plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
@@ -50,7 +47,7 @@ bool ConsolePlugin::initConnections(IPluginManager *APluginManager, int &AInitOr
 		FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
 	}
 
-	return FXmppStreams!=NULL && FMainWindowPlugin!=NULL;
+	return FXmppStreamManager!=NULL && FMainWindowPlugin!=NULL;
 }
 
 bool ConsolePlugin::initObjects()
@@ -76,7 +73,7 @@ bool ConsolePlugin::initSettings()
 
 void ConsolePlugin::onShowXMLConsole(bool)
 {
-	ConsoleWidget *widget = new ConsoleWidget(FPluginManager,NULL);
+	ConsoleWidget *widget = new ConsoleWidget();
 	WidgetManager::setWindowSticky(widget,true);
 	FCleanupHandler.add(widget);
 	widget->show();

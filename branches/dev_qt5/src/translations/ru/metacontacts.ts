@@ -63,8 +63,21 @@
         <translation>%1 - Чат</translation>
     </message>
     <message>
-        <source>Combine Contacts</source>
+        <source>Combine contacts</source>
         <translation>Объединить контакты</translation>
+    </message>
+    <message>
+        <source>Ctrl+M</source>
+        <comment>Combine contacts</comment>
+        <translation>Ctrl+M</translation>
+    </message>
+    <message>
+        <source>Destroy metacontact</source>
+        <translation>Разделить метаконтакт</translation>
+    </message>
+    <message>
+        <source>Detach from metacontact</source>
+        <translation>Отделить от метаконтакта</translation>
     </message>
 </context>
 </TS>

@@ -7,7 +7,7 @@
 #define INBANDSTREAMS_UUID "{faaedbeb-5cfa-47fc-b9d9-7df611ea4ef0}"
 
 class IInBandStream :
-			public IDataStreamSocket
+	public IDataStreamSocket
 {
 public:
 	enum DataStanzaType {
@@ -27,7 +27,7 @@ protected:
 };
 
 class IInBandStreams:
-			public IDataStreamMethod
+	public IDataStreamMethod
 {
 public:
 	virtual QObject *instance() =0;

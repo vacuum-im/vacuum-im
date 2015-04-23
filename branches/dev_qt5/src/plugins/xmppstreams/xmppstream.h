@@ -2,11 +2,9 @@
 #define XMPPSTREAM_H
 
 #include <QTimer>
-#include <QMutex>
 #include <QMultiMap>
 #include <QDomDocument>
-#include <QInputDialog>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <interfaces/iconnectionmanager.h>
 #include "streamparser.h"
 
@@ -28,7 +26,7 @@ class XmppStream :
 	Q_OBJECT;
 	Q_INTERFACES(IXmppStream IXmppStanzaHadler);
 public:
-	XmppStream(IXmppStreams *AXmppStreams, const Jid &AStreamJid);
+	XmppStream(IXmppStreamManager *AXmppStreamManager, const Jid &AStreamJid);
 	~XmppStream();
 	virtual QObject *instance() { return this; }
 	//IXmppStanzaHandler
@@ -43,10 +41,10 @@ public:
 	virtual QString streamId() const;
 	virtual XmppError error() const;
 	virtual Jid streamJid() const;
-	virtual void setStreamJid(const Jid &AJid);
+	virtual void setStreamJid(const Jid &AStreamJid);
+	virtual bool requestPassword();
 	virtual QString password() const;
 	virtual void setPassword(const QString &APassword);
-	virtual QString getSessionPassword(bool AAskIfNeed = true);
 	virtual QString defaultLang() const;
 	virtual void setDefaultLang(const QString &ADefLang);
 	virtual bool isEncryptionRequired() const;
@@ -62,11 +60,13 @@ public:
 	virtual void removeXmppStanzaHandler(int AOrder, IXmppStanzaHadler *AHandler);
 signals:
 	void opened();
-	void aboutToClose();
 	void closed();
+	void aboutToClose();
 	void error(const XmppError &AError);
 	void jidAboutToBeChanged(const Jid &AAfter);
 	void jidChanged(const Jid &ABefore);
+	void passwordRequested(bool &AWait);
+	void passwordProvided(const QString &APassword);
 	void connectionChanged(IConnection *AConnection);
 	void dataHandlerInserted(int AOrder, IXmppDataHandler *AHandler);
 	void dataHandlerRemoved(int AOrder, IXmppDataHandler *AHandler);
@@ -102,13 +102,14 @@ protected slots:
 	void onKeepAliveTimeout();
 private:
 	IConnection *FConnection;
-	IXmppStreams *FXmppStreams;
+	IXmppStreamManager *FXmppStreamManager;
 private:
 	bool FReady;
 	bool FClosed;
 	bool FEncrypt;
 	bool FNodeChanged;
 	bool FDomainChanged;
+	bool FPasswordRequested;
 	Jid FStreamJid;
 	Jid FOnlineJid;
 	Jid FOfflineJid;
@@ -119,10 +120,6 @@ private:
 	StreamParser FParser;
 	QTimer FKeepAliveTimer;
 	StreamState FStreamState;
-private:
-	QMutex FPasswordMutex;
-	QString FSessionPassword;
-	QInputDialog *FPasswordDialog;
 private:
 	QDomElement FServerFeatures;
 	QList<QString>	FAvailFeatures;

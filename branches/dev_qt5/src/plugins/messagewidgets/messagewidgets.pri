@@ -4,8 +4,7 @@ FORMS = infowidget.ui \
         receiverswidget.ui \
         chatwindow.ui \
         normalwindow.ui \
-        tabwindow.ui \
-        messengeroptions.ui
+        tabwindow.ui
 
 HEADERS = messagewidgets.h \
           messageeditor.h \
@@ -20,7 +19,6 @@ HEADERS = messagewidgets.h \
           normalwindow.h \
           tabwidget.h \
           tabwindow.h \
-	  messengeroptions.h \
           tabpagenotifier.h \
           address.h
 
@@ -37,6 +35,5 @@ SOURCES = messagewidgets.cpp \
           normalwindow.cpp \
           tabwidget.cpp \
           tabwindow.cpp \
-          messengeroptions.cpp \
           tabpagenotifier.cpp \
           address.cpp

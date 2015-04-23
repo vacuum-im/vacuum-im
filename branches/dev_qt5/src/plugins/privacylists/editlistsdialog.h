@@ -2,7 +2,7 @@
 #define EDITLISTSDIALOG_H
 
 #include <QDialog>
-#include <interfaces/iroster.h>
+#include <interfaces/irostermanager.h>
 #include <interfaces/iprivacylists.h>
 #include "ui_editlistsdialog.h"
 

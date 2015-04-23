@@ -35,10 +35,6 @@
         <translation>Transfery</translation>
     </message>
     <message>
-        <source>File Transfer</source>
-        <translation>Transfer plików</translation>
-    </message>
-    <message>
         <source>Allows to initiate a thread for transferring files between two XMPP entities</source>
         <translation>Pozwala na rozpoczęcie przesyłania plików pomiędzy dwoma jednostkami XMPP</translation>
     </message>
@@ -62,35 +58,36 @@
         <source>Data transmission terminated by remote user</source>
         <translation>Transfer danych przerwany przez zdalnego użytkownika</translation>
     </message>
+    <message>
+        <source>Ctrl+T</source>
+        <comment>Show file transfers</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File transfer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create separate folder for each sender</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default transfer method:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
-    <name>FileStreamsOptions</name>
+    <name>FileStreamsOptionsWidget</name>
     <message>
         <source>Select default directory</source>
-        <translation>Wybierz domyślny katalog</translation>
+        <translation type="unfinished">Wybierz domyślny katalog</translation>
     </message>
 </context>
 <context>
-    <name>FileStreamsOptionsClass</name>
+    <name>FileStreamsOptionsWidgetClass</name>
     <message>
-        <source>...</source>
-        <translation>...</translation>
-    </message>
-    <message>
-        <source>Default Downloads Directory:</source>
-        <translation>Domyślny katalog do zapisu:</translation>
-    </message>
-    <message>
-        <source>Default Data Stream:</source>
-        <translation>Domyślny strumień danych:</translation>
-    </message>
-    <message>
-        <source>Acceptable Data Streams</source>
-        <translation>Akceptowane strumienie danych</translation>
-    </message>
-    <message>
-        <source>Group downloads by sender</source>
-        <translation>Grupuj pobrania według nadawcy</translation>
+        <source>Default directory:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -5,8 +5,8 @@
 #include <interfaces/inotifications.h>
 #include <interfaces/imessageprocessor.h>
 #include <interfaces/irosterchanger.h>
-#include <interfaces/iroster.h>
-#include <interfaces/ivcard.h>
+#include <interfaces/irostermanager.h>
+#include <interfaces/ivcardmanager.h>
 #include "ui_subscriptiondialog.h"
 
 class SubscriptionDialog :
@@ -16,7 +16,7 @@ class SubscriptionDialog :
 	Q_OBJECT;
 	Q_INTERFACES(ISubscriptionDialog);
 public:
-	SubscriptionDialog(IRosterChanger *ARosterChanger, IPluginManager *APluginManager, const Jid &AStreamJid, const Jid &AContactJid, const QString &ANotify, const QString &AMessage, QWidget *AParent = NULL);
+	SubscriptionDialog(IRosterChanger *ARosterChanger, const Jid &AStreamJid, const Jid &AContactJid, const QString &ANotify, const QString &AMessage, QWidget *AParent = NULL);
 	~SubscriptionDialog();
 	//ISubscriptionDialog
 	virtual QDialog *instance() { return this; }
@@ -27,7 +27,7 @@ public:
 signals:
 	void dialogDestroyed();
 protected:
-	void initialize(IPluginManager *APluginManager);
+	void initialize();
 protected slots:
 	void onDialogAccepted();
 	void onDialogRejected();
@@ -36,7 +36,7 @@ private:
 	Ui::SubscriptionDialogClass ui;
 private:
 	IRoster *FRoster;
-	IVCardPlugin *FVcardPlugin;
+	IVCardManager *FVCardManager;
 	IRosterChanger *FRosterChanger;
 	INotifications *FNotifications;
 	IMessageProcessor *FMessageProcessor;

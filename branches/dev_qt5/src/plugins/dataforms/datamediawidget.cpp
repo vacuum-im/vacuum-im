@@ -1,5 +1,6 @@
 #include "datamediawidget.h"
 
+#include <QTimer>
 #include <QMovie>
 #include <QBuffer>
 #include <QPixmap>
@@ -22,12 +23,7 @@ DataMediaWidget::DataMediaWidget(IDataForms *ADataForms, const IDataMedia &AMedi
 	FUriIndex = 0;
 	FLastError = XmppError(IERR_DATAFORMS_MEDIA_INVALID_TYPE);
 
-	loadUri();
-}
-
-DataMediaWidget::~DataMediaWidget()
-{
-
+	QTimer::singleShot(0,this,SLOT(loadUri()));
 }
 
 IDataMedia DataMediaWidget::media() const

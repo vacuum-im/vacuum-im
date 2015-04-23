@@ -39,8 +39,8 @@ protected slots:
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason);
 private:
-	IPluginManager *FPluginManager;
 	ITrayManager *FTrayManager;
+	IPluginManager *FPluginManager;
 private:
 	int FStartShowLoopCount;
 	MainWindow *FMainWindow;

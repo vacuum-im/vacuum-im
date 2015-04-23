@@ -60,16 +60,16 @@
         <translation>Inaktiv seit</translation>
     </message>
     <message>
-        <source>Share information about OS version</source>
-        <translation>Informationen über OS Version freigeben</translation>
-    </message>
-    <message>
         <source>XMPP Ping</source>
         <translation>XMPP Ping</translation>
     </message>
     <message>
         <source>Supports the exchanging of the application-level pings over XML streams</source>
         <translation>Erlaubt den Austausch von Anwendungs Pings über XML Datenströme</translation>
+    </message>
+    <message>
+        <source>Share information about your OS version</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -2,15 +2,14 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="uk" sourcelanguage="en">
 <context>
-    <name>CompressPlugin</name>
+    <name>CompressFeature</name>
     <message>
-        <source>Unsupported compression method</source>
-        <translation>Метод стиснення не підтримується</translation>
+        <source>Error code: %1</source>
+        <translation>Код помилки: %1</translation>
     </message>
-    <message>
-        <source>Compression setup failed</source>
-        <translation>Не вдалося запустити стиснення</translation>
-    </message>
+</context>
+<context>
+    <name>CompressFeatureFactory</name>
     <message>
         <source>Stream Compression</source>
         <translation>Стиснення потоку</translation>
@@ -20,8 +19,12 @@
         <translation>Дозволяє стискати XML-потоки від і до сервера</translation>
     </message>
     <message>
-        <source>Enable data compression transferred between client and server</source>
-        <translation>Ввімкнути стиснення даних, що передаються між клієнтом та сервером</translation>
+        <source>Unsupported compression method</source>
+        <translation>Метод стиснення не підтримується</translation>
+    </message>
+    <message>
+        <source>Compression setup failed</source>
+        <translation>Не вдалося запустити стиснення</translation>
     </message>
     <message>
         <source>ZLib error</source>
@@ -43,12 +46,9 @@
         <source>Invalid compression level</source>
         <translation>Неправильний рівень стиснення</translation>
     </message>
-</context>
-<context>
-    <name>Compression</name>
     <message>
-        <source>Error code: %1</source>
-        <translation>Код помилки: %1</translation>
+        <source>Enable data compression transferred between client and server</source>
+        <translation>Ввімкнути стиснення даних, що передаються між клієнтом та сервером</translation>
     </message>
 </context>
 </TS>

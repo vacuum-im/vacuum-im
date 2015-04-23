@@ -4,7 +4,7 @@
 #include <QList>
 #include <QTimer>
 #include <QNetworkAccessManager>
-#include <interfaces/imessagestyles.h>
+#include <interfaces/imessagestylemanager.h>
 #include "styleviewer.h"
 
 //Message Style Info Values
@@ -47,13 +47,11 @@
 #define MSSK_FILETRANSFER_COMPLETE          "fileTransferComplete"
 
 //Message Style Options
-#define MSO_STYLE_ID                        "styleId"
 #define MSO_VARIANT                         "variant"
 #define MSO_FONT_FAMILY                     "fontFamily"
 #define MSO_FONT_SIZE                       "fontSize"
 #define MSO_BG_COLOR                        "bgColor"
 #define MSO_BG_IMAGE_FILE                   "bgImageFile"
-#define MSO_ANIMATION_DISABLED              "animationDisabled"
 
 struct ContentItem {
 	int size;
@@ -88,7 +86,7 @@ public:
 	virtual QTextCharFormat textFormatAt(QWidget *AWidget, const QPoint &APosition) const;
 	virtual QTextDocumentFragment textFragmentAt(QWidget *AWidget, const QPoint &APosition) const;
 	virtual bool changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClear = true);
-	virtual bool appendContent(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions);
+	virtual bool appendContent(QWidget *AWidget, const QString &AHtml, const IMessageStyleContentOptions &AOptions);
 	//ISimpleMessageStyle
 	virtual QMap<QString, QVariant> infoValues() const;
 	virtual QList<QString> variants() const;
@@ -96,19 +94,19 @@ signals:
 	void widgetAdded(QWidget *AWidget) const;
 	void widgetRemoved(QWidget *AWidget) const;
 	void optionsChanged(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean) const;
-	void contentAppended(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions) const;
+	void contentAppended(QWidget *AWidget, const QString &AHtml, const IMessageStyleContentOptions &AOptions) const;
 	void urlClicked(QWidget *AWidget, const QUrl &AUrl) const;
 public:
 	static QList<QString> styleVariants(const QString &AStylePath);
 	static QMap<QString, QVariant> styleInfo(const QString &AStylePath);
 protected:
-	bool isSameSender(QWidget *AWidget, const IMessageContentOptions &AOptions) const;
+	bool isSameSender(QWidget *AWidget, const IMessageStyleContentOptions &AOptions) const;
 	void setVariant(QWidget *AWidget, const QString  &AVariant);
 	QString makeStyleTemplate() const;
 	void fillStyleKeywords(QString &AHtml, const IMessageStyleOptions &AOptions) const;
-	QString makeContentTemplate(const IMessageContentOptions &AOptions, bool ASameSender) const;
-	void fillContentKeywords(QString &AHtml, const IMessageContentOptions &AOptions, bool ASameSender) const;
-	QString prepareMessage(const QString &AHtml, const IMessageContentOptions &AOptions) const;
+	QString makeContentTemplate(const IMessageStyleContentOptions &AOptions, bool ASameSender) const;
+	void fillContentKeywords(QString &AHtml, const IMessageStyleContentOptions &AOptions, bool ASameSender) const;
+	QString prepareMessage(const QString &AHtml, const IMessageStyleContentOptions &AOptions) const;
 	QString loadFileData(const QString &AFileName, const QString &DefValue) const;
 	void loadTemplates();
 	void loadSenderColors();

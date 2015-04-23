@@ -2,7 +2,7 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en" sourcelanguage="en">
 <context>
-    <name>IqAuthPlugin</name>
+    <name>IqAuthFeatureFactory</name>
     <message>
         <source>Query Authentication</source>
         <translation>Query Authentication</translation>

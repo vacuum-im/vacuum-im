@@ -2,7 +2,7 @@
 #define VCARDDIALOG_H
 
 #include <QDialog>
-#include <interfaces/ivcard.h>
+#include <interfaces/ivcardmanager.h>
 #include "edititemdialog.h"
 #include "ui_vcarddialog.h"
 
@@ -11,7 +11,7 @@ class VCardDialog :
 {
 	Q_OBJECT;
 public:
-	VCardDialog(IVCardPlugin *AVCardPlugin,const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent);
+	VCardDialog(IVCardManager *AVCardPlugin,const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent);
 	~VCardDialog();
 	Jid streamJid() const;
 	Jid contactJid() const;
@@ -45,7 +45,7 @@ private:
 	Ui::VCardDialogClass ui;
 private:
 	IVCard *FVCard;
-	IVCardPlugin *FVCardPlugin;
+	IVCardManager *FVCardManager;
 private:
 	Jid FContactJid;
 	Jid FStreamJid;

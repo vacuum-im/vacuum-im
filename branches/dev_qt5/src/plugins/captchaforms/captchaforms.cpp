@@ -22,7 +22,7 @@
 CaptchaForms::CaptchaForms()
 {
 	FDataForms = NULL;
-	FXmppStreams = NULL;
+	FXmppStreamManager = NULL;
 	FNotifications = NULL;
 	FStanzaProcessor = NULL;
 }
@@ -53,14 +53,14 @@ bool CaptchaForms::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 	}
 
-	plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IXmppStreamManager").value(0,NULL);
 	if (plugin)
 	{
-		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-		if (FXmppStreams)
+		FXmppStreamManager = qobject_cast<IXmppStreamManager *>(plugin->instance());
+		if (FXmppStreamManager)
 		{
-			connect(FXmppStreams->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamOpened(IXmppStream *)));
-			connect(FXmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *)));
+			connect(FXmppStreamManager->instance(),SIGNAL(streamOpened(IXmppStream *)),SLOT(onXmppStreamOpened(IXmppStream *)));
+			connect(FXmppStreamManager->instance(),SIGNAL(streamClosed(IXmppStream *)),SLOT(onXmppStreamClosed(IXmppStream *)));
 		}
 	}
 
@@ -81,7 +81,7 @@ bool CaptchaForms::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		}
 	}
 
-	return FDataForms!=NULL && FXmppStreams!=NULL && FStanzaProcessor!=NULL;
+	return FDataForms!=NULL && FXmppStreamManager!=NULL && FStanzaProcessor!=NULL;
 }
 
 bool CaptchaForms::initObjects()
@@ -420,7 +420,7 @@ bool CaptchaForms::eventFilter(QObject *AObject, QEvent *AEvent)
 	return QObject::eventFilter(AObject,AEvent);
 }
 
-void CaptchaForms::onStreamOpened(IXmppStream *AXmppStream)
+void CaptchaForms::onXmppStreamOpened(IXmppStream *AXmppStream)
 {
 	if (FStanzaProcessor)
 	{
@@ -434,7 +434,7 @@ void CaptchaForms::onStreamOpened(IXmppStream *AXmppStream)
 	}
 }
 
-void CaptchaForms::onStreamClosed(IXmppStream *AXmppStream)
+void CaptchaForms::onXmppStreamClosed(IXmppStream *AXmppStream)
 {
 	QList<IDataDialogWidget *> dialogs;
 

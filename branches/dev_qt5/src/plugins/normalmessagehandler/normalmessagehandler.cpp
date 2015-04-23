@@ -45,10 +45,10 @@ NormalMessageHandler::NormalMessageHandler()
 	FAvatars = NULL;
 	FMessageWidgets = NULL;
 	FMessageProcessor = NULL;
-	FMessageStyles = NULL;
+	FMessageStyleManager = NULL;
 	FStatusIcons = NULL;
 	FNotifications = NULL;
-	FPresencePlugin = NULL;
+	FPresenceManager = NULL;
 	FRostersView = NULL;
 	FRostersModel = NULL;
 	FXmppUriQueries = NULL;
@@ -91,13 +91,13 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 			connect(FMessageProcessor->instance(),SIGNAL(activeStreamRemoved(const Jid &)),SLOT(onActiveStreamRemoved(const Jid &)));
 	}
 
-	plugin = APluginManager->pluginInterface("IMessageStyles").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IMessageStyleManager").value(0,NULL);
 	if (plugin)
 	{
-		FMessageStyles = qobject_cast<IMessageStyles *>(plugin->instance());
-		if (FMessageStyles)
+		FMessageStyleManager = qobject_cast<IMessageStyleManager *>(plugin->instance());
+		if (FMessageStyleManager)
 		{
-			connect(FMessageStyles->instance(),SIGNAL(styleOptionsChanged(const IMessageStyleOptions &, int, const QString &)),
+			connect(FMessageStyleManager->instance(),SIGNAL(styleOptionsChanged(const IMessageStyleOptions &, int, const QString &)),
 				SLOT(onStyleOptionsChanged(const IMessageStyleOptions &, int, const QString &)));
 		}
 	}
@@ -118,13 +118,13 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 			connect(FStatusIcons->instance(),SIGNAL(statusIconsChanged()),SLOT(onStatusIconsChanged()));
 	}
 
-	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IPresenceManager").value(0,NULL);
 	if (plugin)
 	{
-		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
-		if (FPresencePlugin)
+		FPresenceManager = qobject_cast<IPresenceManager *>(plugin->instance());
+		if (FPresenceManager)
 		{
-			connect(FPresencePlugin->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
+			connect(FPresenceManager->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
 				SLOT(onPresenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)));
 		}
 	}
@@ -175,7 +175,7 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
 
-	return FMessageProcessor!=NULL && FMessageWidgets!=NULL && FMessageStyles!=NULL;
+	return FMessageProcessor!=NULL && FMessageWidgets!=NULL && FMessageStyleManager!=NULL;
 }
 
 bool NormalMessageHandler::initObjects()
@@ -207,7 +207,7 @@ bool NormalMessageHandler::initObjects()
 	}
 	if (FOptionsManager)
 	{
-		FOptionsManager->insertOptionsHolder(this);
+		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 	if (FMessageWidgets)
 	{
@@ -328,13 +328,16 @@ INotification NormalMessageHandler::messageNotify(INotifications *ANotifications
 				notify.data.insert(NDR_TABPAGE_ICONBLINK,true);
 				notify.data.insert(NDR_SHOWMINIMIZED_WIDGET,(qint64)window->instance());
 
-				if (FMessageProcessor)
+				if (!Options::node(OPV_NOTIFICATIONS_HIDEMESSAGE).value().toBool())
 				{
-					QTextDocument doc;
-					FMessageProcessor->messageToText(&doc,AMessage);
-					notify.data.insert(NDR_POPUP_HTML,TextManager::getDocumentBody(doc));
+					if (FMessageProcessor)
+					{
+						QTextDocument doc;
+						FMessageProcessor->messageToText(&doc,AMessage);
+						notify.data.insert(NDR_POPUP_HTML,TextManager::getDocumentBody(doc));
+					}
+					notify.data.insert(NDR_POPUP_TEXT,AMessage.body());
 				}
-				notify.data.insert(NDR_POPUP_TEXT,AMessage.body());
 
 				FNotifiedMessages.insertMulti(window,AMessage.data(MDR_MESSAGE_ID).toInt());
 			}
@@ -397,12 +400,12 @@ bool NormalMessageHandler::messageShowWindow(int AOrder, const Jid &AStreamJid, 
 	return false;
 }
 
-QMultiMap<int, IOptionsWidget *> NormalMessageHandler::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+QMultiMap<int, IOptionsDialogWidget *> NormalMessageHandler::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	QMultiMap<int, IOptionsWidget *> widgets;
-	if (FOptionsManager && ANodeId == OPN_MESSAGES)
+	QMultiMap<int, IOptionsDialogWidget *> widgets;
+	if (FOptionsManager && ANodeId==OPN_MESSAGES)
 	{
-		widgets.insertMulti(OWO_MESSAGES_UNNOTIFYALLNORMAL,FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_UNNOTIFYALLNORMAL),tr("Mark all single messages from user as read when you read the first one"),AParent));
+		widgets.insertMulti(OWO_MESSAGES_UNNOTIFYALLNORMAL,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_UNNOTIFYALLNORMAL),tr("Consider all single contacts messages as read when read the first"),AParent));
 	}
 	return widgets;
 }
@@ -662,7 +665,7 @@ void NormalMessageHandler::updateWindow(IMessageNormalWindow *AWindow) const
 			AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::Avatar,FAvatars->emptyAvatarImage());
 	}
 
-	QString name = FMessageStyles!=NULL ? FMessageStyles->contactName(AWindow->streamJid(),AWindow->contactJid()) : AWindow->contactJid().uFull();
+	QString name = FMessageStyleManager!=NULL ? FMessageStyleManager->contactName(AWindow->streamJid(),AWindow->contactJid()) : AWindow->contactJid().uFull();
 	AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::Name,name);
 
 	QIcon statusIcon;
@@ -672,7 +675,7 @@ void NormalMessageHandler::updateWindow(IMessageNormalWindow *AWindow) const
 		statusIcon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_NORMALMHANDLER_MESSAGE);
 	AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::StatusIcon,statusIcon);
 
-	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AWindow->streamJid()) : NULL;
+	IPresence *presence = FPresenceManager!=NULL ? FPresenceManager->findPresence(AWindow->streamJid()) : NULL;
 	IPresenceItem pitem = presence!=NULL ? presence->findItem(AWindow->contactJid()) : IPresenceItem();
 	AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::StatusText,pitem.status);
 
@@ -737,33 +740,33 @@ void NormalMessageHandler::removeNotifiedMessages(IMessageNormalWindow *AWindow,
 
 void NormalMessageHandler::setMessageStyle(IMessageNormalWindow *AWindow)
 {
-	if (FMessageStyles)
+	if (FMessageStyleManager)
 	{
 		LOG_STRM_DEBUG(AWindow->streamJid(),QString("Changing message style for normal window, with=%1").arg(AWindow->contactJid().bare()));
-		IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::Normal);
+		IMessageStyleOptions soptions = FMessageStyleManager->styleOptions(Message::Normal);
 		if (AWindow->viewWidget()->messageStyle()==NULL || !AWindow->viewWidget()->messageStyle()->changeOptions(AWindow->viewWidget()->styleWidget(),soptions,false))
 		{
-			IMessageStyle *style = FMessageStyles->styleForOptions(soptions);
+			IMessageStyle *style = FMessageStyleManager->styleForOptions(soptions);
 			AWindow->viewWidget()->setMessageStyle(style,soptions);
 		}
 	}
 }
 
-void NormalMessageHandler::fillContentOptions(IMessageNormalWindow *AWindow, IMessageContentOptions &AOptions) const
+void NormalMessageHandler::fillContentOptions(IMessageNormalWindow *AWindow, IMessageStyleContentOptions &AOptions) const
 {
 	AOptions.senderColor = "blue";
 	AOptions.senderId = AWindow->contactJid().full();
-	AOptions.senderName = FMessageStyles->contactName(AWindow->streamJid(),AWindow->contactJid()).toHtmlEscaped();
-	AOptions.senderAvatar = FMessageStyles->contactAvatar(AWindow->contactJid());
-	AOptions.senderIcon = FMessageStyles->contactIcon(AWindow->streamJid(),AWindow->contactJid());
+	AOptions.senderName = FMessageStyleManager->contactName(AWindow->streamJid(),AWindow->contactJid()).toHtmlEscaped();
+	AOptions.senderAvatar = FMessageStyleManager->contactAvatar(AWindow->contactJid());
+	AOptions.senderIcon = FMessageStyleManager->contactIcon(AWindow->streamJid(),AWindow->contactJid());
 }
 
 void NormalMessageHandler::showStyledMessage(IMessageNormalWindow *AWindow, const Message &AMessage)
 {
-	IMessageContentOptions options;
+	IMessageStyleContentOptions options;
 	options.time = AMessage.dateTime();
-	options.timeFormat = FMessageStyles->timeFormat(options.time);
-	options.direction = IMessageContentOptions::DirectionIn;
+	options.timeFormat = FMessageStyleManager->timeFormat(options.time);
+	options.direction = IMessageStyleContentOptions::DirectionIn;
 	options.noScroll = true;
 	fillContentOptions(AWindow,options);
 
@@ -779,13 +782,13 @@ void NormalMessageHandler::showStyledMessage(IMessageNormalWindow *AWindow, cons
 		QString html = tr("<b>The message with a error is received</b>");
 		html += "<p style='color:red;'>"+err.errorMessage().toHtmlEscaped()+"</p>";
 		html += "<hr>";
-		options.kind = IMessageContentOptions::KindMessage;
+		options.kind = IMessageStyleContentOptions::KindMessage;
 		AWindow->viewWidget()->appendHtml(html,options);
 	}
 
-	options.kind = IMessageContentOptions::KindTopic;
+	options.kind = IMessageStyleContentOptions::KindTopic;
 	AWindow->viewWidget()->appendText(tr("Subject: %1").arg(!AMessage.subject().isEmpty() ? AMessage.subject() : tr("<no subject>")),options);
-	options.kind = IMessageContentOptions::KindMessage;
+	options.kind = IMessageStyleContentOptions::KindMessage;
 	AWindow->viewWidget()->appendMessage(AMessage,options);
 }
 
@@ -793,7 +796,7 @@ bool NormalMessageHandler::isAnyPresenceOpened(const QStringList &AStreams) cons
 {
 	foreach(const Jid &streamJid, AStreams)
 	{
-		IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
+		IPresence *presence = FPresenceManager!=NULL ? FPresenceManager->findPresence(streamJid) : NULL;
 		if (presence && presence->isOpen())
 			return true;
 	}

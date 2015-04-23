@@ -2,33 +2,18 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="uk" sourcelanguage="en">
 <context>
-    <name>InBandOptions</name>
-    <message>
-        <source>Packet-Query (recommended)</source>
-        <translation>Пакет-Запит (рекомендується)</translation>
-    </message>
-    <message>
-        <source>Packet-Message</source>
-        <translation>Пакет-Повідомлення</translation>
-    </message>
-</context>
-<context>
-    <name>InBandOptionsClass</name>
-    <message>
-        <source> Bytes</source>
-        <translation> Байт</translation>
-    </message>
+    <name>InBandOptionsWidgetClass</name>
     <message>
         <source>Size of data in packet:</source>
-        <translation>Розмір даних в пакеті:</translation>
+        <translation type="unfinished">Розмір даних в пакеті:</translation>
     </message>
     <message>
-        <source>Maximum size of data in packet:</source>
-        <translation>Макс. розмір даних в пакеті:</translation>
+        <source> Bytes</source>
+        <translation type="unfinished"> Байт</translation>
     </message>
     <message>
-        <source>Packet type:</source>
-        <translation>Тип пакету:</translation>
+        <source>Send data without waiting for acknowledgment of receipt</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

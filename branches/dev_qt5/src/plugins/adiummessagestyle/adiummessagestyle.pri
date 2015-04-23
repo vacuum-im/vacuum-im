@@ -1,12 +1,12 @@
 FORMS = adiumoptionswidget.ui
 
-HEADERS = adiummessagestyleplugin.h \
+HEADERS = adiummessagestyleengine.h \
           adiummessagestyle.h \
           adiumoptionswidget.h \
           styleviewer.h \
           webpage.h
 
-SOURCES = adiummessagestyleplugin.cpp \
+SOURCES = adiummessagestyleengine.cpp \
           adiummessagestyle.cpp \
           adiumoptionswidget.cpp \
           styleviewer.cpp \

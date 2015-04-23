@@ -50,36 +50,16 @@
         <translation>About the program</translation>
     </message>
     <message>
-        <source>Application</source>
-        <translation>Application</translation>
+        <source>Global shortcuts</source>
+        <translation>Global shortcuts</translation>
     </message>
     <message>
-        <source>Show information about Qt</source>
-        <translation>Show information about Qt</translation>
-    </message>
-    <message>
-        <source>Show information about client</source>
-        <translation>Show information about client</translation>
-    </message>
-    <message>
-        <source>Show setup plugins dialog</source>
-        <translation>Show setup plugins dialog</translation>
-    </message>
-    <message>
-        <source>Global</source>
-        <translation>Global</translation>
+        <source>Application shortcuts</source>
+        <translation>Application shortcuts</translation>
     </message>
 </context>
 <context>
     <name>SetupPluginsDialog</name>
-    <message>
-        <source>&lt;System&gt;</source>
-        <translation>&lt;System&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Country&gt;</source>
-        <translation>&lt;Any Country&gt;</translation>
-    </message>
     <message>
         <source>Restart Application</source>
         <translation>Restart Application</translation>
@@ -87,6 +67,43 @@
     <message>
         <source>Settings saved. Do you want to restart application?</source>
         <translation>Settings saved. Do you want to restart application?</translation>
+    </message>
+    <message>
+        <source>Disabled (%1)</source>
+        <translation>Disabled (%1)</translation>
+    </message>
+    <message>
+        <source>With errors (%1)</source>
+        <translation>With errors (%1)</translation>
+    </message>
+    <message numerus="yes">
+        <source>This plugin depends on %n other plugins.</source>
+        <translation>
+            <numerusform>This plugin depends on %n other plugins.</numerusform>
+            <numerusform>This plugin depends on %n other plugins.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>This plugin does not depend on other plugins.</source>
+        <translation>This plugin does not depend on other plugins.</translation>
+    </message>
+    <message numerus="yes">
+        <source>Other %n plugins depend on this plugin.</source>
+        <translation>
+            <numerusform>Other %n plugins depend on this plugin.</numerusform>
+            <numerusform>Other %n plugins depend on this plugin.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Other plugins don&apos;t depend on this plugin.</source>
+        <translation>Other plugins don&apos;t depend on this plugin.</translation>
+    </message>
+    <message numerus="yes">
+        <source>Not found %n dependences.</source>
+        <translation>
+            <numerusform>Not found %n dependences.</numerusform>
+            <numerusform>Not found %n dependences.</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -96,36 +113,12 @@
         <translation>Setup Plugins</translation>
     </message>
     <message>
-        <source>Error Message:</source>
-        <translation>Error Message:</translation>
+        <source>Search plugin</source>
+        <translation>Search plugin</translation>
     </message>
     <message>
-        <source>Common Settings</source>
-        <translation>Common Settings</translation>
-    </message>
-    <message>
-        <source>Language:</source>
-        <translation>Language:</translation>
-    </message>
-    <message>
-        <source>Country:</source>
-        <translation>Country:</translation>
-    </message>
-    <message>
-        <source>Depends</source>
-        <translation>Depends</translation>
-    </message>
-    <message>
-        <source>Depend</source>
-        <translation>Depend</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation>Name</translation>
-    </message>
-    <message>
-        <source>File</source>
-        <translation>File</translation>
+        <source>Plugin Information</source>
+        <translation>Plugin Information</translation>
     </message>
 </context>
 </TS>

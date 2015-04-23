@@ -83,28 +83,28 @@
 <context>
     <name>EditProfilesDialogClass</name>
     <message>
-        <source>Edit Profiles</source>
-        <translation>Редагувати профіль</translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation>Додати</translation>
-    </message>
-    <message>
-        <source>Password</source>
-        <translation>Пароль</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Перейменувати</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>Видалити</translation>
-    </message>
-    <message>
         <source>Close</source>
         <translation>Закрити</translation>
+    </message>
+    <message>
+        <source>Add Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rename Profile</source>
+        <translation type="unfinished">Перейменувати Профіль</translation>
+    </message>
+    <message>
+        <source>Delete Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Profiles Settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -141,8 +141,8 @@
         <translation>Пароль:</translation>
     </message>
     <message>
-        <source>Profiles</source>
-        <translation>Профілі</translation>
+        <source>Settings...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -171,24 +171,36 @@
         <translation>Змінити профіль</translation>
     </message>
     <message>
-        <source>Misc</source>
-        <translation>Різне</translation>
-    </message>
-    <message>
-        <source>Auto run on system startup</source>
-        <translation>Автоматично запускати при старті системи</translation>
-    </message>
-    <message>
         <source>Options</source>
         <translation>Налаштування</translation>
     </message>
     <message>
-        <source>Show change profile dialog</source>
-        <translation>Показувати діалог зміни профілю</translation>
+        <source>Common settings</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show options dialog</source>
-        <translation>Показувати діалог опцій</translation>
+        <source>Auto run application on system startup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Localization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;System Language&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Language:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Common</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Appearance</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
