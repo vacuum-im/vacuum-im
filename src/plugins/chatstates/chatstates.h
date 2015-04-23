@@ -5,7 +5,7 @@
 #include <QTimer>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ichatstates.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/ioptionsmanager.h>
@@ -39,11 +39,11 @@ class ChatStates :
 	public IChatStates,
 	public IStanzaHandler,
 	public IArchiveHandler,
-	public IOptionsHolder,
+	public IOptionsDialogHolder,
 	public ISessionNegotiator
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IChatStates IStanzaHandler IArchiveHandler IOptionsHolder ISessionNegotiator);
+	Q_INTERFACES(IPlugin IChatStates IStanzaHandler IArchiveHandler IOptionsDialogHolder ISessionNegotiator);
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IChatStates");
 public:
 	ChatStates();
@@ -59,7 +59,7 @@ public:
 	//IArchiveHandler
 	virtual bool archiveMessageEdit(int AOrder, const Jid &AStreamJid, Message &AMessage, bool ADirectionIn);
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//ISessionNegotiator
 	virtual int sessionInit(const IStanzaSession &ASession, IDataForm &ARequest);
 	virtual int sessionAccept(const IStanzaSession &ASession, const IDataForm &ARequest, IDataForm &ASubmit);
@@ -105,7 +105,7 @@ protected slots:
 	void onOptionsChanged(const OptionsNode &ANode);
 	void onStanzaSessionTerminated(const IStanzaSession &ASession);
 private:
-	IPresencePlugin *FPresencePlugin;
+	IPresenceManager *FPresenceManager;
 	IMessageWidgets *FMessageWidgets;
 	IStanzaProcessor *FStanzaProcessor;
 	IOptionsManager *FOptionsManager;
@@ -114,7 +114,7 @@ private:
 	IDataForms *FDataForms;
 	INotifications *FNotifications;
 	ISessionNegotiation *FSessionNegotiation;
-	IMultiUserChatPlugin *FMultiUserChatPlugin;
+	IMultiUserChatManager *FMultiChatManager;
 private:
 	QMap<Jid,int> FSHIMessagesIn;
 	QMap<Jid,int> FSHIMessagesOut;

@@ -12,7 +12,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Send anonymous statistics information to developer</source>
+        <source>Send anonymous statistics to developer</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

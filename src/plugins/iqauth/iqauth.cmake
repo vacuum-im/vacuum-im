@@ -1,2 +1,2 @@
-set(SOURCES iqauth.cpp )
-set(HEADERS iqauth.h )
+set(SOURCES iqauthfeaturefactory.cpp iqauthfeature.cpp)
+set(HEADERS iqauthfeaturefactory.h iqauthfeature.h)

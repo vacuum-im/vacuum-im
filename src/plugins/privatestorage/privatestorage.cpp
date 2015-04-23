@@ -12,8 +12,8 @@
 
 PrivateStorage::PrivateStorage()
 {
-	FXmppStreams = NULL;
-	FPresencePlugin = NULL;
+	FXmppStreamManager = NULL;
+	FPresenceManager = NULL;
 	FStanzaProcessor = NULL;
 
 	FSHINotifyDataChanged = -1;
@@ -39,15 +39,15 @@ bool PrivateStorage::initConnections(IPluginManager *APluginManager, int &AInitO
 {
 	Q_UNUSED(AInitOrder);
 
-	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
+	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreamManager").value(0,NULL);
 	if (plugin)
 	{
-		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-		if (FXmppStreams)
+		FXmppStreamManager = qobject_cast<IXmppStreamManager *>(plugin->instance());
+		if (FXmppStreamManager)
 		{
-			connect(FXmppStreams->instance(), SIGNAL(opened(IXmppStream *)), SLOT(onStreamOpened(IXmppStream *)));
-			connect(FXmppStreams->instance(), SIGNAL(aboutToClose(IXmppStream *)), SLOT(onStreamAboutToClose(IXmppStream *)));
-			connect(FXmppStreams->instance(), SIGNAL(closed(IXmppStream *)), SLOT(onStreamClosed(IXmppStream *)));
+			connect(FXmppStreamManager->instance(), SIGNAL(streamOpened(IXmppStream *)), SLOT(onXmppStreamOpened(IXmppStream *)));
+			connect(FXmppStreamManager->instance(), SIGNAL(streamAboutToClose(IXmppStream *)), SLOT(onXmppStreamAboutToClose(IXmppStream *)));
+			connect(FXmppStreamManager->instance(), SIGNAL(streamClosed(IXmppStream *)), SLOT(onXmppStreamClosed(IXmppStream *)));
 		}
 	}
 
@@ -57,13 +57,13 @@ bool PrivateStorage::initConnections(IPluginManager *APluginManager, int &AInitO
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 	}
 
-	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IPresenceManager").value(0,NULL);
 	if (plugin)
 	{
-		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
-		if (FPresencePlugin)
+		FPresenceManager = qobject_cast<IPresenceManager *>(plugin->instance());
+		if (FPresenceManager)
 		{
-			connect(FPresencePlugin->instance(),SIGNAL(presenceAboutToClose(IPresence *, int, const QString &)),
+			connect(FPresenceManager->instance(),SIGNAL(presenceAboutToClose(IPresence *, int, const QString &)),
 				SLOT(onPresenceAboutToClose(IPresence *, int, const QString &)));
 		}
 	}
@@ -271,10 +271,10 @@ QString PrivateStorage::removeData(const Jid &AStreamJid, const QString &ATagNam
 
 void PrivateStorage::notifyDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace)
 {
-	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
+	IPresence *presence = FPresenceManager!=NULL ? FPresenceManager->findPresence(AStreamJid) : NULL;
 	if (FStanzaProcessor && presence && presence->isOpen())
 	{
-		foreach(const IPresenceItem &item, presence->findItems(AStreamJid.bare()))
+		foreach(const IPresenceItem &item, presence->findItems(AStreamJid))
 		{
 			if (item.itemJid != AStreamJid)
 			{
@@ -341,20 +341,20 @@ void PrivateStorage::removeOptionsElement(const Jid &AStreamJid, const QString &
 	}
 }
 
-void PrivateStorage::onStreamOpened(IXmppStream *AXmppStream)
+void PrivateStorage::onXmppStreamOpened(IXmppStream *AXmppStream)
 {
 	LOG_STRM_INFO(AXmppStream->streamJid(),"Private storage opened");
 	FStreamElements.insert(AXmppStream->streamJid(),FStorage.appendChild(FStorage.createElement("stream")).toElement());
 	emit storageOpened(AXmppStream->streamJid());
 }
 
-void PrivateStorage::onStreamAboutToClose(IXmppStream *AXmppStream)
+void PrivateStorage::onXmppStreamAboutToClose(IXmppStream *AXmppStream)
 {
 	LOG_STRM_INFO(AXmppStream->streamJid(),"Private storage about to close");
 	emit storageAboutToClose(AXmppStream->streamJid());
 }
 
-void PrivateStorage::onStreamClosed(IXmppStream *AXmppStream)
+void PrivateStorage::onXmppStreamClosed(IXmppStream *AXmppStream)
 {
 	LOG_STRM_INFO(AXmppStream->streamJid(),"Private storage closed");
 	FPreClosedStreams -= AXmppStream->streamJid();

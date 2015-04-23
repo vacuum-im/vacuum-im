@@ -16,10 +16,6 @@
         <translation>Дозволяє додавати короткі записи до контактів у ростері</translation>
     </message>
     <message>
-        <source>Edit annotation</source>
-        <translation>Редагувати коментар</translation>
-    </message>
-    <message>
         <source>&lt;b&gt;Annotation:&lt;/b&gt;</source>
         <translation>&lt;b&gt;Комментар:&lt;/b&gt;</translation>
     </message>

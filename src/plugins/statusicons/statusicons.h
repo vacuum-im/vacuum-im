@@ -4,23 +4,22 @@
 #include <QRegExp>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/istatusicons.h>
-#include <interfaces/iroster.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/irostermanager.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/irostersmodel.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/ioptionsmanager.h>
-#include "iconsoptionswidget.h"
 
 class StatusIcons :
 	public QObject,
 	public IPlugin,
 	public IStatusIcons,
-	public IOptionsHolder,
+	public IOptionsDialogHolder,
 	public IRosterDataHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IStatusIcons IOptionsHolder IRosterDataHolder);
+	Q_INTERFACES(IPlugin IStatusIcons IOptionsDialogHolder IRosterDataHolder);
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IStatusIcons");
 public:
 	StatusIcons();
@@ -34,7 +33,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IRosterDataHolder
 	virtual QList<int> rosterDataRoles(int AOrder) const;
 	virtual QVariant rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const;
@@ -63,11 +62,11 @@ signals:
 protected:
 	void loadStorages();
 	void clearStorages();
-	void startStatusIconsChanged();
+	void startStatusIconsUpdate();
 	void updateCustomIconMenu(const QStringList &APatterns);
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 protected slots:
-	void onStatusIconsChangedTimer();
+	void onUpdateStatusIcons();
 	void onPresenceChanged(IPresence *APresence, int AShow, const QString &AStatus, int APriority);
 	void onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore);
 	void onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore);
@@ -78,22 +77,21 @@ protected slots:
 	void onOptionsClosed();
 	void onOptionsChanged(const OptionsNode &ANode);
 	void onDefaultIconsetChanged();
-	void onSetCustomIconset(bool);
+	void onSetCustomIconsetByAction(bool);
 private:
-	IRosterPlugin *FRosterPlugin;
-	IPresencePlugin *FPresencePlugin;
+	IRosterManager *FRosterManager;
+	IPresenceManager *FPresenceManager;
 	IRostersModel *FRostersModel;
 	IRostersViewPlugin *FRostersViewPlugin;
-	IMultiUserChatPlugin *FMultiUserChatPlugin;
+	IMultiUserChatManager *FMultiChatManager;
 	IOptionsManager *FOptionsManager;
 private:
 	Menu *FCustomIconMenu;
 	Action *FDefaultIconAction;
 	IconStorage *FDefaultStorage;
-	QHash<QString,Action *> FCustomIconActions;
+	QHash<QString, Action *> FCustomIconActions;
 private:
-	bool FStatusIconsChangedStarted;
-	QString FDefaultIconset;
+	bool FStatusIconsUpdateStarted;
 	QSet<QString> FStatusRules;
 	QMap<QString, QString> FUserRules;
 	QMap<QString, QString> FDefaultRules;

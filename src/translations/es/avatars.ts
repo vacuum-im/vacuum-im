@@ -43,17 +43,5 @@
         <source>Allows to set and display avatars</source>
         <translation>Permite establecer y mostrar avatares</translation>
     </message>
-    <message>
-        <source>Show avatars</source>
-        <translation>Mostrar avatares</translation>
-    </message>
-    <message>
-        <source>Show empty avatars</source>
-        <translation>Mostrar avatares vacíos</translation>
-    </message>
-    <message>
-        <source>Show grayscaled avatars for offline contacts</source>
-        <translation>Mostrar avatares en escala de grises para contactos desconectados</translation>
-    </message>
 </context>
 </TS>

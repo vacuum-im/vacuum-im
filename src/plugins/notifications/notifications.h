@@ -8,17 +8,16 @@
 #include <interfaces/inotifications.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/itraymanager.h>
-#include <interfaces/iroster.h>
+#include <interfaces/irostermanager.h>
 #include <interfaces/iavatars.h>
 #include <interfaces/istatusicons.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/istatuschanger.h>
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/iurlprocessor.h>
 #include "notifywidget.h"
-#include "notifyoptionswidget.h"
 
 struct NotifyRecord {
 	NotifyRecord() {
@@ -44,10 +43,10 @@ class Notifications :
 	public QObject,
 	public IPlugin,
 	public INotifications,
-	public IOptionsHolder
+	public IOptionsDialogHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin INotifications IOptionsHolder);
+	Q_INTERFACES(IPlugin INotifications IOptionsDialogHolder);
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.INotifications");
 public:
 	Notifications();
@@ -61,7 +60,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin();
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//INotifications
 	virtual QList<int> notifications() const;
 	virtual INotification notificationById(int ANotifyId) const;
@@ -117,7 +116,7 @@ protected slots:
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 private:
 	IAvatars *FAvatars;
-	IRosterPlugin *FRosterPlugin;
+	IRosterManager *FRosterManager;
 	IStatusIcons *FStatusIcons;
 	IStatusChanger *FStatusChanger;
 	ITrayManager *FTrayManager;

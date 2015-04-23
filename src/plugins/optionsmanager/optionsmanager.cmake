@@ -1,3 +1,3 @@
-set(SOURCES optionsdialog.cpp optionswidget.cpp optionsmanager.cpp editprofilesdialog.cpp logindialog.cpp optionsheader.cpp)
-set(HEADERS editprofilesdialog.h logindialog.h optionswidget.h optionsdialog.h optionsmanager.h optionsheader.h)
+set(SOURCES optionsmanager.cpp optionsdialog.cpp optionsdialogheader.cpp optionsdialogwidget.cpp editprofilesdialog.cpp logindialog.cpp)
+set(HEADERS optionsmanager.h optionsdialog.h optionsdialogheader.h optionsdialogwidget.h editprofilesdialog.h logindialog.h)
 set(UIS optionsdialog.ui editprofilesdialog.ui logindialog.ui )

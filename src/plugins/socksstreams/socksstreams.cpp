@@ -9,7 +9,7 @@
 
 SocksStreams::SocksStreams() : FServer(this)
 {
-	FXmppStreams = NULL;
+	FXmppStreamManager = NULL;
 	FDataManager = NULL;
 	FStanzaProcessor = NULL;
 	FDiscovery = NULL;
@@ -56,13 +56,13 @@ bool SocksStreams::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		FConnectionManager = qobject_cast<IConnectionManager *>(plugin->instance());
 	}
 
-	plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IXmppStreamManager").value(0,NULL);
 	if (plugin)
 	{
-		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-		if (FXmppStreams)
+		FXmppStreamManager = qobject_cast<IXmppStreamManager *>(plugin->instance());
+		if (FXmppStreamManager)
 		{
-			connect(FXmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onXmppStreamClosed(IXmppStream *)));
+			connect(FXmppStreamManager->instance(),SIGNAL(streamClosed(IXmppStream *)),SLOT(onXmppStreamClosed(IXmppStream *)));
 		}
 	}
 
@@ -112,13 +112,15 @@ bool SocksStreams::initObjects()
 
 bool SocksStreams::initSettings()
 {
-	Options::setDefaultValue(OPV_DATASTREAMS_SOCKSLISTENPORT,5277);
-	Options::setDefaultValue(OPV_DATASTREAMS_METHOD_DISABLEDIRECT,false);
-	Options::setDefaultValue(OPV_DATASTREAMS_METHOD_FORWARDHOST,QString());
-	Options::setDefaultValue(OPV_DATASTREAMS_METHOD_FORWARDPORT,0);
+	Options::setDefaultValue(OPV_DATASTREAMS_SOCKSLISTENPORT,8080);
+	Options::setDefaultValue(OPV_DATASTREAMS_METHOD_ENABLEDIRECT,true);
+	Options::setDefaultValue(OPV_DATASTREAMS_METHOD_ENABLEFORWARD,false);
+	Options::setDefaultValue(OPV_DATASTREAMS_METHOD_FORWARDADDRESS,QString());
 	Options::setDefaultValue(OPV_DATASTREAMS_METHOD_USEACCOUNTSTREAMPROXY,true);
+	Options::setDefaultValue(OPV_DATASTREAMS_METHOD_USEUSERSTREAMPROXY,true);
+	Options::setDefaultValue(OPV_DATASTREAMS_METHOD_USERSTREAMPROXY,QString("proxy.jabbim.cz"));
 	Options::setDefaultValue(OPV_DATASTREAMS_METHOD_USEACCOUNTNETPROXY,true);
-	Options::setDefaultValue(OPV_DATASTREAMS_METHOD_NETWORKPROXY,QString(APPLICATION_PROXY_REF_UUID));
+	Options::setDefaultValue(OPV_DATASTREAMS_METHOD_USERNETWORKPROXY,QString(APPLICATION_PROXY_REF_UUID));
 	Options::setDefaultValue(OPV_DATASTREAMS_METHOD_CONNECTTIMEOUT,10000);
 	return true;
 }
@@ -130,7 +132,7 @@ QString SocksStreams::methodNS() const
 
 QString SocksStreams::methodName() const
 {
-	return tr("SOCKS5 Data Stream");
+	return QString("SOCKS5");
 }
 
 QString SocksStreams::methodDescription() const
@@ -149,36 +151,9 @@ IDataStreamSocket *SocksStreams::dataStreamSocket(const QString &ASocketId, cons
 	return NULL;
 }
 
-IOptionsWidget *SocksStreams::methodSettingsWidget(const OptionsNode &ANode, bool AReadOnly, QWidget *AParent)
+IOptionsDialogWidget *SocksStreams::methodSettingsWidget(const OptionsNode &ANode, QWidget *AParent)
 {
-	return new SocksOptions(this,FConnectionManager,ANode,AReadOnly,AParent);
-}
-
-IOptionsWidget *SocksStreams::methodSettingsWidget(IDataStreamSocket *ASocket, bool AReadOnly, QWidget *AParent)
-{
-	ISocksStream *stream = qobject_cast<ISocksStream *>(ASocket->instance());
-	return stream!=NULL ? new SocksOptions(this,stream,AReadOnly,AParent) : NULL;
-}
-
-void SocksStreams::saveMethodSettings(IOptionsWidget *AWidget, OptionsNode ANode)
-{
-	SocksOptions *widget = qobject_cast<SocksOptions *>(AWidget->instance());
-	if (widget)
-		widget->apply(ANode);
-	else
-		REPORT_ERROR("Failed to save socks stream settings: Invalid options widget");
-}
-
-void SocksStreams::loadMethodSettings(IDataStreamSocket *ASocket, IOptionsWidget *AWidget)
-{
-	SocksOptions *widget = qobject_cast<SocksOptions *>(AWidget->instance());
-	ISocksStream *stream = qobject_cast<ISocksStream *>(ASocket->instance());
-	if (widget && stream)
-		widget->apply(stream);
-	else if (widget == NULL)
-		REPORT_ERROR("Failed to load socks stream settings: Invalid options widget");
-	else if (stream == NULL)
-		REPORT_ERROR("Failed to load socks stream settings: Invalid socket");
+	return new SocksOptionsWidget(this,FConnectionManager,ANode,AParent);
 }
 
 void SocksStreams::loadMethodSettings(IDataStreamSocket *ASocket, const OptionsNode &ANode)
@@ -186,22 +161,36 @@ void SocksStreams::loadMethodSettings(IDataStreamSocket *ASocket, const OptionsN
 	ISocksStream *stream = qobject_cast<ISocksStream *>(ASocket->instance());
 	if (stream)
 	{
-		QStringList proxyItems = ANode.value("stream-proxy-list").toStringList();
+		stream->setConnectTimeout(ANode.value("connect-timeout").toInt());
+		
+		stream->setDirectConnectionEnabled(ANode.value("enable-direct-connections").toBool());
+
+		QList<QString> hostPort = ANode.value("forward-direct-address").toString().split(':');
+		if (hostPort.count() > 1)
+			stream->setDirectConnectionForwardAddress(hostPort.value(0),hostPort.value(1).toUInt());
+		else
+			stream->setDirectConnectionForwardAddress(hostPort.value(0),listeningPort());
+		stream->setDirectConnectionForwardEnabled(ANode.value("enable-forward-direct").toBool());
+
+		QList<QString> streamProxies;
 		if (ANode.value("use-account-stream-proxy").toBool())
 		{
 			QString streamProxy = accountStreamProxy(stream->streamJid());
-			if (!streamProxy.isEmpty() && !proxyItems.contains(streamProxy))
-				proxyItems.prepend(streamProxy);
+			if (!streamProxy.isEmpty() && !streamProxies.contains(streamProxy))
+				streamProxies.append(streamProxy);
 		}
-		stream->setProxyList(proxyItems);
+		if (ANode.value("use-user-stream-proxy").toBool())
+		{
+			QString userProxy = ANode.value("user-stream-proxy").toString();
+			if (!userProxy.isEmpty() && !streamProxies.contains(userProxy))
+				streamProxies.append(userProxy);
+		}
+		stream->setStreamProxyList(streamProxies);
 
-		stream->setConnectTimeout(ANode.value("connect-timeout").toInt());
-		stream->setDirectConnectionsDisabled(ANode.value("disable-direct-connections").toBool());
-		stream->setForwardAddress(ANode.value("forward-host").toString(), ANode.value("forward-port").toInt());
 		if (ANode.value("use-account-network-proxy").toBool())
 			stream->setNetworkProxy(accountNetworkProxy(stream->streamJid()));
 		else if (FConnectionManager)
-			stream->setNetworkProxy(FConnectionManager->proxyById(ANode.value("network-proxy").toString()).proxy);
+			stream->setNetworkProxy(FConnectionManager->proxyById(ANode.value("user-network-proxy").toString()).proxy);
 	}
 	else
 	{
@@ -222,7 +211,7 @@ QString SocksStreams::accountStreamProxy(const Jid &AStreamJid) const
 QNetworkProxy SocksStreams::accountNetworkProxy(const Jid &AStreamJid) const
 {
 	QNetworkProxy proxy(QNetworkProxy::NoProxy);
-	IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(AStreamJid) : NULL;
+	IXmppStream *stream = FXmppStreamManager!=NULL ? FXmppStreamManager->findXmppStream(AStreamJid) : NULL;
 	IDefaultConnection *connection = stream!=NULL ? qobject_cast<IDefaultConnection *>(stream->connection()->instance()) : NULL;
 	return connection!=NULL ? connection->proxy() : QNetworkProxy(QNetworkProxy::NoProxy);
 }

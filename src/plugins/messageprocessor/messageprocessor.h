@@ -3,7 +3,7 @@
 
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessageprocessor.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <interfaces/inotifications.h>
 #include <interfaces/istanzaprocessor.h>
 
@@ -75,11 +75,10 @@ protected:
 protected slots:
 	void onNotificationActivated(int ANotifyId);
 	void onNotificationRemoved(int ANotifyId);
-	void onXmppStreamAdded(IXmppStream *AXmppStream);
-	void onXmppStreamRemoved(IXmppStream *AXmppStream);
+	void onXmppStreamActiveChanged(IXmppStream *AXmppStream, bool AActive);
 	void onXmppStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore);
 private:
-	IXmppStreams *FXmppStreams;
+	IXmppStreamManager *FXmppStreamManager;
 	INotifications *FNotifications;
 	IStanzaProcessor *FStanzaProcessor;
 private:

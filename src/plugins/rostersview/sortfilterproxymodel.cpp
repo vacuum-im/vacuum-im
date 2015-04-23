@@ -9,7 +9,7 @@
 SortFilterProxyModel::SortFilterProxyModel(IRostersViewPlugin *ARostersViewPlugin, QObject *AParent) : QSortFilterProxyModel(AParent)
 {
 	FShowOffline = true;
-	FSortByStatus = false;
+	FSortMode = IRostersView::SortByStatus;
 	FRostersView = ARostersViewPlugin->rostersView();
 }
 
@@ -20,8 +20,8 @@ SortFilterProxyModel::~SortFilterProxyModel()
 
 void SortFilterProxyModel::invalidate()
 {
+	FSortMode = Options::node(OPV_ROSTER_SORTMODE).value().toInt();
 	FShowOffline = Options::node(OPV_ROSTER_SHOWOFFLINE).value().toBool();
-	FSortByStatus = Options::node(OPV_ROSTER_SORTBYSTATUS).value().toBool();
 	QSortFilterProxyModel::invalidate();
 }
 
@@ -71,7 +71,7 @@ bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex 
 		QVariant rightSortOrder = ARight.data(RDR_SORT_ORDER);
 		if (leftSortOrder.isNull() || rightSortOrder.isNull() || leftSortOrder==rightSortOrder)
 		{
-			if (FSortByStatus && leftTypeOrder!=RIKO_STREAM_ROOT)
+			if (FSortMode==IRostersView::SortByStatus && leftTypeOrder!=RIKO_STREAM_ROOT)
 			{
 				int leftShow = ALeft.data(RDR_SHOW).toInt();
 				int rightShow = ARight.data(RDR_SHOW).toInt();

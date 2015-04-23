@@ -10,9 +10,9 @@
 
 #define DISCONNECT_TIMEOUT    5000
 
-DefaultConnection::DefaultConnection(IConnectionPlugin *APlugin, QObject *AParent) : QObject(AParent)
+DefaultConnection::DefaultConnection(IConnectionEngine *AEngine, QObject *AParent) : QObject(AParent)
 {
-	FPlugin = APlugin;
+	FEngine = AEngine;
 	FDisconnecting = false;
 	
 	FDnsLookup.setType(QDnsLookup::SRV);
@@ -150,9 +150,9 @@ QByteArray DefaultConnection::read(qint64 ABytes)
 	return FSocket.read(ABytes);
 }
 
-IConnectionPlugin *DefaultConnection::ownerPlugin() const
+IConnectionEngine *DefaultConnection::engine() const
 {
-	return FPlugin;
+	return FEngine;
 }
 
 QSslCertificate DefaultConnection::hostCertificate() const

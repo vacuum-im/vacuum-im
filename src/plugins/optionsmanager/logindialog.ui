@@ -63,7 +63,7 @@
      <item>
       <widget class="QPushButton" name="pbtProfiles">
        <property name="text">
-        <string>Profiles</string>
+        <string>Settings...</string>
        </property>
       </widget>
      </item>

@@ -11,15 +11,14 @@ class DataTableWidget :
 	Q_INTERFACES(IDataTableWidget);
 public:
 	DataTableWidget(IDataForms *ADataForms, const IDataTable &ATable, QWidget *AParent);
-	~DataTableWidget();
 	virtual QTableWidget *instance() { return this; }
-	virtual const IDataTable &dataTable() const;
+	virtual IDataTable dataTable() const;
 	virtual IDataField currentField() const;
 	virtual IDataField dataField(int ARow, int AColumn) const;
 	virtual IDataField dataField(int ARow, const QString &AVar) const;
 signals:
 	void activated(int ARow, int AColumn);
-	void changed(int ACurrentRow, int ACurrentColumn, int APreviousRow, int APreviousColumn);
+	void changed(int ARow, int AColumn, int APrevRow, int APrevColumn);
 private:
 	IDataForms *FDataForms;
 private:

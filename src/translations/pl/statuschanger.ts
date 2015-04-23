@@ -2,96 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="pl" sourcelanguage="en">
 <context>
-    <name>EditStatusDialog</name>
-    <message>
-        <source>Enter status name</source>
-        <translation>Wprowadź nazwę dla statusu</translation>
-    </message>
-    <message>
-        <source>Status name:</source>
-        <translation>Nazwa statusu:</translation>
-    </message>
-    <message>
-        <source>Wrong status name</source>
-        <translation>Nieprawidłowa nazwa statusu</translation>
-    </message>
-    <message>
-        <source>Can&apos;t delete status</source>
-        <translation>Nie można skasować statusu</translation>
-    </message>
-    <message>
-        <source>You can not delete standard statuses.</source>
-        <translation>Nie można kasować standardowych statusów.</translation>
-    </message>
-    <message>
-        <source>You can not delete active statuses.</source>
-        <translation>Nie można kasować aktywnego statusu.</translation>
-    </message>
-    <message>
-        <source>Delete status</source>
-        <translation>Usuń status</translation>
-    </message>
-    <message>
-        <source>You are assured that wish to remove a status &apos;&lt;b&gt;%1&lt;/b&gt;&apos;?</source>
-        <translation>Jesteś pewien, że chcesz usunąć status &apos;&lt;b&gt;%1&lt;/b&gt;&apos;?</translation>
-    </message>
-    <message>
-        <source>Status with name &apos;&lt;b&gt;%1&lt;/b&gt;&apos; already exists</source>
-        <translation>Status o nazwie &apos;&lt;b&gt;%1&lt;/b&gt;&apos; już istnieje</translation>
-    </message>
-</context>
-<context>
-    <name>EditStatusDialogClass</name>
-    <message>
-        <source>Add</source>
-        <translation>Dodaj</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>Usuń</translation>
-    </message>
-    <message>
-        <source>Edit statuses</source>
-        <translation>Edytuj statusy</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation>Nazwa</translation>
-    </message>
-    <message>
-        <source>Status name displayed in status change menu</source>
-        <translation>Nazwa statusu wyświetlana w menu</translation>
-    </message>
-    <message>
-        <source>Message</source>
-        <translation>Wiadomość</translation>
-    </message>
-    <message>
-        <source>Status message</source>
-        <translation>Wiadomość statusowa</translation>
-    </message>
-    <message>
-        <source>Priority</source>
-        <translation>Priorytet</translation>
-    </message>
-    <message>
-        <source>Status priority</source>
-        <translation>Priorytet statusu</translation>
-    </message>
-    <message>
-        <source>Status type&lt;br&gt;
-Types for standard statuses are grayed out.
-You can set status class for additional statuses defined by you.</source>
-        <translation>Typ statusu&lt;br&gt;
-Typy dla statusów standardowych nieaktywne.
-Można zmienić typ statusu tylko dla dodatkowo zdefiniowanych statusów.</translation>
-    </message>
-    <message>
-        <source>Type</source>
-        <translation>Typ</translation>
-    </message>
-</context>
-<context>
     <name>ModifyStatusDialogClass</name>
     <message>
         <source>Modify Status</source>
@@ -189,18 +99,6 @@ Można zmienić typ statusu tylko dla dodatkowo zdefiniowanych statusów.</trans
         <translation>Modyfikuj status</translation>
     </message>
     <message>
-        <source>Edit Statuses</source>
-        <translation>Edytuj statusy</translation>
-    </message>
-    <message>
-        <source>Auto connect on startup</source>
-        <translation>Połącz zaraz po uruchomieniu programu</translation>
-    </message>
-    <message>
-        <source>Auto reconnect if disconnected</source>
-        <translation>Automatycznie przywracaj połączenie</translation>
-    </message>
-    <message>
         <source>I&apos;m away from my desk</source>
         <translation>Odszedłem od komputera</translation>
     </message>
@@ -211,6 +109,57 @@ Można zmienić typ statusu tylko dla dodatkowo zdefiniowanych statusów.</trans
     <message>
         <source>Left %1</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect to server on startup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reconnect to server on connection errors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Standard and users statuses</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StatusOptionsWidget</name>
+    <message>
+        <source>Add</source>
+        <translation type="unfinished">Dodaj</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">Usuń</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation type="unfinished">Status</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished">Nazwa</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation type="unfinished">Wiadomość</translation>
+    </message>
+    <message>
+        <source>Priority</source>
+        <translation type="unfinished">Priorytet</translation>
+    </message>
+    <message>
+        <source>Can&apos;t delete status</source>
+        <translation type="unfinished">Nie można skasować statusu</translation>
+    </message>
+    <message>
+        <source>You can not delete standard statuses.</source>
+        <translation type="unfinished">Nie można kasować standardowych statusów.</translation>
+    </message>
+    <message>
+        <source>You can not delete active statuses.</source>
+        <translation type="unfinished">Nie można kasować aktywnego statusu.</translation>
     </message>
 </context>
 </TS>

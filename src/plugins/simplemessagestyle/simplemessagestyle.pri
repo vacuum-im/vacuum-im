@@ -1,11 +1,11 @@
 FORMS = simpleoptionswidget.ui
 
-HEADERS = simplemessagestyleplugin.h \
+HEADERS = simplemessagestyleengine.h \
           simplemessagestyle.h \
           simpleoptionswidget.h \
           styleviewer.h
 
-SOURCES = simplemessagestyleplugin.cpp \
+SOURCES = simplemessagestyleengine.cpp \
           simplemessagestyle.cpp \
           simpleoptionswidget.cpp \
           styleviewer.cpp

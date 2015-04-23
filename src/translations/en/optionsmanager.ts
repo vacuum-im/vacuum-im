@@ -83,28 +83,28 @@
 <context>
     <name>EditProfilesDialogClass</name>
     <message>
-        <source>Edit Profiles</source>
-        <translation>Edit Profiles</translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation>Add</translation>
-    </message>
-    <message>
-        <source>Password</source>
-        <translation>Password</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Rename</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>Delete</translation>
-    </message>
-    <message>
         <source>Close</source>
         <translation>Close</translation>
+    </message>
+    <message>
+        <source>Add Profile</source>
+        <translation>Add Profile</translation>
+    </message>
+    <message>
+        <source>Change Password</source>
+        <translation>Change Password</translation>
+    </message>
+    <message>
+        <source>Rename Profile</source>
+        <translation>Rename Profile</translation>
+    </message>
+    <message>
+        <source>Delete Profile</source>
+        <translation>Delete Profile</translation>
+    </message>
+    <message>
+        <source>Profiles Settings</source>
+        <translation>Profiles Settings</translation>
     </message>
 </context>
 <context>
@@ -141,8 +141,8 @@
         <translation>Password:</translation>
     </message>
     <message>
-        <source>Profiles</source>
-        <translation>Profiles</translation>
+        <source>Settings...</source>
+        <translation>Settings...</translation>
     </message>
 </context>
 <context>
@@ -171,24 +171,36 @@
         <translation>Change Profile</translation>
     </message>
     <message>
-        <source>Misc</source>
-        <translation>Misc</translation>
-    </message>
-    <message>
-        <source>Auto run on system startup</source>
-        <translation>Auto run on system startup</translation>
-    </message>
-    <message>
         <source>Options</source>
         <translation>Options</translation>
     </message>
     <message>
-        <source>Show change profile dialog</source>
-        <translation>Show change profile dialog</translation>
+        <source>Common settings</source>
+        <translation>Common settings</translation>
     </message>
     <message>
-        <source>Show options dialog</source>
-        <translation>Show options dialog</translation>
+        <source>Auto run application on system startup</source>
+        <translation>Auto run application on system startup</translation>
+    </message>
+    <message>
+        <source>Localization</source>
+        <translation>Localization</translation>
+    </message>
+    <message>
+        <source>&lt;System Language&gt;</source>
+        <translation>&lt;System Language&gt;</translation>
+    </message>
+    <message>
+        <source>Language:</source>
+        <translation>Language:</translation>
+    </message>
+    <message>
+        <source>Common</source>
+        <translation>Common</translation>
+    </message>
+    <message>
+        <source>Appearance</source>
+        <translation>Appearance</translation>
     </message>
 </context>
 </TS>

@@ -3,6 +3,7 @@
 #include <QHeaderView>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
+#include <utils/pluginhelper.h>
 #include <utils/logger.h>
 #include <utils/menu.h>
 
@@ -16,17 +17,17 @@ DiscoInfoWindow::DiscoInfoWindow(IServiceDiscovery *ADiscovery, const Jid &AStre
 	setWindowTitle(tr("Discovery Info - %1").arg(AContactJid.uFull()));
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_SDISCOVERY_DISCOINFO,0,0,"windowIcon");
 
-	FDataForms = NULL;
-	FDiscovery = ADiscovery;
-	FStreamJid = AStreamJid;
-	FContactJid = AContactJid;
 	FNode = ANode;
 	FFormMenu = NULL;
+	FStreamJid = AStreamJid;
+	FContactJid = AContactJid;
+
+	FDiscovery = ADiscovery;
+	FDataForms = PluginHelper::pluginInstance<IDataForms>();
 
 	ui.pbtExtensions->setEnabled(false);
 	ui.lblError->setVisible(false);
 
-	initialize();
 	connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
 	connect(ui.pbtUpdate,SIGNAL(clicked()),SLOT(onUpdateClicked()));
 	connect(ui.lwtFearures,SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),SLOT(onCurrentFeatureChanged(QListWidgetItem *, QListWidgetItem *)));
@@ -56,13 +57,6 @@ Jid DiscoInfoWindow::contactJid() const
 QString DiscoInfoWindow::node() const
 {
 	return FNode;
-}
-
-void DiscoInfoWindow::initialize()
-{
-	IPlugin *plugin = FDiscovery->pluginManager()->pluginInterface("IDataForms").value(0,NULL);
-	if (plugin)
-		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 }
 
 void DiscoInfoWindow::updateWindow()

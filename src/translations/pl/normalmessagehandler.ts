@@ -61,10 +61,6 @@
         <translation>&lt;b&gt;Odebrano wiadomość z błędem&lt;/b&gt;</translation>
     </message>
     <message>
-        <source>Mark all single messages from user as read when you read the first one</source>
-        <translation>Oznacz wszystkie wiadomości od użytkownika jako przeczytane po przeczytaniu pierwszej</translation>
-    </message>
-    <message>
         <source>Send</source>
         <translation type="unfinished"></translation>
     </message>
@@ -90,6 +86,10 @@
     </message>
     <message>
         <source>Send as Chat Message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Consider all single contacts messages as read when read the first</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -13,7 +13,7 @@
 PEPManager::PEPManager()
 {
 	FDiscovery = NULL;
-	FXmppStreams = NULL;
+	FXmppStreamManager = NULL;
 	FStanzaProcessor = NULL;
 }
 
@@ -49,17 +49,17 @@ bool PEPManager::initConnections(IPluginManager *APluginManager, int &AInitOrder
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 	}
 
-	plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IXmppStreamManager").value(0,NULL);
 	if (plugin)
 	{
-		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-		if (FXmppStreams)
+		FXmppStreamManager = qobject_cast<IXmppStreamManager *>(plugin->instance());
+		if (FXmppStreamManager)
 		{
-			connect(FXmppStreams->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onXmppStreamOpened(IXmppStream *)));
-			connect(FXmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onXmppStreamClosed(IXmppStream *)));
+			connect(FXmppStreamManager->instance(),SIGNAL(streamOpened(IXmppStream *)),SLOT(onXmppStreamOpened(IXmppStream *)));
+			connect(FXmppStreamManager->instance(),SIGNAL(streamClosed(IXmppStream *)),SLOT(onXmppStreamClosed(IXmppStream *)));
 		}
 	}
-	return FDiscovery!=NULL && FStanzaProcessor!=NULL && FXmppStreams!=NULL;
+	return FDiscovery!=NULL && FStanzaProcessor!=NULL && FXmppStreamManager!=NULL;
 }
 
 bool PEPManager::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)

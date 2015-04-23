@@ -13,18 +13,18 @@
     </message>
 </context>
 <context>
-    <name>SimpleMessageStylePlugin</name>
+    <name>SimpleMessageStyleEngine</name>
     <message>
         <source>Simple Message Style</source>
-        <translation>Einfacher Nachrichten Stil</translation>
+        <translation type="unfinished">Einfacher Nachrichten Stil</translation>
     </message>
     <message>
         <source>Allows to use a simplified style in message design</source>
-        <translation>Erlaubt das Nutzen eines vereinfachten Stils im Nachrichten Design</translation>
+        <translation type="unfinished">Erlaubt das Nutzen eines vereinfachten Stils im Nachrichten Design</translation>
     </message>
     <message>
-        <source>Simple Style</source>
-        <translation>Einfacher Stil</translation>
+        <source>Simple</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -45,43 +45,43 @@
         <source>Image Files (*.png *.jpg *.bmp *.gif)</source>
         <translation>Bilddateien (*.png *.jpg *.bmp *.gif)</translation>
     </message>
+    <message>
+        <source>Parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Background</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SimpleOptionsWidgetClass</name>
     <message>
-        <source>Message Style:</source>
-        <translation>Nachrichten Stil:</translation>
-    </message>
-    <message>
         <source>Variant:</source>
         <translation>Variante:</translation>
-    </message>
-    <message>
-        <source>Text Font:</source>
-        <translation>Text Schriftart:</translation>
-    </message>
-    <message>
-        <source>Set Font...</source>
-        <translation>Schriftart...</translation>
-    </message>
-    <message>
-        <source>Default</source>
-        <translation>Standard</translation>
-    </message>
-    <message>
-        <source>Background:</source>
-        <translation>Hintergrund:</translation>
     </message>
     <message>
         <source>Color:</source>
         <translation>Farbe:</translation>
     </message>
     <message>
-        <source>Set Image...</source>
-        <translation>Bild setzen...</translation>
+        <source>Font:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable animation (may be slow)</source>
+        <source>Change...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>not set</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

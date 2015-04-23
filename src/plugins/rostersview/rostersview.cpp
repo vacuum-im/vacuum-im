@@ -42,7 +42,7 @@ RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
 	FPressedLabel = AdvancedDelegateItem::NullId;
 
 	header()->hide();
-	header()->setStretchLastSection(false);
+	header()->setStretchLastSection(true);
 
 	setIndentation(4);
 	setAutoScroll(true);
@@ -1091,13 +1091,6 @@ bool RostersView::viewportEvent(QEvent *AEvent)
 		}
 	}
 	return QTreeView::viewportEvent(AEvent);
-}
-
-void RostersView::resizeEvent(QResizeEvent *AEvent)
-{
-	if (model() && model()->columnCount()>0)
-		header()->resizeSection(0,AEvent->size().width());
-	QTreeView::resizeEvent(AEvent);
 }
 
 bool RostersView::edit(const QModelIndex &AIndex, EditTrigger ATrigger, QEvent *AEvent)

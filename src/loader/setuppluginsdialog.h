@@ -3,8 +3,25 @@
 
 #include <QDialog>
 #include <QDomDocument>
+#include <QStandardItemModel>
+#include <QSortFilterProxyModel>
 #include <interfaces/ipluginmanager.h>
 #include "ui_setuppluginsdialog.h"
+
+class PluginsFilterProxyModel :
+	public QSortFilterProxyModel
+{
+	Q_OBJECT;
+public:
+	PluginsFilterProxyModel(QObject *AParent = NULL);
+	void setErrorsOnly(bool AErrors);
+	void setDisabledOnly(bool ADisabled);
+protected:
+	bool filterAcceptsRow(int ASourceRow, const QModelIndex &ASourceParent) const;
+private:
+	bool FErrorsOnly;
+	bool FDisableOnly;
+};
 
 class SetupPluginsDialog :
 	public QDialog
@@ -14,22 +31,26 @@ public:
 	SetupPluginsDialog(IPluginManager *APluginManager, QDomDocument APluginsSetup, QWidget *AParent = NULL);
 	~SetupPluginsDialog();
 protected:
-	void updateLanguage();
 	void updatePlugins();
 	void saveSettings();
-	QDomElement getPluginElement(const QUuid &AUuid) const;
 protected slots:
-	void onCurrentLanguageChanged(int AIndex);
-	void onCurrentPluginChanged(QTableWidgetItem *ACurrent, QTableWidgetItem *APrevious);
+	void onCurrentPluginChanged(const QModelIndex &ACurrent, const QModelIndex &APrevious);
 	void onDialogButtonClicked(QAbstractButton *AButton);
 	void onHomePageLinkActivated(const QString &ALink);
+	void onDependsLinkActivated(const QString &ALink);
+	void onSearchLineEditSearchStart();
+	void onDisabledCheckButtonClicked();
+	void onWithErrorsCheckButtonClicked();
 private:
 	Ui::SetupPluginsDialogClass ui;
 private:
 	IPluginManager *FPluginManager;
 private:
 	QDomDocument FPluginsSetup;
-	QMap<QTableWidgetItem *, QDomElement> FItemElement;
+	QStandardItemModel FModel;
+	PluginsFilterProxyModel FProxy;
+	QMap<QUuid, QStandardItem *> FPluginItem;
+	QMap<QStandardItem *, QDomElement> FItemElement;
 };
 
 #endif // SETUPPLUGINSDIALOG_H

@@ -8,9 +8,9 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagearchiver.h>
 #include <interfaces/imessagewidgets.h>
-#include <interfaces/imessagestyles.h>
+#include <interfaces/imessagestylemanager.h>
 #include <interfaces/imessageprocessor.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/iprivatestorage.h>
@@ -20,12 +20,11 @@
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/idataforms.h>
 #include <interfaces/isessionnegotiation.h>
-#include <interfaces/iroster.h>
+#include <interfaces/irostermanager.h>
 #include "chatwindowmenu.h"
 #include "archiveviewwindow.h"
-#include "archivestreamoptions.h"
-#include "archiveenginesoptions.h"
 #include "archivereplicator.h"
+#include "archiveaccountoptionswidget.h"
 
 struct StanzaSession {
 	QString sessionId;
@@ -67,11 +66,11 @@ class MessageArchiver :
 	public IMessageArchiver,
 	public IStanzaHandler,
 	public IStanzaRequestOwner,
-	public IOptionsHolder,
+	public IOptionsDialogHolder,
 	public ISessionNegotiator
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IMessageArchiver IStanzaHandler IStanzaRequestOwner IOptionsHolder ISessionNegotiator);
+	Q_INTERFACES(IPlugin IMessageArchiver IStanzaHandler IStanzaRequestOwner IOptionsDialogHolder ISessionNegotiator);
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IMessageArchiver");
 public:
 	MessageArchiver();
@@ -89,7 +88,7 @@ public:
 	//IStanzaRequestOwner
 	virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//SessionNegotiator
 	virtual int sessionInit(const IStanzaSession &ASession, IDataForm &ARequest);
 	virtual int sessionAccept(const IStanzaSession &ASession, const IDataForm &ARequest, IDataForm &ASubmit);
@@ -103,6 +102,7 @@ public:
   //Preferences
 	virtual QString prefsNamespace(const Jid &AStreamJid) const;
 	virtual bool isArchivePrefsEnabled(const Jid &AStreamJid) const;
+	virtual bool isArchiveReplicationEnabled(const Jid &AStreamJid) const;
 	virtual bool isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId) const;
 	virtual IArchiveStreamPrefs archivePrefs(const Jid &AStreamJid) const;
 	virtual IArchiveItemPrefs archiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId = QString::null) const;
@@ -182,8 +182,9 @@ protected:
 	void renegotiateStanzaSessions(const Jid &AStreamJid) const;
 protected:
 	void registerDiscoFeatures();
-	void openHistoryOptionsNode(const Jid &AStreamJid);
-	void closeHistoryOptionsNode(const Jid &AStreamJid);
+	void openHistoryOptionsNode(const QUuid &AAccountId);
+	void closeHistoryOptionsNode(const QUuid &AAccountId);
+	bool isArchiveDuplicationEnabled(const Jid &AStreamJid) const;
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 	Menu *createContextMenu(const QStringList &AStreams, const QStringList &AContacts, QWidget *AParent) const;
 	void notifyInChatWindow(const Jid &AStreamJid, const Jid &AContactJid, const QString &AMessage) const;
@@ -197,6 +198,8 @@ protected slots:
 	void onSelfHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders);
 	void onSelfCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection);
 protected slots:
+	void onAccountInserted(IAccount *AAccount);
+	void onAccountRemoved(IAccount *AAccount);
 	void onXmppStreamOpened(IXmppStream *AXmppStream);
 	void onXmppStreamClosed(IXmppStream *AXmppStream);
 	void onXmppStreamAboutToClose(IXmppStream *AXmppStream);
@@ -219,18 +222,18 @@ protected slots:
 	void onOptionsChanged(const OptionsNode &ANode);
 private:
 	IPluginManager *FPluginManager;
-	IXmppStreams *FXmppStreams;
+	IXmppStreamManager *FXmppStreamManager;
 	IStanzaProcessor *FStanzaProcessor;
 	IOptionsManager *FOptionsManager;
 	IPrivateStorage *FPrivateStorage;
 	IAccountManager *FAccountManager;
-	IRosterPlugin *FRosterPlugin;
+	IRosterManager *FRosterManager;
 	IRostersViewPlugin *FRostersViewPlugin;
 	IServiceDiscovery *FDiscovery;
 	IDataForms *FDataForms;
 	IMessageWidgets *FMessageWidgets;
 	ISessionNegotiation *FSessionNegotiation;
-	IMultiUserChatPlugin *FMultiUserChatPlugin;
+	IMultiUserChatManager *FMultiChatManager;
 private:
 	QMap<Jid,int> FSHIPrefs;
 	QMap<Jid,int> FSHIMessageIn;

@@ -2,14 +2,14 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="pl" sourcelanguage="en">
 <context>
-    <name>IqAuthPlugin</name>
+    <name>IqAuthFeatureFactory</name>
     <message>
         <source>Query Authentication</source>
-        <translation>Autoryzacja przez zapytanie</translation>
+        <translation type="unfinished">Autoryzacja przez zapytanie</translation>
     </message>
     <message>
         <source>Allow you to log on the Jabber server without support SASL authentication</source>
-        <translation>Pozwala zalogować się na serwer Jabbera bez obsługi uwierzytelniania SASL</translation>
+        <translation type="unfinished">Pozwala zalogować się na serwer Jabbera bez obsługi uwierzytelniania SASL</translation>
     </message>
 </context>
 </TS>

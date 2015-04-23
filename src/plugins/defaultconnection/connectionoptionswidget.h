@@ -8,10 +8,10 @@
 
 class ConnectionOptionsWidget :
 	public QWidget,
-	public IOptionsWidget
+	public IOptionsDialogWidget
 {
 	Q_OBJECT;
-	Q_INTERFACES(IOptionsWidget);
+	Q_INTERFACES(IOptionsDialogWidget);
 public:
 	ConnectionOptionsWidget(IConnectionManager *AManager, const OptionsNode &ANode, QWidget *AParent = NULL);
 	~ConnectionOptionsWidget();
@@ -32,7 +32,7 @@ private:
 	IConnectionManager *FManager;
 private:
 	OptionsNode FOptions;
-	IOptionsWidget *FProxySettings;
+	IOptionsDialogWidget *FProxySettings;
 };
 
 #endif // CONNECTIONOPTIONSWIDGET_H

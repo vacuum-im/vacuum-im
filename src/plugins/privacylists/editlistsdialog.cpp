@@ -88,7 +88,7 @@ void EditListsDialog::apply()
 		{
 			const IPrivacyRule &rule = newList.rules.at(i);
 			bool validRule = rule.order>=0 && !ruleOrders.contains(rule.order);
-			validRule &= rule.type == PRIVACY_TYPE_ALWAYS || !rule.value.isEmpty();
+			validRule &= rule.type==PRIVACY_TYPE_ALWAYS || !rule.value.isEmpty();
 			if (!validRule)
 			{
 				newList.rules.removeAt(i);
@@ -513,7 +513,7 @@ void EditListsDialog::onRuleConditionTypeChanged(int AIndex)
 		ui.cmbValue->setInsertPolicy(QComboBox::InsertAlphabetically);
 		if (type == PRIVACY_TYPE_JID)
 		{
-			QList<IRosterItem> ritems = FRoster!=NULL ? FRoster->rosterItems() : QList<IRosterItem>();
+			QList<IRosterItem> ritems = FRoster!=NULL ? FRoster->items() : QList<IRosterItem>();
 			foreach(const IRosterItem &ritem, ritems)
 			{
 				QString itemName = !ritem.name.isEmpty() ? ritem.name + " <"+ritem.itemJid.uFull()+">" : ritem.itemJid.uFull();
@@ -522,7 +522,7 @@ void EditListsDialog::onRuleConditionTypeChanged(int AIndex)
 		}
 		else if (type == PRIVACY_TYPE_GROUP)
 		{
-			QSet<QString> groups = FRoster!=NULL ? FRoster->allGroups() : QSet<QString>();
+			QSet<QString> groups = FRoster!=NULL ? FRoster->groups() : QSet<QString>();
 			foreach(const QString &group, groups)
 				ui.cmbValue->addItem(group,group);
 		}

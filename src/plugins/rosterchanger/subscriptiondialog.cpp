@@ -3,9 +3,10 @@
 #include <definitions/toolbargroups.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
+#include <utils/pluginhelper.h>
 #include <utils/logger.h>
 
-SubscriptionDialog::SubscriptionDialog(IRosterChanger *ARosterChanger, IPluginManager *APluginManager, const Jid &AStreamJid, const Jid &AContactJid,
+SubscriptionDialog::SubscriptionDialog(IRosterChanger *ARosterChanger, const Jid &AStreamJid, const Jid &AContactJid,
 	const QString &ANotify, const QString &AMessage, QWidget *AParent) : QDialog(AParent)
 {
 	REPORT_VIEW;
@@ -14,14 +15,9 @@ SubscriptionDialog::SubscriptionDialog(IRosterChanger *ARosterChanger, IPluginMa
 	setWindowTitle(tr("Subscription request - %1").arg(AStreamJid.uBare()));
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_RCHANGER_SUBSCRIBTION,0,0,"windowIcon");
 
-	FRoster = NULL;
-	FVcardPlugin = NULL;
-	FNotifications = NULL;
-	FMessageProcessor = NULL;
-
-	FRosterChanger = ARosterChanger;
 	FStreamJid = AStreamJid;
 	FContactJid = AContactJid;
+	FRosterChanger = ARosterChanger;
 
 	QToolBar *toolBar = new QToolBar(this);
 	toolBar->setIconSize(QSize(16,16));
@@ -34,10 +30,10 @@ SubscriptionDialog::SubscriptionDialog(IRosterChanger *ARosterChanger, IPluginMa
 	else
 		ui.lblMessage->setVisible(false);
 
-	initialize(APluginManager);
-
 	connect(ui.btbDialogButtons,SIGNAL(accepted()),SLOT(onDialogAccepted()));
 	connect(ui.btbDialogButtons,SIGNAL(rejected()),SLOT(onDialogRejected()));
+
+	initialize();
 }
 
 SubscriptionDialog::~SubscriptionDialog()
@@ -65,60 +61,46 @@ ToolBarChanger *SubscriptionDialog::toolBarChanger() const
 	return FToolBarChanger;
 }
 
-void SubscriptionDialog::initialize(IPluginManager *APluginManager)
+void SubscriptionDialog::initialize()
 {
-	IPlugin *plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
-	if (plugin)
+	IRosterManager *rosterManager = PluginHelper::pluginInstance<IRosterManager>();
+	FRoster = rosterManager!=NULL ? rosterManager->findRoster(FStreamJid) : NULL;
+	if (FRoster && FRoster->hasItem(FContactJid))
 	{
-		IRosterPlugin *rosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
-		FRoster = rosterPlugin!=NULL ? rosterPlugin->findRoster(FStreamJid) : NULL;
-		if (FRoster && FRoster->rosterItem(FContactJid).isValid)
-		{
-			ui.rbtAddToRoster->setEnabled(false);
-			ui.rbtSendAndRequest->setChecked(true);
-		}
+		ui.rbtAddToRoster->setEnabled(false);
+		ui.rbtSendAndRequest->setChecked(true);
 	}
 
-	plugin = APluginManager->pluginInterface("IMessageProcessor").value(0,NULL);
-	if (plugin)
+	FMessageProcessor = PluginHelper::pluginInstance<IMessageProcessor>();
+	if (FMessageProcessor)
 	{
-		FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
-		if (FMessageProcessor)
-		{
-			FShowChat = new Action(FToolBarChanger->toolBar());
-			FShowChat->setText(tr("Chat"));
-			FShowChat->setToolTip(tr("Open chat window"));
-			FShowChat->setIcon(RSR_STORAGE_MENUICONS,MNI_CHATMHANDLER_MESSAGE);
-			FToolBarChanger->insertAction(FShowChat,TBG_RCSRD_ROSTERCHANGER);
-			connect(FShowChat,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
+		FShowChat = new Action(FToolBarChanger->toolBar());
+		FShowChat->setText(tr("Chat"));
+		FShowChat->setToolTip(tr("Open chat window"));
+		FShowChat->setIcon(RSR_STORAGE_MENUICONS,MNI_CHATMHANDLER_MESSAGE);
+		FToolBarChanger->insertAction(FShowChat,TBG_RCSRD_ROSTERCHANGER);
+		connect(FShowChat,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
-			FSendMessage = new Action(FToolBarChanger->toolBar());
-			FSendMessage->setText(tr("Message"));
-			FSendMessage->setToolTip(tr("Send Message"));
-			FSendMessage->setIcon(RSR_STORAGE_MENUICONS,MNI_NORMALMHANDLER_MESSAGE);
-			FToolBarChanger->insertAction(FSendMessage,TBG_RCSRD_ROSTERCHANGER);
-			connect(FSendMessage,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
-		}
+		FSendMessage = new Action(FToolBarChanger->toolBar());
+		FSendMessage->setText(tr("Message"));
+		FSendMessage->setToolTip(tr("Send Message"));
+		FSendMessage->setIcon(RSR_STORAGE_MENUICONS,MNI_NORMALMHANDLER_MESSAGE);
+		FToolBarChanger->insertAction(FSendMessage,TBG_RCSRD_ROSTERCHANGER);
+		connect(FSendMessage,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 	}
 
-	plugin = APluginManager->pluginInterface("IVCardPlugin").value(0,NULL);
-	if (plugin)
+	FVCardManager = PluginHelper::pluginInstance<IVCardManager>();
+	if (FVCardManager)
 	{
-		FVcardPlugin = qobject_cast<IVCardPlugin *>(plugin->instance());
-		if (FVcardPlugin)
-		{
-			FShowVCard = new Action(FToolBarChanger->toolBar());
-			FShowVCard->setText(tr("VCard"));
-			FShowVCard->setToolTip(tr("Show VCard"));
-			FShowVCard->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
-			FToolBarChanger->insertAction(FShowVCard,TBG_RCSRD_ROSTERCHANGER);
-			connect(FShowVCard,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
-		}
+		FShowVCard = new Action(FToolBarChanger->toolBar());
+		FShowVCard->setText(tr("VCard"));
+		FShowVCard->setToolTip(tr("Show VCard"));
+		FShowVCard->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
+		FToolBarChanger->insertAction(FShowVCard,TBG_RCSRD_ROSTERCHANGER);
+		connect(FShowVCard,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 	}
 
-	plugin = APluginManager->pluginInterface("INotifications").value(0,NULL);
-	if (plugin)
-		FNotifications = qobject_cast<INotifications *>(plugin->instance());
+	FNotifications = PluginHelper::pluginInstance<INotifications>();
 }
 
 void SubscriptionDialog::onDialogAccepted()
@@ -163,7 +145,7 @@ void SubscriptionDialog::onToolBarActionTriggered( bool )
 		}
 		else if (action == FShowVCard)
 		{
-			FVcardPlugin->showVCardDialog(FStreamJid,FContactJid.bare());
+			FVCardManager->showVCardDialog(FStreamJid,FContactJid.bare());
 		}
 	}
 }

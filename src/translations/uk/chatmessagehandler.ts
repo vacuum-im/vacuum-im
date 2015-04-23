@@ -41,14 +41,6 @@
         <translation>Return</translation>
     </message>
     <message>
-        <source>Clear window</source>
-        <translation>Очистити вікно</translation>
-    </message>
-    <message>
-        <source>Load messages from history in new chat windows</source>
-        <translation>Завантажувати попередні повідомлення при відкритті вікна чату</translation>
-    </message>
-    <message>
         <source>When receiving new chat message</source>
         <translation>При отриманні нового повідомлення чату</translation>
     </message>
@@ -67,10 +59,6 @@
     <message>
         <source>&lt;Absent&gt;</source>
         <translation>&lt;Відсутній&gt;</translation>
-    </message>
-    <message>
-        <source>When receiving new chat message in current chat window</source>
-        <translation>При отриманні нового повідомлення в активне вікно чату</translation>
     </message>
 </context>
 </TS>

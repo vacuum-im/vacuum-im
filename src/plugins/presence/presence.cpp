@@ -1,5 +1,7 @@
 #include "presence.h"
 
+#include <definitions/namespaces.h>
+#include <utils/datetime.h>
 #include <utils/logger.h>
 
 #define SHC_PRESENCE  "/presence"
@@ -21,13 +23,14 @@ Presence::Presence(IXmppStream *AXmppStream, IStanzaProcessor *AStanzaProcessor)
 	shandle.conditions.append(SHC_PRESENCE);
 	FSHIPresence = FStanzaProcessor->insertStanzaHandle(shandle);
 
-	connect(AXmppStream->instance(),SIGNAL(error(const XmppError &)),SLOT(onStreamError(const XmppError &)));
-	connect(AXmppStream->instance(),SIGNAL(closed()),SLOT(onStreamClosed()));
+	connect(AXmppStream->instance(),SIGNAL(error(const XmppError &)),SLOT(onXmppStreamError(const XmppError &)));
+	connect(AXmppStream->instance(),SIGNAL(closed()),SLOT(onXmppStreamClosed()));
 }
 
 Presence::~Presence()
 {
 	FStanzaProcessor->removeStanzaHandle(FSHIPresence);
+	emit presenceDestroyed();
 }
 
 bool Presence::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
@@ -80,10 +83,10 @@ bool Presence::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AS
 		{
 			Jid fromJid = AStanza.from();
 
-			IPresenceItem &pitem = FItems[fromJid];
+			QMap<QString, IPresenceItem> &bareItems = FItems[fromJid.bare()];
+			IPresenceItem &pitem = bareItems[fromJid.resource()];
 			IPresenceItem before = pitem;
 
-			pitem.isValid = true;
 			pitem.itemJid = fromJid;
 			pitem.show = show;
 			pitem.priority = priority;
@@ -91,18 +94,30 @@ bool Presence::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AS
 
 			if (pitem != before)
 			{
-				for (QHash<Jid,IPresenceItem>::iterator it = FItems.begin(); it!=FItems.end(); )
+				QDomElement delayElem = AStanza.firstElement("delay",NS_XMPP_DELAY);
+				if (!delayElem.isNull())
+					pitem.sentTime = DateTime(delayElem.attribute("stamp")).toLocal();
+				else
+					pitem.sentTime = QDateTime::currentDateTime();
+
+				for (QMap<QString, IPresenceItem>::iterator it = bareItems.begin(); it!=bareItems.end(); )
 				{
-					if (it->show==IPresence::Error && it.key()==fromJid.bare() && it.key()!=fromJid)
-						it = FItems.erase(it);
+					if (it->show==IPresence::Error && it.key()!=fromJid.resource())
+						it = bareItems.erase(it);
 					else
 						++it;
 				}
+
 				emit itemReceived(pitem,before);
 			}
 			
 			if (show == IPresence::Offline)
-				FItems.remove(fromJid);
+			{
+				if (bareItems.count() > 1)
+					bareItems.remove(fromJid.resource());
+				else
+					FItems.remove(fromJid.bare());
+			}
 		}
 		else if (show!=IPresence::Offline && (FShow!=show || FStatus!=status || FPriority!=priority))
 		{
@@ -238,7 +253,7 @@ bool Presence::setPresence(int AShow, const QString &AStatus, int APriority)
 			if (FOpened && AShow==IPresence::Offline)
 			{
 				FOpened = false;
-				clearItems();
+				clearPresenceItems();
 				emit closed();
 			}
 
@@ -260,7 +275,7 @@ bool Presence::setPresence(int AShow, const QString &AStatus, int APriority)
 		if (FOpened)
 		{
 			FOpened = false;
-			clearItems();
+			clearPresenceItems();
 			emit closed();
 		}
 
@@ -348,42 +363,57 @@ bool Presence::sendPresence(const Jid &AContactJid, int AShow, const QString &AS
 	return false;
 }
 
+QList<Jid> Presence::itemsJid() const
+{
+	QList<Jid> pitemsJid;
+	pitemsJid.reserve(FItems.count());
+
+	for (QHash<Jid, QMap<QString, IPresenceItem> >::const_iterator bareIt=FItems.constBegin(); bareIt!=FItems.constEnd(); ++bareIt)
+		for (QMap<QString, IPresenceItem>::const_iterator fullIt=bareIt->constBegin(); fullIt!=bareIt->constEnd(); ++fullIt)
+			pitemsJid.append(fullIt->itemJid);
+
+	return pitemsJid;
+}
+
+QList<IPresenceItem> Presence::items() const
+{
+	QList<IPresenceItem> pitems;
+	for (QHash<Jid, QMap<QString, IPresenceItem> >::const_iterator it=FItems.constBegin(); it!=FItems.constEnd(); ++it)
+		pitems += it->values();
+	return pitems;
+}
+
 IPresenceItem Presence::findItem(const Jid &AItemFullJid) const
 {
-	return FItems.value(AItemFullJid);
+	return FItems.value(AItemFullJid.bare()).value(AItemFullJid.resource());
 }
 
 QList<IPresenceItem> Presence::findItems(const Jid &AItemBareJid) const
 {
-	if (!AItemBareJid.isEmpty())
-	{
-		QList<IPresenceItem> pitems;
-		foreach(const IPresenceItem &pitem, FItems)
-			if (AItemBareJid && pitem.itemJid)
-				pitems.append(pitem);
-		return pitems;
-	}
-	return FItems.values();
+	return FItems.value(AItemBareJid.bare()).values();
 }
 
-void Presence::clearItems()
+void Presence::clearPresenceItems()
 {
-	for (QHash<Jid, IPresenceItem>::iterator it=FItems.begin(); it!=FItems.end(); it = FItems.erase(it))
+	for (QHash<Jid, QMap<QString, IPresenceItem> >::iterator bareIt=FItems.begin(); bareIt!=FItems.end(); bareIt = FItems.erase(bareIt))
 	{
-		IPresenceItem before = it.value();
-		it->show = IPresence::Offline;
-		it->priority = 0;
-		it->status = QString::null;
-		emit itemReceived(it.value(),before);
+		for (QMap<QString, IPresenceItem>::iterator fullIt=bareIt->begin(); fullIt!=bareIt->end(); fullIt=bareIt->erase(fullIt))
+		{
+			IPresenceItem before = fullIt.value();
+			fullIt->priority = 0;
+			fullIt->status = QString::null;
+			fullIt->show = IPresence::Offline;
+			emit itemReceived(fullIt.value(),before);
+		}
 	}
 }
 
-void Presence::onStreamError(const XmppError &AError)
+void Presence::onXmppStreamError(const XmppError &AError)
 {
 	setPresence(IPresence::Error,AError.errorMessage(),0);
 }
 
-void Presence::onStreamClosed()
+void Presence::onXmppStreamClosed()
 {
 	if (isOpen())
 		setPresence(IPresence::Error,tr("XMPP stream closed unexpectedly"),0);

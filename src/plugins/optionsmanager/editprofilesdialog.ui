@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>312</width>
+    <width>385</width>
     <height>221</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Edit Profiles</string>
+   <string>Profiles Settings</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <property name="margin">
@@ -32,28 +32,42 @@
      <item>
       <widget class="QPushButton" name="pbtAdd">
        <property name="text">
-        <string>Add</string>
+        <string>Add Profile</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="Line" name="line">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="pbtPassword">
        <property name="text">
-        <string>Password</string>
+        <string>Change Password</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="pbtRename">
        <property name="text">
-        <string>Rename</string>
+        <string>Rename Profile</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="pbtDelete">
        <property name="text">
-        <string>Delete</string>
+        <string>Delete Profile</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="Line" name="line_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
        </property>
       </widget>
      </item>
@@ -74,6 +88,9 @@
       <widget class="QPushButton" name="pbtClose">
        <property name="text">
         <string>Close</string>
+       </property>
+       <property name="default">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

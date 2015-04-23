@@ -20,17 +20,9 @@
         <translation>Дозволяє іншим модулям розміщувати свої віджети в головному вікні</translation>
     </message>
     <message>
-        <source>Main window</source>
-        <translation>Основне вікно</translation>
-    </message>
-    <message>
-        <source>Hide roster</source>
-        <translation>Заховати ростер</translation>
-    </message>
-    <message>
         <source>Esc</source>
-        <comment>Hide roster</comment>
-        <translation>Esc</translation>
+        <comment>Close main window</comment>
+        <translation type="unfinished">Esc</translation>
     </message>
 </context>
 </TS>

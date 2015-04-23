@@ -5,9 +5,9 @@
 #include <interfaces/isessionnegotiation.h>
 #include <interfaces/idataforms.h>
 #include <interfaces/istanzaprocessor.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <interfaces/iservicediscovery.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/inotifications.h>
 
 class SessionNegotiation :
@@ -97,7 +97,7 @@ private:
 	IDataForms *FDataForms;
 	IStanzaProcessor *FStanzaProcessor;
 	IServiceDiscovery *FDiscovery;
-	IPresencePlugin *FPresencePlugin;
+	IPresenceManager *FPresenceManager;
 	INotifications *FNotifications;
 private:
 	QHash<Jid,int> FSHISession;

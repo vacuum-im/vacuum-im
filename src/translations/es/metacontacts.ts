@@ -62,8 +62,21 @@
         <translation>%1 - Chat</translation>
     </message>
     <message>
-        <source>Combine Contacts</source>
+        <source>Combine contacts</source>
         <translation>Fundir contactos</translation>
+    </message>
+    <message>
+        <source>Ctrl+M</source>
+        <comment>Combine contacts</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Destroy metacontact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Detach from metacontact</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

@@ -6,7 +6,7 @@
 #include <interfaces/iconnectionmanager.h>
 #include <interfaces/idefaultconnection.h>
 #include <interfaces/iaccountmanager.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/ioptionsmanager.h>
 #include "editproxydialog.h"
@@ -17,10 +17,10 @@ class ConnectionManager :
 	public QObject,
 	public IPlugin,
 	public IConnectionManager,
-	public IOptionsHolder
+	public IOptionsDialogHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IConnectionManager IOptionsHolder);
+	Q_INTERFACES(IPlugin IConnectionManager IOptionsDialogHolder);
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IConnectionManager");
 public:
 	ConnectionManager();
@@ -34,10 +34,8 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IConnectionManager
-	virtual QList<QString> pluginList() const;
-	virtual IConnectionPlugin *pluginById(const QString &APluginId) const;
 	virtual QList<QUuid> proxyList() const;
 	virtual IConnectionProxy proxyById(const QUuid &AProxyId) const;
 	virtual void setProxy(const QUuid &AProxyId, const IConnectionProxy &AProxy);
@@ -45,17 +43,21 @@ public:
 	virtual QUuid defaultProxy() const;
 	virtual void setDefaultProxy(const QUuid &AProxyId);
 	virtual QDialog *showEditProxyDialog(QWidget *AParent = NULL);
-	virtual IOptionsWidget *proxySettingsWidget(const OptionsNode &ANode, QWidget *AParent);
-	virtual void saveProxySettings(IOptionsWidget *AWidget, OptionsNode ANode = OptionsNode::null);
+	virtual IOptionsDialogWidget *proxySettingsWidget(const OptionsNode &ANode, QWidget *AParent);
+	virtual void saveProxySettings(IOptionsDialogWidget *AWidget, OptionsNode ANode = OptionsNode::null);
 	virtual QUuid loadProxySettings(const OptionsNode &ANode) const;
 	virtual QList<QSslCertificate> trustedCaCertificates(bool AWithUsers=true) const;
 	virtual void addTrustedCaCertificate(const QSslCertificate &ACertificate);
+	virtual QList<QString> connectionEngines() const;
+	virtual IConnectionEngine *findConnectionEngine(const QString &AEngineId) const;
+	virtual void registerConnectionEngine(IConnectionEngine *AEngine);
 signals:
 	void connectionCreated(IConnection *AConnection);
 	void connectionDestroyed(IConnection *AConnection);
 	void proxyChanged(const QUuid &AProxyId, const IConnectionProxy &AProxy);
 	void proxyRemoved(const QUuid &AProxyId);
 	void defaultProxyChanged(const QUuid &AProxyId);
+	void connectionEngineRegistered(IConnectionEngine *AEngine);
 protected:
 	void updateAccountConnection(IAccount *AAccount) const;
 	void updateConnectionSettings(IAccount *AAccount = NULL) const;
@@ -68,18 +70,18 @@ protected slots:
 protected slots:
 	void onOptionsOpened();
 	void onOptionsChanged(const OptionsNode &ANode);
-	void onAccountShown(IAccount *AAccount);
+	void onAccountActiveChanged(IAccount *AAccount, bool AActive);
 	void onAccountOptionsChanged(IAccount *AAccount, const OptionsNode &ANode);
 	void onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips);
 private:
 	IPluginManager *FPluginManager;
-	IXmppStreams *FXmppStreams;
+	IXmppStreamManager *FXmppStreamManager;
 	IAccountManager *FAccountManager;
 	IOptionsManager *FOptionsManager;
 	IRostersViewPlugin *FRostersViewPlugin;
 private:
 	quint32 FEncryptedLabelId;
-	QMap<QString, IConnectionPlugin *> FPlugins;
+	QMap<QString, IConnectionEngine *> FEngines;
 };
 
 #endif // CONNECTIONMANAGER_H

@@ -36,7 +36,7 @@ ChatWindow::ChatWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 	ui.spwMessageBox->insertWidget(MCWW_VIEWWIDGET,FViewWidget->instance(),100);
 
 	FEditWidget = FMessageWidgets->newEditWidget(this,ui.spwMessageBox);
-	FEditWidget->setSendShortcutId(SCT_MESSAGEWINDOWS_CHAT_SENDMESSAGE);
+	FEditWidget->setSendShortcutId(SCT_MESSAGEWINDOWS_SENDCHATMESSAGE);
 	ui.spwMessageBox->insertWidget(MCWW_EDITWIDGET,FEditWidget->instance());
 	
 	FToolBarWidget = FMessageWidgets->newToolBarWidget(this,ui.spwMessageBox);

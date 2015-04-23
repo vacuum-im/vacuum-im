@@ -2,24 +2,20 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="de" sourcelanguage="en">
 <context>
-    <name>FileArchiveOptions</name>
+    <name>FileArchiveOptionsClass</name>
     <message>
-        <source>Select the location for the file archive</source>
+        <source>Synchronize archive database at startup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move history to:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>FileArchiveOptionsClass</name>
+    <name>FileArchiveOptionsWidget</name>
     <message>
-        <source>Change the location of the file archive (restart required)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Location:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Update archive database at startup</source>
+        <source>Select the location for the file archive</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

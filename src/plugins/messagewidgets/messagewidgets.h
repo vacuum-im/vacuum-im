@@ -18,19 +18,18 @@
 #include "normalwindow.h"
 #include "chatwindow.h"
 #include "tabwindow.h"
-#include "messengeroptions.h"
 #include "tabpagenotifier.h"
 
 class MessageWidgets :
 	public QObject,
 	public IPlugin,
 	public IMessageWidgets,
-	public IOptionsHolder,
+	public IOptionsDialogHolder,
 	public IMessageViewUrlHandler,
 	public IMessageEditContentsHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IMessageWidgets IOptionsHolder IMessageViewUrlHandler IMessageEditContentsHandler);
+	Q_INTERFACES(IPlugin IMessageWidgets IOptionsDialogHolder IMessageViewUrlHandler IMessageEditContentsHandler);
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IMessageWidgets");
 public:
 	MessageWidgets();
@@ -44,7 +43,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IMessageViewUrlHandler
 	virtual bool messageViewUrlOpen(int AOrder, IMessageViewWidget *AWidget, const QUrl &AUrl);
 	//IMessageEditContentsHandler
@@ -53,7 +52,6 @@ public:
 	virtual bool messageEditContentsInsert(int AOrder, IMessageEditWidget *AWidget, const QMimeData *AData, QTextDocument *ADocument);
 	virtual bool messageEditContentsChanged(int AOrder, IMessageEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded);
 	//IMessageWidgets
-	virtual IPluginManager *pluginManager() const { return FPluginManager; }
 	virtual IMessageAddress *newAddress(const Jid &AStreamJid, const Jid &AContactJid, QObject *AParent);
 	virtual IMessageInfoWidget *newInfoWidget(IMessageWindow *AWindow, QWidget *AParent);
 	virtual IMessageViewWidget *newViewWidget(IMessageWindow *AWindow, QWidget *AParent);
@@ -126,12 +124,10 @@ protected slots:
 	void onTabWindowPageAdded(IMessageTabPage *APage);
 	void onTabWindowCurrentPageChanged(IMessageTabPage *APage);
 	void onTabWindowDestroyed();
-	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onOptionsOpened();
 	void onOptionsClosed();
 	void onOptionsChanged(const OptionsNode &ANode);
 private:
-	IPluginManager *FPluginManager;
 	IMainWindow *FMainWindow;
 	IOptionsManager *FOptionsManager;
 private:

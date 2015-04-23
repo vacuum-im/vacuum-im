@@ -4,6 +4,7 @@
 #include <QMessageBox>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
+#include <utils/pluginhelper.h>
 #include <utils/options.h>
 #include <utils/logger.h>
 
@@ -23,7 +24,7 @@ QDataStream &operator>>(QDataStream &AStream, RoomParams &AParams)
 	return AStream;
 }
 
-JoinMultiChatDialog::JoinMultiChatDialog(IMultiUserChatPlugin *AChatPlugin, const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword, QWidget *AParent) : QDialog(AParent)
+JoinMultiChatDialog::JoinMultiChatDialog(IMultiUserChatManager *AChatPlugin, const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword, QWidget *AParent) : QDialog(AParent)
 {
 	REPORT_VIEW;
 	ui.setupUi(this);
@@ -31,19 +32,23 @@ JoinMultiChatDialog::JoinMultiChatDialog(IMultiUserChatPlugin *AChatPlugin, cons
 	setWindowTitle(tr("Join conference"));
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_MUC_JOIN,0,0,"windowIcon");
 
-	FXmppStreams = NULL;
-	FChatPlugin = AChatPlugin;
-	initialize();
+	FMultiChatManager = AChatPlugin;
 
-	if (FXmppStreams)
+	FXmppStreamManager = PluginHelper::pluginInstance<IXmppStreamManager>();
+	if (FXmppStreamManager)
 	{
-		foreach(IXmppStream *xmppStream, FXmppStreams->xmppStreams())
-			if (FXmppStreams->isActive(xmppStream))
-				onStreamAdded(xmppStream);
+		foreach(IXmppStream *xmppStream, FXmppStreamManager->xmppStreams())
+			if (FXmppStreamManager->isXmppStreamActive(xmppStream))
+				onXmppStreamActiveChanged(xmppStream,true);
 
 		ui.cmbStreamJid->model()->sort(0,Qt::AscendingOrder);
 		ui.cmbStreamJid->setCurrentIndex(AStreamJid.isValid() ? ui.cmbStreamJid->findData(AStreamJid.pFull()) : 0);
 		connect(ui.cmbStreamJid,SIGNAL(currentIndexChanged(int)),SLOT(onStreamIndexChanged(int)));
+
+		connect(FXmppStreamManager->instance(),SIGNAL(streamOpened(IXmppStream *)),SLOT(onXmppStreamStateChanged(IXmppStream *)));
+		connect(FXmppStreamManager->instance(),SIGNAL(streamClosed(IXmppStream *)),SLOT(onXmppStreamStateChanged(IXmppStream *)));
+		connect(FXmppStreamManager->instance(),SIGNAL(streamJidChanged(IXmppStream *, const Jid &)),SLOT(onXmppStreamJidChanged(IXmppStream *, const Jid &)));
+		connect(FXmppStreamManager->instance(),SIGNAL(streamActiveChanged(IXmppStream *, bool)),SLOT(onXmppStreamActiveChanged(IXmppStream *, bool)));
 	}
 	onStreamIndexChanged(ui.cmbStreamJid->currentIndex());
 
@@ -66,7 +71,7 @@ JoinMultiChatDialog::JoinMultiChatDialog(IMultiUserChatPlugin *AChatPlugin, cons
 	else if (!ARoomJid.isValid() && FRecentRooms.isEmpty())
 		onResolveNickClicked();
 
-	connect(FChatPlugin->instance(),SIGNAL(roomNickReceived(const Jid &, const Jid &, const QString &)),
+	connect(FMultiChatManager->instance(),SIGNAL(roomNickReceived(const Jid &, const Jid &, const QString &)),
 		SLOT(onRoomNickReceived(const Jid &, const Jid &, const QString &)));
 	connect(ui.cmbHistory,SIGNAL(currentIndexChanged(int)),SLOT(onHistoryIndexChanged(int)));
 	connect(ui.tlbDeleteHistory,SIGNAL(clicked()),SLOT(onDeleteHistoryClicked()));
@@ -79,26 +84,9 @@ JoinMultiChatDialog::~JoinMultiChatDialog()
 
 }
 
-void JoinMultiChatDialog::initialize()
-{
-	IPlugin *plugin = FChatPlugin->pluginManager()->pluginInterface("IXmppStreams").value(0,NULL);
-	if (plugin)
-	{
-		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-		if (FXmppStreams)
-		{
-			connect(FXmppStreams->instance(),SIGNAL(added(IXmppStream *)),SLOT(onStreamAdded(IXmppStream *)));
-			connect(FXmppStreams->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamStateChanged(IXmppStream *)));
-			connect(FXmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamStateChanged(IXmppStream *)));
-			connect(FXmppStreams->instance(),SIGNAL(jidChanged(IXmppStream *, const Jid &)),SLOT(onStreamJidChanged(IXmppStream *, const Jid &)));
-			connect(FXmppStreams->instance(),SIGNAL(removed(IXmppStream *)),SLOT(onStreamRemoved(IXmppStream *)));
-		}
-	}
-}
-
 void JoinMultiChatDialog::updateResolveNickState()
 {
-	IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(FStreamJid) : NULL;
+	IXmppStream *stream = FXmppStreamManager!=NULL ? FXmppStreamManager->findXmppStream(FStreamJid) : NULL;
 	ui.tlbResolveNick->setEnabled(stream!=NULL && stream->isOpen());
 }
 
@@ -139,7 +127,7 @@ void JoinMultiChatDialog::onDialogAccepted()
 
 	if (FStreamJid.isValid() && roomJid.isValid() && !roomJid.node().isEmpty() && roomJid.resource().isEmpty())
 	{
-		IMultiUserChatWindow *chatWindow = FChatPlugin->getMultiChatWindow(FStreamJid,roomJid,nick,password);
+		IMultiUserChatWindow *chatWindow = FMultiChatManager->getMultiChatWindow(FStreamJid,roomJid,nick,password);
 		if (chatWindow)
 		{
 			chatWindow->showTabPage();
@@ -202,10 +190,10 @@ void JoinMultiChatDialog::onHistoryIndexChanged(int AIndex)
 void JoinMultiChatDialog::onResolveNickClicked()
 {
 	Jid serviceJid = ui.lneService->text().trimmed();
-	IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(FStreamJid) : NULL;
+	IXmppStream *stream = FXmppStreamManager!=NULL ? FXmppStreamManager->findXmppStream(FStreamJid) : NULL;
 	if (stream!=NULL && stream->isOpen() && serviceJid.isValid())
 	{
-		if (FChatPlugin->requestRoomNick(FStreamJid,serviceJid))
+		if (FMultiChatManager->requestRoomNick(FStreamJid,serviceJid))
 		{
 			ui.lneNick->clear();
 			ui.tlbResolveNick->setEnabled(false);
@@ -236,24 +224,22 @@ void JoinMultiChatDialog::onRoomNickReceived(const Jid &AStreamJid, const Jid &A
 	}
 }
 
-void JoinMultiChatDialog::onStreamAdded(IXmppStream *AXmppStream)
-{
-	ui.cmbStreamJid->addItem(AXmppStream->streamJid().uFull(),AXmppStream->streamJid().pFull());
-}
-
-void JoinMultiChatDialog::onStreamStateChanged(IXmppStream *AXmppStream)
+void JoinMultiChatDialog::onXmppStreamStateChanged(IXmppStream *AXmppStream)
 {
 	if (AXmppStream->streamJid() == FStreamJid)
 		updateResolveNickState();
 }
 
-void JoinMultiChatDialog::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore)
+void JoinMultiChatDialog::onXmppStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore)
 {
 	ui.cmbStreamJid->removeItem(ui.cmbStreamJid->findData(ABefore.pFull()));
-	onStreamAdded(AXmppStream);
+	ui.cmbStreamJid->addItem(AXmppStream->streamJid().uFull(),AXmppStream->streamJid().pFull());
 }
 
-void JoinMultiChatDialog::onStreamRemoved(IXmppStream *AXmppStream)
+void JoinMultiChatDialog::onXmppStreamActiveChanged(IXmppStream *AXmppStream, bool AActive)
 {
-	ui.cmbStreamJid->removeItem(ui.cmbStreamJid->findData(AXmppStream->streamJid().pFull()));
+	if (AActive)
+		ui.cmbStreamJid->addItem(AXmppStream->streamJid().uFull(),AXmppStream->streamJid().pFull());
+	else
+		ui.cmbStreamJid->removeItem(ui.cmbStreamJid->findData(AXmppStream->streamJid().pFull()));
 }

@@ -5,7 +5,7 @@
     <name>ConnectionManager</name>
     <message>
         <source>Connection Manager</source>
-        <translation>Диспетчер соединений</translation>
+        <translation>Диспетчер подключений</translation>
     </message>
     <message>
         <source>Allows to use different types of connections to a Jabber server</source>
@@ -71,16 +71,16 @@
         <source>Serial number: %1</source>
         <translation>Серийный номер: %1</translation>
     </message>
+    <message>
+        <source>Connection</source>
+        <translation>Подключение</translation>
+    </message>
 </context>
 <context>
     <name>ConnectionOptionsWidgetClass</name>
     <message>
-        <source>Connection</source>
-        <translation>Соединение</translation>
-    </message>
-    <message>
         <source>Connection:</source>
-        <translation>Соединение:</translation>
+        <translation>Подключение:</translation>
     </message>
 </context>
 <context>

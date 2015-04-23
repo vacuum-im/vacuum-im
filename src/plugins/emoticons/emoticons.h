@@ -9,7 +9,6 @@
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/ioptionsmanager.h>
 #include "selecticonmenu.h"
-#include "emoticonsoptions.h"
 
 struct EmoticonTreeItem {
 	QUrl url;
@@ -21,11 +20,11 @@ class Emoticons :
 	public IPlugin,
 	public IEmoticons,
 	public IMessageWriter,
-	public IOptionsHolder,
+	public IOptionsDialogHolder,
 	public IMessageEditContentsHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IEmoticons IMessageWriter IOptionsHolder IMessageEditContentsHandler);
+	Q_INTERFACES(IPlugin IEmoticons IMessageWriter IOptionsDialogHolder IMessageEditContentsHandler);
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IEmoticons");
 public:
 	Emoticons();
@@ -42,7 +41,7 @@ public:
 	virtual void writeTextToMessage(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang);
 	virtual void writeMessageToText(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang);
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IMessageEditContentsHandler
 	virtual bool messageEditContentsCreate(int AOrder, IMessageEditWidget *AWidget, QMimeData *AData);
 	virtual bool messageEditContentsCanInsert(int AOrder, IMessageEditWidget *AWidget, const QMimeData *AData);
@@ -68,7 +67,7 @@ protected slots:
 	void onToolBarWindowLayoutChanged();
 	void onToolBarWidgetCreated(IMessageToolBarWidget *AWidget);
 	void onToolBarWidgetDestroyed(QObject *AObject);
-	void onIconSelected(const QString &ASubStorage, const QString &AIconKey);
+	void onSelectIconMenuSelected(const QString &ASubStorage, const QString &AIconKey);
 	void onSelectIconMenuDestroyed(QObject *AObject);
 	void onOptionsOpened();
 	void onOptionsChanged(const OptionsNode &ANode);

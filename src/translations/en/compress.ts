@@ -2,15 +2,14 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en" sourcelanguage="en">
 <context>
-    <name>CompressPlugin</name>
+    <name>CompressFeature</name>
     <message>
-        <source>Unsupported compression method</source>
-        <translation>Unsupported compression method</translation>
+        <source>Error code: %1</source>
+        <translation>Error code: %1</translation>
     </message>
-    <message>
-        <source>Compression setup failed</source>
-        <translation>Compression setup failed</translation>
-    </message>
+</context>
+<context>
+    <name>CompressFeatureFactory</name>
     <message>
         <source>Stream Compression</source>
         <translation>Stream Compression</translation>
@@ -20,8 +19,12 @@
         <translation>Allows to compress a stream of messages sent and received from the server</translation>
     </message>
     <message>
-        <source>Enable data compression transferred between client and server</source>
-        <translation>Enable data compression transferred between client and server</translation>
+        <source>Unsupported compression method</source>
+        <translation>Unsupported compression method</translation>
+    </message>
+    <message>
+        <source>Compression setup failed</source>
+        <translation>Compression setup failed</translation>
     </message>
     <message>
         <source>ZLib error</source>
@@ -43,12 +46,9 @@
         <source>Invalid compression level</source>
         <translation>Invalid compression level</translation>
     </message>
-</context>
-<context>
-    <name>Compression</name>
     <message>
-        <source>Error code: %1</source>
-        <translation>Error code: %1</translation>
+        <source>Enable data compression transferred between client and server</source>
+        <translation>Enable data compression transferred between client and server</translation>
     </message>
 </context>
 </TS>

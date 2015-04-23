@@ -39,22 +39,6 @@
         <translation>Tab Window</translation>
     </message>
     <message>
-        <source>Enable tab windows</source>
-        <translation>Enable tab windows</translation>
-    </message>
-    <message>
-        <source>Show status changes in chat windows</source>
-        <translation>Show status changes in chat windows</translation>
-    </message>
-    <message>
-        <source>Auto resize input field</source>
-        <translation>Auto resize input field</translation>
-    </message>
-    <message>
-        <source>Save status messages to history</source>
-        <translation>Save status messages to history</translation>
-    </message>
-    <message>
         <source>Tab window</source>
         <translation>Tab window</translation>
     </message>
@@ -75,26 +59,6 @@
         <translation>Previous tab</translation>
     </message>
     <message>
-        <source>Set tabs closable</source>
-        <translation>Set tabs closable</translation>
-    </message>
-    <message>
-        <source>Show tabs at bottom</source>
-        <translation>Show tabs at bottom</translation>
-    </message>
-    <message>
-        <source>Rename tab window</source>
-        <translation>Rename tab window</translation>
-    </message>
-    <message>
-        <source>Delete tab window</source>
-        <translation>Delete tab window</translation>
-    </message>
-    <message>
-        <source>Use as default tab window</source>
-        <translation>Use as default tab window</translation>
-    </message>
-    <message>
         <source>Alt+%1</source>
         <comment>Show tab</comment>
         <translation>Alt+%1</translation>
@@ -102,28 +66,6 @@
     <message>
         <source>Message windows</source>
         <translation>Message windows</translation>
-    </message>
-    <message>
-        <source>Chat window</source>
-        <translation>Chat window</translation>
-    </message>
-    <message>
-        <source>Send message</source>
-        <translation>Send message</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <comment>Send message</comment>
-        <translation>Return</translation>
-    </message>
-    <message>
-        <source>Message window</source>
-        <translation>Message window</translation>
-    </message>
-    <message>
-        <source>Ctrl+Return</source>
-        <comment>Send message</comment>
-        <translation>Ctrl+Return</translation>
     </message>
     <message>
         <source>Edit next message</source>
@@ -149,21 +91,9 @@
         <translation>Ctrl+W</translation>
     </message>
     <message>
-        <source>Show tabs indices</source>
-        <translation>Show tabs indices</translation>
-    </message>
-    <message>
-        <source>Close tab window</source>
-        <translation>Close tab window</translation>
-    </message>
-    <message>
         <source>Esc</source>
         <comment>Close tab window</comment>
         <translation>Esc</translation>
-    </message>
-    <message>
-        <source>Close message window</source>
-        <translation>Close message window</translation>
     </message>
     <message>
         <source>Esc</source>
@@ -205,39 +135,67 @@
         <translation>google.com</translation>
     </message>
     <message>
-        <source>Combine/Split with message windows</source>
-        <translation>Combine/Split with message windows</translation>
-    </message>
-    <message>
-        <source>Combine message windows with contact-list</source>
-        <translation>Combine message windows with contact-list</translation>
-    </message>
-    <message>
-        <source>Show tabs in combined message windows with contact-list mode</source>
-        <translation>Show tabs in combined message windows with contact-list mode</translation>
-    </message>
-    <message>
         <source>Quote Selected Text</source>
         <translation>Quote Selected Text</translation>
     </message>
-</context>
-<context>
-    <name>MessengerOptionsClass</name>
     <message>
-        <source>Minimum input field lines:</source>
-        <translation>Minimum input field lines:</translation>
+        <source>Message window view</source>
+        <translation>Message window view</translation>
     </message>
     <message>
-        <source>Clean chat windows after closing in </source>
-        <translation>Clean chat windows after closing in </translation>
+        <source>Load last messages from history</source>
+        <translation>Load last messages from history</translation>
     </message>
     <message>
-        <source> minutes</source>
-        <translation> minutes</translation>
+        <source>Show message windows together with contacts list</source>
+        <translation>Show message windows together with contacts list</translation>
     </message>
     <message>
-        <source>(0 - do not clean)</source>
-        <translation>(0 - do not clean)</translation>
+        <source>Show message windows in tab window</source>
+        <translation>Show message windows in tab window</translation>
+    </message>
+    <message>
+        <source>Automatically resize messages input field</source>
+        <translation>Automatically resize messages input field</translation>
+    </message>
+    <message>
+        <source>Minimum number of lines in messages input field:</source>
+        <translation>Minimum number of lines in messages input field:</translation>
+    </message>
+    <message>
+        <source>Message window behavior</source>
+        <translation>Message window behavior</translation>
+    </message>
+    <message>
+        <source>Show contacts status changes</source>
+        <translation>Show contacts status changes</translation>
+    </message>
+    <message>
+        <source>Save contacts status messages in history</source>
+        <translation>Save contacts status messages in history</translation>
+    </message>
+    <message>
+        <source>Ctrl+Q</source>
+        <comment>Quote selected text</comment>
+        <translation>Ctrl+Q</translation>
+    </message>
+    <message>
+        <source>Send chat message</source>
+        <translation>Send chat message</translation>
+    </message>
+    <message>
+        <source>Return</source>
+        <comment>Send chat message</comment>
+        <translation>Return</translation>
+    </message>
+    <message>
+        <source>Send single message</source>
+        <translation>Send single message</translation>
+    </message>
+    <message>
+        <source>Ctrl+Return</source>
+        <comment>Send single message</comment>
+        <translation>Ctrl+Return</translation>
     </message>
 </context>
 <context>

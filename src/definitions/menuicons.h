@@ -5,12 +5,10 @@
 #define MNI_ACCOUNT                     "account"
 #define MNI_ACCOUNT_LIST                "accountList"
 #define MNI_ACCOUNT_CHANGE              "accountChange"
+#define MNI_ACCOUNT_MOVE                "accountMove"
 
 //Annotations
 #define MNI_ANNOTATIONS                 "annotations"
-
-//Autostatus
-#define MNI_AUTOSTATUS                  "autostatus"
 
 //Avatars
 #define MNI_AVATAR_SET                  "avatarSet"
@@ -63,11 +61,6 @@
 //DataStreamsManager
 #define MNI_DATASTREAMSMANAGER          "dataStreamsManager"
 
-//Emoticons
-#define MNI_EMOTICONS                   "emoticons"
-#define MNI_EMOTICONS_ARROW_UP          "emoticonsArrowUp"
-#define MNI_EMOTICONS_ARROW_DOWN        "emoticonsArrowDown"
-
 //FileStreamsManager
 #define MNI_FILESTREAMSMANAGER          "filestreamsmanager"
 
@@ -103,9 +96,6 @@
 //MessageArchiver
 #define MNI_HISTORY                     "history"
 #define MNI_HISTORY_DATE                "historyDate"
-
-//MessageStyles
-#define MNI_MESSAGE_STYLES              "messagestyles"
 
 //MessageWidgets
 #define MNI_MESSAGEWIDGETS_SEND         "messagewidgetsSend"
@@ -150,16 +140,20 @@
 
 //Notifications
 #define MNI_NOTIFICATIONS               "notifications"
-#define MNI_NOTIFICATIONS_ACTIVATE_ALL  "notificationsActivateAll"
-#define MNI_NOTIFICATIONS_REMOVE_ALL    "notificationsRemoveAll"
 #define MNI_NOTIFICATIONS_SOUND_ON      "notificationsSoundOn"
 #define MNI_NOTIFICATIONS_SOUND_OFF     "notificationsSoundOff"
+#define MNI_NOTIFICATIONS_REMOVE_ALL    "notificationsRemoveAll"
+#define MNI_NOTIFICATIONS_ACTIVATE_ALL  "notificationsActivateAll"
+#define MNI_NOTIFICATIONS_SOUNDPLAY     "notificationsSoundPlay"
+#define MNI_NOTIFICATIONS_PUPUPWINDOW   "notificationsPopupWindow"
+#define MNI_NOTIFICATIONS_SHOWMINIMIZED "notificationsShowMinimized"
 
 //OptionsManager
 #define MNI_OPTIONS_DIALOG              "optionsDialog"
 #define MNI_OPTIONS_PROFILE             "optionsProfile"
 #define MNI_OPTIONS_PROFILES            "optionsProfiles"
 #define MNI_OPTIONS_EDIT_PROFILES       "optionsEditProfiles"
+#define MNI_OPTIONS_APPEARANCE          "optionsAppearance"
 
 //PrivacyLists
 #define MNI_PRIVACYLISTS                "privacylists"
@@ -242,9 +236,6 @@
 #define MNI_SCHANGER_MODIFY_STATUS      "schangerModifyStatus"
 #define MNI_SCHANGER_EDIT_STATUSES      "schangerEditStatuses"
 #define MNI_SCHANGER_CONNECTING         "schangerConnecting"
-
-//StatusIcons
-#define MNI_STATUSICONS_OPTIONS         "statusiconsOptions"
 
 //VCard
 #define MNI_VCARD                       "VCard"

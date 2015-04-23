@@ -117,7 +117,7 @@ bool RosterSearch::initObjects()
 
 bool RosterSearch::initSettings()
 {
-	Options::setDefaultValue(OPV_ROSTER_SEARCH_ENABLED,false);
+	Options::setDefaultValue(OPV_ROSTER_SEARCH_ENABLED,true);
 	Options::setDefaultValue(OPV_ROSTER_SEARCH_FIELDEBANLED,true);
 	return true;
 }

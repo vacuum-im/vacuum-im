@@ -28,16 +28,8 @@
         <translation>Erlaube/Sperre Benachrichtigungs Sound</translation>
     </message>
     <message>
-        <source>Remove all notifications</source>
-        <translation>Entferne alle Benachrichtigungen</translation>
-    </message>
-    <message>
         <source>Expand contact groups in roster</source>
         <translation>Erweitere Roster Kontaktgruppe</translation>
-    </message>
-    <message>
-        <source>Disable sounds when status is &apos;Do not disturb&apos;</source>
-        <translation>Unterdrücke Sound wenn Status &apos;Do not disturb&apos;</translation>
     </message>
     <message>
         <source>Activate notification</source>
@@ -48,70 +40,70 @@
         <translation>Aktiviere Benachrichtigung</translation>
     </message>
     <message>
-        <source>Enable animation in notification pop-up</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Use native popup notifications if available</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>NotifyOptionsWidget</name>
     <message>
-        <source>Display a notification in your roster</source>
-        <translation>Zeige Benachrichtigung im Roster</translation>
-    </message>
-    <message>
-        <source>Display a notification in popup window</source>
-        <translation>Zeige Benachrichtigung im Popup Fenster</translation>
-    </message>
-    <message>
-        <source>Display a notification in tray</source>
-        <translation>Zeige Benachrichtigung im Tray</translation>
-    </message>
-    <message>
-        <source>Display a notification in tray context menu</source>
-        <translation>Zeige Benachrichtigung im Tray Kontext Menü</translation>
-    </message>
-    <message>
-        <source>Play sound at the notification</source>
-        <translation>Spiele Sound als Benachrichtigung</translation>
-    </message>
-    <message>
-        <source>Highlight the corresponding window in the taskbar</source>
-        <translation>Markiere das Fenster in der Taskbar</translation>
-    </message>
-    <message>
-        <source>Display a notification in tab</source>
-        <translation>Zeige eine Benachrichtigung im Tab</translation>
-    </message>
-    <message>
-        <source>Show the corresponding window minimized in the taskbar</source>
-        <translation>Zeige das Fenster minimiert in der Taskbar</translation>
-    </message>
-    <message>
-        <source>Immediately activate the notification</source>
-        <translation>Benachrichtigung sofort aktivieren</translation>
-    </message>
-    <message>
-        <source>Allowed types of notifications</source>
+        <source>Disable sounds and popup windows if status is &apos;Away&apos;</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>NotifyOptionsWidgetClass</name>
     <message>
-        <source>Time to display a pop-up window (0 - always visible):</source>
-        <translation>Zeit für die Popup-Fenster Anzeige (0 = immer sichtbar):</translation>
+        <source>Disable sounds and popup windows if status is &apos;Do not disturb&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play notification sound when received a message in the active window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not show the message body in the popup window</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source> seconds</source>
-        <translation> Sekunden</translation>
+        <translation type="unfinished"> Sekunden</translation>
     </message>
     <message>
-        <source>Restore Defaults</source>
-        <translation>Standard wiederherstellen</translation>
+        <source>Time to display a pop-up window (0 - always visible):</source>
+        <translation type="unfinished">Zeit für die Popup-Fenster Anzeige (0 = immer sichtbar):</translation>
+    </message>
+    <message>
+        <source>System command to play sound:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notification kinds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Highlight the corresponding window in the taskbar</source>
+        <translation type="unfinished">Markiere das Fenster in der Taskbar</translation>
+    </message>
+</context>
+<context>
+    <name>NotifyKindOptionsWidget</name>
+    <message>
+        <source>Event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play sound at the notification</source>
+        <translation type="unfinished">Spiele Sound als Benachrichtigung</translation>
+    </message>
+    <message>
+        <source>Display a notification in popup window</source>
+        <translation type="unfinished">Zeige Benachrichtigung im Popup Fenster</translation>
+    </message>
+    <message>
+        <source>Show the corresponding window minimized in the taskbar</source>
+        <translation type="unfinished">Zeige das Fenster minimiert in der Taskbar</translation>
+    </message>
+</context>
+<context>
+    <name>NotifyWidget</name>
+    <message>
+        <source>Message is empty or hidden</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

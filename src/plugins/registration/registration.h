@@ -6,13 +6,11 @@
 #include <interfaces/idataforms.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/iservicediscovery.h>
-#include <interfaces/ipresence.h>
-#include <interfaces/ioptionsmanager.h>
-#include <interfaces/iaccountmanager.h>
-#include <interfaces/ixmppstreams.h>
+#include <interfaces/ipresencemanager.h>
+#include <interfaces/ixmppstreammanager.h>
 #include <interfaces/ixmppuriqueries.h>
 #include "registerdialog.h"
-#include "registerstream.h"
+#include "registerfeature.h"
 
 class Registration :
 	public QObject,
@@ -21,12 +19,12 @@ class Registration :
 	public IStanzaRequestOwner,
 	public IXmppUriHandler,
 	public IDiscoFeatureHandler,
-	public IXmppFeaturesPlugin,
-	public IOptionsHolder,
+	public IXmppFeatureFactory,
 	public IDataLocalizer
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IRegistration IStanzaRequestOwner IXmppUriHandler IDiscoFeatureHandler IXmppFeaturesPlugin IOptionsHolder IDataLocalizer);
+	Q_INTERFACES(IPlugin IRegistration IStanzaRequestOwner IXmppUriHandler IDiscoFeatureHandler IXmppFeatureFactory IDataLocalizer);
+	friend class RegisterFeature;
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IRegistration");
 public:
 	Registration();
@@ -46,44 +44,54 @@ public:
 	//IDiscoFeatureHandler
 	virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
 	virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
-	//IXmppFeaturesPlugin
+	//IXmppFeatureFactory
 	virtual QList<QString> xmppFeatures() const;
 	virtual IXmppFeature *newXmppFeature(const QString &AFeatureNS, IXmppStream *AXmppStream);
-	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//IDataLocalizer
 	virtual IDataFormLocale dataFormLocale(const QString &AFormType);
 	//IRegistration
+	virtual QString startStreamRegistration(IXmppStream *AXmppStream);
+	virtual QString submitStreamRegistration(IXmppStream *AXmppStream, const IRegisterSubmit &ASubmit);
 	virtual QString sendRegisterRequest(const Jid &AStreamJid, const Jid &AServiceJid);
 	virtual QString sendUnregisterRequest(const Jid &AStreamJid, const Jid &AServiceJid);
 	virtual QString sendChangePasswordRequest(const Jid &AStreamJid, const Jid &AServiceJid, const QString &AUserName, const QString &APassword);
-	virtual QString sendSubmit(const Jid &AStreamJid, const IRegisterSubmit &ASubmit);
-	virtual bool showRegisterDialog(const Jid &AStreamJid, const Jid &AServiceJid, int AOperation, QWidget *AParent = NULL);
+	virtual QString sendRequestSubmit(const Jid &AStreamJid, const IRegisterSubmit &ASubmit);
+	virtual QDialog *showRegisterDialog(const Jid &AStreamJid, const Jid &AServiceJid, int AOperation, QWidget *AParent = NULL);
 signals:
-	//IXmppFeaturesPlugin
+	//IXmppFeatureFactory
 	void featureCreated(IXmppFeature *AStreamFeature);
 	void featureDestroyed(IXmppFeature *AStreamFeature);
 	//IRegistration
 	void registerFields(const QString &AId, const IRegisterFields &AFields);
-	void registerSuccessful(const QString &AId);
 	void registerError(const QString &AId, const XmppError &AError);
+	void registerSuccess(const QString &AId);
 protected:
 	void registerDiscoFeatures();
+	IRegisterFields readFields(const Jid &AServiceJid, const QDomElement &AQuery) const;
+	bool writeSubmit(QDomElement &AQuery, const IRegisterSubmit &ASubmit) const;
+protected slots:
+	void onXmppFeatureFields(const IRegisterFields &AFields);
+	void onXmppFeatureFinished(bool ARestart);
+	void onXmppFeatureDestroyed();
+protected slots:
+	void onXmppStreamOpened();
+	void onXmppStreamClosed();
+	void onXmppStreamError(const XmppError &AError);
 protected slots:
 	void onRegisterActionTriggered(bool);
-	void onXmppFeatureDestroyed();
 private:
 	IDataForms *FDataForms;
-	IXmppStreams *FXmppStreams;
+	IXmppStreamManager *FXmppStreamManager;
 	IStanzaProcessor *FStanzaProcessor;
 	IServiceDiscovery *FDiscovery;
-	IPresencePlugin *FPresencePlugin;
-	IOptionsManager *FOptionsManager;
-	IAccountManager *FAccountManager;
+	IPresenceManager *FPresenceManager;
 	IXmppUriQueries *FXmppUriQueries;
 private:
 	QList<QString> FSendRequests;
 	QList<QString> FSubmitRequests;
+private:
+	QMap<IXmppStream *, QString> FStreamRegisterId;
+	QMap<IXmppStream *, RegisterFeature *> FStreamFeatures;
 };
 
 #endif // REGISTRATION_H

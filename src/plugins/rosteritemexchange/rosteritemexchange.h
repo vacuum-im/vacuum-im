@@ -3,8 +3,8 @@
 
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/irosteritemexchange.h>
-#include <interfaces/iroster.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/irostermanager.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/irosterchanger.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/istanzaprocessor.h>
@@ -19,14 +19,14 @@ class RosterItemExchange :
 	public QObject,
 	public IPlugin,
 	public IRosterItemExchange,
-	public IOptionsHolder,
+	public IOptionsDialogHolder,
 	public IStanzaHandler,
 	public IStanzaRequestOwner,
 	public IMessageViewDropHandler,
 	public IRostersDragDropHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IRosterItemExchange IOptionsHolder IStanzaHandler IStanzaRequestOwner IMessageViewDropHandler IRostersDragDropHandler);
+	Q_INTERFACES(IPlugin IRosterItemExchange IOptionsDialogHolder IStanzaHandler IStanzaRequestOwner IMessageViewDropHandler IRostersDragDropHandler);
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IRosterItemExchange");
 public:
 	RosterItemExchange();
@@ -44,7 +44,7 @@ public:
 	//IStanzaRequestOwner
 	virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IMessageViewDropHandler
 	virtual bool messagaeViewDragEnter(IMessageViewWidget *AWidget, const QDragEnterEvent *AEvent);
 	virtual bool messageViewDragMove(IMessageViewWidget *AWidget, const QDragMoveEvent *AEvent);
@@ -87,9 +87,9 @@ protected slots:
 	void onExchangeApproveDialogDestroyed();
 private:
 	IGateways *FGateways;
-	IRosterPlugin *FRosterPlugin;
+	IRosterManager *FRosterManager;
 	IRosterChanger *FRosterChanger;
-	IPresencePlugin *FPresencePlugin;
+	IPresenceManager *FPresenceManager;
 	IServiceDiscovery *FDiscovery;
 	IStanzaProcessor *FStanzaProcessor;
 	IOptionsManager *FOptionsManager;

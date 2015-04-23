@@ -2,7 +2,7 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="es" sourcelanguage="en">
 <context>
-    <name>RosterPlugin</name>
+    <name>RosterManager</name>
     <message>
         <source>Roster Manager</source>
         <translation>Administrador de la lista de contactos</translation>

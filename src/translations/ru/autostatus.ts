@@ -2,6 +2,41 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ru" sourcelanguage="en">
 <context>
+    <name>AutoRulesOptionsDialog</name>
+    <message>
+        <source>Auto Status Rules</source>
+        <translation>Павила автостатуса</translation>
+    </message>
+    <message>
+        <source>Time</source>
+        <translation>Время</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation>Статус</translation>
+    </message>
+    <message>
+        <source>Text</source>
+        <translation>Текст</translation>
+    </message>
+    <message>
+        <source>Priority</source>
+        <translation>Приоритет</translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation>Добавить</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>Удалить</translation>
+    </message>
+    <message>
+        <source>Auto status</source>
+        <translation>Автостатус</translation>
+    </message>
+</context>
+<context>
     <name>AutoStatus</name>
     <message>
         <source>Auto status</source>
@@ -16,23 +51,31 @@
         <translation>Позволяет менять статус в зависимости от времени бездействия</translation>
     </message>
     <message>
-        <source>Auto status &apos;Away&apos; due to inactivity for more than #(m) minutes</source>
-        <translation>Автостатус &apos;Ушел&apos; из-за бездействия более #(m) минут</translation>
+        <source>Automatic change of status</source>
+        <translation>Автоматическое изменение статуса</translation>
+    </message>
+    <message>
+        <source>Auto status due to inactivity for more than #(m) minutes</source>
+        <translation>Автостатус из-за бездействия более чем #(m) минут</translation>
+    </message>
+    <message>
+        <source>Disconnected due to inactivity for more than #(m) minutes</source>
+        <translation>Отключен из-за бездействия более чем #(m) минут</translation>
     </message>
 </context>
 <context>
-    <name>StatusOptionsWidget</name>
+    <name>AutoStatusOptionsWidget</name>
     <message>
-        <source>Time</source>
-        <translation>Время</translation>
+        <source>Auto status due to inactivity for more than #(m) minutes</source>
+        <translation>Автостатус из-за бездействия более #(m) минут</translation>
     </message>
     <message>
-        <source>Status</source>
-        <translation>Статус</translation>
+        <source>Disconnected due to inactivity for more than #(m) minutes</source>
+        <translation>Отключен из-за бездействия более #(m) минут</translation>
     </message>
     <message>
-        <source>Text</source>
-        <translation>Текст</translation>
+        <source>Auto Status</source>
+        <translation>Автостатус</translation>
     </message>
     <message>
         <source>You can insert date and time into auto status text:</source>
@@ -151,35 +194,39 @@
         <translation>Пример:</translation>
     </message>
     <message>
-        <source>Auto Status</source>
-        <translation>Авто статус</translation>
-    </message>
-    <message>
         <source>   Status is set to &apos;away&apos; at %(hh:mm:ss), because of idle from $(hh:mm:ss) for #(mm) minutes and #(ss) seconds</source>
         <translation>   Статус изменён на &apos;ушёл&apos; в %(hh:mm:ss) из-за бездействия с $(hh:mm:ss) в течение #(mm) минут и #(ss) секунд</translation>
     </message>
     <message>
-        <source>Priority</source>
-        <translation>Приоритет</translation>
-    </message>
-    <message>
-        <source>Auto status</source>
-        <translation>Автостатус</translation>
+        <source>Show all rules for the automatic change of status...</source>
+        <translation>Показать все правила автоматического изменения статуса...</translation>
     </message>
 </context>
 <context>
-    <name>StatusOptionsWidgetClass</name>
+    <name>AutoStatusOptionsWidgetClass</name>
     <message>
-        <source>Add</source>
-        <translation>Добавить</translation>
+        <source>Change status to</source>
+        <translation>Изменить статус на</translation>
     </message>
     <message>
-        <source>Delete</source>
-        <translation>Удалить</translation>
+        <source>after</source>
+        <translation>после</translation>
     </message>
     <message>
-        <source>Help</source>
-        <translation>Помощь</translation>
+        <source> minutes</source>
+        <translation> минут</translation>
+    </message>
+    <message>
+        <source>of inactivity with message:</source>
+        <translation>бездействия с сообщением:</translation>
+    </message>
+    <message>
+        <source>Automatically disconnect after</source>
+        <translation>Автоматически отключиться после</translation>
+    </message>
+    <message>
+        <source>of inactivity</source>
+        <translation>бездействия</translation>
     </message>
 </context>
 </TS>

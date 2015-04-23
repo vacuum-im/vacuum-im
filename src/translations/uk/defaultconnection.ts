@@ -20,28 +20,28 @@
         <translation>Дозволяти тільки довірені</translation>
     </message>
     <message>
-        <source>Auto Select</source>
-        <translation>Вибирати автоматично</translation>
-    </message>
-    <message>
         <source>SSLv3</source>
-        <translation>TLSv1</translation>
-    </message>
-    <message>
-        <source>SSLv2</source>
         <translation>SSLv3</translation>
     </message>
     <message>
-        <source>TLSv1.0</source>
+        <source>SSLv2</source>
         <translation>SSLv2</translation>
     </message>
     <message>
-        <source>TLSv1.1</source>
+        <source>Auto</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>TLSv1.0</source>
+        <translation type="unfinished">TLSv1.0</translation>
+    </message>
+    <message>
+        <source>TLSv1.1</source>
+        <translation type="unfinished">TLSv1.1</translation>
+    </message>
+    <message>
         <source>TLSv1.2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">TLSv1.2</translation>
     </message>
 </context>
 <context>
@@ -59,95 +59,95 @@
         <translation>Використовувати застаріле SSL-з&apos;єднання</translation>
     </message>
     <message>
-        <source>Certificate check mode:</source>
+        <source>SSL Protocol:</source>
         <translation>Режим перевірки сертифікату:</translation>
     </message>
     <message>
-        <source>SSL Protocol:</source>
+        <source>Certificate:</source>
         <translation>SSL протокол:</translation>
     </message>
 </context>
 <context>
-    <name>DefaultConnectionPlugin</name>
-    <message>
-        <source>Allows to set a standard TCP connection to Jabber server</source>
-        <translation>Дозволяє встановити стандартне TCP-з&apos;єднання до серверу</translation>
-    </message>
+    <name>DefaultConnectionEngine</name>
     <message>
         <source>Default Connection</source>
-        <translation>Стандартне з&apos;єднання</translation>
+        <translation type="unfinished">Стандартне з&apos;єднання</translation>
     </message>
     <message>
-        <source>Organization: %1</source>
-        <translation>Організація: %1</translation>
-    </message>
-    <message>
-        <source>Subunit: %1</source>
-        <translation>Підрозділ: %1</translation>
-    </message>
-    <message>
-        <source>Country: %1</source>
-        <translation>Країна: %1</translation>
-    </message>
-    <message>
-        <source>Locality: %1</source>
-        <translation>Місце знаходження: %1</translation>
-    </message>
-    <message>
-        <source>State/Province: %1</source>
-        <translation>Штат/провінція: %1</translation>
-    </message>
-    <message>
-        <source>SSL Authentication Error</source>
-        <translation>Помилка автентифікації SSL</translation>
-    </message>
-    <message>
-        <source>Disconnect</source>
-        <translation>Відключитися</translation>
-    </message>
-    <message>
-        <source>Connect Once</source>
-        <translation>Підключитися один раз</translation>
-    </message>
-    <message>
-        <source>Connect Always</source>
-        <translation>Підключатися завжди</translation>
-    </message>
-    <message>
-        <source>Connection to &lt;b&gt;%1&lt;/b&gt; can not be considered completely safe due to errors in servers certificate check:</source>
-        <translation>Підключення до &lt;b&gt;%1&lt;/b&gt; не може вважатися повністю безпечним через помилки при перевірці сертифікату сервера:</translation>
-    </message>
-    <message>
-        <source>Name: %1</source>
-        <translation>Ім&apos;я: %1</translation>
-    </message>
-    <message>
-        <source>Certificate holder:</source>
-        <translation>Сертифікат видано:</translation>
-    </message>
-    <message>
-        <source>Certificate issuer:</source>
-        <translation>Сертифікат випущено:</translation>
-    </message>
-    <message>
-        <source>Certificate details:</source>
-        <translation>Відомості про сертифікат:</translation>
-    </message>
-    <message>
-        <source>Effective from: %1</source>
-        <translation>Дійсний з: %1</translation>
-    </message>
-    <message>
-        <source>Expired at: %1</source>
-        <translation>Дійсний до: %1</translation>
-    </message>
-    <message>
-        <source>Serial number: %1</source>
-        <translation>Серійний номер: %1</translation>
+        <source>Allows to set a standard TCP connection to Jabber server</source>
+        <translation type="unfinished">Дозволяє встановити стандартне TCP-з&apos;єднання до серверу</translation>
     </message>
     <message>
         <source>Host certificate is not in trusted list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Organization: %1</source>
+        <translation type="unfinished">Організація: %1</translation>
+    </message>
+    <message>
+        <source>Subunit: %1</source>
+        <translation type="unfinished">Підрозділ: %1</translation>
+    </message>
+    <message>
+        <source>Country: %1</source>
+        <translation type="unfinished">Країна: %1</translation>
+    </message>
+    <message>
+        <source>Locality: %1</source>
+        <translation type="unfinished">Місце знаходження: %1</translation>
+    </message>
+    <message>
+        <source>State/Province: %1</source>
+        <translation type="unfinished">Штат/провінція: %1</translation>
+    </message>
+    <message>
+        <source>Certificate holder:</source>
+        <translation>Підключитися один раз</translation>
+    </message>
+    <message>
+        <source>Certificate issuer:</source>
+        <translation>Підключатися завжди</translation>
+    </message>
+    <message>
+        <source>Certificate details:</source>
+        <translation>Підключення до &lt;b&gt;%1&lt;/b&gt; не може вважатися повністю безпечним через помилки при перевірці сертифікату сервера:</translation>
+    </message>
+    <message>
+        <source>Effective from: %1</source>
+        <translation>Ім&apos;я: %1</translation>
+    </message>
+    <message>
+        <source>Expired at: %1</source>
+        <translation>Сертифікат видано:</translation>
+    </message>
+    <message>
+        <source>Serial number: %1</source>
+        <translation>Сертифікат випущено:</translation>
+    </message>
+    <message>
+        <source>Connection to &lt;b&gt;%1&lt;/b&gt; can not be considered completely safe due to errors in servers certificate check:</source>
+        <translation>Дійсний з: %1</translation>
+    </message>
+    <message>
+        <source>Connect Once</source>
+        <translation>Серійний номер: %1</translation>
+    </message>
+    <message>
+        <source>Connect Always</source>
         <translation>Сертифікат хосту не знаходиться у списку довірених</translation>
+    </message>
+    <message>
+        <source>SSL Authentication Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disconnect</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

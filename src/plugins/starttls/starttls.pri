@@ -1,5 +1,5 @@
-HEADERS = starttls.h \
-          starttlsplugin.h
+HEADERS = starttlsfeature.h \
+          starttlsfeaturefactory.h
 
-SOURCES = starttls.cpp \
-          starttlsplugin.cpp
+SOURCES = starttlsfeature.cpp \
+          starttlsfeaturefactory.cpp

@@ -3,7 +3,7 @@
 
 #include <QSortFilterProxyModel>
 #include <interfaces/irostersview.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/ipresencemanager.h>
 
 class SortFilterProxyModel :
 	public QSortFilterProxyModel
@@ -22,8 +22,8 @@ protected:
 private:
 	IRostersView *FRostersView;
 private:
+	int FSortMode;
 	bool FShowOffline;
-	bool FSortByStatus;
 };
 
 #endif // SORTFILTERPROXYMODEL_H

@@ -1,15 +1,15 @@
-FORMS   = filearchiveoptions.ui
+FORMS   = filearchiveoptionswidget.ui
 
 HEADERS = filemessagearchive.h \
           filewriter.h \
           fileworker.h \
-          filearchiveoptions.h \
+          filearchiveoptionswidget.h \
           databaseworker.h \
           databasesynchronizer.h
 
 SOURCES = filemessagearchive.cpp \
           filewriter.cpp \
           fileworker.cpp \
-          filearchiveoptions.cpp \
+          filearchiveoptionswidget.cpp \
           databaseworker.cpp \
           databasesynchronizer.cpp

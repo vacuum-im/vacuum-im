@@ -156,7 +156,7 @@ bool Statistics::initObjects()
 
 	if (FOptionsManager)
 	{
-		FOptionsManager->insertOptionsHolder(this);
+		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 
 	return true;
@@ -164,16 +164,16 @@ bool Statistics::initObjects()
 
 bool Statistics::initSettings()
 {
-	Options::setDefaultValue(OPV_MISC_STATISTICTS_ENABLED,true);
+	Options::setDefaultValue(OPV_COMMON_STATISTICTS_ENABLED,true);
 	return true;
 }
 
-QMultiMap<int, IOptionsWidget *> Statistics::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+QMultiMap<int, IOptionsDialogWidget *> Statistics::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	QMultiMap<int, IOptionsWidget *> widgets;
-	if (ANodeId == OPN_MISC)
+	QMultiMap<int, IOptionsDialogWidget *> widgets;
+	if (ANodeId == OPN_COMMON)
 	{
-		widgets.insertMulti(OWO_MISC_STATISTICS,FOptionsManager->optionsNodeWidget(Options::node(OPV_MISC_STATISTICTS_ENABLED),tr("Send anonymous statistics information to developer"),AParent));
+		widgets.insertMulti(OWO_COMMON_SENDSTATISTICS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_COMMON_STATISTICTS_ENABLED),tr("Send anonymous statistics to developer"),AParent));
 	}
 	return widgets;
 }
@@ -520,7 +520,7 @@ void Statistics::onNetworkManagerProxyAuthenticationRequired(const QNetworkProxy
 
 void Statistics::onOptionsOpened()
 {
-	FSendHits = Options::node(OPV_MISC_STATISTICTS_ENABLED).value().toBool();
+	FSendHits = Options::node(OPV_COMMON_STATISTICTS_ENABLED).value().toBool();
 
 	FProfileId = Options::node(OPV_STATISTICS_PROFILEID).value().toString();
 	if (FProfileId.isNull())
@@ -545,7 +545,7 @@ void Statistics::onOptionsClosed()
 
 void Statistics::onOptionsChanged(const OptionsNode &ANode)
 {
-	if (ANode.path() == OPV_MISC_STATISTICTS_ENABLED)
+	if (ANode.path() == OPV_COMMON_STATISTICTS_ENABLED)
 	{
 		if (ANode.value().toBool())
 		{

@@ -2,10 +2,9 @@
 #define COMBINECONTACTSDIALOG_H
 
 #include <QDialog>
-#include <interfaces/iroster.h>
+#include <interfaces/irostermanager.h>
 #include <interfaces/iavatars.h>
 #include <interfaces/imetacontacts.h>
-#include <interfaces/ipluginmanager.h>
 #include "ui_combinecontactsdialog.h"
 
 class CombineContactsDialog : 
@@ -13,10 +12,7 @@ class CombineContactsDialog :
 {
 	Q_OBJECT;
 public:
-	CombineContactsDialog(IPluginManager *APluginManager, IMetaContacts *AMetaContacts,
-		const QStringList &AStreams, const QStringList &AContacts, const QStringList &AMetas, QWidget *AParent = NULL);
-protected:
-	void initialize(IPluginManager *APluginManager);
+	CombineContactsDialog(IMetaContacts *AMetaContacts, const QStringList &AStreams, const QStringList &AContacts, const QStringList &AMetas, QWidget *AParent = NULL);
 protected slots:
 	void onDialogButtonsBoxAccepted();
 	void onDialogButtonsBoxRejected();
@@ -25,7 +21,7 @@ private:
 	Ui::CombineContactsDialog ui;
 private:
 	IAvatars *FAvatars;
-	IRosterPlugin *FRosterPlugin;
+	IRosterManager *FRosterManager;
 	IMetaContacts *FMetaContacts;
 private:
 	QUuid FMetaId;

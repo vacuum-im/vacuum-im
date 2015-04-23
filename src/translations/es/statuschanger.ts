@@ -2,96 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="es" sourcelanguage="en">
 <context>
-    <name>EditStatusDialog</name>
-    <message>
-        <source>Enter status name</source>
-        <translation>Escribe el nombre de estado</translation>
-    </message>
-    <message>
-        <source>Status name:</source>
-        <translation>Nombre de estado:</translation>
-    </message>
-    <message>
-        <source>Wrong status name</source>
-        <translation>Nombre de estado incorrecto</translation>
-    </message>
-    <message>
-        <source>Can&apos;t delete status</source>
-        <translation>No se puede borrar el estado</translation>
-    </message>
-    <message>
-        <source>You can not delete standard statuses.</source>
-        <translation>No puedes borrar los estados estándares.</translation>
-    </message>
-    <message>
-        <source>You can not delete active statuses.</source>
-        <translation>No puedes borrar los estados activos.</translation>
-    </message>
-    <message>
-        <source>Delete status</source>
-        <translation>Borrar estado</translation>
-    </message>
-    <message>
-        <source>You are assured that wish to remove a status &apos;&lt;b&gt;%1&lt;/b&gt;&apos;?</source>
-        <translation>¿Estás seguro de que deseas borrar el estado &apos;&lt;b&gt;%1&lt;/b&gt;&apos;?</translation>
-    </message>
-    <message>
-        <source>Status with name &apos;&lt;b&gt;%1&lt;/b&gt;&apos; already exists</source>
-        <translation>Ya existe un estado con nombre &apos;&lt;b&gt;%1&lt;/b&gt;&apos;</translation>
-    </message>
-</context>
-<context>
-    <name>EditStatusDialogClass</name>
-    <message>
-        <source>Add</source>
-        <translation>Añadir</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>Eliminar</translation>
-    </message>
-    <message>
-        <source>Edit statuses</source>
-        <translation>Editar estados</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation>Nombre</translation>
-    </message>
-    <message>
-        <source>Status name displayed in status change menu</source>
-        <translation>Nombre del estado mostrado en el menú</translation>
-    </message>
-    <message>
-        <source>Message</source>
-        <translation>Mensaje</translation>
-    </message>
-    <message>
-        <source>Status message</source>
-        <translation>Mensaje de estado</translation>
-    </message>
-    <message>
-        <source>Priority</source>
-        <translation>Prioridad</translation>
-    </message>
-    <message>
-        <source>Status priority</source>
-        <translation>Prioridad del estado</translation>
-    </message>
-    <message>
-        <source>Status type&lt;br&gt;
-Types for standard statuses are grayed out.
-You can set status class for additional statuses defined by you.</source>
-        <translation>Tipo del estado&lt;br&gt;
-Los tipos para los mensajes estándares están en gris.
-Puedes establecer clases de estados para los estados adicionales definidos por ti.</translation>
-    </message>
-    <message>
-        <source>Type</source>
-        <translation>Tipo</translation>
-    </message>
-</context>
-<context>
     <name>ModifyStatusDialogClass</name>
     <message>
         <source>Modify Status</source>
@@ -189,18 +99,6 @@ Puedes establecer clases de estados para los estados adicionales definidos por t
         <translation>Modificar estado</translation>
     </message>
     <message>
-        <source>Edit Statuses</source>
-        <translation>Editar estados</translation>
-    </message>
-    <message>
-        <source>Auto connect on startup</source>
-        <translation>Conectar automáticamente al iniciar</translation>
-    </message>
-    <message>
-        <source>Auto reconnect if disconnected</source>
-        <translation>Reconectar automáticamente al desconectarse</translation>
-    </message>
-    <message>
         <source>I&apos;m away from my desk</source>
         <translation>Estoy ausente de mi escritorio</translation>
     </message>
@@ -211,6 +109,57 @@ Puedes establecer clases de estados para los estados adicionales definidos por t
     <message>
         <source>Left %1</source>
         <translation>Quedan %1</translation>
+    </message>
+    <message>
+        <source>Connect to server on startup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reconnect to server on connection errors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Standard and users statuses</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StatusOptionsWidget</name>
+    <message>
+        <source>Add</source>
+        <translation type="unfinished">Añadir</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">Eliminar</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation type="unfinished">Estado</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished">Nombre</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation type="unfinished">Mensaje</translation>
+    </message>
+    <message>
+        <source>Priority</source>
+        <translation type="unfinished">Prioridad</translation>
+    </message>
+    <message>
+        <source>Can&apos;t delete status</source>
+        <translation type="unfinished">No se puede borrar el estado</translation>
+    </message>
+    <message>
+        <source>You can not delete standard statuses.</source>
+        <translation type="unfinished">No puedes borrar los estados estándares.</translation>
+    </message>
+    <message>
+        <source>You can not delete active statuses.</source>
+        <translation type="unfinished">No puedes borrar los estados activos.</translation>
     </message>
 </context>
 </TS>

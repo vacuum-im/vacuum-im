@@ -39,10 +39,10 @@ Roster::Roster(IXmppStream *AXmppStream, IStanzaProcessor *AStanzaProcessor) : Q
 
 	FXmppStream->insertXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 
-	connect(FXmppStream->instance(),SIGNAL(opened()),SLOT(onStreamOpened()));
-	connect(FXmppStream->instance(),SIGNAL(closed()),SLOT(onStreamClosed()));
-	connect(FXmppStream->instance(),SIGNAL(jidAboutToBeChanged(const Jid &)),SLOT(onStreamJidAboutToBeChanged(const Jid &)));
-	connect(FXmppStream->instance(),SIGNAL(jidChanged(const Jid &)),SLOT(onStreamJidChanged(const Jid &)));
+	connect(FXmppStream->instance(),SIGNAL(opened()),SLOT(onXmppStreamOpened()));
+	connect(FXmppStream->instance(),SIGNAL(closed()),SLOT(onXmppStreamClosed()));
+	connect(FXmppStream->instance(),SIGNAL(jidAboutToBeChanged(const Jid &)),SLOT(onXmppStreamJidAboutToBeChanged(const Jid &)));
+	connect(FXmppStream->instance(),SIGNAL(jidChanged(const Jid &)),SLOT(onXmppStreamJidChanged(const Jid &)));
 }
 
 Roster::~Roster()
@@ -52,6 +52,7 @@ Roster::~Roster()
 	FXmppStream->removeXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 
 	clearRosterItems();
+	emit rosterDestroyed();
 }
 
 bool Roster::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
@@ -199,40 +200,51 @@ QString Roster::groupDelimiter() const
 	return FGroupDelim;
 }
 
-IRosterItem Roster::rosterItem(const Jid &AItemJid) const
+QList<Jid> Roster::itemsJid() const
 {
-	foreach(const IRosterItem &ritem, FRosterItems)
-		if (AItemJid && ritem.itemJid)
-			return ritem;
-	return IRosterItem();
+	return FItems.keys();
 }
 
-QList<IRosterItem> Roster::rosterItems() const
+QList<IRosterItem> Roster::items() const
 {
-	return FRosterItems.values();
+	return FItems.values();
 }
 
-QSet<QString> Roster::allGroups() const
+bool Roster::hasItem(const Jid &AItemJid) const
 {
-	QSet<QString> groups;
-	foreach(const IRosterItem &ritem, FRosterItems)
-		if (!ritem.itemJid.node().isEmpty())
-			groups += ritem.groups;
-	return groups;
+	return FItems.contains(AItemJid.bare());
+}
+
+IRosterItem Roster::findItem(const Jid &AItemJid) const
+{
+	return FItems.value(AItemJid.bare());
+}
+
+QSet<QString> Roster::groups() const
+{
+	QSet<QString> rgroups;
+	foreach(const IRosterItem &ritem, FItems)
+		rgroups += ritem.groups;
+	return rgroups;
 }
 
 bool Roster::hasGroup(const QString &AGroup) const
 {
-	foreach(const QString &group, allGroups())
-		if (isSubgroup(AGroup,group))
-			return true;
+	foreach(const IRosterItem &ritem, FItems)
+	{
+		foreach(const QString &group, ritem.groups)
+		{
+			if (isSubgroup(AGroup,group))
+				return true;
+		}
+	}
 	return false;
 }
 
 QList<IRosterItem> Roster::groupItems(const QString &AGroup) const
 {
 	QList<IRosterItem> ritems;
-	foreach(const IRosterItem &ritem, FRosterItems)
+	foreach(const IRosterItem &ritem, FItems)
 	{
 		foreach(const QString &group, ritem.groups)
 		{
@@ -248,7 +260,7 @@ QList<IRosterItem> Roster::groupItems(const QString &AGroup) const
 
 QSet<QString> Roster::itemGroups(const Jid &AItemJid) const
 {
-	return rosterItem(AItemJid).groups;
+	return findItem(AItemJid).groups;
 }
 
 bool Roster::isSubgroup(const QString &ASubGroup, const QString &AGroup) const
@@ -419,13 +431,13 @@ void Roster::saveRosterItems(const QString &AFileName) const
 	elem.setAttribute("ver",FRosterVer);
 	elem.setAttribute("streamJid",streamJid().pBare());
 	elem.setAttribute("groupDelimiter",FGroupDelim);
-	foreach(const IRosterItem &ritem, FRosterItems)
+	foreach(const IRosterItem &ritem, FItems)
 	{
 		QDomElement itemElem = elem.appendChild(xml.createElement("item")).toElement();
 		itemElem.setAttribute("jid",ritem.itemJid.bare());
 		itemElem.setAttribute("name",ritem.name);
 		itemElem.setAttribute("subscription",ritem.subscription);
-		itemElem.setAttribute("ask",ritem.ask);
+		itemElem.setAttribute("ask",ritem.subscriptionAsk);
 		foreach(QString group, ritem.groups)
 		{
 			group = replaceGroupDelimiter(group,ROSTER_GROUP_DELIMITER,FGroupDelim);
@@ -439,7 +451,7 @@ void Roster::saveRosterItems(const QString &AFileName) const
 	{
 		LOG_STRM_INFO(streamJid(),QString("Roster items saved to file=%1").arg(AFileName));
 		file.write(xml.toByteArray());
-		file.flush();
+		file.close();
 	}
 	else
 	{
@@ -490,8 +502,8 @@ void Roster::loadRosterItems(const QString &AFileName)
 
 void Roster::renameItem(const Jid &AItemJid, const QString &AName)
 {
-	IRosterItem ritem = rosterItem(AItemJid);
-	if (ritem.isValid && ritem.name!=AName)
+	IRosterItem ritem = findItem(AItemJid);
+	if (!ritem.isNull() && ritem.name!=AName)
 	{
 		LOG_STRM_INFO(streamJid(),QString("Renaming roster item, jid=%1, name=%2").arg(AItemJid.bare(),AName));
 		setItem(AItemJid,AName,ritem.groups);
@@ -500,8 +512,8 @@ void Roster::renameItem(const Jid &AItemJid, const QString &AName)
 
 void Roster::copyItemToGroup(const Jid &AItemJid, const QString &AGroupTo)
 {
-	IRosterItem ritem = rosterItem(AItemJid);
-	if (ritem.isValid && !AGroupTo.isEmpty() && !ritem.groups.contains(AGroupTo))
+	IRosterItem ritem = findItem(AItemJid);
+	if (!ritem.isNull() && !AGroupTo.isEmpty() && !ritem.groups.contains(AGroupTo))
 	{
 		LOG_STRM_INFO(streamJid(),QString("Coping roster item to group, jid=%1, to_group=%2").arg(AItemJid.bare(),AGroupTo));
 		QSet<QString> allItemGroups = ritem.groups;
@@ -511,8 +523,8 @@ void Roster::copyItemToGroup(const Jid &AItemJid, const QString &AGroupTo)
 
 void Roster::moveItemToGroup(const Jid &AItemJid, const QString &AGroupFrom, const QString &AGroupTo)
 {
-	IRosterItem ritem = rosterItem(AItemJid);
-	if (ritem.isValid && !ritem.groups.contains(AGroupTo))
+	IRosterItem ritem = findItem(AItemJid);
+	if (!ritem.isNull() && !ritem.groups.contains(AGroupTo))
 	{
 		LOG_STRM_INFO(streamJid(),QString("Moving roster item to group, jid=%1, from_group=%2, to_group=%3").arg(AItemJid.bare(),AGroupFrom,AGroupTo));
 		QSet<QString> allItemGroups = ritem.groups;
@@ -531,8 +543,8 @@ void Roster::moveItemToGroup(const Jid &AItemJid, const QString &AGroupFrom, con
 
 void Roster::removeItemFromGroup(const Jid &AItemJid, const QString &AGroupFrom)
 {
-	IRosterItem ritem = rosterItem(AItemJid);
-	if (ritem.isValid && ritem.groups.contains(AGroupFrom))
+	IRosterItem ritem = findItem(AItemJid);
+	if (!ritem.isNull() && ritem.groups.contains(AGroupFrom))
 	{
 		LOG_STRM_INFO(streamJid(),QString("Removing roster item from group, jid=%1, from_group=%2").arg(AItemJid.bare(),AGroupFrom));
 		QSet<QString> allItemGroups = ritem.groups;
@@ -635,12 +647,11 @@ void Roster::removeGroup(const QString &AGroup)
 
 void Roster::clearRosterItems()
 {
-	foreach(const Jid &itemJid, FRosterItems.keys())
+	for(QHash<Jid, IRosterItem>::iterator it=FItems.begin(); it!=FItems.end(); it=FItems.erase(it))
 	{
-		IRosterItem ritem = FRosterItems.take(itemJid);
-		IRosterItem before = ritem;
-		ritem.subscription = SUBSCRIPTION_REMOVE;
-		emit itemReceived(ritem,before);
+		IRosterItem before = it.value();
+		it->subscription = SUBSCRIPTION_REMOVE;
+		emit itemReceived(it.value(),before);
 	}
 	FRosterVer.clear();
 }
@@ -697,7 +708,7 @@ void Roster::processItemsElement(const QDomElement &AItemsElem, bool ACompleteRo
 	if (!AItemsElem.isNull())
 	{
 		FRosterVer = AItemsElem.attribute("ver");
-		QSet<Jid> oldItems = ACompleteRoster ? FRosterItems.keys().toSet() : QSet<Jid>();
+		QSet<Jid> oldItems = ACompleteRoster ? FItems.keys().toSet() : QSet<Jid>();
 		QDomElement itemElem = AItemsElem.firstChildElement("item");
 		while (!itemElem.isNull())
 		{
@@ -707,14 +718,13 @@ void Roster::processItemsElement(const QDomElement &AItemsElem, bool ACompleteRo
 				QString subs = itemElem.attribute("subscription");
 				if (subs==SUBSCRIPTION_BOTH || subs==SUBSCRIPTION_TO || subs==SUBSCRIPTION_FROM || subs==SUBSCRIPTION_NONE)
 				{
-					IRosterItem &ritem = FRosterItems[itemJid];
+					IRosterItem &ritem = FItems[itemJid];
 					IRosterItem before = ritem;
 
-					ritem.isValid = true;
 					ritem.itemJid = itemJid;
 					ritem.name = itemElem.attribute("name");
 					ritem.subscription = subs;
-					ritem.ask = itemElem.attribute("ask");
+					ritem.subscriptionAsk = itemElem.attribute("ask");
 					oldItems -= ritem.itemJid;
 
 					QSet<QString> allItemGroups;
@@ -744,7 +754,7 @@ void Roster::processItemsElement(const QDomElement &AItemsElem, bool ACompleteRo
 
 		foreach(const Jid &itemJid, oldItems) 
 		{
-			IRosterItem ritem = FRosterItems.take(itemJid);
+			IRosterItem ritem = FItems.take(itemJid);
 			IRosterItem before = ritem;
 			ritem.subscription = SUBSCRIPTION_REMOVE;
 			LOG_STRM_DEBUG(streamJid(),QString("Roster item removed, jid=%1").arg(ritem.itemJid.bare()));
@@ -758,7 +768,7 @@ QString Roster::replaceGroupDelimiter(const QString &AGroup, const QString &AFro
 	return AGroup.split(AFrom,QString::SkipEmptyParts).join(ATo);
 }
 
-void Roster::onStreamOpened()
+void Roster::onXmppStreamOpened()
 {
 	static const QStringList skipDelimRequestDomains = QStringList() << "facebook.com";
 
@@ -786,7 +796,7 @@ void Roster::onStreamOpened()
 	}
 }
 
-void Roster::onStreamClosed()
+void Roster::onXmppStreamClosed()
 {
 	if (isOpen())
 	{
@@ -798,14 +808,14 @@ void Roster::onStreamClosed()
 	FXmppStream->insertXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 }
 
-void Roster::onStreamJidAboutToBeChanged(const Jid &AAfter)
+void Roster::onXmppStreamJidAboutToBeChanged(const Jid &AAfter)
 {
 	emit streamJidAboutToBeChanged(AAfter);
 	if (!(FXmppStream->streamJid() && AAfter))
 		clearRosterItems();
 }
 
-void Roster::onStreamJidChanged(const Jid &ABefore)
+void Roster::onXmppStreamJidChanged(const Jid &ABefore)
 {
 	emit streamJidChanged(ABefore);
 }

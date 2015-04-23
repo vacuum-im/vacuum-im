@@ -25,9 +25,9 @@ static const QList<int> BirthdayRosterKinds = QList<int>() << RIK_CONTACT;
 BirthdayReminder::BirthdayReminder()
 {
 	FAvatars = NULL;
-	FVCardPlugin = NULL;
-	FRosterPlugin = NULL;
-	FPresencePlugin = NULL;
+	FVCardManager = NULL;
+	FRosterManager = NULL;
+	FPresenceManager = NULL;
 	FRostersModel = NULL;
 	FNotifications = NULL;
 	FRostersViewPlugin = NULL;
@@ -59,12 +59,12 @@ bool BirthdayReminder::initConnections(IPluginManager *APluginManager, int &AIni
 {
 	Q_UNUSED(AInitOrder);
 
-	IPlugin *plugin = APluginManager->pluginInterface("IVCardPlugin").value(0,NULL);
+	IPlugin *plugin = APluginManager->pluginInterface("IVCardManager").value(0,NULL);
 	if (plugin)
 	{
-		FVCardPlugin = qobject_cast<IVCardPlugin *>(plugin->instance());
-		if (FVCardPlugin)
-			connect(FVCardPlugin->instance(),SIGNAL(vcardReceived(const Jid &)),SLOT(onVCardReceived(const Jid &)));
+		FVCardManager = qobject_cast<IVCardManager *>(plugin->instance());
+		if (FVCardManager)
+			connect(FVCardManager->instance(),SIGNAL(vcardReceived(const Jid &)),SLOT(onVCardReceived(const Jid &)));
 	}
 
 	plugin = APluginManager->pluginInterface("IAvatars").value(0,NULL);
@@ -84,21 +84,21 @@ bool BirthdayReminder::initConnections(IPluginManager *APluginManager, int &AIni
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IRosterManager").value(0,NULL);
 	if (plugin)
 	{
-		FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
-		if (FRosterPlugin)
+		FRosterManager = qobject_cast<IRosterManager *>(plugin->instance());
+		if (FRosterManager)
 		{
-			connect(FRosterPlugin->instance(),SIGNAL(rosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)),
+			connect(FRosterManager->instance(),SIGNAL(rosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)),
 				SLOT(onRosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)));
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IPresenceManager").value(0,NULL);
 	if (plugin)
 	{
-		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
+		FPresenceManager = qobject_cast<IPresenceManager *>(plugin->instance());
 	}
 
 	plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
@@ -131,7 +131,7 @@ bool BirthdayReminder::initConnections(IPluginManager *APluginManager, int &AIni
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 	connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
 
-	return FVCardPlugin!=NULL;
+	return FVCardManager!=NULL;
 }
 
 bool BirthdayReminder::initObjects()
@@ -191,12 +191,12 @@ int BirthdayReminder::contactBithdayDaysLeft(const Jid &AContactJid) const
 
 Jid BirthdayReminder::findContactStream(const Jid &AContactJid) const
 {
-	if (FRostersModel && FRosterPlugin)
+	if (FRostersModel && FRosterManager)
 	{
 		foreach(const Jid &streamJid, FRostersModel->streams())
 		{
-			IRoster *roster = FRosterPlugin->findRoster(streamJid);
-			if (roster && roster->rosterItem(AContactJid).isValid)
+			IRoster *roster = FRosterManager->findRoster(streamJid);
+			if (roster && roster->hasItem(AContactJid))
 				return streamJid;
 		}
 	}
@@ -312,7 +312,7 @@ void BirthdayReminder::onNotificationActivated(int ANotifyId)
 		{
 			Jid contactJid = FNotifies.value(ANotifyId);
 			Jid streamJid = findContactStream(contactJid);
-			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
+			IPresence *presence = FPresenceManager!=NULL ? FPresenceManager->findPresence(streamJid) : NULL;
 			QList<IPresenceItem> presences = presence!=NULL ? presence->findItems(contactJid) : QList<IPresenceItem>();
 			FMessageProcessor->createMessageWindow(streamJid, !presences.isEmpty() ? presences.first().itemJid : contactJid, Message::Chat, IMessageHandler::SM_SHOW);
 		}
@@ -361,7 +361,7 @@ void BirthdayReminder::onVCardReceived(const Jid &AContactJid)
 {
 	if (findContactStream(AContactJid).isValid())
 	{
-		IVCard *vcard = FVCardPlugin->getVCard(AContactJid);
+		IVCard *vcard = FVCardManager->getVCard(AContactJid);
 		setContactBithday(AContactJid,DateTime(vcard->value(VVN_BIRTHDAY)).dateTime().date());
 		vcard->unlock();
 	}
@@ -370,9 +370,9 @@ void BirthdayReminder::onVCardReceived(const Jid &AContactJid)
 void BirthdayReminder::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore)
 {
 	Q_UNUSED(ARoster);
-	if (!ABefore.isValid && FVCardPlugin && FVCardPlugin->hasVCard(AItem.itemJid))
+	if (ABefore.isNull() && FVCardManager && FVCardManager->hasVCard(AItem.itemJid))
 	{
-		IVCard *vcard = FVCardPlugin->getVCard(AItem.itemJid);
+		IVCard *vcard = FVCardManager->getVCard(AItem.itemJid);
 		setContactBithday(AItem.itemJid,DateTime(vcard->value(VVN_BIRTHDAY)).dateTime().date());
 		vcard->unlock();
 	}

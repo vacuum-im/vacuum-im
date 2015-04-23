@@ -1,9 +1,9 @@
-FORMS   = inbandoptions.ui
+FORMS   = inbandoptionswidget.ui
 
-HEADERS = inbandoptions.h \
-          inbandstream.h \
-          inbandstreams.h
+HEADERS = inbandstream.h \
+          inbandstreams.h \
+          inbandoptionswidget.h
 
-SOURCES = inbandoptions.cpp \
-          inbandstream.cpp \
-          inbandstreams.cpp
+SOURCES = inbandstream.cpp \
+          inbandstreams.cpp \
+          inbandoptionswidget.cpp

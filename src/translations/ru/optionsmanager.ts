@@ -83,28 +83,28 @@
 <context>
     <name>EditProfilesDialogClass</name>
     <message>
-        <source>Edit Profiles</source>
-        <translation>Редактировать профиль</translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation>Добавить</translation>
-    </message>
-    <message>
-        <source>Password</source>
-        <translation>Пароль</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Переименовать</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>Удалить</translation>
-    </message>
-    <message>
         <source>Close</source>
         <translation>Закрыть</translation>
+    </message>
+    <message>
+        <source>Add Profile</source>
+        <translation>Добавить профиль</translation>
+    </message>
+    <message>
+        <source>Change Password</source>
+        <translation>Изменить пароль</translation>
+    </message>
+    <message>
+        <source>Rename Profile</source>
+        <translation>Переименовать профиль</translation>
+    </message>
+    <message>
+        <source>Delete Profile</source>
+        <translation>Удалить профиль</translation>
+    </message>
+    <message>
+        <source>Profiles Settings</source>
+        <translation>Настройки профилей</translation>
     </message>
 </context>
 <context>
@@ -141,8 +141,8 @@
         <translation>Пароль:</translation>
     </message>
     <message>
-        <source>Profiles</source>
-        <translation>Профили</translation>
+        <source>Settings...</source>
+        <translation>Настройки...</translation>
     </message>
 </context>
 <context>
@@ -171,24 +171,36 @@
         <translation>Сменить профиль</translation>
     </message>
     <message>
-        <source>Misc</source>
-        <translation>Разное</translation>
-    </message>
-    <message>
-        <source>Auto run on system startup</source>
-        <translation>Автоматически запускать при старте системы</translation>
-    </message>
-    <message>
         <source>Options</source>
         <translation>Настройки</translation>
     </message>
     <message>
-        <source>Show change profile dialog</source>
-        <translation>Показать диалог изменения профиля</translation>
+        <source>Common settings</source>
+        <translation>Общие настройки</translation>
     </message>
     <message>
-        <source>Show options dialog</source>
-        <translation>Показать диалог настроек</translation>
+        <source>Auto run application on system startup</source>
+        <translation>Запускать приложение при включении компьютера</translation>
+    </message>
+    <message>
+        <source>Localization</source>
+        <translation>Локализация</translation>
+    </message>
+    <message>
+        <source>&lt;System Language&gt;</source>
+        <translation>&lt;Системный язык&gt;</translation>
+    </message>
+    <message>
+        <source>Language:</source>
+        <translation>Язык:</translation>
+    </message>
+    <message>
+        <source>Common</source>
+        <translation>Общие</translation>
+    </message>
+    <message>
+        <source>Appearance</source>
+        <translation>Оформление</translation>
     </message>
 </context>
 </TS>

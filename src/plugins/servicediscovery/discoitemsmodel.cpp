@@ -1,6 +1,7 @@
 #include "discoitemsmodel.h"
 
 #include <definitions/discoitemdataroles.h>
+#include <utils/pluginhelper.h>
 
 DiscoItemsModel::DiscoItemsModel(IServiceDiscovery *ADiscovery, const Jid &AStreamJid, QObject *AParent) : QAbstractItemModel(AParent)
 {
@@ -11,9 +12,7 @@ DiscoItemsModel::DiscoItemsModel(IServiceDiscovery *ADiscovery, const Jid &AStre
 	FRootIndex->infoFetched = true;
 	FRootIndex->itemsFetched = true;
 
-	IPlugin *plugin = FDiscovery->pluginManager()->pluginInterface("IDataForms").value(0,NULL);
-	if (plugin)
-		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
+	FDataForms = PluginHelper::pluginInstance<IDataForms>();
 
 	connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
 	connect(FDiscovery->instance(),SIGNAL(discoItemsReceived(const IDiscoItems &)),SLOT(onDiscoItemsReceived(const IDiscoItems &)));

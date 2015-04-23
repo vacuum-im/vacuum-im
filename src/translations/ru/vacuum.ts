@@ -50,36 +50,16 @@
         <translation>О Программе</translation>
     </message>
     <message>
-        <source>Application</source>
-        <translation>Приложение</translation>
+        <source>Global shortcuts</source>
+        <translation>Глобальные горячие клавиши</translation>
     </message>
     <message>
-        <source>Show information about Qt</source>
-        <translation>Показать информацию о Qt</translation>
-    </message>
-    <message>
-        <source>Show information about client</source>
-        <translation>Показать информацию о клиенте</translation>
-    </message>
-    <message>
-        <source>Show setup plugins dialog</source>
-        <translation>Показать диалог настройки плагинов</translation>
-    </message>
-    <message>
-        <source>Global</source>
-        <translation>Глобальные</translation>
+        <source>Application shortcuts</source>
+        <translation>Горячие клавиши приложения</translation>
     </message>
 </context>
 <context>
     <name>SetupPluginsDialog</name>
-    <message>
-        <source>&lt;System&gt;</source>
-        <translation>&lt;Системный&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Country&gt;</source>
-        <translation>&lt;Любая страна&gt;</translation>
-    </message>
     <message>
         <source>Restart Application</source>
         <translation>Перезапуск приложения</translation>
@@ -87,6 +67,46 @@
     <message>
         <source>Settings saved. Do you want to restart application?</source>
         <translation>Настройки сохранены. Вы хотите перезапустить приложение?</translation>
+    </message>
+    <message>
+        <source>Disabled (%1)</source>
+        <translation>Отключенные (%1)</translation>
+    </message>
+    <message>
+        <source>With errors (%1)</source>
+        <translation>С ошибками (%1)</translation>
+    </message>
+    <message numerus="yes">
+        <source>This plugin depends on %n other plugins.</source>
+        <translation>
+            <numerusform>Этот плагин зависит от %n другого плагина.</numerusform>
+            <numerusform>Этот плагин зависит от %n других плагинов.</numerusform>
+            <numerusform>Этот плагин зависит от %n других плагинов.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>This plugin does not depend on other plugins.</source>
+        <translation>Этот плагин не зависит от других плагинов.</translation>
+    </message>
+    <message numerus="yes">
+        <source>Other %n plugins depend on this plugin.</source>
+        <translation>
+            <numerusform>Другой %n плагин зависит от этого плагина.</numerusform>
+            <numerusform>Другие %n плагина зависят от этого плагина.</numerusform>
+            <numerusform>Другие %n плагинов зависят от этого плагина.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Other plugins don&apos;t depend on this plugin.</source>
+        <translation>Другие плагины не зависят от этого плагина.</translation>
+    </message>
+    <message numerus="yes">
+        <source>Not found %n dependences.</source>
+        <translation>
+            <numerusform>Не найдена %n зависимость.</numerusform>
+            <numerusform>Не найдено %n зависимости.</numerusform>
+            <numerusform>Не найдено %n зависимостей.</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -96,36 +116,12 @@
         <translation>Настроить плагины</translation>
     </message>
     <message>
-        <source>Error Message:</source>
-        <translation>Сообщение об ошибке:</translation>
+        <source>Search plugin</source>
+        <translation>Поиск плагинов</translation>
     </message>
     <message>
-        <source>Common Settings</source>
-        <translation>Общие настройки</translation>
-    </message>
-    <message>
-        <source>Language:</source>
-        <translation>Язык:</translation>
-    </message>
-    <message>
-        <source>Country:</source>
-        <translation>Страна:</translation>
-    </message>
-    <message>
-        <source>Depends</source>
-        <translation>Зависит</translation>
-    </message>
-    <message>
-        <source>Depend</source>
-        <translation>Зависят</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation>Название</translation>
-    </message>
-    <message>
-        <source>File</source>
-        <translation>Файл</translation>
+        <source>Plugin Information</source>
+        <translation>Информация о плагине</translation>
     </message>
 </context>
 </TS>

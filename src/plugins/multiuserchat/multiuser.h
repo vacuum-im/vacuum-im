@@ -2,7 +2,7 @@
 #define MULTIUSER_H
 
 #include <interfaces/imultiuserchat.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/ipresencemanager.h>
 
 class MultiUser :
 	public QObject,

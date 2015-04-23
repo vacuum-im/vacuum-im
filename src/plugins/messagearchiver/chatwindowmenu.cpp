@@ -4,12 +4,13 @@
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/shortcuts.h>
+#include <utils/pluginhelper.h>
 #include <utils/menu.h>
 
 #define SFP_LOGGING           "logging"
 #define SFV_MUSTNOT_LOGGING   "mustnot"
 
-ChatWindowMenu::ChatWindowMenu(IMessageArchiver *AArchiver, IPluginManager *APluginManager, IMessageToolBarWidget *AToolBarWidget, QWidget *AParent) : Menu(AParent)
+ChatWindowMenu::ChatWindowMenu(IMessageArchiver *AArchiver, IMessageToolBarWidget *AToolBarWidget, QWidget *AParent) : Menu(AParent)
 {
 	FToolBarWidget = AToolBarWidget;
 	connect(FToolBarWidget->messageWindow()->address()->instance(),SIGNAL(addressChanged(const Jid &,const Jid &)),SLOT(onToolBarWidgetAddressChanged(const Jid &,const Jid &)));
@@ -21,9 +22,29 @@ ChatWindowMenu::ChatWindowMenu(IMessageArchiver *AArchiver, IPluginManager *APlu
 
 	FRestorePrefs = false;
 
-	initialize(APluginManager);
-	createActions();
+	FSessionNegotiation = PluginHelper::pluginInstance<ISessionNegotiation>();
+	if (FSessionNegotiation)
+	{
+		connect(FSessionNegotiation->instance(),SIGNAL(sessionActivated(const IStanzaSession &)),
+			SLOT(onStanzaSessionActivated(const IStanzaSession &)));
+		connect(FSessionNegotiation->instance(),SIGNAL(sessionTerminated(const IStanzaSession &)),
+			SLOT(onStanzaSessionTerminated(const IStanzaSession &)));
+	}
 
+	FDiscovery = PluginHelper::pluginInstance<IServiceDiscovery>();
+	if (FDiscovery)
+	{
+		connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoInfoChanged(const IDiscoInfo &)));
+		connect(FDiscovery->instance(),SIGNAL(discoInfoRemoved(const IDiscoInfo &)),SLOT(onDiscoInfoChanged(const IDiscoInfo &)));
+	}
+	
+	FDataForms = PluginHelper::pluginInstance<IDataForms>();
+
+	connect(FArchiver->instance(),SIGNAL(archivePrefsChanged(const Jid &)),SLOT(onArchivePrefsChanged(const Jid &)));
+	connect(FArchiver->instance(),SIGNAL(requestCompleted(const QString &)),SLOT(onArchiveRequestCompleted(const QString &)));
+	connect(FArchiver->instance(),SIGNAL(requestFailed(const QString &, const XmppError &)),SLOT(onArchiveRequestFailed(const QString &, const XmppError &)));
+
+	createActions();
 	updateMenu();
 }
 
@@ -40,70 +61,6 @@ Jid ChatWindowMenu::streamJid() const
 Jid ChatWindowMenu::contactJid() const
 {
 	return FToolBarWidget->messageWindow()->address()->contactJid();
-}
-
-void ChatWindowMenu::initialize(IPluginManager *APluginManager)
-{
-	IPlugin *plugin = APluginManager->pluginInterface("IDataForms").value(0,NULL);
-	if (plugin)
-		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
-
-	plugin = APluginManager->pluginInterface("ISessionNegotiation").value(0,NULL);
-	if (plugin)
-	{
-		FSessionNegotiation = qobject_cast<ISessionNegotiation *>(plugin->instance());
-		if (FSessionNegotiation)
-		{
-			connect(FSessionNegotiation->instance(),SIGNAL(sessionActivated(const IStanzaSession &)),
-				SLOT(onStanzaSessionActivated(const IStanzaSession &)));
-			connect(FSessionNegotiation->instance(),SIGNAL(sessionTerminated(const IStanzaSession &)),
-				SLOT(onStanzaSessionTerminated(const IStanzaSession &)));
-		}
-	}
-
-	plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
-	if (plugin)
-	{
-		FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
-		if (FDiscovery)
-		{
-			connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoInfoChanged(const IDiscoInfo &)));
-			connect(FDiscovery->instance(),SIGNAL(discoInfoRemoved(const IDiscoInfo &)),SLOT(onDiscoInfoChanged(const IDiscoInfo &)));
-		}
-	}
-
-	connect(FArchiver->instance(),SIGNAL(archivePrefsChanged(const Jid &)),SLOT(onArchivePrefsChanged(const Jid &)));
-	connect(FArchiver->instance(),SIGNAL(requestCompleted(const QString &)),SLOT(onArchiveRequestCompleted(const QString &)));
-	connect(FArchiver->instance(),SIGNAL(requestFailed(const QString &, const XmppError &)),SLOT(onArchiveRequestFailed(const QString &, const XmppError &)));
-}
-
-void ChatWindowMenu::createActions()
-{
-	FEnableArchiving = new Action(this);
-	FEnableArchiving->setCheckable(true);
-	FEnableArchiving->setText(tr("Enable Message Archiving"));
-	FEnableArchiving->setShortcutId(SCT_MESSAGEWINDOWS_HISTORYENABLE);
-	connect(FEnableArchiving,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
-	addAction(FEnableArchiving,AG_DEFAULT,false);
-
-	FDisableArchiving = new Action(this);
-	FDisableArchiving->setCheckable(true);
-	FDisableArchiving->setText(tr("Disable Message Archiving"));
-	FDisableArchiving->setShortcutId(SCT_MESSAGEWINDOWS_HISTORYDISABLE);
-	connect(FDisableArchiving,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
-	addAction(FDisableArchiving,AG_DEFAULT,false);
-
-	FStartOTRSession = new Action(this);
-	FStartOTRSession->setText(tr("Start Off-The-Record Session"));
-	FStartOTRSession->setShortcutId(SCT_MESSAGEWINDOWS_HISTORYREQUIREOTR);
-	connect(FStartOTRSession,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
-	addAction(FStartOTRSession,AG_DEFAULT+100,false);
-
-	FStopOTRSession = new Action(this);
-	FStopOTRSession->setText(tr("Terminate Off-The-Record Session"));
-	FStopOTRSession->setShortcutId(SCT_MESSAGEWINDOWS_HISTORYTERMINATEOTR);
-	connect(FStopOTRSession,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
-	addAction(FStopOTRSession,AG_DEFAULT+100,false);
 }
 
 bool ChatWindowMenu::isOTRStanzaSession(const IStanzaSession &ASession) const
@@ -133,6 +90,31 @@ void ChatWindowMenu::restoreSessionPrefs(const Jid &AContactJid)
 		}
 		FRestorePrefs = false;
 	}
+}
+
+void ChatWindowMenu::createActions()
+{
+	FEnableArchiving = new Action(this);
+	FEnableArchiving->setCheckable(true);
+	FEnableArchiving->setText(tr("Enable Message Archiving"));
+	connect(FEnableArchiving,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
+	addAction(FEnableArchiving,AG_DEFAULT,false);
+
+	FDisableArchiving = new Action(this);
+	FDisableArchiving->setCheckable(true);
+	FDisableArchiving->setText(tr("Disable Message Archiving"));
+	connect(FDisableArchiving,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
+	addAction(FDisableArchiving,AG_DEFAULT,false);
+
+	FStartOTRSession = new Action(this);
+	FStartOTRSession->setText(tr("Start Off-The-Record Session"));
+	connect(FStartOTRSession,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
+	addAction(FStartOTRSession,AG_DEFAULT+100,false);
+
+	FStopOTRSession = new Action(this);
+	FStopOTRSession->setText(tr("Terminate Off-The-Record Session"));
+	connect(FStopOTRSession,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
+	addAction(FStopOTRSession,AG_DEFAULT+100,false);
 }
 
 void ChatWindowMenu::updateMenu()
@@ -247,9 +229,7 @@ void ChatWindowMenu::onActionTriggered(bool)
 void ChatWindowMenu::onArchivePrefsChanged(const Jid &AStreamJid)
 {
 	if (streamJid() == AStreamJid)
-	{
 		updateMenu();
-	}
 }
 
 void ChatWindowMenu::onArchiveRequestCompleted(const QString &AId)
@@ -289,17 +269,19 @@ void ChatWindowMenu::onArchiveRequestFailed(const QString &AId, const XmppError 
 	{
 		if (FToolBarWidget->messageWindow()->viewWidget() != NULL)
 		{
-			IMessageContentOptions options;
-			options.kind = IMessageContentOptions::KindStatus;
-			options.type |= IMessageContentOptions::TypeEvent;
-			options.direction = IMessageContentOptions::DirectionIn;
+			IMessageStyleContentOptions options;
+			options.kind = IMessageStyleContentOptions::KindStatus;
+			options.type |= IMessageStyleContentOptions::TypeEvent;
+			options.direction = IMessageStyleContentOptions::DirectionIn;
 			options.time = QDateTime::currentDateTime();
 			FToolBarWidget->messageWindow()->viewWidget()->appendText(tr("Failed to change archive preferences: %1").arg(AError.errorMessage()),options);
 		}
+
 		if (FSessionRequest == AId)
 			FSessionRequest.clear();
 		else
 			FSaveRequest.clear();
+
 		updateMenu();
 	}
 }
@@ -307,17 +289,13 @@ void ChatWindowMenu::onArchiveRequestFailed(const QString &AId, const XmppError 
 void ChatWindowMenu::onDiscoInfoChanged(const IDiscoInfo &ADiscoInfo)
 {
 	if (ADiscoInfo.streamJid==streamJid() && ADiscoInfo.contactJid==contactJid())
-	{
 		updateMenu();
-	}
 }
 
 void ChatWindowMenu::onStanzaSessionActivated(const IStanzaSession &ASession)
 {
 	if (ASession.streamJid==streamJid() && ASession.contactJid==contactJid())
-	{
 		updateMenu();
-	}
 }
 
 void ChatWindowMenu::onStanzaSessionTerminated(const IStanzaSession &ASession)

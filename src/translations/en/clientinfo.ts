@@ -60,16 +60,16 @@
         <translation>Idle Time</translation>
     </message>
     <message>
-        <source>Share information about OS version</source>
-        <translation>Share information about OS version</translation>
-    </message>
-    <message>
         <source>XMPP Ping</source>
         <translation>XMPP Ping</translation>
     </message>
     <message>
         <source>Supports the exchanging of the application-level pings over XML streams</source>
         <translation>Supports the exchanging of the application-level pings over XML streams</translation>
+    </message>
+    <message>
+        <source>Share information about your OS version</source>
+        <translation>Share information about your OS version</translation>
     </message>
 </context>
 <context>

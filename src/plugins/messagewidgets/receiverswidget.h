@@ -5,8 +5,8 @@
 #include <QTimer>
 #include <QSortFilterProxyModel>
 #include <interfaces/imessagewidgets.h>
-#include <interfaces/iroster.h>
-#include <interfaces/ipresence.h>
+#include <interfaces/irostermanager.h>
+#include <interfaces/ipresencemanager.h>
 #include <interfaces/istatusicons.h>
 #include <interfaces/irostersmodel.h>
 #include <interfaces/iaccountmanager.h>
@@ -115,8 +115,8 @@ private:
 private:
 	IStatusIcons *FStatusIcons;
 	IRostersModel *FRostersModel;
-	IRosterPlugin *FRosterPlugin;
-	IPresencePlugin *FPresencePlugin;
+	IRosterManager *FRosterManager;
+	IPresenceManager *FPresenceManager;
 	IAccountManager *FAccountManager;
 	IMessageWidgets *FMessageWidgets;
 	IMessageProcessor *FMessageProcessor;
