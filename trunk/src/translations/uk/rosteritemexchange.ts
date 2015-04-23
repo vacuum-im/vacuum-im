@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.0" language="uk" sourcelanguage="en">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="uk" sourcelanguage="en" version="2.0">
 <context>
     <name>ExchangeApproveDialog</name>
     <message>
@@ -67,11 +65,7 @@
     </message>
     <message numerus="yes">
         <source>Send %n Contact(s)</source>
-        <translation>
-            <numerusform>Відправити %n контакт</numerusform>
-            <numerusform>Відправити %n контакти</numerusform>
-            <numerusform>Відправити %n контактів</numerusform>
-        </translation>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
     <message>
         <source>Roster modification request from %1</source>
@@ -87,27 +81,19 @@
     </message>
     <message numerus="yes">
         <source>%n contact(s) have been sent</source>
-        <translation>
-            <numerusform>%n контакт був відправлений</numerusform>
-            <numerusform>%n контакти були відправлені</numerusform>
-            <numerusform>%n контактів були відправлені</numerusform>
-        </translation>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
     <message numerus="yes">
         <source>Failed to send %n contact(s)</source>
-        <translation>
-            <numerusform>Не вдалося відправити %n контакт</numerusform>
-            <numerusform>Не вдалося відправити %n контакти</numerusform>
-            <numerusform>Не вдалося відправити %n контактів</numerusform>
-        </translation>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
     <message>
         <source>Contacts list management</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Allow gateways and group services manage your contacts list</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>

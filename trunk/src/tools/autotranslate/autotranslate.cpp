@@ -1,7 +1,8 @@
 #include <QtDebug>
 
 #include <QDir>
-#include <QObject>
+#include <QFile>
+#include <QFileInfo>
 #include <QDirIterator>
 #include <QDomDocument>
 #include <QCoreApplication>
@@ -30,30 +31,39 @@ int main(int argc, char *argv[])
 	qInstallMsgHandler(myMessageOutput);
 	QCoreApplication app(argc, argv);
 
-	if (argc != 2)
+	if (argc != 3)
 	{
-		qCritical("Usage: autotranslate <diresctory>.");
+		qCritical("Usage: autotranslate <destination-dir> <source-dir>.");
 		return -1;
 	}
 
-	QDir dir(app.arguments().value(1),"*.ts",QDir::Name,QDir::Files);
-	if (!dir.exists())
+	QDir dstDir(app.arguments().value(1));
+	if (!dstDir.exists())
 	{
-		qCritical("Directory '%s' not found.",dir.dirName().toLocal8Bit().constData());
+		qCritical("Destination directory '%s' not found.",dstDir.dirName().toLocal8Bit().constData());
 		return -1;
 	}
 
-	QDirIterator it(dir);
-	while (it.hasNext())
+	QDir srcDir(app.arguments().value(2),"*.ts",QDir::Name,QDir::Files);
+	if (!srcDir.exists())
 	{
-		QFile file(it.next());
-		if (file.open(QFile::ReadOnly))
+		qCritical("Source directory '%s' not found.",srcDir.dirName().toLocal8Bit().constData());
+		return -1;
+	}
+
+	QDirIterator srcIt(srcDir);
+	while (srcIt.hasNext())
+	{
+		QFile srcFile(srcIt.next());
+		if (srcFile.open(QFile::ReadOnly))
 		{
 			QDomDocument doc;
-			if (doc.setContent(&file,true))
+			if (doc.setContent(&srcFile,true))
 			{
-				qDebug("Auto translating file '%s'.",file.fileName().toLocal8Bit().constData());
+				qDebug("Generation auto translation from '%s'.",srcFile.fileName().toLocal8Bit().constData());
+
 				QDomElement rootElem = doc.firstChildElement("TS");
+				rootElem.setAttribute("language",rootElem.attribute("sourcelanguage","en"));
 				
 				QDomElement contextElem = rootElem.firstChildElement("context");
 				while(!contextElem.isNull())
@@ -87,26 +97,29 @@ int main(int argc, char *argv[])
 					}
 					contextElem = contextElem.nextSiblingElement("context");
 				}
-				file.close();
+				srcFile.close();
 
-				if (file.open(QFile::WriteOnly|QFile::Truncate))
+				QFileInfo srcFileInfo(srcDir.absoluteFilePath(srcFile.fileName()));
+				QFile dstFile(dstDir.absoluteFilePath(srcFileInfo.fileName()));
+				if (dstFile.open(QFile::WriteOnly|QFile::Truncate))
 				{
-					file.write(doc.toByteArray(4));
+					dstFile.write(doc.toByteArray());
+					dstFile.close();
 				}
 				else
 				{
-					qWarning("Failed to open file '%s' for write.",file.fileName().toLocal8Bit().constData());
+					qWarning("Failed to open destination file '%s' for write.",dstFile.fileName().toLocal8Bit().constData());
 				}
 			}
 			else
 			{
-				qWarning("Invalid translation source file '%s'.",file.fileName().toLocal8Bit().constData());
+				qWarning("Invalid translation source file '%s'.",srcFile.fileName().toLocal8Bit().constData());
 			}
-			file.close();
+			srcFile.close();
 		}
 		else
 		{
-			qWarning("Could not open translation source file '%s'.",file.fileName().toLocal8Bit().constData());
+			qWarning("Could not open translation source file '%s'.",srcFile.fileName().toLocal8Bit().constData());
 		}
 	}
 	return 0;

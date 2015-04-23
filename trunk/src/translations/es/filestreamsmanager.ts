@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.0" language="es" sourcelanguage="en">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="es" sourcelanguage="en" version="2.0">
 <context>
     <name>FileStream</name>
     <message>
@@ -61,33 +59,33 @@
     <message>
         <source>Ctrl+T</source>
         <comment>Show file transfers</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>File transfer</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Create separate folder for each sender</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Default transfer method:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>FileStreamsOptionsWidget</name>
     <message>
         <source>Select default directory</source>
-        <translation type="unfinished">Elegir directorio por defecto</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>FileStreamsOptionsWidgetClass</name>
     <message>
         <source>Default directory:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>

@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.0" language="uk" sourcelanguage="en">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="uk" sourcelanguage="en" version="2.0">
 <context>
     <name>BirthdayReminder</name>
     <message>
@@ -21,19 +19,11 @@
     </message>
     <message numerus="yes">
         <source>Birthday in %n day(s)!</source>
-        <translation>
-            <numerusform>День народження через %n день!</numerusform>
-            <numerusform>День народження через %n дні!</numerusform>
-            <numerusform>День народження через %n днів!</numerusform>
-        </translation>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
     <message numerus="yes">
         <source>%1 marks %n years</source>
-        <translation>
-            <numerusform>%1 виконується %n рік</numerusform>
-            <numerusform>%1 виконується %n роки</numerusform>
-            <numerusform>%1 виконується %n років</numerusform>
-        </translation>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
     <message>
         <source>When reminding of upcoming birthdays</source>
@@ -42,14 +32,7 @@
     <message numerus="yes">
         <source>Birthday in %n day(s),
  %1</source>
-        <translation>
-            <numerusform>День народження через %n день,
-%1</numerusform>
-            <numerusform>День народження через %n дні,
-%1</numerusform>
-            <numerusform>День народження через %n днів,
-%1</numerusform>
-        </translation>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
 </context>
 </TS>

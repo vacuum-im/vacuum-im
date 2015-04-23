@@ -84,11 +84,11 @@ struct UTILS_EXPORT AdvancedDelegateItem
 	static quint8 getFloor(quint32 AItemId);
 	static quint16 getOrder(quint32 AItemId);
 
-	static const quint32 NullId;        //= 0
-	static const quint32 BranchId;      //= makeId(MiddleLeft,128,10)
-	static const quint32 CheckStateId;  //= makeId(MiddleLeft,128,100)
-	static const quint32 DecorationId;  //= makeId(MiddleLeft,128,500)
-	static const quint32 DisplayId;     //= makeId(MiddleCenter,128,500)
+	static const quint32 NullId;        // =0
+	static const quint32 BranchId;      // =makeId(MiddleLeft,128,10)
+	static const quint32 CheckStateId;  // =makeId(MiddleLeft,128,100)
+	static const quint32 DecorationId;  // =makeId(MiddleLeft,128,500)
+	static const quint32 DisplayId;     // =makeId(MiddleCenter,128,500)
 
 	ContextData *c;
 	ExplicitData *d;
