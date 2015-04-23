@@ -1,19 +1,17 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="es" sourcelanguage="en">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="es" sourcelanguage="en" version="2.0">
 <context>
     <name>RosterManager</name>
     <message>
         <source>Roster Manager</source>
-        <translation>Administrador de la lista de contactos</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Allows other modules to get information about contacts in the roster</source>
-        <translation>Permite a otros módulos obtener información de los contactos en la lista de contactos</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Roster request failed</source>
-        <translation>Error al consultar la lista de contactos</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>

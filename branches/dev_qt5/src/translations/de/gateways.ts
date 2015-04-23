@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="de" sourcelanguage="en">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" sourcelanguage="en" version="2.0">
 <context>
     <name>AddLegacyContactDialog</name>
     <message>
@@ -83,17 +81,11 @@
     </message>
     <message numerus="yes">
         <source>You are assured that wish to remove a transport &apos;&lt;b&gt;%1&lt;/b&gt;&apos; and its &lt;b&gt;%n contacts&lt;/b&gt; from roster?</source>
-        <translation>
-            <numerusform>Sind sie sicher, daß sie den Transport &apos;&lt;b&gt;%1&lt;/b&gt;&apos; mit seinem Kontakt aus dem Roster entfernen möchten?</numerusform>
-            <numerusform>Sind sie sicher, daß sie den Transport &apos;&lt;b&gt;%1&lt;/b&gt;&apos; mit seinen &lt;b&gt;%n Kontakten&lt;/b&gt; aus dem Roster entfernen möchten?</numerusform>
-        </translation>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
     <message numerus="yes">
         <source>You are assured that wish to remove &lt;b&gt;%n transports&lt;/b&gt; and their contacts from roster?</source>
-        <translation>
-            <numerusform>Send sie sicher, daß sie den Transport mit seinen Kontakten aus dem Roster entfernen möchten?</numerusform>
-            <numerusform>Send sie sicher, daß sie &lt;b&gt;%n Transporte&lt;/b&gt; mit ihren Kontakten aus dem Roster entfernen möchten?</numerusform>
-        </translation>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
     <message>
         <source>Remove transport and its contacts</source>

@@ -1,19 +1,17 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="uk" sourcelanguage="en">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="uk" sourcelanguage="en" version="2.0">
 <context>
     <name>RosterManager</name>
     <message>
         <source>Roster Manager</source>
-        <translation>Менеджер ростеру</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Allows other modules to get information about contacts in the roster</source>
-        <translation>Дозволяє іншим модулям отримувати інформацію про контакти в ростері</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Roster request failed</source>
-        <translation>Не вдалось отримати ростер</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>

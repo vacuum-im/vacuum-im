@@ -1,51 +1,55 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
-<TS version="2.1" language="en" sourcelanguage="en">
-<context>
-    <name>BirthdayReminder</name>
-    <message>
-        <source>Birthday Reminder</source>
-        <translation>Birthday Reminder</translation>
-    </message>
-    <message>
-        <source>Reminds about birthdays of your friends</source>
-        <translation>Reminds about birthdays of your friends</translation>
-    </message>
-    <message>
-        <source>Birthday remind</source>
-        <translation>Birthday remind</translation>
-    </message>
-    <message>
-        <source>Birthday today!</source>
-        <translation>Birthday today!</translation>
-    </message>
-    <message numerus="yes">
-        <source>Birthday in %n day(s)!</source>
-        <translation>
-            <numerusform>Birthday in %n day(s)!</numerusform>
-            <numerusform>Birthday in %n day(s)!</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%1 marks %n years</source>
-        <translation>
-            <numerusform>%1 marks %n years</numerusform>
-            <numerusform>%1 marks %n years</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>When reminding of upcoming birthdays</source>
-        <translation>When reminding of upcoming birthdays</translation>
-    </message>
-    <message numerus="yes">
-        <source>Birthday in %n day(s),
+<TS version="2.0" sourcelanguage="en" language="en">
+ <context>
+  <name>BirthdayReminder</name>
+  <message>
+   <source>Birthday Reminder</source>
+   <translation>Birthday Reminder</translation>
+  </message>
+  <message>
+   <source>Reminds about birthdays of your friends</source>
+   <translation>Reminds about birthdays of your friends</translation>
+  </message>
+  <message>
+   <source>Birthday remind</source>
+   <translation>Birthday remind</translation>
+  </message>
+  <message>
+   <source>Birthday today!</source>
+   <translation>Birthday today!</translation>
+  </message>
+  <message numerus="yes">
+   <source>Birthday in %n day(s)!</source>
+   <translation>
+    <numerusform>Birthday in %n day(s)!</numerusform>
+    <numerusform>Birthday in %n day(s)!</numerusform>
+    <numerusform>Birthday in %n day(s)!</numerusform>
+   </translation>
+  </message>
+  <message numerus="yes">
+   <source>%1 marks %n years</source>
+   <translation>
+    <numerusform>%1 marks %n years</numerusform>
+    <numerusform>%1 marks %n years</numerusform>
+    <numerusform>%1 marks %n years</numerusform>
+   </translation>
+  </message>
+  <message>
+   <source>When reminding of upcoming birthdays</source>
+   <translation>When reminding of upcoming birthdays</translation>
+  </message>
+  <message numerus="yes">
+   <source>Birthday in %n day(s),
  %1</source>
-        <translation>
-            <numerusform>Birthday in %n day(s),
+   <translation>
+    <numerusform>Birthday in %n day(s),
  %1</numerusform>
-            <numerusform>Birthday in %n day(s),
+    <numerusform>Birthday in %n day(s),
  %1</numerusform>
-        </translation>
-    </message>
-</context>
+    <numerusform>Birthday in %n day(s),
+ %1</numerusform>
+   </translation>
+  </message>
+ </context>
 </TS>

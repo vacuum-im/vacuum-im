@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="uk" sourcelanguage="en">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="uk" sourcelanguage="en" version="2.0">
 <context>
     <name>ModifyStatusDialogClass</name>
     <message>
@@ -108,58 +106,58 @@
     </message>
     <message>
         <source>Left %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Вийшов з %1</translation>
     </message>
     <message>
         <source>Connect to server on startup</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Reconnect to server on connection errors</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Standard and users statuses</source>
-        <translation>Вийшов з %1</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>StatusOptionsWidget</name>
     <message>
         <source>Add</source>
-        <translation type="unfinished">Додати</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Видалити</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Status</source>
-        <translation type="unfinished">Статус</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished">Ім&apos;я</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Message</source>
-        <translation type="unfinished">Повідомлення</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Priority</source>
-        <translation type="unfinished">Пріоритет</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Can&apos;t delete status</source>
-        <translation type="unfinished">Неможливо видалити статус</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>You can not delete standard statuses.</source>
-        <translation type="unfinished">Ви не можете видалити стандартні статуси.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>You can not delete active statuses.</source>
-        <translation type="unfinished">Ви не можете видалити активні статуси.</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>

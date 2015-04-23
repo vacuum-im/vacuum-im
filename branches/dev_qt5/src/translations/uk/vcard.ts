@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="uk" sourcelanguage="en">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="uk" sourcelanguage="en" version="2.0">
 <context>
     <name>EditItemDialogClass</name>
     <message>
@@ -234,44 +232,44 @@
     <name>VCardManager</name>
     <message>
         <source>Visit Card Manager</source>
-        <translation>Менеджер візитних карток</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Allows to obtain personal contact information</source>
-        <translation>Дозволяє отримувати персональну інформацію</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Show contact profile</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Ctrl+I</source>
         <comment>Show contact profile</comment>
-        <translation>Ctrl+I</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>User Profile</source>
-        <translation>Особисті дані</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Restrict maximum vCard images size</source>
-        <translation>Обмежувати максимальний розмір зображення в vCard</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Contact Profile</source>
-        <translation>Особисті дані контакту</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Supports the requesting of the personal contact information</source>
-        <translation>Підтримує запит персональної інформації контакту</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Show Profile</source>
-        <translation>Показати особисті дані</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Edit Profile</source>
-        <translation>Редагувати особисті дані</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>

@@ -1,54 +1,52 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="es" sourcelanguage="en">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="es" sourcelanguage="en" version="2.0">
 <context>
     <name>CompressFeature</name>
     <message>
         <source>Error code: %1</source>
-        <translation>Código de error: %1</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>CompressFeatureFactory</name>
     <message>
         <source>Stream Compression</source>
-        <translation>Compresión de flujo XMPP</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Allows to compress a stream of messages sent and received from the server</source>
-        <translation>Permite comprimir un flujo de mensajes enviados y recibidos del servidor</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Unsupported compression method</source>
-        <translation>Método de compresión no soportado</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Compression setup failed</source>
-        <translation>La iniciación de compresión ha fallado</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>ZLib error</source>
-        <translation>Error de ZLib</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Out of memory for ZLib</source>
-        <translation>No hay suficiente memoria para ZLib</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>ZLib version mismatch</source>
-        <translation>La versión de ZLib no coincide</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Invalid or incomplete deflate data</source>
-        <translation>Compresión de datos incorrecta o incompleta</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Invalid compression level</source>
-        <translation>Nivel de compresión inválido</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Enable data compression transferred between client and server</source>
-        <translation>Habilitar la compresión de datos transferidos entre el cliente y el servidor</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>

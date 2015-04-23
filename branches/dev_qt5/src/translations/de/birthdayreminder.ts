@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="de" sourcelanguage="en">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" sourcelanguage="en" version="2.0">
 <context>
     <name>BirthdayReminder</name>
     <message>
@@ -21,17 +19,11 @@
     </message>
     <message numerus="yes">
         <source>Birthday in %n day(s)!</source>
-        <translation>
-            <numerusform>Hat morgen Geburtstag!</numerusform>
-            <numerusform>Hat in %n Tagen Geburtstag!</numerusform>
-        </translation>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
     <message numerus="yes">
         <source>%1 marks %n years</source>
-        <translation>
-            <numerusform>%1 is ein Jahr alt</numerusform>
-            <numerusform>%1 is %n Jahre alt</numerusform>
-        </translation>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
     <message>
         <source>When reminding of upcoming birthdays</source>
@@ -40,10 +32,7 @@
     <message numerus="yes">
         <source>Birthday in %n day(s),
  %1</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
 </context>
 </TS>

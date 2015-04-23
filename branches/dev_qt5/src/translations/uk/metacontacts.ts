@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="uk" sourcelanguage="en">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="uk" sourcelanguage="en" version="2.0">
 <context>
     <name>CombineContactsDialog</name>
     <message>
@@ -9,11 +7,7 @@
     </message>
     <message numerus="yes">
         <source>The following &lt;b&gt;%n contact(s)&lt;/b&gt; will be merged into metacontact:</source>
-        <translation>
-            <numerusform>Цей &lt;b&gt;%n контакт&lt;/b&gt; буде об&apos;єднано в метаконтакт:</numerusform>
-            <numerusform>Ці &lt;b&gt;%n контакти&lt;/b&gt; будуть об&apos;єднані в метаконтакт:</numerusform>
-            <numerusform>Ці &lt;b&gt;%n контактів&lt;/b&gt; будуть об&apos;єднані в метаконтакт:</numerusform>
-        </translation>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
 </context>
 <context>
@@ -64,20 +58,20 @@
     </message>
     <message>
         <source>Combine contacts</source>
-        <translation>Об&apos;єднати контакти</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Ctrl+M</source>
         <comment>Combine contacts</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Destroy metacontact</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Detach from metacontact</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>

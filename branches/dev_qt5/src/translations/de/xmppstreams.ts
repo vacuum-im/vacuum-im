@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="de" sourcelanguage="en">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" sourcelanguage="en" version="2.0">
 <context>
     <name>XmppStream</name>
     <message>
@@ -12,27 +10,27 @@
     <name>XmppStreamManager</name>
     <message>
         <source>XMPP Streams Manager</source>
-        <translation type="unfinished">XMPP Datenstrom Manager</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Allows other modules to create XMPP streams and get access to them</source>
-        <translation type="unfinished">Erlaubt anderen Modulen XMPP Datenströme zu erstellen und zu benutzen</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>XMPP stream destroyed</source>
-        <translation type="unfinished">XMPP Datenstrom getrennt</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Secure connection is not established</source>
-        <translation type="unfinished">Sicher Verbindung ist nicht hergestellt</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Connection closed unexpectedly</source>
-        <translation type="unfinished">Verbindung unerwartet geschlossen</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Failed to start connection</source>
-        <translation type="unfinished">Kann Verbindung nicht herstellen</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>

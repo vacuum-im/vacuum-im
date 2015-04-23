@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="pl" sourcelanguage="en">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="pl" sourcelanguage="en" version="2.0">
 <context>
     <name>ModifyStatusDialogClass</name>
     <message>
@@ -108,58 +106,58 @@
     </message>
     <message>
         <source>Left %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Connect to server on startup</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Reconnect to server on connection errors</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Standard and users statuses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>StatusOptionsWidget</name>
     <message>
         <source>Add</source>
-        <translation type="unfinished">Dodaj</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Usuń</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Status</source>
-        <translation type="unfinished">Status</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished">Nazwa</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Message</source>
-        <translation type="unfinished">Wiadomość</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Priority</source>
-        <translation type="unfinished">Priorytet</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Can&apos;t delete status</source>
-        <translation type="unfinished">Nie można skasować statusu</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>You can not delete standard statuses.</source>
-        <translation type="unfinished">Nie można kasować standardowych statusów.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>You can not delete active statuses.</source>
-        <translation type="unfinished">Nie można kasować aktywnego statusu.</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>
