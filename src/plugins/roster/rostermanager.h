@@ -13,6 +13,7 @@ class RosterManager :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IRosterManager);
+	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IRosterManager");
 public:
 	RosterManager();
 	~RosterManager();

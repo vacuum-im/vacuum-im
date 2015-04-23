@@ -14,6 +14,7 @@ class PresenceManager :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IPresenceManager);
+	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IPresenceManager");
 public:
 	PresenceManager();
 	~PresenceManager();
