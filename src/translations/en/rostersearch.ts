@@ -1,43 +1,43 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
-<TS version="2.1" language="en" sourcelanguage="en">
-<context>
-    <name>RosterSearch</name>
-    <message>
-        <source>Search toolbar</source>
-        <translation>Search toolbar</translation>
-    </message>
-    <message>
-        <source>Roster Search</source>
-        <translation>Roster Search</translation>
-    </message>
-    <message>
-        <source>Show search toolbar</source>
-        <translation>Show search toolbar</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation>Name</translation>
-    </message>
-    <message>
-        <source>Status</source>
-        <translation>Status</translation>
-    </message>
-    <message>
-        <source>Jabber ID</source>
-        <translation>Jabber ID</translation>
-    </message>
-    <message>
-        <source>Allows to search for contacts in the roster</source>
-        <translation>Allows to search for contacts in the roster</translation>
-    </message>
-    <message>
-        <source>Group</source>
-        <translation>Group</translation>
-    </message>
-    <message>
-        <source>Search for Contacts</source>
-        <translation>Search for Contacts</translation>
-    </message>
-</context>
+<TS version="2.0" sourcelanguage="en" language="en">
+ <context>
+  <name>RosterSearch</name>
+  <message>
+   <source>Search toolbar</source>
+   <translation>Search toolbar</translation>
+  </message>
+  <message>
+   <source>Roster Search</source>
+   <translation>Roster Search</translation>
+  </message>
+  <message>
+   <source>Show search toolbar</source>
+   <translation>Show search toolbar</translation>
+  </message>
+  <message>
+   <source>Name</source>
+   <translation>Name</translation>
+  </message>
+  <message>
+   <source>Status</source>
+   <translation>Status</translation>
+  </message>
+  <message>
+   <source>Jabber ID</source>
+   <translation>Jabber ID</translation>
+  </message>
+  <message>
+   <source>Allows to search for contacts in the roster</source>
+   <translation>Allows to search for contacts in the roster</translation>
+  </message>
+  <message>
+   <source>Group</source>
+   <translation>Group</translation>
+  </message>
+  <message>
+   <source>Search for Contacts</source>
+   <translation>Search for Contacts</translation>
+  </message>
+ </context>
 </TS>

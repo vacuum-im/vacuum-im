@@ -1,27 +1,25 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="de" sourcelanguage="en">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" sourcelanguage="en" version="2.0">
 <context>
     <name>StartTLSFeatureFactory</name>
     <message>
         <source>StartTLS</source>
-        <translation type="unfinished">StartTLS</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Allows to establish a secure connection to the server after connecting</source>
-        <translation type="unfinished">Erlaubt das herstellen einer sicheren Verbindung nach dem Verbindungsaufbau</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Failed to begin StartTLS handshake</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Wrong StartTLS negotiation response</source>
-        <translation type="unfinished">Falsche StartTLS Aushandlungsantwort</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>StartTLS negotiation failed</source>
-        <translation type="unfinished">StartTLS Aushandlung gescheitert</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>

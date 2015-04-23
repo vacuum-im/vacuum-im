@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="es" sourcelanguage="en">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="es" sourcelanguage="en" version="2.0">
 <context>
     <name>ConnectionOptionsWidget</name>
     <message>
@@ -20,6 +18,10 @@
         <translation>Permitir solo de confianza</translation>
     </message>
     <message>
+        <source>TLSv1</source>
+        <translation>TLSv1</translation>
+    </message>
+    <message>
         <source>SSLv3</source>
         <translation>SSLv3</translation>
     </message>
@@ -29,19 +31,7 @@
     </message>
     <message>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>TLSv1.0</source>
-        <translation type="unfinished">TLSv1.0</translation>
-    </message>
-    <message>
-        <source>TLSv1.1</source>
-        <translation type="unfinished">TLSv1.1</translation>
-    </message>
-    <message>
-        <source>TLSv1.2</source>
-        <translation type="unfinished">TLSv1.2</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -60,94 +50,94 @@
     </message>
     <message>
         <source>SSL Protocol:</source>
-        <translation type="unfinished"></translation>
+        <translation>Protocolo SSL:</translation>
     </message>
     <message>
         <source>Certificate:</source>
-        <translation>Protocolo SSL:</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>DefaultConnectionEngine</name>
     <message>
         <source>Default Connection</source>
-        <translation type="unfinished">Conexión por defecto</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Allows to set a standard TCP connection to Jabber server</source>
-        <translation type="unfinished">Permite establecer una conexión TCP estándar con el servidor Jabber</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Host certificate is not in trusted list</source>
-        <translation type="unfinished">El certificado del host no está en la lista de confianza</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Name: %1</source>
-        <translation type="unfinished">Nombre: %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Organization: %1</source>
-        <translation type="unfinished">Organización: %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Subunit: %1</source>
-        <translation type="unfinished">Subdivisión: %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Country: %1</source>
-        <translation type="unfinished">País: %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Locality: %1</source>
-        <translation type="unfinished">Ubicación: %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>State/Province: %1</source>
-        <translation type="unfinished">Estado/Provincia: %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Certificate holder:</source>
-        <translation type="unfinished">Certificado expedido:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Certificate issuer:</source>
-        <translation type="unfinished">Certificado emitido:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Certificate details:</source>
-        <translation type="unfinished">Detalles del certificado:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Effective from: %1</source>
-        <translation type="unfinished">Válido desde: %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Expired at: %1</source>
-        <translation type="unfinished">Válido hasta: %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Serial number: %1</source>
-        <translation type="unfinished">Número de serie: %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>SSL Authentication Error</source>
-        <translation type="unfinished">Error de autenticación SSL</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Connection to &lt;b&gt;%1&lt;/b&gt; can not be considered completely safe due to errors in servers certificate check:</source>
-        <translation type="unfinished">Conectar a &lt;b&gt;%1&lt;/b&gt; no podría considerarse completamente seguro debido a errores en la comprobación de certificados de los servidores:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Disconnect</source>
-        <translation type="unfinished">Desconectar</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Connect Once</source>
-        <translation type="unfinished">Conectar una vez</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Connect Always</source>
-        <translation type="unfinished">Conectar siempre</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>

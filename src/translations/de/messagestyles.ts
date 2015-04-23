@@ -1,241 +1,239 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="de" sourcelanguage="en">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" sourcelanguage="en" version="2.0">
 <context>
     <name>MessageStyleManager</name>
     <message>
         <source>Message Styles Manager</source>
-        <translation type="unfinished">Nachrichten Stil Manager</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Allows to use different styles to display messages</source>
-        <translation type="unfinished">Erlaubt die Benutzung verschiedener Stile für die Nachrichtenanzeige</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Messages styles</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Show date separators in message window</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>January</source>
-        <translation type="unfinished">Januar</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>February</source>
-        <translation type="unfinished">Februar</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>March</source>
-        <translation type="unfinished">März</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>April</source>
-        <translation type="unfinished">April</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>May</source>
-        <translation type="unfinished">Mai</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>June</source>
-        <translation type="unfinished">Juni</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>July</source>
-        <translation type="unfinished">Juli</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>August</source>
-        <translation type="unfinished">August</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>September</source>
-        <translation type="unfinished">September</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>October</source>
-        <translation type="unfinished">Oktober</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>November</source>
-        <translation type="unfinished">November</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>December</source>
-        <translation type="unfinished">Dezember</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Monday</source>
-        <translation type="unfinished">Montag</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Tuesday</source>
-        <translation type="unfinished">Dienstag</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Wednesday</source>
-        <translation type="unfinished">Mittwoch</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Thursday</source>
-        <translation type="unfinished">Donnerstag</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Friday</source>
-        <translation type="unfinished">Freitag</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Saturday</source>
-        <translation type="unfinished">Samstag</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Sunday</source>
-        <translation type="unfinished">Sonntag</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>%1, %2 dd</source>
-        <translation type="unfinished">%1, %2 dd</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Today</source>
-        <translation type="unfinished">Heute</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>%1, %2 dd, yyyy</source>
-        <translation type="unfinished">%1 %2 dd, yyyy</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>d MMM yyyy hh:mm</source>
-        <translation type="unfinished">d MMM jjjj hh:mm</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>d MMM hh:mm</source>
-        <translation type="unfinished">d MMM hh:mm</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>hh:mm:ss</source>
-        <translation type="unfinished">hh:mm:ss</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>StyleEditOptionsDialog</name>
     <message>
         <source>Preview</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Message Style - %1 - %2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Receiver</source>
-        <translation type="unfinished">Empfänger</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Sender</source>
-        <translation type="unfinished">Sender</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The message with a error code %1 is received</source>
-        <translation type="unfinished">Die Nachricht wurde mit dem Fehlercode %1 erhalten</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Error description</source>
-        <translation type="unfinished">Fehler Beschreibung</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Subject: Message subject</source>
-        <translation type="unfinished">Betreff: Nachrichten Betreff</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Message body line 1</source>
-        <translation type="unfinished">Nachrichten Body Zeile 1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Message body line 2</source>
-        <translation type="unfinished">Nachrichten Body Zeile 2</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Incoming history message</source>
-        <translation type="unfinished">Eingehende Verlaufs Nachricht</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Incoming history consecutive message</source>
-        <translation type="unfinished">Eingehene fortlaufende Verlaufs Nachricht</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Incoming status message</source>
-        <translation type="unfinished">Eingehende Status Nachricht</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Outgoing history message</source>
-        <translation type="unfinished">Ausgehende Verlaufs Nachricht</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Outgoing status message</source>
-        <translation type="unfinished">Ausgehende Status Nachricht</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Conference topic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Incoming message</source>
-        <translation type="unfinished">Eingehende Nachricht</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Incoming event</source>
-        <translation type="unfinished">Eingehendes Ereignis</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Incoming notification</source>
-        <translation type="unfinished">Eingehender Hinweis</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Incoming mention message</source>
-        <translation type="unfinished">Eingehende Erwähnung</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Outgoing message</source>
-        <translation type="unfinished">Ausgehende Nachricht</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Outgoing consecutive message</source>
-        <translation type="unfinished">Ausgehende fortlaufende Nachricht</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>StyleSelectOptionsWidget</name>
     <message>
         <source>Chat:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Conference:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Message:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Headline:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Error:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Unknown:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>

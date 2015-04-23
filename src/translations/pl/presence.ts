@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="pl" sourcelanguage="en">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="pl" sourcelanguage="en" version="2.0">
 <context>
     <name>Presence</name>
     <message>
@@ -12,11 +10,11 @@
     <name>PresenceManager</name>
     <message>
         <source>Presence Manager</source>
-        <translation type="unfinished">Menedżer obecności</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Allows other modules to obtain information about the status of contacts in the roster</source>
-        <translation type="unfinished">Umożliwia innym modułom na otrzymywanie informacji o statusie kontaktów w rosterze</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>

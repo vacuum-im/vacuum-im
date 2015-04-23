@@ -84,7 +84,7 @@ macx {
   INSTALLS        += sdk_utils
 
   #Dirty hack to install utils translations
-  TARGET           = $$VACUUM_UTILS_NAME
-  include(../translations/languages.inc)
-  TARGET           = $$VACUUM_LOADER_NAME
+  #TARGET           = $$VACUUM_UTILS_NAME
+  #include(../translations/languages.inc)
+  #TARGET           = $$VACUUM_LOADER_NAME
 }

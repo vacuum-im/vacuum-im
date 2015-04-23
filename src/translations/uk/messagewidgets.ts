@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="uk" sourcelanguage="en">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="uk" sourcelanguage="en" version="2.0">
 <context>
     <name>EditWidget</name>
     <message>
@@ -140,73 +138,69 @@
     </message>
     <message>
         <source>Message window view</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Load last messages from history</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Show message windows together with contacts list</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Show message windows in tab window</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Automatically resize messages input field</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Minimum number of lines in messages input field:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Message window behavior</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Show contacts status changes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Save contacts status messages in history</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Ctrl+Q</source>
         <comment>Quote selected text</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Send chat message</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Return</source>
         <comment>Send chat message</comment>
-        <translation type="unfinished">Return</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Send single message</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Ctrl+Return</source>
         <comment>Send single message</comment>
-        <translation type="unfinished">Ctrl+Return</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>NormalWindow</name>
     <message numerus="yes">
         <source>Selected %n contact(s)</source>
-        <translation>
-            <numerusform>Вибрано %n контакт</numerusform>
-            <numerusform>Вибрано %n контактів</numerusform>
-            <numerusform>Вибрано %n контактів</numerusform>
-        </translation>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
     <message>
         <source>Subject</source>
