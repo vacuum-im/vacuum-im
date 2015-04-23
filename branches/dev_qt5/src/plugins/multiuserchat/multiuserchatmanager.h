@@ -44,6 +44,7 @@ class MultiUserChatManager :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IMultiUserChatManager IXmppUriHandler IDiscoFeatureHandler IMessageHandler IDataLocalizer IOptionsDialogHolder IRostersClickHooker IRecentItemHandler);
+	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IMultiUserChatManager");
 public:
 	MultiUserChatManager();
 	~MultiUserChatManager();

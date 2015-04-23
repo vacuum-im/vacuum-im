@@ -15,6 +15,7 @@ class XmppStreamManager :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IXmppStreamManager);
+	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IXmppStreamManager");
 public:
 	XmppStreamManager();
 	~XmppStreamManager();

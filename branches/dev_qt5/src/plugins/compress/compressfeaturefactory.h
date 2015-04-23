@@ -17,6 +17,7 @@ class CompressFeatureFactory :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IXmppFeatureFactory IOptionsDialogHolder);
+	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.ICompressFeatureFactory");
 public:
 	CompressFeatureFactory();
 	~CompressFeatureFactory();
