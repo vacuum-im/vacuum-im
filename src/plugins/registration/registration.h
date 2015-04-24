@@ -25,7 +25,7 @@ class Registration :
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IRegistration IStanzaRequestOwner IXmppUriHandler IDiscoFeatureHandler IXmppFeatureFactory IDataLocalizer);
 	friend class RegisterFeature;
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IRegistration");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.Registration");
 public:
 	Registration();
 	~Registration();

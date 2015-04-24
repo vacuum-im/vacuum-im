@@ -27,7 +27,7 @@ class RosterItemExchange :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IRosterItemExchange IOptionsDialogHolder IStanzaHandler IStanzaRequestOwner IMessageViewDropHandler IRostersDragDropHandler);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IRosterItemExchange");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.RosterItemExchange");
 public:
 	RosterItemExchange();
 	~RosterItemExchange();

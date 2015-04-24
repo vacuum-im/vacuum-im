@@ -27,7 +27,7 @@ class DataStreamsManger :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IDataStreamsManager IStanzaHandler IStanzaRequestOwner IOptionsDialogHolder);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IDataStreamsManager");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.DataStreamsManager");
 public:
 	DataStreamsManger();
 	~DataStreamsManger();

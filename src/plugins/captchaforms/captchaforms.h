@@ -25,7 +25,7 @@ class CaptchaForms :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin ICaptchaForms IStanzaHandler IStanzaRequestOwner IDataLocalizer);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.ICaptchaForms");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.CaptchaForms");
 public:
 	CaptchaForms();
 	~CaptchaForms();

@@ -14,7 +14,7 @@ class StartTLSFeatureFactory :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IXmppFeatureFactory);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IStartTLSFeatureFactory");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.StartTLS");
 public:
 	StartTLSFeatureFactory();
 	~StartTLSFeatureFactory();

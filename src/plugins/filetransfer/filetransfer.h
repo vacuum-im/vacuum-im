@@ -30,7 +30,7 @@ class FileTransfer :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IFileTransfer IOptionsDialogHolder IDiscoFeatureHandler  IRostersDragDropHandler IMessageViewDropHandler IFileStreamsHandler);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IFileTransfer");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.FileTransfer");
 public:
 	FileTransfer();
 	~FileTransfer();

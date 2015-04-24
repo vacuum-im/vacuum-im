@@ -21,7 +21,7 @@ class SessionNegotiation :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin ISessionNegotiation IStanzaHandler IDiscoFeatureHandler ISessionNegotiator IDataLocalizer);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.ISessionNegotiation");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.SessionNegotiation");
 public:
 	SessionNegotiation();
 	~SessionNegotiation();

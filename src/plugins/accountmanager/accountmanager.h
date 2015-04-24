@@ -18,7 +18,7 @@ class AccountManager :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IAccountManager IOptionsDialogHolder);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IAccountManager");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.AccountManager");
 public:
 	AccountManager();
 	~AccountManager();

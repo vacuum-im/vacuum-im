@@ -19,7 +19,7 @@ class JabberSearch :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IJabberSearch IStanzaRequestOwner IDiscoFeatureHandler IDataLocalizer);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IJabberSearch");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.JabberSearch");
 public:
 	JabberSearch();
 	~JabberSearch();

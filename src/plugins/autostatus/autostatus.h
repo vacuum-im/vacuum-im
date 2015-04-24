@@ -19,7 +19,7 @@ class AutoStatus :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IAutoStatus IOptionsDialogHolder);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IAutoStatus");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.AutoStatus");
 public:
 	AutoStatus();
 	~AutoStatus();

@@ -30,7 +30,7 @@ class MessageWidgets :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IMessageWidgets IOptionsDialogHolder IMessageViewUrlHandler IMessageEditContentsHandler);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IMessageWidgets");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.MessageWidgets");
 public:
 	MessageWidgets();
 	~MessageWidgets();

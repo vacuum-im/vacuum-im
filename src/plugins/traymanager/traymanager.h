@@ -13,7 +13,7 @@ class TrayManager :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin ITrayManager);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.ITrayManager");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.TrayManager");
 public:
 	TrayManager();
 	~TrayManager();

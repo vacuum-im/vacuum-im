@@ -27,7 +27,7 @@ class RecentContacts :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IRecentContacts IRosterDataHolder IRostersDragDropHandler IRostersLabelHolder IRostersClickHooker IRecentItemHandler IOptionsDialogHolder);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IRecentContacts");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.RecentContacts");
 public:
 	RecentContacts();
 	~RecentContacts();

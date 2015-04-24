@@ -17,7 +17,7 @@ class ShortcutManager :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IOptionsDialogHolder);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.ShortcutManager");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.ShortcutManager");
 public:
 	ShortcutManager();
 	~ShortcutManager();

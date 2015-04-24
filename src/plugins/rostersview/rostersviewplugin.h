@@ -23,7 +23,7 @@ class RostersViewPlugin :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IRostersViewPlugin IOptionsDialogHolder IRosterDataHolder IRostersLabelHolder);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IRostersViewPlugin");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.RostersView");
 public:
 	RostersViewPlugin();
 	~RostersViewPlugin();

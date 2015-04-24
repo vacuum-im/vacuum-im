@@ -37,7 +37,7 @@ class RosterChanger :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IRosterChanger IOptionsDialogHolder IRostersDragDropHandler IRostersEditHandler IXmppUriHandler);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IRosterChanger");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.RosterChanger");
 public:
 	RosterChanger();
 	~RosterChanger();

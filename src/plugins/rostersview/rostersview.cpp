@@ -54,6 +54,7 @@ RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
 	setSelectionMode(ExtendedSelection);
 	setSelectionBehavior(SelectRows);
 	setContextMenuPolicy(Qt::DefaultContextMenu);
+	setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 
 	FAdvancedItemDelegate = new AdvancedItemDelegate(this);
 	FAdvancedItemDelegate->setVertialSpacing(1);

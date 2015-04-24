@@ -41,7 +41,7 @@ class MetaContacts :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IMetaContacts IRosterDataHolder IRostersLabelHolder IRostersClickHooker IRostersDragDropHandler IRostersEditHandler IRecentItemHandler);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.MetaContacts");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.MetaContacts");
 public:
 	MetaContacts();
 	~MetaContacts();

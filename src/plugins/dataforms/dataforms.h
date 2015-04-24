@@ -26,7 +26,7 @@ class DataForms :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IDataForms);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IDataForms");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.DataForms");
 public:
 	DataForms();
 	~DataForms();

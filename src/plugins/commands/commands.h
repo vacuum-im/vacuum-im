@@ -23,7 +23,7 @@ class Commands :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin ICommands IStanzaHandler IStanzaRequestOwner IXmppUriHandler IDiscoHandler IDiscoFeatureHandler);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.ICommands");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.Commands");
 public:
 	Commands();
 	~Commands();
