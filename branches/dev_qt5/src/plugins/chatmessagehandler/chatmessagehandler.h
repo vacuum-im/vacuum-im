@@ -44,7 +44,7 @@ class ChatMessageHandler :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IXmppUriHandler IMessageHandler IRostersClickHooker IMessageEditSendHandler);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.ChatMessageHandler");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.ChatMessageHandler");
 public:
 	ChatMessageHandler();
 	~ChatMessageHandler();

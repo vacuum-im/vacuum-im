@@ -27,7 +27,7 @@ class Annotations :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IAnnotations IRosterDataHolder);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IAnnotations");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.Annotations");
 public:
 	Annotations();
 	~Annotations();

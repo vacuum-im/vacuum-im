@@ -41,7 +41,7 @@ class VCardManager :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IVCardManager IRosterDataHolder IStanzaRequestOwner IXmppUriHandler IOptionsDialogHolder);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IVCardManager");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.VCardManager");
 	friend class VCard;
 public:
 	VCardManager();

@@ -20,7 +20,7 @@ class StatusIcons :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IStatusIcons IOptionsDialogHolder IRosterDataHolder);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IStatusIcons");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.StatusIcons");
 public:
 	StatusIcons();
 	~StatusIcons();

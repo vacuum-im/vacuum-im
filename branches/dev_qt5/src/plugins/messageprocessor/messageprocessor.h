@@ -16,7 +16,7 @@ class MessageProcessor :
 {
 	Q_OBJECT
 	Q_INTERFACES(IPlugin IMessageProcessor IMessageWriter IStanzaHandler)
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IMessageProcessor");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.MessageProcessor");
 public:
 	MessageProcessor();
 	~MessageProcessor();

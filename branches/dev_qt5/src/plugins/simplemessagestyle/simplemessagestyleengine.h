@@ -16,7 +16,7 @@ class SimpleMessageStyleEngine :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IMessageStyleEngine);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.ISimpleMessageStyleEngine");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.SimpleMessageStyle");
 public:
 	SimpleMessageStyleEngine();
 	~SimpleMessageStyleEngine();

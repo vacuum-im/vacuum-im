@@ -27,7 +27,7 @@ class Bookmarks :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IBookmarks IOptionsDialogHolder IRosterDataHolder IRostersEditHandler);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IBookmarks");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.Bookmarks");
 public:
 	Bookmarks();
 	~Bookmarks();

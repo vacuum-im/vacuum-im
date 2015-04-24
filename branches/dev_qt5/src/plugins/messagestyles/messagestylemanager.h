@@ -18,7 +18,7 @@ class MessageStyleManager :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IMessageStyleManager IOptionsDialogHolder);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IMessageStyleManager");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.MessageStyles");
 public:
 	MessageStyleManager();
 	~MessageStyleManager();

@@ -54,7 +54,7 @@ class ClientInfo :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IClientInfo IOptionsDialogHolder IStanzaHandler IStanzaRequestOwner IDataLocalizer IDiscoFeatureHandler);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IClientInfo");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.ClientInfo");
 public:
 	ClientInfo();
 	~ClientInfo();

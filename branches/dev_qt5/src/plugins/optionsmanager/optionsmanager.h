@@ -30,7 +30,7 @@ class OptionsManager :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IOptionsManager IOptionsDialogHolder);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.OptionsManager");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.OptionsManager");
 public:
 	OptionsManager();
 	~OptionsManager();

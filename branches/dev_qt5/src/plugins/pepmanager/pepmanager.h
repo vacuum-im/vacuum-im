@@ -15,7 +15,7 @@ class PEPManager :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IPEPManager IStanzaHandler);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IPEPManager");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.PEPManager");
 public:
 	PEPManager();
 	~PEPManager();

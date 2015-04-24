@@ -44,7 +44,7 @@ class ChatStates :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IChatStates IStanzaHandler IArchiveHandler IOptionsDialogHolder ISessionNegotiator);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IChatStates");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.ChatStates");
 public:
 	ChatStates();
 	~ChatStates();

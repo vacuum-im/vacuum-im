@@ -40,7 +40,7 @@ class StatusChanger :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IStatusChanger IOptionsDialogHolder);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IStatusChanger");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.StatusChanger");
 public:
 	StatusChanger();
 	~StatusChanger();

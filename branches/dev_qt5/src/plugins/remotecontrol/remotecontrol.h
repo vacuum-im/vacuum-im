@@ -24,7 +24,7 @@ class RemoteControl :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin ICommandServer IStanzaHandler IDataLocalizer);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.RemoteControl");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.RemoteControl");
 public:
 	RemoteControl();
 	~RemoteControl();

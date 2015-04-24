@@ -15,7 +15,7 @@ class IqAuthFeatureFactory :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IXmppFeatureFactory);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IIqAuthFeatureFactory");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.IqAuth");
 public:
 	IqAuthFeatureFactory();
 	~IqAuthFeatureFactory();

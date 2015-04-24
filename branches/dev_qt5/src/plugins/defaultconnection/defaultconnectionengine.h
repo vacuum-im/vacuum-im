@@ -16,7 +16,7 @@ class DefaultConnectionEngine :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IConnectionEngine IDefaultConnectionEngine);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IDefaultConnectionEngine");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.DefaultConnection");
 public:
 	DefaultConnectionEngine();
 	~DefaultConnectionEngine();

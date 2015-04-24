@@ -19,7 +19,7 @@ class RosterSearch :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IRosterSearch IRostersClickHooker IRostersKeyHooker);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IRosterSearch");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.RosterSearch");
 public:
 	RosterSearch();
 	~RosterSearch();

@@ -1,6 +1,7 @@
 #include "filecookiejar.h"
 
 #include <QFile>
+#include <QNetworkCookie>
 
 FileCookieJar::FileCookieJar(const QString &AFile, QObject *AParent) : QNetworkCookieJar(AParent)
 {

@@ -732,10 +732,10 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 				{
 					QString resource = !pItem.itemJid.resource().isEmpty() ? pItem.itemJid.resource() : pItem.itemJid.uBare();
 					QString statusIcon = FStatusIcons!=NULL ? FStatusIcons->iconFileName(streamJid,pItem.itemJid) : QString::null;
-										AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_NAME+orderShift,QString("<img src='%1'> %2 (%3)").arg(statusIcon).arg(resource.toHtmlEscaped()).arg(pItem.priority));
+					AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_NAME+orderShift,QString("<img src='%1'> %2 (%3)").arg(statusIcon).arg(resource.toHtmlEscaped()).arg(pItem.priority));
 
 					if (!pItem.status.isEmpty())
-												AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_STATUS_TEXT+orderShift,pItem.status.toHtmlEscaped().replace('\n',"<br>"));
+						AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_STATUS_TEXT+orderShift,pItem.status.toHtmlEscaped().replace('\n',"<br>"));
 
 					if (resIndex < resources.count()-1)
 						AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_MIDDLELINE+orderShift,"<hr>");
@@ -757,11 +757,11 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 			QString statusIconSet = FStatusIcons!=NULL ? FStatusIcons->iconsetByJid(contactJid) : QString::null;
 			QString statusIconKey = FStatusIcons!=NULL ? FStatusIcons->iconKeyByStatus(show,subscription,subscription_ask) : QString::null;
 			QString statusIconFile = FStatusIcons!=NULL ? FStatusIcons->iconFileName(statusIconSet,statusIconKey) : QString::null;
-						AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_NAME,QString("<img src='%1'> %2 (%3)").arg(statusIconFile).arg(resource.toHtmlEscaped()).arg(priority));
+			AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_NAME,QString("<img src='%1'> %2 (%3)").arg(statusIconFile).arg(resource.toHtmlEscaped()).arg(priority));
 
 			QString statusText = AIndex->data(RDR_STATUS).toString();
 			if (!statusText.isEmpty())
-							AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_STATUS_TEXT,statusText.toHtmlEscaped().replace('\n',"<br>"));
+				AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_STATUS_TEXT,statusText.toHtmlEscaped().replace('\n',"<br>"));
 
 			AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_BOTTOMLINE,"<hr>");
 		}

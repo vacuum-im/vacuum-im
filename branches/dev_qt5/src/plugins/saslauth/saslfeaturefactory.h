@@ -18,7 +18,7 @@ class SASLFeatureFactory :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IXmppFeatureFactory IXmppStanzaHadler);
-	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.ISASLFeatureFactory");
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.SASLAuth");
 public:
 	SASLFeatureFactory();
 	~SASLFeatureFactory();
