@@ -150,8 +150,13 @@ bool Statistics::initConnections(IPluginManager *APluginManager, int &AInitOrder
 
 bool Statistics::initObjects()
 {
+	if (FPluginManager->revisionDate().isValid())
+		FClientVersion = QString("%1.%2").arg(FPluginManager->version(),FPluginManager->revisionDate().date().toString("yyyyMMdd"));
+	else
+		FClientVersion = QString("%1.0").arg(FPluginManager->version());
+
 	FUserAgent = userAgent();
-	LOG_DEBUG(QString("Statistics User-Aget header - %1").arg(FUserAgent));
+	LOG_DEBUG(QString("Statistics User-Agent header - %1").arg(FUserAgent));
 
 	if (FOptionsManager)
 	{
@@ -419,8 +424,9 @@ QUrl Statistics::buildHitUrl(const IStatisticsHit &AHit) const
 	else if (AHit.session == IStatisticsHit::SessionEnd)
 		query.append(qMakePair<QByteArray,QByteArray>("sc",QUrl::toPercentEncoding("end")));
 
+	QString rev =  FPluginManager->revisionDate().date().toString("yyyyddMM");
 	query.append(qMakePair<QByteArray,QByteArray>("an",QUrl::toPercentEncoding(CLIENT_NAME)));
-	query.append(qMakePair<QByteArray,QByteArray>("av",QUrl::toPercentEncoding(QString("%1.%2").arg(FPluginManager->version(),FPluginManager->revision()))));
+	query.append(qMakePair<QByteArray,QByteArray>("av",QUrl::toPercentEncoding(FClientVersion)));
 
 	query.append(qMakePair<QByteArray,QByteArray>("ul",QUrl::toPercentEncoding(QLocale().name())));
 

@@ -36,12 +36,8 @@
 #define SVN_DATA_PATH               "DataPath"
 #define SVN_LOCALE_NAME             "Locale"
 
-#ifdef SVNINFO
-#  include "svninfo.h"
-#  define SVN_DATE                  ""
-#else
-#  define SVN_DATE                  ""
-#  define SVN_REVISION              "0"
+#ifdef GITINFO
+#  include <gitinfo.h>
 #endif
 
 #define DIR_LOGS                    "logs"
@@ -103,13 +99,22 @@ QString PluginManager::version() const
 
 QString PluginManager::revision() const
 {
-	static const QString rev = QString(SVN_REVISION).contains(':') ? QString(SVN_REVISION).split(':').value(1) : QString(SVN_REVISION);
+#if defined GIT_HASH
+	static const QString rev = GIT_HASH;
+#else
+	static const QString rev = "0";
+#endif
 	return rev;
 }
 
 QDateTime PluginManager::revisionDate() const
 {
-	return QDateTime::fromString(SVN_DATE,"yyyy/MM/dd hh:mm:ss");
+#if defined GIT_DATE
+	static const QDateTime date = QDateTime::fromTime_t(QString(GIT_DATE).toInt());
+#else
+	static const QDateTime date = QDateTime();
+#endif
+	return date;
 }
 
 bool PluginManager::isShutingDown() const
@@ -291,6 +296,7 @@ void PluginManager::loadSettings()
 		if (dir.exists() && (dir.exists(DIR_APP_DATA) || dir.mkpath(DIR_APP_DATA)) && dir.cd(DIR_APP_DATA))
 			FDataPath = dir.absolutePath();
 	}
+
 	FileStorage::setResourcesDirs(FileStorage::resourcesDirs()
 		<< (QDir::isAbsolutePath(RESOURCES_DIR) ? RESOURCES_DIR : qApp->applicationDirPath()+"/"+RESOURCES_DIR)
 		<< FDataPath+"/resources");
@@ -312,7 +318,7 @@ void PluginManager::loadSettings()
 			Logger::openLog(logDir.absolutePath());
 		}
 	}
-	LOG_INFO(QString("%1: %2.%3, Qt: %4/%5, OS: %6, Locale: %7").arg(CLIENT_NAME,CLIENT_VERSION).arg(revision(),QT_VERSION_STR,qVersion(),SystemManager::osVersion(),QLocale().name()));
+	LOG_INFO(QString("%1: %2.%3, Qt: %4/%5, OS: %6, Locale: %7").arg(CLIENT_NAME,CLIENT_VERSION,revision(),QT_VERSION_STR,qVersion(),SystemManager::osVersion(),QLocale().name()));
 
 	FPluginsSetup.clear();
 	QDir homeDir(FDataPath);
