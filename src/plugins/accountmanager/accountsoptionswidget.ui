@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>412</width>
-    <height>57</height>
+    <height>59</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -15,14 +15,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QFrame" name="wdtAccounts">
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-    </widget>
+    <widget class="QFrame" name="wdtAccounts"/>
    </item>
    <item>
     <widget class="QLabel" name="lblNoAccounts">
