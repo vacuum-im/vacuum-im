@@ -28,7 +28,7 @@ DataFieldWidget::DataFieldWidget(IDataForms *ADataForms, const IDataField &AFiel
 		FCheckBox->setText(label + (FField.required ? QString("*") : QString::null));
 		FCheckBox->setToolTip(desc);
 		FCheckBox->installEventFilter(this);
-		connect(FCheckBox,SIGNAL(stateChanged(int)),SLOT(changed()));
+		connect(FCheckBox,SIGNAL(stateChanged(int)),SIGNAL(changed()));
 		layout()->addWidget(FCheckBox);
 	}
 	else if (FField.type == DATAFIELD_TYPE_FIXED)
