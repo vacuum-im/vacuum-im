@@ -4,8 +4,16 @@
 <context>
     <name>AboutBox</name>
     <message>
-        <source>Version: %1.%2 %3</source>
-        <translation>Версия: %1.%2 %3</translation>
+        <source>Version: %1 %2 of %3</source>
+        <translation>Версия: %1 %2 от %3</translation>
+    </message>
+    <message>
+        <source>Revision: %1</source>
+        <translation>Ревизия: %1</translation>
+    </message>
+    <message>
+        <source>Version: %1 %2</source>
+        <translation>Версия: %1 %2</translation>
     </message>
 </context>
 <context>

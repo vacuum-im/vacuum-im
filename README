@@ -1,29 +1,32 @@
 Vacuum-IM
 ---------
+Full-featured crossplatform Jabber/XMPP client.
+The core program is just a plugin loader, all functionality is made available
+via plugins. This enforces modularity and ensures well defined component
+interaction via interfaces.
 
 Web Site:
   http://www.vacuum-im.org
-  http://code.google.com/p/vacuum-im/
 
 Source:
-  http://code.google.com/p/vacuum-im
+  https://github.com/Vacuum-IM
+
+Translations:
+  https://www.transifex.com/projects/p/vacuum-im
 
 Jabber conference:
   vacuum@conference.jabber.ru
-
-Forum:
-  http://forum.jrudevels.org/viewforum.php?f=11
-
-
-Sound on X11 platforms
-----------------------
-  The Network Audio System is used if available, otherwise "aplay <soundfile>" command is used.
 
 
 Portable Version
 ----------------
   To make Vacuum-IM portable just create folder VacuumIM (for Windows) 
   in the directory where vacuum.exe is located.
+
+
+Sound on X11 platforms
+----------------------
+  The Network Audio System is used if available, otherwise "aplay <soundfile>" command is used.
 
 
 Known Issues

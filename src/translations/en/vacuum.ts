@@ -4,8 +4,16 @@
 <context>
     <name>AboutBox</name>
     <message>
-        <source>Version: %1.%2 %3</source>
-        <translation>Version: %1.%2 %3</translation>
+        <source>Version: %1 %2 of %3</source>
+        <translation>Version: %1 %2 of %3</translation>
+    </message>
+    <message>
+        <source>Revision: %1</source>
+        <translation>Revision: %1</translation>
+    </message>
+    <message>
+        <source>Version: %1 %2</source>
+        <translation>Version: %1 %2</translation>
     </message>
 </context>
 <context>

@@ -8,7 +8,18 @@ AboutBox::AboutBox(IPluginManager *APluginManager, QWidget *AParent) : QDialog(A
 	setAttribute(Qt::WA_DeleteOnClose,true);
 
 	ui.lblName->setText(CLIENT_NAME);
-	ui.lblVersion->setText(tr("Version: %1.%2 %3").arg(APluginManager->version()).arg(APluginManager->revision()).arg(CLIENT_VERSION_SUFIX));
+
+	if (APluginManager->revisionDate().isValid())
+	{
+		QString revDate = APluginManager->revisionDate().date().toString(Qt::SystemLocaleShortDate);
+		ui.lblVersion->setText(tr("Version: %1 %2 of %3").arg(APluginManager->version(),CLIENT_VERSION_SUFIX,revDate));
+		ui.lblRevision->setText(tr("Revision: %1").arg(APluginManager->revision()));
+	}
+	else
+	{
+		ui.lblVersion->setText(tr("Version: %1 %2").arg(APluginManager->version(),CLIENT_VERSION_SUFIX));
+		ui.lblRevision->setVisible(false);
+	}
 
 	connect(ui.lblHomePage,SIGNAL(linkActivated(const QString &)),SLOT(onLabelLinkActivated(const QString &)));
 	connect(ui.lblSourcePage,SIGNAL(linkActivated(const QString &)),SLOT(onLabelLinkActivated(const QString &)));

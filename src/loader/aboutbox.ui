@@ -92,10 +92,23 @@
    <item>
     <widget class="QLabel" name="lblVersion">
      <property name="text">
-      <string notr="true">Version: 1.0.0.0 Revision: 0000</string>
+      <string notr="true">Version: 1.2.4 of 08.05.2015</string>
      </property>
      <property name="textFormat">
       <enum>Qt::PlainText</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="lblRevision">
+     <property name="text">
+      <string notr="true">Revision: dc6df15a8901737dcf462959125938096239b5f8</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::PlainText</enum>
+     </property>
+     <property name="textInteractionFlags">
+      <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
      </property>
     </widget>
    </item>
@@ -133,7 +146,7 @@
      <item>
       <widget class="QLabel" name="lblSourcePage">
        <property name="text">
-        <string notr="true">&lt;a href='http://code.google.com/p/vacuum-im/'&gt;vacuum-im.googlecode.com&lt;/a&gt;</string>
+        <string notr="true">&lt;a href='https://github.com/Vacuum-IM'&gt;GitHub&lt;/a&gt;</string>
        </property>
        <property name="textFormat">
         <enum>Qt::RichText</enum>
