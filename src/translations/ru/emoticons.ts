@@ -16,11 +16,11 @@
         <translation>Окна сообщений</translation>
     </message>
     <message>
-        <source>Do not convert text smiles to images</source>
+        <source>Do not convert text smileys to images</source>
         <translation>Не конвертировать текстовые смайлы в графические</translation>
     </message>
     <message>
-        <source>Smiles:</source>
+        <source>Smileys:</source>
         <translation>Смайлы:</translation>
     </message>
 </context>

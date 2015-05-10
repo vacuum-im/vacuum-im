@@ -16,12 +16,12 @@
    <translation>Message windows</translation>
   </message>
   <message>
-   <source>Do not convert text smiles to images</source>
-   <translation>Do not convert text smiles to images</translation>
+   <source>Do not convert text smileys to images</source>
+   <translation>Do not convert text smileys to images</translation>
   </message>
   <message>
-   <source>Smiles:</source>
-   <translation>Smiles:</translation>
+   <source>Smileys:</source>
+   <translation>Smileys:</translation>
   </message>
  </context>
 </TS>

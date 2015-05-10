@@ -123,7 +123,7 @@ QMultiMap<int, IOptionsDialogWidget *> Emoticons::optionsDialogWidgets(const QSt
 		cmbEmoticons->setItemDelegate(new IconsetDelegate(cmbEmoticons));
 
 		int index = 1;
-		cmbEmoticons->addItem(tr("Do not convert text smiles to images"),QStringList());
+		cmbEmoticons->addItem(tr("Do not convert text smileys to images"),QStringList());
 		foreach(const QString &iconset, IconStorage::availSubStorages(RSR_STORAGE_EMOTICONS))
 		{
 			IconStorage *storage = new IconStorage(RSR_STORAGE_EMOTICONS,iconset);
@@ -139,7 +139,7 @@ QMultiMap<int, IOptionsDialogWidget *> Emoticons::optionsDialogWidgets(const QSt
 		}
 
 		widgets.insertMulti(OHO_APPEARANCE_MESSAGES,FOptionsManager->newOptionsDialogHeader(tr("Message windows"),AParent));
-		widgets.insertMulti(OWO_APPEARANCE_EMOTICONS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_EMOTICONS_ICONSET),tr("Smiles:"),cmbEmoticons,AParent));
+		widgets.insertMulti(OWO_APPEARANCE_EMOTICONS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_EMOTICONS_ICONSET),tr("Smileys:"),cmbEmoticons,AParent));
 	}
 	return widgets;
 }

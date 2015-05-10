@@ -1843,7 +1843,7 @@ bool MultiUserChatWindow::eventFilter(QObject *AObject, QEvent *AEvent)
 				QStandardItem *userItem = FUsersModel->itemFromIndex(FUsersProxy->mapToSource(ui.ltvUsers->indexAt(mouseEvent->pos())));
 				if(mouseEvent->button()==Qt::MidButton && userItem)
 				{
-					QString sufix = FEditWidget->textEdit()->textCursor().atBlockStart() ? Options::node(OPV_MUC_GROUPCHAT_NICKNAMESUFIX).value().toString() : " ";
+					QString sufix = FEditWidget->textEdit()->textCursor().atBlockStart() ? Options::node(OPV_MUC_GROUPCHAT_NICKNAMESUFFIX).value().toString() : " ";
 					FEditWidget->textEdit()->textCursor().insertText(userItem->text() + sufix);
 					FEditWidget->textEdit()->setFocus();
 					AEvent->accept();
@@ -2211,7 +2211,7 @@ void MultiUserChatWindow::onMultiChatEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bo
 			cursor.setPosition(FStartCompletePos, QTextCursor::KeepAnchor);
 		}
 
-		QString suffix = cursor.atBlockStart() ? Options::node(OPV_MUC_GROUPCHAT_NICKNAMESUFIX).value().toString() : QString(" ");
+		QString suffix = cursor.atBlockStart() ? Options::node(OPV_MUC_GROUPCHAT_NICKNAMESUFFIX).value().toString() : QString(" ");
 		if (FCompleteNicks.count() > 1)
 		{
 			if (!Options::node(OPV_MUC_GROUPCHAT_REFERENUMERATION).value().toBool())
@@ -2499,7 +2499,7 @@ void MultiUserChatWindow::onNickCompleteMenuActionTriggered(bool)
 		QString nick = action->data(ADR_USER_NICK).toString();
 		QTextCursor cursor = FEditWidget->textEdit()->textCursor();
 		cursor.movePosition(QTextCursor::StartOfWord, QTextCursor::KeepAnchor);
-		QString sufix = cursor.atBlockStart() ? Options::node(OPV_MUC_GROUPCHAT_NICKNAMESUFIX).value().toString() : " ";
+		QString sufix = cursor.atBlockStart() ? Options::node(OPV_MUC_GROUPCHAT_NICKNAMESUFFIX).value().toString() : " ";
 		cursor.insertText(nick + sufix);
 	}
 }
