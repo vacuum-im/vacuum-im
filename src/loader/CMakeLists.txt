@@ -17,12 +17,12 @@ set(GIT_HASH "" CACHE STRING "GIT HASH: git log -n 1 --format=%H")
 set(GIT_DATE "" CACHE STRING "GIT DATE: git log -n 1 --format=%ct")
 
 if (GIT_HASH STREQUAL "")
-	execute_process(COMMAND git log -n 1 --format=%H "${CMAKE_SOURCE_DIR}"
+	execute_process(COMMAND cd "${CMAKE_SOURCE_DIR}" && git log -n 1 --format=%H
 			OUTPUT_VARIABLE GIT_HASH OUTPUT_STRIP_TRAILING_WHITESPACE)
 endif (GIT_HASH STREQUAL "")
 
 if (GIT_DATE STREQUAL "")
-	execute_process(COMMAND git log -n 1 --format=%ct "${CMAKE_SOURCE_DIR}"
+	execute_process(COMMAND cd "${CMAKE_SOURCE_DIR}" && git log -n 1 --format=%ct
 			OUTPUT_VARIABLE GIT_DATE OUTPUT_STRIP_TRAILING_WHITESPACE)
 endif (GIT_DATE STREQUAL "")
 
