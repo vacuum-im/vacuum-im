@@ -5,7 +5,7 @@
     <name>AutoRulesOptionsDialog</name>
     <message>
         <source>Auto Status Rules</source>
-        <translation>Павила автостатуса</translation>
+        <translation>Правила автостатуса</translation>
     </message>
     <message>
         <source>Time</source>

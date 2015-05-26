@@ -308,10 +308,6 @@
         <translation>Переименовать группу</translation>
     </message>
     <message>
-        <source>In this Group</source>
-        <translation>В эту группу</translation>
-    </message>
-    <message>
         <source>Contacts list management</source>
         <translation>Управление списком контактов</translation>
     </message>
@@ -327,6 +323,10 @@
         <source>Del</source>
         <comment>Remove contact/group from roster</comment>
         <translation>Del</translation>
+    </message>
+    <message>
+        <source>Into this Group</source>
+        <translation>В эту группу</translation>
     </message>
 </context>
 <context>

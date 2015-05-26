@@ -14,11 +14,11 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Do not convert text smiles to images</source>
+        <source>Do not convert text smileys to images</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Smiles:</source>
+        <source>Smileys:</source>
         <translation type="unfinished"/>
     </message>
 </context>

@@ -67,7 +67,7 @@
     </message>
     <message>
         <source>Share information about your OS version</source>
-        <translation type="unfinished"/>
+        <translation>Compartir información del Sistema Operativo</translation>
     </message>
 </context>
 <context>
