@@ -122,7 +122,7 @@ QString SystemManager::osVersion()
 			osver = "MacOS (unknown)";
 			break;
 		}
-#elif defined(Q_OS_X11)
+#elif defined(Q_OS_UNIX)
 		if (QFile::exists(QLatin1String("/etc/os-release")))
 		{
 			QSettings s(QLatin1String("/etc/os-release"), QSettings::IniFormat);
