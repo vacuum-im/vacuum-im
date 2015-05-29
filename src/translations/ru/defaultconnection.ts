@@ -45,6 +45,41 @@
     </message>
 </context>
 <context>
+    <name>ConnectionOptionsWidget</name>
+    <message>
+        <source>Disable check</source>
+        <translation>Отключить проверку</translation>
+    </message>
+    <message>
+        <source>Request on errors</source>
+        <translation>Спрашивать при ошибках</translation>
+    </message>
+    <message>
+        <source>Disconnect on errors</source>
+        <translation>Отключаться при ошибках</translation>
+    </message>
+    <message>
+        <source>Allow only trusted</source>
+        <translation>Разрешать только доверенные</translation>
+    </message>
+    <message>
+        <source>TLSv1</source>
+        <translation>TLSv1</translation>
+    </message>
+    <message>
+        <source>SSLv3</source>
+        <translation>SSLv3</translation>
+    </message>
+    <message>
+        <source>SSLv2</source>
+        <translation>SSLv2</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>Автоматически</translation>
+    </message>
+</context>
+<context>
     <name>ConnectionOptionsWidgetClass</name>
     <message>
         <source>Host:</source>

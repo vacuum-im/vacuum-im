@@ -977,7 +977,7 @@ Menu *RosterChanger::createGroupMenu(const QHash<int,QVariant> &AData, const QSe
 						{
 							Action *curGroupAction = new Action(groupMenu);
 							curGroupAction->setData(AData);
-							curGroupAction->setText(tr("In this Group"));
+							curGroupAction->setText(tr("Into this Group"));
 							curGroupAction->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_THIS_GROUP);
 							curGroupAction->setData(ADR_TO_GROUP,groupPath);
 							connect(curGroupAction,SIGNAL(triggered(bool)),ASlot);

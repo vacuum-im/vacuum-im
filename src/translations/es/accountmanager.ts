@@ -7,14 +7,14 @@
     </message>
     <message>
         <source>Account Password</source>
-        <translation type="unfinished"/>
+        <translation>Contraseña de la cuenta</translation>
     </message>
 </context>
 <context>
     <name>AccountItemWidget</name>
     <message>
         <source>Settings...</source>
-        <translation type="unfinished"/>
+        <translation>Ajustes...</translation>
     </message>
 </context>
 <context>
@@ -37,47 +37,47 @@
     </message>
     <message>
         <source>Common account settings</source>
-        <translation type="unfinished"/>
+        <translation>Ajustes comunes de la cuenta</translation>
     </message>
     <message>
         <source>Account</source>
-        <translation type="unfinished"/>
+        <translation>Cuenta</translation>
     </message>
     <message>
         <source>Name:</source>
-        <translation type="unfinished"/>
+        <translation>Nombre:</translation>
     </message>
     <message>
         <source>Password:</source>
-        <translation type="unfinished"/>
+        <translation>Contraseña:</translation>
     </message>
     <message>
         <source>Resource:</source>
-        <translation type="unfinished"/>
+        <translation>Recurso:</translation>
     </message>
     <message>
         <source>Additional settings</source>
-        <translation type="unfinished"/>
+        <translation>Ajustes adicionales</translation>
     </message>
     <message>
         <source>Require secure connection to server</source>
-        <translation type="unfinished"/>
+        <translation>Requiere una conexión segura con el servidor</translation>
     </message>
     <message>
         <source>Parameters</source>
-        <translation type="unfinished"/>
+        <translation>Parámetros</translation>
     </message>
     <message>
         <source>Additional</source>
-        <translation type="unfinished"/>
+        <translation>Adicional</translation>
     </message>
     <message>
         <source>Home</source>
-        <translation type="unfinished"/>
+        <translation>Casa</translation>
     </message>
     <message>
         <source>Work</source>
-        <translation type="unfinished"/>
+        <translation>Trabajo</translation>
     </message>
     <message>
         <source>Notebook</source>
@@ -85,41 +85,41 @@
     </message>
     <message>
         <source>(default)</source>
-        <translation type="unfinished"/>
+        <translation>(por defecto)</translation>
     </message>
     <message>
         <source>&lt;Empty&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;Vacío&gt;</translation>
     </message>
     <message>
         <source>Default resource:</source>
-        <translation type="unfinished"/>
+        <translation>Recurso por defecto:</translation>
     </message>
 </context>
 <context>
     <name>AccountsOptionsClass</name>
     <message>
         <source>Add or register a new account</source>
-        <translation type="unfinished"/>
+        <translation>Añadir o registrar una nueva cuenta</translation>
     </message>
 </context>
 <context>
     <name>AccountsOptionsWidget</name>
     <message>
         <source>Add Account...</source>
-        <translation type="unfinished"/>
+        <translation>Añadir cuenta...</translation>
     </message>
     <message>
         <source>Show inactive accounts</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar cuentas inactivas</translation>
     </message>
     <message>
         <source>Hide inactive accounts</source>
-        <translation type="unfinished"/>
+        <translation>Ocultar cuentas inactivas</translation>
     </message>
     <message>
         <source>Remove Account</source>
-        <translation type="unfinished"/>
+        <translation>Eliminar cuenta</translation>
     </message>
     <message>
         <source>You are assured that wish to remove an account &lt;b&gt;%1&lt;/b&gt;?&lt;br&gt;All settings will be lost.</source>
@@ -130,7 +130,7 @@
     <name>AppendCheckPage</name>
     <message>
         <source>Connection to Server</source>
-        <translation type="unfinished"/>
+        <translation>Conexión con el servidor</translation>
     </message>
     <message>
         <source>Wizard checks possibility to connect with the specified credentials</source>
@@ -138,15 +138,15 @@
     </message>
     <message>
         <source>Show account settings window</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar la ventana de ajustes de la cuenta</translation>
     </message>
     <message>
         <source>Connecting...</source>
-        <translation type="unfinished"/>
+        <translation>Conectando...</translation>
     </message>
     <message>
         <source>Failed to check connection :(</source>
-        <translation type="unfinished"/>
+        <translation>Error al comprobar la conexión :(</translation>
     </message>
     <message>
         <source>Internal Error</source>

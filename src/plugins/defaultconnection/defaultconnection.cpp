@@ -82,6 +82,7 @@ bool DefaultConnection::connectToHost()
 		}
 		else
 		{
+			LOG_ERROR("Failed to init DNS SRV lookup");
 			connectToNextHost();
 		}
 		return true;

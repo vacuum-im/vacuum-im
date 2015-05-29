@@ -1304,7 +1304,6 @@ void ArchiveViewWindow::onHeaderContextMenuRequested(const QPoint &APos)
 		else if (itemType == HIT_DATEGROUP)
 		{
 			Action *removeDate = new Action(menu);
-			QDate date = item->data(HDR_DATEGROUP_DATE).toDate();
 			removeDate->setText(tr("Remove History for %1").arg(item->text()));
 			removeDate->setData(ADR_HEADER_STREAM,headerStream);
 			removeDate->setData(ADR_HEADER_WITH,headerWith);

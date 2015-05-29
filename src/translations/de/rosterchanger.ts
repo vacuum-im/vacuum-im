@@ -302,10 +302,6 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>In this Group</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
         <source>Contacts list management</source>
         <translation type="unfinished"/>
     </message>
@@ -320,6 +316,10 @@
     <message>
         <source>Del</source>
         <comment>Remove contact/group from roster</comment>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Into this Group</source>
         <translation type="unfinished"/>
     </message>
 </context>

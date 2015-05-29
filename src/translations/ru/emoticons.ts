@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ru" sourcelanguage="en">
+<TS version="2.0" language="ru" sourcelanguage="en">
 <context>
     <name>Emoticons</name>
     <message>
@@ -16,11 +16,11 @@
         <translation>Окна сообщений</translation>
     </message>
     <message>
-        <source>Do not convert text smiles to images</source>
+        <source>Do not convert text smileys to images</source>
         <translation>Не конвертировать текстовые смайлы в графические</translation>
     </message>
     <message>
-        <source>Smiles:</source>
+        <source>Smileys:</source>
         <translation>Смайлы:</translation>
     </message>
 </context>

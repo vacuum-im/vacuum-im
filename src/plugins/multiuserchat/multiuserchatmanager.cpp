@@ -300,7 +300,7 @@ bool MultiUserChatManager::initSettings()
 	Options::setDefaultValue(OPV_MUC_GROUPCHAT_QUITONWINDOWCLOSE,false);
 	Options::setDefaultValue(OPV_MUC_GROUPCHAT_REJOINAFTERKICK,false);
 	Options::setDefaultValue(OPV_MUC_GROUPCHAT_REFERENUMERATION,false);
-	Options::setDefaultValue(OPV_MUC_GROUPCHAT_NICKNAMESUFIX,", ");
+	Options::setDefaultValue(OPV_MUC_GROUPCHAT_NICKNAMESUFFIX,", ");
 
 	if (FOptionsManager)
 	{
