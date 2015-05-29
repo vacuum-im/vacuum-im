@@ -401,7 +401,6 @@ QString Statistics::windowsVersion() const
 QUrl Statistics::buildHitUrl(const IStatisticsHit &AHit) const
 {
 	QUrl url(MP_URL);
-	url.setQueryDelimiters('=','&');
 
 	QList< QPair<QString,QString> > query;
 	query.append(qMakePair<QString,QString>("v",QUrl::toPercentEncoding(MP_VER)));
@@ -472,7 +471,7 @@ QUrl Statistics::buildHitUrl(const IStatisticsHit &AHit) const
 
 	QUrlQuery urlQuery;
 	urlQuery.setQueryDelimiters('=','&');
-	urlQuery.setEncodedQueryItems(query);
+	urlQuery.setQueryItems(query);
 	url.setQuery(urlQuery);
 
 	return url;
