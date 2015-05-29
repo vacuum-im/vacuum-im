@@ -10,20 +10,25 @@ project(loader CXX)
 
 include_directories("${CMAKE_SOURCE_DIR}/src" "${CMAKE_BINARY_DIR}/src/loader")
 
-set(VER_STRING "" CACHE STRING "This string will be appended to program version (defaults to SVN revision number)")
+set(GIT_HASH "" CACHE STRING "GIT HASH: git log -n 1 --format=%H")
+set(GIT_DATE "" CACHE STRING "GIT DATE: git log -n 1 --format=%ct")
 
-if (VER_STRING STREQUAL "")
-execute_process(COMMAND svnversion -n -c "${CMAKE_SOURCE_DIR}"
-	OUTPUT_VARIABLE SVN_REVISION)
-else (VER_STRING STREQUAL "")
-	set(SVN_REVISION "0:${VER_STRING}") # see PluginManager::revision()
-endif (VER_STRING STREQUAL "")
+if (GIT_HASH STREQUAL "")
+	execute_process(COMMAND git log -n 1 --format=%H WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+			OUTPUT_VARIABLE GIT_HASH OUTPUT_STRIP_TRAILING_WHITESPACE)
+endif (GIT_HASH STREQUAL "")
 
-if (NOT (SVN_REVISION STREQUAL "" OR SVN_REVISION STREQUAL "exported" OR SVN_REVISION STREQUAL "Unversioned directory")) 
-	file(REMOVE "svninfo.h")
-	file(WRITE "svninfo.h" "#define SVN_REVISION \"${SVN_REVISION}\"\n")
-	add_definitions(-DSVNINFO)
-endif (NOT (SVN_REVISION STREQUAL "" OR SVN_REVISION STREQUAL "exported" OR SVN_REVISION STREQUAL "Unversioned directory")) 
+if (GIT_DATE STREQUAL "")
+	execute_process(COMMAND git log -n 1 --format=%ct WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+			OUTPUT_VARIABLE GIT_DATE OUTPUT_STRIP_TRAILING_WHITESPACE)
+endif (GIT_DATE STREQUAL "")
+
+if (NOT (GIT_DATE STREQUAL ""))
+	file(REMOVE "${CMAKE_BINARY_DIR}/src/loader/gitinfo.h")
+	file(APPEND "${CMAKE_BINARY_DIR}/src/loader/gitinfo.h" "#define GIT_HASH \"${GIT_HASH}\"\n")
+	file(APPEND "${CMAKE_BINARY_DIR}/src/loader/gitinfo.h" "#define GIT_DATE \"${GIT_DATE}\"\n")
+	add_definitions(-DGITINFO)
+endif (NOT (GIT_DATE STREQUAL ""))
 
 if (WIN32)
 	if (MINGW)

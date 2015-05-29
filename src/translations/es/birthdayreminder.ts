@@ -3,19 +3,19 @@
     <name>BirthdayReminder</name>
     <message>
         <source>Birthday Reminder</source>
-        <translation>Recordatorio de cumpleaños</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Reminds about birthdays of your friends</source>
-        <translation>Te recuerda los cumpleaños de tus amigos</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Birthday remind</source>
-        <translation>Recordatorio de cumpleaños</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Birthday today!</source>
-        <translation>¡Cumpleaños hoy!</translation>
+        <translation type="unfinished"/>
     </message>
     <message numerus="yes">
         <source>Birthday in %n day(s)!</source>
@@ -27,7 +27,7 @@
     </message>
     <message>
         <source>When reminding of upcoming birthdays</source>
-        <translation>Cuándo recordar el próximo cumpleaños</translation>
+        <translation type="unfinished"/>
     </message>
     <message numerus="yes">
         <source>Birthday in %n day(s),

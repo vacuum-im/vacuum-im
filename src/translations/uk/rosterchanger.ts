@@ -302,8 +302,25 @@
         <translation>Перейменувати групу</translation>
     </message>
     <message>
-        <source>In this Group</source>
-        <translation>В цю групу</translation>
+        <source>Contacts list management</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Automatically accept all subscription requests</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Remove subscription when you was deleted from contacts list</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Del</source>
+        <comment>Remove contact/group from roster</comment>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Into this Group</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Contacts list management</source>

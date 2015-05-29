@@ -69,6 +69,7 @@ private:
 private:
 	bool FSendHits;
 	QString FUserAgent;
+	QString FClientVersion;
 	QTimer FPendingTimer;
 	QTimer FSessionTimer;
 	QList<IStatisticsHit> FPendingHits;

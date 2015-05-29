@@ -1232,7 +1232,7 @@ void MetaContacts::updateMetaRecentItems(const Jid &AStreamJid, const QUuid &AMe
 		}
 		else foreach(const IRecentItem &item, FRecentContacts->streamItems(AStreamJid))
 		{
-			if (item.type==REIT_METACONTACT && meta.id==item.reference)
+			if (item.type==REIT_METACONTACT && item.reference==meta.id)
 			{
 				FUpdatingRecentItem = item;
 				FMetaRecentItems[sRoot].remove(AMetaId);

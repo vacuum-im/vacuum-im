@@ -308,7 +308,24 @@
         <translation>Переименовать группу</translation>
     </message>
     <message>
-        <source>In this Group</source>
+        <source>Contacts list management</source>
+        <translation>Управление списком контактов</translation>
+    </message>
+    <message>
+        <source>Automatically accept all subscription requests</source>
+        <translation>Автоматически принимать все запросы на авторизацию</translation>
+    </message>
+    <message>
+        <source>Remove subscription when you was deleted from contacts list</source>
+        <translation>Удалять авторизацию при удалении вас из списка контактов</translation>
+    </message>
+    <message>
+        <source>Del</source>
+        <comment>Remove contact/group from roster</comment>
+        <translation>Del</translation>
+    </message>
+    <message>
+        <source>Into this Group</source>
         <translation>В эту группу</translation>
     </message>
     <message>

@@ -71,7 +71,7 @@
     </message>
     <message>
         <source>Connection</source>
-        <translation type="unfinished"/>
+        <translation>Conexión</translation>
     </message>
 </context>
 <context>
