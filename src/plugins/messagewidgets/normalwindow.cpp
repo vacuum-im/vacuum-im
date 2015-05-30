@@ -8,7 +8,7 @@
 #include <definitions/messagedataroles.h>
 #include <definitions/rosterindexkinds.h>
 #include <definitions/rosterindexroles.h>
-#include <definitions/messagenormalwindowwidgets.h>
+#include <definitions/messagewindowwidgets.h>
 #include <utils/widgetmanager.h>
 #include <utils/iconstorage.h>
 #include <utils/xmpperror.h>
@@ -129,6 +129,11 @@ IMessageStatusBarWidget *NormalWindow::statusBarWidget() const
 IMessageReceiversWidget *NormalWindow::receiversWidget() const
 {
 	return FReceiversWidget;
+}
+
+SplitterWidget *NormalWindow::messageWidgetsBox() const
+{
+	return ui.spwMessageBox;
 }
 
 QString NormalWindow::tabPageId() const
@@ -277,11 +282,6 @@ void NormalWindow::loadWindowGeometryAndState()
 
 	if (!ui.sprReceivers->restoreState(Options::fileValue("messages.messagewindow.splitter-receivers-state").toByteArray()))
 		ui.sprReceivers->setSizes(QList<int>() << 700 << 300);
-}
-
-SplitterWidget *NormalWindow::messageWidgetsBox() const
-{
-	return ui.spwMessageBox;
 }
 
 void NormalWindow::updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip)

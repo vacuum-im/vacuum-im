@@ -1,6 +1,7 @@
 #ifndef MULTIUSERCHATWINDOW_H
 #define MULTIUSERCHATWINDOW_H
 
+#include <QListView>
 #include <QStandardItemModel>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/imessagewidgets.h>
@@ -15,10 +16,9 @@
 #include <interfaces/ipresencemanager.h>
 #include <interfaces/irecentcontacts.h>
 #include <interfaces/istanzaprocessor.h>
-#include "edituserslistdialog.h"
 #include "inputtextdialog.h"
 #include "usersproxymodel.h"
-#include "ui_multiuserchatwindow.h"
+#include "edituserslistdialog.h"
 
 struct WindowStatus {
 	QDateTime startTime;
@@ -45,7 +45,7 @@ class MultiUserChatWindow :
 	Q_OBJECT;
 	Q_INTERFACES(IMessageWindow IMultiUserChatWindow IMessageTabPage IStanzaHandler IMessageHandler IMessageEditSendHandler);
 public:
-	MultiUserChatWindow(IMultiUserChatManager *AChatPlugin, IMultiUserChat *AMultiChat);
+	MultiUserChatWindow(IMultiUserChatManager *AMultiChatManager, IMultiUserChat *AMultiChat);
 	~MultiUserChatWindow();
 	virtual QMainWindow *instance() { return this; }
 	//IMessageWindow
@@ -59,6 +59,7 @@ public:
 	virtual IMessageToolBarWidget *toolBarWidget() const;
 	virtual IMessageStatusBarWidget *statusBarWidget() const;
 	virtual IMessageReceiversWidget *receiversWidget() const;
+	virtual SplitterWidget *messageWidgetsBox() const;
 	//ITabWindowPage
 	virtual QString tabPageId() const;
 	virtual bool isVisibleTabPage() const;
@@ -84,9 +85,12 @@ public:
 	virtual bool messageShowWindow(int AMessageId);
 	virtual bool messageShowWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode);
 	//IMultiUserChatWindow
+	virtual SplitterWidget *viewWidgetsBox() const;
+	virtual SplitterWidget *usersWidgetsBox() const;
+	virtual SplitterWidget *centralWidgetsBox() const;
 	virtual IMultiUserChat *multiUserChat() const;
-	virtual IMessageChatWindow *openChatWindow(const Jid &AContactJid);
-	virtual IMessageChatWindow *findChatWindow(const Jid &AContactJid) const;
+	virtual IMessageChatWindow *openPrivateChatWindow(const Jid &AContactJid);
+	virtual IMessageChatWindow *findPrivateChatWindow(const Jid &AContactJid) const;
 	virtual void contextMenuForRoom(Menu *AMenu);
 	virtual void contextMenuForUser(IMultiUser *AUser, Menu *AMenu);
 	virtual void toolTipsForUser(IMultiUser *AUser, QMap<int,QString> &AToolTips);
@@ -112,9 +116,10 @@ signals:
 	void privateChatWindowCreated(IMessageChatWindow *AWindow);
 	void privateChatWindowDestroyed(IMessageChatWindow *AWindow);
 protected:
-	void connectMultiChatSignals();
+	void initialize();
 	void createMessageWidgets();
 	void createStaticRoomActions();
+protected:
 	void saveWindowState();
 	void loadWindowState();
 	void saveWindowGeometry();
@@ -177,7 +182,6 @@ protected slots:
 	void onMultiChatWindowActivated();
 	void onMultiChatNotifierActiveNotifyChanged(int ANotifyId);
 	void onMultiChatEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bool &AHooked);
-	void onMultiChatHorizontalSplitterMoved(int APos, int AIndex);
 	void onMultiChatUserItemDoubleClicked(const QModelIndex &AIndex);
 	void onMultiChatContentAppended(const QString &AHtml, const IMessageStyleContentOptions &AOptions);
 	void onMultiChatMessageStyleOptionsChanged(const IMessageStyleOptions &AOptions, bool ACleared);
@@ -208,8 +212,6 @@ protected slots:
 	void onArchiveMessagesLoaded(const QString &AId, const IArchiveCollectionBody &ABody);
 	void onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext);
 private:
-	Ui::MultiUserChatWindowClass ui;
-private:
 	IMessageWidgets *FMessageWidgets;
 	IMessageProcessor *FMessageProcessor;
 	IMessageStyleManager *FMessageStyleManager;
@@ -231,6 +233,11 @@ private:
 	IMessageStatusBarWidget *FStatusBarWidget;
 	IMessageTabPageNotifier *FTabPageNotifier;
 private:
+	SplitterWidget *FMainSplitter;
+	SplitterWidget *FCentralSplitter;
+	SplitterWidget *FViewSplitter;
+	SplitterWidget *FUsersSplitter;
+private:
 	Action *FClearChat;
 	Action *FEnterRoom;
 	Action *FExitRoom;
@@ -250,12 +257,12 @@ private:
 	QString FLastAffiliation;
 	QDateTime FLastStanzaTime;
 private:
-	int FUsersListWidth;
+	bool FStateLoaded;
 	bool FShownDetached;
 	bool FDestroyOnChatClosed;
 	QString FTabPageToolTip;
 	QList<int> FActiveMessages;
-	QList<IMessageChatWindow *> FChatWindows;
+	QList<IMessageChatWindow *> FPrivateChatWindows;
 	QMap<IMessageChatWindow *, QTimer *> FDestroyTimers;
 	QMultiMap<IMessageChatWindow *,int> FActiveChatMessages;
 	QMap<int, IDataDialogWidget *> FDataFormMessages;
@@ -265,6 +272,7 @@ private:
 	QMap<IMessageChatWindow *, QList<Message> > FPendingMessages;
 	QMap<IMessageChatWindow *, QList<WindowContent> > FPendingContent;
 private:
+	QListView *FUsersView;
 	UsersProxyModel *FUsersProxy;
 	QStandardItemModel *FUsersModel;
 	QHash<IMultiUser *, QStandardItem *> FUsers;

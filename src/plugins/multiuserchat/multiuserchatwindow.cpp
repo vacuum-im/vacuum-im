@@ -29,6 +29,7 @@
 #include <definitions/tabpagenotifypriorities.h>
 #include <definitions/messagedataroles.h>
 #include <definitions/messagehandlerorders.h>
+#include <definitions/messagewindowwidgets.h>
 #include <definitions/messageeditsendhandlerorders.h>
 #include <utils/widgetmanager.h>
 #include <utils/pluginhelper.h>
@@ -54,18 +55,13 @@
 
 #define REJOIN_AFTER_KICK_MSEC      500
 
-MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatManager *AChatPlugin, IMultiUserChat *AMultiChat)
+MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatManager *AMultiChatManager, IMultiUserChat *AMultiChat) : QMainWindow(NULL)
 {
 	REPORT_VIEW;
-	ui.setupUi(this);
+	setContentsMargins(3,3,3,3);
 	setAttribute(Qt::WA_DeleteOnClose, false);
 
-	FMultiChatManager = AChatPlugin;
-	FMultiChat = AMultiChat;
-	FMultiChat->instance()->setParent(this);
-	FMultiChat->setAutoPresence(true);
-	connect(this,SIGNAL(tabPageActivated()),SLOT(onMultiChatWindowActivated()));
-
+	FUsersView = NULL;
 	FInfoWidget = NULL;
 	FViewWidget = NULL;
 	FEditWidget = NULL;
@@ -77,83 +73,75 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatManager *AChatPlugin, IMu
 	FSHIAnyStanza = -1;
 	FLastAffiliation = MUC_AFFIL_NONE;
 
+	FStateLoaded = false;
 	FShownDetached = false;
 	FDestroyOnChatClosed = false;
-	FUsersListWidth = -1;
 
 	FStartCompletePos = 0;
 	FCompleteIt = FCompleteNicks.constEnd();
 
-	FUsersModel = new QStandardItemModel(0,1,ui.ltvUsers);
+	FMultiChatManager = AMultiChatManager;
 
-	FUsersProxy = new UsersProxyModel(AMultiChat,FUsersModel);
+	FMultiChat = AMultiChat;
+	FMultiChat->instance()->setParent(this);
+	connect(FMultiChat->instance(),SIGNAL(chatAboutToConnect()),SLOT(onChatAboutToConnect()));
+	connect(FMultiChat->instance(),SIGNAL(chatOpened()),SLOT(onChatOpened()));
+	connect(FMultiChat->instance(),SIGNAL(chatNotify(const QString &)),SLOT(onChatNotify(const QString &)));
+	connect(FMultiChat->instance(),SIGNAL(chatError(const QString &)),SLOT(onChatError(const QString &)));
+	connect(FMultiChat->instance(),SIGNAL(chatClosed()),SLOT(onChatClosed()));
+	connect(FMultiChat->instance(),SIGNAL(roomNameChanged(const QString &)),SLOT(onRoomNameChanged(const QString &)));
+	connect(FMultiChat->instance(),SIGNAL(userPresence(IMultiUser *,int,const QString &)),SLOT(onUserPresence(IMultiUser *,int,const QString &)));
+	connect(FMultiChat->instance(),SIGNAL(userDataChanged(IMultiUser *, int, const QVariant, const QVariant &)),SLOT(onUserDataChanged(IMultiUser *, int, const QVariant, const QVariant &)));
+	connect(FMultiChat->instance(),SIGNAL(userNickChanged(IMultiUser *, const QString &, const QString &)),SLOT(onUserNickChanged(IMultiUser *, const QString &, const QString &)));
+	connect(FMultiChat->instance(),SIGNAL(presenceChanged(int, const QString &)),SLOT(onPresenceChanged(int, const QString &)));
+	connect(FMultiChat->instance(),SIGNAL(subjectChanged(const QString &, const QString &)),SLOT(onSubjectChanged(const QString &, const QString &)));
+	connect(FMultiChat->instance(),SIGNAL(serviceMessageReceived(const Message &)),SLOT(onServiceMessageReceived(const Message &)));
+	connect(FMultiChat->instance(),SIGNAL(inviteDeclined(const Jid &, const QString &)),SLOT(onInviteDeclined(const Jid &, const QString &)));
+	connect(FMultiChat->instance(),SIGNAL(userKicked(const QString &, const QString &, const QString &)),SLOT(onUserKicked(const QString &, const QString &, const QString &)));
+	connect(FMultiChat->instance(),SIGNAL(userBanned(const QString &, const QString &, const QString &)),SLOT(onUserBanned(const QString &, const QString &, const QString &)));
+	connect(FMultiChat->instance(),SIGNAL(affiliationListReceived(const QString &,const QList<IMultiUserListItem> &)),SLOT(onAffiliationListReceived(const QString &,const QList<IMultiUserListItem> &)));
+	connect(FMultiChat->instance(),SIGNAL(configFormReceived(const IDataForm &)), SLOT(onConfigFormReceived(const IDataForm &)));
+	connect(FMultiChat->instance(),SIGNAL(roomDestroyed(const QString &)), SLOT(onRoomDestroyed(const QString &)));
+
+	FMainSplitter = new SplitterWidget(this,Qt::Vertical);
+	FMainSplitter->setSpacing(3);
+	setCentralWidget(FMainSplitter);
+
+	FCentralSplitter = new SplitterWidget(FMainSplitter,Qt::Horizontal);
+	FMainSplitter->insertWidget(MUCWW_CENTRALSPLITTER,FCentralSplitter,100);
+
+	FViewSplitter = new SplitterWidget(FCentralSplitter,Qt::Vertical);
+	FCentralSplitter->insertWidget(MUCWW_VIEWSPLITTER,FViewSplitter,75);
+
+	FUsersSplitter = new SplitterWidget(FCentralSplitter,Qt::Vertical);
+	FCentralSplitter->insertWidget(MUCWW_USERSSPLITTER,FUsersSplitter,25,MUCWW_USERSHANDLE);
+	FCentralSplitter->setHandleCollapsible(MUCWW_USERSHANDLE,true);
+	FCentralSplitter->setHandleStretchable(MUCWW_USERSHANDLE,false);
+
+	FUsersModel = new QStandardItemModel(0,1,this);
+
+	FUsersProxy = new UsersProxyModel(FMultiChat,this);
 	FUsersProxy->setSortLocaleAware(true);
 	FUsersProxy->setDynamicSortFilter(true);
 	FUsersProxy->setSortCaseSensitivity(Qt::CaseInsensitive);
 	FUsersProxy->setSourceModel(FUsersModel);
 	FUsersProxy->sort(0, Qt::AscendingOrder);
 
-	ui.ltvUsers->setModel(FUsersProxy);
-	ui.ltvUsers->viewport()->installEventFilter(this);
-	connect(ui.ltvUsers,SIGNAL(doubleClicked(const QModelIndex &)),SLOT(onMultiChatUserItemDoubleClicked(const QModelIndex &)));
-
-	ui.sprHSplitter->installEventFilter(this);
-	connect(ui.sprHSplitter,SIGNAL(splitterMoved(int,int)),SLOT(onMultiChatHorizontalSplitterMoved(int,int)));
-
-	FStatusIcons = PluginHelper::pluginInstance<IStatusIcons>();
-	if (FStatusIcons)
-	{
-		connect(FStatusIcons->instance(),SIGNAL(statusIconsChanged()),SLOT(onStatusIconsChanged()));
-	}
-
-	FMessageWidgets = PluginHelper::pluginInstance<IMessageWidgets>();
-	if (FMessageWidgets)
-	{
-		FMessageWidgets->insertEditSendHandler(MESHO_MULTIUSERCHATWINDOW_COMMANDS,this);
-		FMessageWidgets->insertEditSendHandler(MESHO_MULTIUSERCHATWINDOW_GROUPCHAT,this);
-		FMessageWidgets->insertEditSendHandler(MESHO_MULTIUSERCHATWINDOW_PRIVATECHAT,this);
-	}
-
-	FMessageProcessor = PluginHelper::pluginInstance<IMessageProcessor>();
-	if (FMessageProcessor)
-	{
-		FMessageProcessor->insertMessageHandler(MHO_MULTIUSERCHAT_GROUPCHAT,this);
-	}
-
-	FMessageStyleManager = PluginHelper::pluginInstance<IMessageStyleManager>();
-	if (FMessageStyleManager)
-	{
-		connect(FMessageStyleManager->instance(),SIGNAL(styleOptionsChanged(const IMessageStyleOptions &, int, const QString &)),
-			SLOT(onStyleOptionsChanged(const IMessageStyleOptions &, int, const QString &)));
-	}
-
-	FMessageArchiver = PluginHelper::pluginInstance<IMessageArchiver>();
-	if (FMessageArchiver)
-	{
-		connect(FMessageArchiver->instance(),SIGNAL(messagesLoaded(const QString &, const IArchiveCollectionBody &)),
-			SLOT(onArchiveMessagesLoaded(const QString &, const IArchiveCollectionBody &)));
-		connect(FMessageArchiver->instance(),SIGNAL(requestFailed(const QString &, const XmppError &)),
-			SLOT(onArchiveRequestFailed(const QString &, const XmppError &)));
-	}
-
-	FDataForms = PluginHelper::pluginInstance<IDataForms>();
-	FStatusChanger = PluginHelper::pluginInstance<IStatusChanger>();
-	FRecentContacts = PluginHelper::pluginInstance<IRecentContacts>();
-	FStanzaProcessor = PluginHelper::pluginInstance<IStanzaProcessor>();
-
+	connect(this,SIGNAL(tabPageActivated()),SLOT(onMultiChatWindowActivated()));
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString, QWidget *)),SLOT(onShortcutActivated(const QString, QWidget *)));
 
+	initialize();
 	createMessageWidgets();
-	connectMultiChatSignals();
 	createStaticRoomActions();
-	loadWindowState();
 	setMultiChatMessageStyle();
+
+	FMultiChat->setAutoPresence(true);
 	updateMultiChatWindow();
 }
 
 MultiUserChatWindow::~MultiUserChatWindow()
 {
-	QList<IMessageChatWindow *> chatWindows = FChatWindows;
+	QList<IMessageChatWindow *> chatWindows = FPrivateChatWindows;
 	foreach(IMessageChatWindow *window,chatWindows)
 		delete window->instance();
 
@@ -169,7 +157,6 @@ MultiUserChatWindow::~MultiUserChatWindow()
 		FMessageWidgets->removeEditSendHandler(MESHO_MULTIUSERCHATWINDOW_PRIVATECHAT,this);
 	}
 
-	saveWindowState();
 	emit tabPageDestroyed();
 }
 
@@ -221,6 +208,11 @@ IMessageStatusBarWidget *MultiUserChatWindow::statusBarWidget() const
 IMessageReceiversWidget *MultiUserChatWindow::receiversWidget() const
 {
 	return NULL;
+}
+
+SplitterWidget *MultiUserChatWindow::messageWidgetsBox() const
+{
+	return FMainSplitter;
 }
 
 QString MultiUserChatWindow::tabPageId() const
@@ -346,7 +338,7 @@ bool MultiUserChatWindow::messageEditSendProcesse(int AOrder, IMessageEditWidget
 	else if (AOrder == MESHO_MULTIUSERCHATWINDOW_PRIVATECHAT)
 	{
 		IMessageChatWindow *window = qobject_cast<IMessageChatWindow *>(AWidget->messageWindow()->instance());
-		if (FChatWindows.contains(window) && FMultiChat->isOpen() && FMultiChat->userByNick(window->contactJid().resource())!=NULL)
+		if (FPrivateChatWindows.contains(window) && FMultiChat->isOpen() && FMultiChat->userByNick(window->contactJid().resource())!=NULL)
 		{
 			Message message;
 
@@ -646,20 +638,35 @@ bool MultiUserChatWindow::messageShowWindow(int AOrder, const Jid &AStreamJid, c
 	return false;
 }
 
+SplitterWidget *MultiUserChatWindow::viewWidgetsBox() const
+{
+	return FViewSplitter;
+}
+
+SplitterWidget *MultiUserChatWindow::usersWidgetsBox() const
+{
+	return FUsersSplitter;
+}
+
+SplitterWidget *MultiUserChatWindow::centralWidgetsBox() const
+{
+	return FCentralSplitter;
+}
+
 IMultiUserChat *MultiUserChatWindow::multiUserChat() const
 {
 	return FMultiChat;
 }
 
-IMessageChatWindow *MultiUserChatWindow::openChatWindow(const Jid &AContactJid)
+IMessageChatWindow *MultiUserChatWindow::openPrivateChatWindow(const Jid &AContactJid)
 {
 	messageShowWindow(MHO_MULTIUSERCHAT_GROUPCHAT,streamJid(),AContactJid,Message::Chat,IMessageHandler::SM_SHOW);
-	return findChatWindow(AContactJid);
+	return findPrivateChatWindow(AContactJid);
 }
 
-IMessageChatWindow *MultiUserChatWindow::findChatWindow(const Jid &AContactJid) const
+IMessageChatWindow *MultiUserChatWindow::findPrivateChatWindow(const Jid &AContactJid) const
 {
-	foreach(IMessageChatWindow *window,FChatWindows)
+	foreach(IMessageChatWindow *window,FPrivateChatWindows)
 		if (window->contactJid() == AContactJid)
 			return window;
 	return NULL;
@@ -881,36 +888,48 @@ void MultiUserChatWindow::exitAndDestroy(const QString &AStatus, int AWaitClose)
 		delete this;
 }
 
-void MultiUserChatWindow::connectMultiChatSignals()
+void MultiUserChatWindow::initialize()
 {
-	connect(FMultiChat->instance(),SIGNAL(chatAboutToConnect()),SLOT(onChatAboutToConnect()));
-	connect(FMultiChat->instance(),SIGNAL(chatOpened()),SLOT(onChatOpened()));
-	connect(FMultiChat->instance(),SIGNAL(chatNotify(const QString &)),SLOT(onChatNotify(const QString &)));
-	connect(FMultiChat->instance(),SIGNAL(chatError(const QString &)), SLOT(onChatError(const QString &)));
-	connect(FMultiChat->instance(),SIGNAL(chatClosed()),SLOT(onChatClosed()));
-	connect(FMultiChat->instance(),SIGNAL(roomNameChanged(const QString &)),SLOT(onRoomNameChanged(const QString &)));
-	connect(FMultiChat->instance(),SIGNAL(userPresence(IMultiUser *,int,const QString &)),
-		SLOT(onUserPresence(IMultiUser *,int,const QString &)));
-	connect(FMultiChat->instance(),SIGNAL(userDataChanged(IMultiUser *, int, const QVariant, const QVariant &)),
-		SLOT(onUserDataChanged(IMultiUser *, int, const QVariant, const QVariant &)));
-	connect(FMultiChat->instance(),SIGNAL(userNickChanged(IMultiUser *, const QString &, const QString &)),
-		SLOT(onUserNickChanged(IMultiUser *, const QString &, const QString &)));
-	connect(FMultiChat->instance(),SIGNAL(presenceChanged(int, const QString &)),
-		SLOT(onPresenceChanged(int, const QString &)));
-	connect(FMultiChat->instance(),SIGNAL(subjectChanged(const QString &, const QString &)),
-		SLOT(onSubjectChanged(const QString &, const QString &)));
-	connect(FMultiChat->instance(),SIGNAL(serviceMessageReceived(const Message &)),
-		SLOT(onServiceMessageReceived(const Message &)));
-	connect(FMultiChat->instance(),SIGNAL(inviteDeclined(const Jid &, const QString &)),
-		SLOT(onInviteDeclined(const Jid &, const QString &)));
-	connect(FMultiChat->instance(),SIGNAL(userKicked(const QString &, const QString &, const QString &)),
-		SLOT(onUserKicked(const QString &, const QString &, const QString &)));
-	connect(FMultiChat->instance(),SIGNAL(userBanned(const QString &, const QString &, const QString &)),
-		SLOT(onUserBanned(const QString &, const QString &, const QString &)));
-	connect(FMultiChat->instance(),SIGNAL(affiliationListReceived(const QString &,const QList<IMultiUserListItem> &)),
-		SLOT(onAffiliationListReceived(const QString &,const QList<IMultiUserListItem> &)));
-	connect(FMultiChat->instance(),SIGNAL(configFormReceived(const IDataForm &)), SLOT(onConfigFormReceived(const IDataForm &)));
-	connect(FMultiChat->instance(),SIGNAL(roomDestroyed(const QString &)), SLOT(onRoomDestroyed(const QString &)));
+	FMessageWidgets = PluginHelper::pluginInstance<IMessageWidgets>();
+	if (FMessageWidgets)
+	{
+		FMessageWidgets->insertEditSendHandler(MESHO_MULTIUSERCHATWINDOW_COMMANDS,this);
+		FMessageWidgets->insertEditSendHandler(MESHO_MULTIUSERCHATWINDOW_GROUPCHAT,this);
+		FMessageWidgets->insertEditSendHandler(MESHO_MULTIUSERCHATWINDOW_PRIVATECHAT,this);
+	}
+
+	FStatusIcons = PluginHelper::pluginInstance<IStatusIcons>();
+	if (FStatusIcons)
+	{
+		connect(FStatusIcons->instance(),SIGNAL(statusIconsChanged()),SLOT(onStatusIconsChanged()));
+	}
+
+	FMessageProcessor = PluginHelper::pluginInstance<IMessageProcessor>();
+	if (FMessageProcessor)
+	{
+		FMessageProcessor->insertMessageHandler(MHO_MULTIUSERCHAT_GROUPCHAT,this);
+	}
+
+	FMessageStyleManager = PluginHelper::pluginInstance<IMessageStyleManager>();
+	if (FMessageStyleManager)
+	{
+		connect(FMessageStyleManager->instance(),SIGNAL(styleOptionsChanged(const IMessageStyleOptions &, int, const QString &)),
+			SLOT(onStyleOptionsChanged(const IMessageStyleOptions &, int, const QString &)));
+	}
+
+	FMessageArchiver = PluginHelper::pluginInstance<IMessageArchiver>();
+	if (FMessageArchiver)
+	{
+		connect(FMessageArchiver->instance(),SIGNAL(messagesLoaded(const QString &, const IArchiveCollectionBody &)),
+			SLOT(onArchiveMessagesLoaded(const QString &, const IArchiveCollectionBody &)));
+		connect(FMessageArchiver->instance(),SIGNAL(requestFailed(const QString &, const XmppError &)),
+			SLOT(onArchiveRequestFailed(const QString &, const XmppError &)));
+	}
+
+	FDataForms = PluginHelper::pluginInstance<IDataForms>();
+	FStatusChanger = PluginHelper::pluginInstance<IStatusChanger>();
+	FRecentContacts = PluginHelper::pluginInstance<IRecentContacts>();
+	FStanzaProcessor = PluginHelper::pluginInstance<IStanzaProcessor>();
 }
 
 void MultiUserChatWindow::createMessageWidgets()
@@ -919,33 +938,31 @@ void MultiUserChatWindow::createMessageWidgets()
 	{
 		FAddress = FMessageWidgets->newAddress(FMultiChat->streamJid(),FMultiChat->roomJid(),this);
 
-		ui.wdtInfo->setLayout(new QVBoxLayout);
-		ui.wdtInfo->layout()->setMargin(0);
-		FInfoWidget = FMessageWidgets->newInfoWidget(this,ui.wdtInfo);
-		ui.wdtInfo->layout()->addWidget(FInfoWidget->instance());
+		FInfoWidget = FMessageWidgets->newInfoWidget(this,FMainSplitter);
+		FMainSplitter->insertWidget(MUCWW_INFOWIDGET,FInfoWidget->instance());
 
-		ui.wdtView->setLayout(new QVBoxLayout);
-		ui.wdtView->layout()->setMargin(0);
-		FViewWidget = FMessageWidgets->newViewWidget(this,ui.wdtView);
-		ui.wdtView->layout()->addWidget(FViewWidget->instance());
+		FViewWidget = FMessageWidgets->newViewWidget(this,FCentralSplitter);
 		connect(FViewWidget->instance(),SIGNAL(contentAppended(const QString &, const IMessageStyleContentOptions &)),
 			SLOT(onMultiChatContentAppended(const QString &, const IMessageStyleContentOptions &)));
 		connect(FViewWidget->instance(),SIGNAL(messageStyleOptionsChanged(const IMessageStyleOptions &, bool)),
 			SLOT(onMultiChatMessageStyleOptionsChanged(const IMessageStyleOptions &, bool)));
+		FViewSplitter->insertWidget(MUCWW_VIEWWIDGET,FViewWidget->instance(),100);
 		FWindowStatus[FViewWidget].createTime = QDateTime::currentDateTime();
 
-		ui.wdtEdit->setLayout(new QVBoxLayout);
-		ui.wdtEdit->layout()->setMargin(0);
-		FEditWidget = FMessageWidgets->newEditWidget(this,ui.wdtEdit);
-		FEditWidget->setSendShortcutId(SCT_MESSAGEWINDOWS_SENDCHATMESSAGE);
-		ui.wdtEdit->layout()->addWidget(FEditWidget->instance());
-		connect(FEditWidget->instance(),SIGNAL(keyEventReceived(QKeyEvent *,bool &)),SLOT(onMultiChatEditWidgetKeyEvent(QKeyEvent *,bool &)));
+		FUsersView = new QListView(FCentralSplitter);
+		FUsersView->viewport()->installEventFilter(this);
+		FUsersView->setModel(FUsersProxy);
+		connect(FUsersView,SIGNAL(doubleClicked(const QModelIndex &)),SLOT(onMultiChatUserItemDoubleClicked(const QModelIndex &)));
+		FUsersSplitter->insertWidget(MUCWW_USERSWIDGET,FUsersView,100);
 
-		ui.wdtToolBar->setLayout(new QVBoxLayout);
-		ui.wdtToolBar->layout()->setMargin(0);
-		FToolBarWidget = FMessageWidgets->newToolBarWidget(this,ui.wdtToolBar);
-		ui.wdtToolBar->layout()->addWidget(FToolBarWidget->instance());
+		FEditWidget = FMessageWidgets->newEditWidget(this,FMainSplitter);
+		FEditWidget->setSendShortcutId(SCT_MESSAGEWINDOWS_SENDCHATMESSAGE);
+		connect(FEditWidget->instance(),SIGNAL(keyEventReceived(QKeyEvent *,bool &)),SLOT(onMultiChatEditWidgetKeyEvent(QKeyEvent *,bool &)));
+		FMainSplitter->insertWidget(MUCWW_EDITWIDGET,FEditWidget->instance());
+
+		FToolBarWidget = FMessageWidgets->newToolBarWidget(this,FMainSplitter);
 		FToolBarWidget->toolBarChanger()->setSeparatorsVisible(false);
+		FMainSplitter->insertWidget(MUCWW_TOOLBARWIDGET,FToolBarWidget->instance());
 
 		FMenuBarWidget = FMessageWidgets->newMenuBarWidget(this,this);
 		setMenuBar(FMenuBarWidget->instance());
@@ -1035,13 +1052,19 @@ void MultiUserChatWindow::createStaticRoomActions()
 
 void MultiUserChatWindow::saveWindowState()
 {
-	if (FUsersListWidth > 0)
-		Options::setFileValue(FUsersListWidth,"muc.mucwindow.users-list-width",tabPageId());
+	int size = FCentralSplitter->handleSize(MUCWW_USERSHANDLE);
+	Options::setFileValue(size>0 ? size : -1,"muc.mucwindow.users-list-width",tabPageId());
 }
 
 void MultiUserChatWindow::loadWindowState()
 {
-	FUsersListWidth = Options::fileValue("muc.mucwindow.users-list-width",tabPageId()).toInt();
+	int size = Options::fileValue("muc.mucwindow.users-list-width",tabPageId()).toInt();
+	if (size > 0)
+		FCentralSplitter->setHandleSize(MUCWW_USERSHANDLE,size);
+	else if (size < 0)
+		FCentralSplitter->setHandleSize(MUCWW_USERSHANDLE,0);
+	else
+		FCentralSplitter->setHandleSize(MUCWW_USERSHANDLE,130);
 }
 
 void MultiUserChatWindow::saveWindowGeometry()
@@ -1084,7 +1107,7 @@ void MultiUserChatWindow::updateListItem(const Jid &AContactJid)
 	QStandardItem *userItem = FUsers.value(user);
 	if (userItem)
 	{
-		IMessageChatWindow *window = findChatWindow(AContactJid);
+		IMessageChatWindow *window = findPrivateChatWindow(AContactJid);
 		if (FActiveChatMessages.contains(window))
 			userItem->setIcon(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MUC_PRIVATE_MESSAGE));
 		else if (FStatusIcons)
@@ -1115,17 +1138,17 @@ void MultiUserChatWindow::highlightUserRole(IMultiUser *AUser)
 		if (role == MUC_ROLE_MODERATOR)
 		{
 			itemFont.setBold(true);
-			itemColor = ui.ltvUsers->palette().color(QPalette::Active, QPalette::Text);
+			itemColor = FUsersView->palette().color(QPalette::Active, QPalette::Text);
 		}
 		else if (role == MUC_ROLE_PARTICIPANT)
 		{
 			itemFont.setBold(false);
-			itemColor = ui.ltvUsers->palette().color(QPalette::Active, QPalette::Text);
+			itemColor = FUsersView->palette().color(QPalette::Active, QPalette::Text);
 		}
 		else
 		{
 			itemFont.setBold(false);
-			itemColor = ui.ltvUsers->palette().color(QPalette::Disabled, QPalette::Text);
+			itemColor = FUsersView->palette().color(QPalette::Disabled, QPalette::Text);
 		}
 		userItem->setFont(itemFont);
 		userItem->setForeground(itemColor);
@@ -1544,7 +1567,7 @@ IMessageChatWindow *MultiUserChatWindow::getPrivateChatWindow(const Jid &AContac
 	IMultiUser *user = FMultiChat->userByNick(AContactJid.resource());
 	if (user!=NULL && user!=FMultiChat->mainUser())
 	{
-		window = findChatWindow(AContactJid);
+		window = findPrivateChatWindow(AContactJid);
 		if (!window)
 		{
 			window = FMessageWidgets!=NULL ? FMessageWidgets->getChatWindow(streamJid(),AContactJid) : NULL;
@@ -1565,7 +1588,7 @@ IMessageChatWindow *MultiUserChatWindow::getPrivateChatWindow(const Jid &AContac
 					SLOT(onPrivateChatMessageStyleOptionsChanged(const IMessageStyleOptions &, bool)));
 				connect(window->tabPageNotifier()->instance(),SIGNAL(activeNotifyChanged(int)),this,SLOT(onPrivateChatNotifierActiveNotifyChanged(int)));
 
-				FChatWindows.append(window);
+				FPrivateChatWindows.append(window);
 				FWindowStatus[window->viewWidget()].createTime = QDateTime::currentDateTime();
 
 				Action *clearAction = new Action(window->instance());
@@ -1767,16 +1790,13 @@ void MultiUserChatWindow::showEvent(QShowEvent *AEvent)
 	}
 
 	QMainWindow::showEvent(AEvent);
-	
-	QList<int> splitterSizes = ui.sprHSplitter->sizes();
-	int usersListIndex = ui.sprHSplitter->indexOf(ui.ltvUsers);
-	if (FUsersListWidth>0 && usersListIndex>0 && splitterSizes.value(usersListIndex)!=FUsersListWidth)
+
+	if (!FStateLoaded)
 	{
-		splitterSizes[0] += splitterSizes.value(usersListIndex) - FUsersListWidth;
-		splitterSizes[usersListIndex] = FUsersListWidth;
-		ui.sprHSplitter->setSizes(splitterSizes);
+		loadWindowState();
+		FStateLoaded = true;
 	}
-	
+
 	if (FEditWidget)
 		FEditWidget->textEdit()->setFocus();
 	
@@ -1788,22 +1808,24 @@ void MultiUserChatWindow::closeEvent(QCloseEvent *AEvent)
 {
 	if (FShownDetached)
 		saveWindowGeometry();
+	saveWindowState();
 
 	if (Options::node(OPV_MUC_GROUPCHAT_QUITONWINDOWCLOSE).value().toBool() && !Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool())
 		exitAndDestroy(QString::null);
 
 	QMainWindow::closeEvent(AEvent);
+
 	emit tabPageClosed();
 }
 
 bool MultiUserChatWindow::eventFilter(QObject *AObject, QEvent *AEvent)
 {
-	if (AObject == ui.ltvUsers->viewport())
+	if (FUsersView && AObject==FUsersView->viewport())
 	{
 		if (AEvent->type() == QEvent::ContextMenu)
 		{
 			QContextMenuEvent *menuEvent = static_cast<QContextMenuEvent *>(AEvent);
-			QStandardItem *userItem = FUsersModel->itemFromIndex(FUsersProxy->mapToSource(ui.ltvUsers->indexAt(menuEvent->pos())));
+			QStandardItem *userItem = FUsersModel->itemFromIndex(FUsersProxy->mapToSource(FUsersView->indexAt(menuEvent->pos())));
 			IMultiUser *user = FUsers.key(userItem,NULL);
 			if (user)
 			{
@@ -1821,7 +1843,7 @@ bool MultiUserChatWindow::eventFilter(QObject *AObject, QEvent *AEvent)
 		else if (AEvent->type() == QEvent::ToolTip)
 		{
 			QHelpEvent *helpEvent = static_cast<QHelpEvent *>(AEvent);
-			QStandardItem *userItem = FUsersModel->itemFromIndex(FUsersProxy->mapToSource(ui.ltvUsers->indexAt(helpEvent->pos())));
+			QStandardItem *userItem = FUsersModel->itemFromIndex(FUsersProxy->mapToSource(FUsersView->indexAt(helpEvent->pos())));
 			IMultiUser *user = FUsers.key(userItem,NULL);
 			if (user)
 			{
@@ -1840,7 +1862,7 @@ bool MultiUserChatWindow::eventFilter(QObject *AObject, QEvent *AEvent)
 			QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(AEvent);
 			if (FEditWidget)
 			{
-				QStandardItem *userItem = FUsersModel->itemFromIndex(FUsersProxy->mapToSource(ui.ltvUsers->indexAt(mouseEvent->pos())));
+				QStandardItem *userItem = FUsersModel->itemFromIndex(FUsersProxy->mapToSource(FUsersView->indexAt(mouseEvent->pos())));
 				if(mouseEvent->button()==Qt::MidButton && userItem)
 				{
 					QString sufix = FEditWidget->textEdit()->textCursor().atBlockStart() ? Options::node(OPV_MUC_GROUPCHAT_NICKNAMESUFFIX).value().toString() : " ";
@@ -1851,28 +1873,7 @@ bool MultiUserChatWindow::eventFilter(QObject *AObject, QEvent *AEvent)
 				}
 				else if (mouseEvent->button()==Qt::LeftButton && !userItem)
 				{
-					ui.ltvUsers->selectionModel()->clearSelection();
-				}
-			}
-		}
-	}
-	else if (AObject == ui.sprHSplitter)
-	{
-		if (AEvent->type() == QEvent::Resize)
-		{
-			int usersListIndex = ui.sprHSplitter->indexOf(ui.ltvUsers);
-			QResizeEvent *resizeEvent = static_cast<QResizeEvent *>(AEvent);
-			if (resizeEvent && FUsersListWidth>0 && usersListIndex>0 && resizeEvent->oldSize().width()>0)
-			{
-				double k = (double)resizeEvent->size().width() / resizeEvent->oldSize().width();
-				QList<int> splitterSizes = ui.sprHSplitter->sizes();
-				for (int i=0; i<splitterSizes.count(); i++)
-					splitterSizes[i] = qRound(splitterSizes[i]*k);
-				if (splitterSizes.value(usersListIndex) != FUsersListWidth)
-				{
-					splitterSizes[0] += splitterSizes.value(usersListIndex) - FUsersListWidth;
-					splitterSizes[usersListIndex] = FUsersListWidth;
-					ui.sprHSplitter->setSizes(splitterSizes);
+					FUsersView->selectionModel()->clearSelection();
 				}
 			}
 		}
@@ -2028,7 +2029,7 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
 	if (AUser == FMultiChat->mainUser())
 		FLastAffiliation = AUser->affiliation();
 
-	IMessageChatWindow *window = findChatWindow(AUser->contactJid());
+	IMessageChatWindow *window = findPrivateChatWindow(AUser->contactJid());
 	if (window)
 	{
 		if (FUsers.contains(AUser) || !FDestroyTimers.contains(window))
@@ -2070,7 +2071,7 @@ void MultiUserChatWindow::onUserNickChanged(IMultiUser *AUser, const QString &AO
 		userItem->setText(ANewNick);
 		Jid userOldJid = AUser->contactJid();
 		userOldJid.setResource(AOldNick);
-		IMessageChatWindow *window = findChatWindow(userOldJid);
+		IMessageChatWindow *window = findPrivateChatWindow(userOldJid);
 		if (window)
 		{
 			window->address()->appendAddress(streamJid(),AUser->contactJid());
@@ -2256,17 +2257,11 @@ void MultiUserChatWindow::onMultiChatEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bo
 	}
 }
 
-void MultiUserChatWindow::onMultiChatHorizontalSplitterMoved(int APos, int AIndex)
-{
-	Q_UNUSED(APos); Q_UNUSED(AIndex);
-	FUsersListWidth = ui.sprHSplitter->sizes().value(ui.sprHSplitter->indexOf(ui.ltvUsers));
-}
-
 void MultiUserChatWindow::onMultiChatUserItemDoubleClicked(const QModelIndex &AIndex)
 {
 	IMultiUser *user = FUsers.key(FUsersModel->itemFromIndex(FUsersProxy->mapToSource(AIndex)));
 	if (user)
-		openChatWindow(user->contactJid());
+		openPrivateChatWindow(user->contactJid());
 }
 
 void MultiUserChatWindow::onMultiChatContentAppended(const QString &AHtml, const IMessageStyleContentOptions &AOptions)
@@ -2335,13 +2330,13 @@ void MultiUserChatWindow::onPrivateChatWindowClosed()
 void MultiUserChatWindow::onPrivateChatWindowDestroyed()
 {
 	IMessageChatWindow *window = qobject_cast<IMessageChatWindow *>(sender());
-	if (FChatWindows.contains(window))
+	if (FPrivateChatWindows.contains(window))
 	{
 		LOG_STRM_INFO(streamJid(),QString("Private chat window destroyed, room=%1, user=%2").arg(contactJid().bare(),window->contactJid().resource()));
 		removePrivateChatActiveMessages(window);
 		if (FDestroyTimers.contains(window))
 			delete FDestroyTimers.take(window);
-		FChatWindows.removeAt(FChatWindows.indexOf(window));
+		FPrivateChatWindows.removeAt(FPrivateChatWindows.indexOf(window));
 		FWindowStatus.remove(window->viewWidget());
 		FPendingMessages.remove(window);
 		FPendingContent.remove(window);
@@ -2511,7 +2506,7 @@ void MultiUserChatWindow::onOpenPrivateChatWindowActionTriggered(bool)
 	{
 		IMultiUser *user = FMultiChat->userByNick(action->data(ADR_USER_NICK).toString());
 		if (user)
-			openChatWindow(user->contactJid());
+			openPrivateChatWindow(user->contactJid());
 	}
 }
 
@@ -2568,7 +2563,7 @@ void MultiUserChatWindow::onConfigFormDialogAccepted()
 
 void MultiUserChatWindow::onStatusIconsChanged()
 {
-	foreach(IMessageChatWindow *window, FChatWindows) {
+	foreach(IMessageChatWindow *window, FPrivateChatWindows) {
 		updatePrivateChatWindow(window);	}
 	foreach(IMultiUser *user, FUsers.keys()) {
 		updateListItem(user->contactJid());	}
@@ -2683,7 +2678,7 @@ void MultiUserChatWindow::onStyleOptionsChanged(const IMessageStyleOptions &AOpt
 {
 	if (AMessageType==Message::Chat && AContext.isEmpty())
 	{
-		foreach (IMessageChatWindow *window, FChatWindows)
+		foreach (IMessageChatWindow *window, FPrivateChatWindows)
 		{
 			IMessageStyle *style = window->viewWidget()!=NULL ? window->viewWidget()->messageStyle() : NULL;
 			if (style==NULL || !style->changeOptions(window->viewWidget()->styleWidget(),AOptions,false))

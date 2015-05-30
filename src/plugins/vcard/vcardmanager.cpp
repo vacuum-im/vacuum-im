@@ -728,7 +728,7 @@ void VCardManager::onShowVCardDialogByMessageWindowAction(bool)
 			Jid contactJid = widget->messageWindow()->contactJid();
 			QList<IMultiUserChatWindow *> windows = FMultiChatManager!=NULL ? FMultiChatManager->multiChatWindows() : QList<IMultiUserChatWindow *>();
 			for (int i=0; !isMucUser && i<windows.count(); i++)
-				isMucUser = windows.at(i)->findChatWindow(contactJid)!=NULL;
+				isMucUser = windows.at(i)->findPrivateChatWindow(contactJid)!=NULL;
 			showVCardDialog(widget->messageWindow()->streamJid(), isMucUser ? contactJid : contactJid.bare());
 		}
 	}

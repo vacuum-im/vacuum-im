@@ -1,5 +1,4 @@
 FORMS = joinmultichatdialog.ui \
-        multiuserchatwindow.ui \
         edituserslistdialog.ui \
         inputtextdialog.ui
         

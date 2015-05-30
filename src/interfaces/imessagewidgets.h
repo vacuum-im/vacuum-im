@@ -288,6 +288,7 @@ public:
 	virtual IMessageToolBarWidget *toolBarWidget() const =0;
 	virtual IMessageStatusBarWidget *statusBarWidget() const =0;
 	virtual IMessageReceiversWidget *receiversWidget() const =0;
+	virtual SplitterWidget *messageWidgetsBox() const =0;
 protected:
 	virtual void widgetLayoutChanged() =0;
 };
@@ -308,7 +309,6 @@ public:
 	virtual void setSubject(const QString &ASubject) =0;
 	virtual QString threadId() const =0;
 	virtual void setThreadId(const QString &AThreadId) =0;
-	virtual SplitterWidget *messageWidgetsBox() const =0;
 	virtual void updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip) =0;
 protected:
 	virtual void modeChanged(int AMode) =0;
@@ -319,7 +319,6 @@ class IMessageChatWindow :
 {
 public:
 	virtual QMainWindow *instance() =0;
-	virtual SplitterWidget *messageWidgetsBox() const =0;
 	virtual void updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip) =0;
 };
 
