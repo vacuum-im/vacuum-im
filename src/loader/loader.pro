@@ -13,10 +13,6 @@ include(loader.pri)
 
 #Appication icon
 win32:RC_FILE      = loader.rc
-macx:ICON          = ../../vacuum.icns
-
-#MacOS Info.plist
-macx:QMAKE_INFO_PLIST = ../../src/packages/macosx/Info.plist
 
 #GIT Info
 GIT_HASH = $$system(git log -n 1 --format=%H)
@@ -64,7 +60,7 @@ unix:!macx {
 
 #MacOS Install
 macx {
-	UTILS_LIB_NAME   = lib$${TARGET_UTILS}.$${VERSION_UTILS}.dylib
+  UTILS_LIB_NAME   = lib$${TARGET_UTILS}.$${VERSION_UTILS}.dylib
   UTILS_LIB_LINK   = lib$${TARGET_UTILS}.1.dylib
   UTILS_LIB_LINK_EXTERNAL_PLUGINS = lib$${TARGET_UTILS}.dylib
 
@@ -82,4 +78,11 @@ macx {
 	TARGET           = $$TARGET_UTILS
 	include(../translations.inc)
 	TARGET           = $$TARGET_LOADER
+
+  ICON              = ../../vacuum.icns
+  QMAKE_INFO_PLIST  = ../packages/macosx/Info.plist
+
+  en_lproj.path     = $$INSTALL_RESOURCES/en.lproj/
+  en_lproj.files    = ../packages/macosx/InfoPlist.strings
+  INSTALLS         += en_lproj
 }
