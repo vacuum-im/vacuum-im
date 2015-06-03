@@ -156,6 +156,29 @@ Action *Action::duplicateAction(QAction *ASource, QObject *AParent)
 	return NULL;
 }
 
+Action *Action::duplicateActionAndMenu(QAction *ASource, QWidget *AParent)
+{
+	if (ASource != NULL)
+	{
+		Action *duplAction = NULL;
+		if (ASource->menu() == NULL)
+		{
+			duplAction = Action::duplicateAction(ASource,AParent);
+		}
+		else if (ASource->menu()->menuAction() == ASource)
+		{
+			duplAction = Menu::duplicateMenu(ASource->menu(),AParent)->menuAction();
+		}
+		else
+		{
+			duplAction = Action::duplicateAction(ASource,AParent);
+			duplAction->setMenu(Menu::duplicateMenu(ASource->menu(),AParent));
+		}
+		return duplAction;
+	}
+	return NULL;
+}
+
 void Action::onCarbonActionChanged()
 {
 	Action::copyActionProperties(this,FCarbon);
