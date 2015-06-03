@@ -12,10 +12,6 @@ include(loader.pri)
 
 #Appication icon
 win32:RC_FILE      = loader.rc
-macx:ICON          = ../../vacuum.icns
-
-#MacOS Info.plist
-macx:QMAKE_INFO_PLIST = ../../src/packages/macosx/Info.plist
 
 #GIT Info
 GIT_HASH = $$system(git log -n 1 --format=%H)
@@ -84,4 +80,11 @@ macx {
   #TARGET           = $$VACUUM_UTILS_NAME
   #include(../translations/languages.inc)
   #TARGET           = $$VACUUM_LOADER_NAME
+
+  ICON              = ../../vacuum.icns
+  QMAKE_INFO_PLIST  = ../packages/macosx/Info.plist
+
+  en_lproj.path     = $$INSTALL_RESOURCES/en.lproj/
+  en_lproj.files    = ../packages/macosx/InfoPlist.strings
+  INSTALLS         += en_lproj
 }

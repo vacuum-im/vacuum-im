@@ -69,7 +69,7 @@ void StateWidget::onPermitStatusChanged(const Jid &AContactJid, int AStatus)
 {
 	if (FWindow->contactJid().pBare() == AContactJid.pBare())
 	{
-		foreach(Action *action, FMenu->groupActions(AG_DEFAULT))
+		foreach(Action *action, FMenu->actions(AG_DEFAULT))
 			action->setChecked(action->data(ADR_PERMIT_STATUS).toInt()==AStatus);
 	}
 }

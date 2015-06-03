@@ -1323,17 +1323,17 @@ void RecentContacts::onRostersViewIndexContextMenuAboutToShow()
 
 		QStringList proxyCaptions;
 		QList<Action *> proxyActions;
-		foreach(Action *action, proxyMenu->groupActions())
+		foreach(Action *action, proxyMenu->actions())
 		{
 			proxyActions.append(action);
 			proxyCaptions.append(action->text());
 			int proxyGroup = proxyMenu->actionGroup(action);
 
 			proxyMenu->removeAction(action);
-			menu->addAction(action,proxyGroup,true);
+			menu->addAction(action,proxyGroup);
 		}
 
-		foreach(Action *action, menu->groupActions())
+		foreach(Action *action, menu->actions())
 		{
 			if (proxyCaptions.contains(action->text()) && !proxyActions.contains(action))
 				menu->removeAction(action);

@@ -19,35 +19,45 @@ class UTILS_EXPORT Menu :
 public:
 	Menu(QWidget *AParent = NULL);
 	~Menu();
-	bool isEmpty() const;
+	// QMenu
+	void clear();
 	Action *menuAction() const;
+	QList<Action *> actions() const;
+	void setIcon(const QIcon &AIcon);
+	void setTitle(const QString &ATitle);
+	// Menu
+	QMenu *carbonMenu() const;
+	QList<Action *> actions(int AGroup) const;
 	int actionGroup(const Action *AAction) const;
 	QAction *nextGroupSeparator(int AGroup) const;
-	QList<Action *> groupActions(int AGroup = AG_NULL) const;
-	QList<Action *> findActions(const QMultiHash<int, QVariant> &AData, bool ASearchInSubMenu = false) const;
+	QList<Action *> findActions(const QMultiHash<int, QVariant> &AData, bool ADeep = false) const;
+	void addAction(Action *ABefore, Action *AAction, int AGroup = AG_DEFAULT);
 	void addAction(Action *AAction, int AGroup = AG_DEFAULT, bool ASort = false);
-	void addMenuActions(const Menu *AMenu, int AGroup = AG_DEFAULT, bool ASort = false);
+	void addMenuActions(const Menu *AMenu, int AGroup = AG_NULL, bool ASort = false);
 	void removeAction(Action *AAction);
-	void clear();
-	void setIcon(const QIcon &AIcon);
 	void setIcon(const QString &AStorageName, const QString &AIconKey, int AIconIndex = 0);
-	void setTitle(const QString &ATitle);
 signals:
-	void actionInserted(QAction *ABefore, Action *AAction, int AGroup, bool ASort);
+	void actionInserted(QAction *ABefore, Action *AAction, int AGroup);
 	void actionRemoved(Action *AAction);
 	void separatorInserted(Action *ABefore, QAction *ASeparator);
 	void separatorRemoved(QAction *ASeparator);
 	void menuDestroyed(Menu *AMenu);
 public:
-	static bool copyStandardMenu(Menu *ADestination, QMenu *ASource, int AGroup = AG_DEFAULT);
+	static void copyMenuProperties(Menu *ADestination, QMenu *ASource, int AFirstGroup = AG_DEFAULT);
+	static Action *findDuplicateAction(Menu *ADuplicate, QAction *ASource);
+	static Menu *duplicateMenu(QMenu *ASource, QWidget *AParent = NULL);
+protected:
+	bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:
+	void onCarbonMenuActionChanged();
 	void onActionDestroyed(Action *AAction);
 private:
+	QMenu *FCarbon;
 	Action *FMenuAction;
 	IconStorage *FIconStorage;
 private:
 	QMap<int, QAction *> FSeparators;
-	QMultiMap<int, Action *> FActions;
+	QMap<int, QList<Action *> > FActions;
 };
 
 #endif // MENU_H

@@ -1,7 +1,10 @@
 #include "menu.h"
 
+#include <QActionEvent>
+
 Menu::Menu(QWidget *AParent) : QMenu(AParent)
 {
+	FCarbon = NULL;
 	FIconStorage = NULL;
 
 	FMenuAction = new Action(this);
@@ -17,9 +20,12 @@ Menu::~Menu()
 	emit menuDestroyed(this);
 }
 
-bool Menu::isEmpty() const
+void Menu::clear()
 {
-	return FActions.isEmpty();
+	foreach(QList<Action *> groupActions, FActions)
+		foreach(Action *action, groupActions)
+			removeAction(action);
+	QMenu::clear();
 }
 
 Action *Menu::menuAction() const
@@ -27,50 +33,77 @@ Action *Menu::menuAction() const
 	return FMenuAction;
 }
 
+QList<Action *> Menu::actions() const
+{
+	QList<Action *> allActions;
+	foreach(QList<Action *> groupActions, FActions)
+		allActions += groupActions;
+	return allActions;
+}
+
+void Menu::setIcon(const QIcon &AIcon)
+{
+	setIcon(QString::null,QString::null,0);
+	FMenuAction->setIcon(AIcon);
+	QMenu::setIcon(AIcon);
+}
+
+void Menu::setTitle(const QString &ATitle)
+{
+	FMenuAction->setText(ATitle);
+	QMenu::setTitle(ATitle);
+}
+
+QMenu *Menu::carbonMenu() const
+{
+	return FCarbon;
+}
+
+QList<Action *> Menu::actions(int AGroup) const
+{
+	return AGroup!=AG_NULL ? FActions.value(AGroup) : actions();
+}
+
 int Menu::actionGroup(const Action *AAction) const
 {
-	QMultiMap<int,Action *>::const_iterator it = qFind(FActions.begin(),FActions.end(),AAction);
-	if (it != FActions.constEnd())
-		return it.key();
+	for (QMap<int, QList<Action *> >::const_iterator groupIt=FActions.constBegin(); groupIt!=FActions.constEnd(); ++groupIt)
+		if (qFind(groupIt->constBegin(),groupIt->constEnd(),AAction) != groupIt->constEnd())
+			return groupIt.key();
 	return AG_NULL;
 }
 
 QAction *Menu::nextGroupSeparator(int AGroup) const
 {
-	QMultiMap<int,Action *>::const_iterator it = FActions.lowerBound(AGroup);
-	if (it != FActions.end())
-		return FSeparators.value(it.key());
-	return NULL;
+	QMap<int, QAction *>::const_iterator it = FSeparators.upperBound(AGroup);
+	return it!=FSeparators.end() ? it.value() : NULL;
 }
 
-QList<Action *> Menu::groupActions(int AGroup) const
-{
-	if (AGroup == AG_NULL)
-		return FActions.values();
-	return FActions.values(AGroup);
-}
-
-QList<Action *> Menu::findActions(const QMultiHash<int, QVariant> &AData, bool ASearchInSubMenu) const
+QList<Action *> Menu::findActions(const QMultiHash<int, QVariant> &AData, bool ADeep) const
 {
 	QList<Action *> actionList;
-	QList<int> keys = AData.keys();
-	foreach(Action *action,FActions)
+	for (QMap<int, QList<Action *> >::const_iterator groupIt=FActions.constBegin(); groupIt!=FActions.constEnd(); ++groupIt)
 	{
-		foreach (int key, keys)
+		for(QList<Action *>::const_iterator actionIt=groupIt->constBegin(); actionIt!=groupIt->constEnd(); ++actionIt)
 		{
-			if (AData.values(key).contains(action->data(key)))
+			Action *action = *actionIt;
+			
+			for (QMultiHash<int, QVariant>::const_iterator dataIt=AData.constBegin(); dataIt!=AData.constEnd(); ++dataIt)
 			{
-				actionList.append(action);
-				break;
+				if (action->data(dataIt.key()) == dataIt.value())
+				{
+					actionList.append(action);
+					break;
+				}
 			}
+
+			if (ADeep && action->menu()!=NULL)
+				actionList += action->menu()->findActions(AData,ADeep);
 		}
-		if (ASearchInSubMenu && action->menu())
-			actionList += action->menu()->findActions(AData,ASearchInSubMenu);
 	}
 	return actionList;
 }
 
-void Menu::addAction(Action *AAction, int AGroup, bool ASort)
+void Menu::addAction(Action *ABefore, Action *AAction, int AGroup)
 {
 #ifdef Q_OS_MAC
 	QWidget *associatedWidget = AAction->associatedWidgets().value(0);
@@ -81,119 +114,99 @@ void Menu::addAction(Action *AAction, int AGroup, bool ASort)
 	}
 #endif
 
-	QAction *before = NULL;
-	QAction *separator = NULL;
+	removeAction(AAction);
+	QList<Action *> &groupActions = FActions[AGroup];
 
-	QMultiMap<int,Action *>::iterator it = qFind(FActions.begin(),FActions.end(),AAction);
-	if (it != FActions.end())
-	{
-		if (FActions.values(it.key()).count() == 1)
-		{
-			QAction *sep = FSeparators.take(it.key());
-			QMenu::removeAction(sep);
-			emit separatorRemoved(sep);
-		}
-		FActions.erase(it);
-		QMenu::removeAction(AAction);
-	}
+	int insertIndex = ABefore!=NULL ? groupActions.indexOf(ABefore) : -1;
+	QAction *insertBefore = insertIndex>=0 ? ABefore : nextGroupSeparator(AGroup);
 
-	it = FActions.find(AGroup);
-	if (it == FActions.end())
+	if (insertIndex >= 0)
+		groupActions.insert(insertIndex,AAction);
+	else
+		groupActions.append(AAction);
+
+	if (insertBefore != NULL)
+		QMenu::insertAction(insertBefore,AAction);
+	else
+		QMenu::addAction(AAction);
+
+	connect(AAction,SIGNAL(actionDestroyed(Action *)),SLOT(onActionDestroyed(Action *)));
+	emit actionInserted(insertBefore,AAction,AGroup);
+
+	if (!FSeparators.contains(AGroup))
 	{
-		before = nextGroupSeparator(AGroup);
-		if (before != NULL)
-			QMenu::insertAction(before,AAction);
-		else
-			QMenu::addAction(AAction);
-		separator = insertSeparator(AAction);
+		QAction *separator = insertSeparator(AAction);
 		FSeparators.insert(AGroup,separator);
+		emit separatorInserted(AAction,separator);
+	}
+}
+
+void Menu::addAction(Action *AAction, int AGroup, bool ASort)
+{
+	if (ASort && FActions.contains(AGroup))
+	{
+		bool isSortByRole = AAction->data(Action::DR_SortString).isValid();
+		QString actionSortData = isSortByRole ? AAction->data(Action::DR_SortString).toString() : AAction->text();
+
+		Action *before = NULL;
+		foreach(Action *action, actions(AGroup))
+		{
+			QString beforeSortData = isSortByRole ? action->data(Action::DR_SortString).toString() : action->text();
+			if (QString::localeAwareCompare(actionSortData,beforeSortData) < 0)
+			{
+				before = action;
+				break;
+			}
+		}
+		addAction(before,AAction,AGroup);
 	}
 	else
 	{
-		if (ASort)
-		{
-			QList<QAction *> actionList = QMenu::actions();
-
-			bool sortRole = true;
-			QString sortString = AAction->data(Action::DR_SortString).toString();
-			if (sortString.isEmpty())
-			{
-				sortString = AAction->text();
-				sortRole = false;
-			}
-
-			for (int i = 0; !before && i<actionList.count(); ++i)
-			{
-				Action *action = qobject_cast<Action *>(actionList.at(i));
-				if (FActions.key(action) == AGroup)
-				{
-					QString curSortString = action->text();
-					if (sortRole)
-						curSortString = action->data(Action::DR_SortString).toString();
-					if (QString::localeAwareCompare(curSortString,sortString) > 0)
-						before = actionList.at(i);
-				}
-			}
-		}
-
-		if (!before)
-		{
-			QMap<int,QAction *>::const_iterator sepIt = FSeparators.upperBound(AGroup);
-			if (sepIt != FSeparators.constEnd())
-				before = sepIt.value();
-		}
-
-		if (before != NULL)
-			QMenu::insertAction(before,AAction);
-		else
-			QMenu::addAction(AAction);
+		addAction(NULL,AAction,AGroup);
 	}
-
-	FActions.insertMulti(AGroup,AAction);
-	connect(AAction,SIGNAL(actionDestroyed(Action *)),SLOT(onActionDestroyed(Action *)));
-
-	emit actionInserted(before,AAction,AGroup,ASort);
-	if (separator) emit separatorInserted(AAction,separator);
 }
 
 void Menu::addMenuActions(const Menu *AMenu, int AGroup, bool ASort)
 {
-	foreach(Action *action,AMenu->groupActions(AGroup))
-		addAction(action,AMenu->actionGroup(action),ASort);
+	foreach(Action *action, AMenu->actions(AGroup))
+	{
+		if (AGroup != AG_NULL)
+			addAction(action,AGroup,ASort);
+		else
+			addAction(action,AMenu->actionGroup(action),ASort);
+	}
 }
 
 void Menu::removeAction(Action *AAction)
 {
-	QMultiMap<int,Action *>::iterator it = qFind(FActions.begin(),FActions.end(),AAction);
-	if (it != FActions.end())
+	for (QMap<int, QList<Action *> >::iterator groupIt=FActions.begin(); groupIt!=FActions.end(); ++groupIt)
 	{
-		disconnect(AAction,SIGNAL(actionDestroyed(Action *)),this,SLOT(onActionDestroyed(Action *)));
-
-		if (FActions.values(it.key()).count() == 1)
+		QList<Action *>::iterator actionIt = qFind(groupIt->begin(), groupIt->end(), AAction);
+		if (actionIt != groupIt->end())
 		{
-			QAction *separator = FSeparators.take(it.key());
-			QMenu::removeAction(separator);
-			emit separatorRemoved(separator);
+			disconnect(AAction,SIGNAL(actionDestroyed(Action *)),this,SLOT(onActionDestroyed(Action *)));
+
+			if (groupIt->count() == 1)
+			{
+				QAction *separator = FSeparators.take(groupIt.key());
+				if (separator)
+				{
+					QMenu::removeAction(separator);
+					emit separatorRemoved(separator);
+				}
+				FActions.erase(groupIt);
+			}
+			else
+			{
+				groupIt->erase(actionIt);
+			}
+			
+			QMenu::removeAction(AAction);
+			emit actionRemoved(AAction);
+
+			break;
 		}
-
-		FActions.erase(it);
-		QMenu::removeAction(AAction);
-		emit actionRemoved(AAction);
 	}
-}
-
-void Menu::clear()
-{
-	foreach(Action *action, FActions.values())
-		removeAction(action);
-	QMenu::clear();
-}
-
-void Menu::setIcon(const QIcon &AIcon)
-{
-	setIcon(QString::null,QString::null,0);
-	FMenuAction->setIcon(AIcon);
-	QMenu::setIcon(AIcon);
 }
 
 void Menu::setIcon(const QString &AStorageName, const QString &AIconKey, int AIconIndex)
@@ -210,36 +223,134 @@ void Menu::setIcon(const QString &AStorageName, const QString &AIconKey, int AIc
 	}
 }
 
-void Menu::setTitle(const QString &ATitle)
+void Menu::copyMenuProperties(Menu *ADestination, QMenu *ASource, int AFirstGroup)
 {
-	FMenuAction->setText(ATitle);
-	QMenu::setTitle(ATitle);
-}
-
-bool Menu::copyStandardMenu(Menu *ADestination, QMenu *ASource, int AGroup)
-{
-	if (ADestination && ASource)
+	if (ADestination != ASource)
 	{
-		ADestination->setIcon(ASource->icon());
-		ADestination->setTitle(ASource->title());
-		ADestination->setSeparatorsCollapsible(ASource->separatorsCollapsible());
-		ADestination->setTearOffEnabled(ASource->isTearOffEnabled());
-		foreach(QAction *srcAction, ASource->actions())
+		Menu *source = qobject_cast<Menu *>(ASource);
+		if (source == NULL)
 		{
-			if (!srcAction->isSeparator())
+			foreach(QAction *srcAction, ASource->actions())
 			{
-				Action *destAction = new Action(ADestination);
-				Action::copyStandardAction(destAction,srcAction);
-				ADestination->addAction(destAction,AGroup);
-			}
-			else
-			{
-				AGroup += 10;
+				if (!srcAction->isSeparator())
+				{
+					Action *destAction;
+					if (srcAction->menu() != NULL)
+						destAction = Menu::duplicateMenu(srcAction->menu(),ADestination)->menuAction();
+					else
+						destAction = Action::duplicateAction(srcAction,ADestination);
+					ADestination->addAction(destAction,AFirstGroup);
+				}
+				else
+				{
+					AFirstGroup += 10;
+				}
 			}
 		}
-		return true;
+		else foreach(Action *srcAction, source->actions())
+		{
+			Action *destAction;
+			if (srcAction->menu() != NULL)
+				destAction = Menu::duplicateMenu(srcAction->menu(),ADestination)->menuAction();
+			else
+				destAction = Action::duplicateAction(srcAction,ADestination);
+			ADestination->addAction(destAction,source->actionGroup(srcAction));
+		}
+
+		ADestination->setDefaultAction(ASource->defaultAction());
+		ADestination->setSeparatorsCollapsible(ASource->separatorsCollapsible());
+		ADestination->setTearOffEnabled(ASource->isTearOffEnabled());
+
+		Action::copyActionProperties(ADestination->menuAction(),ASource->menuAction());
 	}
-	return false;
+}
+
+Action *Menu::findDuplicateAction(Menu *ADuplicate, QAction *ASource)
+{
+	if (ASource != NULL)
+	{
+		foreach(Action *destAction, ADuplicate->actions())
+		{
+			if (destAction->carbonAction() == ASource)
+				return destAction;
+			else if (destAction->menu()!=NULL && ASource->menu()!=NULL && destAction->menu()->carbonMenu()==ASource->menu())
+				return destAction;
+		}
+	}
+	return NULL;
+}
+
+Menu *Menu::duplicateMenu(QMenu *ASource, QWidget *AParent)
+{
+	if (ASource != NULL)
+	{
+		Menu *duplMenu = new Menu(AParent);
+		Menu::copyMenuProperties(duplMenu,ASource,AG_DEFAULT);
+		connect(ASource->menuAction(),SIGNAL(changed()),duplMenu,SLOT(onCarbonMenuActionChanged()));
+
+		duplMenu->FCarbon = ASource;
+		ASource->installEventFilter(duplMenu);
+		connect(ASource,SIGNAL(destroyed()),duplMenu,SLOT(deleteLater()));
+
+		return duplMenu;
+	}
+	return NULL;
+}
+
+bool Menu::eventFilter(QObject *AObject, QEvent *AEvent)
+{
+	if (AObject == FCarbon)
+	{
+		if (AEvent->type() == QEvent::ActionAdded)
+		{
+			QActionEvent *actionEvent = static_cast<QActionEvent *>(AEvent);
+			QAction *srcAction = actionEvent->action();
+			if (!srcAction->isSeparator())
+			{
+				Action *duplAction;
+				if (srcAction->menu() != NULL)
+					duplAction = Menu::duplicateMenu(srcAction->menu(),this)->menuAction();
+				else
+					duplAction = Action::duplicateAction(srcAction,this);
+
+				Menu *source = qobject_cast<Menu *>(FCarbon);
+				if (source != NULL)
+				{
+					int group = source->actionGroup(qobject_cast<Action *>(actionEvent->action()));
+					Action *srcBefore = qobject_cast<Action *>(actionEvent->before());
+					Action *duplBefore = Menu::findDuplicateAction(this,srcBefore);
+					addAction(duplBefore, duplAction, group!=AG_NULL ? group : AG_DEFAULT);
+				}
+				else
+				{
+					addAction(duplAction);
+				}
+			}
+		}
+		else if (AEvent->type() == QEvent::ActionRemoved)
+		{
+			QActionEvent *actionEvent = static_cast<QActionEvent *>(AEvent);
+			QAction *srcAction = actionEvent->action();
+			if (!srcAction->isSeparator())
+			{
+				Action *duplAction = findDuplicateAction(this,srcAction);
+				if (duplAction)
+				{
+					removeAction(duplAction);
+					if (duplAction->menu() != NULL)
+						duplAction->menu()->deleteLater();
+					else
+						duplAction->deleteLater();
+				}
+			}
+		}
+	}
+	return QMenu::eventFilter(AObject,AEvent);
+}
+
+void Menu::onCarbonMenuActionChanged()
+{
+	Action::copyActionProperties(FMenuAction,FCarbon->menuAction());
 }
 
 void Menu::onActionDestroyed(Action *AAction)
