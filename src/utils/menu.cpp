@@ -106,11 +106,14 @@ QList<Action *> Menu::findActions(const QMultiHash<int, QVariant> &AData, bool A
 void Menu::addAction(Action *ABefore, Action *AAction, int AGroup)
 {
 #ifdef Q_OS_MAC
-	QWidget *associatedWidget = AAction->associatedWidgets().value(0);
-	if (associatedWidget!=NULL && associatedWidget!=this)
+	// https://bugreports.qt.io/browse/QTBUG-34160
+	QList<QWidget *> actionWidgets = AAction->associatedWidgets();
+	if (!actionWidgets.isEmpty() && !actionWidgets.contains(this))
 	{
-		qWarning("Menu addAction: Failed to add action (%s): Action associatedWidgets is not empty", AAction->text().toLocal8Bit().constData());
-		return;
+		if (AAction->menu() != NULL)
+			AAction = Menu::duplicateMenu(AAction->menu(),this)->menuAction();
+		else
+			AAction = Action::duplicateAction(AAction,this);
 	}
 #endif
 
