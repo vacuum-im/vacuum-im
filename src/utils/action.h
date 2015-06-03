@@ -28,25 +28,29 @@ public:
 public:
 	Action(QObject *AParent = NULL);
 	~Action();
-	//QAction
+	// QAction
 	Menu *menu() const;
 	void setMenu(Menu *AMenu);
 	void setIcon(const QIcon &AIcon);
-	void setIcon(const QString &AStorageName, const QString &AIconKey, int AIconIndex = 0);
-	//Action
+	// Action
+	QAction *carbonAction() const;
 	QVariant data(int ARole) const;
 	void setData(int ARole, const QVariant &AData);
 	void setData(const QHash<int, QVariant> &AData);
 	QString shortcutId() const;
 	void setShortcutId(const QString &AId);
+	void setIcon(const QString &AStorageName, const QString &AIconKey, int AIconIndex = 0);
 signals:
 	void actionDestroyed(Action *AAction);
 public:
-	static bool copyStandardAction(Action *ADestination, QAction *ASource);
+	static void copyActionProperties(Action *ADestination, QAction *ASource);
+	static Action *duplicateAction(QAction *ASource, QObject *AParent = NULL);
 protected slots:
+	void onCarbonActionChanged();
 	void onMenuDestroyed(Menu *AMenu);
 private:
 	Menu *FMenu;
+	QAction *FCarbon;
 	IconStorage *FIconStorage;
 private:
 	QString FShortcutId;

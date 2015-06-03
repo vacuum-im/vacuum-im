@@ -1147,9 +1147,9 @@ void StatusChanger::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &A
 				Menu *menu = new Menu(AMenu);
 				menu->setTitle(tr("Status"));
 				menu->setIcon(FMainMenu->icon());
-				foreach(Action *action, FMainMenu->groupActions(AG_SCSM_STATUSCHANGER_CUSTOM_STATUS))
+				foreach(Action *action, FMainMenu->actions(AG_SCSM_STATUSCHANGER_CUSTOM_STATUS))
 					menu->addAction(action,AG_SCSM_STATUSCHANGER_CUSTOM_STATUS,true);
-				foreach(Action *action, FMainMenu->groupActions(AG_SCSM_STATUSCHANGER_DEFAULT_STATUS))
+				foreach(Action *action, FMainMenu->actions(AG_SCSM_STATUSCHANGER_DEFAULT_STATUS))
 					menu->addAction(action,AG_SCSM_STATUSCHANGER_DEFAULT_STATUS,true);
 				AMenu->addAction(menu->menuAction(),AG_RVCM_STATUSCHANGER,true);
 			}

@@ -584,7 +584,7 @@ Action *NormalMessageHandler::findWindowMenuAction(IMessageNormalWindow *AWindow
 		Action *menuAction = AWindow->toolBarWidget()->toolBarChanger()->handleAction(menuHandle);
 		if (menuAction && menuAction->menu())
 		{
-			foreach(Action *action, menuAction->menu()->groupActions())
+			foreach(Action *action, menuAction->menu()->actions())
 				if (action->data(ADR_ACTION_ID).toInt() == AActionId)
 					return action;
 		}

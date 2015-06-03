@@ -459,7 +459,7 @@ void StatusIcons::clearStorages()
 	FCustomIconActions.clear();
 	
 	qDeleteAll(FStorages);
-	qDeleteAll(FCustomIconMenu->groupActions(AG_DEFAULT));
+	qDeleteAll(FCustomIconMenu->actions(AG_DEFAULT));
 }
 
 void StatusIcons::startStatusIconsUpdate()
