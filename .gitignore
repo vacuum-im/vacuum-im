@@ -195,3 +195,4 @@ $RECYCLE.BIN/
 # Mac crap
 .DS_Store
 !/src/packages/macosx/DS_Store
+*.xcodeproj
