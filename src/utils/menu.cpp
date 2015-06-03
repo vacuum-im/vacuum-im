@@ -225,11 +225,7 @@ void Menu::copyMenuProperties(Menu *ADestination, QMenu *ASource, int AFirstGrou
 			{
 				if (!srcAction->isSeparator())
 				{
-					Action *destAction;
-					if (srcAction->menu() != NULL)
-						destAction = Menu::duplicateMenu(srcAction->menu(),ADestination)->menuAction();
-					else
-						destAction = Action::duplicateAction(srcAction,ADestination);
+					Action *destAction = Action::duplicateActionAndMenu(srcAction,ADestination);
 					ADestination->addAction(destAction,AFirstGroup);
 				}
 				else
@@ -240,11 +236,7 @@ void Menu::copyMenuProperties(Menu *ADestination, QMenu *ASource, int AFirstGrou
 		}
 		else foreach(Action *srcAction, source->actions())
 		{
-			Action *destAction;
-			if (srcAction->menu() != NULL)
-				destAction = Menu::duplicateMenu(srcAction->menu(),ADestination)->menuAction();
-			else
-				destAction = Action::duplicateAction(srcAction,ADestination);
+			Action *destAction = Action::duplicateActionAndMenu(srcAction,ADestination);
 			ADestination->addAction(destAction,source->actionGroup(srcAction));
 		}
 
@@ -298,11 +290,7 @@ bool Menu::eventFilter(QObject *AObject, QEvent *AEvent)
 			QAction *srcAction = actionEvent->action();
 			if (!srcAction->isSeparator())
 			{
-				Action *duplAction;
-				if (srcAction->menu() != NULL)
-					duplAction = Menu::duplicateMenu(srcAction->menu(),this)->menuAction();
-				else
-					duplAction = Action::duplicateAction(srcAction,this);
+				Action *duplAction = Action::duplicateActionAndMenu(srcAction,this);
 
 				Menu *source = qobject_cast<Menu *>(FCarbon);
 				if (source != NULL)

@@ -45,6 +45,7 @@ signals:
 public:
 	static void copyActionProperties(Action *ADestination, QAction *ASource);
 	static Action *duplicateAction(QAction *ASource, QObject *AParent = NULL);
+	static Action *duplicateActionAndMenu(QAction *ASource, QWidget *AParent = NULL);
 protected slots:
 	void onCarbonActionChanged();
 	void onMenuDestroyed(Menu *AMenu);
