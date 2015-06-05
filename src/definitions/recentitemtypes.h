@@ -3,6 +3,7 @@
 
 #define REIT_CONTACT                      "contact"
 #define REIT_CONFERENCE                   "conference"
+#define REIT_CONFERENCE_PRIVATE           "conferencePrivate"
 #define REIT_METACONTACT                  "metacontact"
 
 #endif // DEF_RECENTITEMTYPES

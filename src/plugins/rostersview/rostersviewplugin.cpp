@@ -689,7 +689,7 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 		{
 			QString name = AIndex->data(RDR_NAME).toString();
 			if (!name.isEmpty())
-				AToolTips.insert(RTTO_ROSTERSVIEW_INFO_NAME,"<big><b>" + Qt::escape(name) + "</b></big>");
+				AToolTips.insert(RTTO_ROSTERSVIEW_INFO_NAME,QString("<big><b>%1</b></big>").arg(Qt::escape(name)));
 
 			if (streamJid.isValid() && AIndex->kind()!=RIK_STREAM_ROOT && FRostersModel && FRostersModel->streamsLayout()==IRostersModel::LayoutMerged)
 			{

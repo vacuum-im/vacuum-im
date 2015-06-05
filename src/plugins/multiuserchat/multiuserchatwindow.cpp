@@ -338,7 +338,7 @@ bool MultiUserChatWindow::messageEditSendProcesse(int AOrder, IMessageEditWidget
 	else if (AOrder == MESHO_MULTIUSERCHATWINDOW_PRIVATECHAT)
 	{
 		IMessageChatWindow *window = qobject_cast<IMessageChatWindow *>(AWidget->messageWindow()->instance());
-		if (FPrivateChatWindows.contains(window) && FMultiChat->isOpen() && FMultiChat->userByNick(window->contactJid().resource())!=NULL)
+		if (FPrivateChatWindows.contains(window) && FMultiChat->isOpen() && FMultiChat->findUser(window->contactJid().resource())!=NULL)
 		{
 			Message message;
 
@@ -386,7 +386,7 @@ bool MultiUserChatWindow::messageDisplay(const Message &AMessage, int ADirection
 				{
 					displayed = true;
 					if (!AMessage.isDelayed())
-						updateRecentItemActiveTime();
+						updateRecentItemActiveTime(NULL);
 					if (FHistoryRequests.values().contains(NULL))
 						FPendingMessages[NULL].append(AMessage);
 					showMultiChatUserMessage(AMessage,userJid.resource());
@@ -403,7 +403,7 @@ bool MultiUserChatWindow::messageDisplay(const Message &AMessage, int ADirection
 				{
 					displayed = true;
 					if (!AMessage.isDelayed())
-						updateRecentItemActiveTime();
+						updateRecentItemActiveTime(window);
 					if (FHistoryRequests.values().contains(window))
 						FPendingMessages[window].append(AMessage);
 					showPrivateChatMessage(window,AMessage);
@@ -477,10 +477,10 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 					}
 					notify.data.insert(NDR_ICON,storage->getIcon(MNI_MUC_MESSAGE));
 					notify.data.insert(NDR_STREAM_JID,streamJid().full());
-					notify.data.insert(NDR_CONTACT_JID,userJid.pBare());
+					notify.data.insert(NDR_CONTACT_JID,userJid.bare());
 					notify.data.insert(NDR_ROSTER_ORDER,RNO_GROUPCHATMESSAGE);
 					notify.data.insert(NDR_ROSTER_FLAGS,IRostersNotify::Blink|IRostersNotify::AllwaysVisible|IRostersNotify::HookClicks);
-					notify.data.insert(NDR_POPUP_TITLE,tr("[%1] in conference %2").arg(userJid.resource()).arg(userJid.uNode()));
+					notify.data.insert(NDR_POPUP_TITLE,tr("[%1] in [%2]").arg(userJid.resource()).arg(userJid.uNode()));
 					notify.data.insert(NDR_SOUND_FILE,SDF_MUC_MESSAGE);
 
 					if (!isActiveTabPage())
@@ -500,11 +500,11 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 					notify.data.insert(NDR_ICON,storage->getIcon(MNI_MUC_PRIVATE_MESSAGE));
 					notify.data.insert(NDR_TOOLTIP,tr("Private message from: [%1]").arg(userJid.resource()));
 					notify.data.insert(NDR_STREAM_JID,streamJid().full());
-					notify.data.insert(NDR_CONTACT_JID,userJid.pBare());
+					notify.data.insert(NDR_CONTACT_JID,userJid.full());
 					notify.data.insert(NDR_ROSTER_ORDER,RNO_GROUPCHATMESSAGE);
 					notify.data.insert(NDR_ROSTER_FLAGS,IRostersNotify::Blink|IRostersNotify::AllwaysVisible|IRostersNotify::HookClicks);
 					notify.data.insert(NDR_POPUP_CAPTION,tr("Private message"));
-					notify.data.insert(NDR_POPUP_TITLE,tr("[%1] in conference %2").arg(userJid.resource()).arg(userJid.uNode()));
+					notify.data.insert(NDR_POPUP_TITLE,QString("[%1]").arg(userJid.resource()));
 					notify.data.insert(NDR_SOUND_FILE,SDF_MUC_PRIVATE_MESSAGE);
 
 					if (!window->isActiveTabPage())
@@ -523,9 +523,20 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 			if (notify.kinds & INotification::RosterNotify)
 			{
 				QMap<QString,QVariant> searchData;
-				searchData.insert(QString::number(RDR_KIND),RIK_MUC_ITEM);
 				searchData.insert(QString::number(RDR_STREAM_JID),streamJid().pFull());
-				searchData.insert(QString::number(RDR_PREP_BARE_JID),userJid.pBare());
+
+				if (FRecentContacts!=NULL && AMessage.type()==Message::Chat && !userJid.resource().isEmpty())
+				{
+					searchData.insert(QString::number(RDR_KIND),RIK_RECENT_ITEM);
+					searchData.insert(QString::number(RDR_RECENT_TYPE),REIT_CONFERENCE_PRIVATE);
+					searchData.insert(QString::number(RDR_RECENT_REFERENCE),userJid.pFull());
+				}
+				else
+				{
+					searchData.insert(QString::number(RDR_KIND),RIK_MUC_ITEM);
+					searchData.insert(QString::number(RDR_PREP_BARE_JID),userJid.pBare());
+				}
+
 				notify.data.insert(NDR_ROSTER_SEARCH_DATA,searchData);
 			}
 			if ((notify.kinds & INotification::PopupWindow)>0 && !Options::node(OPV_NOTIFICATIONS_HIDEMESSAGE).value().toBool())
@@ -824,11 +835,11 @@ void MultiUserChatWindow::toolTipsForUser(IMultiUser *AUser, QMap<int,QString> &
 {
 	if (FUsers.contains(AUser))
 	{
-		AToolTips.insert(MUTTO_MUC_NICKNAME,QString("<big><b>%1</b></big>").arg(Qt::escape(AUser->nickName())));
+		AToolTips.insert(MUTTO_MULTIUSERCHAT_NICKNAME,QString("<big><b>%1</b></big>").arg(Qt::escape(AUser->nickName())));
 
 		Jid realJid = AUser->data(MUDR_REAL_JID).toString();
 		if (!realJid.isEmpty())
-			AToolTips.insert(MUTTO_MUC_REALJID,tr("<b>Jabber ID:</b> %1").arg(Qt::escape(realJid.uBare())));
+			AToolTips.insert(MUTTO_MULTIUSERCHAT_REALJID,tr("<b>Jabber ID:</b> %1").arg(Qt::escape(realJid.uBare())));
 
 		QString role = AUser->data(MUDR_ROLE).toString();
 		if (!role.isEmpty())
@@ -840,7 +851,7 @@ void MultiUserChatWindow::toolTipsForUser(IMultiUser *AUser, QMap<int,QString> &
 				roleName = tr("Participant");
 			else if (role == MUC_ROLE_MODERATOR)
 				roleName = tr("Moderator");
-			AToolTips.insert(MUTTO_MUC_ROLE,tr("<b>Role:</b> %1").arg(Qt::escape(roleName)));
+			AToolTips.insert(MUTTO_MULTIUSERCHAT_ROLE,tr("<b>Role:</b> %1").arg(Qt::escape(roleName)));
 		}
 
 		QString affiliation = AUser->data(MUDR_AFFILIATION).toString();
@@ -855,7 +866,7 @@ void MultiUserChatWindow::toolTipsForUser(IMultiUser *AUser, QMap<int,QString> &
 				affilName = tr("Administrator");
 			else if (affiliation == MUC_AFFIL_OWNER)
 				affilName = tr("Owner");
-			AToolTips.insert(MUTTO_MUC_AFFILIATION,tr("<b>Affiliation:</b> %1").arg(Qt::escape(affilName)));
+			AToolTips.insert(MUTTO_MULTIUSERCHAT_AFFILIATION,tr("<b>Affiliation:</b> %1").arg(Qt::escape(affilName)));
 		}
 
 		QString ttStatus;
@@ -864,7 +875,7 @@ void MultiUserChatWindow::toolTipsForUser(IMultiUser *AUser, QMap<int,QString> &
 		ttStatus = tr("<b>Status:</b> %1").arg(Qt::escape(statusName));
 		if (!statusText.isEmpty())
 			ttStatus +="<br>"+Qt::escape(statusText).replace('\n',"<br>");
-		AToolTips.insert(MUTTO_MUC_STATUS,ttStatus);
+		AToolTips.insert(MUTTO_MULTIUSERCHAT_STATUS,ttStatus);
 
 		emit multiUserToolTips(AUser,AToolTips);
 	}
@@ -950,8 +961,9 @@ void MultiUserChatWindow::createMessageWidgets()
 		FWindowStatus[FViewWidget].createTime = QDateTime::currentDateTime();
 
 		FUsersView = new QListView(FCentralSplitter);
-		FUsersView->viewport()->installEventFilter(this);
 		FUsersView->setModel(FUsersProxy);
+		FUsersView->viewport()->installEventFilter(this);
+		FUsersView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 		connect(FUsersView,SIGNAL(doubleClicked(const QModelIndex &)),SLOT(onMultiChatUserItemDoubleClicked(const QModelIndex &)));
 		FUsersSplitter->insertWidget(MUCWW_USERSWIDGET,FUsersView,100);
 
@@ -1103,7 +1115,7 @@ void MultiUserChatWindow::refreshCompleteNicks()
 
 void MultiUserChatWindow::updateListItem(const Jid &AContactJid)
 {
-	IMultiUser *user = FMultiChat->userByNick(AContactJid.resource());
+	IMultiUser *user = FMultiChat->findUser(AContactJid.resource());
 	QStandardItem *userItem = FUsers.value(user);
 	if (userItem)
 	{
@@ -1112,18 +1124,6 @@ void MultiUserChatWindow::updateListItem(const Jid &AContactJid)
 			userItem->setIcon(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MUC_PRIVATE_MESSAGE));
 		else if (FStatusIcons)
 			userItem->setIcon(FStatusIcons->iconByJidStatus(AContactJid,user->data(MUDR_SHOW).toInt(),QString::null,false));
-	}
-}
-
-void MultiUserChatWindow::updateRecentItemActiveTime()
-{
-	if (FRecentContacts)
-	{
-		IRecentItem recentItem;
-		recentItem.type = REIT_CONFERENCE;
-		recentItem.streamJid = streamJid();
-		recentItem.reference = contactJid().pBare();
-		FRecentContacts->setItemActiveTime(recentItem);
 	}
 }
 
@@ -1204,7 +1204,7 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
 		QStringList parts = AText.split(" ");
 		parts.removeFirst();
 		QString nick = parts.takeFirst();
-		if (FMultiChat->userByNick(nick))
+		if (FMultiChat->findUser(nick))
 			FMultiChat->setRole(nick,MUC_ROLE_NONE,parts.join(" "));
 		else
 			showMultiChatStatusMessage(tr("User %1 is not present in the conference").arg(nick),IMessageStyleContentOptions::TypeNotification,IMessageStyleContentOptions::StatusError);
@@ -1215,7 +1215,7 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
 		QStringList parts = AText.split(" ");
 		parts.removeFirst();
 		QString nick = parts.takeFirst();
-		if (FMultiChat->userByNick(nick))
+		if (FMultiChat->findUser(nick))
 			FMultiChat->setAffiliation(nick,MUC_AFFIL_OUTCAST,parts.join(" "));
 		else
 			showMultiChatStatusMessage(tr("User %1 is not present in the conference").arg(nick),IMessageStyleContentOptions::TypeNotification,IMessageStyleContentOptions::StatusError);
@@ -1248,7 +1248,7 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
 		QStringList parts = AText.split(" ");
 		parts.removeFirst();
 		QString nick = parts.takeFirst();
-		if (FMultiChat->userByNick(nick))
+		if (FMultiChat->findUser(nick))
 		{
 			Message message;
 			message.setBody(parts.join(" "));
@@ -1299,6 +1299,26 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
 		hasCommand = true;
 	}
 	return hasCommand;
+}
+
+void MultiUserChatWindow::updateRecentItemActiveTime(IMessageChatWindow *AWindow)
+{
+	if (FRecentContacts)
+	{
+		IRecentItem recentItem;
+		recentItem.streamJid = streamJid();
+		if (AWindow == NULL)
+		{
+			recentItem.type = REIT_CONFERENCE;
+			recentItem.reference = contactJid().pBare();
+		}
+		else
+		{
+			recentItem.type = REIT_CONFERENCE_PRIVATE;
+			recentItem.reference = AWindow->contactJid().pFull();
+		}
+		FRecentContacts->setItemActiveTime(recentItem);
+	}
 }
 
 void MultiUserChatWindow::showDateSeparator(IMessageViewWidget *AView, const QDateTime &ADateTime)
@@ -1486,7 +1506,7 @@ void MultiUserChatWindow::showMultiChatUserMessage(const Message &AMessage, cons
 	options.senderName = Qt::escape(ANick);
 	options.senderId = options.senderName;
 
-	IMultiUser *user = FMultiChat->nickName()!=ANick ? FMultiChat->userByNick(ANick) : FMultiChat->mainUser();
+	IMultiUser *user = FMultiChat->nickName()!=ANick ? FMultiChat->findUser(ANick) : FMultiChat->mainUser();
 	if (user)
 		options.senderIcon = FMessageStyleManager->contactIcon(user->contactJid(),user->data(MUDR_SHOW).toInt(),SUBSCRIPTION_BOTH,false);
 	else
@@ -1545,7 +1565,7 @@ void MultiUserChatWindow::updateMultiChatWindow()
 		tabIcon = tabPageNotifier()->notifyById(tabPageNotifier()->activeNotify()).icon;
 
 	setWindowIcon(tabIcon);
-	setWindowIconText(tr("%1 (%2)").arg(contactJid().uNode()).arg(FUsers.count()));
+	setWindowIconText(QString("%1 (%2)").arg(FMultiChat->roomShortName()).arg(FUsers.count()));
 	setWindowTitle(tr("%1 - Conference").arg(FMultiChat->roomName()));
 
 	emit tabPageChanged();
@@ -1563,12 +1583,11 @@ void MultiUserChatWindow::removeMultiChatActiveMessages()
 
 IMessageChatWindow *MultiUserChatWindow::getPrivateChatWindow(const Jid &AContactJid)
 {
-	IMessageChatWindow *window = NULL;
-	IMultiUser *user = FMultiChat->userByNick(AContactJid.resource());
-	if (user!=NULL && user!=FMultiChat->mainUser())
+	IMessageChatWindow *window = findPrivateChatWindow(AContactJid);
+	if (window == NULL)
 	{
-		window = findPrivateChatWindow(AContactJid);
-		if (!window)
+		IMultiUser *user = FMultiChat->findUser(AContactJid.resource());
+		if (user!=NULL && user!=FMultiChat->mainUser())
 		{
 			window = FMessageWidgets!=NULL ? FMessageWidgets->getChatWindow(streamJid(),AContactJid) : NULL;
 			if (window)
@@ -1607,10 +1626,10 @@ IMessageChatWindow *MultiUserChatWindow::getPrivateChatWindow(const Jid &AContac
 				LOG_STRM_ERROR(streamJid(),QString("Failed to create private chat window, room=%1, user=%2: Instance is not created").arg(contactJid().bare(),AContactJid.resource()));
 			}
 		}
-	}
-	else if (user == NULL)
-	{
-		REPORT_ERROR("Failed to create private chat window: User not found");
+		else if (user == NULL)
+		{
+			REPORT_ERROR("Failed to create private chat window: User not found");
+		}
 	}
 	return window;
 }
@@ -1632,7 +1651,7 @@ void MultiUserChatWindow::setPrivateChatMessageStyle(IMessageChatWindow *AWindow
 
 void MultiUserChatWindow::fillPrivateChatContentOptions(IMessageChatWindow *AWindow, IMessageStyleContentOptions &AOptions) const
 {
-	IMultiUser *user = AOptions.direction==IMessageStyleContentOptions::DirectionIn ? FMultiChat->userByNick(AWindow->contactJid().resource()) : FMultiChat->mainUser();
+	IMultiUser *user = AOptions.direction==IMessageStyleContentOptions::DirectionIn ? FMultiChat->findUser(AWindow->contactJid().resource()) : FMultiChat->mainUser();
 	if (user)
 		AOptions.senderIcon = FMessageStyleManager->contactIcon(user->contactJid(),user->data(MUDR_SHOW).toInt(),SUBSCRIPTION_BOTH,false);
 
@@ -1717,10 +1736,10 @@ void MultiUserChatWindow::requestPrivateChatHistory(IMessageChatWindow *AWindow)
 
 void MultiUserChatWindow::updatePrivateChatWindow(IMessageChatWindow *AWindow)
 {
-	IMultiUser *user = FMultiChat->userByNick(AWindow->contactJid().resource());
+	IMultiUser *user = FMultiChat->findUser(AWindow->contactJid().resource());
 	if (user)
 	{
-		QString name = QString("[%1]").arg(user->nickName());
+		QString name = tr("[%1] in [%2]").arg(user->nickName(),FMultiChat->roomShortName());
 		AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::Name,name);
 
 		QIcon statusIcon = FStatusIcons!=NULL ? FStatusIcons->iconByJidStatus(user->contactJid(),user->data(MUDR_SHOW).toInt(),SUBSCRIPTION_BOTH,false) : QIcon();
@@ -2116,7 +2135,7 @@ void MultiUserChatWindow::onInviteDeclined(const Jid &AContactJid, const QString
 
 void MultiUserChatWindow::onUserKicked(const QString &ANick, const QString &AReason, const QString &AByUser)
 {
-	IMultiUser *user = FMultiChat->userByNick(ANick);
+	IMultiUser *user = FMultiChat->findUser(ANick);
 	Jid realJid = user!=NULL ? user->data(MUDR_REAL_JID).toString() : Jid::null;
 
 	showMultiChatStatusMessage(tr("%1 has been kicked from the room%2. %3")
@@ -2130,7 +2149,7 @@ void MultiUserChatWindow::onUserKicked(const QString &ANick, const QString &ARea
 
 void MultiUserChatWindow::onUserBanned(const QString &ANick, const QString &AReason, const QString &AByUser)
 {
-	IMultiUser *user = FMultiChat->userByNick(ANick);
+	IMultiUser *user = FMultiChat->findUser(ANick);
 	Jid realJid = user!=NULL ? user->data(MUDR_REAL_JID).toString() : Jid::null;
 	showMultiChatStatusMessage(tr("%1 has been banned from the room%2. %3")
 		.arg(!realJid.isEmpty() ? ANick + QString(" <%1>").arg(realJid.uFull()) : ANick)
@@ -2221,7 +2240,7 @@ void MultiUserChatWindow::onMultiChatEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bo
 				nickMenu->setAttribute(Qt::WA_DeleteOnClose,true);
 				foreach(const QString &nick, FCompleteNicks)
 				{
-					IMultiUser *user = FMultiChat->userByNick(nick);
+					IMultiUser *user = FMultiChat->findUser(nick);
 					if (user)
 					{
 						Action *action = new Action(nickMenu);
@@ -2304,7 +2323,7 @@ void MultiUserChatWindow::onPrivateChatWindowActivated()
 void MultiUserChatWindow::onPrivateChatWindowClosed()
 {
 	IMessageChatWindow *window = qobject_cast<IMessageChatWindow *>(sender());
-	if (window && FMultiChat->userByNick(window->contactJid().resource())!=NULL)
+	if (window && FMultiChat->findUser(window->contactJid().resource())!=NULL)
 	{
 		LOG_STRM_DEBUG(streamJid(),QString("Private chat window closed, room=%1, user=%2").arg(contactJid().bare(),window->contactJid().resource()));
 		int destroyTimeout = Options::node(OPV_MESSAGES_CLEANCHATTIMEOUT).value().toInt();
@@ -2356,7 +2375,7 @@ void MultiUserChatWindow::onPrivateChatClearWindowActionTriggered(bool)
 void MultiUserChatWindow::onPrivateChatContextMenuRequested(Menu *AMenu)
 {
 	IMessageInfoWidget *widget = qobject_cast<IMessageInfoWidget *>(sender());
-	IMultiUser *user = widget!=NULL ? FMultiChat->userByNick(widget->messageWindow()->contactJid().resource()) : NULL;
+	IMultiUser *user = widget!=NULL ? FMultiChat->findUser(widget->messageWindow()->contactJid().resource()) : NULL;
 	if (user)
 		contextMenuForUser(user,AMenu);
 }
@@ -2364,7 +2383,7 @@ void MultiUserChatWindow::onPrivateChatContextMenuRequested(Menu *AMenu)
 void MultiUserChatWindow::onPrivateChatToolTipsRequested(QMap<int,QString> &AToolTips)
 {
 	IMessageInfoWidget *widget = qobject_cast<IMessageInfoWidget *>(sender());
-	IMultiUser *user = widget!=NULL ? FMultiChat->userByNick(widget->messageWindow()->contactJid().resource()) : NULL;
+	IMultiUser *user = widget!=NULL ? FMultiChat->findUser(widget->messageWindow()->contactJid().resource()) : NULL;
 	if (user)
 		toolTipsForUser(user,AToolTips);
 }
@@ -2504,7 +2523,7 @@ void MultiUserChatWindow::onOpenPrivateChatWindowActionTriggered(bool)
 	Action *action =qobject_cast<Action *>(sender());
 	if (action)
 	{
-		IMultiUser *user = FMultiChat->userByNick(action->data(ADR_USER_NICK).toString());
+		IMultiUser *user = FMultiChat->findUser(action->data(ADR_USER_NICK).toString());
 		if (user)
 			openPrivateChatWindow(user->contactJid());
 	}

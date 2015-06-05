@@ -1369,7 +1369,7 @@ void ServiceDiscovery::onMultiUserPresence(IMultiUser *AUser, int AShow, const Q
 		Jid userStreamJid = AUser->data(MUDR_STREAM_JID).toString();
 		foreach(IMultiUserChat *mchat, FMultiChatManager->multiUserChats())
 		{
-			IMultiUser *muser = mchat->userByNick(AUser->nickName());
+			IMultiUser *muser = mchat->findUser(AUser->nickName());
 			if (muser!=NULL && muser!=AUser && mchat->roomJid()==AUser->roomJid() && mchat->streamJid()==userStreamJid)
 			{
 				isSingleUser = false;

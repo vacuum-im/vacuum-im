@@ -126,10 +126,10 @@ protected:
 	void loadWindowGeometry();
 	void refreshCompleteNicks();
 	void updateListItem(const Jid &AContactJid);
-	void updateRecentItemActiveTime();
 	void highlightUserRole(IMultiUser *AUser);
 	void highlightUserAffiliation(IMultiUser *AUser);
 	bool execShortcutCommand(const QString &AText);
+	void updateRecentItemActiveTime(IMessageChatWindow *AWindow);
 	void showDateSeparator(IMessageViewWidget *AView, const QDateTime &ADateTime);
 protected:
 	bool isMentionMessage(const Message &AMessage) const;
@@ -212,36 +212,9 @@ protected slots:
 	void onArchiveMessagesLoaded(const QString &AId, const IArchiveCollectionBody &ABody);
 	void onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext);
 private:
-	IMessageWidgets *FMessageWidgets;
-	IMessageProcessor *FMessageProcessor;
-	IMessageStyleManager *FMessageStyleManager;
-	IMessageArchiver *FMessageArchiver;
-	IDataForms *FDataForms;
-	IStatusIcons *FStatusIcons;
-	IStatusChanger *FStatusChanger;
-	IMultiUserChat *FMultiChat;
-	IMultiUserChatManager *FMultiChatManager;
-	IRecentContacts *FRecentContacts;
-	IStanzaProcessor *FStanzaProcessor;
-private:
-	IMessageAddress *FAddress;
-	IMessageInfoWidget *FInfoWidget;
-	IMessageViewWidget *FViewWidget;
-	IMessageEditWidget *FEditWidget;
-	IMessageMenuBarWidget *FMenuBarWidget;
-	IMessageToolBarWidget *FToolBarWidget;
-	IMessageStatusBarWidget *FStatusBarWidget;
-	IMessageTabPageNotifier *FTabPageNotifier;
-private:
-	SplitterWidget *FMainSplitter;
-	SplitterWidget *FCentralSplitter;
-	SplitterWidget *FViewSplitter;
-	SplitterWidget *FUsersSplitter;
-private:
 	Action *FClearChat;
 	Action *FEnterRoom;
 	Action *FExitRoom;
-private:
 	Action *FChangeNick;
 	Action *FInviteContact;
 	Action *FRequestVoice;
@@ -253,35 +226,62 @@ private:
 	Action *FConfigRoom;
 	Action *FDestroyRoom;
 private:
-	int FSHIAnyStanza;
-	QString FLastAffiliation;
-	QDateTime FLastStanzaTime;
+	IDataForms *FDataForms;
+	IStatusIcons *FStatusIcons;
+	IStatusChanger *FStatusChanger;
+	IMultiUserChat *FMultiChat;
+	IMessageWidgets *FMessageWidgets;
+	IRecentContacts *FRecentContacts;
+	IStanzaProcessor *FStanzaProcessor;
+	IMessageArchiver *FMessageArchiver;
+	IMessageProcessor *FMessageProcessor;
+	IMultiUserChatManager *FMultiChatManager;
+	IMessageStyleManager *FMessageStyleManager;
 private:
+	SplitterWidget *FMainSplitter;
+	SplitterWidget *FCentralSplitter;
+	SplitterWidget *FViewSplitter;
+	SplitterWidget *FUsersSplitter;
+private:
+	IMessageAddress *FAddress;
+	IMessageInfoWidget *FInfoWidget;
+	IMessageViewWidget *FViewWidget;
+	IMessageEditWidget *FEditWidget;
+	IMessageMenuBarWidget *FMenuBarWidget;
+	IMessageToolBarWidget *FToolBarWidget;
+	IMessageStatusBarWidget *FStatusBarWidget;
+	IMessageTabPageNotifier *FTabPageNotifier;
+private:
+	int FSHIAnyStanza;
 	bool FStateLoaded;
 	bool FShownDetached;
 	bool FDestroyOnChatClosed;
 	QString FTabPageToolTip;
-	QList<int> FActiveMessages;
-	QList<IMessageChatWindow *> FPrivateChatWindows;
-	QMap<IMessageChatWindow *, QTimer *> FDestroyTimers;
-	QMultiMap<IMessageChatWindow *,int> FActiveChatMessages;
-	QMap<int, IDataDialogWidget *> FDataFormMessages;
-	QHash<IMultiUser *, UserStatus> FUserStatus;
-	QMap<IMessageViewWidget *, WindowStatus> FWindowStatus;
-	QMap<QString, IMessageChatWindow *> FHistoryRequests;
-	QMap<IMessageChatWindow *, QList<Message> > FPendingMessages;
-	QMap<IMessageChatWindow *, QList<WindowContent> > FPendingContent;
-private:
-	QListView *FUsersView;
-	UsersProxyModel *FUsersProxy;
-	QStandardItemModel *FUsersModel;
-	QHash<IMultiUser *, QStandardItem *> FUsers;
+	QString FLastAffiliation;
+	QDateTime FLastStanzaTime;
 private:
 	int FStartCompletePos;
 	QString FCompleteNickStarts;
 	QString FCompleteNickLast;
 	QList<QString> FCompleteNicks;
 	QList<QString>::const_iterator FCompleteIt;
+private:
+	QListView *FUsersView;
+	UsersProxyModel *FUsersProxy;
+	QStandardItemModel *FUsersModel;
+	QHash<IMultiUser *, UserStatus> FUserStatus;
+	QHash<IMultiUser *, QStandardItem *> FUsers;
+private:
+	QList<IMessageChatWindow *> FPrivateChatWindows;
+	QMap<IMessageChatWindow *, QTimer *> FDestroyTimers;
+	QMultiMap<IMessageChatWindow *,int> FActiveChatMessages;
+private:
+	QList<int> FActiveMessages;
+	QMap<int, IDataDialogWidget *> FDataFormMessages;
+	QMap<QString, IMessageChatWindow *> FHistoryRequests;
+	QMap<IMessageViewWidget *, WindowStatus> FWindowStatus;
+	QMap<IMessageChatWindow *, QList<Message> > FPendingMessages;
+	QMap<IMessageChatWindow *, QList<WindowContent> > FPendingContent;
 };
 
 #endif // MULTIUSERCHATWINDOW_H

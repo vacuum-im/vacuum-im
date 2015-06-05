@@ -724,7 +724,7 @@ QList<Message> RemoteControl::notifiedMessages(const Jid &AStreamJid, const Jid 
 			{
 				if (message.type()!=Message::Error && !message.body().isEmpty())
 				{
-					if (FMultiChatManager==NULL || FMultiChatManager->findMultiUserChat(AStreamJid,Jid(message.from()).bare())==NULL)
+					if (FMultiChatManager==NULL || FMultiChatManager->findMultiUserChat(AStreamJid,message.from())==NULL)
 					{
 						if (AContactJid.isEmpty() || AContactJid==message.from())
 							messages.append(message);

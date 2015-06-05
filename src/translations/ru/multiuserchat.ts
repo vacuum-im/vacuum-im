@@ -574,6 +574,14 @@ Check values and try again</source>
         <source>Invite user</source>
         <translation>Пригласить пользователя</translation>
     </message>
+    <message>
+        <source>&lt;b&gt;Conference:&lt;/b&gt; %1</source>
+        <translation>&lt;b&gt;Конференция:&lt;/b&gt; %1</translation>
+    </message>
+    <message>
+        <source>&lt;big&gt;&lt;b&gt;[%1]&lt;/b&gt;&lt;/big&gt; in [%2]</source>
+        <translation>&lt;big&gt;&lt;b&gt;[%1]&lt;/b&gt;&lt;/big&gt; в [%2]</translation>
+    </message>
 </context>
 <context>
     <name>MultiUserChatWindow</name>
@@ -680,10 +688,6 @@ Check values and try again</source>
     <message>
         <source>%1 is not valid room JID</source>
         <translation>%1 не является правильным JID комнаты</translation>
-    </message>
-    <message>
-        <source>%1 (%2)</source>
-        <translation>%1 (%2)</translation>
     </message>
     <message>
         <source>%1 - Private chat</source>
@@ -804,10 +808,6 @@ Check values and try again</source>
     <message>
         <source>Owner</source>
         <translation>Владелец</translation>
-    </message>
-    <message>
-        <source>[%1] in conference %2</source>
-        <translation>[%1] в конференции %2</translation>
     </message>
     <message>
         <source>Supported list of commands: 
@@ -992,6 +992,10 @@ Check values and try again</source>
     <message>
         <source>Room now does not show unavailable members</source>
         <translation>Комната теперь не показывает отключенных участников</translation>
+    </message>
+    <message>
+        <source>[%1] in [%2]</source>
+        <translation>[%1] в [%2]</translation>
     </message>
 </context>
 </TS>

@@ -29,7 +29,6 @@ MultiUserChat::MultiUserChat(IMultiUserChatManager *AMultiChatManager, const Jid
 	FNickName = ANickName;
 	FPassword = APassword;
 	FShow = IPresence::Offline;
-	FRoomName = FRoomJid.uBare();
 
 	FMessageProcessor = PluginHelper::pluginInstance<IMessageProcessor>();
 	if (FMessageProcessor)
@@ -230,7 +229,12 @@ Jid MultiUserChat::roomJid() const
 
 QString MultiUserChat::roomName() const
 {
-	return FRoomName;
+	return !FRoomName.isEmpty() ? FRoomName : roomShortName();
+}
+
+QString MultiUserChat::roomShortName() const
+{
+	return FRoomJid.uNode();
 }
 
 bool MultiUserChat::isOpen() const
@@ -283,7 +287,7 @@ QList<IMultiUser *> MultiUserChat::allUsers() const
 	return result;
 }
 
-IMultiUser *MultiUserChat::userByNick(const QString &ANick) const
+IMultiUser *MultiUserChat::findUser(const QString &ANick) const
 {
 	return FUsers.value(ANick,NULL);
 }
@@ -604,7 +608,7 @@ bool MultiUserChat::setRole(const QString &ANick, const QString &ARole, const QS
 {
 	if (FStanzaProcessor && isOpen())
 	{
-		IMultiUser *user = userByNick(ANick);
+		IMultiUser *user = findUser(ANick);
 		if (user)
 		{
 			Stanza request("iq");
@@ -638,7 +642,7 @@ bool MultiUserChat::setAffiliation(const QString &ANick, const QString &AAffilia
 {
 	if (FStanzaProcessor && isOpen())
 	{
-		IMultiUser *user = userByNick(ANick);
+		IMultiUser *user = findUser(ANick);
 		if (user)
 		{
 			Stanza request("iq");

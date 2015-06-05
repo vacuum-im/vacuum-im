@@ -574,6 +574,14 @@ Check values and try again</translation>
    <source>Invite user</source>
    <translation>Invite user</translation>
   </message>
+  <message>
+   <source>&lt;b>Conference:&lt;/b> %1</source>
+   <translation>&lt;b>Conference:&lt;/b> %1</translation>
+  </message>
+  <message>
+   <source>&lt;big>&lt;b>[%1]&lt;/b>&lt;/big> in [%2]</source>
+   <translation>&lt;big>&lt;b>[%1]&lt;/b>&lt;/big> in [%2]</translation>
+  </message>
  </context>
  <context>
   <name>MultiUserChatWindow</name>
@@ -680,10 +688,6 @@ Check values and try again</translation>
   <message>
    <source>%1 is not valid room JID</source>
    <translation>%1 is not valid room JID</translation>
-  </message>
-  <message>
-   <source>%1 (%2)</source>
-   <translation>%1 (%2)</translation>
   </message>
   <message>
    <source>%1 - Private chat</source>
@@ -804,10 +808,6 @@ Check values and try again</translation>
   <message>
    <source>Owner</source>
    <translation>Owner</translation>
-  </message>
-  <message>
-   <source>[%1] in conference %2</source>
-   <translation>[%1] in conference %2</translation>
   </message>
   <message>
    <source>Supported list of commands: 
@@ -992,6 +992,10 @@ Check values and try again</translation>
   <message>
    <source>Room now does not show unavailable members</source>
    <translation>Room now does not show unavailable members</translation>
+  </message>
+  <message>
+   <source>[%1] in [%2]</source>
+   <translation>[%1] in [%2]</translation>
   </message>
  </context>
 </TS>

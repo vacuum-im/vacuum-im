@@ -81,7 +81,6 @@ public:
 	virtual IRecentItem recentItemForIndex(const IRosterIndex *AIndex) const;
 	virtual QList<IRosterIndex *> recentItemProxyIndexes(const IRecentItem &AItem) const;
 	//IMultiUserChatManager
-	virtual bool requestRoomNick(const Jid &AStreamJid, const Jid &ARoomJid);
 	virtual QList<IMultiUserChat *> multiUserChats() const;
 	virtual IMultiUserChat *findMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid) const;
 	virtual IMultiUserChat *getMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick,const QString &APassword);
@@ -92,6 +91,7 @@ public:
 	virtual IRosterIndex *findMultiChatRosterIndex(const Jid &AStreamJid, const Jid &ARoomJid) const;
 	virtual IRosterIndex *getMultiChatRosterIndex(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword);
 	virtual void showJoinMultiChatDialog(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword);
+	virtual bool requestRoomNick(const Jid &AStreamJid, const Jid &ARoomJid);
 signals:
 	void multiUserChatCreated(IMultiUserChat *AMultiChat);
 	void multiUserChatDestroyed(IMultiUserChat *AMultiChat);
@@ -109,44 +109,57 @@ protected:
 	void registerDiscoFeatures();
 	bool isReady(const Jid &AStreamJid) const;
 	QString streamVCardNick(const Jid &AStreamJid) const;
-	void updateRecentItemProxy(IRosterIndex *AIndex);
-	void updateRecentItemProperties(IRosterIndex *AIndex);
+	void updateRecentChatItem(IRosterIndex *AIndex);
+	void updateRecentChatItemProperties(IRosterIndex *AIndex);
 	void updateChatRosterIndex(IMultiUserChatWindow *AWindow);
+	void updateRecentUserItem(IMultiUserChat *AChat, const QString &ANick);
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 	Menu *createInviteMenu(const Jid &AContactJid, QWidget *AParent) const;
 	Action *createJoinAction(const Jid &AStreamJid, const Jid &ARoomJid, QObject *AParent) const;
 	IRosterIndex *getConferencesGroupIndex(const Jid &AStreamJid) const;
 	IMultiUserChatWindow *findMultiChatWindowForIndex(const IRosterIndex *AIndex) const;
 	IMultiUserChatWindow *getMultiChatWindowForIndex(const IRosterIndex *AIndex);
-	QString getRoomName(const Jid &AStreamJid, const Jid &ARoomJid) const;
+	IMultiUser *findMultiChatWindowUser(const Jid &AStreamJid, const Jid &AContactJid) const;
+	QString getMultiChatName(const Jid &AStreamJid, const Jid &ARoomJid) const;
 protected slots:
+	void onJoinRoomActionTriggered(bool);
+	void onOpenRoomActionTriggered(bool);
+	void onEnterRoomActionTriggered(bool);
+	void onExitRoomActionTriggered(bool);
+	void onCopyToClipboardActionTriggered(bool);
+protected slots:
+	void onStatusIconsChanged();
+	void onActiveStreamRemoved(const Jid &AStreamJid);
+	void onShortcutActivated(const QString &AId, QWidget *AWidget);
+	void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
+protected slots:
+	void onMultiChatDestroyed();
+	void onMultiChatWindowDestroyed();
+	void onMultiChatNameChanged(const QString &AName);
+	void onMultiChatPresenceChanged(int AShow, const QString &AStatus);
 	void onMultiChatContextMenu(Menu *AMenu);
 	void onMultiUserContextMenu(IMultiUser *AUser, Menu *AMenu);
 	void onMultiUserToolTips(IMultiUser *AUser, QMap<int,QString> &AToolTips);
-	void onMultiUserChatChanged();
-	void onMultiUserChatDestroyed();
-	void onMultiChatWindowDestroyed();
+	void onMultiUserPrivateChatWindowChanged(IMessageChatWindow *AWindow);
+	void onMultiUserPresenceChanged(IMultiUser *AUser, int AShow, const QString &AStatus);
+	void onMultiUserNickChanged(IMultiUser *AUser, const QString &AOldNick, const QString &ANewNick);
+	void onMultiUserDataChanged(IMultiUser *AUser, int ARole, const QVariant &ABefore, const QVariant &AAfter);
 protected slots:
 	void onMultiChatWindowInfoContextMenu(Menu *AMenu);
 	void onMultiChatWindowInfoToolTips(QMap<int,QString> &AToolTips);
 protected slots:
 	void onRostersModelStreamsLayoutChanged(int ABefore);
 	void onRostersModelIndexDestroyed(IRosterIndex *AIndex);
+	void onRostersModelIndexDataChanged(IRosterIndex *AIndex, int ARole);
 protected slots:
-	void onStatusIconsChanged();
-	void onJoinRoomActionTriggered(bool);
-	void onOpenRoomActionTriggered(bool);
-	void onEnterRoomActionTriggered(bool);
-	void onExitRoomActionTriggered(bool);
-	void onCopyToClipboardActionTriggered(bool);
-	void onActiveStreamRemoved(const Jid &AStreamJid);
-	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
 	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
-	void onRostersViewClipboardMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
-	void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
+	void onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips);
+	void onRostersViewIndexClipboardMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
+protected slots:
 	void onRegisterFieldsReceived(const QString &AId, const IRegisterFields &AFields);
 	void onRegisterErrorReceived(const QString &AId, const XmppError &AError);
+protected slots:
 	void onInviteDialogFinished(int AResult);
 	void onInviteActionTriggered(bool);
 private:
@@ -169,8 +182,8 @@ private:
 	QMap<int, Message> FActiveInvites;
 	QList<IRosterIndex *> FChatIndexes;
 	QList<IMultiUserChatWindow *> FChatWindows;
-	QMap<QMessageBox *,InviteFields> FInviteDialogs;
 	QMap<QString, QPair<Jid,Jid> > FNickRequests;
+	QMap<QMessageBox *,InviteFields> FInviteDialogs;
 };
 
 #endif // MULTIUSERCHATMANAGER_H

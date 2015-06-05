@@ -112,6 +112,7 @@ public:
 	virtual Jid streamJid() const =0;
 	virtual Jid roomJid() const =0;
 	virtual QString roomName() const =0;
+	virtual QString roomShortName() const =0;
 	virtual bool isOpen() const =0;
 	virtual bool isConnected() const =0;
 	virtual bool autoPresence() const =0;
@@ -120,7 +121,7 @@ public:
 	virtual bool isUserPresent(const Jid &AContactJid) const =0;
 	virtual IMultiUser *mainUser() const =0;
 	virtual QList<IMultiUser *> allUsers() const =0;
-	virtual IMultiUser *userByNick(const QString &ANick) const =0;
+	virtual IMultiUser *findUser(const QString &ANick) const =0;
 	//Occupant
 	virtual QString nickName() const =0;
 	virtual bool setNickName(const QString &ANick) =0;
@@ -212,7 +213,6 @@ class IMultiUserChatManager
 {
 public:
 	virtual QObject *instance() = 0;
-	virtual bool requestRoomNick(const Jid &AStreamJid, const Jid &ARoomJid) =0;
 	virtual QList<IMultiUserChat *> multiUserChats() const =0;
 	virtual IMultiUserChat *findMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid) const =0;
 	virtual IMultiUserChat *getMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword) =0;
@@ -223,6 +223,7 @@ public:
 	virtual IRosterIndex *findMultiChatRosterIndex(const Jid &AStreamJid, const Jid &ARoomJid) const =0;
 	virtual IRosterIndex *getMultiChatRosterIndex(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword) =0;
 	virtual void showJoinMultiChatDialog(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword) =0;
+	virtual bool requestRoomNick(const Jid &AStreamJid, const Jid &ARoomJid) =0;
 protected:
 	virtual void multiUserChatCreated(IMultiUserChat *AMultiChat) =0;
 	virtual void multiUserChatDestroyed(IMultiUserChat *AMultiChat) =0;

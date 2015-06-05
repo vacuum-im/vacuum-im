@@ -33,6 +33,7 @@ public:
 	virtual Jid streamJid() const;
 	virtual Jid roomJid() const;
 	virtual QString roomName() const;
+	virtual QString roomShortName() const;
 	virtual bool isOpen() const;
 	virtual bool isConnected() const;
 	virtual bool autoPresence() const;
@@ -41,7 +42,7 @@ public:
 	virtual bool isUserPresent(const Jid &AContactJid) const;
 	virtual IMultiUser *mainUser() const;
 	virtual QList<IMultiUser *> allUsers() const;
-	virtual IMultiUser *userByNick(const QString &ANick) const;
+	virtual IMultiUser *findUser(const QString &ANick) const;
 	//Occupant
 	virtual QString nickName() const;
 	virtual bool setNickName(const QString &ANick);
