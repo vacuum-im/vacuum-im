@@ -582,6 +582,10 @@ Check values and try again</source>
         <source>&lt;big&gt;&lt;b&gt;[%1]&lt;/b&gt;&lt;/big&gt; in [%2]</source>
         <translation>&lt;big&gt;&lt;b&gt;[%1]&lt;/b&gt;&lt;/big&gt; в [%2]</translation>
     </message>
+    <message>
+        <source>Messages</source>
+        <translation>Сообщения</translation>
+    </message>
 </context>
 <context>
     <name>MultiUserChatWindow</name>

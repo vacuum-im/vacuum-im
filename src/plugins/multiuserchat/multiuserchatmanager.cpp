@@ -311,6 +311,8 @@ bool MultiUserChatManager::initSettings()
 
 	if (FOptionsManager)
 	{
+		IOptionsDialogNode conferencesNode = { ONO_CONFERENCES, OPN_CONFERENCES, MNI_MUC_CONFERENCE, tr("Conferences") };
+		FOptionsManager->insertOptionsDialogNode(conferencesNode);
 		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 
@@ -320,15 +322,15 @@ bool MultiUserChatManager::initSettings()
 QMultiMap<int, IOptionsDialogWidget *> MultiUserChatManager::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
-	if (FOptionsManager && ANodeId==OPN_MESSAGES)
+	if (FOptionsManager && ANodeId==OPN_CONFERENCES)
 	{
-		widgets.insertMulti(OHO_MESSAGES_CONFERENCES,FOptionsManager->newOptionsDialogHeader(tr("Conferences"),AParent));
-		widgets.insertMulti(OWO_MESSAGES_MUC_SHOWENTERS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_GROUPCHAT_SHOWENTERS),tr("Show users connections and disconnections"),AParent));
-		widgets.insertMulti(OWO_MESSAGES_MUC_SHOWSTATUS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_GROUPCHAT_SHOWSTATUS),tr("Show users status changes"),AParent));
-		widgets.insertMulti(OWO_MESSAGES_MUC_ARCHIVESTATUS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_GROUPCHAT_ARCHIVESTATUS),tr("Save users status messages in history"),AParent));
-		widgets.insertMulti(OWO_MESSAGES_MUC_QUITONWINDOWCLOSE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_GROUPCHAT_QUITONWINDOWCLOSE),tr("Leave the conference when window closed"),AParent));
-		widgets.insertMulti(OWO_MESSAGES_MUC_REJOINAFTERKICK,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_GROUPCHAT_REJOINAFTERKICK),tr("Automatically rejoin to conference after kick"),AParent));
-		widgets.insertMulti(OWO_MESSAGES_MUC_REFERENUMERATION,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_GROUPCHAT_REFERENUMERATION),tr("Select a user to refer by enumeration in the input field"),AParent));
+		widgets.insertMulti(OHO_CONFERENCES_MESSAGES,FOptionsManager->newOptionsDialogHeader(tr("Messages"),AParent));
+		widgets.insertMulti(OWO_CONFERENCES_SHOWENTERS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_GROUPCHAT_SHOWENTERS),tr("Show users connections and disconnections"),AParent));
+		widgets.insertMulti(OWO_CONFERENCES_SHOWSTATUS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_GROUPCHAT_SHOWSTATUS),tr("Show users status changes"),AParent));
+		widgets.insertMulti(OWO_CONFERENCES_ARCHIVESTATUS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_GROUPCHAT_ARCHIVESTATUS),tr("Save users status messages in history"),AParent));
+		widgets.insertMulti(OWO_CONFERENCES_QUITONWINDOWCLOSE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_GROUPCHAT_QUITONWINDOWCLOSE),tr("Leave the conference when window closed"),AParent));
+		widgets.insertMulti(OWO_CONFERENCES_REJOINAFTERKICK,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_GROUPCHAT_REJOINAFTERKICK),tr("Automatically rejoin to conference after kick"),AParent));
+		widgets.insertMulti(OWO_CONFERENCES_REFERENUMERATION,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_GROUPCHAT_REFERENUMERATION),tr("Select a user to refer by enumeration in the input field"),AParent));
 	}
 	return widgets;
 }

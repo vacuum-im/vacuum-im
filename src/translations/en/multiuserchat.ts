@@ -582,6 +582,10 @@ Check values and try again</translation>
    <source>&lt;big>&lt;b>[%1]&lt;/b>&lt;/big> in [%2]</source>
    <translation>&lt;big>&lt;b>[%1]&lt;/b>&lt;/big> in [%2]</translation>
   </message>
+  <message>
+   <source>Messages</source>
+   <translation>Messages</translation>
+  </message>
  </context>
  <context>
   <name>MultiUserChatWindow</name>
