@@ -5,10 +5,14 @@ LEGEND
   [*] Enhancement
   [-] Bug fix
 
+
+v1.2.5
 ------
   [-] Fixed automatic activation of notifications
   [-] Fixed conference entrance detection by status codes
   [-] The application may fail on changing discovery entity in discovery items window
+  [-] Removed some CAPTCHA validations for compatibility with XEP
+  [-] Fixed truncation nickname to space in the conference /nick command
 
 
 v1.2.4
