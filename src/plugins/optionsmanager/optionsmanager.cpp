@@ -172,9 +172,8 @@ QMultiMap<int, IOptionsDialogWidget *> OptionsManager::optionsDialogWidgets(cons
 		QDir localeDir(QApplication::applicationDirPath());
 		localeDir.cd(TRANSLATIONS_DIR);
 
-		QComboBox *langCombox = new QComboBox(AParent);
-		langCombox->addItem(tr("<System Language>"),QString());
-		foreach(QString name, localeDir.entryList(QDir::Dirs,QDir::LocaleAware))
+		QMap<QString, QString> sortLangMap;
+		foreach(QString name, localeDir.entryList(QDir::Dirs,QDir::LocaleAware) << "en")
 		{
 			QLocale locale(name);
 			if (locale.language() != QLocale::C)
@@ -185,10 +184,16 @@ QMultiMap<int, IOptionsDialogWidget *> OptionsManager::optionsDialogWidgets(cons
 				{
 					langName[0] = langName[0].toUpper();
 					countryName[0] = countryName[0].toUpper();
-					langCombox->addItem(QString("%1 (%2)").arg(langName,countryName),locale.name());
+					sortLangMap.insert(QString("%1 (%2)").arg(langName,countryName),locale.name());
 				}
 			}
 		}
+		
+		QComboBox *langCombox = new QComboBox(AParent);
+		langCombox->addItem(tr("<System Language>"),QString());
+		for(QMap<QString,QString>::const_iterator it=sortLangMap.constBegin(); it!=sortLangMap.constEnd(); ++it)
+			if (langCombox->findData(it.value()) < 0)
+				langCombox->addItem(it.key(),it.value());
 		widgets.insertMulti(OWO_COMMON_LANGUAGE,newOptionsDialogWidget(Options::node(OPV_COMMON_LANGUAGE),tr("Language:"),langCombox,AParent));
 	}
 	return widgets;

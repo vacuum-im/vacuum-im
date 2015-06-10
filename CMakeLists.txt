@@ -1,13 +1,17 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 
 project(vacuum-im)
 
 if(POLICY CMP0020)
-	CMAKE_POLICY(SET CMP0020 NEW)
+	cmake_policy(SET CMP0020 NEW)
+endif()
+
+if(POLICY CMP0022)
+	cmake_policy(SET CMP0022 NEW)
 endif()
 
 if(POLICY CMP0043)
-   cmake_policy(SET CMP0043 NEW)
+	cmake_policy(SET CMP0043 NEW)
 endif()
 
 find_package (Qt5Widgets REQUIRED)
