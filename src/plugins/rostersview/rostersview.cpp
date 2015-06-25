@@ -186,7 +186,7 @@ AdvancedDelegateItem RostersView::rosterLabel(int AOrder, quint32 ALabelId, cons
 		label.d->id = RLID_ROSTERSVIEW_STATUS;
 		label.d->kind = AdvancedDelegateItem::CustomData;
 		label.d->hints.insert(AdvancedDelegateItem::FontSizeDelta,-1);
-		label.d->hints.insert(AdvancedDelegateItem::FontStyle,QFont::StyleItalic);
+		label.d->hints.insert(AdvancedDelegateItem::FontItalic,true);
 		label.d->data = FNotifyItems.value(FActiveNotifies.value(index)).footer;
 	}
 	return label;

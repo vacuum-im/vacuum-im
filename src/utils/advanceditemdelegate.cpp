@@ -736,7 +736,7 @@ QStyleOptionViewItemV4 AdvancedItemDelegate::indexStyleOption(const QStyleOption
 	QVariant value = AIndex.data(Qt::FontRole);
 	if (value.isValid() && !value.isNull()) 
 	{
-		indexOption.font = qvariant_cast<QFont>(value).resolve(indexOption.font);
+		indexOption.font = value.value<QFont>().resolve(indexOption.font);
 		indexOption.fontMetrics = QFontMetrics(indexOption.font);
 	}
 
@@ -798,29 +798,35 @@ QStyleOptionViewItemV4 AdvancedItemDelegate::itemStyleOption(const AdvancedDeleg
 
 	if (!AItem.d->hints.isEmpty())
 	{
-		QVariant hint = AItem.d->hints.value(AdvancedDelegateItem::FontWeight);
-		if (!hint.isNull())
-			itemOption.font.setWeight(hint.toInt());
+		QVariant hint;
 
 		hint = AItem.d->hints.value(AdvancedDelegateItem::FontHint);
 		if (!hint.isNull())
-			itemOption.font.setStyleHint((QFont::StyleHint)hint.toInt());
-
-		hint = AItem.d->hints.value(AdvancedDelegateItem::FontStyle);
-		if (!hint.isNull())
-			itemOption.font.setStyle((QFont::Style)hint.toInt());
+			itemOption.font = hint.value<QFont>().resolve(itemOption.font);
 
 		hint = AItem.d->hints.value(AdvancedDelegateItem::FontSize);
 		if (!hint.isNull())
 			itemOption.font.setPointSize(hint.toInt());
 
-		hint = AItem.d->hints.value(AdvancedDelegateItem::FontSizeDelta);
+		hint = AItem.d->hints.value(AdvancedDelegateItem::FontWeight);
 		if (!hint.isNull())
-			itemOption.font.setPointSize(itemOption.font.pointSize()+hint.toInt());
+			itemOption.font.setWeight(hint.toInt());
+
+		hint = AItem.d->hints.value(AdvancedDelegateItem::FontItalic);
+		if (!hint.isNull())
+			itemOption.font.setItalic(hint.toBool());
 
 		hint = AItem.d->hints.value(AdvancedDelegateItem::FontUnderline);
 		if (!hint.isNull())
 			itemOption.font.setUnderline(hint.toBool());
+
+		hint = AItem.d->hints.value(AdvancedDelegateItem::FontStrikeOut);
+		if (!hint.isNull())
+			itemOption.font.setStrikeOut(hint.toBool());
+
+		hint = AItem.d->hints.value(AdvancedDelegateItem::FontSizeDelta);
+		if (!hint.isNull())
+			itemOption.font.setPointSize(itemOption.font.pointSize()+hint.toInt());
 
 		hint = AItem.d->hints.value(AdvancedDelegateItem::StatesForceOn);
 		if (!hint.isNull())

@@ -351,7 +351,7 @@ AdvancedDelegateItem RostersViewPlugin::rosterLabel(int AOrder, quint32 ALabelId
 			statusLabel.d->kind = AdvancedDelegateItem::CustomData;
 			statusLabel.d->data = AIndex->data(RDR_STATUS).toString();
 			statusLabel.d->hints.insert(AdvancedDelegateItem::FontSizeDelta,-1);
-			statusLabel.d->hints.insert(AdvancedDelegateItem::FontStyle,QFont::StyleItalic);
+			statusLabel.d->hints.insert(AdvancedDelegateItem::FontItalic,true);
 			return statusLabel;
 		}
 	}
