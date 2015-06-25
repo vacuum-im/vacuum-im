@@ -1980,16 +1980,16 @@ void RosterChanger::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &A
 void RosterChanger::onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu)
 {
 	Q_UNUSED(AWindow);
-	if (!AUser->data(MUDR_REAL_JID).toString().isEmpty())
+	if (AUser->realJid().isValid())
 	{
-		IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(AUser->data(MUDR_STREAM_JID).toString()) : NULL;
-		if (roster && roster->isOpen() && !roster->hasItem(AUser->data(MUDR_REAL_JID).toString()))
+		IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(AUser->streamJid()) : NULL;
+		if (roster && roster->isOpen() && !roster->hasItem(AUser->realJid()))
 		{
 			Action *action = new Action(AMenu);
 			action->setText(tr("Add Contact..."));
-			action->setData(ADR_STREAM_JID,AUser->data(MUDR_STREAM_JID));
-			action->setData(ADR_CONTACT_JID,AUser->data(MUDR_REAL_JID));
-			action->setData(ADR_NAME,AUser->data(MUDR_NICK_NAME));
+			action->setData(ADR_STREAM_JID,AUser->streamJid().full());
+			action->setData(ADR_CONTACT_JID,AUser->realJid().bare());
+			action->setData(ADR_NAME,AUser->userJid().resource());
 			action->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_ADD_CONTACT);
 			connect(action,SIGNAL(triggered(bool)),SLOT(onShowAddContactDialog(bool)));
 			AMenu->addAction(action,AG_MUCM_ROSTERCHANGER,true);

@@ -9,7 +9,8 @@ HEADERS = multiuser.h \
           multiuserchatwindow.h \
           edituserslistdialog.h \
           inputtextdialog.h \
-          usersproxymodel.h
+          multiuserview.h
+
 
 SOURCES = multiuser.cpp \
           multiuserchat.cpp \
@@ -18,4 +19,4 @@ SOURCES = multiuser.cpp \
           multiuserchatwindow.cpp \
           edituserslistdialog.cpp \
           inputtextdialog.cpp \
-          usersproxymodel.cpp
+          multiuserview.cpp

@@ -120,6 +120,7 @@
 #define OPV_MUC_GROUPCHAT_QUITONWINDOWCLOSE             "muc.groupchat.quit-on-window-close"
 #define OPV_MUC_GROUPCHAT_REFERENUMERATION              "muc.groupchat.refer-enumeration"
 #define OPV_MUC_GROUPCHAT_NICKNAMESUFFIX                "muc.groupchat.nickname-suffix"
+#define OPV_MUC_GROUPCHAT_USERVIEWMODE                  "muc.groupchat.user-view-mode"
 // Bookmarks
 #define OPV_MUC_GROUPCHAT_SHOWAUTOJOINED                "muc.groupchat.show-auto-joined"
 

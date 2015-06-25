@@ -1,5 +1,6 @@
 #include "multiuserchatmanager.h"
 
+#include <QComboBox>
 #include <QClipboard>
 #include <QInputDialog>
 #include <QApplication>
@@ -308,6 +309,7 @@ bool MultiUserChatManager::initSettings()
 	Options::setDefaultValue(OPV_MUC_GROUPCHAT_REJOINAFTERKICK,false);
 	Options::setDefaultValue(OPV_MUC_GROUPCHAT_REFERENUMERATION,false);
 	Options::setDefaultValue(OPV_MUC_GROUPCHAT_NICKNAMESUFFIX,", ");
+	Options::setDefaultValue(OPV_MUC_GROUPCHAT_USERVIEWMODE,IMultiUserView::ViewSimple);
 
 	if (FOptionsManager)
 	{
@@ -331,6 +333,14 @@ QMultiMap<int, IOptionsDialogWidget *> MultiUserChatManager::optionsDialogWidget
 		widgets.insertMulti(OWO_CONFERENCES_QUITONWINDOWCLOSE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_GROUPCHAT_QUITONWINDOWCLOSE),tr("Leave the conference when window closed"),AParent));
 		widgets.insertMulti(OWO_CONFERENCES_REJOINAFTERKICK,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_GROUPCHAT_REJOINAFTERKICK),tr("Automatically rejoin to conference after kick"),AParent));
 		widgets.insertMulti(OWO_CONFERENCES_REFERENUMERATION,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_GROUPCHAT_REFERENUMERATION),tr("Select a user to refer by enumeration in the input field"),AParent));
+
+		widgets.insertMulti(OHO_CONFERENCES_USERVIEW,FOptionsManager->newOptionsDialogHeader(tr("Participants List"),AParent));
+
+		QComboBox *cmbViewMode = new QComboBox(AParent);
+		cmbViewMode->addItem(tr("Full"), IMultiUserView::ViewFull);
+		cmbViewMode->addItem(tr("Simplified"), IMultiUserView::ViewSimple);
+		cmbViewMode->addItem(tr("Compact"), IMultiUserView::ViewCompact);
+		widgets.insertMulti(OWO_CONFERENCES_USERVIEWMODE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_GROUPCHAT_USERVIEWMODE),tr("Participants list view:"),cmbViewMode,AParent));
 	}
 	return widgets;
 }
@@ -628,7 +638,7 @@ bool MultiUserChatManager::recentItemCanShow(const IRecentItem &AItem) const
 		IMultiUserChatWindow *chatWindow = findMultiChatWindow(AItem.streamJid,userJid);
 		IMultiUser *user = chatWindow!=NULL ? chatWindow->multiUserChat()->findUser(userJid.resource()) : NULL;
 		IMessageChatWindow *privateWindow = chatWindow!=NULL ? chatWindow->findPrivateChatWindow(userJid) : NULL;
-		return privateWindow!=NULL || (user!=NULL && user->data(MUDR_SHOW).toInt()!=IPresence::Offline);
+		return privateWindow!=NULL || (user!=NULL && user->presence().show!=IPresence::Offline);
 	}
 	return false;
 }
@@ -644,7 +654,7 @@ QIcon MultiUserChatManager::recentItemIcon(const IRecentItem &AItem) const
 		else if (AItem.type == REIT_CONFERENCE_PRIVATE)
 		{
 			IMultiUser *user = findMultiChatWindowUser(AItem.streamJid,AItem.reference);
-			int show = user!=NULL ? user->data(MUDR_SHOW).toInt() : IPresence::Offline;
+			int show = user!=NULL ? user->presence().show : IPresence::Offline;
 			return FStatusIcons->iconByJidStatus(AItem.reference,show,SUBSCRIPTION_BOTH,false);
 		}
 	}
@@ -761,13 +771,8 @@ IMultiUserChatWindow *MultiUserChatManager::getMultiChatWindow(const Jid &AStrea
 				connect(window->instance(),SIGNAL(privateChatWindowDestroyed(IMessageChatWindow *)),SLOT(onMultiUserPrivateChatWindowChanged(IMessageChatWindow *)));
 
 				connect(window->multiUserChat()->instance(),SIGNAL(roomNameChanged(const QString &)),SLOT(onMultiChatNameChanged(const QString &)));
-				connect(window->multiUserChat()->instance(),SIGNAL(presenceChanged(int, const QString &)),SLOT(onMultiChatPresenceChanged(int, const QString &)));
-				connect(window->multiUserChat()->instance(),SIGNAL(userPresence(IMultiUser *, int , const QString &)),
-					SLOT(onMultiUserPresenceChanged(IMultiUser *, int , const QString &)));
-				connect(window->multiUserChat()->instance(),SIGNAL(userNickChanged(IMultiUser *, const QString &, const QString &)),
-					SLOT(onMultiUserNickChanged(IMultiUser *, const QString &, const QString &)));
-				connect(window->multiUserChat()->instance(),SIGNAL(userDataChanged(IMultiUser *, int, const QVariant &, const QVariant &)),
-					SLOT(onMultiUserDataChanged(IMultiUser *, int, const QVariant &, const QVariant &)));
+				connect(window->multiUserChat()->instance(),SIGNAL(presenceChanged(const IPresenceItem &)),SLOT(onMultiChatPresenceChanged(const IPresenceItem &)));
+				connect(window->multiUserChat()->instance(),SIGNAL(userChanged(IMultiUser *, int, const QVariant &)),SLOT(onMultiUserChanged(IMultiUser *, int, const QVariant &)));
 				
 				connect(window->infoWidget()->instance(),SIGNAL(contextMenuRequested(Menu *)),SLOT(onMultiChatWindowInfoContextMenu(Menu *)));
 				connect(window->infoWidget()->instance(),SIGNAL(toolTipsRequested(QMap<int,QString> &)),SLOT(onMultiChatWindowInfoToolTips(QMap<int,QString> &)));
@@ -986,13 +991,13 @@ void MultiUserChatManager::updateChatRosterIndex(IMultiUserChatWindow *AWindow)
 	if (chatIndex)
 	{
 		if (FStatusIcons)
-			chatIndex->setData(FStatusIcons->iconByJidStatus(AWindow->contactJid(),AWindow->multiUserChat()->show(),SUBSCRIPTION_BOTH,false),Qt::DecorationRole);
+			chatIndex->setData(FStatusIcons->iconByJidStatus(AWindow->contactJid(),AWindow->multiUserChat()->roomPresence().show,SUBSCRIPTION_BOTH,false),Qt::DecorationRole);
 		if (!AWindow->multiUserChat()->roomError().isNull())
 			chatIndex->setData(AWindow->multiUserChat()->roomError().errorMessage(),RDR_STATUS);
 		else
 			chatIndex->setData(QString(),RDR_STATUS);
 		chatIndex->setData(getMultiChatName(AWindow->streamJid(),AWindow->contactJid()),RDR_NAME);
-		chatIndex->setData(AWindow->multiUserChat()->show(),RDR_SHOW);
+		chatIndex->setData(AWindow->multiUserChat()->roomPresence().show,RDR_SHOW);
 		chatIndex->setData(AWindow->multiUserChat()->nickName(),RDR_MUC_NICK);
 		chatIndex->setData(AWindow->multiUserChat()->password(),RDR_MUC_PASSWORD);
 		updateRecentChatItemProperties(chatIndex);
@@ -1327,9 +1332,9 @@ void MultiUserChatManager::onMultiChatNameChanged(const QString &AName)
 		updateChatRosterIndex(findMultiChatWindow(chat->streamJid(),chat->roomJid()));
 }
 
-void MultiUserChatManager::onMultiChatPresenceChanged(int AShow, const QString &AStatus)
+void MultiUserChatManager::onMultiChatPresenceChanged(const IPresenceItem &APresence)
 {
-	Q_UNUSED(AShow); Q_UNUSED(AStatus);
+	Q_UNUSED(APresence);
 	IMultiUserChat *chat = qobject_cast<IMultiUserChat *>(sender());
 	if (chat)
 		updateChatRosterIndex(findMultiChatWindow(chat->streamJid(),chat->roomJid()));
@@ -1363,58 +1368,44 @@ void MultiUserChatManager::onMultiUserPrivateChatWindowChanged(IMessageChatWindo
 		updateRecentUserItem(window->multiUserChat(),AWindow->contactJid().resource());
 }
 
-void MultiUserChatManager::onMultiUserPresenceChanged(IMultiUser *AUser, int AShow, const QString &AStatus)
+void MultiUserChatManager::onMultiUserChanged(IMultiUser *AUser, int AData, const QVariant &ABefore)
 {
-	Q_UNUSED(AShow); Q_UNUSED(AStatus);
-	IMultiUserChat *chat = qobject_cast<IMultiUserChat *>(sender());
-	if (chat)
-		updateRecentUserItem(chat,AUser->nickName());
-}
-
-
-void MultiUserChatManager::onMultiUserNickChanged(IMultiUser *AUser, const QString &AOldNick, const QString &ANewNick)
-{
-	Q_UNUSED(AOldNick); Q_UNUSED(ANewNick);
 	IMultiUserChat *chat = qobject_cast<IMultiUserChat *>(sender());
 	if (chat)
 	{
-		if (chat->mainUser() != AUser)
+		static const QList<int> updateDataRoles = QList<int>() << MUDR_PRESENCE;
+		if (AData == MUDR_NICK)
 		{
-			if (FRecentContacts)
+			if (chat->mainUser() != AUser)
 			{
-				IRecentItem oldItem;
-				oldItem.type = REIT_CONFERENCE_PRIVATE;
-				oldItem.streamJid = chat->streamJid();
-				oldItem.reference = Jid(chat->roomJid().bare() + "/" + AOldNick).pFull();
-
-				QList<IRecentItem> items = FRecentContacts->streamItems(chat->streamJid());
-				int oldIndex = items.indexOf(oldItem);
-				if (oldIndex >= 0)
+				if (FRecentContacts)
 				{
-					IRecentItem newItem = items.value(oldIndex);
-					newItem.reference = Jid(chat->roomJid().bare() + "/" + ANewNick).pFull();
+					IRecentItem beforeItem;
+					beforeItem.type = REIT_CONFERENCE_PRIVATE;
+					beforeItem.streamJid = chat->streamJid();
+					beforeItem.reference = Jid(chat->roomJid().bare() + "/" + ABefore.toString()).pFull();
 
-					FRecentContacts->removeItem(oldItem);
-					FRecentContacts->setItemActiveTime(newItem,oldItem.activeTime);
+					QList<IRecentItem> items = FRecentContacts->streamItems(chat->streamJid());
+					int beforeIndex = items.indexOf(beforeItem);
+					if (beforeIndex >= 0)
+					{
+						IRecentItem newItem = items.value(beforeIndex);
+						newItem.reference = Jid(chat->roomJid().bare() + "/" + AUser->nick()).pFull();
+
+						FRecentContacts->removeItem(beforeItem);
+						FRecentContacts->setItemActiveTime(newItem,beforeItem.activeTime);
+					}
 				}
 			}
+			else
+			{
+				updateChatRosterIndex(findMultiChatWindow(chat->streamJid(),chat->roomJid()));
+			}
 		}
-		else
+		else if (updateDataRoles.contains(AData))
 		{
-			updateChatRosterIndex(findMultiChatWindow(chat->streamJid(),chat->roomJid()));
+			updateRecentUserItem(chat,AUser->nick());
 		}
-	}
-}
-
-void MultiUserChatManager::onMultiUserDataChanged(IMultiUser *AUser, int ARole, const QVariant &ABefore, const QVariant &AAfter)
-{
-	Q_UNUSED(ABefore); Q_UNUSED(AAfter);
-	static const QList<int> updateDataRoles = QList<int>();
-	if (updateDataRoles.contains(ARole))
-	{
-		IMultiUserChat *chat = qobject_cast<IMultiUserChat *>(sender());
-		if (chat)
-			updateRecentUserItem(chat,AUser->nickName());
 	}
 }
 
@@ -1627,7 +1618,7 @@ void MultiUserChatManager::onRostersViewIndexToolTips(IRosterIndex *AIndex, quin
 			if (user)
 			{
 				window->toolTipsForUser(user,AToolTips);
-				AToolTips.insert(RTTO_ROSTERSVIEW_INFO_NAME,tr("<big><b>[%1]</b></big> in [%2]").arg(Qt::escape(user->nickName()),Qt::escape(window->multiUserChat()->roomShortName())));
+				AToolTips.insert(RTTO_ROSTERSVIEW_INFO_NAME,tr("<big><b>[%1]</b></big> in [%2]").arg(Qt::escape(user->nick()),Qt::escape(window->multiUserChat()->roomShortName())));
 				AToolTips.insert(RTTO_MULTIUSERCHAT_ROOM,tr("<b>Conference:</b> %1").arg(window->multiUserChat()->roomJid().uBare()));
 			}
 		}

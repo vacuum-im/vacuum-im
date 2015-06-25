@@ -586,6 +586,26 @@ Check values and try again</translation>
    <source>Messages</source>
    <translation>Messages</translation>
   </message>
+  <message>
+   <source>Participants List</source>
+   <translation>Participants List</translation>
+  </message>
+  <message>
+   <source>Full</source>
+   <translation>Full</translation>
+  </message>
+  <message>
+   <source>Simplified</source>
+   <translation>Simplified</translation>
+  </message>
+  <message>
+   <source>Compact</source>
+   <translation>Compact</translation>
+  </message>
+  <message>
+   <source>Participants list view:</source>
+   <translation>Participants list view:</translation>
+  </message>
  </context>
  <context>
   <name>MultiUserChatWindow</name>

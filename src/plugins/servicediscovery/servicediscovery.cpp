@@ -1360,44 +1360,48 @@ void ServiceDiscovery::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)
 	removeQueuedRequest(request);
 }
 
-void ServiceDiscovery::onMultiUserPresence(IMultiUser *AUser, int AShow, const QString &AStatus)
-{
-	Q_UNUSED(AStatus);
-	if (AShow==IPresence::Offline || AShow==IPresence::Error)
-	{
-		bool isSingleUser = true;
-		Jid userStreamJid = AUser->data(MUDR_STREAM_JID).toString();
-		foreach(IMultiUserChat *mchat, FMultiChatManager->multiUserChats())
-		{
-			IMultiUser *muser = mchat->findUser(AUser->nickName());
-			if (muser!=NULL && muser!=AUser && mchat->roomJid()==AUser->roomJid() && mchat->streamJid()==userStreamJid)
-			{
-				isSingleUser = false;
-				break;
-			}
-		}
-		if (isSingleUser)
-		{
-			DiscoveryRequest request;
-			request.streamJid = userStreamJid;
-			request.contactJid = AUser->contactJid();
-			removeQueuedRequest(request);
-			removeDiscoInfo(userStreamJid,AUser->contactJid());
-			FEntityCaps[userStreamJid].remove(AUser->contactJid());
-		}
-	}
-}
-
 void ServiceDiscovery::onMultiUserChatCreated(IMultiUserChat *AMultiChat)
 {
-	connect(AMultiChat->instance(), SIGNAL(userPresence(IMultiUser *, int, const QString &)), SLOT(onMultiUserPresence(IMultiUser *, int, const QString &)));
+	connect(AMultiChat->instance(), SIGNAL(userChanged(IMultiUser *, int, const QVariant &)), SLOT(onMultiUserChanged(IMultiUser *, int, const QVariant &)));
+}
+
+void ServiceDiscovery::onMultiUserChanged(IMultiUser *AUser, int AData, const QVariant &ABefore)
+{
+	Q_UNUSED(ABefore);
+	if (AData == MUDR_PRESENCE)
+	{
+		if (AUser->presence().show==IPresence::Offline || AUser->presence().show==IPresence::Error)
+		{
+			bool isLastUser = true;
+			foreach(IMultiUserChat *chat, FMultiChatManager->multiUserChats())
+			{
+				IMultiUser *user = chat->findUser(AUser->nick());
+				if (user!=NULL && user!=AUser && chat->roomJid()==AUser->roomJid() && chat->streamJid()==AUser->streamJid())
+				{
+					isLastUser = false;
+					break;
+				}
+			}
+
+			if (isLastUser)
+			{
+				DiscoveryRequest request;
+				request.streamJid = AUser->streamJid();
+				request.contactJid = AUser->userJid();
+				removeQueuedRequest(request);
+
+				removeDiscoInfo(AUser->streamJid(),AUser->userJid());
+				FEntityCaps[AUser->streamJid()].remove(AUser->userJid());
+			}
+		}
+	}
 }
 
 void ServiceDiscovery::onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu)
 {
 	if (isReady(AWindow->streamJid()))
 	{
-		IDiscoInfo dinfo = discoInfo(AWindow->streamJid(),AUser->contactJid());
+		IDiscoInfo dinfo = discoInfo(AWindow->streamJid(),AUser->userJid());
 
 		// Many clients support version info but don`t show it in disco info
 		if (dinfo.streamJid.isValid() && !dinfo.features.contains(NS_JABBER_VERSION))

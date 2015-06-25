@@ -17,6 +17,7 @@
 #include <definitions/notificationtypeorders.h>
 #include <definitions/tabpagenotifypriorities.h>
 #include <definitions/sessionnegotiatororders.h>
+#include <definitions/multiuserdataroles.h>
 #include <utils/iconstorage.h>
 #include <utils/options.h>
 #include <utils/logger.h>
@@ -673,21 +674,23 @@ void ChatStates::onPresenceClosed(IPresence *APresence)
 
 void ChatStates::onMultiUserChatCreated(IMultiUserChat *AMultiChat)
 {
-	connect(AMultiChat->instance(),SIGNAL(userPresence(IMultiUser *, int, const QString &)),
-		SLOT(onMultiUserPresenceReceived(IMultiUser *, int, const QString &)));
+	connect(AMultiChat->instance(),SIGNAL(userChanged(IMultiUser *, int, const QVariant &)),SLOT(onMultiUserChanged(IMultiUser *, int, const QVariant &)));
 }
 
-void ChatStates::onMultiUserPresenceReceived(IMultiUser *AUser, int AShow, const QString &AStatus)
+void ChatStates::onMultiUserChanged(IMultiUser *AUser, int AData, const QVariant &ABefore)
 {
-	Q_UNUSED(AStatus);
-	if (AShow==IPresence::Offline || AShow==IPresence::Error)
+	Q_UNUSED(ABefore);
+	if (AData == MUDR_PRESENCE)
 	{
-		IMultiUserChat *multiChat = qobject_cast<IMultiUserChat *>(sender());
-		if (FChatParams.contains(multiChat->streamJid()) && FChatParams[multiChat->streamJid()].contains(AUser->contactJid()))
+		if (AUser->presence().show==IPresence::Offline || AUser->presence().show==IPresence::Error)
 		{
-			setUserState(multiChat->streamJid(),AUser->contactJid(),IChatStates::StateUnknown);
-			setSelfState(multiChat->streamJid(),AUser->contactJid(),IChatStates::StateUnknown,false);
-			FChatParams[multiChat->streamJid()].remove(AUser->contactJid());
+			IMultiUserChat *multiChat = qobject_cast<IMultiUserChat *>(sender());
+			if (FChatParams.contains(multiChat->streamJid()) && FChatParams[multiChat->streamJid()].contains(AUser->userJid()))
+			{
+				setUserState(multiChat->streamJid(),AUser->userJid(),IChatStates::StateUnknown);
+				setSelfState(multiChat->streamJid(),AUser->userJid(),IChatStates::StateUnknown,false);
+				FChatParams[multiChat->streamJid()].remove(AUser->userJid());
+			}
 		}
 	}
 }

@@ -1,8 +1,7 @@
 #ifndef MULTIUSERCHATWINDOW_H
 #define MULTIUSERCHATWINDOW_H
 
-#include <QListView>
-#include <QStandardItemModel>
+#include <interfaces/iavatars.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/imessageprocessor.h>
@@ -16,8 +15,8 @@
 #include <interfaces/ipresencemanager.h>
 #include <interfaces/irecentcontacts.h>
 #include <interfaces/istanzaprocessor.h>
+#include "multiuserview.h"
 #include "inputtextdialog.h"
-#include "usersproxymodel.h"
 #include "edituserslistdialog.h"
 
 struct WindowStatus {
@@ -85,10 +84,11 @@ public:
 	virtual bool messageShowWindow(int AMessageId);
 	virtual bool messageShowWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode);
 	//IMultiUserChatWindow
+	virtual IMultiUserChat *multiUserChat() const;
+	virtual IMultiUserView *multiUserView() const;
 	virtual SplitterWidget *viewWidgetsBox() const;
 	virtual SplitterWidget *usersWidgetsBox() const;
 	virtual SplitterWidget *centralWidgetsBox() const;
-	virtual IMultiUserChat *multiUserChat() const;
 	virtual IMessageChatWindow *openPrivateChatWindow(const Jid &AContactJid);
 	virtual IMessageChatWindow *findPrivateChatWindow(const Jid &AContactJid) const;
 	virtual void contextMenuForRoom(Menu *AMenu);
@@ -124,10 +124,8 @@ protected:
 	void loadWindowState();
 	void saveWindowGeometry();
 	void loadWindowGeometry();
+protected:
 	void refreshCompleteNicks();
-	void updateListItem(const Jid &AContactJid);
-	void highlightUserRole(IMultiUser *AUser);
-	void highlightUserAffiliation(IMultiUser *AUser);
 	bool execShortcutCommand(const QString &AText);
 	void updateRecentItemActiveTime(IMessageChatWindow *AWindow);
 	void showDateSeparator(IMessageViewWidget *AView, const QDateTime &ADateTime);
@@ -163,13 +161,11 @@ protected slots:
 	void onChatClosed();
 	void onRoomNameChanged(const QString &AName);
 	//Occupant
-	void onUserPresence(IMultiUser *AUser, int AShow, const QString &AStatus);
-	void onUserDataChanged(IMultiUser *AUser, int ARole, const QVariant &ABefore, const QVariant &AAfter);
-	void onUserNickChanged(IMultiUser *AUser, const QString &AOldNick, const QString &ANewNick);
-	void onPresenceChanged(int AShow, const QString &AStatus);
+	void onPresenceChanged(const IPresenceItem &APresence);
 	void onSubjectChanged(const QString &ANick, const QString &ASubject);
 	void onServiceMessageReceived(const Message &AMessage);
 	void onInviteDeclined(const Jid &AContactJid, const QString &AReason);
+	void onUserChanged(IMultiUser *AUser, int AData, const QVariant &ABefore);
 	//Moderator
 	void onUserKicked(const QString &ANick, const QString &AReason, const QString &AByUser);
 	//Administrator
@@ -182,7 +178,10 @@ protected slots:
 	void onMultiChatWindowActivated();
 	void onMultiChatNotifierActiveNotifyChanged(int ANotifyId);
 	void onMultiChatEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bool &AHooked);
+	void onMultiChatUserItemNotifyActivated(int ANotifyId);
 	void onMultiChatUserItemDoubleClicked(const QModelIndex &AIndex);
+	void onMultiChatUserItemContextMenu(QStandardItem *AItem, Menu *AMenu);
+	void onMultiChatUserItemToolTips(QStandardItem *AItem, QMap<int,QString> &AToolTips);
 	void onMultiChatContentAppended(const QString &AHtml, const IMessageStyleContentOptions &AOptions);
 	void onMultiChatMessageStyleOptionsChanged(const IMessageStyleOptions &AOptions, bool ACleared);
 protected slots:
@@ -207,6 +206,7 @@ protected slots:
 protected slots:
 	void onStatusIconsChanged();
 	void onAutoRejoinAfterKick();
+	void onOptionsChanged(const OptionsNode &ANode);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onArchiveRequestFailed(const QString &AId, const XmppError &AError);
 	void onArchiveMessagesLoaded(const QString &AId, const IArchiveCollectionBody &ABody);
@@ -226,6 +226,7 @@ private:
 	Action *FConfigRoom;
 	Action *FDestroyRoom;
 private:
+	IAvatars *FAvatars;
 	IDataForms *FDataForms;
 	IStatusIcons *FStatusIcons;
 	IStatusChanger *FStatusChanger;
@@ -266,12 +267,10 @@ private:
 	QList<QString> FCompleteNicks;
 	QList<QString>::const_iterator FCompleteIt;
 private:
-	QListView *FUsersView;
-	UsersProxyModel *FUsersProxy;
-	QStandardItemModel *FUsersModel;
-	QHash<IMultiUser *, UserStatus> FUserStatus;
-	QHash<IMultiUser *, QStandardItem *> FUsers;
+	IMultiUserView *FUsersView;
+	QHash<IMultiUser *, UserStatus> FUsers;
 private:
+	QMap<int, int> FActiveChatMessageNotify;
 	QList<IMessageChatWindow *> FPrivateChatWindows;
 	QMap<IMessageChatWindow *, QTimer *> FDestroyTimers;
 	QMultiMap<IMessageChatWindow *,int> FActiveChatMessages;

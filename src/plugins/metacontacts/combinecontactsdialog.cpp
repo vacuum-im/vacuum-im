@@ -67,7 +67,7 @@ CombineContactsDialog::CombineContactsDialog(IMetaContacts *AMetaContacts, const
 			QString name = !ritem.name.isEmpty() ? ritem.name : ritem.itemJid.uBare();
 
 			QImage avatar = FAvatars!=NULL ? FAvatars->loadAvatarImage(FAvatars->avatarHash(it.value()),AVATAR_SIZE) : QImage();
-			avatar = avatar.isNull() ? (FAvatars!=NULL ? FAvatars->emptyAvatarImage(AVATAR_SIZE) : QImage()) : avatar;
+			avatar = avatar.isNull() ? (FAvatars!=NULL ? FAvatars->loadAvatarImage(QString::null,AVATAR_SIZE) : QImage()) : avatar;
 			avatar = ImageManager::squared(avatar,AVATAR_SIZE.width());
 
 			QListWidgetItem *item = new QListWidgetItem(QIcon(QPixmap::fromImage(avatar)),name,ui.lwtContacts);

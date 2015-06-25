@@ -662,7 +662,7 @@ void NormalMessageHandler::updateWindow(IMessageNormalWindow *AWindow) const
 		if (!avatar.isEmpty() && FAvatars->hasAvatar(avatar))
 			AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::Avatar,avatar);
 		else
-			AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::Avatar,FAvatars->emptyAvatarImage());
+			AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::Avatar,FAvatars->loadAvatarImage());
 	}
 
 	QString name = FMessageStyleManager!=NULL ? FMessageStyleManager->contactName(AWindow->streamJid(),AWindow->contactJid()) : AWindow->contactJid().uFull();

@@ -92,7 +92,7 @@ protected slots:
 	void onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore);
 	void onPresenceClosed(IPresence *APresence);
 	void onMultiUserChatCreated(IMultiUserChat *AMultiChat);
-	void onMultiUserPresenceReceived(IMultiUser *AUser, int AShow, const QString &AStatus);
+	void onMultiUserChanged(IMultiUser *AUser, int AData, const QVariant &ABefore);
 	void onChatWindowCreated(IMessageChatWindow *AWindow);
 	void onChatWindowActivated();
 	void onChatWindowTextChanged();

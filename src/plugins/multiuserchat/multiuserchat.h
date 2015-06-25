@@ -50,14 +50,13 @@ public:
 	virtual void setPassword(const QString &APassword);
 	virtual IMultiUserChatHistory history() const;
 	virtual void setHistory(const IMultiUserChatHistory &AHistory);
-	virtual int show() const;
-	virtual QString status() const;
 	virtual XmppError roomError() const;
+	virtual IPresenceItem roomPresence() const;
 	virtual bool sendStreamPresence();
-	virtual bool sendPresence(int AShow, const QString &AStatus);
+	virtual bool sendPresence(int AShow, const QString &AStatus, int APriority);
 	virtual bool sendMessage(const Message &AMessage, const QString &AToNick = QString::null);
-	virtual bool requestVoice();
 	virtual bool inviteContact(const Jid &AContactJid, const QString &AReason);
+	virtual bool requestVoice();
 	//Moderator
 	virtual QString subject() const;
 	virtual bool sendSubject(const QString &ASubject);
@@ -82,14 +81,12 @@ signals:
 	void roomNameChanged(const QString &AName);
 	void streamJidChanged(const Jid &ABefore, const Jid &AAfter);
 	//Occupant
-	void userPresence(IMultiUser *AUser, int AShow, const QString &AStatus);
-	void userDataChanged(IMultiUser *AUser, int ARole, const QVariant &ABefore, const QVariant &AAfter);
-	void userNickChanged(IMultiUser *AUser, const QString &AOldNick, const QString &ANewNick);
-	void presenceChanged(int AShow, const QString &AStatus);
-	void serviceMessageReceived(const Message &AMessage);
+	void presenceChanged(const IPresenceItem &APresence);
 	void messageSent(const Message &AMessage);
+	void serviceMessageReceived(const Message &AMessage);
 	void messageReceived(const QString &ANick, const Message &AMessage);
 	void inviteDeclined(const Jid &AContactJid, const QString &AReason);
+	void userChanged(IMultiUser *AUser, int AData, const QVariant &ABefore);
 	//Moderator
 	void subjectChanged(const QString &ANick, const QString &ASubject);
 	void userKicked(const QString &ANick, const QString &AReason, const QString &AByUser);
@@ -108,13 +105,13 @@ signals:
 protected:
 	bool processMessage(const Stanza &AStanza);
 	bool processPresence(const Stanza &AStanza);
-	void closeChat(int AShow, const QString &AStatus);
+	void closeChat(const IPresenceItem &APresence);
 protected slots:
-	void onUserDataChanged(int ARole, const QVariant &ABefore, const QVariant &AAfter);
+	void onUserChanged(int AData, const QVariant &ABefore);
 	void onPresenceChanged(int AShow, const QString &AStatus, int APriority);
 	void onDiscoveryInfoReceived(const IDiscoInfo &AInfo);
-	void onXmppStreamClosed();
 	void onXmppStreamJidChanged(const Jid &ABefore);
+	void onXmppStreamClosed();
 private:
 	IPresence *FPresence;
 	IDataForms *FDataForms;
@@ -132,18 +129,17 @@ private:
 private:
 	int FSHIPresence;
 	int FSHIMessage;
-	int FShow;
 	int FErrorCode;
 	bool FConnected;
 	bool FAutoPresence;
 	Jid FStreamJid;
 	Jid FRoomJid;
-	QString FStatus;
 	QString FSubject;
 	QString FNickName;
 	QString FPassword;
 	MultiUser *FMainUser;
 	XmppError FRoomError;
+	IPresenceItem FRoomPresence;
 	QList<int> FStatusCodes;
 	IMultiUserChatHistory FHistory;
 	QHash<QString, MultiUser *> FUsers;

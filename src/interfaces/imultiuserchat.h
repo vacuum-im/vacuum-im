@@ -2,9 +2,13 @@
 #define IMULTIUSERCHAT_H
 
 #include <QMenuBar>
+#include <QTreeView>
 #include <interfaces/idataforms.h>
 #include <interfaces/irostersmodel.h>
 #include <interfaces/imessagewidgets.h>
+#include <interfaces/ipresencemanager.h>
+#include <utils/advanceditemdelegate.h>
+#include <utils/advanceditemmodel.h>
 #include <utils/menubarchanger.h>
 #include <utils/xmpperror.h>
 #include <utils/message.h>
@@ -90,19 +94,36 @@ struct IMultiUserChatHistory
 	QDateTime since;
 };
 
+struct IMultiUserViewNotify
+{
+	enum Flags {
+		Blink          = 0x01,
+	};
+	IMultiUserViewNotify() {
+		order = -1;
+		flags = 0;
+	}
+	int order;
+	int flags;
+	QIcon icon;
+	QString footer;
+};
+
+
 class IMultiUser
 {
 public:
 	virtual QObject *instance() = 0;
+	virtual Jid streamJid() const =0;
 	virtual Jid roomJid() const =0;
-	virtual Jid contactJid() const =0;
-	virtual QString nickName() const =0;
+	virtual Jid userJid() const =0;
+	virtual Jid realJid() const =0;
+	virtual QString nick() const =0;
 	virtual QString role() const =0;
 	virtual QString affiliation() const =0;
-	virtual QVariant data(int ARole) const =0;
-	virtual void setData(int ARole, const QVariant &AValue) =0;
+	virtual IPresenceItem presence() const =0;
 protected:
-	virtual void dataChanged(int ARole, const QVariant &ABefore, const QVariant &AAfter) =0;
+	virtual void changed(int AData, const QVariant &ABefore) =0;
 };
 
 class IMultiUserChat
@@ -129,14 +150,13 @@ public:
 	virtual void setPassword(const QString &APassword) =0;
 	virtual IMultiUserChatHistory history() const =0;
 	virtual void setHistory(const IMultiUserChatHistory &AHistory) =0;
-	virtual int show() const =0;
-	virtual QString status() const =0;
 	virtual XmppError roomError() const =0;
+	virtual IPresenceItem roomPresence() const =0;
 	virtual bool sendStreamPresence() =0;
-	virtual bool sendPresence(int AShow, const QString &AStatus) =0;
+	virtual bool sendPresence(int AShow, const QString &AStatus, int APriority) =0;
 	virtual bool sendMessage(const Message &AMessage, const QString &AToNick = QString::null) =0;
-	virtual bool requestVoice() =0;
 	virtual bool inviteContact(const Jid &AContactJid, const QString &AReason) =0;
+	virtual bool requestVoice() =0;
 	//Moderator
 	virtual QString subject() const =0;
 	virtual bool sendSubject(const QString &ASubject) =0;
@@ -161,14 +181,12 @@ protected:
 	virtual void roomNameChanged(const QString &AName) =0;
 	virtual void streamJidChanged(const Jid &ABefore, const Jid &AAfter) =0;
 	//Occupant
-	virtual void userPresence(IMultiUser *AUser, int AShow, const QString &AStatus) =0;
-	virtual void userDataChanged(IMultiUser *AUser, int ARole, const QVariant &ABefore, const QVariant &AAfter) =0;
-	virtual void userNickChanged(IMultiUser *AUser, const QString &AOldNick, const QString &ANewNick) =0;
-	virtual void presenceChanged(int AShow, const QString &AStatus) =0;
-	virtual void serviceMessageReceived(const Message &AMessage) =0;
+	virtual void presenceChanged(const IPresenceItem &APresence) =0;
 	virtual void messageSent(const Message &AMessage) =0;
+	virtual void serviceMessageReceived(const Message &AMessage) =0;
 	virtual void messageReceived(const QString &ANick, const Message &AMessage) =0;
 	virtual void inviteDeclined(const Jid &AContactJid, const QString &AReason) =0;
+	virtual void userChanged(IMultiUser *AUser, int AData, const QVariant &ABefore) =0;
 	//Moderator
 	virtual void subjectChanged(const QString &ANick, const QString &ASubject) =0;
 	virtual void userKicked(const QString &ANick, const QString &AReason, const QString &AByUser) =0;
@@ -186,15 +204,64 @@ protected:
 	virtual void roomDestroyed(const QString &AReason) =0;
 };
 
+class IMultiUserView
+{
+public:
+	enum ViewMode {
+		ViewFull,
+		ViewSimple,
+		ViewCompact
+	};
+public:
+	virtual QTreeView *instance() =0;
+	virtual int viewMode() const =0;
+	virtual void setViewMode(int AMode) =0;
+	// Items
+	virtual AdvancedItemModel *model() const =0;
+	virtual AdvancedItemDelegate *itemDelegate() const =0;
+	virtual IMultiUser *findItemUser(const QStandardItem *AItem) const =0;
+	virtual QStandardItem *findUserItem(const IMultiUser *AUser) const =0;
+	virtual QModelIndex indexFromItem(const QStandardItem *AItem) const =0;
+	virtual QStandardItem *itemFromIndex(const QModelIndex &AIndex) const =0;
+	// Labels
+	virtual AdvancedDelegateItem generalLabel(quint32 ALabelId) const =0;
+	virtual void insertGeneralLabel(const AdvancedDelegateItem &ALabel) =0;
+	virtual void removeGeneralLabel(quint32 ALabelId) =0;
+	virtual void insertItemLabel(const AdvancedDelegateItem &ALabel, QStandardItem *AItem) =0;
+	virtual void removeItemLabel(quint32 ALabelId, QStandardItem *AItem = NULL) =0;
+	virtual QRect labelRect(quint32 ALabeld, const QModelIndex &AIndex) const =0;
+	virtual quint32 labelAt(const QPoint &APoint, const QModelIndex &AIndex) const =0;
+	// Notify
+	virtual QStandardItem *notifyItem(int ANotifyId) const =0;
+	virtual QList<int> itemNotifies(QStandardItem *AItem) const =0;
+	virtual IMultiUserViewNotify itemNotify(int ANotifyId) const =0;
+	virtual int insertItemNotify(const IMultiUserViewNotify &ANotify, QStandardItem *AItem) =0;
+	virtual void activateItemNotify(int ANotifyId) =0;
+	virtual void removeItemNotify(int ANotifyId) =0;
+	// Context
+	virtual void contextMenuForItem(QStandardItem *AItem, Menu *AMenu) =0;
+	virtual void toolTipsForItem(QStandardItem *AItem, QMap<int,QString> &AToolTips) =0;
+protected:
+	virtual void viewModeChanged(int AMode) =0;
+	// Notify
+	virtual void itemNotifyInserted(int ANotifyId) =0;
+	virtual void itemNotifyActivated(int ANotifyId) =0;
+	virtual void itemNotifyRemoved(int ANotfyId) =0;
+	// Context
+	virtual void itemContextMenu(QStandardItem *AItem, Menu *AMenu) =0;
+	virtual void itemToolTips(QStandardItem *AItem, QMap<int,QString> &AToolTips) =0;
+};
+
 class IMultiUserChatWindow :
 	public IMessageWindow
 {
 public:
 	virtual QMainWindow *instance() =0;
+	virtual IMultiUserChat *multiUserChat() const =0;
+	virtual IMultiUserView *multiUserView() const =0;
 	virtual SplitterWidget *viewWidgetsBox() const =0;
 	virtual SplitterWidget *usersWidgetsBox() const =0;
 	virtual SplitterWidget *centralWidgetsBox() const =0;
-	virtual IMultiUserChat *multiUserChat() const =0;
 	virtual IMessageChatWindow *openPrivateChatWindow(const Jid &AContactJid) =0;
 	virtual IMessageChatWindow *findPrivateChatWindow(const Jid &AContactJid) const =0;
 	virtual void contextMenuForRoom(Menu *AMenu) =0;
@@ -239,6 +306,7 @@ protected:
 
 Q_DECLARE_INTERFACE(IMultiUser,"Vacuum.Plugin.IMultiUser/1.0")
 Q_DECLARE_INTERFACE(IMultiUserChat,"Vacuum.Plugin.IMultiUserChat/1.6")
+Q_DECLARE_INTERFACE(IMultiUserView,"Vacuum.Plugin.IMultiUserView/1.0")
 Q_DECLARE_INTERFACE(IMultiUserChatWindow,"Vacuum.Plugin.IMultiUserChatWindow/1.3")
 Q_DECLARE_INTERFACE(IMultiUserChatManager,"Vacuum.Plugin.IMultiUserChatManager/1.8")
 

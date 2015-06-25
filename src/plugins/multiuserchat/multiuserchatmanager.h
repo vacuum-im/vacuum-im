@@ -136,14 +136,12 @@ protected slots:
 	void onMultiChatDestroyed();
 	void onMultiChatWindowDestroyed();
 	void onMultiChatNameChanged(const QString &AName);
-	void onMultiChatPresenceChanged(int AShow, const QString &AStatus);
+	void onMultiChatPresenceChanged(const IPresenceItem &APresence);
 	void onMultiChatContextMenu(Menu *AMenu);
 	void onMultiUserContextMenu(IMultiUser *AUser, Menu *AMenu);
 	void onMultiUserToolTips(IMultiUser *AUser, QMap<int,QString> &AToolTips);
 	void onMultiUserPrivateChatWindowChanged(IMessageChatWindow *AWindow);
-	void onMultiUserPresenceChanged(IMultiUser *AUser, int AShow, const QString &AStatus);
-	void onMultiUserNickChanged(IMultiUser *AUser, const QString &AOldNick, const QString &ANewNick);
-	void onMultiUserDataChanged(IMultiUser *AUser, int ARole, const QVariant &ABefore, const QVariant &AAfter);
+	void onMultiUserChanged(IMultiUser *AUser, int AData, const QVariant &ABefore);
 protected slots:
 	void onMultiChatWindowInfoContextMenu(Menu *AMenu);
 	void onMultiChatWindowInfoToolTips(QMap<int,QString> &AToolTips);

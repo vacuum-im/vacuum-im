@@ -46,15 +46,14 @@ public:
 	virtual QList<quint32> rosterLabels(int AOrder, const IRosterIndex *AIndex) const;
 	virtual AdvancedDelegateItem rosterLabel(int AOrder, quint32 ALabelId, const IRosterIndex *AIndex) const;
 	//IAvatars
-	virtual QString avatarHash(const Jid &AContactJid) const;
 	virtual bool hasAvatar(const QString &AHash) const;
 	virtual QString avatarFileName(const QString &AHash) const;
+	virtual QString avatarHash(const Jid &AContactJid, bool AExact=false) const;
 	virtual QString saveAvatarData(const QByteArray &AData) const;
 	virtual QByteArray loadAvatarData(const QString &AHash) const;
 	virtual bool setAvatar(const Jid &AStreamJid, const QByteArray &AData);
 	virtual QString setCustomPictire(const Jid &AContactJid, const QByteArray &AData);
-	virtual QImage emptyAvatarImage(const QSize &AMaxSize = QSize(), bool AGray = false) const;
-	virtual QImage loadAvatarImage(const QString &AHash, const QSize &AMaxSize = QSize(), bool AGray = false) const;
+	virtual QImage loadAvatarImage(const QString &AHash=QString::null, const QSize &AMaxSize=QSize(), bool AGray=false) const;
 signals:
 	void avatarChanged(const Jid &AContactJid);
 	//IRosterDataHolder
@@ -66,19 +65,24 @@ protected:
 	QByteArray loadFromFile(const QString &AFileName) const;
 	bool saveToFile(const QString &AFileName, const QByteArray &AData) const;
 	QByteArray loadAvatarFromVCard(const Jid &AContactJid) const;
-	void updatePresence(const Jid &AStreamJid) const;
-	void updateDataHolder(const Jid &AContactJid = Jid::null);
+protected:
+	void updatePresence(const Jid &AStreamJid);
+	void updateDataHolder(const Jid &AContactJid);
 	bool updateVCardAvatar(const Jid &AContactJid, const QString &AHash, bool AFromVCard);
 	bool updateIqAvatar(const Jid &AContactJid, const QString &AHash);
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 protected slots:
+	void onVCardReceived(const Jid &AContactJid);
+	void onVCardPublished(const Jid &AStreamJid);
+protected slots:
 	void onXmppStreamOpened(IXmppStream *AXmppStream);
 	void onXmppStreamClosed(IXmppStream *AXmppStream);
-	void onVCardChanged(const Jid &AContactJid);
+protected slots:
 	void onRosterIndexInserted(IRosterIndex *AIndex);
 	void onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
 	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int, QString> &AToolTips);
+protected slots:
 	void onSetAvatarByAction(bool);
 	void onClearAvatarByAction(bool);
 	void onIconStorageChanged();
@@ -86,13 +90,16 @@ protected slots:
 	void onOptionsClosed();
 	void onOptionsChanged(const OptionsNode &ANode);
 private:
-	IPluginManager *FPluginManager;
-	IXmppStreamManager *FXmppStreamManager;
-	IStanzaProcessor *FStanzaProcessor;
 	IVCardManager *FVCardManager;
-	IPresenceManager *FPresenceManager;
 	IRostersModel *FRostersModel;
+	IStanzaProcessor *FStanzaProcessor;
+	IPresenceManager *FPresenceManager;
+	IXmppStreamManager *FXmppStreamManager;
 	IRostersViewPlugin *FRostersViewPlugin;
+private:
+	QSize FAvatarSize;
+	bool FAvatarsVisible;
+	quint32 FAvatarLabelId;
 private:
 	QMap<Jid, int> FSHIPresenceIn;
 	QMap<Jid, int> FSHIPresenceOut;
@@ -103,15 +110,12 @@ private:
 	QHash<Jid, QString> FIqAvatars;
 	QMap<QString, Jid> FIqAvatarRequests;
 private:
-	QSize FAvatarSize;
-	bool FAvatarsVisible;
 	QMap<Jid, QString> FCustomPictures;
 private:
-	quint32 FAvatarLabelId;
 	QDir FAvatarsDir;
 	QImage FEmptyAvatar;
-	QImage FEmptyGrayAvatar;
 	QMap<Jid, QString> FStreamAvatars;
+private:
 	mutable QHash<QString, QMap<QSize,QImage> > FAvatarImages;
 	mutable QHash<QString, QMap<QSize,QImage> > FAvatarGrayImages;
 };

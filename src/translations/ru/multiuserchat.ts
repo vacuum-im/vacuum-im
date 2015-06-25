@@ -586,6 +586,26 @@ Check values and try again</source>
         <source>Messages</source>
         <translation>Сообщения</translation>
     </message>
+    <message>
+        <source>Participants List</source>
+        <translation>Список участников</translation>
+    </message>
+    <message>
+        <source>Full</source>
+        <translation>Полный</translation>
+    </message>
+    <message>
+        <source>Simplified</source>
+        <translation>Упрощенный</translation>
+    </message>
+    <message>
+        <source>Compact</source>
+        <translation>Компактный</translation>
+    </message>
+    <message>
+        <source>Participants list view:</source>
+        <translation>Вид списка участников:</translation>
+    </message>
 </context>
 <context>
     <name>MultiUserChatWindow</name>

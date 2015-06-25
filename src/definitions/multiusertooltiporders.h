@@ -3,6 +3,7 @@
 
 #include <definitions/rostertooltiporders.h>
 
+#define MUTTO_MULTIUSERCHAT_AVATAR                      RTTO_AVATAR_IMAGE
 #define MUTTO_MULTIUSERCHAT_NICKNAME                    RTTO_ROSTERSVIEW_INFO_NAME
 #define MUTTO_MULTIUSERCHAT_REALJID                     RTTO_ROSTERSVIEW_INFO_JABBERID
 #define MUTTO_MULTIUSERCHAT_ROLE                        RTTO_MULTIUSERCHAT_ROLE

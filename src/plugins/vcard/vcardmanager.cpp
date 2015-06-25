@@ -306,7 +306,6 @@ void VCardManager::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 		if (AStanza.type() == "result")
 		{
 			LOG_STRM_INFO(AStreamJid,QString("User vCard loaded, jid=%1, id=%2").arg(fromJid.full(),AStanza.id()));
-			FSearchStrings.remove(fromJid);
 			saveVCardFile(fromJid,elem);
 			emit vcardReceived(fromJid);
 		}
@@ -314,27 +313,24 @@ void VCardManager::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 		{
 			XmppStanzaError err(AStanza);
 			LOG_STRM_WARNING(AStreamJid,QString("Failed to load user vCard, jid=%1, id=%2: %3").arg(fromJid.full(),AStanza.id(),err.condition()));
-			FSearchStrings.remove(fromJid);
 			saveVCardFile(fromJid,QDomElement());
 			emit vcardError(fromJid,err);
 		}
 	}
 	else if (FVCardPublishId.contains(AStanza.id()))
 	{
-		Jid streamJid = FVCardPublishId.take(AStanza.id());
-		Stanza stanza = FVCardPublishStanza.take(AStanza.id());
+		Stanza stanza = FVCardPublishId.take(AStanza.id());
 		if (AStanza.type() == "result")
 		{
 			LOG_STRM_INFO(AStreamJid,QString("Self vCard published, id=%1").arg(AStanza.id()));
-			FSearchStrings.remove(streamJid);
-			saveVCardFile(streamJid,stanza.element().firstChildElement(VCARD_TAGNAME));
-			emit vcardPublished(streamJid);
+			saveVCardFile(AStreamJid.bare(),stanza.element().firstChildElement(VCARD_TAGNAME));
+			emit vcardPublished(AStreamJid);
 		}
 		else
 		{
 			XmppStanzaError err(AStanza);
 			LOG_STRM_WARNING(AStreamJid,QString("Failed to publish self vCard, id=%1: %2").arg(AStanza.id(),err.condition()));
-			emit vcardError(streamJid,err);
+			emit vcardError(AStreamJid,err);
 		}
 	}
 }
@@ -408,7 +404,7 @@ bool VCardManager::requestVCard(const Jid &AStreamJid, const Jid &AContactJid)
 
 bool VCardManager::publishVCard(const Jid &AStreamJid, IVCard *AVCard)
 {
-	if (FStanzaProcessor && AVCard->isValid() && FVCardPublishId.key(AStreamJid.pBare()).isEmpty())
+	if (FStanzaProcessor && AVCard->isValid())
 	{
 		restrictVCardImagesSize(AVCard);
 
@@ -419,8 +415,7 @@ bool VCardManager::publishVCard(const Jid &AStreamJid, IVCard *AVCard)
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,VCARD_TIMEOUT))
 		{
 			LOG_STRM_INFO(AStreamJid,QString("Self vCard publish request sent, id=%1").arg(stanza.id()));
-			FVCardPublishId.insert(stanza.id(),AStreamJid.pBare());
-			FVCardPublishStanza.insert(stanza.id(),stanza);
+			FVCardPublishId.insert(stanza.id(),stanza);
 			return true;
 		}
 		else
@@ -550,6 +545,7 @@ void VCardManager::saveVCardFile(const Jid &AContactJid,const QDomElement &AElem
 		{
 			REPORT_ERROR(QString("Failed to save vCard to file: %1").arg(file.errorString()));
 		}
+		FSearchStrings.remove(AContactJid.bare());
 	}
 	else
 	{
@@ -696,11 +692,11 @@ void VCardManager::onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiU
 	Action *action = new Action(AMenu);
 	action->setText(tr("Show Profile"));
 	action->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
-	action->setData(ADR_STREAM_JID,AUser->data(MUDR_STREAM_JID));
-	if (!AUser->data(MUDR_REAL_JID).toString().isEmpty())
-		action->setData(ADR_CONTACT_JID,Jid(AUser->data(MUDR_REAL_JID).toString()).bare());
+	action->setData(ADR_STREAM_JID,AUser->streamJid().full());
+	if (AUser->realJid().isValid())
+		action->setData(ADR_CONTACT_JID,AUser->realJid().bare());
 	else
-		action->setData(ADR_CONTACT_JID,AUser->data(MUDR_CONTACT_JID));
+		action->setData(ADR_CONTACT_JID,AUser->userJid().full());
 	AMenu->addAction(action,AG_MUCM_VCARD,true);
 	connect(action,SIGNAL(triggered(bool)),SLOT(onShowVCardDialogByAction(bool)));
 }
