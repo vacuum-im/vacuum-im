@@ -217,6 +217,7 @@ private:
 	IRegistration *FRegistration;
 	IRegisterFields FRegisterFields;
 	IRegisterSubmit FRegisterSubmit;
+	QMap<QString, QVariant> FChangedFields;
 };
 
 
