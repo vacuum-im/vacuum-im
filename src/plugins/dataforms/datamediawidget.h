@@ -20,7 +20,7 @@ signals:
 	void mediaShown();
 	void mediaError(const XmppError &AError);
 protected slots:
-	void loadUri();
+	void loadNextUri();
 protected:
 	bool updateWidget(const IDataMediaURI &AUri, const QByteArray &AData);
 protected slots:

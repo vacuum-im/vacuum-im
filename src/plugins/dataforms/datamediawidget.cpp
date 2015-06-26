@@ -23,7 +23,8 @@ DataMediaWidget::DataMediaWidget(IDataForms *ADataForms, const IDataMedia &AMedi
 	FUriIndex = 0;
 	FLastError = XmppError(IERR_DATAFORMS_MEDIA_INVALID_TYPE);
 
-	QTimer::singleShot(0,this,SLOT(loadUri()));
+	// Delayed load to emit mediaShown signal
+	QTimer::singleShot(0,this,SLOT(loadNextUri()));
 }
 
 IDataMedia DataMediaWidget::media() const
@@ -36,7 +37,7 @@ IDataMediaURI DataMediaWidget::mediaUri() const
 	return FMedia.uris.value(FUriIndex);
 }
 
-void DataMediaWidget::loadUri()
+void DataMediaWidget::loadNextUri()
 {
 	if (FUriIndex < FMedia.uris.count())
 	{
@@ -50,7 +51,7 @@ void DataMediaWidget::loadUri()
 		else
 		{
 			FUriIndex++;
-			loadUri();
+			loadNextUri();
 		}
 	}
 	else
@@ -119,7 +120,7 @@ void DataMediaWidget::onUrlLoaded(const QUrl &AUrl, const QByteArray &AData)
 		{
 			FUriIndex++;
 			FLastError = XmppError(IERR_DATAFORMS_MEDIA_INVALID_FORMAT);
-			loadUri();
+			loadNextUri();
 		}
 	}
 }
@@ -130,6 +131,6 @@ void DataMediaWidget::onUrlLoadFailed(const QUrl &AUrl, const XmppError &AError)
 	{
 		FUriIndex++;
 		FLastError = AError;
-		loadUri();
+		loadNextUri();
 	}
 }
