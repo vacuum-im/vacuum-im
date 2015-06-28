@@ -207,6 +207,7 @@ protected slots:
 	void onStatusIconsChanged();
 	void onAutoRejoinAfterKick();
 	void onOptionsChanged(const OptionsNode &ANode);
+	void onCentralSplitterHandleMoved(int AOrderId, int ASize);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onArchiveRequestFailed(const QString &AId, const XmppError &AError);
 	void onArchiveMessagesLoaded(const QString &AId, const IArchiveCollectionBody &ABody);
@@ -225,6 +226,7 @@ private:
 	Action *FOwnersList;
 	Action *FConfigRoom;
 	Action *FDestroyRoom;
+	Action *FUsersHide;
 private:
 	IAvatars *FAvatars;
 	IDataForms *FDataForms;

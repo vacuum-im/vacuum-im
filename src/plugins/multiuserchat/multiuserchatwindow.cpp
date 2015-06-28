@@ -53,6 +53,8 @@
 
 #define REJOIN_AFTER_KICK_MSEC      500
 
+#define DEFAULT_USERS_LIST_WIDTH    130
+
 MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatManager *AMultiChatManager, IMultiUserChat *AMultiChat) : QMainWindow(NULL)
 {
 	REPORT_VIEW;
@@ -104,6 +106,7 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatManager *AMultiChatManage
 	setCentralWidget(FMainSplitter);
 
 	FCentralSplitter = new SplitterWidget(FMainSplitter,Qt::Horizontal);
+	connect(FCentralSplitter,SIGNAL(handleMoved(int,int)),SLOT(onCentralSplitterHandleMoved(int,int)));
 	FMainSplitter->insertWidget(MUCWW_CENTRALSPLITTER,FCentralSplitter,100);
 
 	FViewSplitter = new SplitterWidget(FCentralSplitter,Qt::Vertical);
@@ -1074,26 +1077,45 @@ void MultiUserChatWindow::createStaticRoomActions()
 	connect(FExitRoom,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
 	QToolButton *exitButton = FToolBarWidget->toolBarChanger()->insertAction(FExitRoom, TBG_MCWTBW_ROOM_EXIT);
 	exitButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
+	FUsersHide = new Action(this);
+	FUsersHide->setCheckable(true);
+	FUsersHide->setToolTip(tr("Hide/Show Participants List"));
+	FUsersHide->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_USERS_HIDE);
+	connect(FUsersHide,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
+	FToolBarWidget->toolBarChanger()->insertAction(FUsersHide, TBG_MCWTBW_USERS_HIDE);
 }
 
 void MultiUserChatWindow::saveWindowState()
 {
 	if (FStateLoaded)
 	{
-		int size = FCentralSplitter->handleSize(MUCWW_USERSHANDLE);
-		Options::setFileValue(size>0 ? size : -1,"muc.mucwindow.users-list-width",tabPageId());
+		int width = FCentralSplitter->handleSize(MUCWW_USERSHANDLE);
+		if (width > 0)
+		{
+			Options::setFileValue(width,"muc.mucwindow.users-list-width",tabPageId());
+			Options::setFileValue(false,"muc.mucwindow.users-list-hidden",tabPageId());
+		}
+		else
+		{
+			Options::setFileValue(true,"muc.mucwindow.users-list-hidden",tabPageId());
+		}
 	}
 }
 
 void MultiUserChatWindow::loadWindowState()
 {
 	int size = Options::fileValue("muc.mucwindow.users-list-width",tabPageId()).toInt();
-	if (size > 0)
-		FCentralSplitter->setHandleSize(MUCWW_USERSHANDLE,size);
-	else if (size < 0)
+	bool hidden = Options::fileValue("muc.mucwindow.users-list-hidden",tabPageId()).toBool();
+
+	if (hidden)
 		FCentralSplitter->setHandleSize(MUCWW_USERSHANDLE,0);
+	else if (size > 0)
+		FCentralSplitter->setHandleSize(MUCWW_USERSHANDLE,size);
 	else
-		FCentralSplitter->setHandleSize(MUCWW_USERSHANDLE,130);
+		FCentralSplitter->setHandleSize(MUCWW_USERSHANDLE,DEFAULT_USERS_LIST_WIDTH);
+	FUsersHide->setChecked(!hidden);
+	
 	FStateLoaded = true;
 }
 
@@ -2420,6 +2442,20 @@ void MultiUserChatWindow::onRoomActionTriggered(bool)
 				FMultiChat->destroyRoom(reason);
 		}
 	}
+	else if (action == FUsersHide)
+	{
+		if (FUsersHide->isChecked())
+		{
+			int width = Options::fileValue("muc.mucwindow.users-list-width",tabPageId()).toInt();
+			FCentralSplitter->setHandleSize(MUCWW_USERSHANDLE, width>0 ? width : DEFAULT_USERS_LIST_WIDTH);
+		}
+		else
+		{
+			int width = FCentralSplitter->handleSize(MUCWW_USERSHANDLE);
+			Options::setFileValue(width,"muc.mucwindow.users-list-width",tabPageId());
+			FCentralSplitter->setHandleSize(MUCWW_USERSHANDLE,0);
+		}
+	}
 }
 
 void MultiUserChatWindow::onNickCompleteMenuActionTriggered(bool)
@@ -2514,6 +2550,17 @@ void MultiUserChatWindow::onOptionsChanged(const OptionsNode &ANode)
 	if (ANode.path() == OPV_MUC_GROUPCHAT_USERVIEWMODE)
 	{
 		FUsersView->setViewMode(ANode.value().toInt());
+	}
+}
+
+void MultiUserChatWindow::onCentralSplitterHandleMoved(int AOrderId, int ASize)
+{
+	if (AOrderId == MUCWW_USERSHANDLE)
+	{
+		if (ASize<=0 && FUsersHide->isChecked())
+			FUsersHide->setChecked(false);
+		else if (ASize>0 && !FUsersHide->isChecked())
+			FUsersHide->setChecked(true);
 	}
 }
 

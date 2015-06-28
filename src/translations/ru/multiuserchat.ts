@@ -1021,5 +1021,9 @@ Check values and try again</source>
         <source>[%1] in [%2]</source>
         <translation>[%1] в [%2]</translation>
     </message>
+    <message>
+        <source>Hide/Show Participants List</source>
+        <translation>Скрыть/Показать список участников</translation>
+    </message>
 </context>
 </TS>

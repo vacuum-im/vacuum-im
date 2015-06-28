@@ -84,4 +84,8 @@
     <key>mucUserMenu</key>
     <object mime="image/png">mucusermenu.png</object>
   </icon>
+  <icon>
+    <key>mucUsersHide</key>
+    <object mime="image/png">mucusershide.png</object>
+  </icon>
 </icondef>
