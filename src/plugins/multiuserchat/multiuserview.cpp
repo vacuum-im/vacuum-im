@@ -20,7 +20,7 @@ MultiUserView::MultiUserView(IMultiUserChat *AMultiChat, QWidget *AParent) : QTr
 	setContextMenuPolicy(Qt::DefaultContextMenu);
 	setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 
-	FAvatarSize = QSize(24,24);
+	FAvatarSize = 24;
 	FViewMode = IMultiUserView::ViewFull;
 
 	header()->hide();
@@ -94,7 +94,7 @@ QVariant MultiUserView::advancedItemData(int AOrder, const QStandardItem *AItem,
 			case MUDR_AFFILIATION:
 				return user->affiliation();
 			case MUDR_AVATAR_IMAGE:
-				return FAvatars!=NULL ? FAvatars->loadAvatarImage(FAvatars->avatarHash(user->userJid()),FAvatarSize) : QVariant();
+				return FAvatars!=NULL ? FAvatars->visibleAvatarImage(FAvatars->avatarHash(user->userJid()),FAvatarSize) : QVariant();
 			}
 		}
 	}
@@ -150,12 +150,18 @@ void MultiUserView::setViewMode(int AMode)
 			avatarLabel.d->kind = AdvancedDelegateItem::CustomData;
 			avatarLabel.d->data = MUDR_AVATAR_IMAGE;
 			insertGeneralLabel(avatarLabel);
-
-			FAvatarSize = FViewMode==IMultiUserView::ViewFull ? QSize(32,32) : QSize(24,24);
 		}
 		else
 		{
 			removeGeneralLabel(MUIL_MULTIUSERCHAT_AVATAR);
+		}
+
+		if (FAvatars)
+		{
+			if (FViewMode == IMultiUserView::ViewFull)
+				FAvatarSize = FAvatars->avatarSize(IAvatars::AvatarNormal);
+			else
+				FAvatarSize = FAvatars->avatarSize(IAvatars::AvatarSmall);
 		}
 
 		emit viewModeChanged(FViewMode);

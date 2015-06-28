@@ -835,8 +835,8 @@ void MultiUserChatWindow::toolTipsForUser(IMultiUser *AUser, QMap<int,QString> &
 {
 	if (FUsers.contains(AUser))
 	{
-		QString avatar = FAvatars!=NULL ? FAvatars->avatarHash(AUser->userJid()) : QString::null;
-		if (!avatar.isEmpty() && FAvatars->hasAvatar(avatar))
+		QString avatar = FAvatars!=NULL ? FAvatars->avatarHash(AUser->userJid(),true) : QString::null;
+		if (FAvatars->hasAvatar(avatar))
 		{
 			QString fileName = FAvatars->avatarFileName(avatar);
 			QSize imageSize = QImageReader(fileName).size();
@@ -1676,11 +1676,11 @@ void MultiUserChatWindow::updatePrivateChatWindow(IMessageChatWindow *AWindow)
 	{
 		if (FAvatars)
 		{
-			QString avatar = FAvatars->avatarHash(user->userJid());
-			if (!avatar.isEmpty() && FAvatars->hasAvatar(avatar))
+			QString avatar = FAvatars->avatarHash(user->userJid(), true);
+			if (FAvatars->hasAvatar(avatar))
 				AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::Avatar,avatar);
 			else
-				AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::Avatar,FAvatars->loadAvatarImage());
+				AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::Avatar,FAvatars->emptyAvatarImage(FAvatars->avatarSize(IAvatars::AvatarSmall)));
 		}
 
 		QString name = tr("[%1] in [%2]").arg(user->nick(),FMultiChat->roomShortName());

@@ -10,42 +10,52 @@ ImageManager::ImageManager()
 
 QImage ImageManager::grayscaled(const QImage &AImage)
 {
-	QImage img = AImage;
-	if (!AImage.isNull())
+	if (!AImage.isNull() && !AImage.isGrayscale())
 	{
-		int pixels = img.width() * img.height();
-		if (pixels*(int)sizeof(QRgb) <= img.byteCount())
+		QImage result = AImage;
+		int pixels = result.width() * result.height();
+		if (pixels*(int)sizeof(QRgb) <= result.byteCount())
 		{
-			QRgb *data = (QRgb *)img.bits();
-			for (int i = 0; i < pixels; i++)
+			QRgb *data = (QRgb *)result.bits();
+			for (int i = 0; i<pixels; i++)
 			{
 				int val = qGray(data[i]);
 				data[i] = qRgba(val, val, val, qAlpha(data[i]));
 			}
+			return result;
 		}
 	}
-	return img;
+	return AImage;
 }
 
 QImage ImageManager::squared(const QImage &AImage, int ASize)
 {
 	if (!AImage.isNull() && ((AImage.width()!=ASize) || (AImage.height()!=ASize)))
 	{
-		QImage squaredImage(ASize, ASize, QImage::Format_ARGB32);
-		squaredImage.fill(QColor(0, 0, 0, 0).rgba());
-		int w = AImage.width(), h = AImage.height();
-		QPainter p(&squaredImage);
+		QImage result(ASize, ASize, QImage::Format_ARGB32);
+		result.fill(QColor(0, 0, 0, 0).rgba());
+
+		int w = AImage.width();
+		int h = AImage.height();
+		QImage scaled = AImage;
+		if (w<h && h!=ASize)
+			scaled = AImage.scaledToHeight(ASize, Qt::SmoothTransformation);
+		else if (w>=h && w!=ASize)
+			scaled = AImage.scaledToWidth(ASize, Qt::SmoothTransformation);
+
+		w = scaled.width();
+		h = scaled.height();
 		QPoint offset(0,0);
-		QImage copy = (w < h) ? ((h == ASize) ? AImage : AImage.scaledToHeight(ASize, Qt::SmoothTransformation)) : ((w == ASize) ? AImage : AImage.scaledToWidth(ASize, Qt::SmoothTransformation));
-		w = copy.width();
-		h = copy.height();
 		if (w > h)
 			offset.setY((ASize - h) / 2);
 		else if (h > w)
 			offset.setX((ASize - w) / 2);
-		p.drawImage(offset, copy);
+
+		QPainter p(&result);
+		p.drawImage(offset, scaled);
 		p.end();
-		return squaredImage;
+
+		return result;
 	}
 	return AImage;
 }
@@ -54,28 +64,28 @@ QImage ImageManager::roundSquared(const QImage &AImage, int ASize, int ARadius)
 {
 	if (!AImage.isNull())
 	{
-		QImage shapeImg(QSize(ASize, ASize), QImage::Format_ARGB32_Premultiplied);
-		shapeImg.fill(QColor(0, 0, 0, 0).rgba());
+		QImage shapeImage(QSize(ASize, ASize), QImage::Format_ARGB32_Premultiplied);
+		shapeImage.fill(QColor(0, 0, 0, 0).rgba());
 
-		QPainter sp(&shapeImg);
+		QPainter sp(&shapeImage);
 		sp.setRenderHint(QPainter::Antialiasing);
 		sp.fillRect(0, 0, ASize, ASize, Qt::transparent);
 		sp.setPen(QPen(Qt::color1));
 		sp.setBrush(QBrush(Qt::color1));
 		sp.drawRoundedRect(QRect(0, 0, ASize, ASize), ARadius + 1, ARadius + 1);
 		sp.end();
-		
-		QImage roundSquaredImage(ASize, ASize, QImage::Format_ARGB32_Premultiplied);
-		roundSquaredImage.fill(QColor(0, 0, 0, 0).rgba());
-		
-		QPainter p(&roundSquaredImage);
+	
+		QImage result(ASize, ASize, QImage::Format_ARGB32_Premultiplied);
+		result.fill(QColor(0, 0, 0, 0).rgba());
+
+		QPainter p(&result);
 		p.fillRect(0, 0, ASize, ASize, Qt::transparent);
-		p.drawImage(0, 0, shapeImg);
+		p.drawImage(0, 0, shapeImage);
 		p.setCompositionMode(QPainter::CompositionMode_SourceIn);
 		p.drawImage(0, 0, squared(AImage, ASize));
 		p.end();
 
-		return roundSquaredImage;
+		return result;
 	}
 	return AImage;
 }
@@ -84,25 +94,25 @@ QImage ImageManager::addShadow(const QImage &AImage, const QColor &AColor, const
 {
 	if (!AImage.isNull())
 	{
-		QImage shadowed(AImage.size(), AImage.format());
-		shadowed.fill(QColor(0, 0, 0, 0).rgba());
+		QImage result(AImage.size(), AImage.format());
+		result.fill(QColor(0, 0, 0, 0).rgba());
 
-		QImage tmp(AImage.size(), QImage::Format_ARGB32_Premultiplied);
-		tmp.fill(0);
+		QImage shadow(AImage.size(), QImage::Format_ARGB32_Premultiplied);
+		shadow.fill(0);
 
-		QPainter tmpPainter(&tmp);
-		tmpPainter.setCompositionMode(QPainter::CompositionMode_Source);
-		tmpPainter.drawPixmap(AOffset, QPixmap::fromImage(AImage));
-		tmpPainter.setCompositionMode(QPainter::CompositionMode_SourceIn);
-		tmpPainter.fillRect(tmp.rect(), AColor);
-		tmpPainter.end();
+		QPainter sp(&shadow);
+		sp.setCompositionMode(QPainter::CompositionMode_Source);
+		sp.drawPixmap(AOffset, QPixmap::fromImage(AImage));
+		sp.setCompositionMode(QPainter::CompositionMode_SourceIn);
+		sp.fillRect(shadow.rect(), AColor);
+		sp.end();
 
-		QPainter p(&shadowed);
-		p.drawImage(0, 0, tmp);
+		QPainter p(&result);
+		p.drawImage(0, 0, shadow);
 		p.drawImage(0, 0, AImage);
 		p.end();
 
-		return shadowed;
+		return result;
 	}
 	return AImage;
 }
@@ -111,14 +121,16 @@ QImage ImageManager::colorized(const QImage &AImage, const QColor &AColor)
 {
 	if (!AImage.isNull())
 	{
-		QImage resultImage(AImage.size(), QImage::Format_ARGB32_Premultiplied);
-		QPainter painter(&resultImage);
+		QImage result(AImage.size(), QImage::Format_ARGB32_Premultiplied);
+
+		QPainter painter(&result);
 		painter.drawImage(0, 0, grayscaled(AImage));
 		painter.setCompositionMode(QPainter::CompositionMode_Screen);
-		painter.fillRect(resultImage.rect(), AColor);
+		painter.fillRect(result.rect(), AColor);
 		painter.end();
-		resultImage.setAlphaChannel(AImage.alphaChannel());
-		return resultImage;
+
+		result.setAlphaChannel(AImage.alphaChannel());
+		return result;
 	}
 	return AImage;
 }
@@ -127,14 +139,16 @@ QImage ImageManager::opacitized(const QImage &AImage, double AOpacity)
 {
 	if (!AImage.isNull())
 	{
-		QImage resultImage(AImage.size(), QImage::Format_ARGB32);
-		resultImage.fill(QColor::fromRgb(0, 0, 0, 0).rgba());
-		QPainter painter(&resultImage);
+		QImage result(AImage.size(), QImage::Format_ARGB32);
+		result.fill(QColor::fromRgb(0, 0, 0, 0).rgba());
+
+		QPainter painter(&result);
 		painter.setOpacity(AOpacity);
 		painter.drawImage(0, 0, AImage);
 		painter.end();
-		resultImage.setAlphaChannel(AImage.alphaChannel());
-		return resultImage;
+
+		result.setAlphaChannel(AImage.alphaChannel());
+		return result;
 	}
 	return AImage;
 }
@@ -143,13 +157,15 @@ QImage ImageManager::addSpace(const QImage &AImage, int ALeft, int ATop, int ARi
 {
 	if (!AImage.isNull())
 	{
-		QImage resultImage(AImage.size() + QSize(ALeft + ARight, ATop + ABottom), QImage::Format_ARGB32);
-		resultImage.fill(QColor::fromRgb(0, 0, 0, 0).rgba());
-		QPainter painter(&resultImage);
+		QImage result(AImage.size() + QSize(ALeft + ARight, ATop + ABottom), QImage::Format_ARGB32);
+		result.fill(QColor::fromRgb(0, 0, 0, 0).rgba());
+
+		QPainter painter(&result);
 		painter.drawImage(ALeft, ATop, AImage);
 		painter.end();
-		resultImage.setAlphaChannel(AImage.alphaChannel());
-		return resultImage;
+
+		result.setAlphaChannel(AImage.alphaChannel());
+		return result;
 	}
 	return AImage;
 }
@@ -158,18 +174,22 @@ QImage ImageManager::rotatedImage(const QImage &AImage, qreal AAngle)
 {
 	if (!AImage.isNull())
 	{
-		QImage rotated(AImage.size(), QImage::Format_ARGB32_Premultiplied);
-		rotated.fill(Qt::transparent);
-		QPainter p(&rotated);
+		QImage result(AImage.size(), QImage::Format_ARGB32_Premultiplied);
+		result.fill(Qt::transparent);
+
+		qreal dx = AImage.size().width() / 2.0;
+		qreal dy = AImage.size().height() / 2.0;
+
+		QPainter p(&result);
 		p.setRenderHint(QPainter::Antialiasing);
 		p.setRenderHint(QPainter::SmoothPixmapTransform);
-		qreal dx = AImage.size().width() / 2.0, dy = AImage.size().height() / 2.0;
 		p.translate(dx, dy);
 		p.rotate(AAngle);
 		p.translate(-dx, -dy);
 		p.drawImage(0, 0, AImage);
 		p.end();
-		return rotated;
+		
+		return result;
 	}
 	return AImage;
 }

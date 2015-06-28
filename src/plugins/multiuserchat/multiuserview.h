@@ -85,7 +85,7 @@ private:
 	QMultiMap<QStandardItem *, int> FItemNotifies;
 private:
 	int FViewMode;
-	QSize FAvatarSize;
+	int FAvatarSize;
 	AdvancedItemModel *FModel;
 	AdvancedItemDelegate *FDelegate;
 	QHash<const IMultiUser *, QStandardItem *> FUserItem;

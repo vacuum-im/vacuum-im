@@ -538,10 +538,10 @@ void ChatMessageHandler::updateWindow(IMessageChatWindow *AWindow)
 	if (FAvatars)
 	{
 		QString avatar = FAvatars->avatarHash(AWindow->contactJid());
-		if (!avatar.isEmpty() && FAvatars->hasAvatar(avatar))
+		if (FAvatars->hasAvatar(avatar))
 			AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::Avatar,avatar);
 		else
-			AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::Avatar,FAvatars->loadAvatarImage());
+			AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::Avatar,FAvatars->emptyAvatarImage(FAvatars->avatarSize(IAvatars::AvatarSmall)));
 	}
 
 	QString name = FMessageStyleManager!=NULL ? FMessageStyleManager->contactName(AWindow->streamJid(),AWindow->contactJid()) : AWindow->contactJid().uFull();

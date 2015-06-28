@@ -80,7 +80,7 @@ bool InBandStream::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 		AAccept = true;
 		if (AStanza.firstElement("error").isNull())
 		{
-			QByteArray data =  QByteArray::fromBase64(elem.text().toUtf8());
+			QByteArray data =  QByteArray::fromBase64(elem.text().toLatin1());
 			if (FSeqIn==elem.attribute("seq").toInt() && data.size()>0 && data.size()<=FBlockSize)
 			{
 				if (AStanza.tagName() == "iq")

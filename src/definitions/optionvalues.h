@@ -35,6 +35,11 @@
 #define OPV_ACCOUNT_HISTORYREPLICATE                    "accounts.account.history-replicate"
 #define OPV_ACCOUNT_HISTORYDUPLICATE                    "accounts.account.history-duplicate"
 
+// Avatars
+#define OPV_AVATARS_SMALLSIZE                           "avatars.small-size"
+#define OPV_AVATARS_LARGESIZE                           "avatars.large-size"
+#define OPV_AVATARS_NORMALSIZE                          "avatars.normal-size"
+
 // BirthdayReminder
 #define OPV_BIRTHDAYREMINDER_STARTTIME                  "birthdayreminder.start-time"
 #define OPV_BIRTHDAYREMINDER_STOPTIME                   "birthdayreminder.stop-time"

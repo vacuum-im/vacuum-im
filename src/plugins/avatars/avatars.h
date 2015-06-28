@@ -2,6 +2,9 @@
 #define AVATARS_H
 
 #include <QDir>
+#include <QSet>
+#include <QRunnable>
+#include <QThreadPool>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iavatars.h>
 #include <interfaces/ixmppstreammanager.h>
@@ -11,6 +14,25 @@
 #include <interfaces/irostersview.h>
 #include <interfaces/irostersmodel.h>
 #include <utils/options.h>
+
+class LoadAvatarTask :
+	public QRunnable
+{
+public:
+	LoadAvatarTask(QObject *AAvatars, const QString &AFile, quint8 ASize, bool AVCard);
+	QByteArray parseFile(QFile *AFile) const;
+	virtual void run();
+public:
+	bool FVCard;
+	quint8 FSize;
+	QString FFile;
+	QObject *FAvatars;
+public:
+	QString FHash;
+	QByteArray FData;
+	QImage FGrayImage;
+	QImage FColorImage;
+};
 
 class Avatars :
 	public QObject,
@@ -46,6 +68,7 @@ public:
 	virtual QList<quint32> rosterLabels(int AOrder, const IRosterIndex *AIndex) const;
 	virtual AdvancedDelegateItem rosterLabel(int AOrder, quint32 ALabelId, const IRosterIndex *AIndex) const;
 	//IAvatars
+	virtual quint8 avatarSize(int AType) const;
 	virtual bool hasAvatar(const QString &AHash) const;
 	virtual QString avatarFileName(const QString &AHash) const;
 	virtual QString avatarHash(const Jid &AContactJid, bool AExact=false) const;
@@ -53,7 +76,10 @@ public:
 	virtual QByteArray loadAvatarData(const QString &AHash) const;
 	virtual bool setAvatar(const Jid &AStreamJid, const QByteArray &AData);
 	virtual QString setCustomPictire(const Jid &AContactJid, const QByteArray &AData);
-	virtual QImage loadAvatarImage(const QString &AHash=QString::null, const QSize &AMaxSize=QSize(), bool AGray=false) const;
+	virtual QImage emptyAvatarImage(quint8 ASize, bool AGray=false) const;
+	virtual QImage cachedAvatarImage(const QString &AHash, quint8 ASize, bool AGray=false) const;
+	virtual QImage loadAvatarImage(const QString &AHash, quint8 ASize, bool AGray=false) const;
+	virtual QImage visibleAvatarImage(const QString &AHash, quint8 ASize, bool AGray=false) const;
 signals:
 	void avatarChanged(const Jid &AContactJid);
 	//IRosterDataHolder
@@ -62,9 +88,12 @@ signals:
 	void rosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex = NULL);
 protected:
 	QString getImageFormat(const QByteArray &AData) const;
-	QByteArray loadFromFile(const QString &AFileName) const;
-	bool saveToFile(const QString &AFileName, const QByteArray &AData) const;
-	QByteArray loadAvatarFromVCard(const Jid &AContactJid) const;
+	QByteArray loadFileData(const QString &AFileName) const;
+	bool saveFileData(const QString &AFileName, const QByteArray &AData) const;
+	void storeAvatarImages(const QString &AHash, quint8 ASize, const QImage &AColor, const QImage &AGray) const;
+protected:
+	bool startLoadVCardAvatar(const Jid &AContactJid);
+	void startLoadAvatarTask(const Jid &AContactJid, LoadAvatarTask *ATask);
 protected:
 	void updatePresence(const Jid &AStreamJid);
 	void updateDataHolder(const Jid &AContactJid);
@@ -74,6 +103,7 @@ protected:
 protected slots:
 	void onVCardReceived(const Jid &AContactJid);
 	void onVCardPublished(const Jid &AStreamJid);
+	void onLoadAvatarTaskFinished(LoadAvatarTask *ATask);
 protected slots:
 	void onXmppStreamOpened(IXmppStream *AXmppStream);
 	void onXmppStreamClosed(IXmppStream *AXmppStream);
@@ -97,9 +127,13 @@ private:
 	IXmppStreamManager *FXmppStreamManager;
 	IRostersViewPlugin *FRostersViewPlugin;
 private:
-	QSize FAvatarSize;
+	quint8 FAvatarSize;
 	bool FAvatarsVisible;
 	quint32 FAvatarLabelId;
+private:
+	QDir FAvatarsDir;
+	QImage FEmptyAvatar;
+	QMap<Jid, QString> FStreamAvatars;
 private:
 	QMap<Jid, int> FSHIPresenceIn;
 	QMap<Jid, int> FSHIPresenceOut;
@@ -112,12 +146,11 @@ private:
 private:
 	QMap<Jid, QString> FCustomPictures;
 private:
-	QDir FAvatarsDir;
-	QImage FEmptyAvatar;
-	QMap<Jid, QString> FStreamAvatars;
-private:
-	mutable QHash<QString, QMap<QSize,QImage> > FAvatarImages;
-	mutable QHash<QString, QMap<QSize,QImage> > FAvatarGrayImages;
+	QThreadPool FThreadPool;
+	QHash<QString, LoadAvatarTask *> FFileTasks;
+	QHash<LoadAvatarTask *, QSet<Jid> > FTaskContacts;
+	mutable QHash<QString, QMap<quint8, QImage> > FAvatarImages;
+	mutable QHash<QString, QMap<quint8, QImage> > FAvatarGrayImages;
 };
 
 #endif // AVATARS_H
