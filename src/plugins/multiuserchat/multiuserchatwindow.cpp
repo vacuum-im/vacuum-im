@@ -106,13 +106,17 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatManager *AMultiChatManage
 	setCentralWidget(FMainSplitter);
 
 	FCentralSplitter = new SplitterWidget(FMainSplitter,Qt::Horizontal);
+	FCentralSplitter->setSpacing(3);
 	connect(FCentralSplitter,SIGNAL(handleMoved(int,int)),SLOT(onCentralSplitterHandleMoved(int,int)));
-	FMainSplitter->insertWidget(MUCWW_CENTRALSPLITTER,FCentralSplitter,100);
 
 	FViewSplitter = new SplitterWidget(FCentralSplitter,Qt::Vertical);
-	FCentralSplitter->insertWidget(MUCWW_VIEWSPLITTER,FViewSplitter,75);
+	FViewSplitter->setSpacing(3);
 
 	FUsersSplitter = new SplitterWidget(FCentralSplitter,Qt::Vertical);
+	FUsersSplitter->setSpacing(3);
+
+	FMainSplitter->insertWidget(MUCWW_CENTRALSPLITTER,FCentralSplitter,100);
+	FCentralSplitter->insertWidget(MUCWW_VIEWSPLITTER,FViewSplitter,75);
 	FCentralSplitter->insertWidget(MUCWW_USERSSPLITTER,FUsersSplitter,25,MUCWW_USERSHANDLE);
 	FCentralSplitter->setHandleCollapsible(MUCWW_USERSHANDLE,true);
 	FCentralSplitter->setHandleStretchable(MUCWW_USERSHANDLE,false);
@@ -967,7 +971,7 @@ void MultiUserChatWindow::createMessageWidgets()
 		FInfoWidget = FMessageWidgets->newInfoWidget(this,FMainSplitter);
 		FMainSplitter->insertWidget(MUCWW_INFOWIDGET,FInfoWidget->instance());
 
-		FViewWidget = FMessageWidgets->newViewWidget(this,FCentralSplitter);
+		FViewWidget = FMessageWidgets->newViewWidget(this,FViewSplitter);
 		connect(FViewWidget->instance(),SIGNAL(contentAppended(const QString &, const IMessageStyleContentOptions &)),
 			SLOT(onMultiChatContentAppended(const QString &, const IMessageStyleContentOptions &)));
 		connect(FViewWidget->instance(),SIGNAL(messageStyleOptionsChanged(const IMessageStyleOptions &, bool)),
@@ -975,7 +979,7 @@ void MultiUserChatWindow::createMessageWidgets()
 		FViewSplitter->insertWidget(MUCWW_VIEWWIDGET,FViewWidget->instance(),100);
 		FWindowStatus[FViewWidget].createTime = QDateTime::currentDateTime();
 
-		FUsersView = new MultiUserView(FMultiChat,FCentralSplitter);
+		FUsersView = new MultiUserView(FMultiChat,FUsersSplitter);
 		FUsersView->instance()->viewport()->installEventFilter(this);
 		FUsersView->setViewMode(Options::node(OPV_MUC_GROUPCHAT_USERVIEWMODE).value().toInt());
 		connect(FUsersView->instance(),SIGNAL(itemNotifyActivated(int)),SLOT(onMultiChatUserItemNotifyActivated(int)));
@@ -2161,6 +2165,7 @@ void MultiUserChatWindow::onMultiChatEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bo
 					{
 						Action *action = new Action(nickMenu);
 						action->setText(user->nick());
+						action->setIcon(FUsersView->findUserItem(user)->icon());
 						action->setData(ADR_USER_NICK,user->nick());
 						connect(action,SIGNAL(triggered(bool)),SLOT(onNickCompleteMenuActionTriggered(bool)));
 						nickMenu->addAction(action,AG_DEFAULT,true);
