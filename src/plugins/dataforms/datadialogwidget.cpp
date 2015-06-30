@@ -1,16 +1,13 @@
 #include "datadialogwidget.h"
 
 #include <QVBoxLayout>
-#include <QApplication>
-#include <QDesktopWidget>
+#include <QPushButton>
 #include <utils/logger.h>
 
 DataDialogWidget::DataDialogWidget(IDataForms *ADataForms, const IDataForm &AForm, QWidget *AParent) : QDialog(AParent)
 {
 	REPORT_VIEW;
 	setAttribute(Qt::WA_DeleteOnClose,true);
-	setLayout(new QVBoxLayout(this));
-	layout()->setMargin(5);
 
 	FFormWidget = NULL;
 	FAllowInvalid = false;
@@ -18,21 +15,24 @@ DataDialogWidget::DataDialogWidget(IDataForms *ADataForms, const IDataForm &AFor
 
 	QToolBar *toolBar = new QToolBar(this);
 	FToolBarChanger = new ToolBarChanger(toolBar);
-	layout()->setMenuBar(toolBar);
 
 	FFormHolder = new QWidget(this);
-	FFormHolder->setLayout(new QVBoxLayout(FFormHolder));
+	FFormHolder->setLayout(new QVBoxLayout());
 	FFormHolder->layout()->setMargin(0);
-	layout()->addWidget(FFormHolder);
 
 	QFrame *hline = new QFrame(this);
 	hline->setFrameShape(QFrame::HLine);
 	hline->setFrameShadow(QFrame::Raised);
-	layout()->addWidget(hline);
 
 	FDialogButtons = new QDialogButtonBox(QDialogButtonBox::Ok|QDialogButtonBox::Cancel,Qt::Horizontal,this);
 	connect(FDialogButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonClicked(QAbstractButton *)));
-	layout()->addWidget(FDialogButtons);
+
+	QVBoxLayout *dialogLayout = new QVBoxLayout(this);
+	dialogLayout->setMargin(5);
+	dialogLayout->setMenuBar(toolBar);
+	dialogLayout->addWidget(FFormHolder);
+	dialogLayout->addWidget(hline);
+	dialogLayout->addWidget(FDialogButtons);
 
 	setForm(AForm);
 }
@@ -44,17 +44,17 @@ DataDialogWidget::~DataDialogWidget()
 
 ToolBarChanger *DataDialogWidget::toolBarChanged() const
 {
-   return FToolBarChanger;
+	return FToolBarChanger;
 }
 
 QDialogButtonBox *DataDialogWidget::dialogButtons() const
 {
-   return FDialogButtons;
+	return FDialogButtons;
 }
 
 IDataFormWidget *DataDialogWidget::formWidget() const
 {
-   return FFormWidget;
+	return FFormWidget;
 }
 
 void DataDialogWidget::setForm(const IDataForm &AForm)
@@ -62,30 +62,37 @@ void DataDialogWidget::setForm(const IDataForm &AForm)
 	if (FFormWidget)
 	{
 		FFormHolder->layout()->removeWidget(FFormWidget->instance());
-		emit formWidgetDestroyed(FFormWidget);
 		FFormWidget->instance()->deleteLater();
+		emit formWidgetDestroyed(FFormWidget);
 	}
 
 	setWindowTitle(AForm.title);
-	FFormWidget = FDataForms->formWidget(AForm,this);
+	FFormWidget = FDataForms->formWidget(AForm,FFormHolder);
 	FFormHolder->layout()->addWidget(FFormWidget->instance());
+	connect(FFormWidget->instance(),SIGNAL(fieldChanged(IDataFieldWidget *)),SLOT(onFormFieldChanged()));
+
+	onFormFieldChanged();
 	emit formWidgetCreated(FFormWidget);
 }
 
 bool DataDialogWidget::allowInvalid() const
 {
-   return FAllowInvalid;
+	return FAllowInvalid;
 }
 
 void DataDialogWidget::setAllowInvalid(bool AAllowInvalid)
 {
-   FAllowInvalid = AAllowInvalid;
+	FAllowInvalid = AAllowInvalid;
+	onFormFieldChanged();
 }
 
-QSize DataDialogWidget::sizeHint() const
+void DataDialogWidget::onFormFieldChanged()
 {
-   QSize desktopSize = QApplication::desktop()->availableGeometry(this).size();
-   return QDialog::sizeHint().boundedTo(desktopSize/2);
+	if (FFormWidget)
+	{
+		bool valid = FAllowInvalid || FDataForms->isSubmitValid(FFormWidget->dataForm(),FFormWidget->userDataForm());
+		FDialogButtons->button(QDialogButtonBox::Ok)->setEnabled(valid);
+	}
 }
 
 void DataDialogWidget::onDialogButtonClicked(QAbstractButton *AButton)

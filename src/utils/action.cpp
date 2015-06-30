@@ -3,6 +3,7 @@
 Action::Action(QObject *AParent) : QAction(AParent)
 {
 	FMenu = NULL;
+	FCarbon = NULL;
 	FIconStorage = NULL;
 }
 
@@ -20,18 +21,15 @@ Menu *Action::menu() const
 
 void Action::setMenu(Menu *AMenu)
 {
-	if (FMenu)
+	if (FMenu != AMenu)
 	{
-		disconnect(FMenu,SIGNAL(menuDestroyed(Menu *)),this,SLOT(onMenuDestroyed(Menu *)));
-		if (FMenu!=AMenu && FMenu->parent()==this)
-			delete FMenu;
+		if (FMenu)
+			disconnect(FMenu,SIGNAL(menuDestroyed(Menu *)),this,SLOT(onMenuDestroyed(Menu *)));
+		if (AMenu)
+			connect(AMenu,SIGNAL(menuDestroyed(Menu *)),SLOT(onMenuDestroyed(Menu *)));
+		FMenu = AMenu;
+		QAction::setMenu(AMenu);
 	}
-	if (AMenu)
-	{
-		connect(AMenu,SIGNAL(menuDestroyed(Menu *)),SLOT(onMenuDestroyed(Menu *)));
-	}
-	QAction::setMenu(AMenu);
-	FMenu = AMenu;
 }
 
 void Action::setIcon(const QIcon &AIcon)
@@ -40,18 +38,9 @@ void Action::setIcon(const QIcon &AIcon)
 	QAction::setIcon(AIcon);
 }
 
-void Action::setIcon(const QString &AStorageName, const QString &AIconKey, int AIconIndex)
+QAction *Action::carbonAction() const
 {
-	if (!AStorageName.isEmpty() && !AIconKey.isEmpty())
-	{
-		FIconStorage = IconStorage::staticStorage(AStorageName);
-		FIconStorage->insertAutoIcon(this,AIconKey,AIconIndex);
-	}
-	else if (FIconStorage)
-	{
-		FIconStorage->removeAutoIcon(this);
-		FIconStorage = NULL;
-	}
+	return FCarbon;
 }
 
 QVariant Action::data(int ARole) const
@@ -61,15 +50,23 @@ QVariant Action::data(int ARole) const
 
 void Action::setData(int ARole, const QVariant &AData)
 {
-	if (AData.isValid())
-		FData.insert(ARole,AData);
-	else
-		FData.remove(ARole);
+	if (FData.value(ARole) != AData)
+	{
+		if (AData.isValid())
+			FData.insert(ARole,AData);
+		else
+			FData.remove(ARole);
+		emit changed();
+	}
 }
 
 void Action::setData(const QHash<int,QVariant> &AData)
 {
-	FData.unite(AData);
+	if (AData != FData)
+	{
+		FData.unite(AData);
+		emit changed();
+	}
 }
 
 QString Action::shortcutId() const
@@ -79,42 +76,120 @@ QString Action::shortcutId() const
 
 void Action::setShortcutId(const QString &AId)
 {
-	FShortcutId = AId;
-	Shortcuts::bindObjectShortcut(AId, this);
+	if (FShortcutId != AId)
+	{
+		FShortcutId = AId;
+		Shortcuts::bindObjectShortcut(AId, this);
+		emit changed();
+	}
 }
 
-bool Action::copyStandardAction(Action *ADestination, QAction *ASource)
+void Action::setIcon(const QString &AStorageName, const QString &AIconKey, int AIconIndex)
 {
-	if (ADestination && ASource && !ASource->isSeparator())
+	if (!AStorageName.isEmpty() && !AIconKey.isEmpty())
 	{
-		ADestination->setActionGroup(ASource->actionGroup());
+		FIconStorage = IconStorage::staticStorage(AStorageName);
+		FIconStorage->insertAutoIcon(this,AIconKey,AIconIndex);
+		emit changed();
+	}
+	else if (FIconStorage)
+	{
+		FIconStorage->removeAutoIcon(this);
+		FIconStorage = NULL;
+		emit changed();
+	}
+}
+
+void Action::copyActionProperties(Action *ADestination, QAction *ASource)
+{
+	if (ADestination != ASource)
+	{
 		ADestination->setAutoRepeat(ASource->autoRepeat());
 		ADestination->setCheckable(ASource->isCheckable());
-		ADestination->setChecked(ASource->isChecked());
-		ADestination->setEnabled(ASource->isEnabled());
 		ADestination->setFont(ASource->font());
 		ADestination->setIcon(ASource->icon());
 		ADestination->setIconText(ASource->iconText());
 		ADestination->setIconVisibleInMenu(ASource->isIconVisibleInMenu());
 		ADestination->setMenuRole(ASource->menuRole());
 		ADestination->setPriority(ASource->priority());
-		ADestination->setShortcut(ASource->shortcut());
-		ADestination->setShortcutContext(ASource->shortcutContext());
+		ADestination->setSeparator(ASource->isSeparator());
+		ADestination->setShortcuts(ASource->shortcuts());
+		ADestination->setSoftKeyRole(ASource->softKeyRole());
 		ADestination->setStatusTip(ASource->statusTip());
 		ADestination->setText(ASource->text());
 		ADestination->setToolTip(ASource->toolTip());
-		ADestination->setVisible(ASource->isVisible());
 		ADestination->setWhatsThis(ASource->whatsThis());
-		connect(ADestination,SIGNAL(triggered()),ASource,SLOT(trigger()));
-		connect(ADestination,SIGNAL(toggled(bool)),ASource,SLOT(toggle()));
-		return true;
+
+		ADestination->setChecked(ASource->isChecked());
+		ADestination->setEnabled(ASource->isEnabled());
+		ADestination->setVisible(ASource->isVisible());
+
+		Action *source = qobject_cast<Action *>(ASource);
+		if (source != NULL)
+		{
+			ADestination->setData(source->FData);
+			ADestination->setShortcutId(source->shortcutId());
+		}
+		else
+		{
+			ADestination->setShortcut(ASource->shortcut());
+			ADestination->setShortcutContext(ASource->shortcutContext());
+		}
 	}
-	return false;
+}
+
+Action *Action::duplicateAction(QAction *ASource, QObject *AParent)
+{
+	if (ASource != NULL)
+	{
+		Action *duplAction = new Action(AParent);
+		Action::copyActionProperties(duplAction,ASource);
+
+		duplAction->FCarbon = ASource;
+		connect(ASource,SIGNAL(changed()),duplAction,SLOT(onCarbonActionChanged()));
+
+		connect(duplAction,SIGNAL(triggered()),ASource,SLOT(trigger()));
+		connect(duplAction,SIGNAL(toggled(bool)),ASource,SLOT(setChecked(bool)));
+		connect(ASource,SIGNAL(destroyed()),duplAction,SLOT(deleteLater()));
+
+		return duplAction;
+	}
+	return NULL;
+}
+
+Action *Action::duplicateActionAndMenu(QAction *ASource, QWidget *AParent)
+{
+	if (ASource != NULL)
+	{
+		Action *duplAction = NULL;
+		if (ASource->menu() == NULL)
+		{
+			duplAction = Action::duplicateAction(ASource,AParent);
+		}
+		else if (ASource->menu()->menuAction() == ASource)
+		{
+			duplAction = Menu::duplicateMenu(ASource->menu(),AParent)->menuAction();
+		}
+		else
+		{
+			duplAction = Action::duplicateAction(ASource,AParent);
+			duplAction->setMenu(Menu::duplicateMenu(ASource->menu(),AParent));
+		}
+		return duplAction;
+	}
+	return NULL;
+}
+
+void Action::onCarbonActionChanged()
+{
+	Action::copyActionProperties(this,FCarbon);
 }
 
 void Action::onMenuDestroyed(Menu *AMenu)
 {
-	Q_UNUSED(AMenu);
-	FMenu = NULL;
-	QAction::setMenu(NULL);
+	if (AMenu == FMenu)
+	{
+		FMenu = NULL;
+		QAction::setMenu(NULL);
+	}
 }

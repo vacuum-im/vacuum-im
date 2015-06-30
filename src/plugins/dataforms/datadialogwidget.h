@@ -23,9 +23,8 @@ signals:
 	void formWidgetCreated(IDataFormWidget *AForm);
 	void formWidgetDestroyed(IDataFormWidget *AForm);
 	void dialogDestroyed(IDataDialogWidget *ADialog);
-public:
-   virtual QSize sizeHint() const;
 protected slots:
+	void onFormFieldChanged();
 	void onDialogButtonClicked(QAbstractButton *AButton);
 private:
 	IDataForms *FDataForms;

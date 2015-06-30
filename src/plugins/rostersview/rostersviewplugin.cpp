@@ -546,7 +546,7 @@ void RostersViewPlugin::onRostersViewIndexContextMenuAboutToShow()
 	if (menu)
 	{
 		QSet<Action *> streamsActions = FStreamsContextMenuActions.take(menu);
-		QSet<Action *> rootActions = menu->groupActions().toSet() - streamsActions;
+		QSet<Action *> rootActions = menu->actions().toSet() - streamsActions;
 		foreach(Action *streamAction, streamsActions)
 		{
 			foreach(Action *rootAction, rootActions)
@@ -790,10 +790,10 @@ void RostersViewPlugin::onRostersViewIndexContextMenu(const QList<IRosterIndex *
 			}
 		}
 
-		QSet<Action *> curActions = AMenu->groupActions().toSet();
+		QSet<Action *> curActions = AMenu->actions().toSet();
 		FRostersView->contextMenuForIndex(streamIndexes,NULL,AMenu);
 		connect(AMenu,SIGNAL(aboutToShow()),SLOT(onRostersViewIndexContextMenuAboutToShow()));
-		FStreamsContextMenuActions[AMenu] = AMenu->groupActions().toSet() - curActions;
+		FStreamsContextMenuActions[AMenu] = AMenu->actions().toSet() - curActions;
 	}
 }
 
