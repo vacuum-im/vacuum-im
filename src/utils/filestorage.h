@@ -3,6 +3,7 @@
 
 #include <QList>
 #include <QHash>
+#include <QObject>
 #include <QString>
 #include <QDateTime>
 #include <QStringList>
