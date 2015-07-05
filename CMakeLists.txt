@@ -188,30 +188,28 @@ if (APPLE)
 		MACOSX_BUNDLE_INFO_STRING "Vacuum-IM"
 		MACOSX_BUNDLE_BUNDLE_VERSION "${VERSION}"
 		MACOSX_BUNDLE_ICON_FILE "vacuum"
-		MACOSX_BUNDLE_GUI_IDENTIFIER "com.jrudevels.vacuum"
-		MACOSX_BUNDLE_COPYRIGHT "Copyright 2010-2012, Potapov S.A.")
+		MACOSX_BUNDLE_GUI_IDENTIFIER "org.vacuum-im"
+		MACOSX_BUNDLE_COPYRIGHT "Copyright 2010-2015, Potapov S.A.")
 	list(APPEND DIRS
 		${QT_LIBRARY_DIR}
 		${CMAKE_INSTALL_PREFIX}/${LIBDIR})
+
+	file(COPY vacuum.icns DESTINATION "${INSTALL_RESOURCES}")
+	file(WRITE "${CMAKE_BINARY_DIR}/${INSTALL_RESOURCES}/qt.conf" "[Paths]\nPlugins = PlugIns")
+	file(COPY "${_qt5Core_install_prefix}/plugins/imageformats" DESTINATION "${INSTALL_PLUGINS}")
+	file(COPY "${_qt5Core_install_prefix}/plugins/audio" DESTINATION "${INSTALL_PLUGINS}")
+	file(COPY "${_qt5Core_install_prefix}/plugins/platforms" DESTINATION "${INSTALL_PLUGINS}")
+	file(COPY "${_qt5Core_install_prefix}/plugins/sqldrivers/libqsqlite.dylib" DESTINATION "${INSTALL_PLUGINS}/sqldrivers")
+	foreach(LANG ${LOCALIZED_LANGS})
+		string(SUBSTRING ${LANG} 0 2 SHORTLANG)
+		file(COPY "${_qt5Core_install_prefix}/translations/qt_${SHORTLANG}.qm" DESTINATION "${INSTALL_TRANSLATIONS}/${LANG}")
+	endforeach(LANG)
+
 	install(CODE "
 		include(BundleUtilities)
 		file(GLOB_RECURSE PLUGINS \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_APP_DIR}/Contents/PlugIns/*.dylib\")
 		fixup_bundle(\"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_APP_DIR}\"   \"\${PLUGINS}\"   \"${DIRS}\")"
 		COMPONENT xxx-this_should_be_the_last_component_in_lexicographical_order_because_cmake_sucks)
-	file(COPY vacuum.icns
-		DESTINATION "${INSTALL_RESOURCES}")
-
-	file(WRITE "${CMAKE_BINARY_DIR}/${INSTALL_RESOURCES}/qt.conf" "[Paths]\nPlugins = PlugIns")
-	file(COPY "${QT_PLUGINS_DIR}/imageformats"
-		DESTINATION "${INSTALL_PLUGINS}")
-	file(COPY "${QT_PLUGINS_DIR}/sqldrivers/libqsqlite.dylib"
-		DESTINATION "${INSTALL_PLUGINS}/sqldrivers")
-	# Qt localization
-	foreach(LANG ${LOCALIZED_LANGS})
-		string(SUBSTRING ${LANG} 0 2 SHORTLANG)
-		file(COPY "${QT_TRANSLATIONS_DIR}/qt_${SHORTLANG}.qm"
-			DESTINATION "${INSTALL_TRANSLATIONS}/${LANG}")
-	endforeach(LANG)
 endif (APPLE)
 
 if (INSTALL_SDK)
