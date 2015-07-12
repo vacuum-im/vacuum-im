@@ -138,53 +138,53 @@
     </message>
     <message>
         <source>Message window view</source>
-        <translation type="unfinished"/>
+        <translation>Vista de la ventana de mensaje</translation>
     </message>
     <message>
         <source>Load last messages from history</source>
-        <translation type="unfinished"/>
+        <translation>Cargar los últimos mensajes del historial</translation>
     </message>
     <message>
         <source>Show message windows together with contacts list</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar la ventana de mensaje junto a la lista de contactos</translation>
     </message>
     <message>
         <source>Show message windows in tab window</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar las ventanas de mensaje en una ventana de pestañas</translation>
     </message>
     <message>
         <source>Automatically resize messages input field</source>
-        <translation type="unfinished"/>
+        <translation>Cambiar automáticamente el tamaño del campo de entrada</translation>
     </message>
     <message>
         <source>Minimum number of lines in messages input field:</source>
-        <translation type="unfinished"/>
+        <translation>Cantidad mínima de líneas en los campos de entrada:</translation>
     </message>
     <message>
         <source>Message window behavior</source>
-        <translation type="unfinished"/>
+        <translation>Comportamiento de la ventana de mensaje</translation>
     </message>
     <message>
         <source>Show contacts status changes</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar los cambios de estado de los contactos</translation>
     </message>
     <message>
         <source>Save contacts status messages in history</source>
-        <translation type="unfinished"/>
+        <translation>Guardar los mensajes de estado de los contactos en el historial</translation>
     </message>
     <message>
         <source>Ctrl+Q</source>
         <comment>Quote selected text</comment>
-        <translation type="unfinished"/>
+        <translation>Ctrl+Q</translation>
     </message>
     <message>
         <source>Send chat message</source>
-        <translation type="unfinished"/>
+        <translation>Enviar mensaje de chat</translation>
     </message>
     <message>
         <source>Return</source>
         <comment>Send chat message</comment>
-        <translation type="unfinished"/>
+        <translation>Return</translation>
     </message>
     <message>
         <source>Send single message</source>

@@ -3,7 +3,7 @@
     <name>Account</name>
     <message>
         <source>Enter password for account &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation type="unfinished"/>
+        <translation>Ingresa la contraseña para la cuenta &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
         <source>Account Password</source>
@@ -81,7 +81,7 @@
     </message>
     <message>
         <source>Notebook</source>
-        <translation type="unfinished"/>
+        <translation>Cuaderno</translation>
     </message>
     <message>
         <source>(default)</source>
@@ -123,7 +123,7 @@
     </message>
     <message>
         <source>You are assured that wish to remove an account &lt;b&gt;%1&lt;/b&gt;?&lt;br&gt;All settings will be lost.</source>
-        <translation type="unfinished"/>
+        <translation>¿Estás seguro que deseas eliminar la cuenta &lt;b&gt;%1&lt;/b&gt;?&lt;br&gt; Se perderán todos los ajustes.</translation>
     </message>
 </context>
 <context>
@@ -150,236 +150,236 @@
     </message>
     <message>
         <source>Internal Error</source>
-        <translation type="unfinished"/>
+        <translation>Error interno</translation>
     </message>
     <message>
         <source>You have successfully connected!</source>
-        <translation type="unfinished"/>
+        <translation>¡Has conectado satisfactoriamente!</translation>
     </message>
     <message>
         <source>Account credentials successfully checked, click &apos;Finish&apos; button to add the account.</source>
-        <translation type="unfinished"/>
+        <translation>Credenciales de la cuenta comprobadas satisfactoriamente, haz clic en el botón &quot;Terminar&quot; para añadir la cuenta.</translation>
     </message>
     <message>
         <source>Failed to connect :(</source>
-        <translation type="unfinished"/>
+        <translation>Error al conectar :(</translation>
     </message>
     <message>
         <source>Click &apos;Back&apos; button to change the account credentials or the &apos;Finish&apos; button to add the account as is.</source>
-        <translation type="unfinished"/>
+        <translation>Haz clic en el botón &quot;Atrás&quot; para cambiar las credenciales de la cuenta y &quot;Terminar&quot; para añadirla tal y como está.</translation>
     </message>
 </context>
 <context>
     <name>AppendServicePage</name>
     <message>
         <source>Jabber/XMPP</source>
-        <translation type="unfinished"/>
+        <translation>Jabber/XMPP</translation>
     </message>
     <message>
         <source>Google Talk</source>
-        <translation type="unfinished"/>
+        <translation>Google Talk</translation>
     </message>
     <message>
         <source>Yandex Online</source>
-        <translation type="unfinished"/>
+        <translation>Yandex Online</translation>
     </message>
     <message>
         <source>Odnoklassniki</source>
-        <translation type="unfinished"/>
+        <translation>Odnoklassniki</translation>
     </message>
     <message>
         <source>LiveJournal</source>
-        <translation type="unfinished"/>
+        <translation>LiveJournal</translation>
     </message>
     <message>
         <source>QIP</source>
-        <translation type="unfinished"/>
+        <translation>QIP</translation>
     </message>
     <message>
         <source>Select Service</source>
-        <translation type="unfinished"/>
+        <translation>Elegir Servicio</translation>
     </message>
     <message>
         <source>Select the service for which you already have a registered account</source>
-        <translation type="unfinished"/>
+        <translation>Elige el servicio para el que ya tengas una cuenta registrada</translation>
     </message>
 </context>
 <context>
     <name>AppendSettingsPage</name>
     <message>
         <source>Account Settings</source>
-        <translation type="unfinished"/>
+        <translation>Ajustes de la cuenta</translation>
     </message>
     <message>
         <source>Jabber ID:</source>
-        <translation type="unfinished"/>
+        <translation>ID de Jabber:</translation>
     </message>
     <message>
         <source>Password:</source>
-        <translation type="unfinished"/>
+        <translation>Contraseña:</translation>
     </message>
     <message>
         <source>Save password</source>
-        <translation type="unfinished"/>
+        <translation>Guardar contraseña</translation>
     </message>
     <message>
         <source>Duplicate Account</source>
-        <translation type="unfinished"/>
+        <translation>Duplicar cuenta</translation>
     </message>
     <message>
         <source>Account with Jabber ID &lt;b&gt;%1&lt;/b&gt; already exists.</source>
-        <translation type="unfinished"/>
+        <translation>Ya existe una cuenta con ID de Jabber &lt;b&gt;%1&lt;/b&gt;.</translation>
     </message>
     <message>
         <source>Fill out the account credentials and connection settings</source>
-        <translation type="unfinished"/>
+        <translation>Llena las credenciales los ajustes de conexión de la cuenta</translation>
     </message>
 </context>
 <context>
     <name>ConnectionOptionsWidget</name>
     <message>
         <source>Show connection settings</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar ajustes de conexión</translation>
     </message>
     <message>
         <source>Hide connection settings</source>
-        <translation type="unfinished"/>
+        <translation>Ocultar ajustes de conexión</translation>
     </message>
 </context>
 <context>
     <name>CreateAccountWizard</name>
     <message>
         <source>Create Account Wizard</source>
-        <translation type="unfinished"/>
+        <translation>Asistente para la creación de cuentas</translation>
     </message>
     <message>
         <source>Account not Created</source>
-        <translation type="unfinished"/>
+        <translation>Cuenta no creada</translation>
     </message>
     <message>
         <source>Failed to create account %1 due to internal error.</source>
-        <translation type="unfinished"/>
+        <translation>Falló la creación de la cuenta %1 debido a un error interno.</translation>
     </message>
 </context>
 <context>
     <name>RegisterRequestPage</name>
     <message>
         <source>Register on Server</source>
-        <translation type="unfinished"/>
+        <translation>Registrar en el servidor</translation>
     </message>
     <message>
         <source>Fill out the form offered by server to register</source>
-        <translation type="unfinished"/>
+        <translation>Llena el formulario solicitado por el servidor para registrarte</translation>
     </message>
     <message>
         <source>Connecting...</source>
-        <translation type="unfinished"/>
+        <translation>Conectando...</translation>
     </message>
     <message>
         <source>Failed to start registration :(</source>
-        <translation type="unfinished"/>
+        <translation>Error al iniciar el registro :(</translation>
     </message>
     <message>
         <source>Internal Error</source>
-        <translation type="unfinished"/>
+        <translation>Error interno</translation>
     </message>
     <message>
         <source>Username</source>
-        <translation type="unfinished"/>
+        <translation>Nombre de usuario</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished"/>
+        <translation>Contraseña</translation>
     </message>
     <message>
         <source>Email</source>
-        <translation type="unfinished"/>
+        <translation>Correo electrónico</translation>
     </message>
     <message>
         <source>Failed to register :(</source>
-        <translation type="unfinished"/>
+        <translation>Error al registrarse :(</translation>
     </message>
 </context>
 <context>
     <name>RegisterServerPage</name>
     <message>
         <source>Select Server</source>
-        <translation type="unfinished"/>
+        <translation>Elegir servidor</translation>
     </message>
     <message>
         <source>Select the server on which you want to register an account</source>
-        <translation type="unfinished"/>
+        <translation>Elige el servidor en el que desees registrar una cuenta</translation>
     </message>
     <message>
         <source>Server:</source>
-        <translation type="unfinished"/>
+        <translation>Servidor:</translation>
     </message>
     <message>
         <source>Some public servers</source>
-        <translation type="unfinished"/>
+        <translation>Algunos servidores públicos</translation>
     </message>
     <message>
         <source>* Not all servers support within the client registration, in some cases, you can only register on the servers web site.</source>
-        <translation type="unfinished"/>
+        <translation>*No todos los servidores soportan el registro desde el cliente, en algunos casos solo podrás registrarte desde el sitio web de estos.</translation>
     </message>
     <message>
         <source>jabbim.com</source>
         <comment>Most stable and reliable server for your country which supports in-band account registration</comment>
-        <translation type="unfinished"/>
+        <translation>jabbim.com</translation>
     </message>
 </context>
 <context>
     <name>RegisterSubmitPage</name>
     <message>
         <source>Finishing Registration</source>
-        <translation type="unfinished"/>
+        <translation>Terminando el registro</translation>
     </message>
     <message>
         <source>Show account settings window</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar la ventana de ajustes de la cuenta</translation>
     </message>
     <message>
         <source>Registration...</source>
-        <translation type="unfinished"/>
+        <translation>Registro...</translation>
     </message>
     <message>
         <source>Failed to register :(</source>
-        <translation type="unfinished"/>
+        <translation>Error al registrarse :(</translation>
     </message>
     <message>
         <source>This username is already registered by someone else</source>
-        <translation type="unfinished"/>
+        <translation>El nombre de usuario ya está registrado por alguien más</translation>
     </message>
     <message>
         <source>You have successfully registered!</source>
-        <translation type="unfinished"/>
+        <translation>¡Te has registrado satisfactoriamente!</translation>
     </message>
     <message>
         <source>Account %1@%2 successfully registered, click &apos;Finish&apos; button to add the account.</source>
-        <translation type="unfinished"/>
+        <translation>La cuenta %1@%2 se ha registrado satisfactoriamente, haz clic en el botón &quot;Terminar&quot; para añadir la cuenta.</translation>
     </message>
     <message>
         <source>Wizard waiting for registration confirmation from server</source>
-        <translation type="unfinished"/>
+        <translation>El asistente espera por la confirmación de registro desde el servidor</translation>
     </message>
 </context>
 <context>
     <name>WizardStartPage</name>
     <message>
         <source>Add Jabber/XMPP Account</source>
-        <translation type="unfinished"/>
+        <translation>Añadir cuenta Jabber/XMPP</translation>
     </message>
     <message>
         <source>This wizard will help you to add an existing account or register a new one</source>
-        <translation type="unfinished"/>
+        <translation>Este asistente te ayudará a añadir una cuenta existente o registrar una nueva</translation>
     </message>
     <message>
         <source>I want to add my existing account</source>
-        <translation type="unfinished"/>
+        <translation>Quiero añadir una cuenta existente</translation>
     </message>
     <message>
         <source>I want to register a new account</source>
-        <translation type="unfinished"/>
+        <translation>Quiero registrar una cuenta nueva</translation>
     </message>
 </context>
 </TS>

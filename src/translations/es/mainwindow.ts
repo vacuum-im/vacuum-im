@@ -20,7 +20,7 @@
     <message>
         <source>Esc</source>
         <comment>Close main window</comment>
-        <translation type="unfinished"/>
+        <translation>Esc</translation>
     </message>
 </context>
 </TS>
