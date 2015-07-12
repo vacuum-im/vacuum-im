@@ -78,7 +78,7 @@ bool JabberSearch::initObjects()
 	}
 	if (FDataForms)
 	{
-		FDataForms->insertLocalizer(this,DATA_FORM_SEARCH);
+		FDataForms->insertLocalizer(this,DFT_JABBERSEARCH);
 	}
 	return true;
 }
@@ -207,7 +207,7 @@ Action *JabberSearch::createDiscoFeatureAction(const Jid &AStreamJid, const QStr
 IDataFormLocale JabberSearch::dataFormLocale(const QString &AFormType)
 {
 	IDataFormLocale locale;
-	if (AFormType == DATA_FORM_SEARCH)
+	if (AFormType == DFT_JABBERSEARCH)
 	{
 		locale.title = tr("Jabber Search");
 		locale.fields["first"].label = tr("First Name");

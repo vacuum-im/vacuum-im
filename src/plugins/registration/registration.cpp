@@ -107,7 +107,7 @@ bool Registration::initObjects()
 	}
 	if (FDataForms)
 	{
-		FDataForms->insertLocalizer(this,DATA_FORM_REGISTER);
+		FDataForms->insertLocalizer(this,DFT_REGISTER);
 	}
 	if (FXmppUriQueries)
 	{
@@ -242,7 +242,7 @@ IXmppFeature *Registration::newXmppFeature(const QString &AFeatureNS, IXmppStrea
 IDataFormLocale Registration::dataFormLocale(const QString &AFormType)
 {
 	IDataFormLocale locale;
-	if (AFormType == DATA_FORM_REGISTER)
+	if (AFormType == DFT_REGISTER)
 	{
 		locale.title = tr("Registration Form");
 		locale.fields["username"].label = tr("Account Name");

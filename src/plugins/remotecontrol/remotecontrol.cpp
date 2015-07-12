@@ -154,7 +154,7 @@ bool RemoteControl::initObjects()
 
 	if (FDataForms)
 	{
-		FDataForms->insertLocalizer(this, DATA_FORM_REMOTECONTROL);
+		FDataForms->insertLocalizer(this, DFT_REMOTECONTROL);
 	}
 
 	if (FStanzaProcessor)
@@ -260,7 +260,7 @@ bool RemoteControl::receiveCommandRequest(const ICommandRequest &ARequest)
 IDataFormLocale RemoteControl::dataFormLocale(const QString &AFormType)
 {
 	IDataFormLocale locale;
-	if (AFormType == DATA_FORM_REMOTECONTROL)
+	if (AFormType == DFT_REMOTECONTROL)
 	{
 		locale.fields[FIELD_AUTO_AUTH].label = tr("Whether to automatically authorize subscription requests");
 		locale.fields[FIELD_AUTO_FILES].label = tr("Whether to automatically accept file transfers");
@@ -324,7 +324,7 @@ bool RemoteControl::processSetStatus(const ICommandRequest &ARequest)
 			IDataField field;
 			field.type = DATAFIELD_TYPE_HIDDEN;
 			field.var = "FORM_TYPE";
-			field.value = DATA_FORM_REMOTECONTROL;
+			field.value = DFT_REMOTECONTROL;
 			field.required = false;
 			result.form.fields.append(field);
 
@@ -399,7 +399,7 @@ bool RemoteControl::processLeaveMUC(const ICommandRequest &ARequest)
 			IDataField field;
 			field.type = DATAFIELD_TYPE_HIDDEN;
 			field.var = "FORM_TYPE";
-			field.value = DATA_FORM_REMOTECONTROL;
+			field.value = DFT_REMOTECONTROL;
 			field.required = false;
 			result.form.fields.append(field);
 
@@ -480,7 +480,7 @@ bool RemoteControl::processFileTransfers(const ICommandRequest &ARequest)
 			IDataField field;
 			field.type = DATAFIELD_TYPE_HIDDEN;
 			field.var = "FORM_TYPE";
-			field.value = DATA_FORM_REMOTECONTROL;
+			field.value = DFT_REMOTECONTROL;
 			field.required = false;
 			result.form.fields.append(field);
 
@@ -571,7 +571,7 @@ bool RemoteControl::processSetOptions(const ICommandRequest &ARequest)
 			IDataField field;
 			field.type = DATAFIELD_TYPE_HIDDEN;
 			field.var = "FORM_TYPE";
-			field.value = DATA_FORM_REMOTECONTROL;
+			field.value = DFT_REMOTECONTROL;
 			field.required = false;
 			result.form.fields.append(field);
 
@@ -621,7 +621,7 @@ bool RemoteControl::processForwardMessages(const ICommandRequest &ARequest)
 			IDataField field;
 			field.type = DATAFIELD_TYPE_HIDDEN;
 			field.var = "FORM_TYPE";
-			field.value = DATA_FORM_REMOTECONTROL;
+			field.value = DFT_REMOTECONTROL;
 			field.required = false;
 			result.form.fields.append(field);
 

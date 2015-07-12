@@ -47,11 +47,6 @@
 #define MUC_SC_MEMBERS_ONLY             322
 #define MUC_SC_SYSTEM_SHUTDOWN          332
 
-#define MUC_FT_REQUEST                  "http://jabber.org/protocol/muc#request"
-#define MUC_FT_ROOM_GONFIG              "http://jabber.org/protocol/muc#roomconfig"
-#define MUC_FT_ROOM_INFO                "http://jabber.org/protocol/muc#roominfo"
-#define MUC_FV_ROLE                     "muc#role"
-
 #define MUC_NODE_ROOM_NICK              "x-roomuser-item"
 #define MUC_NODE_ROOMS                  "http://jabber.org/protocol/muc#rooms"
 #define MUC_NODE_TRAFFIC                "http://jabber.org/protocol/muc#traffic"
@@ -71,12 +66,11 @@
 #define MUC_UNMODERATED                 "muc_unmoderated"
 #define MUC_UNSECURED                   "muc_unsecured"
 
-struct IMultiUserListItem 
+struct IMultiUserListItem
 {
-	QString jid;
-	QString role;
+	Jid realJid;
+	QString reason;
 	QString affiliation;
-	QString notes;
 };
 
 struct IMultiUserChatHistory
@@ -130,6 +124,7 @@ class IMultiUserChat
 {
 public:
 	virtual QObject *instance() = 0;
+	virtual bool isIsolated() const =0;
 	virtual Jid streamJid() const =0;
 	virtual Jid roomJid() const =0;
 	virtual QString roomName() const =0;
@@ -139,69 +134,68 @@ public:
 	virtual bool autoPresence() const =0;
 	virtual void setAutoPresence(bool AAuto) =0;
 	virtual QList<int> statusCodes() const =0;
-	virtual bool isUserPresent(const Jid &AContactJid) const =0;
+	virtual QList<int> statusCodes(const Stanza &AStanza) const =0;
+	virtual XmppError roomError() const =0;
+	virtual IPresenceItem roomPresence() const =0;
 	virtual IMultiUser *mainUser() const =0;
 	virtual QList<IMultiUser *> allUsers() const =0;
 	virtual IMultiUser *findUser(const QString &ANick) const =0;
-	//Occupant
+	virtual bool isUserPresent(const Jid &AContactJid) const =0;
+	// Occupant
 	virtual QString nickName() const =0;
 	virtual bool setNickName(const QString &ANick) =0;
 	virtual QString password() const =0;
 	virtual void setPassword(const QString &APassword) =0;
-	virtual IMultiUserChatHistory history() const =0;
-	virtual void setHistory(const IMultiUserChatHistory &AHistory) =0;
-	virtual XmppError roomError() const =0;
-	virtual IPresenceItem roomPresence() const =0;
+	virtual IMultiUserChatHistory historyScope() const =0;
+	virtual void setHistoryScope(const IMultiUserChatHistory &AHistory) =0;
 	virtual bool sendStreamPresence() =0;
 	virtual bool sendPresence(int AShow, const QString &AStatus, int APriority) =0;
 	virtual bool sendMessage(const Message &AMessage, const QString &AToNick = QString::null) =0;
-	virtual bool inviteContact(const Jid &AContactJid, const QString &AReason) =0;
-	virtual bool requestVoice() =0;
-	//Moderator
+	virtual bool sendInvitation(const Jid &AContactJid, const QString &AMessage = QString::null) =0;
+	virtual bool sendVoiceRequest() =0;
+	// Moderator
 	virtual QString subject() const =0;
 	virtual bool sendSubject(const QString &ASubject) =0;
-	virtual bool sendDataFormMessage(const IDataForm &AForm) =0;
-	//Administrator
-	virtual bool setRole(const QString &ANick, const QString &ARole, const QString &AReason = QString::null) =0;
-	virtual bool setAffiliation(const QString &ANick, const QString &AAffiliation, const QString &AReason = QString::null) =0;
-	virtual bool requestAffiliationList(const QString &AAffiliation) =0;
-	virtual bool changeAffiliationList(const QList<IMultiUserListItem> &ADeltaList) =0;
-	//Owner
-	virtual bool requestConfigForm() =0;
-	virtual bool sendConfigForm(const IDataForm &AForm) =0;
-	virtual bool destroyRoom(const QString &AReason) =0;
+	virtual bool sendVoiceApproval(const Message &AMessage) =0;
+	// Administrator
+	virtual QString loadAffiliationList(const QString &AAffiliation) =0;
+	virtual QString updateAffiliationList(const QList<IMultiUserListItem> &AItems) =0;
+	virtual QString setUserRole(const QString &ANick, const QString &ARole, const QString &AReason = QString::null) =0;
+	virtual QString setUserAffiliation(const QString &ANick, const QString &AAffiliation, const QString &AReason = QString::null) =0;
+	// Owner
+	virtual QString loadRoomConfig() =0;
+	virtual QString updateRoomConfig(const IDataForm &AForm) =0;
+	virtual QString destroyRoom(const QString &AReason) =0;
 protected:
-	virtual void chatAboutToConnect() =0;
 	virtual void chatOpened() =0;
-	virtual void chatNotify(const QString &ANotify) =0;
-	virtual void chatError(const QString &AMessage) =0;
-	virtual void chatAboutToDisconnect() =0;
 	virtual void chatClosed() =0;
+	virtual void chatAboutToConnect() =0;
+	virtual void chatAboutToDisconnect() =0;
 	virtual void chatDestroyed() =0;
+	// Common
 	virtual void roomNameChanged(const QString &AName) =0;
 	virtual void streamJidChanged(const Jid &ABefore, const Jid &AAfter) =0;
-	//Occupant
-	virtual void presenceChanged(const IPresenceItem &APresence) =0;
+	virtual void requestFailed(const QString &AId, const XmppError &AError) =0;
+	// Occupant
 	virtual void messageSent(const Message &AMessage) =0;
-	virtual void serviceMessageReceived(const Message &AMessage) =0;
-	virtual void messageReceived(const QString &ANick, const Message &AMessage) =0;
-	virtual void inviteDeclined(const Jid &AContactJid, const QString &AReason) =0;
+	virtual void messageReceived(const Message &AMessage) =0;
+	virtual void presenceChanged(const IPresenceItem &APresence) =0;
+	virtual void invitationDeclined(const Jid &AContactJid, const QString &AReason) =0;
 	virtual void userChanged(IMultiUser *AUser, int AData, const QVariant &ABefore) =0;
-	//Moderator
+	// Moderator
+	virtual void voiceRequestReceived(const Message &AMessage) =0;
 	virtual void subjectChanged(const QString &ANick, const QString &ASubject) =0;
 	virtual void userKicked(const QString &ANick, const QString &AReason, const QString &AByUser) =0;
-	virtual void dataFormMessageReceived(const Message &AMessage) =0;
-	virtual void dataFormMessageSent(const IDataForm &AForm) =0;
-	//Administrator
 	virtual void userBanned(const QString &ANick, const QString &AReason, const QString &AByUser) =0;
-	virtual void affiliationListReceived(const QString &AAffiliation, const QList<IMultiUserListItem> &AList) =0;
-	virtual void affiliationListChanged(const QList<IMultiUserListItem> &ADeltaList) =0;
-	//Owner
-	virtual void configFormReceived(const IDataForm &AForm) =0;
-	virtual void configFormSent(const IDataForm &AForm) =0;
-	virtual void configFormAccepted() =0;
-	virtual void configFormRejected(const XmppError &AError) =0;
-	virtual void roomDestroyed(const QString &AReason) =0;
+	// Administrator
+	virtual void userRoleUpdated(const QString &AId, const QString &ANick) =0;
+	virtual void userAffiliationUpdated(const QString &AId, const QString &ANick) =0;
+	virtual void affiliationListLoaded(const QString &AId, const QList<IMultiUserListItem> &AItems) =0;
+	virtual void affiliationListUpdated(const QString &AId, const QList<IMultiUserListItem> &AItems) =0;
+	// Owner
+	virtual void roomConfigLoaded(const QString &AId, const IDataForm &AForm) =0;
+	virtual void roomConfigUpdated(const QString &AId, const IDataForm &AForm) =0;
+	virtual void roomDestroyed(const QString &AId, const QString &AReason) =0;
 };
 
 class IMultiUserView
@@ -282,7 +276,7 @@ public:
 	virtual QObject *instance() = 0;
 	virtual QList<IMultiUserChat *> multiUserChats() const =0;
 	virtual IMultiUserChat *findMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid) const =0;
-	virtual IMultiUserChat *getMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword) =0;
+	virtual IMultiUserChat *getMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword, bool AIsolated) =0;
 	virtual QList<IMultiUserChatWindow *> multiChatWindows() const =0;
 	virtual IMultiUserChatWindow *findMultiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid) const =0;
 	virtual IMultiUserChatWindow *getMultiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword) =0;

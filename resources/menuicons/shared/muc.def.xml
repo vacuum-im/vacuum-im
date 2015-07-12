@@ -5,14 +5,6 @@
     <object mime="image/png">mucconference.png</object>
   </icon>
   <icon>
-    <key>mucShowAllRooms</key>
-    <object mime="image/png">mucconference.png</object>
-  </icon>
-  <icon>
-    <key>mucLeaveHiddenRooms</key>
-    <object mime="image/png">mucexitroom.png</object>
-  </icon>
-  <icon>
     <key>mucJoin</key>
     <object mime="image/png">mucjoin.png</object>
   </icon>
@@ -45,8 +37,8 @@
     <object mime="image/png">mucrequestvoice.png</object>
   </icon>
   <icon>
-    <key>mucEditBanList</key>
-    <object mime="image/png">muceditbanList.png</object>
+    <key>mucEditAffiliations</key>
+    <object mime="image/png">muceditaffiliations.png</object>
   </icon>
   <icon>
     <key>mucEditMembersList</key>
@@ -75,14 +67,6 @@
   <icon>
     <key>mucPrivateMessage</key>
     <object mime="image/png">mucprivatemessage.png</object>
-  </icon>
-  <icon>
-    <key>mucDataMessage</key>
-    <object mime="image/png">mucdatamessage.png</object>
-  </icon>
-  <icon>
-    <key>mucUserMenu</key>
-    <object mime="image/png">mucusermenu.png</object>
   </icon>
   <icon>
     <key>mucUsersHide</key>

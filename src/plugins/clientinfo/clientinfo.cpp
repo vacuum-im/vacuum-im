@@ -188,7 +188,7 @@ bool ClientInfo::initObjects()
 
 	if (FDataForms)
 	{
-		FDataForms->insertLocalizer(this,DATA_FORM_SOFTWAREINFO);
+		FDataForms->insertLocalizer(this,DFT_SOFTWAREINFO);
 	}
 
 	return true;
@@ -355,7 +355,7 @@ void ClientInfo::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanz
 IDataFormLocale ClientInfo::dataFormLocale(const QString &AFormType)
 {
 	IDataFormLocale locale;
-	if (AFormType == DATA_FORM_SOFTWAREINFO)
+	if (AFormType == DFT_SOFTWAREINFO)
 	{
 		locale.title = tr("Software information");
 		locale.fields[FORM_FIELD_SOFTWARE].label = tr("Software");
@@ -762,7 +762,7 @@ void ClientInfo::onDiscoInfoReceived(const IDiscoInfo &AInfo)
 	{
 		foreach(const IDataForm &form, AInfo.extensions)
 		{
-			if (FDataForms->fieldValue("FORM_TYPE",form.fields).toString() == DATA_FORM_SOFTWAREINFO)
+			if (FDataForms->fieldValue("FORM_TYPE",form.fields).toString() == DFT_SOFTWAREINFO)
 			{
 				SoftwareItem &software = FSoftwareItems[AInfo.contactJid];
 				software.name = FDataForms->fieldValue(FORM_FIELD_SOFTWARE,form.fields).toString();

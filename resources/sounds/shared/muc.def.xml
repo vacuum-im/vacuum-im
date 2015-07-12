@@ -2,7 +2,6 @@
 <sounddef>
   <file>
     <key>mucMessage</key>
-    <key>mucDataMessage</key>
     <key>mucPrivateMessage</key>
     <key>mucInviteMessage</key>
     <object mime='sound/wav'>message.wav</object>

@@ -227,10 +227,10 @@ bool MultiUserChatManager::initObjects()
 
 	if (FDataForms)
 	{
-		FDataForms->insertLocalizer(this,DATA_FORM_MUC_REGISTER);
-		FDataForms->insertLocalizer(this,DATA_FORM_MUC_ROOMCONFIG);
-		FDataForms->insertLocalizer(this,DATA_FORM_MUC_ROOM_INFO);
-		FDataForms->insertLocalizer(this,DATA_FORM_MUC_REQUEST);
+		FDataForms->insertLocalizer(this,DFT_MUC_REGISTER);
+		FDataForms->insertLocalizer(this,DFT_MUC_ROOMCONFIG);
+		FDataForms->insertLocalizer(this,DFT_MUC_ROOM_INFO);
+		FDataForms->insertLocalizer(this,DFT_MUC_REQUEST);
 	}
 
 	if (FDiscovery)
@@ -399,7 +399,7 @@ bool MultiUserChatManager::xmppUriOpen(const Jid &AStreamJid, const Jid &AContac
 		if (chat != NULL)
 		{
 			foreach(const QString &userJid, AParams.values("jid"))
-				chat->inviteContact(userJid, QString::null);
+				chat->sendInvitation(userJid, QString::null);
 		}
 		return true;
 	}
@@ -426,8 +426,11 @@ Action *MultiUserChatManager::createDiscoFeatureAction(const Jid &AStreamJid, co
 	{
 		if (FDiscovery && FDiscovery->findIdentity(ADiscoInfo.identity,DIC_CONFERENCE,QString::null)>=0)
 		{
-			Action *action = createJoinAction(AStreamJid,ADiscoInfo.contactJid,AParent);
-			return action;
+			if (findMultiChatWindow(AStreamJid,ADiscoInfo.contactJid) == NULL)
+			{
+				Action *action = createJoinAction(AStreamJid,ADiscoInfo.contactJid,AParent);
+				return action;
+			}
 		}
 		else
 		{
@@ -444,7 +447,7 @@ Action *MultiUserChatManager::createDiscoFeatureAction(const Jid &AStreamJid, co
 IDataFormLocale MultiUserChatManager::dataFormLocale(const QString &AFormType)
 {
 	IDataFormLocale locale;
-	if (AFormType == DATA_FORM_MUC_REGISTER)
+	if (AFormType == DFT_MUC_REGISTER)
 	{
 		locale.title = tr("Register in conference");
 		locale.fields["muc#register_allow"].label = tr("Allow this person to register with the room?");
@@ -455,7 +458,7 @@ IDataFormLocale MultiUserChatManager::dataFormLocale(const QString &AFormType)
 		locale.fields["muc#register_roomnick"].label = tr("Desired Nickname");
 		locale.fields["muc#register_url"].label = tr("Your URL");
 	}
-	else if (AFormType == DATA_FORM_MUC_REQUEST)
+	else if (AFormType == DFT_MUC_REQUEST)
 	{
 		locale.title = tr("Request for voice");
 		locale.fields["muc#role"].label = tr("Requested Role");
@@ -463,7 +466,7 @@ IDataFormLocale MultiUserChatManager::dataFormLocale(const QString &AFormType)
 		locale.fields["muc#roomnick"].label = tr("Room Nickname");
 		locale.fields["muc#request_allow"].label = tr("Grant Voice?");
 	}
-	else if (AFormType == DATA_FORM_MUC_ROOMCONFIG)
+	else if (AFormType == DFT_MUC_ROOMCONFIG)
 	{
 		locale.title = tr("Configure conference");
 		locale.fields["muc#maxhistoryfetch"].label = tr("Maximum Number of History Messages Returned by Room");
@@ -487,12 +490,21 @@ IDataFormLocale MultiUserChatManager::dataFormLocale(const QString &AFormType)
 		locale.fields["muc#roomconfig_roomowners"].label = tr("Full List of Room Owners");
 		locale.fields["muc#roomconfig_roomsecret"].label = tr("The Room Password");
 		locale.fields["muc#roomconfig_whois"].label = tr("Affiliations that May Discover Real JIDs of Occupants");
+		locale.fields["muc#roomconfig_whois"].options["anyone"].label = tr("Anyone");
+		locale.fields["muc#roomconfig_whois"].options["moderators"].label = tr("Moderators only");
 		//EJabberd extension
 		locale.fields["public_list"].label = tr("Make Participants List Public?");
 		locale.fields["members_by_default"].label = tr("Make all Occupants as Participants?");
 		locale.fields["allow_private_messages"].label = tr("Allow Occupants to Send Private Messages?");
+		locale.fields["allow_private_messages_from_visitors"].label = tr("Allow visitors to send private messages to");
+		locale.fields["allow_private_messages_from_visitors"].options["anyone"].label = tr("Anyone");
+		locale.fields["allow_private_messages_from_visitors"].options["nobody"].label = tr("Nobody");
+		locale.fields["allow_private_messages_from_visitors"].options["moderators"].label = tr("Moderators only");
 		locale.fields["allow_query_users"].label = tr("Allow Occupants to Query Other Occupants?");
 		locale.fields["muc#roomconfig_allowvisitorstatus"].label = tr("Allow Visitors to Send Status Text in Presence Updates?");
+		locale.fields["muc#roomconfig_allowvisitornickchange"].label = tr("Allow visitors to change nickname?");
+		locale.fields["muc#roomconfig_allowvoicerequests"].label = tr("Allow visitors to send voice requests?");
+		locale.fields["muc#roomconfig_voicerequestmininterval"].label = tr("Minimum interval between voice requests (in seconds)");
 		locale.fields["captcha_protected"].label = tr("Make this Room CAPTCHA Protected?");
 		locale.fields["muc#roomconfig_captcha_whitelist"].label = tr("Do not Request CAPTCHA for Followed Jabber ID");
 		//OpenFire extension
@@ -500,7 +512,7 @@ IDataFormLocale MultiUserChatManager::dataFormLocale(const QString &AFormType)
 		locale.fields["x-muc#roomconfig_canchangenick"].label = tr("Allow Occupants to Change Nicknames?");
 		locale.fields["x-muc#roomconfig_registration"].label = tr("Allow Users to Register with the Room?");
 	}
-	else if (AFormType == DATA_FORM_MUC_ROOM_INFO)
+	else if (AFormType == DFT_MUC_ROOM_INFO)
 	{
 		locale.title = tr("Conference information");
 		locale.fields["muc#roominfo_contactjid"].label = tr("Contact JID");
@@ -539,7 +551,7 @@ INotification MultiUserChatManager::messageNotify(INotifications *ANotifications
 		Jid roomJid = AMessage.from();
 		Jid streamJid = AMessage.to();
 		Jid contactJid = inviteElem.attribute("from");
-		LOG_STRM_DEBUG(streamJid,QString("Received invite to room=%1 from=%2").arg(roomJid.full(),contactJid.full()));
+		LOG_STRM_DEBUG(streamJid,QString("Received invite to room=%1, from=%2").arg(roomJid.full(),contactJid.full()));
 
 		if (!findMultiChatWindow(streamJid,roomJid))
 		{
@@ -713,7 +725,7 @@ IMultiUserChat *MultiUserChatManager::findMultiUserChat(const Jid &AStreamJid, c
 	return NULL;
 }
 
-IMultiUserChat *MultiUserChatManager::getMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword)
+IMultiUserChat *MultiUserChatManager::getMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword, bool AIsolated)
 {
 	IMultiUserChat *chat = findMultiUserChat(AStreamJid,ARoomJid);
 	if (!chat)
@@ -721,7 +733,7 @@ IMultiUserChat *MultiUserChatManager::getMultiUserChat(const Jid &AStreamJid, co
 		if (AStreamJid.isValid() && ARoomJid.isValid())
 		{
 			LOG_STRM_INFO(AStreamJid,QString("Creating multi user chat, room=%1, nick=%2").arg(ARoomJid.bare(),ANick));
-			chat = new MultiUserChat(this,AStreamJid, ARoomJid.bare(), ANick.isEmpty() ? AStreamJid.uNode() : ANick, APassword, this);
+			chat = new MultiUserChat(AStreamJid, ARoomJid.bare(), ANick.isEmpty() ? AStreamJid.uNode() : ANick, APassword, AIsolated, this);
 			connect(chat->instance(),SIGNAL(chatDestroyed()),SLOT(onMultiChatDestroyed()));
 			FChats.append(chat);
 			emit multiUserChatCreated(chat);
@@ -755,7 +767,7 @@ IMultiUserChatWindow *MultiUserChatManager::getMultiChatWindow(const Jid &AStrea
 		window = findMultiChatWindow(AStreamJid,ARoomJid);
 		if (!window)
 		{
-			IMultiUserChat *chat = getMultiUserChat(AStreamJid,ARoomJid,ANick,APassword);
+			IMultiUserChat *chat = getMultiUserChat(AStreamJid,ARoomJid,ANick,APassword,false);
 			if (chat)
 			{
 				LOG_STRM_INFO(AStreamJid,QString("Creating multi user chat window, room=%1, nick=%2").arg(ARoomJid.bare(),ANick));
@@ -1066,7 +1078,7 @@ Action *MultiUserChatManager::createJoinAction(const Jid &AStreamJid, const Jid 
 {
 	Action *action = new Action(AParent);
 	action->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_JOIN);
-	action->setText(tr("Join conference"));
+	action->setText(tr("Join Conference..."));
 	action->setData(ADR_STREAM_JID,AStreamJid.full());
 	action->setData(ADR_HOST,ARoomJid.domain());
 	action->setData(ADR_ROOM,ARoomJid.node());
@@ -1702,15 +1714,20 @@ void MultiUserChatManager::onInviteDialogFinished(int AResult)
 			QDomElement declElem = mstanza.addElement("x",NS_MUC_USER).appendChild(mstanza.createElement("decline")).toElement();
 			declElem.setAttribute("to",fields.fromJid.full());
 
+			bool ok;
 			QString reason = tr("I'm too busy right now");
-			reason = QInputDialog::getText(inviteDialog,tr("Decline invite"),tr("Enter a reason"),QLineEdit::Normal,reason);
-			if (!reason.isEmpty())
-				declElem.appendChild(mstanza.createElement("reason")).appendChild(mstanza.createTextNode(reason));
+			reason = QInputDialog::getText(inviteDialog,tr("Decline Invite - %1").arg(fields.roomJid.bare()),tr("Enter a message:"),QLineEdit::Normal,reason,&ok);
 
-			if (FMessageProcessor->sendMessage(fields.streamJid,decline,IMessageProcessor::DirectionOut))
-				LOG_STRM_INFO(fields.streamJid,QString("Invite request from=%1 to room=%2 rejected").arg(fields.fromJid.full(),fields.roomJid.full()));
-			else
-				LOG_STRM_WARNING(fields.streamJid,QString("Failed to send invite reject message to=%1").arg(fields.fromJid.full()));
+			if (ok)
+			{
+				if (!reason.isEmpty())
+					declElem.appendChild(mstanza.createElement("reason")).appendChild(mstanza.createTextNode(reason));
+
+				if (FMessageProcessor->sendMessage(fields.streamJid,decline,IMessageProcessor::DirectionOut))
+					LOG_STRM_INFO(fields.streamJid,QString("Invite request from=%1 to room=%2 rejected").arg(fields.fromJid.full(),fields.roomJid.full()));
+				else
+					LOG_STRM_WARNING(fields.streamJid,QString("Failed to send invite reject message to=%1").arg(fields.fromJid.full()));
+			}
 		}
 	}
 }
@@ -1728,10 +1745,11 @@ void MultiUserChatManager::onInviteActionTriggered(bool)
 		if (window)
 		{
 			bool ok;
-			QString reason = tr("Please, enter this conference!");
-			reason = QInputDialog::getText(window->instance(),tr("Invite user"),tr("Enter a reason"),QLineEdit::Normal,reason,&ok);
+			QString reason = tr("Please, enter this conference.");
+			reason = QInputDialog::getText(window->instance(),tr("Invite User - %1").arg(roomJid.bare()),tr("Enter a message:"),QLineEdit::Normal,reason,&ok);
+
 			if (ok)
-				window->multiUserChat()->inviteContact(contactJid,reason);
+				window->multiUserChat()->sendInvitation(contactJid,reason);
 		}
 	}
 }

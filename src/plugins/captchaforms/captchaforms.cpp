@@ -88,7 +88,7 @@ bool CaptchaForms::initObjects()
 {
 	if (FDataForms)
 	{
-		FDataForms->insertLocalizer(this,DATA_FORM_CAPTCHAFORMS);
+		FDataForms->insertLocalizer(this,DFT_CAPTCHAFORMS);
 	}
 	if (FNotifications)
 	{
@@ -177,7 +177,7 @@ void CaptchaForms::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 IDataFormLocale CaptchaForms::dataFormLocale(const QString &AFormType)
 {
 	IDataFormLocale locale;
-	if (AFormType == DATA_FORM_CAPTCHAFORMS)
+	if (AFormType == DFT_CAPTCHAFORMS)
 	{
 		locale.title = tr("CAPTCHA Challenge");
 		locale.fields["audio_recog"].label = tr("Describe the sound you hear");

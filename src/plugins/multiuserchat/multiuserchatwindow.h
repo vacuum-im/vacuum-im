@@ -39,10 +39,11 @@ class MultiUserChatWindow :
 	public IMultiUserChatWindow,
 	public IStanzaHandler,
 	public IMessageHandler,
+	public IMessageViewUrlHandler,
 	public IMessageEditSendHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IMessageWindow IMultiUserChatWindow IMessageTabPage IStanzaHandler IMessageHandler IMessageEditSendHandler);
+	Q_INTERFACES(IMessageWindow IMultiUserChatWindow IMessageTabPage IStanzaHandler IMessageHandler IMessageViewUrlHandler IMessageEditSendHandler);
 public:
 	MultiUserChatWindow(IMultiUserChatManager *AMultiChatManager, IMultiUserChat *AMultiChat);
 	~MultiUserChatWindow();
@@ -77,6 +78,8 @@ public:
 	//IMessageEditSendHandler
 	virtual bool messageEditSendPrepare(int AOrder, IMessageEditWidget *AWidget);
 	virtual bool messageEditSendProcesse(int AOrder, IMessageEditWidget *AWidget);
+	//IMessageViewUrlHandler
+	virtual bool messageViewUrlOpen(int AOrder, IMessageViewWidget *AWidget, const QUrl &AUrl);
 	//IMessageHandler
 	virtual bool messageCheck(int AOrder, const Message &AMessage, int ADirection);
 	virtual bool messageDisplay(const Message &AMessage, int ADirection);
@@ -129,6 +132,7 @@ protected:
 	bool execShortcutCommand(const QString &AText);
 	void updateRecentItemActiveTime(IMessageChatWindow *AWindow);
 	void showDateSeparator(IMessageViewWidget *AView, const QDateTime &ADateTime);
+	void showHTMLStatusMessage(IMessageViewWidget *AView, const QString &AHtml, int AType=0, int AStatus=0, const QDateTime &ATime=QDateTime::currentDateTime());
 protected:
 	bool isMentionMessage(const Message &AMessage) const;
 	void setMultiChatMessageStyle();
@@ -154,26 +158,25 @@ protected:
 	void closeEvent(QCloseEvent *AEvent);
 	bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:
-	void onChatAboutToConnect();
-	void onChatOpened();
-	void onChatNotify(const QString &ANotify);
-	void onChatError(const QString &AMessage);
-	void onChatClosed();
-	void onRoomNameChanged(const QString &AName);
+	void onMultiChatOpened();
+	void onMultiChatClosed();
+	void onMultiChatAboutToConnect();
+	//Common
+	void onMultiChatRoomNameChanged(const QString &AName);
+	void onMultiChatRequestFailed(const QString &AId, const XmppError &AError);
 	//Occupant
-	void onPresenceChanged(const IPresenceItem &APresence);
-	void onSubjectChanged(const QString &ANick, const QString &ASubject);
-	void onServiceMessageReceived(const Message &AMessage);
-	void onInviteDeclined(const Jid &AContactJid, const QString &AReason);
-	void onUserChanged(IMultiUser *AUser, int AData, const QVariant &ABefore);
+	void onMultiChatPresenceChanged(const IPresenceItem &APresence);
+	void onMultiChatInvitationDeclined(const Jid &AContactJid, const QString &AReason);
+	void onMultiChatUserChanged(IMultiUser *AUser, int AData, const QVariant &ABefore);
 	//Moderator
-	void onUserKicked(const QString &ANick, const QString &AReason, const QString &AByUser);
-	//Administrator
-	void onUserBanned(const QString &ANick, const QString &AReason, const QString &AByUser);
-	void onAffiliationListReceived(const QString &AAffiliation, const QList<IMultiUserListItem> &AList);
+	void onMultiChatVoiceRequestReceived(const Message &AMessage);
+	void onMultiChatSubjectChanged(const QString &ANick, const QString &ASubject);
+	void onMultiChatUserKicked(const QString &ANick, const QString &AReason, const QString &AByUser);
+	void onMultiChatUserBanned(const QString &ANick, const QString &AReason, const QString &AByUser);
 	//Owner
-	void onConfigFormReceived(const IDataForm &AForm);
-	void onRoomDestroyed(const QString &AReason);
+	void onMultiChatRoomConfigLoaded(const QString &AId, const IDataForm &AForm);
+	void onMultiChatRoomConfigUpdated(const QString &AId, const IDataForm &AForm);
+	void onMultiChatRoomDestroyed(const QString &AId, const QString &AReason);
 protected slots:
 	void onMultiChatWindowActivated();
 	void onMultiChatNotifierActiveNotifyChanged(int ANotifyId);
@@ -200,12 +203,10 @@ protected slots:
 	void onOpenPrivateChatWindowActionTriggered(bool);
 	void onChangeUserRoleActionTriggeted(bool);
 	void onChangeUserAffiliationActionTriggered(bool);
-	void onDataFormMessageDialogAccepted();
-	void onAffiliationListDialogAccepted();
-	void onConfigFormDialogAccepted();
 protected slots:
 	void onStatusIconsChanged();
 	void onAutoRejoinAfterKick();
+	void onRoomConfigFormDialogAccepted();
 	void onOptionsChanged(const OptionsNode &ANode);
 	void onCentralSplitterHandleMoved(int AOrderId, int ASize);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
@@ -220,10 +221,7 @@ private:
 	Action *FInviteContact;
 	Action *FRequestVoice;
 	Action *FChangeTopic;
-	Action *FBanList;
-	Action *FMembersList;
-	Action *FAdminsList;
-	Action *FOwnersList;
+	Action *FEditAffiliations;
 	Action *FConfigRoom;
 	Action *FDestroyRoom;
 	Action *FUsersHide;
@@ -263,6 +261,12 @@ private:
 	QString FLastAffiliation;
 	QDateTime FLastStanzaTime;
 private:
+	QString FRoleRequestId;
+	QString FAffilRequestId;
+	QString FDestroyRequestId;
+	QString FLoadConfigRequestId;
+	QString FUpdateConfigRequestId;
+private:
 	int FStartCompletePos;
 	QString FCompleteNickStarts;
 	QString FCompleteNickLast;
@@ -278,7 +282,6 @@ private:
 	QMultiMap<IMessageChatWindow *,int> FActiveChatMessages;
 private:
 	QList<int> FActiveMessages;
-	QMap<int, IDataDialogWidget *> FDataFormMessages;
 	QMap<QString, IMessageChatWindow *> FHistoryRequests;
 	QMap<IMessageViewWidget *, WindowStatus> FWindowStatus;
 	QMap<IMessageChatWindow *, QList<Message> > FPendingMessages;

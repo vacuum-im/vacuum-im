@@ -135,7 +135,7 @@ bool SessionNegotiation::initObjects()
 	}
 	if (FDataForms)
 	{
-		FDataForms->insertLocalizer(this,DATA_FORM_SESSION_NEGOTIATION);
+		FDataForms->insertLocalizer(this,DFT_SESSIONNEGOTIATION);
 	}
 	insertNegotiator(this,SNO_DEFAULT);
 	return true;
@@ -278,7 +278,7 @@ Action *SessionNegotiation::createDiscoFeatureAction(const Jid &AStreamJid, cons
 IDataFormLocale SessionNegotiation::dataFormLocale(const QString &AFormType)
 {
 	IDataFormLocale locale;
-	if (AFormType == DATA_FORM_SESSION_NEGOTIATION)
+	if (AFormType == DFT_SESSIONNEGOTIATION)
 	{
 		locale.title = tr("Session Negotiation");
 		locale.fields["accept"].label = tr("Accept the Invitation?");
@@ -1141,7 +1141,7 @@ IDataForm SessionNegotiation::defaultForm(const QString &AActionVar, const QVari
 	IDataField form_type;
 	form_type.var = "FORM_TYPE";
 	form_type.type = DATAFIELD_TYPE_HIDDEN;
-	form_type.value = DATA_FORM_SESSION_NEGOTIATION;
+	form_type.value = DFT_SESSIONNEGOTIATION;
 	form_type.required = false;
 
 	IDataField actionField;

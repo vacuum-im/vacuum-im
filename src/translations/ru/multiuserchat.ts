@@ -4,32 +4,68 @@
 <context>
     <name>EditUsersListDialog</name>
     <message>
-        <source>Add new item</source>
-        <translation>Добавить элемент</translation>
+        <source>Edit Users Affiliations - %1</source>
+        <translation>Редактировать членство пользователей - %1</translation>
     </message>
     <message>
-        <source>Enter new item JID:</source>
-        <translation>Введите новый JID:</translation>
+        <source>Owners</source>
+        <translation>Владельцы</translation>
     </message>
     <message>
-        <source>Entered item JID is not valid or already exists.</source>
-        <translation>Введённый JID неправильный или уже существует.</translation>
+        <source>Administrators</source>
+        <translation>Администраторы</translation>
     </message>
     <message>
-        <source>Wrong item JID</source>
-        <translation>Неверный JID</translation>
+        <source>Members</source>
+        <translation>Участники</translation>
+    </message>
+    <message>
+        <source>Outcasts</source>
+        <translation>Заблокированные</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation>Нет</translation>
+    </message>
+    <message>
+        <source>Add User</source>
+        <translation>Добавить пользователя</translation>
+    </message>
+    <message>
+        <source>Enter user Jabber ID:</source>
+        <translation>Введите Jabber ID пользователя:</translation>
+    </message>
+    <message>
+        <source>Enter note:</source>
+        <translation>Введите заметку:</translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation>Предупреждение</translation>
+    </message>
+    <message>
+        <source>User %1 already present in list of &apos;%2&apos;</source>
+        <translation>Пользователь %1 уже присутствует в списке &apos;%2&apos;</translation>
+    </message>
+    <message>
+        <source>Failed to load list of &apos;%1&apos;</source>
+        <translation>Не удалось загрузить список &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <source>Failed to update users affiliation lists</source>
+        <translation>Не удалось обновить списки членства пользователей</translation>
+    </message>
+    <message>
+        <source>Failed to load list of &apos;%1&apos;: %2</source>
+        <translation>Не удалось загрузить список &apos;%1&apos;: %2</translation>
+    </message>
+    <message>
+        <source>Failed to update users affiliation lists: %1</source>
+        <translation>Не удалось обновить списки членства пользователей: %1</translation>
     </message>
 </context>
 <context>
     <name>EditUsersListDialogClass</name>
-    <message>
-        <source>Jid</source>
-        <translation>JID</translation>
-    </message>
-    <message>
-        <source>Reason</source>
-        <translation>Причина</translation>
-    </message>
     <message>
         <source>Add</source>
         <translation>Добавить</translation>
@@ -37,6 +73,10 @@
     <message>
         <source>Delete</source>
         <translation>Удалить</translation>
+    </message>
+    <message>
+        <source>Search in lists</source>
+        <translation>Поиск по спискам</translation>
     </message>
 </context>
 <context>
@@ -94,53 +134,6 @@ Check values and try again</source>
     <message>
         <source>Service:</source>
         <translation>Сервис:</translation>
-    </message>
-</context>
-<context>
-    <name>MultiUserChat</name>
-    <message>
-        <source>Room configuration is not available.</source>
-        <translation>Настройка комнаты недоступна.</translation>
-    </message>
-    <message>
-        <source>Room configuration accepted.</source>
-        <translation>Настройки комнаты применены.</translation>
-    </message>
-    <message>
-        <source>Request for list of %1s is failed: %2</source>
-        <translation>Не удалось получить список &apos;%1s&apos;: %2</translation>
-    </message>
-    <message>
-        <source>Changes in list of %1s was not accepted: %2</source>
-        <translation>Изменение в списке &apos;%1s&apos; не приняты: %2</translation>
-    </message>
-    <message>
-        <source>Changes in list of %1s was accepted.</source>
-        <translation>Изменения в списке &apos;%1s&apos; приняты.</translation>
-    </message>
-    <message>
-        <source>Failed to send request for list of %1s.</source>
-        <translation>Не удалось отправить запрос списка &apos;%1s&apos;.</translation>
-    </message>
-    <message>
-        <source>Failed to send changes in list of %1s</source>
-        <translation>Не удалось отправить изменения в списке &apos;%1s&apos;</translation>
-    </message>
-    <message>
-        <source>Room configuration request failed.</source>
-        <translation>Не удалось отправить запрос конфигурации комнаты.</translation>
-    </message>
-    <message>
-        <source>Room configuration submit failed.</source>
-        <translation>Не удалось подтвердить конфигурацию комнаты.</translation>
-    </message>
-    <message>
-        <source>Room destruction request was sent.</source>
-        <translation>Запрос на уничтожение комнаты послан.</translation>
-    </message>
-    <message>
-        <source>Your nick was changed by server to &apos;%1&apos;</source>
-        <translation>Ваш ник был изменен сервером на &apos;%1&apos;</translation>
     </message>
 </context>
 <context>
@@ -559,22 +552,6 @@ Check values and try again</source>
         <translation>Я слишком занят сейчас</translation>
     </message>
     <message>
-        <source>Decline invite</source>
-        <translation>Отклонить приглашение</translation>
-    </message>
-    <message>
-        <source>Enter a reason</source>
-        <translation>Введите причину</translation>
-    </message>
-    <message>
-        <source>Please, enter this conference!</source>
-        <translation>Пожалуйста, войдите в эту конференцию!</translation>
-    </message>
-    <message>
-        <source>Invite user</source>
-        <translation>Пригласить пользователя</translation>
-    </message>
-    <message>
         <source>&lt;b&gt;Conference:&lt;/b&gt; %1</source>
         <translation>&lt;b&gt;Конференция:&lt;/b&gt; %1</translation>
     </message>
@@ -606,6 +583,54 @@ Check values and try again</source>
         <source>Participants list view:</source>
         <translation>Вид списка участников:</translation>
     </message>
+    <message>
+        <source>Anyone</source>
+        <translation>Всем</translation>
+    </message>
+    <message>
+        <source>Moderators only</source>
+        <translation>Только модераторам</translation>
+    </message>
+    <message>
+        <source>Allow visitors to send private messages to</source>
+        <translation>Разрежить гостям отправлять приватные сообщения</translation>
+    </message>
+    <message>
+        <source>Nobody</source>
+        <translation>Никому</translation>
+    </message>
+    <message>
+        <source>Allow visitors to change nickname?</source>
+        <translation>Разрешить гостям менять ник?</translation>
+    </message>
+    <message>
+        <source>Allow visitors to send voice requests?</source>
+        <translation>Разрешить гостям отправлять запросы голоса?</translation>
+    </message>
+    <message>
+        <source>Minimum interval between voice requests (in seconds)</source>
+        <translation>Минимальный интервал между запросами голоса (в секундах)</translation>
+    </message>
+    <message>
+        <source>Decline Invite - %1</source>
+        <translation>Отклонить приглашение - %1</translation>
+    </message>
+    <message>
+        <source>Enter a message:</source>
+        <translation>Введите сообщение:</translation>
+    </message>
+    <message>
+        <source>Please, enter this conference.</source>
+        <translation>Пожалуйста, войдите в эту конференцию.</translation>
+    </message>
+    <message>
+        <source>Invite User - %1</source>
+        <translation>Приглавить пользователя - %1</translation>
+    </message>
+    <message>
+        <source>Join Conference...</source>
+        <translation>Войти в конференцию...</translation>
+    </message>
 </context>
 <context>
     <name>MultiUserChatWindow</name>
@@ -618,32 +643,12 @@ Check values and try again</source>
         <translation>Сообщение в конференции</translation>
     </message>
     <message>
-        <source>Private message from: [%1]</source>
-        <translation>Личное сообщение от: [%1]</translation>
-    </message>
-    <message>
         <source>Private message</source>
         <translation>Личное сообщение</translation>
     </message>
     <message>
-        <source>Data form received from: %1</source>
-        <translation>Получена форма данных от: %1</translation>
-    </message>
-    <message>
-        <source>Data form received</source>
-        <translation>Получена форма данных</translation>
-    </message>
-    <message>
-        <source>Data form received: %1</source>
-        <translation>Получена форма данных от: %1</translation>
-    </message>
-    <message>
-        <source>Change topic</source>
-        <translation>Изменить тему</translation>
-    </message>
-    <message>
         <source>Change Role</source>
-        <translation>Изменить тип</translation>
+        <translation>Изменить роль</translation>
     </message>
     <message>
         <source>Visitor</source>
@@ -662,78 +667,6 @@ Check values and try again</source>
         <translation>Изменить членство</translation>
     </message>
     <message>
-        <source>%1 affiliation changed while not in the room</source>
-        <translation>У %1 членство изменилось во время отсутствия</translation>
-    </message>
-    <message>
-        <source>Room configuration change has occurred</source>
-        <translation>Произошло изменение конфигурации комнаты</translation>
-    </message>
-    <message>
-        <source>Room logging is now enabled</source>
-        <translation>Протоколирование сообщений в комнате включено</translation>
-    </message>
-    <message>
-        <source>Room logging is now disabled</source>
-        <translation>Протоколирование сообщений в комнате выключено</translation>
-    </message>
-    <message>
-        <source>The room is now non-anonymous</source>
-        <translation>Эта комната теперь не анонимная</translation>
-    </message>
-    <message>
-        <source>The room is now semi-anonymous</source>
-        <translation>Эта комната теперь полуанонимная</translation>
-    </message>
-    <message>
-        <source>A new room has been created</source>
-        <translation>Была создана новая комната</translation>
-    </message>
-    <message>
-        <source>%1 has been removed from the room because of an affiliation change</source>
-        <translation>%1 был удалён из комнаты из-за изменения членства</translation>
-    </message>
-    <message>
-        <source>%1 has been removed from the room because the room has been changed to members-only</source>
-        <translation>%1 был удалён из комнаты из-за установления статуса &quot;только для участников&quot;</translation>
-    </message>
-    <message>
-        <source>%1 is being removed from the room because of a system shutdown</source>
-        <translation>%1 был удалён из комнаты из-за выключения системы</translation>
-    </message>
-    <message>
-        <source>User %1 is not present in the conference</source>
-        <translation>Пользователь %1 не присутствует в конференции</translation>
-    </message>
-    <message>
-        <source>%1 is not valid contact JID</source>
-        <translation>%1 не является правильным JID</translation>
-    </message>
-    <message>
-        <source>%1 is not valid room JID</source>
-        <translation>%1 не является правильным JID комнаты</translation>
-    </message>
-    <message>
-        <source>%1 - Private chat</source>
-        <translation>%1 - Личные сообщения</translation>
-    </message>
-    <message>
-        <source>Notify: %1</source>
-        <translation>Уведомление: %1</translation>
-    </message>
-    <message>
-        <source>Error: %1</source>
-        <translation>Ошибка: %1</translation>
-    </message>
-    <message>
-        <source>%1 role changed from %2 to %3</source>
-        <translation>Тип пользователя %1 был изменён с %2 на %3</translation>
-    </message>
-    <message>
-        <source>%1 affiliation changed from %2 to %3</source>
-        <translation>Членство %1 было изменено с %2 на %3</translation>
-    </message>
-    <message>
         <source>%1 changed nick to %2</source>
         <translation>%1 изменил ник на %2</translation>
     </message>
@@ -742,76 +675,8 @@ Check values and try again</source>
         <translation>Тема: %1</translation>
     </message>
     <message>
-        <source>%1 has changed the subject to: %2</source>
-        <translation>%1 изменил тему на: %2</translation>
-    </message>
-    <message>
-        <source>%1 has declined your invite to this room. %2</source>
-        <translation>%1 отклонил ваше приглашение в эту комнату. %2</translation>
-    </message>
-    <message>
-        <source>%1 has been kicked from the room%2. %3</source>
-        <translation>%1 был выкинут из комнаты%2. %3</translation>
-    </message>
-    <message>
         <source> by %1</source>
-        <translation> модератором %1</translation>
-    </message>
-    <message>
-        <source>%1 has been banned from the room%2. %3</source>
-        <translation>%1 был забанен в комнате%2. %3</translation>
-    </message>
-    <message>
-        <source>Edit ban list - %1</source>
-        <translation>Редактировать список банов - %1</translation>
-    </message>
-    <message>
-        <source>Edit members list - %1</source>
-        <translation>Редактировать список участников - %1</translation>
-    </message>
-    <message>
-        <source>Edit administrators list - %1</source>
-        <translation>Редактировать список администраторов - %1</translation>
-    </message>
-    <message>
-        <source>Edit owners list - %1</source>
-        <translation>Редактировать список владельцев - %1</translation>
-    </message>
-    <message>
-        <source>This room was destroyed by owner. %1</source>
-        <translation>Комната была уничтожена владельцем. %1</translation>
-    </message>
-    <message>
-        <source>Change nick name</source>
-        <translation>Изменить ник</translation>
-    </message>
-    <message>
-        <source>Invite user</source>
-        <translation>Пригласить пользователя</translation>
-    </message>
-    <message>
-        <source>Enter user JID:</source>
-        <translation>Введите JID пользователя:</translation>
-    </message>
-    <message>
-        <source>Enter a reason:</source>
-        <translation>Введите причину:</translation>
-    </message>
-    <message>
-        <source>Kick reason</source>
-        <translation>Причина отключения</translation>
-    </message>
-    <message>
-        <source>Enter reason for kick</source>
-        <translation>Введите причину отключения</translation>
-    </message>
-    <message>
-        <source>Ban reason</source>
-        <translation>Причина бана</translation>
-    </message>
-    <message>
-        <source>Enter reason for ban</source>
-        <translation>Введите причину бана</translation>
+        <translation> пользователем %1</translation>
     </message>
     <message>
         <source>%1 - Conference</source>
@@ -866,22 +731,6 @@ Check values and try again</source>
         <translation>Обращение в конференции</translation>
     </message>
     <message>
-        <source>%1 &lt;%2&gt; has joined the room</source>
-        <translation>%1 &lt;%2&gt; присоединился к комнате</translation>
-    </message>
-    <message>
-        <source>%1 has joined the room</source>
-        <translation>%1 присоединился к комнате</translation>
-    </message>
-    <message>
-        <source>%1 &lt;%2&gt; has left the room</source>
-        <translation>%1 &lt;%2&gt; вышел из комнаты</translation>
-    </message>
-    <message>
-        <source>%1 has left the room</source>
-        <translation>%1 вышел из комнаты</translation>
-    </message>
-    <message>
         <source>Loading history...</source>
         <translation>Загрузка истории...</translation>
     </message>
@@ -902,14 +751,6 @@ Check values and try again</source>
         <translation>Открыть диалог чата</translation>
     </message>
     <message>
-        <source>Kick User</source>
-        <translation>Выгнать</translation>
-    </message>
-    <message>
-        <source>Ban User</source>
-        <translation>Забанить</translation>
-    </message>
-    <message>
         <source>Change Nick</source>
         <translation>Изменить ник</translation>
     </message>
@@ -924,26 +765,6 @@ Check values and try again</source>
     <message>
         <source>Request Voice</source>
         <translation>Запросить голос</translation>
-    </message>
-    <message>
-        <source>Clear Conference Window</source>
-        <translation>Очистить окно конференции</translation>
-    </message>
-    <message>
-        <source>Edit Ban List</source>
-        <translation>Редактировать список банов</translation>
-    </message>
-    <message>
-        <source>Edit Members List</source>
-        <translation>Редактировать список участников</translation>
-    </message>
-    <message>
-        <source>Edit Administrators List</source>
-        <translation>Редактировать список администраторов</translation>
-    </message>
-    <message>
-        <source>Edit Owners List</source>
-        <translation>Редактировать список владельцев</translation>
     </message>
     <message>
         <source>Configure Conference</source>
@@ -962,32 +783,12 @@ Check values and try again</source>
         <translation>Выйти из конференции</translation>
     </message>
     <message>
-        <source>Clear Chat Window</source>
-        <translation>Очистить окно чата</translation>
-    </message>
-    <message>
-        <source>Enter your new nick name in conference %1</source>
-        <translation>Введите Ваш новый ник в конференции %1</translation>
-    </message>
-    <message>
-        <source>Enter new topic for conference %1</source>
-        <translation>Введите новую тему для конференции %1</translation>
-    </message>
-    <message>
-        <source>Please, enter this conference!</source>
-        <translation>Пожалуйста, войдите в эту конференцию!</translation>
-    </message>
-    <message>
-        <source>Destroying conference</source>
-        <translation>Уничтожить конференцию</translation>
-    </message>
-    <message>
         <source>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</source>
         <translation>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</translation>
     </message>
     <message>
         <source>&lt;b&gt;Role:&lt;/b&gt; %1</source>
-        <translation>&lt;b&gt;Тип:&lt;/b&gt; %1</translation>
+        <translation>&lt;b&gt;Роль:&lt;/b&gt; %1</translation>
     </message>
     <message>
         <source>&lt;b&gt;Affiliation:&lt;/b&gt; %1</source>
@@ -998,32 +799,312 @@ Check values and try again</source>
         <translation>&lt;b&gt;Статус:&lt;/b&gt; %1</translation>
     </message>
     <message>
-        <source>This room is non-anonymous</source>
-        <translation>Эта комната не анонимная</translation>
-    </message>
-    <message>
-        <source>You entered into the room</source>
-        <translation>Вы вошли в комнату</translation>
-    </message>
-    <message>
-        <source>You left the room</source>
-        <translation>Вы вышли из комнаты</translation>
-    </message>
-    <message>
-        <source>Room now shows unavailable members</source>
-        <translation>Комната теперь показывает отключенных участников</translation>
-    </message>
-    <message>
-        <source>Room now does not show unavailable members</source>
-        <translation>Комната теперь не показывает отключенных участников</translation>
-    </message>
-    <message>
         <source>[%1] in [%2]</source>
         <translation>[%1] в [%2]</translation>
     </message>
     <message>
         <source>Hide/Show Participants List</source>
         <translation>Скрыть/Показать список участников</translation>
+    </message>
+    <message>
+        <source>User %1 was not found in the conference</source>
+        <translation>Пользователь %1 не найден в конференции</translation>
+    </message>
+    <message>
+        <source>User %1 already has a voice in the conference</source>
+        <translation>Пользователь %1 уже имеет голос в конференции</translation>
+    </message>
+    <message>
+        <source>Unable to grant a voice to the user %1</source>
+        <translation>Не удалось предоставить голос пользователю %1</translation>
+    </message>
+    <message>
+        <source>You granted the voice to the user %1</source>
+        <translation>Вы предоставили голос пользователю %1</translation>
+    </message>
+    <message>
+        <source>User %1 requests a voice in the conference, %2</source>
+        <translation>Пользоватлеть %1 запрашивает голос в конференции, %2</translation>
+    </message>
+    <message>
+        <source>Grant Voice</source>
+        <translation>Предоставить голос</translation>
+    </message>
+    <message>
+        <source>Voice request received</source>
+        <translation>Получен запрос голоса</translation>
+    </message>
+    <message>
+        <source>User %1 requests a voice in the conference</source>
+        <translation>Пользователь %1 запрашивает голос в конференции</translation>
+    </message>
+    <message>
+        <source>Edit Users Affiliations</source>
+        <translation>Редактировать членство пользователей</translation>
+    </message>
+    <message>
+        <source>Clear window</source>
+        <translation>Очистить окно</translation>
+    </message>
+    <message>
+        <source>Kick user %1 request was sent</source>
+        <translation>Запрос на изгнание пользователя %1 был отправлен</translation>
+    </message>
+    <message>
+        <source>Failed to send kick user %1 request</source>
+        <translation>Не удалось отправить запрос на изгнание пользователя %1</translation>
+    </message>
+    <message>
+        <source>Ban user %1 request was sent</source>
+        <translation>Запрос на блокировку пользователя %1 был отправлен</translation>
+    </message>
+    <message>
+        <source>Failed to send ban user %1 request</source>
+        <translation>Не удалось отправить запрос на блокировку пользователя %1</translation>
+    </message>
+    <message>
+        <source>Private message was sent to user %1</source>
+        <translation>Личное сообщение было отправлено пользователю %1</translation>
+    </message>
+    <message>
+        <source>Failed to send private message to user %1</source>
+        <translation>Не удалось отправить личное сообщение пользователю %1</translation>
+    </message>
+    <message>
+        <source>You nickname was changed to %1</source>
+        <translation>Ваш ник был изменен на %1</translation>
+    </message>
+    <message>
+        <source>Failed to change your nickname to %1</source>
+        <translation>Не удалось изменить ваш ник на %1</translation>
+    </message>
+    <message>
+        <source>Change subject request was sent</source>
+        <translation>Запрос изменения темы был отправлен</translation>
+    </message>
+    <message>
+        <source>Failed to send change subject request</source>
+        <translation>Не удалось отправить запрос изменения темы</translation>
+    </message>
+    <message>
+        <source>This conference is non-anonymous</source>
+        <translation>Эта конференция не анонимная</translation>
+    </message>
+    <message>
+        <source>User %1 affiliation changed while not in the conference</source>
+        <translation>Членство пользователя %1 было изменено во время отсутствия в конференции</translation>
+    </message>
+    <message>
+        <source>Conference now shows unavailable members</source>
+        <translation>Конференция теперь показывает отключенных участников</translation>
+    </message>
+    <message>
+        <source>Conference now does not show unavailable members</source>
+        <translation>Конференция теперь не показывает отключенных участников</translation>
+    </message>
+    <message>
+        <source>Conference configuration change has occurred</source>
+        <translation>Настройки конференции были изменены</translation>
+    </message>
+    <message>
+        <source>Conference logging is now enabled</source>
+        <translation>Протоколирование сообщений в конференции включено</translation>
+    </message>
+    <message>
+        <source>Conference logging is now disabled</source>
+        <translation>Протоколирование сообщений в конференции выключено</translation>
+    </message>
+    <message>
+        <source>The conference is now non-anonymous</source>
+        <translation>Конференция теперь не анонимная</translation>
+    </message>
+    <message>
+        <source>The conference is now semi-anonymous</source>
+        <translation>Конференция теперь полу-анонимная</translation>
+    </message>
+    <message>
+        <source>A new conference has been created</source>
+        <translation>Была создана новая конференция</translation>
+    </message>
+    <message>
+        <source>User %1 has been removed from the conference because of an affiliation change</source>
+        <translation>Пользователь %1 был отключен от конференции из-за изменения членства</translation>
+    </message>
+    <message>
+        <source>User %1 has been removed from the conference because the conference has been changed to members-only</source>
+        <translation>Пользователь %1 был отключен от конференции т.к. она стала только для участников</translation>
+    </message>
+    <message>
+        <source>User %1 is being removed from the conference because of a system shutdown</source>
+        <translation>Пользователь %1 был отключен от конференции из-за отключения системы</translation>
+    </message>
+    <message>
+        <source>%1 - Private Chat</source>
+        <translation>%1 - Приватный чат</translation>
+    </message>
+    <message>
+        <source>You have joined the conference</source>
+        <translation>Вы присоединились к конференции</translation>
+    </message>
+    <message>
+        <source>You have no voice in this conference, %1</source>
+        <translation>У вас нет голоса в конференции, %1</translation>
+    </message>
+    <message>
+        <source>You have left the conference</source>
+        <translation>Вы вышли из конференции</translation>
+    </message>
+    <message>
+        <source>Failed to change user role: %1</source>
+        <translation>Не удалось изменить роль пользователя: %1</translation>
+    </message>
+    <message>
+        <source>Failed to change user affiliation: %1</source>
+        <translation>Не удалось изменить членство пользователя: %1</translation>
+    </message>
+    <message>
+        <source>Failed to load conference configuration: %1</source>
+        <translation>Не удалось загрузить настройки конференции: %1</translation>
+    </message>
+    <message>
+        <source>Failed to update conference configuration: %1</source>
+        <translation>Не удалось изменить настройки конференции: %1</translation>
+    </message>
+    <message>
+        <source>Failed to destroy this conference: %1</source>
+        <translation>Не удалось удалить эту конференцию: %1</translation>
+    </message>
+    <message>
+        <source>Failed to join to the conference: %1</source>
+        <translation>Не удалось присоединиться к конференции: %1</translation>
+    </message>
+    <message>
+        <source>User %1 has declined your invite to this conference. %2</source>
+        <translation>Пользователь %1 отклонил ваше приглашение в конференцию. %2</translation>
+    </message>
+    <message>
+        <source>%1 &lt;%2&gt; has joined</source>
+        <translation>%1 &lt;%2&gt; присоединился</translation>
+    </message>
+    <message>
+        <source>%1 has joined</source>
+        <translation>%1 присоединился</translation>
+    </message>
+    <message>
+        <source>%1 &lt;%2&gt; has left</source>
+        <translation>%1 &lt;%2&gt; вышел</translation>
+    </message>
+    <message>
+        <source>%1 has left</source>
+        <translation>%1 вышел</translation>
+    </message>
+    <message>
+        <source>%1 changed role from %2 to %3</source>
+        <translation>У %1 изменилась роль с %2 на %3</translation>
+    </message>
+    <message>
+        <source>%1 changed affiliation from %2 to %3</source>
+        <translation>У %1 изменилось членство с %2 на %3</translation>
+    </message>
+    <message>
+        <source>User %1 has been kicked from the conference%2 %3</source>
+        <translation>Пользователь %1 был выгнан из конференции%2 %3</translation>
+    </message>
+    <message>
+        <source> by user %1</source>
+        <translation> пользователем %1</translation>
+    </message>
+    <message>
+        <source>User %1 has been banned in the conference%2 %3</source>
+        <translation>Пользователь %1 был заблокирован в конференции%2 %3</translation>
+    </message>
+    <message>
+        <source>Conference configuration accepted</source>
+        <translation>Настройки конференции были приняты</translation>
+    </message>
+    <message>
+        <source>This conference was destroyed by owner. %1</source>
+        <translation>Эта конференция была удалена владельцем. %1</translation>
+    </message>
+    <message>
+        <source>Change Nickname - %1</source>
+        <translation>Изменить ник - %1</translation>
+    </message>
+    <message>
+        <source>Enter your new nickname:</source>
+        <translation>Введите ваш новый ник:</translation>
+    </message>
+    <message>
+        <source>Change Topic - %1</source>
+        <translation>Изменить тему - %1</translation>
+    </message>
+    <message>
+        <source>Enter new topic:</source>
+        <translation>Введите новую тему:</translation>
+    </message>
+    <message>
+        <source>Invite User - %1</source>
+        <translation>Пригласить пользователя - %1</translation>
+    </message>
+    <message>
+        <source>Enter user Jabber ID:</source>
+        <translation>Введите Jabber ID пользователя:</translation>
+    </message>
+    <message>
+        <source>Please, enter this conference.</source>
+        <translation>Пожалуйста, войдите в эту конференцию.</translation>
+    </message>
+    <message>
+        <source>Enter a message:</source>
+        <translation>Введите сообщение:</translation>
+    </message>
+    <message>
+        <source>You already have a voice in the conference</source>
+        <translation>Вы уже имеете голос в конференции</translation>
+    </message>
+    <message>
+        <source>Failed to send a request for voice in the conference</source>
+        <translation>Не удалось отправить запрос голоса в конференции</translation>
+    </message>
+    <message>
+        <source>Request for voice in the conference was sent</source>
+        <translation>Запрос голоса в конференции был отправлен</translation>
+    </message>
+    <message>
+        <source>Destroy Conference - %1</source>
+        <translation>Удалить конференцию - %1</translation>
+    </message>
+    <message>
+        <source>Kick User - %1</source>
+        <translation>Выгнать пользователя - %1</translation>
+    </message>
+    <message>
+        <source>Ban User - %1</source>
+        <translation>Заблокировать пользователя - %1</translation>
+    </message>
+    <message>
+        <source>Voice request from [%1]</source>
+        <translation>Запрос голоса от [%1]</translation>
+    </message>
+    <message>
+        <source>Private message from [%1]</source>
+        <translation>Личное сообщение от [%1]</translation>
+    </message>
+    <message>
+        <source>Invitation was sent to user %1</source>
+        <translation>Приглашение было отправлено пользователю %1</translation>
+    </message>
+    <message>
+        <source>Failed to send invitation to user %1</source>
+        <translation>Не удалось отправить приглашение пользователю %1</translation>
+    </message>
+    <message>
+        <source>Kick</source>
+        <translation>Выгнать</translation>
+    </message>
+    <message>
+        <source>Ban</source>
+        <translation>Заблокировать</translation>
     </message>
 </context>
 </TS>

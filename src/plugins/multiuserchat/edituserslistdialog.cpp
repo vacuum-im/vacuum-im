@@ -1,150 +1,384 @@
 #include "edituserslistdialog.h"
 
 #include <QMessageBox>
-#include <QHeaderView>
 #include <QInputDialog>
+#include <QHeaderView>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <utils/iconstorage.h>
 #include <utils/logger.h>
 
-#define TIDR_ITEMJID    Qt::UserRole+1
-#define JID_COLUMN_NUM 0
+enum UserItemDataRoles {
+	UDR_REAL_JID       = Qt::UserRole,
+	UDR_REASON,
+	UDR_AFFILIATION,
+	UDR_FILTER,
+	UDR_REASON_LABEL,
+};
 
-EditUsersListDialog::EditUsersListDialog(const QString &AAffiliation, const QList<IMultiUserListItem> &AList, QWidget *AParent) : QDialog(AParent)
+static const QStringList Affiliations = QStringList() << MUC_AFFIL_OUTCAST << MUC_AFFIL_MEMBER << MUC_AFFIL_ADMIN << MUC_AFFIL_OWNER;
+
+UsersListProxyModel::UsersListProxyModel(QObject *AParent) : QSortFilterProxyModel(AParent)
+{
+
+}
+
+bool UsersListProxyModel::filterAcceptsRow(int ASourceRow, const QModelIndex &ASourceParent) const
+{
+	if (!ASourceParent.isValid())
+		return true;
+	return QSortFilterProxyModel::filterAcceptsRow(ASourceRow,ASourceParent);
+}
+
+EditUsersListDialog::EditUsersListDialog(IMultiUserChat *AMultiChat, const QString &AAffiliation, QWidget *AParent) : QDialog(AParent)
 {
 	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
+	setWindowTitle(tr("Edit Users Affiliations - %1").arg(AMultiChat->roomJid().bare()));
+	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_MUC_EDIT_AFFILIATIONS,0,0,"windowIcon");
 
-	FAffiliation = AAffiliation;
+	FMultiChat = AMultiChat;
+	connect(FMultiChat->instance(),SIGNAL(chatClosed()),SLOT(reject()));
+	connect(FMultiChat->instance(),SIGNAL(requestFailed(const QString &, const XmppError &)),
+		SLOT(onMultiChatRequestFailed(const QString &, const XmppError &)));
+	connect(FMultiChat->instance(),SIGNAL(affiliationListLoaded(const QString &, const QList<IMultiUserListItem> &)),
+		SLOT(onMultiChatListLoaded(const QString &, const QList<IMultiUserListItem> &)));
+	connect(FMultiChat->instance(),SIGNAL(affiliationListUpdated(const QString &, const QList<IMultiUserListItem> &)),
+		SLOT(onMultiChatListUpdated(const QString &, const QList<IMultiUserListItem> &)));
+	
+	FModel = new QStandardItemModel(this);
+	FModel->setColumnCount(1);
 
-	if (AAffiliation == MUC_AFFIL_OUTCAST)
-		IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_MUC_EDIT_BAN_LIST,0,0,"windowIcon");
-	else if (AAffiliation == MUC_AFFIL_MEMBER)
-		IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_MUC_EDIT_MEMBERS_LIST,0,0,"windowIcon");
-	else if (AAffiliation == MUC_AFFIL_ADMIN)
-		IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_MUC_EDIT_ADMINS_LIST,0,0,"windowIcon");
-	else if (AAffiliation == MUC_AFFIL_OWNER)
-		IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_MUC_EDIT_OWNERS_LIST,0,0,"windowIcon");
+	FDelegate = new AdvancedItemDelegate(this);
+	FDelegate->setContentsMargings(QMargins(5,2,5,2));
 
-	int row = 0;
-	ui.tbwTable->setRowCount(AList.count());
-	foreach(const IMultiUserListItem &listItem, AList)
-	{
-		Jid itemJid = listItem.jid;
-		QTableWidgetItem *jidItem = new QTableWidgetItem();
-		jidItem->setText(itemJid.uFull());
-		jidItem->setData(TIDR_ITEMJID, itemJid.full());
-		jidItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-		ui.tbwTable->setItem(row,0,jidItem);
-		if (FAffiliation == MUC_AFFIL_OUTCAST)
-		{
-			QTableWidgetItem *reasonItem = new QTableWidgetItem(listItem.notes);
-			reasonItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-			ui.tbwTable->setItem(jidItem->row(),1,reasonItem);
-		}
-		row++;
-		FCurrentItems.insert(itemJid,jidItem);
-	}
-	ui.tbwTable->horizontalHeader()->setHighlightSections(false);
+	FProxy = new UsersListProxyModel(this);
+	FProxy->setSourceModel(FModel);
+	FProxy->setFilterRole(UDR_FILTER);
+	FProxy->setDynamicSortFilter(true);
+	FProxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
+	FProxy->sort(0);
 
-	if (AAffiliation == MUC_AFFIL_OUTCAST)
-	{
-		ui.tbwTable->horizontalHeader()->setResizeMode(0,QHeaderView::ResizeToContents);
-		ui.tbwTable->horizontalHeader()->setResizeMode(1,QHeaderView::Stretch);
-	}
-	else
-	{
-		ui.tbwTable->hideColumn(1);
-		ui.tbwTable->horizontalHeader()->setResizeMode(0,QHeaderView::Stretch);
-	}
-	// default sort to JID column
-	ui.tbwTable->setSortingEnabled(true);
-	ui.tbwTable->sortByColumn(JID_COLUMN_NUM, Qt::AscendingOrder);
+	foreach (const QString &curAffiliation, Affiliations)
+		FAffilTab.insert(curAffiliation,ui.tbrTabs->addTab(affiliatioName(curAffiliation)));
+
+	QString curAffiliation = Options::fileValue("muc.edit-users-list-dialog.affiliation",FMultiChat->roomJid().pBare()).toString();
+	curAffiliation = AAffiliation!=MUC_AFFIL_NONE ? AAffiliation : curAffiliation;
+
+	ui.tbrTabs->setDocumentMode(true);
+	ui.tbrTabs->setCurrentIndex(FAffilTab.value(curAffiliation));
+	connect(ui.tbrTabs,SIGNAL(currentChanged(int)),SLOT(onCurrentAffiliationChanged(int)));
+
+	ui.tbvItems->setModel(FProxy);
+	ui.tbvItems->setItemDelegate(FDelegate);
+	ui.tbvItems->verticalHeader()->hide();
+	ui.tbvItems->horizontalHeader()->hide();
+	ui.tbvItems->setEditTriggers(QAbstractItemView::NoEditTriggers);
+	ui.tbvItems->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+
+	connect(ui.sleSearch,SIGNAL(searchStart()),SLOT(onSearchLineEditSearchStart()));
+
+	ui.dbbButtons->button(QDialogButtonBox::Save)->setEnabled(false);
+	connect(ui.dbbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonBoxButtonClicked(QAbstractButton *)));
 
 	connect(ui.pbtAdd,SIGNAL(clicked()),SLOT(onAddClicked()));
 	connect(ui.pbtDelete,SIGNAL(clicked()),SLOT(onDeleteClicked()));
+
+	restoreGeometry(Options::fileValue("muc.edit-users-list-dialog.geometry").toByteArray());
+
+	onCurrentAffiliationChanged(ui.tbrTabs->currentIndex());
 }
 
 EditUsersListDialog::~EditUsersListDialog()
 {
-
+	Options::setFileValue(saveGeometry(),"muc.edit-users-list-dialog.geometry");
+	Options::setFileValue(currentAffiliation(),"muc.edit-users-list-dialog.affiliation",FMultiChat->roomJid().pBare());
 }
 
-QString EditUsersListDialog::affiliation() const
+QString EditUsersListDialog::currentAffiliation() const
 {
-	return FAffiliation;
+	return FAffilTab.key(ui.tbrTabs->currentIndex());
 }
 
 QList<IMultiUserListItem> EditUsersListDialog::deltaList() const
 {
 	QList<IMultiUserListItem> result;
-	foreach(QTableWidgetItem *jidItem, FAddedItems)
+
+	QSet<Jid> listItems = FUserListItem.keys().toSet();
+	QSet<Jid> modelItems = FUserModelItem.keys().toSet();
+
+	QSet<Jid> newItems =  modelItems - listItems;
+	QSet<Jid> oldItems = listItems - modelItems;
+
+	foreach(const Jid &realJid, newItems)
 	{
+		QStandardItem *modelItem = FUserModelItem.value(realJid);
+
 		IMultiUserListItem listItem;
-		listItem.jid = jidItem->data(TIDR_ITEMJID).toString();
-		listItem.affiliation = FAffiliation;
-		if (FAffiliation == MUC_AFFIL_OUTCAST)
-			listItem.notes = ui.tbwTable->item(jidItem->row(),1)->text();
+		listItem.realJid = realJid;
+		listItem.reason = modelItem->data(UDR_REASON).toString();
+		listItem.affiliation = modelItem->data(UDR_AFFILIATION).toString();
+
 		result.append(listItem);
 	}
-	foreach(const Jid &userJid, FDeletedItems)
+
+	foreach (const Jid &realJid, oldItems)
 	{
 		IMultiUserListItem listItem;
-		listItem.jid = userJid.full();
+		listItem.realJid = realJid;
 		listItem.affiliation = MUC_AFFIL_NONE;
+
 		result.append(listItem);
 	}
+
 	return result;
 }
 
-void EditUsersListDialog::setTitle(const QString &ATitle)
+QString EditUsersListDialog::affiliatioName(const QString &AAffiliation) const
 {
-	setWindowTitle(ATitle);
+	if (AAffiliation == MUC_AFFIL_OWNER)
+		return tr("Owners");
+	else if (AAffiliation == MUC_AFFIL_ADMIN)
+		return tr("Administrators");
+	else if (AAffiliation == MUC_AFFIL_MEMBER)
+		return tr("Members");
+	else if (AAffiliation == MUC_AFFIL_OUTCAST)
+		return tr("Outcasts");
+	return tr("None");
+}
+
+void EditUsersListDialog::updateAffiliationTabNames() const
+{
+	foreach(const QString &affiliation, Affiliations)
+	{
+		QString text;
+		if (!FAffilUpdateId.isEmpty() || FAffilLoadId.values().contains(affiliation))
+			text = QString("%1 (...)").arg(affiliatioName(affiliation));
+		else if (FAffilRoot.contains(affiliation))
+			text = QString("%1 (%2)").arg(affiliatioName(affiliation)).arg(FAffilRoot.value(affiliation)->rowCount());
+		else
+			text = affiliatioName(affiliation);
+		ui.tbrTabs->setTabText(FAffilTab.value(affiliation),text);
+	}
+}
+
+QStandardItem *EditUsersListDialog::createModelItem(const Jid &ARealJid) const
+{
+	QStandardItem *modelItem = new QStandardItem(ARealJid.uFull());
+	modelItem->setData(ARealJid.full(),UDR_REAL_JID);
+
+	AdvancedDelegateItem nameLabel(AdvancedDelegateItem::DisplayId);
+	nameLabel.d->kind = AdvancedDelegateItem::Display;
+	nameLabel.d->data = Qt::DisplayRole;
+
+	AdvancedDelegateItem reasonLabel(AdvancedDelegateItem::DisplayId+1);
+	reasonLabel.d->kind = AdvancedDelegateItem::CustomData;
+	reasonLabel.d->data = UDR_REASON_LABEL;
+
+	AdvancedDelegateItems labels;
+	labels.insert(nameLabel.d->id, nameLabel);
+	labels.insert(reasonLabel.d->id, reasonLabel);
+	modelItem->setData(QVariant::fromValue<AdvancedDelegateItems>(labels), FDelegate->itemsRole());
+
+	return modelItem;
+}
+
+void EditUsersListDialog::updateModelItem(QStandardItem *AModelItem, const IMultiUserListItem &AListItem) const
+{
+	AModelItem->setData(AListItem.reason,UDR_REASON);
+	AModelItem->setData(AListItem.affiliation,UDR_AFFILIATION);
+
+	AModelItem->setData(AListItem.realJid.uFull() + " " + AListItem.reason,UDR_FILTER);
+	AModelItem->setData(!AListItem.reason.isEmpty() ? QString(" - %1").arg(AListItem.reason) : QString::null,UDR_REASON_LABEL);
+}
+
+void EditUsersListDialog::applyListItems(const QList<IMultiUserListItem> &AListItems)
+{
+	foreach(const IMultiUserListItem &listItem, AListItems)
+	{
+		QStandardItem *affilRoot = FAffilRoot.value(listItem.affiliation);
+		QStandardItem *modelItem = FUserModelItem.value(listItem.realJid);
+
+		// User deleted from all lists, or user affiliation does not loaded
+		if (listItem.affiliation==MUC_AFFIL_NONE || affilRoot==NULL)
+		{
+			if (modelItem != NULL)
+			{
+				FUserModelItem.remove(listItem.realJid);
+				qDeleteAll(modelItem->parent()->takeRow(modelItem->row()));
+			}
+			FUserListItem.remove(listItem.realJid);
+		}
+		else
+		{
+			// User is not created yet
+			if (modelItem == NULL)
+			{
+				modelItem = createModelItem(listItem.realJid);
+				FUserModelItem.insert(listItem.realJid,modelItem);
+				affilRoot->appendRow(modelItem);
+			}
+			// User affiliation changed
+			else if (modelItem->parent() != affilRoot)
+			{
+				modelItem->parent()->takeRow(modelItem->row());
+				affilRoot->appendRow(modelItem);
+			}
+			updateModelItem(modelItem,listItem);
+			FUserListItem.insert(listItem.realJid,listItem);
+		}
+	}
 }
 
 void EditUsersListDialog::onAddClicked()
 {
-	Jid userJid = Jid::fromUserInput(QInputDialog::getText(this,tr("Add new item"),tr("Enter new item JID:")));
-	if (userJid.isValid() && !FCurrentItems.contains(userJid))
+	QString affiliation = currentAffiliation();
+	QStandardItem *affilRoot = FAffilRoot.value(affiliation);
+	if (affilRoot!=NULL && FAffilLoadId.isEmpty())
 	{
-		int row = ui.tbwTable->rowCount();
-		ui.tbwTable->setRowCount(row+1);
-		QTableWidgetItem *jidItem = new QTableWidgetItem();
-		jidItem->setText(userJid.uFull());
-		jidItem->setData(TIDR_ITEMJID,userJid.full());
-		jidItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-		ui.tbwTable->setItem(row,0,jidItem);
-		if (FAffiliation == MUC_AFFIL_OUTCAST)
+		Jid userJid = Jid::fromUserInput(QInputDialog::getText(this,tr("Add User"),tr("Enter user Jabber ID:"))).bare();
+		if (userJid.isValid())
 		{
-			QTableWidgetItem *reasonItem = new QTableWidgetItem;
-			reasonItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
-			ui.tbwTable->setItem(jidItem->row(),1,reasonItem);
-			ui.tbwTable->horizontalHeader()->resizeSection(0,QHeaderView::ResizeToContents);
+			if (!FUserModelItem.contains(userJid))
+			{
+				IMultiUserListItem listItem;
+				listItem.realJid = userJid;
+				listItem.affiliation = affiliation;
+				listItem.reason = QInputDialog::getText(this,tr("Add User"),tr("Enter note:"));
+
+				QStandardItem *modelItem = createModelItem(listItem.realJid);
+				updateModelItem(modelItem,listItem);
+				FUserModelItem.insert(userJid,modelItem);
+				affilRoot->appendRow(modelItem);
+
+				ui.tbvItems->setCurrentIndex(FProxy->mapFromSource(FModel->indexFromItem(modelItem)));
+
+				updateAffiliationTabNames();
+				ui.dbbButtons->button(QDialogButtonBox::Save)->setEnabled(true);
+			}
+			else
+			{
+				QStandardItem *modelItem = FUserModelItem.value(userJid);
+				QMessageBox::warning(this,tr("Warning"),tr("User %1 already present in list of '%2'").arg(userJid.uBare(),affiliatioName(modelItem->data(UDR_AFFILIATION).toString())));
+			}
 		}
-		ui.tbwTable->setCurrentItem(jidItem);
-		FDeletedItems.removeAll(userJid);
-		FAddedItems.insert(userJid,jidItem);
-		FCurrentItems.insert(userJid,jidItem);
-	}
-	else if (!userJid.isEmpty())
-	{
-		QMessageBox::warning(this,tr("Wrong item JID"),tr("Entered item JID is not valid or already exists."));
 	}
 }
 
 void EditUsersListDialog::onDeleteClicked()
 {
-	QTableWidgetItem *tableItem = ui.tbwTable->currentItem();
-	if (tableItem)
+	QStandardItem *affilRoot = FAffilRoot.value(currentAffiliation());
+
+	QList<QStandardItem *> removeModelItems;
+	foreach(const QModelIndex &index, ui.tbvItems->selectionModel()->selectedIndexes())
 	{
-		Jid userJid = ui.tbwTable->item(tableItem->row(),0)->data(TIDR_ITEMJID).toString();
-		if (!FAddedItems.contains(userJid))
-			FDeletedItems.append(userJid);
+		QStandardItem *modelItem = FModel->itemFromIndex(FProxy->mapToSource(index));
+		if (modelItem!=NULL && modelItem->parent()==affilRoot)
+			removeModelItems.append(modelItem);
+	}
+
+	foreach(QStandardItem *modelItem, removeModelItems)
+	{
+		FUserModelItem.remove(modelItem->data(UDR_REAL_JID).toString());
+		qDeleteAll(modelItem->parent()->takeRow(modelItem->row()));
+		ui.dbbButtons->button(QDialogButtonBox::Save)->setEnabled(true);
+	}
+
+	updateAffiliationTabNames();
+}
+
+void EditUsersListDialog::onSearchLineEditSearchStart()
+{
+	FProxy->setFilterFixedString(ui.sleSearch->text());
+}
+
+void EditUsersListDialog::onCurrentAffiliationChanged(int ATabIndex)
+{
+	QString affiliation = FAffilTab.key(ATabIndex);
+	if (!FAffilRoot.contains(affiliation))
+	{
+		QString id = FMultiChat->loadAffiliationList(affiliation);
+		if (!id.isEmpty())
+		{
+			QStandardItem *affilRoot = new QStandardItem(affiliation);
+			FAffilRoot.insert(affiliation,affilRoot);
+			FModel->appendRow(affilRoot);
+
+			FAffilLoadId.insert(id,affiliation);
+		}
 		else
-			FAddedItems.remove(userJid);
-		FCurrentItems.remove(userJid);
-		ui.tbwTable->removeRow(tableItem->row());
+		{
+			QMessageBox::warning(this,tr("Warning"), tr("Failed to load list of '%1'").arg(affiliatioName(affiliation)));
+		}
+		updateAffiliationTabNames();
+	}
+	ui.tbvItems->setRootIndex(FProxy->mapFromSource(FModel->indexFromItem(FAffilRoot.value(affiliation))));
+}
+
+void EditUsersListDialog::onDialogButtonBoxButtonClicked(QAbstractButton *AButton)
+{
+	if (ui.dbbButtons->standardButton(AButton) == QDialogButtonBox::Save)
+	{
+		QList<IMultiUserListItem> listItems = deltaList();
+		if (!listItems.isEmpty())
+		{
+			FAffilUpdateId = FMultiChat->updateAffiliationList(listItems);
+			if (!FAffilUpdateId.isEmpty())
+			{
+				updateAffiliationTabNames();
+				ui.dbbButtons->button(QDialogButtonBox::Save)->setEnabled(false);
+			}
+			else
+			{
+				QMessageBox::warning(this,tr("Warning"), tr("Failed to update users affiliation lists"));
+			}
+		}
+		else
+		{
+			ui.dbbButtons->button(QDialogButtonBox::Save)->setEnabled(false);
+		}
+	}
+	else if (ui.dbbButtons->standardButton(AButton) == QDialogButtonBox::Close)
+	{
+		reject();
+	}
+}
+
+void EditUsersListDialog::onMultiChatRequestFailed(const QString &AId, const XmppError &AError)
+{
+	if (FAffilLoadId.contains(AId))
+	{
+		QString affiliation = FAffilLoadId.take(AId);
+		FModel->removeRow(FAffilRoot.take(affiliation)->row());
+		QMessageBox::warning(this,tr("Warning"), tr("Failed to load list of '%1': %2").arg(affiliatioName(affiliation),AError.errorMessage()));
+		updateAffiliationTabNames();
+	}
+	else if (AId == FAffilUpdateId)
+	{
+		FAffilUpdateId.clear();
+		QMessageBox::warning(this,tr("Warning"), tr("Failed to update users affiliation lists: %1").arg(AError.errorMessage()));
+		ui.dbbButtons->button(QDialogButtonBox::Save)->setEnabled(true);
+		updateAffiliationTabNames();
+	}
+}
+
+void EditUsersListDialog::onMultiChatListLoaded(const QString &AId, const QList<IMultiUserListItem> &AItems)
+{
+	if (FAffilLoadId.contains(AId))
+	{
+		FAffilLoadId.remove(AId);
+		applyListItems(AItems);
+		updateAffiliationTabNames();
+	}
+}
+
+void EditUsersListDialog::onMultiChatListUpdated(const QString &AId, const QList<IMultiUserListItem> &AItems)
+{
+	if (AId == FAffilUpdateId)
+	{
+		FAffilUpdateId.clear();
+		applyListItems(AItems);
+		updateAffiliationTabNames();
 	}
 }

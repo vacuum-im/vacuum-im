@@ -4,32 +4,68 @@
  <context>
   <name>EditUsersListDialog</name>
   <message>
-   <source>Add new item</source>
-   <translation>Add new item</translation>
+   <source>Edit Users Affiliations - %1</source>
+   <translation>Edit Users Affiliations - %1</translation>
   </message>
   <message>
-   <source>Enter new item JID:</source>
-   <translation>Enter new item JID:</translation>
+   <source>Owners</source>
+   <translation>Owners</translation>
   </message>
   <message>
-   <source>Entered item JID is not valid or already exists.</source>
-   <translation>Entered item JID is not valid or already exists.</translation>
+   <source>Administrators</source>
+   <translation>Administrators</translation>
   </message>
   <message>
-   <source>Wrong item JID</source>
-   <translation>Wrong item JID</translation>
+   <source>Members</source>
+   <translation>Members</translation>
+  </message>
+  <message>
+   <source>Outcasts</source>
+   <translation>Outcasts</translation>
+  </message>
+  <message>
+   <source>None</source>
+   <translation>None</translation>
+  </message>
+  <message>
+   <source>Add User</source>
+   <translation>Add User</translation>
+  </message>
+  <message>
+   <source>Enter user Jabber ID:</source>
+   <translation>Enter user Jabber ID:</translation>
+  </message>
+  <message>
+   <source>Enter note:</source>
+   <translation>Enter note:</translation>
+  </message>
+  <message>
+   <source>Warning</source>
+   <translation>Warning</translation>
+  </message>
+  <message>
+   <source>User %1 already present in list of '%2'</source>
+   <translation>User %1 already present in list of '%2'</translation>
+  </message>
+  <message>
+   <source>Failed to load list of '%1'</source>
+   <translation>Failed to load list of '%1'</translation>
+  </message>
+  <message>
+   <source>Failed to update users affiliation lists</source>
+   <translation>Failed to update users affiliation lists</translation>
+  </message>
+  <message>
+   <source>Failed to load list of '%1': %2</source>
+   <translation>Failed to load list of '%1': %2</translation>
+  </message>
+  <message>
+   <source>Failed to update users affiliation lists: %1</source>
+   <translation>Failed to update users affiliation lists: %1</translation>
   </message>
  </context>
  <context>
   <name>EditUsersListDialogClass</name>
-  <message>
-   <source>Jid</source>
-   <translation>Jid</translation>
-  </message>
-  <message>
-   <source>Reason</source>
-   <translation>Reason</translation>
-  </message>
   <message>
    <source>Add</source>
    <translation>Add</translation>
@@ -37,6 +73,10 @@
   <message>
    <source>Delete</source>
    <translation>Delete</translation>
+  </message>
+  <message>
+   <source>Search in lists</source>
+   <translation>Search in lists</translation>
   </message>
  </context>
  <context>
@@ -94,53 +134,6 @@ Check values and try again</translation>
   <message>
    <source>Service:</source>
    <translation>Service:</translation>
-  </message>
- </context>
- <context>
-  <name>MultiUserChat</name>
-  <message>
-   <source>Room configuration is not available.</source>
-   <translation>Room configuration is not available.</translation>
-  </message>
-  <message>
-   <source>Room configuration accepted.</source>
-   <translation>Room configuration accepted.</translation>
-  </message>
-  <message>
-   <source>Request for list of %1s is failed: %2</source>
-   <translation>Request for list of %1s is failed: %2</translation>
-  </message>
-  <message>
-   <source>Changes in list of %1s was not accepted: %2</source>
-   <translation>Changes in list of %1s was not accepted: %2</translation>
-  </message>
-  <message>
-   <source>Changes in list of %1s was accepted.</source>
-   <translation>Changes in list of %1s was accepted.</translation>
-  </message>
-  <message>
-   <source>Failed to send request for list of %1s.</source>
-   <translation>Failed to send request for list of %1s.</translation>
-  </message>
-  <message>
-   <source>Failed to send changes in list of %1s</source>
-   <translation>Failed to send changes in list of %1s</translation>
-  </message>
-  <message>
-   <source>Room configuration request failed.</source>
-   <translation>Room configuration request failed.</translation>
-  </message>
-  <message>
-   <source>Room configuration submit failed.</source>
-   <translation>Room configuration submit failed.</translation>
-  </message>
-  <message>
-   <source>Room destruction request was sent.</source>
-   <translation>Room destruction request was sent.</translation>
-  </message>
-  <message>
-   <source>Your nick was changed by server to '%1'</source>
-   <translation>Your nick was changed by server to '%1'</translation>
   </message>
  </context>
  <context>
@@ -559,22 +552,6 @@ Check values and try again</translation>
    <translation>I'm too busy right now</translation>
   </message>
   <message>
-   <source>Decline invite</source>
-   <translation>Decline invite</translation>
-  </message>
-  <message>
-   <source>Enter a reason</source>
-   <translation>Enter a reason</translation>
-  </message>
-  <message>
-   <source>Please, enter this conference!</source>
-   <translation>Please, enter this conference!</translation>
-  </message>
-  <message>
-   <source>Invite user</source>
-   <translation>Invite user</translation>
-  </message>
-  <message>
    <source>&lt;b>Conference:&lt;/b> %1</source>
    <translation>&lt;b>Conference:&lt;/b> %1</translation>
   </message>
@@ -606,6 +583,54 @@ Check values and try again</translation>
    <source>Participants list view:</source>
    <translation>Participants list view:</translation>
   </message>
+  <message>
+   <source>Anyone</source>
+   <translation>Anyone</translation>
+  </message>
+  <message>
+   <source>Moderators only</source>
+   <translation>Moderators only</translation>
+  </message>
+  <message>
+   <source>Allow visitors to send private messages to</source>
+   <translation>Allow visitors to send private messages to</translation>
+  </message>
+  <message>
+   <source>Nobody</source>
+   <translation>Nobody</translation>
+  </message>
+  <message>
+   <source>Allow visitors to change nickname?</source>
+   <translation>Allow visitors to change nickname?</translation>
+  </message>
+  <message>
+   <source>Allow visitors to send voice requests?</source>
+   <translation>Allow visitors to send voice requests?</translation>
+  </message>
+  <message>
+   <source>Minimum interval between voice requests (in seconds)</source>
+   <translation>Minimum interval between voice requests (in seconds)</translation>
+  </message>
+  <message>
+   <source>Decline Invite - %1</source>
+   <translation>Decline Invite - %1</translation>
+  </message>
+  <message>
+   <source>Enter a message:</source>
+   <translation>Enter a message:</translation>
+  </message>
+  <message>
+   <source>Please, enter this conference.</source>
+   <translation>Please, enter this conference.</translation>
+  </message>
+  <message>
+   <source>Invite User - %1</source>
+   <translation>Invite User - %1</translation>
+  </message>
+  <message>
+   <source>Join Conference...</source>
+   <translation>Join Conference...</translation>
+  </message>
  </context>
  <context>
   <name>MultiUserChatWindow</name>
@@ -618,28 +643,8 @@ Check values and try again</translation>
    <translation>Conference message</translation>
   </message>
   <message>
-   <source>Private message from: [%1]</source>
-   <translation>Private message from: [%1]</translation>
-  </message>
-  <message>
    <source>Private message</source>
    <translation>Private message</translation>
-  </message>
-  <message>
-   <source>Data form received from: %1</source>
-   <translation>Data form received from: %1</translation>
-  </message>
-  <message>
-   <source>Data form received</source>
-   <translation>Data form received</translation>
-  </message>
-  <message>
-   <source>Data form received: %1</source>
-   <translation>Data form received: %1</translation>
-  </message>
-  <message>
-   <source>Change topic</source>
-   <translation>Change topic</translation>
   </message>
   <message>
    <source>Change Role</source>
@@ -662,78 +667,6 @@ Check values and try again</translation>
    <translation>Change Affiliation</translation>
   </message>
   <message>
-   <source>%1 affiliation changed while not in the room</source>
-   <translation>%1 affiliation changed while not in the room</translation>
-  </message>
-  <message>
-   <source>Room configuration change has occurred</source>
-   <translation>Room configuration change has occurred</translation>
-  </message>
-  <message>
-   <source>Room logging is now enabled</source>
-   <translation>Room logging is now enabled</translation>
-  </message>
-  <message>
-   <source>Room logging is now disabled</source>
-   <translation>Room logging is now disabled</translation>
-  </message>
-  <message>
-   <source>The room is now non-anonymous</source>
-   <translation>The room is now non-anonymous</translation>
-  </message>
-  <message>
-   <source>The room is now semi-anonymous</source>
-   <translation>The room is now semi-anonymous</translation>
-  </message>
-  <message>
-   <source>A new room has been created</source>
-   <translation>A new room has been created</translation>
-  </message>
-  <message>
-   <source>%1 has been removed from the room because of an affiliation change</source>
-   <translation>%1 has been removed from the room because of an affiliation change</translation>
-  </message>
-  <message>
-   <source>%1 has been removed from the room because the room has been changed to members-only</source>
-   <translation>%1 has been removed from the room because the room has been changed to members-only</translation>
-  </message>
-  <message>
-   <source>%1 is being removed from the room because of a system shutdown</source>
-   <translation>%1 is being removed from the room because of a system shutdown</translation>
-  </message>
-  <message>
-   <source>User %1 is not present in the conference</source>
-   <translation>User %1 is not present in the conference</translation>
-  </message>
-  <message>
-   <source>%1 is not valid contact JID</source>
-   <translation>%1 is not valid contact JID</translation>
-  </message>
-  <message>
-   <source>%1 is not valid room JID</source>
-   <translation>%1 is not valid room JID</translation>
-  </message>
-  <message>
-   <source>%1 - Private chat</source>
-   <translation>%1 - Private chat</translation>
-  </message>
-  <message>
-   <source>Notify: %1</source>
-   <translation>Notify: %1</translation>
-  </message>
-  <message>
-   <source>Error: %1</source>
-   <translation>Error: %1</translation>
-  </message>
-  <message>
-   <source>%1 role changed from %2 to %3</source>
-   <translation>%1 role changed from %2 to %3</translation>
-  </message>
-  <message>
-   <source>%1 affiliation changed from %2 to %3</source>
-   <translation>%1 affiliation changed from %2 to %3</translation>
-  </message>
-  <message>
    <source>%1 changed nick to %2</source>
    <translation>%1 changed nick to %2</translation>
   </message>
@@ -742,76 +675,8 @@ Check values and try again</translation>
    <translation>Subject: %1</translation>
   </message>
   <message>
-   <source>%1 has changed the subject to: %2</source>
-   <translation>%1 has changed the subject to: %2</translation>
-  </message>
-  <message>
-   <source>%1 has declined your invite to this room. %2</source>
-   <translation>%1 has declined your invite to this room. %2</translation>
-  </message>
-  <message>
-   <source>%1 has been kicked from the room%2. %3</source>
-   <translation>%1 has been kicked from the room%2. %3</translation>
-  </message>
-  <message>
    <source> by %1</source>
    <translation> by %1</translation>
-  </message>
-  <message>
-   <source>%1 has been banned from the room%2. %3</source>
-   <translation>%1 has been banned from the room%2. %3</translation>
-  </message>
-  <message>
-   <source>Edit ban list - %1</source>
-   <translation>Edit ban list - %1</translation>
-  </message>
-  <message>
-   <source>Edit members list - %1</source>
-   <translation>Edit members list - %1</translation>
-  </message>
-  <message>
-   <source>Edit administrators list - %1</source>
-   <translation>Edit administrators list - %1</translation>
-  </message>
-  <message>
-   <source>Edit owners list - %1</source>
-   <translation>Edit owners list - %1</translation>
-  </message>
-  <message>
-   <source>This room was destroyed by owner. %1</source>
-   <translation>This room was destroyed by owner. %1</translation>
-  </message>
-  <message>
-   <source>Change nick name</source>
-   <translation>Change nick name</translation>
-  </message>
-  <message>
-   <source>Invite user</source>
-   <translation>Invite user</translation>
-  </message>
-  <message>
-   <source>Enter user JID:</source>
-   <translation>Enter user JID:</translation>
-  </message>
-  <message>
-   <source>Enter a reason:</source>
-   <translation>Enter a reason:</translation>
-  </message>
-  <message>
-   <source>Kick reason</source>
-   <translation>Kick reason</translation>
-  </message>
-  <message>
-   <source>Enter reason for kick</source>
-   <translation>Enter reason for kick</translation>
-  </message>
-  <message>
-   <source>Ban reason</source>
-   <translation>Ban reason</translation>
-  </message>
-  <message>
-   <source>Enter reason for ban</source>
-   <translation>Enter reason for ban</translation>
   </message>
   <message>
    <source>%1 - Conference</source>
@@ -866,22 +731,6 @@ Check values and try again</translation>
    <translation>Mention in conference</translation>
   </message>
   <message>
-   <source>%1 &lt;%2> has joined the room</source>
-   <translation>%1 &lt;%2> has joined the room</translation>
-  </message>
-  <message>
-   <source>%1 has joined the room</source>
-   <translation>%1 has joined the room</translation>
-  </message>
-  <message>
-   <source>%1 &lt;%2> has left the room</source>
-   <translation>%1 &lt;%2> has left the room</translation>
-  </message>
-  <message>
-   <source>%1 has left the room</source>
-   <translation>%1 has left the room</translation>
-  </message>
-  <message>
    <source>Loading history...</source>
    <translation>Loading history...</translation>
   </message>
@@ -902,14 +751,6 @@ Check values and try again</translation>
    <translation>Open Chat Dialog</translation>
   </message>
   <message>
-   <source>Kick User</source>
-   <translation>Kick User</translation>
-  </message>
-  <message>
-   <source>Ban User</source>
-   <translation>Ban User</translation>
-  </message>
-  <message>
    <source>Change Nick</source>
    <translation>Change Nick</translation>
   </message>
@@ -924,26 +765,6 @@ Check values and try again</translation>
   <message>
    <source>Request Voice</source>
    <translation>Request Voice</translation>
-  </message>
-  <message>
-   <source>Clear Conference Window</source>
-   <translation>Clear Conference Window</translation>
-  </message>
-  <message>
-   <source>Edit Ban List</source>
-   <translation>Edit Ban List</translation>
-  </message>
-  <message>
-   <source>Edit Members List</source>
-   <translation>Edit Members List</translation>
-  </message>
-  <message>
-   <source>Edit Administrators List</source>
-   <translation>Edit Administrators List</translation>
-  </message>
-  <message>
-   <source>Edit Owners List</source>
-   <translation>Edit Owners List</translation>
   </message>
   <message>
    <source>Configure Conference</source>
@@ -962,26 +783,6 @@ Check values and try again</translation>
    <translation>Exit conference</translation>
   </message>
   <message>
-   <source>Clear Chat Window</source>
-   <translation>Clear Chat Window</translation>
-  </message>
-  <message>
-   <source>Enter your new nick name in conference %1</source>
-   <translation>Enter your new nick name in conference %1</translation>
-  </message>
-  <message>
-   <source>Enter new topic for conference %1</source>
-   <translation>Enter new topic for conference %1</translation>
-  </message>
-  <message>
-   <source>Please, enter this conference!</source>
-   <translation>Please, enter this conference!</translation>
-  </message>
-  <message>
-   <source>Destroying conference</source>
-   <translation>Destroying conference</translation>
-  </message>
-  <message>
    <source>&lt;b>Jabber ID:&lt;/b> %1</source>
    <translation>&lt;b>Jabber ID:&lt;/b> %1</translation>
   </message>
@@ -998,32 +799,312 @@ Check values and try again</translation>
    <translation>&lt;b>Status:&lt;/b> %1</translation>
   </message>
   <message>
-   <source>This room is non-anonymous</source>
-   <translation>This room is non-anonymous</translation>
-  </message>
-  <message>
-   <source>You entered into the room</source>
-   <translation>You entered into the room</translation>
-  </message>
-  <message>
-   <source>You left the room</source>
-   <translation>You left the room</translation>
-  </message>
-  <message>
-   <source>Room now shows unavailable members</source>
-   <translation>Room now shows unavailable members</translation>
-  </message>
-  <message>
-   <source>Room now does not show unavailable members</source>
-   <translation>Room now does not show unavailable members</translation>
-  </message>
-  <message>
    <source>[%1] in [%2]</source>
    <translation>[%1] in [%2]</translation>
   </message>
   <message>
    <source>Hide/Show Participants List</source>
    <translation>Hide/Show Participants List</translation>
+  </message>
+  <message>
+   <source>User %1 was not found in the conference</source>
+   <translation>User %1 was not found in the conference</translation>
+  </message>
+  <message>
+   <source>User %1 already has a voice in the conference</source>
+   <translation>User %1 already has a voice in the conference</translation>
+  </message>
+  <message>
+   <source>Unable to grant a voice to the user %1</source>
+   <translation>Unable to grant a voice to the user %1</translation>
+  </message>
+  <message>
+   <source>You granted the voice to the user %1</source>
+   <translation>You granted the voice to the user %1</translation>
+  </message>
+  <message>
+   <source>User %1 requests a voice in the conference, %2</source>
+   <translation>User %1 requests a voice in the conference, %2</translation>
+  </message>
+  <message>
+   <source>Grant Voice</source>
+   <translation>Grant Voice</translation>
+  </message>
+  <message>
+   <source>Voice request received</source>
+   <translation>Voice request received</translation>
+  </message>
+  <message>
+   <source>User %1 requests a voice in the conference</source>
+   <translation>User %1 requests a voice in the conference</translation>
+  </message>
+  <message>
+   <source>Edit Users Affiliations</source>
+   <translation>Edit Users Affiliations</translation>
+  </message>
+  <message>
+   <source>Clear window</source>
+   <translation>Clear window</translation>
+  </message>
+  <message>
+   <source>Kick user %1 request was sent</source>
+   <translation>Kick user %1 request was sent</translation>
+  </message>
+  <message>
+   <source>Failed to send kick user %1 request</source>
+   <translation>Failed to send kick user %1 request</translation>
+  </message>
+  <message>
+   <source>Ban user %1 request was sent</source>
+   <translation>Ban user %1 request was sent</translation>
+  </message>
+  <message>
+   <source>Failed to send ban user %1 request</source>
+   <translation>Failed to send ban user %1 request</translation>
+  </message>
+  <message>
+   <source>Private message was sent to user %1</source>
+   <translation>Private message was sent to user %1</translation>
+  </message>
+  <message>
+   <source>Failed to send private message to user %1</source>
+   <translation>Failed to send private message to user %1</translation>
+  </message>
+  <message>
+   <source>You nickname was changed to %1</source>
+   <translation>You nickname was changed to %1</translation>
+  </message>
+  <message>
+   <source>Failed to change your nickname to %1</source>
+   <translation>Failed to change your nickname to %1</translation>
+  </message>
+  <message>
+   <source>Change subject request was sent</source>
+   <translation>Change subject request was sent</translation>
+  </message>
+  <message>
+   <source>Failed to send change subject request</source>
+   <translation>Failed to send change subject request</translation>
+  </message>
+  <message>
+   <source>This conference is non-anonymous</source>
+   <translation>This conference is non-anonymous</translation>
+  </message>
+  <message>
+   <source>User %1 affiliation changed while not in the conference</source>
+   <translation>User %1 affiliation changed while not in the conference</translation>
+  </message>
+  <message>
+   <source>Conference now shows unavailable members</source>
+   <translation>Conference now shows unavailable members</translation>
+  </message>
+  <message>
+   <source>Conference now does not show unavailable members</source>
+   <translation>Conference now does not show unavailable members</translation>
+  </message>
+  <message>
+   <source>Conference configuration change has occurred</source>
+   <translation>Conference configuration change has occurred</translation>
+  </message>
+  <message>
+   <source>Conference logging is now enabled</source>
+   <translation>Conference logging is now enabled</translation>
+  </message>
+  <message>
+   <source>Conference logging is now disabled</source>
+   <translation>Conference logging is now disabled</translation>
+  </message>
+  <message>
+   <source>The conference is now non-anonymous</source>
+   <translation>The conference is now non-anonymous</translation>
+  </message>
+  <message>
+   <source>The conference is now semi-anonymous</source>
+   <translation>The conference is now semi-anonymous</translation>
+  </message>
+  <message>
+   <source>A new conference has been created</source>
+   <translation>A new conference has been created</translation>
+  </message>
+  <message>
+   <source>User %1 has been removed from the conference because of an affiliation change</source>
+   <translation>User %1 has been removed from the conference because of an affiliation change</translation>
+  </message>
+  <message>
+   <source>User %1 has been removed from the conference because the conference has been changed to members-only</source>
+   <translation>User %1 has been removed from the conference because the conference has been changed to members-only</translation>
+  </message>
+  <message>
+   <source>User %1 is being removed from the conference because of a system shutdown</source>
+   <translation>User %1 is being removed from the conference because of a system shutdown</translation>
+  </message>
+  <message>
+   <source>%1 - Private Chat</source>
+   <translation>%1 - Private Chat</translation>
+  </message>
+  <message>
+   <source>You have joined the conference</source>
+   <translation>You have joined the conference</translation>
+  </message>
+  <message>
+   <source>You have no voice in this conference, %1</source>
+   <translation>You have no voice in this conference, %1</translation>
+  </message>
+  <message>
+   <source>You have left the conference</source>
+   <translation>You have left the conference</translation>
+  </message>
+  <message>
+   <source>Failed to change user role: %1</source>
+   <translation>Failed to change user role: %1</translation>
+  </message>
+  <message>
+   <source>Failed to change user affiliation: %1</source>
+   <translation>Failed to change user affiliation: %1</translation>
+  </message>
+  <message>
+   <source>Failed to load conference configuration: %1</source>
+   <translation>Failed to load conference configuration: %1</translation>
+  </message>
+  <message>
+   <source>Failed to update conference configuration: %1</source>
+   <translation>Failed to update conference configuration: %1</translation>
+  </message>
+  <message>
+   <source>Failed to destroy this conference: %1</source>
+   <translation>Failed to destroy this conference: %1</translation>
+  </message>
+  <message>
+   <source>Failed to join to the conference: %1</source>
+   <translation>Failed to join to the conference: %1</translation>
+  </message>
+  <message>
+   <source>User %1 has declined your invite to this conference. %2</source>
+   <translation>User %1 has declined your invite to this conference. %2</translation>
+  </message>
+  <message>
+   <source>%1 &lt;%2> has joined</source>
+   <translation>%1 &lt;%2> has joined</translation>
+  </message>
+  <message>
+   <source>%1 has joined</source>
+   <translation>%1 has joined</translation>
+  </message>
+  <message>
+   <source>%1 &lt;%2> has left</source>
+   <translation>%1 &lt;%2> has left</translation>
+  </message>
+  <message>
+   <source>%1 has left</source>
+   <translation>%1 has left</translation>
+  </message>
+  <message>
+   <source>%1 changed role from %2 to %3</source>
+   <translation>%1 changed role from %2 to %3</translation>
+  </message>
+  <message>
+   <source>%1 changed affiliation from %2 to %3</source>
+   <translation>%1 changed affiliation from %2 to %3</translation>
+  </message>
+  <message>
+   <source>User %1 has been kicked from the conference%2 %3</source>
+   <translation>User %1 has been kicked from the conference%2 %3</translation>
+  </message>
+  <message>
+   <source> by user %1</source>
+   <translation> by user %1</translation>
+  </message>
+  <message>
+   <source>User %1 has been banned in the conference%2 %3</source>
+   <translation>User %1 has been banned in the conference%2 %3</translation>
+  </message>
+  <message>
+   <source>Conference configuration accepted</source>
+   <translation>Conference configuration accepted</translation>
+  </message>
+  <message>
+   <source>This conference was destroyed by owner. %1</source>
+   <translation>This conference was destroyed by owner. %1</translation>
+  </message>
+  <message>
+   <source>Change Nickname - %1</source>
+   <translation>Change Nickname - %1</translation>
+  </message>
+  <message>
+   <source>Enter your new nickname:</source>
+   <translation>Enter your new nickname:</translation>
+  </message>
+  <message>
+   <source>Change Topic - %1</source>
+   <translation>Change Topic - %1</translation>
+  </message>
+  <message>
+   <source>Enter new topic:</source>
+   <translation>Enter new topic:</translation>
+  </message>
+  <message>
+   <source>Invite User - %1</source>
+   <translation>Invite User - %1</translation>
+  </message>
+  <message>
+   <source>Enter user Jabber ID:</source>
+   <translation>Enter user Jabber ID:</translation>
+  </message>
+  <message>
+   <source>Please, enter this conference.</source>
+   <translation>Please, enter this conference.</translation>
+  </message>
+  <message>
+   <source>Enter a message:</source>
+   <translation>Enter a message:</translation>
+  </message>
+  <message>
+   <source>You already have a voice in the conference</source>
+   <translation>You already have a voice in the conference</translation>
+  </message>
+  <message>
+   <source>Failed to send a request for voice in the conference</source>
+   <translation>Failed to send a request for voice in the conference</translation>
+  </message>
+  <message>
+   <source>Request for voice in the conference was sent</source>
+   <translation>Request for voice in the conference was sent</translation>
+  </message>
+  <message>
+   <source>Destroy Conference - %1</source>
+   <translation>Destroy Conference - %1</translation>
+  </message>
+  <message>
+   <source>Kick User - %1</source>
+   <translation>Kick User - %1</translation>
+  </message>
+  <message>
+   <source>Ban User - %1</source>
+   <translation>Ban User - %1</translation>
+  </message>
+  <message>
+   <source>Voice request from [%1]</source>
+   <translation>Voice request from [%1]</translation>
+  </message>
+  <message>
+   <source>Private message from [%1]</source>
+   <translation>Private message from [%1]</translation>
+  </message>
+  <message>
+   <source>Invitation was sent to user %1</source>
+   <translation>Invitation was sent to user %1</translation>
+  </message>
+  <message>
+   <source>Failed to send invitation to user %1</source>
+   <translation>Failed to send invitation to user %1</translation>
+  </message>
+  <message>
+   <source>Kick</source>
+   <translation>Kick</translation>
+  </message>
+  <message>
+   <source>Ban</source>
+   <translation>Ban</translation>
   </message>
  </context>
 </TS>

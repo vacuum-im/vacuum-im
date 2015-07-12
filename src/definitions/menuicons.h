@@ -111,8 +111,6 @@
 //MultiUserChat
 #define MNI_MUC_CONFERENCE              "mucConference"
 #define MNI_MUC_JOIN                    "mucJoin"
-#define MNI_MUC_SHOW_ALL_ROOMS          "mucShowAllRooms"
-#define MNI_MUC_LEAVE_HIDDEN_ROOMS      "mucLeaveHiddenRooms"
 #define MNI_MUC_INVITE                  "mucInvite"
 #define MNI_MUC_CHANGE_NICK             "mucChangeNick"
 #define MNI_MUC_CHANGE_TOPIC            "mucChangeTopic"
@@ -120,16 +118,11 @@
 #define MNI_MUC_ENTER_ROOM              "mucEnterRoom"
 #define MNI_MUC_EXIT_ROOM               "mucExitRoom"
 #define MNI_MUC_REQUEST_VOICE           "mucRequestVoice"
-#define MNI_MUC_EDIT_BAN_LIST           "mucEditBanList"
-#define MNI_MUC_EDIT_MEMBERS_LIST       "mucEditMembersList"
-#define MNI_MUC_EDIT_ADMINS_LIST        "mucEditAdminsList"
-#define MNI_MUC_EDIT_OWNERS_LIST        "mucEditOwnersList"
+#define MNI_MUC_EDIT_AFFILIATIONS       "mucEditAffiliations"
 #define MNI_MUC_CONFIGURE_ROOM          "mucConfigureRoom"
 #define MNI_MUC_DESTROY_ROOM            "mucDestroyRoom"
 #define MNI_MUC_MESSAGE                 "mucMessage"
 #define MNI_MUC_PRIVATE_MESSAGE         "mucPrivateMessage"
-#define MNI_MUC_DATA_MESSAGE            "mucDataMessage"
-#define MNI_MUC_USER_MENU               "mucUserMenu"
 #define MNI_MUC_USERS_HIDE              "mucUsersHide"
 
 //NormalMessageHandler
