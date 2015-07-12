@@ -1078,7 +1078,7 @@ Action *MultiUserChatManager::createJoinAction(const Jid &AStreamJid, const Jid 
 {
 	Action *action = new Action(AParent);
 	action->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_JOIN);
-	action->setText(tr("Join Conference..."));
+	action->setText(tr("Join Conference"));
 	action->setData(ADR_STREAM_JID,AStreamJid.full());
 	action->setData(ADR_HOST,ARoomJid.domain());
 	action->setData(ADR_ROOM,ARoomJid.node());

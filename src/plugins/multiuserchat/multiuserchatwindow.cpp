@@ -379,7 +379,9 @@ bool MultiUserChatWindow::messageViewUrlOpen(int AOrder, IMessageViewWidget *AWi
 
 			Message message;
 			message.setTo(contactJid().bare()).setId(AUrl.queryItemValue("id"));
-			FDataForms->xmlForm(form,message.stanza().element());
+			
+			QDomElement formElem = message.stanza().element();
+			FDataForms->xmlForm(form,formElem);
 			
 			QString nick = AUrl.queryItemValue("roomnick");
 			IMultiUser *user = FMultiChat->findUser(nick);

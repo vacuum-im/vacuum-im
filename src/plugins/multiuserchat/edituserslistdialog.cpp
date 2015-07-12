@@ -171,6 +171,7 @@ QStandardItem *EditUsersListDialog::createModelItem(const Jid &ARealJid) const
 	AdvancedDelegateItem nameLabel(AdvancedDelegateItem::DisplayId);
 	nameLabel.d->kind = AdvancedDelegateItem::Display;
 	nameLabel.d->data = Qt::DisplayRole;
+	nameLabel.d->hints.insert(AdvancedDelegateItem::FontWeight,QFont::Bold);
 
 	AdvancedDelegateItem reasonLabel(AdvancedDelegateItem::DisplayId+1);
 	reasonLabel.d->kind = AdvancedDelegateItem::CustomData;

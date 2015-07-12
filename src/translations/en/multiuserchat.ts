@@ -628,8 +628,8 @@ Check values and try again</translation>
    <translation>Invite User - %1</translation>
   </message>
   <message>
-   <source>Join Conference...</source>
-   <translation>Join Conference...</translation>
+   <source>Join Conference</source>
+   <translation>Join Conference</translation>
   </message>
  </context>
  <context>

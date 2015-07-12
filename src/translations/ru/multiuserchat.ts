@@ -628,8 +628,8 @@ Check values and try again</source>
         <translation>Приглавить пользователя - %1</translation>
     </message>
     <message>
-        <source>Join Conference...</source>
-        <translation>Войти в конференцию...</translation>
+        <source>Join Conference</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
