@@ -31,14 +31,17 @@ protected:
 	QString affiliatioName(const QString &AAffiliation) const;
 	void updateAffiliationTabNames() const;
 protected:
+	QList<QStandardItem *> selectedModelItems() const;
 	QStandardItem *createModelItem(const Jid &ARealJid) const;
 	void updateModelItem(QStandardItem *AModelItem, const IMultiUserListItem &AListItem) const;
 	void applyListItems(const QList<IMultiUserListItem> &AListItems);
 protected slots:
 	void onAddClicked();
 	void onDeleteClicked();
+	void onMoveUserActionTriggered();
 	void onSearchLineEditSearchStart();
 	void onCurrentAffiliationChanged(int ATabIndex);
+	void onItemsTableContextMenuRequested(const QPoint &APos);
 	void onDialogButtonBoxButtonClicked(QAbstractButton *AButton);
 protected slots:
 	void onMultiChatRequestFailed(const QString &AId, const XmppError &AError);

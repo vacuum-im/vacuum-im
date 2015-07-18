@@ -26,7 +26,11 @@
       <widget class="QTabBar" name="tbrTabs" native="true"/>
      </item>
      <item>
-      <widget class="QTableView" name="tbvItems"/>
+      <widget class="QTableView" name="tbvItems">
+       <property name="contextMenuPolicy">
+        <enum>Qt::CustomContextMenu</enum>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

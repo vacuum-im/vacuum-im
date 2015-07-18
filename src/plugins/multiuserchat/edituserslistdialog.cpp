@@ -8,6 +8,9 @@
 #include <utils/iconstorage.h>
 #include <utils/logger.h>
 
+#define ADR_USER_JID           Action::DR_Parametr1
+#define ADR_USER_AFFILIATON    Action::DR_Parametr2
+
 enum UserItemDataRoles {
 	UDR_REAL_JID       = Qt::UserRole,
 	UDR_REASON,
@@ -76,6 +79,7 @@ EditUsersListDialog::EditUsersListDialog(IMultiUserChat *AMultiChat, const QStri
 	ui.tbvItems->horizontalHeader()->hide();
 	ui.tbvItems->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	ui.tbvItems->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+	connect(ui.tbvItems,SIGNAL(customContextMenuRequested(const QPoint &)),SLOT(onItemsTableContextMenuRequested(const QPoint &)));
 
 	connect(ui.sleSearch,SIGNAL(searchStart()),SLOT(onSearchLineEditSearchStart()));
 
@@ -161,6 +165,19 @@ void EditUsersListDialog::updateAffiliationTabNames() const
 			text = affiliatioName(affiliation);
 		ui.tbrTabs->setTabText(FAffilTab.value(affiliation),text);
 	}
+}
+
+QList<QStandardItem *> EditUsersListDialog::selectedModelItems() const
+{
+	QList<QStandardItem *> modelItems;
+	QStandardItem *affilRoot = FAffilRoot.value(currentAffiliation());
+	foreach(const QModelIndex &index, ui.tbvItems->selectionModel()->selectedIndexes())
+	{
+		QStandardItem *modelItem = FModel->itemFromIndex(FProxy->mapToSource(index));
+		if (modelItem!=NULL && modelItem->parent()==affilRoot)
+			modelItems.append(modelItem);
+	}
+	return modelItems;
 }
 
 QStandardItem *EditUsersListDialog::createModelItem(const Jid &ARealJid) const
@@ -269,24 +286,50 @@ void EditUsersListDialog::onAddClicked()
 
 void EditUsersListDialog::onDeleteClicked()
 {
-	QStandardItem *affilRoot = FAffilRoot.value(currentAffiliation());
-
-	QList<QStandardItem *> removeModelItems;
-	foreach(const QModelIndex &index, ui.tbvItems->selectionModel()->selectedIndexes())
-	{
-		QStandardItem *modelItem = FModel->itemFromIndex(FProxy->mapToSource(index));
-		if (modelItem!=NULL && modelItem->parent()==affilRoot)
-			removeModelItems.append(modelItem);
-	}
-
-	foreach(QStandardItem *modelItem, removeModelItems)
+	foreach(QStandardItem *modelItem, selectedModelItems())
 	{
 		FUserModelItem.remove(modelItem->data(UDR_REAL_JID).toString());
 		qDeleteAll(modelItem->parent()->takeRow(modelItem->row()));
 		ui.dbbButtons->button(QDialogButtonBox::Save)->setEnabled(true);
 	}
-
 	updateAffiliationTabNames();
+}
+
+void EditUsersListDialog::onMoveUserActionTriggered()
+{
+	Action *action = qobject_cast<Action *>(sender());
+	if (action)
+	{
+		QString affiliation = action->data(ADR_USER_AFFILIATON).toString();
+		QStandardItem *affilRoot = FAffilRoot.value(affiliation);
+
+		foreach(const Jid userJid, action->data(ADR_USER_JID).toStringList())
+		{
+			QStandardItem *modelItem = FUserModelItem.value(userJid);
+			if (modelItem)
+			{
+				if (affiliation == MUC_AFFIL_NONE)
+				{
+					FUserModelItem.remove(userJid);
+					qDeleteAll(modelItem->parent()->takeRow(modelItem->row()));
+				}
+				else if (affilRoot)
+				{
+					modelItem->parent()->takeRow(modelItem->row());
+
+					IMultiUserListItem listItem;
+					listItem.realJid = userJid;
+					listItem.affiliation = affiliation;
+					updateModelItem(modelItem,listItem);
+
+					affilRoot->appendRow(modelItem);
+				}
+			}
+		}
+		
+		updateAffiliationTabNames();
+		ui.dbbButtons->button(QDialogButtonBox::Save)->setEnabled(true);
+	}
 }
 
 void EditUsersListDialog::onSearchLineEditSearchStart()
@@ -343,6 +386,43 @@ void EditUsersListDialog::onDialogButtonBoxButtonClicked(QAbstractButton *AButto
 	else if (ui.dbbButtons->standardButton(AButton) == QDialogButtonBox::Close)
 	{
 		reject();
+	}
+}
+
+void EditUsersListDialog::onItemsTableContextMenuRequested(const QPoint &APos)
+{
+	QList<QStandardItem *> modelItems = selectedModelItems();
+	if (!modelItems.isEmpty())
+	{
+		Menu *menu = new Menu(this);
+		menu->setAttribute(Qt::WA_DeleteOnClose, true);
+
+		QStringList users;
+		foreach(QStandardItem *modelItem, modelItems)
+			users.append(modelItem->data(UDR_REAL_JID).toString());
+
+		foreach(const QString &affiliation, Affiliations)
+		{
+			if (affiliation != currentAffiliation())
+			{
+				Action *action = new Action(menu);
+				action->setData(ADR_USER_JID,users);
+				action->setData(ADR_USER_AFFILIATON, affiliation);
+				action->setEnabled(FAffilRoot.contains(affiliation));
+				action->setText(tr("Move %n user(s) to '%1'","",users.count()).arg(affiliatioName(affiliation)));
+				connect(action,SIGNAL(triggered()),SLOT(onMoveUserActionTriggered()));
+				menu->addAction(action);
+			}
+		}
+
+		Action *action = new Action(menu);
+		action->setData(ADR_USER_JID,users);
+		action->setData(ADR_USER_AFFILIATON, MUC_AFFIL_NONE);
+		action->setText(tr("Delete %n user(s)","",users.count()));
+		connect(action,SIGNAL(triggered()),SLOT(onMoveUserActionTriggered()));
+		menu->addAction(action);
+
+		menu->popup(ui.tbvItems->mapToGlobal(APos));
 	}
 }
 

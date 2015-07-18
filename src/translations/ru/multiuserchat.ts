@@ -63,6 +63,22 @@
         <source>Failed to update users affiliation lists: %1</source>
         <translation>Не удалось обновить списки членства пользователей: %1</translation>
     </message>
+    <message numerus="yes">
+        <source>Move %n user(s) to &apos;%1&apos;</source>
+        <translation>
+            <numerusform>Переместить %n пользователя в &apos;%1&apos;</numerusform>
+            <numerusform>Переместить %n пользователей в &apos;%1&apos;</numerusform>
+            <numerusform>Переместить %n пользователей в &apos;%1&apos;</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Delete %n user(s)</source>
+        <translation>
+            <numerusform>Удалить %n пользователя</numerusform>
+            <numerusform>Удалить %n пользователей</numerusform>
+            <numerusform>Удалить %n пользователей</numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>EditUsersListDialogClass</name>
