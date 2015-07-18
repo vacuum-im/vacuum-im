@@ -1600,9 +1600,14 @@ void MultiUserChatWindow::showMultiChatUserMessage(const Message &AMessage, cons
 
 	IMultiUser *user = FMultiChat->nickName()!=ANick ? FMultiChat->findUser(ANick) : FMultiChat->mainUser();
 	if (user)
+	{
+		options.senderAvatar = FMessageStyleManager->contactAvatar(user->userJid());
 		options.senderIcon = FMessageStyleManager->contactIcon(user->userJid(),user->presence().show,SUBSCRIPTION_BOTH,false);
+	}
 	else
+	{
 		options.senderIcon = FMessageStyleManager->contactIcon(Jid::null,IPresence::Offline,SUBSCRIPTION_BOTH,false);
+	}
 
 	if (FMultiChat->nickName() != ANick)
 	{
@@ -1745,7 +1750,10 @@ void MultiUserChatWindow::fillPrivateChatContentOptions(IMessageChatWindow *AWin
 {
 	IMultiUser *user = AOptions.direction==IMessageStyleContentOptions::DirectionIn ? FMultiChat->findUser(AWindow->contactJid().resource()) : FMultiChat->mainUser();
 	if (user)
+	{
+		AOptions.senderAvatar = FMessageStyleManager->contactAvatar(user->userJid());
 		AOptions.senderIcon = FMessageStyleManager->contactIcon(user->userJid(),user->presence().show,SUBSCRIPTION_BOTH,false);
+	}
 
 	if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
 		AOptions.timeFormat = FMessageStyleManager->timeFormat(AOptions.time,AOptions.time);

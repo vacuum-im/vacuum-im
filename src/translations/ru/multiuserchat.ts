@@ -629,7 +629,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>Join Conference</source>
-        <translation type="unfinished"></translation>
+        <translation>Войти в конференцию</translation>
     </message>
 </context>
 <context>
