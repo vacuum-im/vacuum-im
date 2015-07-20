@@ -513,7 +513,7 @@ bool MultiUserChatWindow::messageDisplay(const Message &AMessage, int ADirection
 			}
 			else
 			{
-				LOG_STRM_ERROR(streamJid(),QString("Failed to show outgoing private chat message, room=%1, user=%2: Private chat window is not created").arg(contactJid().bare(),userJid.resource()));
+				LOG_STRM_ERROR(streamJid(),QString("Failed to show outgoing private chat message, nick=%1, room=%2: Private chat window is not created").arg(userJid.resource(),contactJid().bare()));
 			}
 		}
 	}
@@ -742,7 +742,7 @@ bool MultiUserChatWindow::messageShowWindow(int AOrder, const Jid &AStreamJid, c
 			}
 			else
 			{
-				LOG_STRM_WARNING(AStreamJid,QString("Failed to show private chat window, room=%1, user=%2: Private chat window not created").arg(contactJid().bare(),AContactJid.resource()));
+				LOG_STRM_WARNING(AStreamJid,QString("Failed to show private chat window, nick=%1, room=%2: Private chat window not created").arg(AContactJid.resource(),contactJid().bare()));
 			}
 		}
 	}

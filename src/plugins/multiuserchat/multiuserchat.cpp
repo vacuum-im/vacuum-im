@@ -89,10 +89,12 @@ MultiUserChat::~MultiUserChat()
 		FStanzaProcessor->removeStanzaHandle(FSHIMessage);
 		FStanzaProcessor->removeStanzaHandle(FSHIPresence);
 	}
+
 	if (FMessageProcessor)
 	{
 		FMessageProcessor->removeMessageEditor(MEO_MULTIUSERCHAT,this);
 	}
+
 	emit chatDestroyed();
 }
 
@@ -117,13 +119,13 @@ void MultiUserChat::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASt
 		QString nick = FRoleUpdateId.take(AStanza.id());
 		if (AStanza.type() == "result")
 		{
-			LOG_STRM_INFO(AStreamJid,QString("User role updated, room=%1, user=%2, id=%3").arg(FRoomJid.bare(),nick,AStanza.id()));
+			LOG_STRM_INFO(AStreamJid,QString("User role updated, nick=%1, id=%2, room=%3").arg(nick,AStanza.id(),FRoomJid.bare()));
 			emit userRoleUpdated(AStanza.id(), nick);
 		}
 		else
 		{
 			XmppStanzaError err(AStanza);
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to update user role, room=%1, user=%2, id=%3: %4").arg(FRoomJid.bare(),nick,AStanza.id(),err.condition()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to update user role, nick=%1, id=%2, room=%3: %4").arg(nick,AStanza.id(),FRoomJid.bare(),err.condition()));
 			emit requestFailed(AStanza.id(), err);
 		}
 	}
@@ -132,13 +134,13 @@ void MultiUserChat::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASt
 		QString nick = FAffilUpdateId.take(AStanza.id());
 		if (AStanza.type() == "result")
 		{
-			LOG_STRM_INFO(AStreamJid,QString("User affiliation updated, room=%1, user=%2, id=%3").arg(FRoomJid.bare(),nick,AStanza.id()));
+			LOG_STRM_INFO(AStreamJid,QString("User affiliation updated, nick=%1, id=%2, room=%3").arg(nick,AStanza.id(),FRoomJid.bare()));
 			emit userAffiliationUpdated(AStanza.id(),nick);
 		}
 		else
 		{
 			XmppStanzaError err(AStanza);
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to update user affiliation, room=%1, user=%2, id=%3: %4").arg(FRoomJid.bare(),nick,AStanza.id(),err.condition()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to update user affiliation, nick=%1, id=%2, room=%3: %4").arg(nick,AStanza.id(),FRoomJid.bare(),err.condition()));
 			emit requestFailed(AStanza.id(), err);
 		}
 	}
@@ -147,7 +149,7 @@ void MultiUserChat::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASt
 		QString affiliation = FAffilListLoadId.take(AStanza.id());
 		if (AStanza.type() == "result")
 		{
-			LOG_STRM_INFO(AStreamJid,QString("Conference affiliation list loaded, room=%1, affiliation=%2, id=%3").arg(FRoomJid.bare(),affiliation,AStanza.id()));
+			LOG_STRM_INFO(AStreamJid,QString("Conference affiliation list loaded, affiliation=%1, id=%2, room=%3").arg(affiliation,AStanza.id(),FRoomJid.bare()));
 
 			QList<IMultiUserListItem> items;
 			QDomElement itemElem = AStanza.firstElement("query",NS_MUC_ADMIN).firstChildElement("item");
@@ -168,7 +170,7 @@ void MultiUserChat::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASt
 		else
 		{
 			XmppStanzaError err(AStanza);
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to load conference affiliation list, room=%1, affiliation=%2, id=%3: %4").arg(FRoomJid.bare(),affiliation,AStanza.id(),err.condition()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to load conference affiliation list, affiliation=%1, id=%2, room=%3: %4").arg(affiliation,AStanza.id(),FRoomJid.bare(),err.condition()));
 			emit requestFailed(AStanza.id(), err);
 		}
 	}
@@ -177,13 +179,13 @@ void MultiUserChat::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASt
 		QList<IMultiUserListItem> items = FAffilListUpdateId.take(AStanza.id());
 		if (AStanza.type() == "result")
 		{
-			LOG_STRM_INFO(AStreamJid,QString("Conference affiliation list updated, room=%1, id=%2").arg(FRoomJid.bare(),AStanza.id()));
+			LOG_STRM_INFO(AStreamJid,QString("Conference affiliation list updated, id=%1, room=%2").arg(AStanza.id(),FRoomJid.bare()));
 			emit affiliationListUpdated(AStanza.id(), items);
 		}
 		else
 		{
 			XmppStanzaError err(AStanza);
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to update conference affiliation list, room=%1, id=%2: %3").arg(FRoomJid.bare(),AStanza.id(),err.condition()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to update conference affiliation list, id=%1, room=%2: %3").arg(AStanza.id(),FRoomJid.bare(),err.condition()));
 			emit requestFailed(AStanza.id(), err);
 		}
 	}
@@ -192,7 +194,7 @@ void MultiUserChat::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASt
 		FConfigLoadId.removeAll(AStanza.id());
 		if (AStanza.type() == "result")
 		{
-			LOG_STRM_INFO(AStreamJid,QString("Conference configuration loaded, room=%1, id=%2").arg(FRoomJid.bare(), AStanza.id()));
+			LOG_STRM_INFO(AStreamJid,QString("Conference configuration loaded, id=%1, room=%2").arg(AStanza.id(),FRoomJid.bare()));
 			QDomElement formElem = AStanza.firstElement("query",NS_MUC_OWNER).firstChildElement("x");
 			while (formElem.namespaceURI() != NS_JABBER_DATA)
 				formElem = formElem.nextSiblingElement("x");
@@ -201,7 +203,7 @@ void MultiUserChat::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASt
 		else
 		{
 			XmppStanzaError err(AStanza);
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to load conference configuration, room=%1, id=%2: %3").arg(FRoomJid.bare(),AStanza.id(),err.condition()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to load conference configuration, id=%1, room=%2: %3").arg(AStanza.id(),FRoomJid.bare(),err.condition()));
 			emit requestFailed(AStanza.id(),err);
 		}
 	}
@@ -210,13 +212,13 @@ void MultiUserChat::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASt
 		IDataForm form = FConfigUpdateId.take(AStanza.id());
 		if (AStanza.type() == "result")
 		{
-			LOG_STRM_INFO(AStreamJid,QString("Conference configuration updated, room=%1, id=%2").arg(FRoomJid.bare(),AStanza.id()));
+			LOG_STRM_INFO(AStreamJid,QString("Conference configuration updated, id=%1, room=%2").arg(AStanza.id(),FRoomJid.bare()));
 			emit roomConfigUpdated(AStanza.id(), form);
 		}
 		else
 		{
 			XmppStanzaError err(AStanza);
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to update conference configuration, room=%1, id=%2: %3").arg(FRoomJid.bare(),AStanza.id(),err.condition()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to update conference configuration, id=%1, room=%2: %3").arg(AStanza.id(),FRoomJid.bare(),err.condition()));
 			emit requestFailed(AStanza.id(),err);
 		}
 	}
@@ -225,13 +227,13 @@ void MultiUserChat::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASt
 		QString reason = FRoomDestroyId.take(AStanza.id());
 		if (AStanza.type() == "result")
 		{
-			LOG_STRM_INFO(AStreamJid,QString("Conference destroyed, room=%1, id=%2").arg(FRoomJid.bare(),AStanza.id()));
+			LOG_STRM_INFO(AStreamJid,QString("Conference destroyed, id=%1, room=%2").arg(AStanza.id(),FRoomJid.bare()));
 			emit roomDestroyed(AStanza.id(),reason);
 		}
 		else
 		{
 			XmppStanzaError err(AStanza);
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to destroy conference, room=%1, id=%2: %3").arg(FRoomJid.bare(),AStanza.id(),err.condition()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to destroy conference, id=%1, room=%2: %3").arg(AStanza.id(),FRoomJid.bare(),err.condition()));
 			emit requestFailed(AStanza.id(),err);
 		}
 	}
@@ -397,7 +399,11 @@ QString MultiUserChat::password() const
 
 void MultiUserChat::setPassword(const QString &APassword)
 {
-	FPassword = APassword;
+	if (FPassword != APassword)
+	{
+		FPassword = APassword;
+		LOG_STRM_INFO(FStreamJid,QString("Conference password changed, room=%1").arg(FRoomJid.bare()));
+	}
 }
 
 IMultiUserChatHistory MultiUserChat::historyScope() const
@@ -426,7 +432,7 @@ bool MultiUserChat::sendPresence(int AShow, const QString &AStatus, int APriorit
 		presence.setTo(userJid.full());
 
 		QString showText;
-		bool isConnecting = true;
+		bool isOnline = true;
 		switch (AShow)
 		{
 		case IPresence::Online:
@@ -445,11 +451,11 @@ bool MultiUserChat::sendPresence(int AShow, const QString &AStatus, int APriorit
 			showText = "xa";
 			break;
 		default:
-			isConnecting = false;
+			isOnline = false;
 			showText = "unavailable";
 		}
 
-		if (!isConnecting)
+		if (!isOnline)
 		{
 			presence.setType("unavailable");
 		}
@@ -463,8 +469,10 @@ bool MultiUserChat::sendPresence(int AShow, const QString &AStatus, int APriorit
 		if (!AStatus.isEmpty())
 			presence.addElement("status").appendChild(presence.createTextNode(AStatus));
 
-		if (!isConnected() && isConnecting)
+		if (!isConnected() && isOnline)
 		{
+			LOG_STRM_DEBUG(FStreamJid,QString("Conference about to connect, room=%1").arg(FRoomJid.bare()));
+
 			FRoomError = XmppError::null;
 			emit chatAboutToConnect();
 
@@ -500,20 +508,21 @@ bool MultiUserChat::sendPresence(int AShow, const QString &AStatus, int APriorit
 					onDiscoveryInfoReceived(FDiscovery->discoInfo(streamJid(),roomJid()));
 			}
 		}
-		else if (isConnected() && !isConnecting)
+		else if (isConnected() && !isOnline)
 		{
+			LOG_STRM_DEBUG(FStreamJid,QString("Conference about to disconnect, room=%1").arg(FRoomJid.bare()));
 			emit chatAboutToDisconnect();
 		}
 
 		if (FStanzaProcessor->sendStanzaOut(FStreamJid,presence))
 		{
-			LOG_STRM_INFO(FStreamJid,QString("Presence sent to conference, room=%1, show=%2").arg(FRoomJid.bare()).arg(AShow));
-			FConnected = isConnecting;
+			LOG_STRM_INFO(FStreamJid,QString("Presence sent to conference, show=%1, room=%2").arg(AShow).arg(FRoomJid.bare()));
+			FConnected = isOnline;
 			return true;
 		}
 		else
 		{
-			LOG_STRM_WARNING(FStreamJid,QString("Failed to send presence to conference, room=%1, show=%2").arg(FRoomJid.bare()).arg(AShow));
+			LOG_STRM_WARNING(FStreamJid,QString("Failed to send presence to conference, show=%1, room=%2").arg(AShow).arg(FRoomJid.bare()));
 		}
 	}
 	else
@@ -566,12 +575,12 @@ bool MultiUserChat::sendInvitation(const Jid &AContactJid, const QString &AMessa
 
 		if (FStanzaProcessor->sendStanzaOut(FStreamJid, mstanza))
 		{
-			LOG_STRM_INFO(FStreamJid,QString("Conference invite sent, room=%1, contact=%2").arg(FRoomJid.bare(),AContactJid.full()));
+			LOG_STRM_INFO(FStreamJid,QString("Conference invite sent, contact=%1, room=%2").arg(AContactJid.full(),FRoomJid.bare()));
 			return true;
 		}
 		else
 		{
-			LOG_STRM_WARNING(FStreamJid,QString("Failed to send conference invite, room=%1, contact=%2").arg(FRoomJid.bare(),AContactJid.full()));
+			LOG_STRM_WARNING(FStreamJid,QString("Failed to send conference invite, contact=%1, room=%2").arg(AContactJid.full(),FRoomJid.bare()));
 		}
 	}
 	return false;
@@ -668,13 +677,13 @@ QString MultiUserChat::loadAffiliationList(const QString &AAffiliation)
 
 		if (FStanzaProcessor->sendStanzaRequest(this,FStreamJid,request,MUC_LIST_TIMEOUT))
 		{
-			LOG_STRM_INFO(FStreamJid,QString("Load affiliation list request sent, room=%1, affiliation=%2, id=%3").arg(FRoomJid.bare(),AAffiliation,request.id()));
+			LOG_STRM_INFO(FStreamJid,QString("Load affiliation list request sent, affiliation=%1, id=%2, room=%3").arg(AAffiliation,request.id(),FRoomJid.bare()));
 			FAffilListLoadId.insert(request.id(), AAffiliation);
 			return request.id();
 		}
 		else
 		{
-			LOG_STRM_WARNING(FStreamJid,QString("Failed to send load affiliation list request, room=%1, affiliation=%2").arg(FRoomJid.bare(),AAffiliation));
+			LOG_STRM_WARNING(FStreamJid,QString("Failed to send load affiliation list request, affiliation=%1, room=%2").arg(AAffiliation,FRoomJid.bare()));
 		}
 	}
 	return QString::null;
@@ -699,7 +708,7 @@ QString MultiUserChat::updateAffiliationList(const QList<IMultiUserListItem> &AI
 
 		if (FStanzaProcessor->sendStanzaRequest(this,FStreamJid,request,MUC_LIST_TIMEOUT))
 		{
-			LOG_STRM_INFO(FStreamJid,QString("Update affiliation list request sent, room=%1, id=%2").arg(FRoomJid.bare(),request.id()));
+			LOG_STRM_INFO(FStreamJid,QString("Update affiliation list request sent, id=%1, room=%2").arg(request.id(),FRoomJid.bare()));
 			FAffilListUpdateId.insert(request.id(),AItems);
 			return request.id();
 		}
@@ -730,18 +739,18 @@ QString MultiUserChat::setUserRole(const QString &ANick, const QString &ARole, c
 
 			if (FStanzaProcessor->sendStanzaRequest(this,FStreamJid,request,MUC_IQ_TIMEOUT))
 			{
-				LOG_STRM_INFO(FStreamJid,QString("Update role request sent, room=%1, user=%2, role=%3").arg(FRoomJid.bare(),ANick,ARole));
+				LOG_STRM_INFO(FStreamJid,QString("Update role request sent, nick=%1, role=%2, id=%3, room=%4").arg(ANick,ARole,request.id(),FRoomJid.bare()));
 				FRoleUpdateId.insert(request.id(),ANick);
 				return request.id();
 			}
 			else
 			{
-				LOG_STRM_WARNING(FStreamJid,QString("Failed to send update role request, room=%1, user=%1, role=%3").arg(FRoomJid.bare(),ANick,ARole));
+				LOG_STRM_WARNING(FStreamJid,QString("Failed to send update role request, nick=%1, role=%2, room=%3").arg(ANick,ARole,FRoomJid.bare()));
 			}
 		}
 		else
 		{
-			LOG_STRM_WARNING(FStreamJid,QString("Failed to change user role, room=%1, user=%2: User not found").arg(FRoomJid.bare(),ANick));
+			LOG_STRM_WARNING(FStreamJid,QString("Failed to change user role, nick=%1, room=%2: User not found").arg(ANick,FRoomJid.bare()));
 		}
 	}
 	return QString::null;
@@ -769,18 +778,18 @@ QString MultiUserChat::setUserAffiliation(const QString &ANick, const QString &A
 
 			if (FStanzaProcessor->sendStanzaRequest(this,FStreamJid,request,MUC_IQ_TIMEOUT))
 			{
-				LOG_STRM_INFO(FStreamJid,QString("Update affiliation request sent, room=%1, user=%2, affiliation=%3").arg(FRoomJid.bare(),ANick,AAffiliation));
+				LOG_STRM_INFO(FStreamJid,QString("Update affiliation request sent, nick=%1, affiliation=%2, id=%3, room=%4").arg(ANick,AAffiliation,request.id(),FRoomJid.bare()));
 				FAffilUpdateId.insert(request.id(),ANick);
 				return request.id();
 			}
 			else
 			{
-				LOG_STRM_WARNING(FStreamJid,QString("Failed to send update affiliation request, room=%1, user=%2, affiliation=%3").arg(FRoomJid.bare(),ANick,AAffiliation));
+				LOG_STRM_WARNING(FStreamJid,QString("Failed to send update affiliation request, nick=%1, affiliation=%2, room=%3").arg(ANick,AAffiliation,FRoomJid.bare()));
 			}
 		}
 		else
 		{
-			LOG_STRM_WARNING(FStreamJid,QString("Failed to change user affiliation, room=%1, user=%2: User not found").arg(FRoomJid.bare(),ANick));
+			LOG_STRM_WARNING(FStreamJid,QString("Failed to change user affiliation, nick=%1, room=%2: User not found").arg(ANick,FRoomJid.bare()));
 		}
 	}
 	return QString::null;
@@ -796,7 +805,7 @@ QString MultiUserChat::loadRoomConfig()
 
 		if (FStanzaProcessor->sendStanzaRequest(this,FStreamJid,request,MUC_IQ_TIMEOUT))
 		{
-			LOG_STRM_INFO(FStreamJid,QString("Conference configuration load request sent, room=%1, id=%2").arg(FRoomJid.bare(),request.id()));
+			LOG_STRM_INFO(FStreamJid,QString("Conference configuration load request sent, id=%1, room=%1").arg(request.id(),FRoomJid.bare()));
 			FConfigLoadId.append(request.id());
 			return request.id();
 		}
@@ -820,7 +829,7 @@ QString MultiUserChat::updateRoomConfig(const IDataForm &AForm)
 
 		if (FStanzaProcessor->sendStanzaRequest(this,FStreamJid,request,MUC_IQ_TIMEOUT))
 		{
-			LOG_STRM_INFO(FStreamJid,QString("Conference configuration update request sent, room=%1, id=%2").arg(FRoomJid.bare(),request.id()));
+			LOG_STRM_INFO(FStreamJid,QString("Conference configuration update request sent, id=%1, room=%2").arg(request.id(),FRoomJid.bare()));
 			FConfigUpdateId.insert(request.id(),AForm);
 			return request.id();
 		}
@@ -847,7 +856,7 @@ QString MultiUserChat::destroyRoom(const QString &AReason)
 
 		if (FStanzaProcessor->sendStanzaRequest(this,FStreamJid,request,MUC_IQ_TIMEOUT))
 		{
-			LOG_STRM_INFO(FStreamJid,QString("Conference destruction request sent, room=%1, id=%2").arg(FRoomJid.bare(),request.id()));
+			LOG_STRM_INFO(FStreamJid,QString("Conference destruction request sent, id=%1, room=%2").arg(request.id(),FRoomJid.bare()));
 			FRoomDestroyId.insert(request.id(),AReason);
 			return request.id();
 		}
@@ -875,7 +884,7 @@ bool MultiUserChat::processMessage(const Stanza &AStanza)
 		if (FSubject != newSubject)
 		{
 			FSubject = newSubject;
-			LOG_STRM_INFO(FStreamJid,QString("Conference subject changed, room=%1, user=%2").arg(FRoomJid.bare(),fromNick));
+			LOG_STRM_INFO(FStreamJid,QString("Conference subject changed, nick=%1, room=%2").arg(fromNick,FRoomJid.bare()));
 			emit subjectChanged(fromNick, FSubject);
 		}
 	}
@@ -887,7 +896,7 @@ bool MultiUserChat::processMessage(const Stanza &AStanza)
 			QDomElement declElem = AStanza.firstElement("x",NS_MUC_USER).firstChildElement("decline");
 			Jid contactJid = declElem.attribute("from");
 			QString reason = declElem.firstChildElement("reason").text();
-			LOG_STRM_INFO(FStreamJid,QString("Conference invite declined, room=%1, user=%2: %3").arg(FRoomJid.bare(),contactJid.full(),reason));
+			LOG_STRM_INFO(FStreamJid,QString("Conference invite declined, contact=%1, room=%2: %3").arg(contactJid.full(),FRoomJid.bare(),reason));
 			emit invitationDeclined(contactJid,reason);
 		}
 		else if (FDataForms && !AStanza.firstElement("x",NS_JABBER_DATA).isNull())
@@ -958,16 +967,8 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 			MultiUser *user = FUsers.value(fromNick);
 			if (user == NULL)
 			{
-				Jid realJid = itemElem.attribute("jid");
-				user = new MultiUser(FStreamJid,fromJid,realJid,this);
-				LOG_STRM_DEBUG(FStreamJid,QString("User entered the conference, room=%1, user=%2, role=%3, affiliation=%4").arg(FRoomJid.bare(),fromNick,role,affiliation));
-			}
-			else
-			{
-				if (user->role() != role)
-					LOG_STRM_DEBUG(FStreamJid,QString("User role changed, room=%1, user=%2, role=%3").arg(FRoomJid.bare(),fromNick,role));
-				if (user->affiliation() != affiliation)
-					LOG_STRM_DEBUG(FStreamJid,QString("User affiliation changed, room=%1, user=%2, affiliation=%3").arg(FRoomJid.bare(),fromNick,affiliation));
+				LOG_STRM_DEBUG(FStreamJid,QString("User has joined the conference, nick=%1, role=%2, affiliation=%3, room=%4").arg(fromNick,role,affiliation,FRoomJid.bare()));
+				user = new MultiUser(FStreamJid,fromJid,itemElem.attribute("jid"),this);
 			}
 
 			user->setRole(role);
@@ -984,22 +985,24 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 			if (!isOpen() && (fromNick==FNickName || FStatusCodes.contains(MUC_SC_SELF_PRESENCE)))
 			{
 				FMainUser = user;
+
 				if (FNickName != fromNick)
 				{
-					LOG_STRM_WARNING(FStreamJid,QString("Main user nick was changed by server, room=%1, from=%2, to=%3").arg(FRoomJid.bare(),FNickName,fromNick));
+					LOG_STRM_WARNING(FStreamJid,QString("Main user nick was changed by server, from=%1, to=%2, room=%3").arg(FNickName,fromNick,FRoomJid.bare()));
 					FNickName = fromNick;
 				}
-				LOG_STRM_INFO(FStreamJid,QString("Received initial conference presence, room=%1, nick=%2, role=%3, affiliation=%4").arg(FRoomJid.bare(),fromNick,role,affiliation));
+
+				LOG_STRM_INFO(FStreamJid,QString("Received initial conference presence, nick=%1, role=%2, affiliation=%3, room=%4").arg(fromNick,role,affiliation,FRoomJid.bare()));
 				emit chatOpened();
 			}
 
-			LOG_STRM_DEBUG(FStreamJid,QString("User changed status in conference, room=%1, user=%2, show=%3, status=%4").arg(FRoomJid.bare(),fromNick).arg(presence.show).arg(presence.status));
-
 			if (user == FMainUser)
 			{
+				LOG_STRM_DEBUG(FStreamJid,QString("Conference presence changed from=%1 to=%2, room=%3").arg(FRoomPresence.show).arg(presence.show).arg(FRoomJid.bare()));
 				FRoomPresence = presence;
 				emit presenceChanged(FRoomPresence);
 			}
+
 			accepted = true;
 		}
 	}
@@ -1020,16 +1023,12 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 			if (FStatusCodes.contains(MUC_SC_NICK_CHANGED))
 			{
 				QString newNick = itemElem.attribute("nick");
-				if (!newNick.isEmpty())
+				if (!newNick.isEmpty() && !FUsers.contains(newNick))
 				{
-					LOG_STRM_DEBUG(FStreamJid,QString("Changing user nick from=%1 to=%2 in room=%3").arg(fromNick,newNick,FRoomJid.bare()));
-					if (!FUsers.contains(newNick))
-					{
-						applyPresence = false;
-						FUsers.remove(fromNick);
-						FUsers.insert(newNick,user);
-					}
+					applyPresence = false;
+
 					user->setNick(newNick);
+					FUsers.insert(newNick,FUsers.take(fromNick));
 
 					if (user == FMainUser)
 					{
@@ -1037,47 +1036,51 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 						sendPresence(FRoomPresence.show,FRoomPresence.status,FRoomPresence.priority);
 					}
 				}
+				else if (newNick.isEmpty())
+				{
+					LOG_STRM_ERROR(FStreamJid,QString("Failed to changes user nick from=%1, room=%2: New nick is empty").arg(fromNick,FRoomJid.bare()));
+				}
 				else
 				{
-					LOG_STRM_ERROR(FStreamJid,QString("Failed to changes user nick, room=%1, user=%2: New nick is empty").arg(FRoomJid.bare(),fromNick));
+					LOG_STRM_ERROR(FStreamJid,QString("Failed to changes user nick from=%1 to=%2, room=%3: Nick occupied by another user").arg(fromNick,newNick,FRoomJid.bare()));
 				}
 			}
 			else if (FStatusCodes.contains(MUC_SC_USER_KICKED))
 			{
 				QString actor = itemElem.firstChildElement("actor").attribute("nick");
 				QString reason = itemElem.firstChildElement("reason").text();
-				LOG_STRM_DEBUG(FStreamJid,QString("User was kicked from conference, room=%1, user=%2, by=%3: %4").arg(FRoomJid.bare(),fromNick,actor,reason));
+				LOG_STRM_INFO(FStreamJid,QString("User was kicked from conference, nick=%1, by=%2, room=%3: %4").arg(fromNick,actor,FRoomJid.bare(),reason));
 				emit userKicked(fromNick,reason,actor);
 			}
 			else if (FStatusCodes.contains(MUC_SC_USER_BANNED))
 			{
 				QString actor = itemElem.firstChildElement("actor").attribute("nick");
 				QString reason = itemElem.firstChildElement("reason").text();
-				LOG_STRM_DEBUG(FStreamJid,QString("User was banned in conference, room=%1, user=%2, by=%3: %4").arg(FRoomJid.bare(),fromNick,actor,reason));
+				LOG_STRM_INFO(FStreamJid,QString("User was banned in conference, nick=%1, by=%2, room=%3: %4").arg(fromNick,actor,FRoomJid.bare(),reason));
 				emit userBanned(fromNick,reason,actor);
 			}
 			else if (!xelem.firstChildElement("destroy").isNull())
 			{
 				QString reason = xelem.firstChildElement("destroy").firstChildElement("reason").text();
-				LOG_STRM_DEBUG(FStreamJid,QString("Conference was destroyed by owner, room=%1: %2").arg(FRoomJid.bare(),reason));
+				LOG_STRM_INFO(FStreamJid,QString("Conference was destroyed by owner, room=%1: %2").arg(FRoomJid.bare(),reason));
 				emit roomDestroyed(QString::null,reason);
 			}
 
 			if (applyPresence)
 			{
+				LOG_STRM_DEBUG(FStreamJid,QString("User has left the conference, nick=%1, show=%2, status=%3, room=%4").arg(fromNick).arg(presence.show).arg(presence.status).arg(FRoomJid.bare()));
+
 				user->setRole(role);
 				user->setAffiliation(affiliation);
 				user->setPresence(presence);
 
 				if (user != FMainUser)
 				{
-					LOG_STRM_DEBUG(FStreamJid,QString("User leave the conference, room=%1, user=%2, show=%3, status=%4").arg(FRoomJid.bare(),fromNick).arg(presence.show).arg(presence.status));
 					FUsers.remove(fromNick);
 					delete user;
 				}
 				else
 				{
-					LOG_STRM_INFO(FStreamJid,QString("You leave the conference, room=%1, show=%2, status=%3").arg(FRoomJid.bare(),role,affiliation));
 					closeChat(presence);
 				}
 			}
@@ -1088,7 +1091,7 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 	else if (AStanza.type() == "error")
 	{
 		XmppStanzaError err(AStanza);
-		LOG_STRM_WARNING(FStreamJid,QString("Error presence received in conference, room=%1, user=%2: %3").arg(FRoomJid.bare(),fromNick,err.condition()));
+		LOG_STRM_WARNING(FStreamJid,QString("Error presence received in conference, nick=%1, room=%2: %3").arg(fromNick,FRoomJid.bare(),err.condition()));
 
 		if (fromNick == FNickName)
 		{
@@ -1098,6 +1101,7 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 			presence.itemJid = fromJid;
 			presence.show = IPresence::Error;
 			presence.status = err.errorMessage();
+
 			closeChat(presence);
 		}
 
@@ -1147,8 +1151,8 @@ void MultiUserChat::onDiscoveryInfoReceived(const IDiscoInfo &AInfo)
 		QString name = index>=0 ? AInfo.identity.at(index).name : QString::null;
 		if (!name.isEmpty() && FRoomName!=name)
 		{
-			FRoomName = name;
 			LOG_STRM_DEBUG(FStreamJid,QString("Conference name changed, room=%1: %2").arg(FRoomJid.bare(),FRoomName));
+			FRoomName = name;
 			emit roomNameChanged(FRoomName);
 		}
 	}

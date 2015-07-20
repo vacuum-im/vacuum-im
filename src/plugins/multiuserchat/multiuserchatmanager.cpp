@@ -1319,7 +1319,7 @@ void MultiUserChatManager::onMultiChatDestroyed()
 	IMultiUserChat *chat = qobject_cast<IMultiUserChat *>(sender());
 	if (chat)
 	{
-		LOG_STRM_INFO(chat->streamJid(),QString("Multi user chat destroyed, room=%1").arg(chat->roomJid().full()));
+		LOG_STRM_INFO(chat->streamJid(),QString("Multi user chat destroyed, room=%1").arg(chat->roomJid().bare()));
 		FChats.removeAll(chat);
 		emit multiUserChatDestroyed(chat);
 	}
@@ -1330,7 +1330,7 @@ void MultiUserChatManager::onMultiChatWindowDestroyed()
 	IMultiUserChatWindow *window = qobject_cast<IMultiUserChatWindow *>(sender());
 	if (window)
 	{
-		LOG_STRM_INFO(window->streamJid(),QString("Multi user chat window destroyed, room=%1").arg(window->multiUserChat()->roomJid().full()));
+		LOG_STRM_INFO(window->streamJid(),QString("Multi user chat window destroyed, room=%1").arg(window->multiUserChat()->roomJid().bare()));
 		FChatWindows.removeAll(window);
 		emit multiChatWindowDestroyed(window);
 	}
@@ -1495,18 +1495,18 @@ bool MultiUserChatManager::requestRoomNick(const Jid &AStreamJid, const Jid &ARo
 		QString requestId = FRegistration->sendRegisterRequest(AStreamJid,ARoomJid.domain());
 		if (!requestId.isEmpty())
 		{
-			LOG_STRM_INFO(AStreamJid,QString("Room nick request sent as register request, room=%1, id=%2").arg(ARoomJid.domain(),requestId));
+			LOG_STRM_INFO(AStreamJid,QString("Room nick request sent as register request, service=%1, id=%2").arg(ARoomJid.domain(),requestId));
 			FNickRequests.insert(requestId, qMakePair<Jid,Jid>(AStreamJid,ARoomJid));
 			return true;
 		}
 		else
 		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to send room nick request as register request, room=%1").arg(ARoomJid.domain()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to send room nick request as register request, service=%1").arg(ARoomJid.domain()));
 		}
 	}
 	else
 	{
-		LOG_STRM_WARNING(AStreamJid,QString("Failed to send room nick request, room=%1: Required interfaces not found").arg(ARoomJid.domain()));
+		LOG_STRM_WARNING(AStreamJid,QString("Failed to send room nick request, service=%1: Required interfaces not found").arg(ARoomJid.domain()));
 	}
 	return false;
 }
@@ -1702,7 +1702,7 @@ void MultiUserChatManager::onInviteDialogFinished(int AResult)
 		InviteFields fields = FInviteDialogs.take(inviteDialog);
 		if (AResult == QMessageBox::Yes)
 		{
-			LOG_STRM_INFO(fields.streamJid,QString("Invite request from=%1 to room=%2 accepted").arg(fields.fromJid.full(),fields.roomJid.full()));
+			LOG_STRM_INFO(fields.streamJid,QString("Invite request from=%1 to room=%2 accepted").arg(fields.fromJid.full(),fields.roomJid.bare()));
 			showJoinMultiChatDialog(fields.streamJid,fields.roomJid,QString::null,fields.password);
 		}
 		else if (AResult == QMessageBox::No)
@@ -1724,7 +1724,7 @@ void MultiUserChatManager::onInviteDialogFinished(int AResult)
 					declElem.appendChild(mstanza.createElement("reason")).appendChild(mstanza.createTextNode(reason));
 
 				if (FMessageProcessor->sendMessage(fields.streamJid,decline,IMessageProcessor::DirectionOut))
-					LOG_STRM_INFO(fields.streamJid,QString("Invite request from=%1 to room=%2 rejected").arg(fields.fromJid.full(),fields.roomJid.full()));
+					LOG_STRM_INFO(fields.streamJid,QString("Invite request from=%1 to room=%2 rejected").arg(fields.fromJid.full(),fields.roomJid.bare()));
 				else
 					LOG_STRM_WARNING(fields.streamJid,QString("Failed to send invite reject message to=%1").arg(fields.fromJid.full()));
 			}

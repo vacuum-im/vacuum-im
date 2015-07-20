@@ -138,6 +138,8 @@ void MultiUserView::setViewMode(int AMode)
 {
 	if (FViewMode != AMode)
 	{
+		LOG_STRM_DEBUG(FMultiChat->streamJid(),QString("Changing view mode from %1 to %2, room=%3").arg(FViewMode).arg(AMode).arg(FMultiChat->roomJid().full()));
+
 		FViewMode = AMode;
 
 		foreach(QStandardItem *item, FUserItem)
@@ -207,6 +209,8 @@ void MultiUserView::insertGeneralLabel(const AdvancedDelegateItem &ALabel)
 {
 	if (ALabel.d->id != AdvancedDelegateItem::NullId)
 	{
+		LOG_STRM_DEBUG(FMultiChat->streamJid(),QString("Inserting general label, label=%1, room=%2").arg(ALabel.d->id).arg(FMultiChat->roomJid().bare()));
+		
 		FGeneralLabels.insert(ALabel.d->id,ALabel);
 		foreach(QStandardItem *item, FUserItem)
 			insertItemLabel(ALabel,item);
@@ -219,6 +223,7 @@ void MultiUserView::insertGeneralLabel(const AdvancedDelegateItem &ALabel)
 
 void MultiUserView::removeGeneralLabel(quint32 ALabelId)
 {
+	LOG_STRM_DEBUG(FMultiChat->streamJid(),QString("Removing general label, label=%1, room=%2").arg(ALabelId).arg(FMultiChat->roomJid().bare()));
 	FGeneralLabels.remove(ALabelId);
 	removeItemLabel(ALabelId);
 }
@@ -294,14 +299,14 @@ IMultiUserViewNotify MultiUserView::itemNotify(int ANotifyId) const
 int MultiUserView::insertItemNotify(const IMultiUserViewNotify &ANotify, QStandardItem *AItem)
 {
 	static int NotifyId = 0;
-	
 	do NotifyId = qMax(++NotifyId, 1); while (FNotifies.contains(NotifyId));
+
+	LOG_STRM_DEBUG(FMultiChat->streamJid(),QString("Inserting item notify, notify=%1, order=%2, flags=%3, room=%4").arg(NotifyId).arg(ANotify.order).arg(ANotify.flags).arg(FMultiChat->roomJid().bare()));
 
 	FNotifies.insert(NotifyId,ANotify);
 	FItemNotifies.insertMulti(AItem,NotifyId);
 	updateItemNotify(AItem);
 
-	LOG_DEBUG(QString("Item notify inserted, id=%1, order=%2, flags=%3").arg(NotifyId).arg(ANotify.order).arg(ANotify.flags));
 	emit itemNotifyInserted(NotifyId);
 
 	return NotifyId;
@@ -311,7 +316,7 @@ void MultiUserView::activateItemNotify(int ANotifyId)
 {
 	if (FNotifies.contains(ANotifyId))
 	{
-		LOG_DEBUG(QString("Item notify activated, id=%1").arg(ANotifyId));
+		LOG_STRM_DEBUG(FMultiChat->streamJid(),QString("Activating item notify, notify=%1, room=%2").arg(ANotifyId).arg(FMultiChat->roomJid().bare()));
 		emit itemNotifyActivated(ANotifyId);
 	}
 }
@@ -320,24 +325,26 @@ void MultiUserView::removeItemNotify(int ANotifyId)
 {
 	if (FNotifies.contains(ANotifyId))
 	{
-		QStandardItem *item = FItemNotifies.key(ANotifyId);
+		LOG_STRM_DEBUG(FMultiChat->streamJid(),QString("Removing item notify, notify=%1, room=%2").arg(ANotifyId).arg(FMultiChat->roomJid().bare()));
 
+		QStandardItem *item = FItemNotifies.key(ANotifyId);
 		FNotifies.remove(ANotifyId);
 		FItemNotifies.remove(item);
 		updateItemNotify(item);
 
-		LOG_DEBUG(QString("Item notify removed, id=%1").arg(ANotifyId));
 		emit itemNotifyRemoved(ANotifyId);
 	}
 }
 
 void MultiUserView::contextMenuForItem(QStandardItem *AItem, Menu *AMenu)
 {
+	LOG_STRM_DEBUG(FMultiChat->streamJid(),QString("Requesting context menu for item, user=%1").arg(AItem->data(MUDR_USER_JID).toString()));
 	emit itemContextMenu(AItem,AMenu);
 }
 
 void MultiUserView::toolTipsForItem(QStandardItem *AItem, QMap<int,QString> &AToolTips)
 {
+	LOG_STRM_DEBUG(FMultiChat->streamJid(),QString("Requesting tool tips for item, user=%1").arg(AItem->data(MUDR_USER_JID).toString()));
 	emit itemToolTips(AItem,AToolTips);
 }
 
@@ -533,6 +540,8 @@ void MultiUserView::onMultiUserChanged(IMultiUser *AUser, int AData, const QVari
 		{
 			if (userItem == NULL)
 			{
+				LOG_STRM_DEBUG(FMultiChat->streamJid(),QString("Creating user item, user=%1").arg(AUser->userJid().full()));
+
 				userItem = new AdvancedItem(AUser->nick());
 				userItem->setData(MUIK_USER,MUDR_KIND);
 				FUserItem.insert(AUser,userItem);
@@ -564,8 +573,6 @@ void MultiUserView::onMultiUserChanged(IMultiUser *AUser, int AData, const QVari
 				
 				FModel->appendRow(userItem);
 				FModel->sort(0);
-
-				LOG_DEBUG(QString("User item created, jid=%1").arg(AUser->userJid().full()));
 			}
 			else
 			{
@@ -574,13 +581,19 @@ void MultiUserView::onMultiUserChanged(IMultiUser *AUser, int AData, const QVari
 		}
 		else if (userItem != NULL)
 		{
-			qDeleteAll(FModel->takeRow(userItem->row()));
+			LOG_STRM_DEBUG(FMultiChat->streamJid(),QString("Destroying user item, user=%1").arg(AUser->userJid().full()));
 
+			foreach(int notifyId, FItemNotifies.values(userItem))
+				removeItemNotify(notifyId);
+
+			foreach(int labelId, FLabelItems.keys(userItem))
+				removeItemLabel(labelId,userItem);
+
+			qDeleteAll(FModel->takeRow(userItem->row()));
 			FUserItem.remove(AUser);
 			FItemUser.remove(userItem);
-			userItem = NULL;
 
-			LOG_DEBUG(QString("User item destroyed, jid=%1").arg(AUser->userJid().full()));
+			userItem = NULL;
 		}
 	}
 	else if (AData == MUDR_NICK)
@@ -607,7 +620,7 @@ void MultiUserView::onUpdateBlinkLabels()
 {
 	foreach(quint32 labelId, FBlinkLabels)
 		foreach(QStandardItem *item, FLabelItems.values(labelId))
-		repaintUserItem(item);
+			repaintUserItem(item);
 }
 
 void MultiUserView::onStatusIconsChanged()
