@@ -991,10 +991,6 @@ Check values and try again</translation>
    <translation>Failed to destroy this conference: %1</translation>
   </message>
   <message>
-   <source>Failed to join to the conference: %1</source>
-   <translation>Failed to join to the conference: %1</translation>
-  </message>
-  <message>
    <source>User %1 has declined your invite to this conference. %2</source>
    <translation>User %1 has declined your invite to this conference. %2</translation>
   </message>
@@ -1121,6 +1117,14 @@ Check values and try again</translation>
   <message>
    <source>Ban</source>
    <translation>Ban</translation>
+  </message>
+  <message>
+   <source>Leaving conference...</source>
+   <translation>Leaving conference...</translation>
+  </message>
+  <message>
+   <source>You have left the conference due to error: %1</source>
+   <translation>You have left the conference due to error: %1</translation>
   </message>
  </context>
 </TS>

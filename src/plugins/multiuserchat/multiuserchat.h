@@ -30,13 +30,13 @@ public:
 	//IMessageEditor
 	virtual bool messageReadWrite(int AOrder, const Jid &AStreamJid, Message &AMessage, int ADirection);
 	//IMultiUserChat
-	virtual bool isIsolated() const;
 	virtual Jid streamJid() const;
 	virtual Jid roomJid() const;
 	virtual QString roomName() const;
 	virtual QString roomShortName() const;
+	virtual int state() const;
 	virtual bool isOpen() const;
-	virtual bool isConnected() const;
+	virtual bool isIsolated() const;
 	virtual bool autoPresence() const;
 	virtual void setAutoPresence(bool AAuto);
 	virtual QList<int> statusCodes() const;
@@ -47,6 +47,7 @@ public:
 	virtual QList<IMultiUser *> allUsers() const;
 	virtual IMultiUser *findUser(const QString &ANick) const;
 	virtual bool isUserPresent(const Jid &AContactJid) const;
+	virtual void abortConnection(const QString &AStatus, bool AError=true);
 	//Occupant
 	virtual QString nickName() const;
 	virtual bool setNickName(const QString &ANick);
@@ -73,10 +74,7 @@ public:
 	virtual QString updateRoomConfig(const IDataForm &AForm);
 	virtual QString destroyRoom(const QString &AReason);
 signals:
-	void chatOpened();
-	void chatClosed();
-	void chatAboutToConnect();
-	void chatAboutToDisconnect();
+	void stateChanged(int AState);
 	void chatDestroyed();
 	//Common
 	void roomNameChanged(const QString &AName);
@@ -103,9 +101,10 @@ signals:
 	void roomConfigUpdated(const QString &AId, const IDataForm &AForm);
 	void roomDestroyed(const QString &AId, const QString &AReason);
 protected:
+	void setState(ChatState AState);
 	bool processMessage(const Stanza &AStanza);
 	bool processPresence(const Stanza &AStanza);
-	void closeChat(const IPresenceItem &APresence);
+	void closeRoom(const IPresenceItem &APresence);
 protected slots:
 	void onUserChanged(int AData, const QVariant &ABefore);
 	void onDiscoveryInfoReceived(const IDiscoInfo &AInfo);
@@ -131,10 +130,11 @@ private:
 	QMap<QString, QString> FRoomDestroyId;
 private:
 	bool FIsolated;
-	bool FConnected;
 	bool FAutoPresence;
+	bool FResendPresence;
 	Jid FStreamJid;
 	Jid FRoomJid;
+	ChatState FState;
 	QString FSubject;
 	QString FNickName;
 	QString FPassword;

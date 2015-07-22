@@ -564,10 +564,10 @@ void Bookmarks::startBookmark(const Jid &AStreamJid, const IBookmark &ABookmark,
 			IMultiUserChatWindow *window = FMultiChatManager->getMultiChatWindow(AStreamJid,ABookmark.conference.roomJid,ABookmark.conference.nick,ABookmark.conference.password);
 			if (window)
 			{
+				if (window->multiUserChat()->state() == IMultiUserChat::Closed)
+					window->multiUserChat()->sendStreamPresence();
 				if (AShowWindow)
 					window->showTabPage();
-				if (!window->multiUserChat()->isConnected())
-					window->multiUserChat()->sendStreamPresence();
 			}
 		}
 		else if (ABookmark.type == IBookmark::Url)

@@ -129,7 +129,7 @@ protected slots:
 	void onCopyToClipboardActionTriggered(bool);
 protected slots:
 	void onStatusIconsChanged();
-	void onActiveStreamRemoved(const Jid &AStreamJid);
+	void onActiveXmppStreamRemoved(const Jid &AStreamJid);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
 protected slots:

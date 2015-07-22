@@ -42,7 +42,7 @@ EditUsersListDialog::EditUsersListDialog(IMultiUserChat *AMultiChat, const QStri
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_MUC_EDIT_AFFILIATIONS,0,0,"windowIcon");
 
 	FMultiChat = AMultiChat;
-	connect(FMultiChat->instance(),SIGNAL(chatClosed()),SLOT(reject()));
+	connect(FMultiChat->instance(),SIGNAL(stateChanged(int)),SLOT(reject()));
 	connect(FMultiChat->instance(),SIGNAL(requestFailed(const QString &, const XmppError &)),
 		SLOT(onMultiChatRequestFailed(const QString &, const XmppError &)));
 	connect(FMultiChat->instance(),SIGNAL(affiliationListLoaded(const QString &, const QList<IMultiUserListItem> &)),

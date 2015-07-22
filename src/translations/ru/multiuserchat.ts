@@ -991,10 +991,6 @@ Check values and try again</source>
         <translation>Не удалось удалить эту конференцию: %1</translation>
     </message>
     <message>
-        <source>Failed to join to the conference: %1</source>
-        <translation>Не удалось присоединиться к конференции: %1</translation>
-    </message>
-    <message>
         <source>User %1 has declined your invite to this conference. %2</source>
         <translation>Пользователь %1 отклонил ваше приглашение в конференцию. %2</translation>
     </message>
@@ -1121,6 +1117,14 @@ Check values and try again</source>
     <message>
         <source>Ban</source>
         <translation>Заблокировать</translation>
+    </message>
+    <message>
+        <source>Leaving conference...</source>
+        <translation>Выходим из конференции...</translation>
+    </message>
+    <message>
+        <source>You have left the conference due to error: %1</source>
+        <translation>Вы вышли из конференции из-за ошибки: %1</translation>
     </message>
 </context>
 </TS>

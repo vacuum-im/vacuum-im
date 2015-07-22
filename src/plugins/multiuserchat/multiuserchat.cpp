@@ -17,11 +17,13 @@
 
 MultiUserChat::MultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANickName, const QString &APassword, bool AIsolated, QObject *AParent) : QObject(AParent)
 {
-	FMainUser = NULL;
 	FSHIMessage = -1;
 	FSHIPresence = -1;
-	FConnected = false;
+
+	FMainUser = NULL;
 	FAutoPresence = false;
+	FResendPresence = false;
+	FState = IMultiUserChat::Closed;
 
 	FIsolated = AIsolated;
 	FRoomJid = ARoomJid;
@@ -81,8 +83,7 @@ MultiUserChat::MultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const Q
 
 MultiUserChat::~MultiUserChat()
 {
-	if (!FUsers.isEmpty())
-		closeChat(IPresenceItem());
+	abortConnection(QString::null,false);
 
 	if (FStanzaProcessor)
 	{
@@ -249,11 +250,6 @@ bool MultiUserChat::messageReadWrite(int AOrder, const Jid &AStreamJid, Message 
 	return false;
 }
 
-bool MultiUserChat::isIsolated() const
-{
-	return FIsolated;
-}
-
 Jid MultiUserChat::streamJid() const
 {
 	return FStreamJid;
@@ -274,14 +270,19 @@ QString MultiUserChat::roomShortName() const
 	return FRoomJid.uNode();
 }
 
-bool MultiUserChat::isOpen() const
+int MultiUserChat::state() const
 {
-	return FMainUser!=NULL;
+	return FState;
 }
 
-bool MultiUserChat::isConnected() const
+bool MultiUserChat::isOpen() const
 {
-	return FConnected;
+	return FState==IMultiUserChat::Opened;
+}
+
+bool MultiUserChat::isIsolated() const
+{
+	return FIsolated;
 }
 
 bool MultiUserChat::autoPresence() const
@@ -354,6 +355,20 @@ bool MultiUserChat::isUserPresent(const Jid &AContactJid) const
 	return FUsers.contains(AContactJid.resource());
 }
 
+void MultiUserChat::abortConnection(const QString &AStatus, bool AError)
+{
+	if (FState != IMultiUserChat::Closed)
+	{
+		LOG_STRM_INFO(FStreamJid,QString("Aborting conference connection, status=%1, room=%2").arg(AStatus,FRoomJid.bare()));
+
+		IPresenceItem presence;
+		presence.itemJid = FMainUser!=NULL ? FMainUser->userJid() : FRoomJid;
+		presence.show = AError ? IPresence::Error : IPresence::Offline;
+		presence.status = AStatus;
+		closeRoom(presence);
+	}
+}
+
 QString MultiUserChat::nickName() const
 {
 	return FNickName;
@@ -363,7 +378,7 @@ bool MultiUserChat::setNickName(const QString &ANick)
 {
 	if (!ANick.isEmpty())
 	{
-		if (isConnected() && FNickName!=ANick)
+		if (isOpen() && FNickName!=ANick)
 		{
 			Jid userJid(FRoomJid.node(),FRoomJid.domain(),ANick);
 
@@ -379,10 +394,14 @@ bool MultiUserChat::setNickName(const QString &ANick)
 				LOG_STRM_WARNING(FStreamJid,QString("Failed to send change conference nick request, room=%1").arg(FRoomJid.bare()));
 			}
 		}
-		else
+		else if (FState == IMultiUserChat::Closed)
 		{
 			FNickName = ANick;
 			return true;
+		}
+		else
+		{
+			LOG_STRM_ERROR(FStreamJid,QString("Failed to change conference nick, room=%1: Intermediate chat state").arg(FRoomJid.bare()));
 		}
 	}
 	else
@@ -455,26 +474,23 @@ bool MultiUserChat::sendPresence(int AShow, const QString &AStatus, int APriorit
 			showText = "unavailable";
 		}
 
-		if (!isOnline)
-		{
-			presence.setType("unavailable");
-		}
-		else
+		if (!AStatus.isEmpty())
+			presence.addElement("status").appendChild(presence.createTextNode(AStatus));
+
+		if (isOnline)
 		{
 			if (!showText.isEmpty())
 				presence.addElement("show").appendChild(presence.createTextNode(showText));
 			presence.addElement("priority").appendChild(presence.createTextNode(QString::number(APriority)));
 		}
-
-		if (!AStatus.isEmpty())
-			presence.addElement("status").appendChild(presence.createTextNode(AStatus));
-
-		if (!isConnected() && isOnline)
+		else
 		{
-			LOG_STRM_DEBUG(FStreamJid,QString("Conference about to connect, room=%1").arg(FRoomJid.bare()));
+			presence.setType("unavailable");
+		}
 
+		if (FState==IMultiUserChat::Closed && isOnline)
+		{
 			FRoomError = XmppError::null;
-			emit chatAboutToConnect();
 
 			QDomElement xelem = presence.addElement("x",NS_MUC);
 			if (FHistory.empty || FHistory.maxChars>0 || FHistory.maxStanzas>0 || FHistory.seconds>0 || FHistory.since.isValid())
@@ -508,21 +524,33 @@ bool MultiUserChat::sendPresence(int AShow, const QString &AStatus, int APriorit
 					onDiscoveryInfoReceived(FDiscovery->discoInfo(streamJid(),roomJid()));
 			}
 		}
-		else if (isConnected() && !isOnline)
-		{
-			LOG_STRM_DEBUG(FStreamJid,QString("Conference about to disconnect, room=%1").arg(FRoomJid.bare()));
-			emit chatAboutToDisconnect();
-		}
 
-		if (FStanzaProcessor->sendStanzaOut(FStreamJid,presence))
+		if (FState==IMultiUserChat::Closed && !isOnline)
 		{
-			LOG_STRM_INFO(FStreamJid,QString("Presence sent to conference, show=%1, room=%2").arg(AShow).arg(FRoomJid.bare()));
-			FConnected = isOnline;
-			return true;
+			// Do not send offline presences if room is already closed
+		}
+		else if (FState==IMultiUserChat::Opening && isOnline)
+		{
+			LOG_STRM_WARNING(FStreamJid,QString("Failed to send presence to conference, show=%1, room=%2: Room is in opening state").arg(AShow).arg(FRoomJid.bare()));
+		}
+		else if (FState == IMultiUserChat::Closing)
+		{
+			LOG_STRM_WARNING(FStreamJid,QString("Failed to send presence to conference, show=%1, room=%2: Room is in closing state").arg(AShow).arg(FRoomJid.bare()));
+		}
+		else if (!FStanzaProcessor->sendStanzaOut(FStreamJid,presence))
+		{
+			LOG_STRM_WARNING(FStreamJid,QString("Failed to send presence to conference, show=%1, room=%2").arg(AShow).arg(FRoomJid.bare()));
 		}
 		else
 		{
-			LOG_STRM_WARNING(FStreamJid,QString("Failed to send presence to conference, show=%1, room=%2").arg(AShow).arg(FRoomJid.bare()));
+			LOG_STRM_INFO(FStreamJid,QString("Presence sent to conference, show=%1, room=%2").arg(AShow).arg(FRoomJid.bare()));
+
+			if (FState==IMultiUserChat::Closed && isOnline)
+				setState(IMultiUserChat::Opening);
+			else if (FState==IMultiUserChat::Opened && !isOnline)
+				setState(IMultiUserChat::Closing);
+
+			return true;
 		}
 	}
 	else
@@ -868,6 +896,27 @@ QString MultiUserChat::destroyRoom(const QString &AReason)
 	return false;
 }
 
+void MultiUserChat::setState(ChatState AState)
+{
+	if (FState != AState)
+	{
+		LOG_STRM_INFO(FStreamJid,QString("Conference state changed from=%1 to=%2, room=%3").arg(FState).arg(AState).arg(FRoomJid.bare()));
+		FState = AState;
+
+		if (FState == IMultiUserChat::Opened)
+		{
+			if (FResendPresence)
+				sendStreamPresence();
+		}
+		else if (FState == IMultiUserChat::Closed)
+		{
+			FResendPresence = false;
+		}
+
+		emit stateChanged(AState);
+	}
+}
+
 bool MultiUserChat::processMessage(const Stanza &AStanza)
 {
 	bool hooked = false;
@@ -982,18 +1031,21 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 				emit userChanged(user,MUDR_PRESENCE,QVariant());
 			}
 
-			if (!isOpen() && (fromNick==FNickName || FStatusCodes.contains(MUC_SC_SELF_PRESENCE)))
+			if (FState == IMultiUserChat::Opening)
 			{
-				FMainUser = user;
-
-				if (FNickName != fromNick)
+				if (fromNick == FNickName)
+				{
+					FMainUser = user;
+					setState(IMultiUserChat::Opened);
+				}
+				else if (FStatusCodes.contains(MUC_SC_SELF_PRESENCE))
 				{
 					LOG_STRM_WARNING(FStreamJid,QString("Main user nick was changed by server, from=%1, to=%2, room=%3").arg(FNickName,fromNick,FRoomJid.bare()));
 					FNickName = fromNick;
-				}
 
-				LOG_STRM_INFO(FStreamJid,QString("Received initial conference presence, nick=%1, role=%2, affiliation=%3, room=%4").arg(fromNick,role,affiliation,FRoomJid.bare()));
-				emit chatOpened();
+					FMainUser = user;
+					setState(IMultiUserChat::Opened);
+				}
 			}
 
 			if (user == FMainUser)
@@ -1069,19 +1121,14 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 			if (applyPresence)
 			{
 				LOG_STRM_DEBUG(FStreamJid,QString("User has left the conference, nick=%1, show=%2, status=%3, room=%4").arg(fromNick).arg(presence.show).arg(presence.status).arg(FRoomJid.bare()));
-
-				user->setRole(role);
-				user->setAffiliation(affiliation);
-				user->setPresence(presence);
-
 				if (user != FMainUser)
 				{
-					FUsers.remove(fromNick);
-					delete user;
+					user->setPresence(presence);
+					delete FUsers.take(fromNick);
 				}
 				else
 				{
-					closeChat(presence);
+					closeRoom(presence);
 				}
 			}
 
@@ -1090,50 +1137,58 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 	}
 	else if (AStanza.type() == "error")
 	{
-		XmppStanzaError err(AStanza);
-		LOG_STRM_WARNING(FStreamJid,QString("Error presence received in conference, nick=%1, room=%2: %3").arg(fromNick,FRoomJid.bare(),err.condition()));
-
-		if (fromNick == FNickName)
+		MultiUser *user = FUsers.value(fromNick);
+		if (user)
 		{
-			FRoomError = err;
+			XmppStanzaError err(AStanza);
+			LOG_STRM_DEBUG(FStreamJid,QString("User has left the conference due to error, nick=%1, room=%2: %3").arg(fromNick,FRoomJid.bare(),err.errorMessage()));
 
 			IPresenceItem presence;
 			presence.itemJid = fromJid;
 			presence.show = IPresence::Error;
 			presence.status = err.errorMessage();
 
-			closeChat(presence);
-		}
+			if (user != FMainUser)
+			{
+				user->setPresence(presence);
+				delete FUsers.take(fromNick);
+			}
+			else
+			{
+				FRoomError = err;
+				closeRoom(presence);
+			}
 
-		accepted = true;
+			accepted = true;
+		}
 	}
 
 	FStatusCodes.clear();
 	return accepted;
 }
 
-void MultiUserChat::closeChat(const IPresenceItem &APresence)
+void MultiUserChat::closeRoom(const IPresenceItem &APresence)
 {
-	FConnected = false;
-	LOG_STRM_INFO(FStreamJid,QString("Closing conference, room=%1").arg(FRoomJid.bare()));
-
-	if (isOpen())
+	if (FState != IMultiUserChat::Closed)
 	{
-		FMainUser->setPresence(APresence);
-		delete FMainUser;
+		if (FMainUser != NULL)
+		{
+			FMainUser->setPresence(APresence);
+			delete FMainUser;
+			FMainUser = NULL;
+		}
+		FUsers.remove(FNickName);
+
+		foreach(MultiUser *user, FUsers)
+			user->setPresence(IPresenceItem());
+		qDeleteAll(FUsers);
+		FUsers.clear();
+
+		FRoomPresence = APresence;
+		emit presenceChanged(FRoomPresence);
+
+		setState(IMultiUserChat::Closed);
 	}
-	FMainUser = NULL;
-	FUsers.remove(FNickName);
-
-	foreach(MultiUser *user, FUsers)
-		user->setPresence(IPresenceItem());
-	qDeleteAll(FUsers);
-	FUsers.clear();
-
-	FRoomPresence = APresence;
-	emit presenceChanged(FRoomPresence);
-
-	emit chatClosed();
 }
 
 void MultiUserChat::onUserChanged(int AData, const QVariant &ABefore)
@@ -1161,10 +1216,7 @@ void MultiUserChat::onDiscoveryInfoReceived(const IDiscoInfo &AInfo)
 void MultiUserChat::onXmppStreamClosed(IXmppStream *AXmppStream)
 {
 	if (AXmppStream->streamJid() == FStreamJid)
-	{
-		if (!FUsers.isEmpty())
-			closeChat(IPresenceItem());
-	}
+		abortConnection(AXmppStream->error().errorMessage(),!AXmppStream->error().isNull());
 }
 
 void MultiUserChat::onXmppStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore)
@@ -1178,9 +1230,11 @@ void MultiUserChat::onXmppStreamJidChanged(IXmppStream *AXmppStream, const Jid &
 
 void MultiUserChat::onPresenceChanged(IPresence *APresence, int AShow, const QString &AStatus, int APriority)
 {
-	if (APresence->streamJid() == FStreamJid) 
+	if (FAutoPresence && APresence->streamJid()==FStreamJid)
 	{
-		if (FAutoPresence)
+		if (FState==IMultiUserChat::Opening && AShow!=IPresence::Offline)
+			FResendPresence = true;
+		else if (AShow != IPresence::Error)
 			sendPresence(AShow,AStatus,APriority);
 	}
 }

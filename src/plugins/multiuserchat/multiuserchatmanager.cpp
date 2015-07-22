@@ -97,7 +97,7 @@ bool MultiUserChatManager::initConnections(IPluginManager *APluginManager, int &
 		FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
 		if (FMessageProcessor)
 		{
-			connect(FMessageProcessor->instance(),SIGNAL(activeStreamRemoved(const Jid &)),SLOT(onActiveStreamRemoved(const Jid &)));
+			connect(FMessageProcessor->instance(),SIGNAL(activeStreamRemoved(const Jid &)),SLOT(onActiveXmppStreamRemoved(const Jid &)));
 		}
 	}
 
@@ -377,7 +377,7 @@ bool MultiUserChatManager::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AI
 			}
 			else
 			{
-				if (!window->multiUserChat()->isConnected() && window->multiUserChat()->roomError().isNull())
+				if (window->multiUserChat()->state()==IMultiUserChat::Closed && window->multiUserChat()->roomError().isNull())
 					window->multiUserChat()->sendStreamPresence();
 				window->showTabPage();
 			}
@@ -1191,10 +1191,11 @@ void MultiUserChatManager::onEnterRoomActionTriggered(bool)
 		QStringList roomJid = action->data(ADR_ROOM).toStringList();
 		QStringList nick = action->data(ADR_NICK).toStringList();
 		QStringList password = action->data(ADR_PASSWORD).toStringList();
+
 		for (int i=0; i<streamJid.count(); i++)
 		{
 			IMultiUserChatWindow *window = getMultiChatWindow(streamJid.at(i),roomJid.at(i),nick.at(i),password.at(i));
-			if (window && !window->multiUserChat()->isConnected())
+			if (window!=NULL && window->multiUserChat()->state()==IMultiUserChat::Closed)
 				window->multiUserChat()->sendStreamPresence();
 		}
 	}
@@ -1232,15 +1233,15 @@ void MultiUserChatManager::onStatusIconsChanged()
 	}
 }
 
-void MultiUserChatManager::onActiveStreamRemoved(const Jid &AStreamJid)
+void MultiUserChatManager::onActiveXmppStreamRemoved(const Jid &AStreamJid)
 {
 	foreach(IMultiUserChatWindow *window, FChatWindows)
 		if (window->streamJid() == AStreamJid)
-			window->exitAndDestroy(QString::null,0);
+			delete window->instance();
 
-	foreach(QMessageBox * inviteDialog, FInviteDialogs.keys())
+	foreach(QMessageBox *inviteDialog, FInviteDialogs.keys())
 		if (FInviteDialogs.value(inviteDialog).streamJid == AStreamJid)
-			inviteDialog->done(QMessageBox::Ignore);
+			inviteDialog->reject();
 
 	foreach(int messageId, FActiveInvites.keys())
 	{
@@ -1273,7 +1274,7 @@ void MultiUserChatManager::onShortcutActivated(const QString &AId, QWidget *AWid
 			IMultiUserChatWindow *window = getMultiChatWindowForIndex(indexes.first());
 			if (window)
 			{
-				if (!window->multiUserChat()->isConnected() && window->multiUserChat()->roomError().isNull())
+				if (window->multiUserChat()->state()==IMultiUserChat::Closed && window->multiUserChat()->roomError().isNull())
 					window->multiUserChat()->sendStreamPresence();
 				window->showTabPage();
 			}
@@ -1584,7 +1585,7 @@ void MultiUserChatManager::onRostersViewIndexContextMenu(const QList<IRosterInde
 				connect(open,SIGNAL(triggered(bool)),SLOT(onOpenRoomActionTriggered(bool)));
 				AMenu->addAction(open,AG_RVCM_MULTIUSERCHAT_OPEN);
 
-				if (!window->multiUserChat()->isConnected())
+				if (window->multiUserChat()->state() == IMultiUserChat::Closed)
 				{
 					Action *enter = new Action(AMenu);
 					enter->setText(tr("Enter"));

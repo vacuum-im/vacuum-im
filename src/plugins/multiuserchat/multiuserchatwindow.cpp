@@ -90,9 +90,7 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatManager *AMultiChatManage
 
 	FMultiChat = AMultiChat;
 	FMultiChat->instance()->setParent(this);
-	connect(FMultiChat->instance(),SIGNAL(chatOpened()),SLOT(onMultiChatOpened()));
-	connect(FMultiChat->instance(),SIGNAL(chatClosed()),SLOT(onMultiChatClosed()));
-	connect(FMultiChat->instance(),SIGNAL(chatAboutToConnect()),SLOT(onMultiChatAboutToConnect()));
+	connect(FMultiChat->instance(),SIGNAL(stateChanged(int)),SLOT(onMultiChatStateChanged(int)));
 	connect(FMultiChat->instance(),SIGNAL(roomNameChanged(const QString &)),SLOT(onMultiChatRoomNameChanged(const QString &)));
 	connect(FMultiChat->instance(),SIGNAL(requestFailed(const QString &, const XmppError &)),SLOT(onMultiChatRequestFailed(const QString &, const XmppError &)));
 	connect(FMultiChat->instance(),SIGNAL(presenceChanged(const IPresenceItem &)),SLOT(onMultiChatPresenceChanged(const IPresenceItem &)));
@@ -141,6 +139,8 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatManager *AMultiChatManage
 
 MultiUserChatWindow::~MultiUserChatWindow()
 {
+	FMultiChat->abortConnection(QString::null,false);
+
 	QList<IMessageChatWindow *> chatWindows = FPrivateChatWindows;
 	foreach(IMessageChatWindow *window,chatWindows)
 		delete window->instance();
@@ -994,20 +994,18 @@ void MultiUserChatWindow::toolTipsForUser(IMultiUser *AUser, QMap<int,QString> &
 void MultiUserChatWindow::exitAndDestroy(const QString &AStatus, int AWaitClose)
 {
 	closeTabPage();
-
-	bool waitClose = false;
 	FDestroyOnChatClosed = true;
 
-	if (FMultiChat->isConnected())
+	if (FMultiChat->state() != IMultiUserChat::Closed)
 	{
-		waitClose = true;
 		FMultiChat->sendPresence(IPresence::Offline,AStatus,0);
+		showMultiChatStatusMessage(tr("Leaving conference..."),IMessageStyleContentOptions::TypeNotification,IMessageStyleContentOptions::StatusOffline);
+		QTimer::singleShot(AWaitClose, this, SLOT(deleteLater()));
 	}
-
-	if (AWaitClose > 0)
-		QTimer::singleShot(waitClose ? AWaitClose : 0, this, SLOT(deleteLater()));
 	else
-		delete this;
+	{
+		deleteLater();
+	}
 }
 
 void MultiUserChatWindow::initialize()
@@ -1967,78 +1965,77 @@ bool MultiUserChatWindow::eventFilter(QObject *AObject, QEvent *AEvent)
 	return QMainWindow::eventFilter(AObject,AEvent);
 }
 
-void MultiUserChatWindow::onMultiChatOpened()
+void MultiUserChatWindow::onMultiChatStateChanged(int AState)
 {
-	if (FStanzaProcessor)
+	QAction *enterHandler = FToolBarWidget->toolBarChanger()->actionHandle(FEnterRoom);
+	if (enterHandler)
+		enterHandler->setVisible(AState == IMultiUserChat::Closed);
+
+	if (AState == IMultiUserChat::Opened)
 	{
-		IStanzaHandle shandle;
-		shandle.handler = this;
-		shandle.order = qMin(SHO_MI_MULTIUSERCHAT,SHO_PI_MULTIUSERCHAT)-1;
-		shandle.direction = IStanzaHandle::DirectionIn;
-		shandle.streamJid = FMultiChat->streamJid();
-		shandle.conditions.append("/iq");
-		shandle.conditions.append("/message");
-		shandle.conditions.append("/presence");
-		FSHIAnyStanza = FStanzaProcessor->insertStanzaHandle(shandle);
-	}
-
-	if (FMultiChat->statusCodes().contains(MUC_SC_ROOM_CREATED))
-		FLoadConfigRequestId = FMultiChat->loadRoomConfig();
-
-	showMultiChatStatusMessage(tr("You have joined the conference"),IMessageStyleContentOptions::TypeEvent,IMessageStyleContentOptions::StatusOnline);
-
-	if (FMultiChat->mainUser()->role() == MUC_ROLE_VISITOR)
-	{
-		QUrl url;
-		url.setScheme(MUC_URL_SCHEME);
-		url.setPath(FMultiChat->mainUser()->userJid().full());
-		url.setFragment(MUC_URL_REQUESTVOICE);
-
-		QString html = tr("You have no voice in this conference, %1").arg(QString("<a href='%1'>%2</a>").arg(url.toString(),tr("Request Voice")));
-		showHTMLStatusMessage(FViewWidget,html,IMessageStyleContentOptions::TypeNotification);
-	}
-}
-
-void MultiUserChatWindow::onMultiChatClosed()
-{
-	if (FStanzaProcessor)
-	{
-		FStanzaProcessor->removeStanzaHandle(FSHIAnyStanza);
-		FSHIAnyStanza = -1;
-	}
-
-	if (!FDestroyOnChatClosed)
-	{
-		bool isConflictError = FMultiChat->roomError().toStanzaError().conditionCode()==XmppStanzaError::EC_CONFLICT;
-		if (FMultiChat->roomPresence().show==IPresence::Error && isConflictError && !FMultiChat->nickName().endsWith("/"+FMultiChat->streamJid().resource()))
+		if (FStanzaProcessor)
 		{
-			LOG_STRM_INFO(streamJid(),QString("Adding resource to nick due it has been registered by some one else, room=%1, nick=%2").arg(contactJid().bare(),FMultiChat->nickName()));
-			FMultiChat->setNickName(FMultiChat->nickName()+"/"+FMultiChat->streamJid().resource());
-			FEnterRoom->trigger();
+			IStanzaHandle shandle;
+			shandle.handler = this;
+			shandle.order = qMin(SHO_MI_MULTIUSERCHAT,SHO_PI_MULTIUSERCHAT)-1;
+			shandle.direction = IStanzaHandle::DirectionIn;
+			shandle.streamJid = FMultiChat->streamJid();
+			shandle.conditions.append("/iq");
+			shandle.conditions.append("/message");
+			shandle.conditions.append("/presence");
+			FSHIAnyStanza = FStanzaProcessor->insertStanzaHandle(shandle);
+		}
+
+		showMultiChatStatusMessage(tr("You have joined the conference"),IMessageStyleContentOptions::TypeEvent,IMessageStyleContentOptions::StatusOnline);
+
+		if (FMultiChat->mainUser()->role() == MUC_ROLE_VISITOR)
+		{
+			QUrl url;
+			url.setScheme(MUC_URL_SCHEME);
+			url.setPath(FMultiChat->mainUser()->userJid().full());
+			url.setFragment(MUC_URL_REQUESTVOICE);
+
+			QString html = tr("You have no voice in this conference, %1").arg(QString("<a href='%1'>%2</a>").arg(url.toString(),tr("Request Voice")));
+			showHTMLStatusMessage(FViewWidget,html,IMessageStyleContentOptions::TypeNotification);
+		}
+		else if (FMultiChat->statusCodes().contains(MUC_SC_ROOM_CREATED))
+		{
+			FLoadConfigRequestId = FMultiChat->loadRoomConfig();
+		}
+	}
+	else if (AState == IMultiUserChat::Closed)
+	{
+		if (FStanzaProcessor)
+		{
+			FStanzaProcessor->removeStanzaHandle(FSHIAnyStanza);
+			FSHIAnyStanza = -1;
+		}
+
+		if (!FDestroyOnChatClosed)
+		{
+			if (FMultiChat->roomPresence().show == IPresence::Error)
+				showMultiChatStatusMessage(tr("You have left the conference due to error: %1").arg(FMultiChat->roomPresence().status),IMessageStyleContentOptions::TypeEvent,IMessageStyleContentOptions::StatusError);
+			else
+				showMultiChatStatusMessage(tr("You have left the conference"),IMessageStyleContentOptions::TypeEvent,IMessageStyleContentOptions::StatusOffline);
+			updateMultiChatWindow();
 		}
 		else
 		{
-			showMultiChatStatusMessage(tr("You have left the conference"),IMessageStyleContentOptions::TypeEvent,IMessageStyleContentOptions::StatusOffline);
+			deleteLater();
 		}
-		updateMultiChatWindow();
 	}
-	else
+	else if (AState == IMultiUserChat::Opening)
 	{
-		deleteLater();
+		IMultiUserChatHistory history;
+		if (FLastStanzaTime.isValid())
+		{
+			if (FLastAffiliation != MUC_AFFIL_NONE)
+				history.seconds = FLastStanzaTime.secsTo(QDateTime::currentDateTime());
+			else
+				history.since = FLastStanzaTime; // Time lost is possible if CAPTCHA enabled
+		}
+		FMultiChat->setHistoryScope(history);
 	}
-}
-
-void MultiUserChatWindow::onMultiChatAboutToConnect()
-{
-	IMultiUserChatHistory history;
-	if (FLastStanzaTime.isValid())
-	{
-		if (FLastAffiliation != MUC_AFFIL_NONE)
-			history.seconds = FLastStanzaTime.secsTo(QDateTime::currentDateTime());
-		else
-			history.since = FLastStanzaTime; // Time lost is possible if CAPTCHA enabled
-	}
-	FMultiChat->setHistoryScope(history);
 }
 
 void MultiUserChatWindow::onMultiChatRoomNameChanged(const QString &AName)
@@ -2063,12 +2060,7 @@ void MultiUserChatWindow::onMultiChatRequestFailed(const QString &AId, const Xmp
 
 void MultiUserChatWindow::onMultiChatPresenceChanged(const IPresenceItem &APresence)
 {
-	QAction *enterHandler = FToolBarWidget->toolBarChanger()->actionHandle(FEnterRoom);
-	if (enterHandler)
-		enterHandler->setVisible(!FMultiChat->isOpen());
-	
-	if (APresence.show == IPresence::Error)
-		showMultiChatStatusMessage(tr("Failed to join to the conference: %1").arg(APresence.status),IMessageStyleContentOptions::TypeNotification,IMessageStyleContentOptions::StatusError);
+	Q_UNUSED(APresence);
 
 	if (FMultiChat->mainUser() != NULL)
 		FLastAffiliation = FMultiChat->mainUser()->affiliation();
@@ -2266,7 +2258,7 @@ void MultiUserChatWindow::onMultiChatRoomConfigLoaded(const QString &AId, const 
 
 		IDataDialogWidget *dialog = FDataForms->dialogWidget(localizedForm,this);
 		connect(dialog->instance(),SIGNAL(accepted()),SLOT(onRoomConfigFormDialogAccepted()));
-		connect(FMultiChat->instance(),SIGNAL(chatClosed()),dialog->instance(),SLOT(reject()));
+		connect(FMultiChat->instance(),SIGNAL(stateChanged(int)),dialog->instance(),SLOT(reject()));
 		dialog->instance()->show();
 	}
 }
@@ -2701,7 +2693,7 @@ void MultiUserChatWindow::onStatusIconsChanged()
 
 void MultiUserChatWindow::onAutoRejoinAfterKick()
 {
-	FMultiChat->sendStreamPresence();
+	FEnterRoom->trigger();
 }
 
 void MultiUserChatWindow::onRoomConfigFormDialogAccepted()

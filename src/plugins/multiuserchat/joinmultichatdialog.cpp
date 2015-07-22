@@ -130,8 +130,8 @@ void JoinMultiChatDialog::onDialogAccepted()
 		IMultiUserChatWindow *chatWindow = FMultiChatManager->getMultiChatWindow(FStreamJid,roomJid,nick,password);
 		if (chatWindow)
 		{
-			chatWindow->showTabPage();
 			chatWindow->multiUserChat()->sendStreamPresence();
+			chatWindow->showTabPage();
 		}
 
 		RoomParams &params = FRecentRooms[roomJid];

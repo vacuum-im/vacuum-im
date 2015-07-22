@@ -97,7 +97,7 @@ public:
 	virtual void contextMenuForRoom(Menu *AMenu);
 	virtual void contextMenuForUser(IMultiUser *AUser, Menu *AMenu);
 	virtual void toolTipsForUser(IMultiUser *AUser, QMap<int,QString> &AToolTips);
-	virtual void exitAndDestroy(const QString &AStatus, int AWaitClose = 15000);
+	virtual void exitAndDestroy(const QString &AStatus, int AWaitClose = 5000);
 signals:
 	//ITabWindowPage
 	void tabPageAssign();
@@ -158,9 +158,7 @@ protected:
 	void closeEvent(QCloseEvent *AEvent);
 	bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:
-	void onMultiChatOpened();
-	void onMultiChatClosed();
-	void onMultiChatAboutToConnect();
+	void onMultiChatStateChanged(int AState);
 	//Common
 	void onMultiChatRoomNameChanged(const QString &AName);
 	void onMultiChatRequestFailed(const QString &AId, const XmppError &AError);
@@ -230,7 +228,6 @@ private:
 	IDataForms *FDataForms;
 	IStatusIcons *FStatusIcons;
 	IStatusChanger *FStatusChanger;
-	IMultiUserChat *FMultiChat;
 	IMessageWidgets *FMessageWidgets;
 	IRecentContacts *FRecentContacts;
 	IStanzaProcessor *FStanzaProcessor;
@@ -273,6 +270,7 @@ private:
 	QList<QString> FCompleteNicks;
 	QList<QString>::const_iterator FCompleteIt;
 private:
+	IMultiUserChat *FMultiChat;
 	IMultiUserView *FUsersView;
 	QHash<IMultiUser *, UserStatus> FUsers;
 private:

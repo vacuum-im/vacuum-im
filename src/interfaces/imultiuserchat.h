@@ -123,14 +123,21 @@ protected:
 class IMultiUserChat
 {
 public:
+	enum ChatState {
+		Closed,
+		Opening,
+		Opened,
+		Closing
+	};
+public:
 	virtual QObject *instance() = 0;
-	virtual bool isIsolated() const =0;
 	virtual Jid streamJid() const =0;
 	virtual Jid roomJid() const =0;
 	virtual QString roomName() const =0;
 	virtual QString roomShortName() const =0;
+	virtual int state() const =0;
 	virtual bool isOpen() const =0;
-	virtual bool isConnected() const =0;
+	virtual bool isIsolated() const =0;
 	virtual bool autoPresence() const =0;
 	virtual void setAutoPresence(bool AAuto) =0;
 	virtual QList<int> statusCodes() const =0;
@@ -141,6 +148,7 @@ public:
 	virtual QList<IMultiUser *> allUsers() const =0;
 	virtual IMultiUser *findUser(const QString &ANick) const =0;
 	virtual bool isUserPresent(const Jid &AContactJid) const =0;
+	virtual void abortConnection(const QString &AStatus, bool AError=true) =0;
 	// Occupant
 	virtual QString nickName() const =0;
 	virtual bool setNickName(const QString &ANick) =0;
@@ -167,10 +175,7 @@ public:
 	virtual QString updateRoomConfig(const IDataForm &AForm) =0;
 	virtual QString destroyRoom(const QString &AReason) =0;
 protected:
-	virtual void chatOpened() =0;
-	virtual void chatClosed() =0;
-	virtual void chatAboutToConnect() =0;
-	virtual void chatAboutToDisconnect() =0;
+	virtual void stateChanged(int AState) =0;
 	virtual void chatDestroyed() =0;
 	// Common
 	virtual void roomNameChanged(const QString &AName) =0;
@@ -261,7 +266,7 @@ public:
 	virtual void contextMenuForRoom(Menu *AMenu) =0;
 	virtual void contextMenuForUser(IMultiUser *AUser, Menu *AMenu) =0;
 	virtual void toolTipsForUser(IMultiUser *AUser, QMap<int,QString> &AToolTips) =0;
-	virtual void exitAndDestroy(const QString &AStatus, int AWaitClose = 15000) =0;
+	virtual void exitAndDestroy(const QString &AStatus, int AWaitClose = 5000) =0;
 protected:
 	virtual void multiChatContextMenu(Menu *AMenu) =0;
 	virtual void multiUserContextMenu(IMultiUser *AUser, Menu *AMenu) =0;
