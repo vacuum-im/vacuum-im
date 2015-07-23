@@ -88,7 +88,7 @@
     </message>
     <message>
         <source>Consider all single contacts messages as read when read the first</source>
-        <translation type="unfinished"/>
+        <translation>Considerar todos los mensajes individuales de contactos como leídos al leer el primero</translation>
     </message>
 </context>
 </TS>

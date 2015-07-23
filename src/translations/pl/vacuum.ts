@@ -2,15 +2,7 @@
 <context>
     <name>AboutBox</name>
     <message>
-        <source>Version: %1 %2 of %3</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <source>Revision: %1</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <source>Version: %1 %2</source>
+        <source>Version: %1.%2 %3</source>
         <translation type="unfinished"/>
     </message>
 </context>

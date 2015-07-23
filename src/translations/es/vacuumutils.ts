@@ -3,11 +3,11 @@
     <name>PasswordDialog</name>
     <message>
         <source>Enter password:</source>
-        <translation type="unfinished"/>
+        <translation>Escribe la contraseña:</translation>
     </message>
     <message>
         <source>Save password</source>
-        <translation type="unfinished"/>
+        <translation>Guardar contraseña</translation>
     </message>
 </context>
 <context>

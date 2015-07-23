@@ -1,5 +1,3 @@
-#include <QtDebug>
-
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -7,7 +5,7 @@
 #include <QDomDocument>
 #include <QCoreApplication>
 
-void myMessageOutput(QtMsgType type, const char *msg)
+void myMessageHandler(QtMsgType type, const char *msg)
 {
 	switch (type) 
 	{
@@ -28,7 +26,7 @@ void myMessageOutput(QtMsgType type, const char *msg)
 
 int main(int argc, char *argv[])
 {
-	qInstallMsgHandler(myMessageOutput);
+	qInstallMsgHandler(myMessageHandler);
 	QCoreApplication app(argc, argv);
 
 	if (argc != 3)
