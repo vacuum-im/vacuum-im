@@ -1,2 +1,2 @@
 TEMPLATE          = subdirs
-SUBDIRS           = autotranslate
+SUBDIRS           = autotranslate txprepare

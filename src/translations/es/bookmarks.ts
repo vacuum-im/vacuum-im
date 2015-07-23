@@ -39,15 +39,15 @@
     </message>
     <message>
         <source>Conferences</source>
-        <translation type="unfinished"/>
+        <translation>Salas</translation>
     </message>
     <message>
         <source>Disable auto join to conferences on this computer</source>
-        <translation type="unfinished"/>
+        <translation>Inhabilitar entrada automática a salas desde este equipo</translation>
     </message>
     <message>
         <source>Show windows of auto joined conferences at startup</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar las ventanas de las salas conectadas accedidas automáticamente al iniciar</translation>
     </message>
 </context>
 <context>

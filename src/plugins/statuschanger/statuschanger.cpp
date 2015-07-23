@@ -904,16 +904,30 @@ void StatusChanger::removeConnectingLabel(IPresence *APresence)
 
 void StatusChanger::autoReconnect(IPresence *APresence)
 {
-	IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(APresence->streamJid()) : NULL;
-	if (account && account->optionsNode().value("auto-reconnect").toBool())
+	static const QList<int> stopStreamErrors = QList<int>() 
+		<< XmppStreamError::EC_CONFLICT << XmppStreamError::EC_NOT_AUTHORIZED;
+	static const QList<int> stopSaslErrors = QList<int>() 
+		<< XmppSaslError::EC_NOT_AUTHORIZED << XmppSaslError::EC_INVALID_AUTHZID;
+	static const QList<int> stopStanzaErrors = QList<int>() 
+		<< XmppStanzaError::EC_NOT_AUTHORIZED;
+
+	bool stopReconnect = stopStreamErrors.contains(APresence->xmppStream()->error().toStreamError().conditionCode());
+	stopReconnect = stopReconnect || stopSaslErrors.contains(APresence->xmppStream()->error().toSaslError().conditionCode());
+	stopReconnect = stopReconnect || stopStanzaErrors.contains(APresence->xmppStream()->error().toStanzaError().conditionCode());
+
+	if (!stopReconnect)
 	{
-		int statusId = FLastOnlineStatus.value(APresence, STATUS_MAIN_ID);
-		int statusShow = statusItemShow(statusId);
-		if (statusShow!=IPresence::Offline && statusShow!=IPresence::Error)
+		IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(APresence->streamJid()) : NULL;
+		if (account && account->optionsNode().value("auto-reconnect").toBool())
 		{
-			int reconSecs = FFastReconnect.contains(APresence) ? 1 : 30;
-			FPendingReconnect.insert(APresence,QPair<QDateTime,int>(QDateTime::currentDateTime().addSecs(reconSecs),statusId));
-			QTimer::singleShot(reconSecs*1000+100,this,SLOT(onReconnectTimer()));
+			int statusId = FLastOnlineStatus.value(APresence, STATUS_MAIN_ID);
+			int statusShow = statusItemShow(statusId);
+			if (statusShow!=IPresence::Offline && statusShow!=IPresence::Error)
+			{
+				int reconSecs = FFastReconnect.contains(APresence) ? 1 : 30;
+				FPendingReconnect.insert(APresence,QPair<QDateTime,int>(QDateTime::currentDateTime().addSecs(reconSecs),statusId));
+				QTimer::singleShot(reconSecs*1000+100,this,SLOT(onReconnectTimer()));
+			}
 		}
 	}
 }
