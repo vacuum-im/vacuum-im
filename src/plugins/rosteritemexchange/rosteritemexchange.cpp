@@ -807,7 +807,7 @@ void RosterItemExchange::onSendExchangeRequestByAction()
 		}
 
 		if (!sendExchangeRequest(request,false).isEmpty())
-			notifyInChatWindow(request.streamJid,request.contactJid,tr("%n contact(s) have been sent","",request.items.count()));
+			notifyInChatWindow(request.streamJid,request.contactJid,tr("%n contact(s) sent","",request.items.count()));
 		else
 			notifyInChatWindow(request.streamJid,request.contactJid,tr("Failed to send %n contact(s)","",request.items.count()));
 	}

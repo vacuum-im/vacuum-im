@@ -260,7 +260,7 @@ void SetupPluginsDialog::onCurrentPluginChanged(const QModelIndex &ACurrent, con
 			pluginItem->setData(dependsFailed,PDR_DEPENDS_FAILED);
 
 			if (!dependsFailed.isEmpty())
-				ui.lblDependsFor->setText(QString("<a href='depend-failed'>%1</a>").arg(tr("Not found %n dependences.","",dependsFailed.count())));
+				ui.lblDependsFor->setText(QString("<a href='depend-failed'>%1</a>").arg(tr("%n dependency(ies) not found.","",dependsFailed.count())));
 			else
 				ui.lblDependsFor->setText(QString::null);
 			ui.lblDependsOn->setText(QString::null);
