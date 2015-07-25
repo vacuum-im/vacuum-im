@@ -128,7 +128,7 @@
     </message>
     <message>
         <source>Message Style - %1 - %2</source>
-        <translation>Стить сообщения - %1 - %2</translation>
+        <translation>Стиль сообщения - %1 - %2</translation>
     </message>
     <message>
         <source>Receiver</source>
