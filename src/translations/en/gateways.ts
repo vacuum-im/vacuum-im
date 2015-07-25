@@ -81,22 +81,6 @@
    <source>Logout from transport</source>
    <translation>Logout from transport</translation>
   </message>
-  <message numerus="yes">
-   <source>You are assured that wish to remove a transport '&lt;b>%1&lt;/b>' and its &lt;b>%n contacts&lt;/b> from roster?</source>
-   <translation>
-    <numerusform>You are assured that wish to remove a transport '&lt;b>%1&lt;/b>' and its &lt;b>%n contacts&lt;/b> from roster?</numerusform>
-    <numerusform>You are assured that wish to remove a transport '&lt;b>%1&lt;/b>' and its &lt;b>%n contacts&lt;/b> from roster?</numerusform>
-    <numerusform>You are assured that wish to remove a transport '&lt;b>%1&lt;/b>' and its &lt;b>%n contacts&lt;/b> from roster?</numerusform>
-   </translation>
-  </message>
-  <message numerus="yes">
-   <source>You are assured that wish to remove &lt;b>%n transports&lt;/b> and their contacts from roster?</source>
-   <translation>
-    <numerusform>You are assured that wish to remove &lt;b>%n transports&lt;/b> and their contacts from roster?</numerusform>
-    <numerusform>You are assured that wish to remove &lt;b>%n transports&lt;/b> and their contacts from roster?</numerusform>
-    <numerusform>You are assured that wish to remove &lt;b>%n transports&lt;/b> and their contacts from roster?</numerusform>
-   </translation>
-  </message>
   <message>
    <source>Remove transport and its contacts</source>
    <translation>Remove transport and its contacts</translation>
@@ -104,6 +88,22 @@
   <message>
    <source>Remove transports and their contacts</source>
    <translation>Remove transports and their contacts</translation>
+  </message>
+  <message numerus="yes">
+   <source>Are you sure you wish to remove transport '&lt;b>%1&lt;/b>' and its &lt;b>%n contact(s)&lt;/b> from the roster?</source>
+   <translation>
+    <numerusform>Are you sure you wish to remove transport '&lt;b>%1&lt;/b>' and its &lt;b>%n contact(s)&lt;/b> from the roster?</numerusform>
+    <numerusform>Are you sure you wish to remove transport '&lt;b>%1&lt;/b>' and its &lt;b>%n contact(s)&lt;/b> from the roster?</numerusform>
+    <numerusform>Are you sure you wish to remove transport '&lt;b>%1&lt;/b>' and its &lt;b>%n contact(s)&lt;/b> from the roster?</numerusform>
+   </translation>
+  </message>
+  <message numerus="yes">
+   <source>Are you sure you wish to remove &lt;b>%n transport(s)&lt;/b> and their contacts from the roster?</source>
+   <translation>
+    <numerusform>Are you sure you wish to remove &lt;b>%n transport(s)&lt;/b> and their contacts from the roster?</numerusform>
+    <numerusform>Are you sure you wish to remove &lt;b>%n transport(s)&lt;/b> and their contacts from the roster?</numerusform>
+    <numerusform>Are you sure you wish to remove &lt;b>%n transport(s)&lt;/b> and their contacts from the roster?</numerusform>
+   </translation>
   </message>
  </context>
 </TS>

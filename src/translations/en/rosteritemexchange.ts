@@ -86,14 +86,6 @@
    <translation>%1 offers you to make some changes in your contact list.</translation>
   </message>
   <message numerus="yes">
-   <source>%n contact(s) have been sent</source>
-   <translation>
-    <numerusform>%n contact(s) have been sent</numerusform>
-    <numerusform>%n contact(s) have been sent</numerusform>
-    <numerusform>%n contact(s) have been sent</numerusform>
-   </translation>
-  </message>
-  <message numerus="yes">
    <source>Failed to send %n contact(s)</source>
    <translation>
     <numerusform>Failed to send %n contact(s)</numerusform>
@@ -108,6 +100,14 @@
   <message>
    <source>Allow gateways and group services manage your contacts list</source>
    <translation>Allow gateways and group services manage your contacts list</translation>
+  </message>
+  <message numerus="yes">
+   <source>%n contact(s) sent</source>
+   <translation>
+    <numerusform>%n contact(s) sent</numerusform>
+    <numerusform>%n contact(s) sent</numerusform>
+    <numerusform>%n contact(s) sent</numerusform>
+   </translation>
   </message>
  </context>
 </TS>
