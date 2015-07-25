@@ -454,8 +454,8 @@ bool PluginManager::loadPlugins()
 			QUuid puid = it.key();
 			if (!checkDependences(puid))
 			{
-				LOG_WARNING(QString("Dependences not found for plugin, uuid=%1").arg(puid.toString()));
-				unloadPlugin(puid, tr("Dependences not found"));
+				LOG_WARNING(QString("Dependencies not found for plugin, uuid=%1").arg(puid.toString()));
+				unloadPlugin(puid, tr("Dependencies not found"));
 				it = FPluginItems.constBegin();
 			}
 			else if (!checkConflicts(puid))
