@@ -155,11 +155,10 @@ void CreateAccountWizard::accept()
 	IAccount *account = accountManager!=NULL ? accountManager->createAccount(streamJid,streamJid.uBare()) : NULL;
 	if (account != NULL)
 	{
-		REPORT_EVENT(SEVP_ACCOUNT_CREATED,1);
-
 		bool showSettings = false;
 		if (field(WF_WIZARD_MODE).toInt() == ModeAppend)
 		{
+			REPORT_EVENT(SEVP_ACCOUNT_APPENDED,1);
 			AppendSettingsPage *settingsPage = qobject_cast<AppendSettingsPage *>(page(PageAppendSettings));
 			if (settingsPage != NULL)
 				settingsPage->saveAccountSettings(account);
@@ -167,6 +166,7 @@ void CreateAccountWizard::accept()
 		}
 		else if (field(WF_WIZARD_MODE).toInt() == ModeRegister)
 		{
+			REPORT_EVENT(SEVP_ACCOUNT_REGISTERED,1);
 			RegisterServerPage *serverPage = qobject_cast<RegisterServerPage *>(page(PageRegisterServer));
 			if (serverPage != NULL)
 				serverPage->saveAccountSettings(account);

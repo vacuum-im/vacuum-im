@@ -19,19 +19,18 @@
 #define SEVP_APPLICATION_RESTART                             "application|restart|Application Restart"
 
 #define SEVP_SESSION_STARTED                                 "session|started|Session Started"
-#define SEVP_SESSION_CONTINUED                               "session|continued|Session Continued"
 #define SEVP_SESSION_FINISHED                                "session|finished|Session Finished"
 
+#define SEVP_STATISTICS_SERVERS                              "statistics|servers|Statistics Servers"
+#define SEVP_STATISTICS_METRICS                              "statistics|metrics|Statistics Metrics"
 #define SEVP_STATISTICS_ENABLED                              "statistics|enabled|Statistics Enabled"
 #define SEVP_STATISTICS_DISABLED                             "statistics|disabled|Statistics Disabled"
 
 #define SEVP_FILESTREAM_SUCCESS                              "file-stream|success|File Stream Success"
 #define SEVP_FILESTREAM_FAILURE                              "file-stream|failure|File Stream Failure"
 
-#define SEVP_REGISTRATION_STREAM_BEGIN                       "registration|stream-begin|Registration Stream Begin"
-#define SEVP_REGISTRATION_STREAM_SUCCESS                     "registration|stream-success|Registration Stream Success"
-
-#define SEVP_ACCOUNT_CREATED                                 "account|created|Account Created"
+#define SEVP_ACCOUNT_APPENDED                                "account|appended|Account Appended"
+#define SEVP_ACCOUNT_REGISTERED                              "account|registered|Account Registered"
 
 // Hit-Timing
 #define STMP_APPLICATION_START                               "application|start|Application Start"
