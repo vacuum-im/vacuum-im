@@ -348,7 +348,7 @@ void BirthdayReminder::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabe
 			if (ALabelId == FBirthdayLabelId)
 			{
 				QDate birthday = contactBithday(contactJid);
-				QString tip = tr("%1 marks %n years","",QDate::currentDate().year() - birthday.year()).arg(QDate::currentDate().addDays(daysLeft).toString(Qt::DefaultLocaleLongDate));
+				QString tip = tr("%1 turns %n","",QDate::currentDate().year() - birthday.year()).arg(QDate::currentDate().addDays(daysLeft).toString(Qt::DefaultLocaleLongDate));
 				AToolTips.insert(RTTO_BIRTHDAY_NOTIFY,tip);
 			}
 			QString tip = daysLeft>0 ? tr("Birthday in %n day(s)!","",daysLeft) : tr("Birthday today!");

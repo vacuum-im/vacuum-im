@@ -34,10 +34,6 @@
         <translation>Неверный интерфейс плагина</translation>
     </message>
     <message>
-        <source>Dependences not found</source>
-        <translation>Зависимости не найдены</translation>
-    </message>
-    <message>
         <source>Conflict with plugin %1</source>
         <translation>Конфликт с плагином %1</translation>
     </message>
@@ -65,6 +61,10 @@
         <source>Application shortcuts</source>
         <translation>Горячие клавиши приложения</translation>
     </message>
+    <message>
+        <source>Dependencies not found</source>
+        <translation>Зависимости не найдены</translation>
+    </message>
 </context>
 <context>
     <name>SetupPluginsDialog</name>
@@ -84,20 +84,24 @@
         <source>With errors (%1)</source>
         <translation>С ошибками (%1)</translation>
     </message>
+    <message>
+        <source>This plugin does not depend on other plugins.</source>
+        <translation>Этот плагин не зависит от других плагинов.</translation>
+    </message>
+    <message>
+        <source>Other plugins don&apos;t depend on this plugin.</source>
+        <translation>Другие плагины не зависят от этого плагина.</translation>
+    </message>
     <message numerus="yes">
-        <source>This plugin depends on %n other plugins.</source>
+        <source>This plugin depends on %n other plugin(s).</source>
         <translation>
             <numerusform>Этот плагин зависит от %n другого плагина.</numerusform>
             <numerusform>Этот плагин зависит от %n других плагинов.</numerusform>
             <numerusform>Этот плагин зависит от %n других плагинов.</numerusform>
         </translation>
     </message>
-    <message>
-        <source>This plugin does not depend on other plugins.</source>
-        <translation>Этот плагин не зависит от других плагинов.</translation>
-    </message>
     <message numerus="yes">
-        <source>Other %n plugins depend on this plugin.</source>
+        <source>Other %n plugin(s) depend on this plugin.</source>
         <translation>
             <numerusform>Другой %n плагин зависит от этого плагина.</numerusform>
             <numerusform>Другие %n плагина зависят от этого плагина.</numerusform>
@@ -105,11 +109,11 @@
         </translation>
     </message>
     <message>
-        <source>Other plugins don&apos;t depend on this plugin.</source>
-        <translation>Другие плагины не зависят от этого плагина.</translation>
+        <source>Another plugin depends on this plugin.</source>
+        <translation>Другой плагин зависит от этого плагина.</translation>
     </message>
     <message numerus="yes">
-        <source>Not found %n dependences.</source>
+        <source>%n dependency(ies) not found.</source>
         <translation>
             <numerusform>Не найдена %n зависимость.</numerusform>
             <numerusform>Не найдено %n зависимости.</numerusform>

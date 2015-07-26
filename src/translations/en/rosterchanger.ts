@@ -134,10 +134,6 @@
    <translation>Remove contact</translation>
   </message>
   <message>
-   <source>You are assured that wish to remove a contact &lt;b>%1&lt;/b> from roster?</source>
-   <translation>You are assured that wish to remove a contact &lt;b>%1&lt;/b> from roster?</translation>
-  </message>
-  <message>
    <source>You are now subscribed for %1 presence.</source>
    <translation>You are now subscribed for %1 presence.</translation>
   </message>
@@ -150,16 +146,8 @@
    <translation>Subscribe for contact presence</translation>
   </message>
   <message>
-   <source>You are assured that wish to subscribe for a contact &lt;b>%1&lt;/b> presence?</source>
-   <translation>You are assured that wish to subscribe for a contact &lt;b>%1&lt;/b> presence?</translation>
-  </message>
-  <message>
    <source>Unsubscribe from contact presence</source>
    <translation>Unsubscribe from contact presence</translation>
-  </message>
-  <message>
-   <source>You are assured that wish to unsubscribe from a contact &lt;b>%1&lt;/b> presence?</source>
-   <translation>You are assured that wish to unsubscribe from a contact &lt;b>%1&lt;/b> presence?</translation>
   </message>
   <message>
    <source>Roster Editor</source>
@@ -194,14 +182,6 @@
   <message>
    <source>When receiving authorization request</source>
    <translation>When receiving authorization request</translation>
-  </message>
-  <message numerus="yes">
-   <source>You are assured that wish to remove &lt;b>%n contact(s)&lt;/b> from roster?</source>
-   <translation>
-    <numerusform>You are assured that wish to remove &lt;b>%n contact(s)&lt;/b> from roster?</numerusform>
-    <numerusform>You are assured that wish to remove &lt;b>%n contact(s)&lt;/b> from roster?</numerusform>
-    <numerusform>You are assured that wish to remove &lt;b>%n contact(s)&lt;/b> from roster?</numerusform>
-   </translation>
   </message>
   <message>
    <source>Add Contact</source>
@@ -327,6 +307,26 @@
   <message>
    <source>Into this Group</source>
    <translation>Into this Group</translation>
+  </message>
+  <message>
+   <source>Are you sure you wish to remove a contact &lt;b>%1&lt;/b> from the roster?</source>
+   <translation>Are you sure you wish to remove a contact &lt;b>%1&lt;/b> from the roster?</translation>
+  </message>
+  <message>
+   <source>Are you sure you wish to subscribe for a contact &lt;b>%1&lt;/b> presence?</source>
+   <translation>Are you sure you wish to subscribe for a contact &lt;b>%1&lt;/b> presence?</translation>
+  </message>
+  <message>
+   <source>Are you sure you wish to unsubscribe from a contact &lt;b>%1&lt;/b> presence?</source>
+   <translation>Are you sure you wish to unsubscribe from a contact &lt;b>%1&lt;/b> presence?</translation>
+  </message>
+  <message numerus="yes">
+   <source>Are you sure you wish to remove &lt;b>%n contact(s)&lt;/b> from the roster?</source>
+   <translation>
+    <numerusform>Are you sure you wish to remove &lt;b>%n contact(s)&lt;/b> from the roster?</numerusform>
+    <numerusform>Are you sure you wish to remove &lt;b>%n contact(s)&lt;/b> from the roster?</numerusform>
+    <numerusform>Are you sure you wish to remove &lt;b>%n contact(s)&lt;/b> from the roster?</numerusform>
+   </translation>
   </message>
  </context>
  <context>

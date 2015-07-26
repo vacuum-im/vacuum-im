@@ -27,14 +27,6 @@
     <numerusform>Birthday in %n day(s)!</numerusform>
    </translation>
   </message>
-  <message numerus="yes">
-   <source>%1 marks %n years</source>
-   <translation>
-    <numerusform>%1 marks %n years</numerusform>
-    <numerusform>%1 marks %n years</numerusform>
-    <numerusform>%1 marks %n years</numerusform>
-   </translation>
-  </message>
   <message>
    <source>When reminding of upcoming birthdays</source>
    <translation>When reminding of upcoming birthdays</translation>
@@ -49,6 +41,14 @@
  %1</numerusform>
     <numerusform>Birthday in %n day(s),
  %1</numerusform>
+   </translation>
+  </message>
+  <message numerus="yes">
+   <source>%1 turns %n</source>
+   <translation>
+    <numerusform>%1 turns %n</numerusform>
+    <numerusform>%1 turns %n</numerusform>
+    <numerusform>%1 turns %n</numerusform>
    </translation>
   </message>
  </context>

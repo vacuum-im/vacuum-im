@@ -1,6 +1,20 @@
 #ifndef DEF_STATISTICSPARAMS_H
 #define DEF_STATISTICSPARAMS_H
 
+// Metrics
+#define SCMP_ACCOUNTS_COUNT                                  1
+#define SCMP_CONTACTS_COUNT                                  2
+#define SCMP_AGENTS_COUNT                                    3
+#define SCMP_GROUPS_COUNT                                    4
+#define SCMP_CHATWINDOWS_COUNT                               5
+#define SCMP_MULTICHATWINDOWS_COUNT                          6
+#define SCMP_BOOKMARKS_COUNT                                 7
+#define SCMP_STATUSITEMS_COUNT                               8
+
+// Dimensions
+#define SCDP_SERVER_NAME                                     1
+#define SCDP_SERVER_VERSION                                  2
+
 // Hit-Event
 #define SEVP_APPLICATION_RESTART                             "application|restart|Application Restart"
 

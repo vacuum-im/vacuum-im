@@ -7,7 +7,7 @@
 #include "utilsexport.h"
 
 class StanzaData :
-   public QSharedData
+	public QSharedData
 {
 public:
 	StanzaData(const QString &ATagName);
@@ -49,6 +49,8 @@ public:
 	QString toString(int AIndent = 1) const;
 	QByteArray toByteArray() const;
 public:
+	static bool isValidXmlChar(quint32 ACode);
+	static QString replaceInvalidXmlChars(QString &AXml, const QChar &AWithChar='?');
 	static QDomElement findElement(const QDomElement &AParent, const QString &ATagName = QString::null, const QString &ANamespace = QString::null);
 private:
 	QSharedDataPointer<StanzaData> d;
