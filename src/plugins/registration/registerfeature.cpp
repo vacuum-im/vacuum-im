@@ -2,7 +2,6 @@
 
 #include <definitions/namespaces.h>
 #include <definitions/internalerrors.h>
-#include <definitions/statisticsparams.h>
 #include <definitions/xmppstanzahandlerorders.h>
 #include <utils/widgetmanager.h>
 #include <utils/pluginhelper.h>
@@ -62,7 +61,6 @@ bool RegisterFeature::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, in
 		{
 			if (AStanza.type() == "result")
 			{
-				REPORT_EVENT(SEVP_REGISTRATION_STREAM_SUCCESS,1);
 				LOG_INFO(QString("XMPP account registration submit accepted, server=%1").arg(FXmppStream->streamJid().pDomain()));
 
 				FFinished = true;
@@ -111,9 +109,7 @@ bool RegisterFeature::start(const QDomElement &AElem)
 			FXmppStream->insertXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 			FXmppStream->sendStanza(request);
 
-			REPORT_EVENT(SEVP_REGISTRATION_STREAM_BEGIN,1);
 			LOG_INFO(QString("XMPP account registration feature started, server=%1").arg(FXmppStream->streamJid().pDomain()));
-
 			return true;
 		}
 		else

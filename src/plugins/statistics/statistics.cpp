@@ -658,10 +658,14 @@ void Statistics::sendServerInfoHit(const QString &AName, const QString &AVersion
 {
 	if (!AName.isEmpty())
 	{
-		IStatisticsHit hit = makeViewHit();
+		IStatisticsHit hit = makeEventHit(SEVP_STATISTICS_SERVERS);
+
 		hit.dimensions[SCDP_SERVER_NAME] = AName;
 		if (!AVersion.isEmpty())
 			hit.dimensions[SCDP_SERVER_VERSION] = AVersion;
+		else
+			hit.dimensions[SCDP_SERVER_VERSION] = "Unknown";
+
 		sendStatisticsHit(hit);
 	}
 }
@@ -759,7 +763,7 @@ void Statistics::onOptionsChanged(const OptionsNode &ANode)
 
 void Statistics::onSessionTimerTimeout()
 {
-	IStatisticsHit hit = makeViewHit();
+	IStatisticsHit hit = makeEventHit(SEVP_STATISTICS_METRICS);
 
 	QList<Jid> streams;
 	if (FAccountManager)
