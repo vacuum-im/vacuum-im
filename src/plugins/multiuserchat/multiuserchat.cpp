@@ -1137,30 +1137,27 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 	}
 	else if (AStanza.type() == "error")
 	{
+		XmppStanzaError err(AStanza);
+		LOG_STRM_DEBUG(FStreamJid,QString("User has left the conference due to error, nick=%1, room=%2: %3").arg(fromNick,FRoomJid.bare(),err.errorMessage()));
+
+		IPresenceItem presence;
+		presence.itemJid = fromJid;
+		presence.show = IPresence::Error;
+		presence.status = err.errorMessage();
+
 		MultiUser *user = FUsers.value(fromNick);
-		if (user)
+		if (fromNick == FNickName)
 		{
-			XmppStanzaError err(AStanza);
-			LOG_STRM_DEBUG(FStreamJid,QString("User has left the conference due to error, nick=%1, room=%2: %3").arg(fromNick,FRoomJid.bare(),err.errorMessage()));
-
-			IPresenceItem presence;
-			presence.itemJid = fromJid;
-			presence.show = IPresence::Error;
-			presence.status = err.errorMessage();
-
-			if (user != FMainUser)
-			{
-				user->setPresence(presence);
-				delete FUsers.take(fromNick);
-			}
-			else
-			{
-				FRoomError = err;
-				closeRoom(presence);
-			}
-
-			accepted = true;
+			FRoomError = err;
+			closeRoom(presence);
 		}
+		else if (user!=NULL && user!=FMainUser)
+		{
+			user->setPresence(presence);
+			delete FUsers.take(fromNick);
+		}
+
+		accepted = true;
 	}
 
 	FStatusCodes.clear();
