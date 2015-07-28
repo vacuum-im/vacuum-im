@@ -325,7 +325,7 @@ void ArchiveAccountOptionsWidget::apply()
 		prefs.methodManual = ui.cmbMethodManual->itemData(ui.cmbMethodManual->currentIndex()).toString();
 		prefs.defaultPrefs.otr = ui.cmbModeOTR->itemData(ui.cmbModeOTR->currentIndex()).toString();
 		prefs.defaultPrefs.save = ui.cmbModeSave->itemData(ui.cmbModeSave->currentIndex()).toString();
-		prefs.defaultPrefs.expire = ui.cmbExpireTime->currentText().toInt()*ONE_DAY;
+		prefs.defaultPrefs.expire = ui.cmbExpireTime->itemData(ui.cmbExpireTime->currentIndex()).toInt();
 
 		foreach(const Jid &itemJid, FTableItems.keys())
 		{
@@ -378,6 +378,7 @@ void ArchiveAccountOptionsWidget::reset()
 	FTableItems.clear();
 	ui.tbwItemPrefs->clearContents();
 	ui.tbwItemPrefs->setRowCount(0);
+
 	if (FArchiver->isReady(FStreamJid))
 		onArchivePrefsChanged(FStreamJid);
 
@@ -398,12 +399,12 @@ void ArchiveAccountOptionsWidget::updateWidget()
 
 	if (requesting)
 		ui.lblStatus->setText(tr("Waiting for host response..."));
-	if (!FArchiver->isReady(FStreamJid))
+	else if (!FArchiver->isReady(FStreamJid))
 		ui.lblStatus->setText(tr("History preferences is not available"));
 	else if (!FLastError.isNull())
 		ui.lblStatus->setText(tr("Failed to save archive preferences: %1").arg(FLastError.errorMessage()));
-	else
-		ui.lblStatus->clear();
+	else if (!ui.lblStatus->text().isEmpty())
+		ui.lblStatus->setText(tr("Preferences accepted"));
 
 	setEnabled(FArchiver->isReady(FStreamJid));
 }
@@ -589,20 +590,17 @@ void ArchiveAccountOptionsWidget::onArchivePrefsClosed( const Jid &AStreamJid )
 
 void ArchiveAccountOptionsWidget::onArchiveRequestCompleted(const QString &AId)
 {
-	if (FSaveRequests.contains(AId))
+	if (FSaveRequests.removeOne(AId))
 	{
-		ui.lblStatus->setText(tr("Preferences accepted"));
-		FSaveRequests.removeAt(FSaveRequests.indexOf(AId));
 		updateWidget();
 	}
 }
 
 void ArchiveAccountOptionsWidget::onArchiveRequestFailed(const QString &AId, const XmppError &AError)
 {
-	if (FSaveRequests.contains(AId))
+	if (FSaveRequests.removeOne(AId))
 	{
 		FLastError = AError;
-		FSaveRequests.removeAt(FSaveRequests.indexOf(AId));
 		updateWidget();
 		emit modified();
 	}

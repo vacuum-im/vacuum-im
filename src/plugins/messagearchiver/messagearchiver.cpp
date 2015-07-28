@@ -315,7 +315,7 @@ bool MessageArchiver::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Sta
 
 void MessageArchiver::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 {
-	XmppStanzaError err = AStanza.type()=="result" ? XmppStanzaError(AStanza) : XmppStanzaError::null;
+	XmppStanzaError err = AStanza.type()!="result" ? XmppStanzaError(AStanza) : XmppStanzaError::null;
 
 	if (FPrefsLoadRequests.contains(AStanza.id()))
 	{
