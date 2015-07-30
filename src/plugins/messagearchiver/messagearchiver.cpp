@@ -1521,13 +1521,14 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
 {
 	if (isReady(AStreamJid) || AElem.hasChildNodes() || FInStoragePrefs.contains(AStreamJid))
 	{
-		LOG_STRM_INFO(AStreamJid,"Applying new archive prefs");
-
 		//Hack for Jabberd 1.4.3
 		if (!FInStoragePrefs.contains(AStreamJid) && AElem.hasAttribute("j_private_flag"))
 			FInStoragePrefs.append(AStreamJid);
 
 		bool initPrefs = !isReady(AStreamJid);
+		bool prefsInStgorage = FInStoragePrefs.contains(AStreamJid);
+		LOG_STRM_INFO(AStreamJid,QString("Applying new archive prefs, init=%1, in_storage=%2").arg(initPrefs).arg(prefsInStgorage));
+
 		IArchiveStreamPrefs &prefs = FArchivePrefs[AStreamJid];
 
 		QDomElement autoElem = isSupported(AStreamJid,NS_ARCHIVE_PREF) ? AElem.firstChildElement("auto") : QDomElement();
@@ -1617,7 +1618,7 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
 			sessionElem = sessionElem.nextSiblingElement("session");
 		}
 
-		if (FInStoragePrefs.contains(AStreamJid))
+		if (prefsInStgorage)
 		{
 			foreach(const Jid &itemJid, oldItemJids)
 				prefs.itemPrefs.remove(itemJid);

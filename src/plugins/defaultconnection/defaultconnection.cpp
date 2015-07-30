@@ -292,10 +292,9 @@ void DefaultConnection::onDnsResultsReady(int AId, const QJDns::Response &AResul
 
 void DefaultConnection::onDnsError(int AId, QJDns::Error AError)
 {
-	Q_UNUSED(AError);
 	if (FSrvQueryId == AId)
 	{
-		LOG_WARNING(QString("Failed to lookup DNS SRV records: %1").arg(AError));
+		LOG_WARNING(QString("Failed to lookup DNS SRV records, err=%1").arg(AError));
 		FDns.shutdown();
 	}
 }
