@@ -1,10 +1,10 @@
 #include "systemmanager.h"
 
 #include <QDir>
-#include <QSettings>
 #include <QSysInfo>
 #include <QProcess>
 #include <QFileInfo>
+#include <QSettings>
 #include <QTextStream>
 #include <QStringList>
 #include <thirdparty/idle/idle.h>
@@ -76,7 +76,10 @@ QString SystemManager::osVersion()
 	static QString osver;
 	if (osver.isEmpty())
 	{
-#if defined(Q_WS_MAC)
+#if defined(Q_WS_WIN) || defined(Q_OS_CYGWIN)
+		QSettings settings("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", QSettings::NativeFormat);
+		osver = settings.value("ProductName").toString();
+#elif defined(Q_WS_MAC)
 		switch (QSysInfo::MacintoshVersion)
 		{
 # if QT_VERSION >= 0x040807
@@ -182,60 +185,6 @@ QString SystemManager::osVersion()
 					osver = QLatin1String("Linux/Unix (unknown)");
 				}
 			}
-		}
-#elif defined(Q_WS_WIN) || defined(Q_OS_CYGWIN)
-		switch (QSysInfo::WindowsVersion)
-		{
-		case QSysInfo::WV_CE_6:
-			osver = "Windows CE 6.x";
-			break;
-		case QSysInfo::WV_CE_5:
-			osver = "Windows CE 5.x";
-			break;
-		case QSysInfo::WV_CENET:
-			osver = "Windows CE .NET";
-			break;
-		case QSysInfo::WV_CE:
-			osver = "Windows CE";
-			break;
-# if QT_VERSION >= 0x040803
-		case QSysInfo::WV_WINDOWS8:
-			osver = "Windows 8";
-			break;
-# endif
-		case QSysInfo::WV_WINDOWS7:
-			osver = "Windows 7";
-			break;
-		case QSysInfo::WV_VISTA:
-			osver = "Windows Vista";
-			break;
-		case QSysInfo::WV_2003:
-			osver = "Windows Server 2003";
-			break;
-		case QSysInfo::WV_XP:
-			osver = "Windows XP";
-			break;
-		case QSysInfo::WV_2000:
-			osver = "Windows 2000";
-			break;
-		case QSysInfo::WV_NT:
-			osver = "Windows NT";
-			break;
-		case QSysInfo::WV_Me:
-			osver = "Windows Me";
-			break;
-		case QSysInfo::WV_98:
-			osver = "Windows 98";
-			break;
-		case QSysInfo::WV_95:
-			osver = "Windows 95";
-			break;
-		case QSysInfo::WV_32s:
-			osver = "Windows 3.1 with Win32s";
-			break;
-		default:
-			osver = "Windows (unknown)";
-			break;
 		}
 #elif defined(Q_WS_HAIKU)
 		BPath path;
