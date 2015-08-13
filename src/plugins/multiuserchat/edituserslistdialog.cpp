@@ -115,6 +115,7 @@ QList<IMultiUserListItem> EditUsersListDialog::deltaList() const
 	QSet<Jid> newItems =  modelItems - listItems;
 	QSet<Jid> oldItems = listItems - modelItems;
 
+	// Created Items
 	foreach(const Jid &realJid, newItems)
 	{
 		QStandardItem *modelItem = FUserModelItem.value(realJid);
@@ -127,6 +128,7 @@ QList<IMultiUserListItem> EditUsersListDialog::deltaList() const
 		result.append(listItem);
 	}
 
+	// Deleted Items
 	foreach (const Jid &realJid, oldItems)
 	{
 		IMultiUserListItem listItem;
@@ -134,6 +136,18 @@ QList<IMultiUserListItem> EditUsersListDialog::deltaList() const
 		listItem.affiliation = MUC_AFFIL_NONE;
 
 		result.append(listItem);
+	}
+
+	// Changed Items
+	for (QHash<Jid, QStandardItem*>::const_iterator it=FUserModelItem.constBegin(); it!=FUserModelItem.constEnd(); ++it)
+	{
+		IMultiUserListItem listItem = FUserListItem.value(it.key());
+		QString modelAffiliation = it.value()->data(UDR_AFFILIATION).toString();
+		if (listItem.realJid==it.key() && listItem.affiliation!=modelAffiliation)
+		{
+			listItem.affiliation = modelAffiliation;
+			result.append(listItem);
+		}
 	}
 
 	return result;
