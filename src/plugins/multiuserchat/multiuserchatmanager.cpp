@@ -465,11 +465,14 @@ Action *MultiUserChatManager::createDiscoFeatureAction(const Jid &AStreamJid, co
 	{
 		if (FDiscovery && FDiscovery->findIdentity(ADiscoInfo.identity,DIC_CONFERENCE,QString::null)>=0)
 		{
-			Action *action = createJoinAction(AStreamJid,ADiscoInfo.contactJid,AParent);
-			action->setEnabled(findMultiChatWindow(AStreamJid,ADiscoInfo.contactJid) == NULL);
-			return action;
+			if (findMultiChatWindow(AStreamJid,ADiscoInfo.contactJid) == NULL)
+			{
+				Action *action = createJoinAction(AStreamJid,ADiscoInfo.contactJid,AParent);
+				action->setEnabled(findMultiChatWindow(AStreamJid,ADiscoInfo.contactJid) == NULL);
+				return action;
+			}
 		}
-		else
+		else if (FDiscovery)
 		{
 			Menu *inviteMenu = createInviteMenu(ADiscoInfo.contactJid,AParent);
 			if (inviteMenu->isEmpty())
