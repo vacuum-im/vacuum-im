@@ -179,6 +179,7 @@ protected slots:
 	void onMultiChatWindowActivated();
 	void onMultiChatNotifierActiveNotifyChanged(int ANotifyId);
 	void onMultiChatEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bool &AHooked);
+	void onMultiChatViewWidgetContextMenu(const QPoint &APosition, Menu *AMenu);
 	void onMultiChatUserItemNotifyActivated(int ANotifyId);
 	void onMultiChatUserItemDoubleClicked(const QModelIndex &AIndex);
 	void onMultiChatUserItemContextMenu(QStandardItem *AItem, Menu *AMenu);

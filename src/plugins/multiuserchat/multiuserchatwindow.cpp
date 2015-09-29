@@ -1070,6 +1070,8 @@ void MultiUserChatWindow::createMessageWidgets()
 		FMainSplitter->insertWidget(MUCWW_INFOWIDGET,FInfoWidget->instance());
 
 		FViewWidget = FMessageWidgets->newViewWidget(this,FViewSplitter);
+		connect(FViewWidget->instance(),SIGNAL(viewContextMenu(const QPoint &, Menu *)),
+			SLOT(onMultiChatViewWidgetContextMenu(const QPoint &, Menu *)));
 		connect(FViewWidget->instance(),SIGNAL(contentAppended(const QString &, const IMessageStyleContentOptions &)),
 			SLOT(onMultiChatContentAppended(const QString &, const IMessageStyleContentOptions &)));
 		connect(FViewWidget->instance(),SIGNAL(messageStyleOptionsChanged(const IMessageStyleOptions &, bool)),
@@ -2377,6 +2379,14 @@ void MultiUserChatWindow::onMultiChatEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bo
 	{
 		FCompleteIt = FCompleteNicks.constEnd();
 	}
+}
+
+void MultiUserChatWindow::onMultiChatViewWidgetContextMenu(const QPoint &APosition, Menu *AMenu)
+{
+	QTextDocumentFragment fragmet = FViewWidget->textFragmentAt(APosition);
+	IMultiUser *user = FMultiChat!=NULL ? FMultiChat->findUser(fragmet.toPlainText()) : NULL;
+	if (user!=NULL && user!=FMultiChat->mainUser())
+		contextMenuForUser(user,AMenu);
 }
 
 void MultiUserChatWindow::onMultiChatUserItemNotifyActivated(int ANotifyId)
