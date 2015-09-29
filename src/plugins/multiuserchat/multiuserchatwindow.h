@@ -256,8 +256,6 @@ private:
 	bool FShownDetached;
 	bool FInitializeConfig;
 	bool FDestroyOnChatClosed;
-	QString FTabPageToolTip;
-	QString FLastAffiliation;
 	QDateTime FLastStanzaTime;
 private:
 	QString FRoleRequestId;

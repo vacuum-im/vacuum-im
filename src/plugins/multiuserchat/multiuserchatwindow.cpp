@@ -77,7 +77,6 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatManager *AMultiChatManage
 	FTabPageNotifier = NULL;
 
 	FSHIAnyStanza = -1;
-	FLastAffiliation = MUC_AFFIL_NONE;
 
 	FStateLoaded = false;
 	FShownDetached = false;
@@ -281,7 +280,7 @@ QString MultiUserChatWindow::tabPageCaption() const
 
 QString MultiUserChatWindow::tabPageToolTip() const
 {
-	return FTabPageToolTip;
+	return QString::null;
 }
 
 IMessageTabPageNotifier *MultiUserChatWindow::tabPageNotifier() const
@@ -303,7 +302,8 @@ void MultiUserChatWindow::setTabPageNotifier(IMessageTabPageNotifier *ANotifier)
 bool MultiUserChatWindow::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
 	Q_UNUSED(AAccept); Q_UNUSED(AStreamJid);
-	if (AHandlerId==FSHIAnyStanza && contactJid().pBare()==Jid(AStanza.from()).pBare())
+	Jid fromJid = AStanza.from();
+	if (AHandlerId==FSHIAnyStanza && contactJid().pBare()==fromJid.pBare())
 	{
 		if (AStanza.tagName() == "message")
 			FLastStanzaTime = QDateTime::currentDateTime().addSecs(1);
@@ -2041,28 +2041,21 @@ void MultiUserChatWindow::onMultiChatStateChanged(int AState)
 
 		if (!FDestroyOnChatClosed)
 		{
+			IMultiUserChatHistory history;
+			history.since = FLastStanzaTime;
+			FMultiChat->setHistoryScope(history);
+
 			if (FMultiChat->roomPresence().show == IPresence::Error)
 				showMultiChatStatusMessage(tr("You have left the conference due to error: %1").arg(FMultiChat->roomPresence().status),IMessageStyleContentOptions::TypeEvent,IMessageStyleContentOptions::StatusError);
 			else
 				showMultiChatStatusMessage(tr("You have left the conference"),IMessageStyleContentOptions::TypeEvent,IMessageStyleContentOptions::StatusOffline);
+
 			updateMultiChatWindow();
 		}
 		else
 		{
 			deleteLater();
 		}
-	}
-	else if (AState == IMultiUserChat::Opening)
-	{
-		IMultiUserChatHistory history;
-		if (FLastStanzaTime.isValid())
-		{
-			if (FLastAffiliation != MUC_AFFIL_NONE)
-				history.seconds = FLastStanzaTime.secsTo(QDateTime::currentDateTime());
-			else
-				history.since = FLastStanzaTime; // Time lost is possible if CAPTCHA enabled
-		}
-		FMultiChat->setHistoryScope(history);
 	}
 }
 
@@ -2089,10 +2082,6 @@ void MultiUserChatWindow::onMultiChatRequestFailed(const QString &AId, const Xmp
 void MultiUserChatWindow::onMultiChatPresenceChanged(const IPresenceItem &APresence)
 {
 	Q_UNUSED(APresence);
-
-	if (FMultiChat->mainUser() != NULL)
-		FLastAffiliation = FMultiChat->mainUser()->affiliation();
-
 	updateMultiChatWindow();
 }
 
