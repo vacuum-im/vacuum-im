@@ -160,7 +160,7 @@ protected:
 protected slots:
 	void onMultiChatStateChanged(int AState);
 	//Common
-	void onMultiChatRoomNameChanged(const QString &AName);
+	void onMultiChatRoomTitleChanged(const QString &ATitle);
 	void onMultiChatRequestFailed(const QString &AId, const XmppError &AError);
 	//Occupant
 	void onMultiChatPresenceChanged(const IPresenceItem &APresence);
@@ -205,6 +205,7 @@ protected slots:
 	void onStatusIconsChanged();
 	void onAutoRejoinAfterKick();
 	void onRoomConfigFormDialogAccepted();
+	void onRoomConfigFormDialogRejected();
 	void onOptionsChanged(const OptionsNode &ANode);
 	void onCentralSplitterHandleMoved(int AOrderId, int ASize);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
@@ -253,6 +254,7 @@ private:
 	int FSHIAnyStanza;
 	bool FStateLoaded;
 	bool FShownDetached;
+	bool FInitializeConfig;
 	bool FDestroyOnChatClosed;
 	QString FTabPageToolTip;
 	QString FLastAffiliation;
@@ -261,8 +263,8 @@ private:
 	QString FRoleRequestId;
 	QString FAffilRequestId;
 	QString FDestroyRequestId;
-	QString FLoadConfigRequestId;
-	QString FUpdateConfigRequestId;
+	QString FConfigLoadRequestId;
+	QString FConfigUpdateRequestId;
 private:
 	int FStartCompletePos;
 	QString FCompleteNickStarts;

@@ -46,7 +46,6 @@
 #define NS_MUC_USER                             "http://jabber.org/protocol/muc#user"
 #define NS_MUC_ADMIN                            "http://jabber.org/protocol/muc#admin"
 #define NS_MUC_OWNER                            "http://jabber.org/protocol/muc#owner"
-#define NS_MUC_UNIQUE                           "http://jabber.org/protocol/muc#unique"
 
 #define NS_DISCO                                "http://jabber.org/protocol/disco"
 #define NS_DISCO_INFO                           "http://jabber.org/protocol/disco#info"

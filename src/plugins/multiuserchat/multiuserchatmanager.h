@@ -19,9 +19,10 @@
 #include <interfaces/irostersview.h>
 #include <interfaces/istatusicons.h>
 #include <interfaces/irecentcontacts.h>
+#include <interfaces/istanzaprocessor.h>
 #include "multiuserchat.h"
 #include "multiuserchatwindow.h"
-#include "joinmultichatdialog.h"
+#include "createmultichatwizard.h"
 
 struct InviteFields {
 	Jid streamJid;
@@ -40,10 +41,11 @@ class MultiUserChatManager :
 	public IDataLocalizer,
 	public IOptionsDialogHolder,
 	public IRostersClickHooker,
-	public IRecentItemHandler
+	public IRecentItemHandler,
+	public IStanzaRequestOwner
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IMultiUserChatManager IXmppUriHandler IDiscoFeatureHandler IMessageHandler IDataLocalizer IOptionsDialogHolder IRostersClickHooker IRecentItemHandler);
+	Q_INTERFACES(IPlugin IMultiUserChatManager IXmppUriHandler IDiscoFeatureHandler IMessageHandler IDataLocalizer IOptionsDialogHolder IRostersClickHooker IRecentItemHandler IStanzaRequestOwner);
 public:
 	MultiUserChatManager();
 	~MultiUserChatManager();
@@ -57,6 +59,8 @@ public:
 	virtual bool startPlugin() { return true; }
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
+	//IStanzaRequestOwner
+	virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
 	//IRostersClickHooker
 	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
 	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
@@ -90,8 +94,11 @@ public:
 	virtual QList<IRosterIndex *> multiChatRosterIndexes() const;
 	virtual IRosterIndex *findMultiChatRosterIndex(const Jid &AStreamJid, const Jid &ARoomJid) const;
 	virtual IRosterIndex *getMultiChatRosterIndex(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword);
-	virtual void showJoinMultiChatDialog(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword);
-	virtual bool requestRoomNick(const Jid &AStreamJid, const Jid &ARoomJid);
+	virtual QDialog *showMultiChatWizard(QWidget *AParent = NULL);
+	virtual QDialog *showJoinMultiChatWizard(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword, QWidget *AParent = NULL);
+	virtual QDialog *showCreateMultiChatWizard(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword, QWidget *AParent = NULL);
+	virtual QDialog *showManualMultiChatWizard(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword, QWidget *AParent = NULL);
+	virtual QString requestRegisteredNick(const Jid &AStreamJid, const Jid &ARoomJid);
 signals:
 	void multiUserChatCreated(IMultiUserChat *AMultiChat);
 	void multiUserChatDestroyed(IMultiUserChat *AMultiChat);
@@ -102,26 +109,27 @@ signals:
 	void multiChatContextMenu(IMultiUserChatWindow *AWindow, Menu *AMenu);
 	void multiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
 	void multiUserToolTips(IMultiUserChatWindow *AWindow, IMultiUser *AUser, QMap<int,QString> &AToolTips);
-	void roomNickReceived(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick);
+	void registeredNickReceived(const QString &AId, const QString &ANick);
 	//IRecentItemHandler
 	void recentItemUpdated(const IRecentItem &AItem);
 protected:
 	void registerDiscoFeatures();
 	bool isReady(const Jid &AStreamJid) const;
-	QString streamVCardNick(const Jid &AStreamJid) const;
 	void updateRecentChatItem(IRosterIndex *AIndex);
 	void updateRecentChatItemProperties(IRosterIndex *AIndex);
 	void updateChatRosterIndex(IMultiUserChatWindow *AWindow);
 	void updateRecentUserItem(IMultiUserChat *AChat, const QString &ANick);
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
+	Action *createWizardAction(QWidget *AParent) const;
 	Menu *createInviteMenu(const Jid &AContactJid, QWidget *AParent) const;
-	Action *createJoinAction(const Jid &AStreamJid, const Jid &ARoomJid, QObject *AParent) const;
+	Action *createJoinAction(const Jid &AStreamJid, const Jid &ARoomJid, QWidget *AParent) const;
 	IRosterIndex *getConferencesGroupIndex(const Jid &AStreamJid) const;
 	IMultiUserChatWindow *findMultiChatWindowForIndex(const IRosterIndex *AIndex) const;
 	IMultiUserChatWindow *getMultiChatWindowForIndex(const IRosterIndex *AIndex);
 	IMultiUser *findMultiChatWindowUser(const Jid &AStreamJid, const Jid &AContactJid) const;
 	QString getMultiChatName(const Jid &AStreamJid, const Jid &ARoomJid) const;
 protected slots:
+	void onWizardRoomActionTriggered(bool);
 	void onJoinRoomActionTriggered(bool);
 	void onOpenRoomActionTriggered(bool);
 	void onEnterRoomActionTriggered(bool);
@@ -131,11 +139,10 @@ protected slots:
 	void onStatusIconsChanged();
 	void onActiveXmppStreamRemoved(const Jid &AStreamJid);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
-	void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
 protected slots:
 	void onMultiChatDestroyed();
 	void onMultiChatWindowDestroyed();
-	void onMultiChatNameChanged(const QString &AName);
+	void onMultiChatTitleChanged(const QString &ATitle);
 	void onMultiChatPresenceChanged(const IPresenceItem &APresence);
 	void onMultiChatContextMenu(Menu *AMenu);
 	void onMultiUserContextMenu(IMultiUser *AUser, Menu *AMenu);
@@ -155,9 +162,6 @@ protected slots:
 	void onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips);
 	void onRostersViewIndexClipboardMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 protected slots:
-	void onRegisterFieldsReceived(const QString &AId, const IRegisterFields &AFields);
-	void onRegisterErrorReceived(const QString &AId, const XmppError &AError);
-protected slots:
 	void onInviteDialogFinished(int AResult);
 	void onInviteActionTriggered(bool);
 private:
@@ -169,18 +173,18 @@ private:
 	IServiceDiscovery *FDiscovery;
 	INotifications *FNotifications;
 	IDataForms *FDataForms;
-	IVCardManager *FVCardManager;
-	IRegistration *FRegistration;
 	IXmppUriQueries *FXmppUriQueries;
 	IOptionsManager *FOptionsManager;
 	IStatusIcons *FStatusIcons;
 	IRecentContacts *FRecentContacts;
+	IStanzaProcessor *FStanzaProcessor;
 private:
 	QList<IMultiUserChat *> FChats;
 	QMap<int, Message> FActiveInvites;
 	QList<IRosterIndex *> FChatIndexes;
+	QList<QString> FDiscoNickRequests;
+	QMap<QString,QString> FRegisterNickRequests;
 	QList<IMultiUserChatWindow *> FChatWindows;
-	QMap<QString, QPair<Jid,Jid> > FNickRequests;
 	QMap<QMessageBox *,InviteFields> FInviteDialogs;
 };
 

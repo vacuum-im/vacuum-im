@@ -1,11 +1,10 @@
-FORMS = joinmultichatdialog.ui \
-        edituserslistdialog.ui \
+FORMS = edituserslistdialog.ui \
         inputtextdialog.ui
         
 HEADERS = multiuser.h \
           multiuserchat.h \
           multiuserchatmanager.h \
-          joinmultichatdialog.h \
+          createmultichatwizard.h \
           multiuserchatwindow.h \
           edituserslistdialog.h \
           inputtextdialog.h \
@@ -15,7 +14,7 @@ HEADERS = multiuser.h \
 SOURCES = multiuser.cpp \
           multiuserchat.cpp \
           multiuserchatmanager.cpp \
-          joinmultichatdialog.cpp \
+          createmultichatwizard.cpp \
           multiuserchatwindow.cpp \
           edituserslistdialog.cpp \
           inputtextdialog.cpp \

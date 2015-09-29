@@ -47,24 +47,24 @@
 #define MUC_SC_MEMBERS_ONLY             322
 #define MUC_SC_SYSTEM_SHUTDOWN          332
 
-#define MUC_NODE_ROOM_NICK              "x-roomuser-item"
+#define MUC_NODE_NICK                   "x-roomuser-item"
 #define MUC_NODE_ROOMS                  "http://jabber.org/protocol/muc#rooms"
 #define MUC_NODE_TRAFFIC                "http://jabber.org/protocol/muc#traffic"
 
-#define MUC_HIDDEN                      "muc_hidden"
-#define MUC_MEMBERSONLY                 "muc_membersonly"
-#define MUC_MODERATED                   "muc_moderated"
-#define MUC_NONANONYMOUS                "muc_nonanonymous"
-#define MUC_OPEN                        "muc_open"
-#define MUC_PASSWORD                    "muc_password"
-#define MUC_PASSWORDPROTECTED           "muc_passwordprotected"
-#define MUC_PERSISTENT                  "muc_persistent"
-#define MUC_PUBLIC                      "muc_public"
-#define MUC_ROOMS                       "muc_rooms"
-#define MUC_SEMIANONYMOUS               "muc_semianonymous"
-#define MUC_TEMPORARY                   "muc_temporary"
-#define MUC_UNMODERATED                 "muc_unmoderated"
-#define MUC_UNSECURED                   "muc_unsecured"
+#define MUC_FEATURE_PUBLIC              "muc_public"
+#define MUC_FEATURE_HIDDEN              "muc_hidden"
+#define MUC_FEATURE_OPEN                "muc_open"
+#define MUC_FEATURE_MEMBERSONLY         "muc_membersonly"
+#define MUC_FEATURE_UNMODERATED         "muc_unmoderated"
+#define MUC_FEATURE_MODERATED           "muc_moderated"
+#define MUC_FEATURE_NONANONYMOUS        "muc_nonanonymous"
+#define MUC_FEATURE_SEMIANONYMOUS       "muc_semianonymous"
+#define MUC_FEATURE_UNSECURED           "muc_unsecured"
+#define MUC_FEATURE_PASSWORD            "muc_password"
+#define MUC_FEATURE_PASSWORDPROTECTED   "muc_passwordprotected"
+#define MUC_FEATURE_TEMPORARY           "muc_temporary"
+#define MUC_FEATURE_PERSISTENT          "muc_persistent"
+#define MUC_FEATURE_ROOMS               "muc_rooms"
 
 struct IMultiUserListItem
 {
@@ -134,7 +134,7 @@ public:
 	virtual Jid streamJid() const =0;
 	virtual Jid roomJid() const =0;
 	virtual QString roomName() const =0;
-	virtual QString roomShortName() const =0;
+	virtual QString roomTitle() const =0;
 	virtual int state() const =0;
 	virtual bool isOpen() const =0;
 	virtual bool isIsolated() const =0;
@@ -178,7 +178,7 @@ protected:
 	virtual void stateChanged(int AState) =0;
 	virtual void chatDestroyed() =0;
 	// Common
-	virtual void roomNameChanged(const QString &AName) =0;
+	virtual void roomTitleChanged(const QString &ATitle) =0;
 	virtual void streamJidChanged(const Jid &ABefore, const Jid &AAfter) =0;
 	virtual void requestFailed(const QString &AId, const XmppError &AError) =0;
 	// Occupant
@@ -288,8 +288,11 @@ public:
 	virtual QList<IRosterIndex *> multiChatRosterIndexes() const =0;
 	virtual IRosterIndex *findMultiChatRosterIndex(const Jid &AStreamJid, const Jid &ARoomJid) const =0;
 	virtual IRosterIndex *getMultiChatRosterIndex(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword) =0;
-	virtual void showJoinMultiChatDialog(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword) =0;
-	virtual bool requestRoomNick(const Jid &AStreamJid, const Jid &ARoomJid) =0;
+	virtual QDialog *showMultiChatWizard(QWidget *AParent = NULL) =0;
+	virtual QDialog *showJoinMultiChatWizard(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword, QWidget *AParent = NULL) =0;
+	virtual QDialog *showCreateMultiChatWizard(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword, QWidget *AParent = NULL) =0;
+	virtual QDialog *showManualMultiChatWizard(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword, QWidget *AParent = NULL) =0;
+	virtual QString requestRegisteredNick(const Jid &AStreamJid, const Jid &ARoomJid) =0;
 protected:
 	virtual void multiUserChatCreated(IMultiUserChat *AMultiChat) =0;
 	virtual void multiUserChatDestroyed(IMultiUserChat *AMultiChat) =0;
@@ -300,7 +303,7 @@ protected:
 	virtual void multiChatContextMenu(IMultiUserChatWindow *AWindow, Menu *AMenu) =0;
 	virtual void multiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu) =0;
 	virtual void multiUserToolTips(IMultiUserChatWindow *AWindow, IMultiUser *AUser, QMap<int,QString> &AToolTips) =0;
-	virtual void roomNickReceived(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick) =0;
+	virtual void registeredNickReceived(const QString &AId, const QString &ANick) =0;
 };
 
 Q_DECLARE_INTERFACE(IMultiUser,"Vacuum.Plugin.IMultiUser/1.0")

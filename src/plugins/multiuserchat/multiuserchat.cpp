@@ -15,6 +15,8 @@
 #define MUC_IQ_TIMEOUT      30000
 #define MUC_LIST_TIMEOUT    60000
 
+#define DIC_CONFERENCE      "conference"
+
 MultiUserChat::MultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANickName, const QString &APassword, bool AIsolated, QObject *AParent) : QObject(AParent)
 {
 	FSHIMessage = -1;
@@ -262,12 +264,12 @@ Jid MultiUserChat::roomJid() const
 
 QString MultiUserChat::roomName() const
 {
-	return !FRoomName.isEmpty() ? FRoomName : roomShortName();
+	return FRoomJid.uNode();
 }
 
-QString MultiUserChat::roomShortName() const
+QString MultiUserChat::roomTitle() const
 {
-	return FRoomJid.uNode();
+	return !FRoomTitle.isEmpty() ? FRoomTitle : roomName();
 }
 
 int MultiUserChat::state() const
@@ -833,7 +835,7 @@ QString MultiUserChat::loadRoomConfig()
 
 		if (FStanzaProcessor->sendStanzaRequest(this,FStreamJid,request,MUC_IQ_TIMEOUT))
 		{
-			LOG_STRM_INFO(FStreamJid,QString("Conference configuration load request sent, id=%1, room=%1").arg(request.id(),FRoomJid.bare()));
+			LOG_STRM_INFO(FStreamJid,QString("Conference configuration load request sent, id=%1, room=%2").arg(request.id(),FRoomJid.bare()));
 			FConfigLoadId.append(request.id());
 			return request.id();
 		}
@@ -893,7 +895,7 @@ QString MultiUserChat::destroyRoom(const QString &AReason)
 			LOG_STRM_WARNING(FStreamJid,QString("Failed to send conference destruction request, room=%1").arg(FRoomJid.bare()));
 		}
 	}
-	return false;
+	return QString::null;
 }
 
 void MultiUserChat::setState(ChatState AState)
@@ -1199,13 +1201,13 @@ void MultiUserChat::onDiscoveryInfoReceived(const IDiscoInfo &AInfo)
 {
 	if (AInfo.streamJid==streamJid() && AInfo.contactJid==roomJid())
 	{
-		int index = FDiscovery->findIdentity(AInfo.identity,"conference","text");
+		int index = FDiscovery->findIdentity(AInfo.identity,DIC_CONFERENCE,QString::null);
 		QString name = index>=0 ? AInfo.identity.at(index).name : QString::null;
-		if (!name.isEmpty() && FRoomName!=name)
+		if (!name.isEmpty() && FRoomTitle!=name)
 		{
-			LOG_STRM_DEBUG(FStreamJid,QString("Conference name changed, room=%1: %2").arg(FRoomJid.bare(),FRoomName));
-			FRoomName = name;
-			emit roomNameChanged(FRoomName);
+			FRoomTitle = name;
+			LOG_STRM_DEBUG(FStreamJid,QString("Conference title changed, room=%1: %2").arg(FRoomJid.bare(),FRoomTitle));
+			emit roomTitleChanged(FRoomTitle);
 		}
 	}
 }

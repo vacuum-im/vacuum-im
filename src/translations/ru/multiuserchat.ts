@@ -2,6 +2,92 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ru" sourcelanguage="en">
 <context>
+    <name>ConfigPage</name>
+    <message>
+        <source>Conference settings</source>
+        <translation>Настройки конференции</translation>
+    </message>
+    <message>
+        <source>Enter the desired parameters of the new conference</source>
+        <translation>Введите желаемые параметры новой конференции</translation>
+    </message>
+    <message>
+        <source>Creating conference...</source>
+        <translation>Создание конференции...</translation>
+    </message>
+    <message>
+        <source>Failed to create conference</source>
+        <translation>Не удалось создать конференцию</translation>
+    </message>
+    <message>
+        <source>Failed to create conference instance</source>
+        <translation>Не удалось создать экземпляр конференции</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Ошибка</translation>
+    </message>
+    <message>
+        <source>Conference is not created :(</source>
+        <translation>Конференция не создана :(</translation>
+    </message>
+    <message>
+        <source>Conference is not configured :(</source>
+        <translation>Конференция не настроена :(</translation>
+    </message>
+    <message>
+        <source>Failed to create conference: %1</source>
+        <translation>Не удалось создать конференцию: %1</translation>
+    </message>
+    <message>
+        <source>Saving conference settings...</source>
+        <translation>Сохранение настроек конференции...</translation>
+    </message>
+    <message>
+        <source>Failed to send conference settings</source>
+        <translation>Не удалось отправить настройки конференции</translation>
+    </message>
+    <message>
+        <source>Loading settings...</source>
+        <translation>Загрузка настроек...</translation>
+    </message>
+    <message>
+        <source>Failed to load conference settings</source>
+        <translation>Не удалось загрузить настройки конференции</translation>
+    </message>
+    <message>
+        <source>Failed to change default conference settings</source>
+        <translation>Не удалось изменить настройки конферепнции по умолчанию</translation>
+    </message>
+    <message>
+        <source>Failed to load conference settings: %1</source>
+        <translation>Не удалось загрузить настройки конференции: %1</translation>
+    </message>
+    <message>
+        <source>Failed to update conference settings: %1</source>
+        <translation>Не удалось обновить настройки конференции: %1</translation>
+    </message>
+</context>
+<context>
+    <name>CreateMultiChatWizard</name>
+    <message>
+        <source>Error</source>
+        <translation>Ошибка</translation>
+    </message>
+    <message>
+        <source>Failed to join to the conference: Conference windows is not created</source>
+        <translation>Не удалось присоединиться к конференции: Окно конференции не создано</translation>
+    </message>
+    <message>
+        <source>Create Conference Wizard</source>
+        <translation>Мастер создания конференции</translation>
+    </message>
+    <message>
+        <source>Failed to join to the conference: Not all required parameters is specified</source>
+        <translation>Не удалось присоединиться к конференции: Не все обязательные параметры определены</translation>
+    </message>
+</context>
+<context>
     <name>EditUsersListDialog</name>
     <message>
         <source>Edit Users Affiliations - %1</source>
@@ -96,32 +182,137 @@
     </message>
 </context>
 <context>
-    <name>JoinMultiChatDialog</name>
+    <name>JoinPage</name>
+    <message>
+        <source>Join</source>
+        <translation>Войти</translation>
+    </message>
+    <message>
+        <source>Enter parameters to join to the conference</source>
+        <translation>Укажите параметры для входа в конференцию</translation>
+    </message>
+    <message>
+        <source>Nick</source>
+        <translation>Ник</translation>
+    </message>
+    <message>
+        <source>Join with nick:</source>
+        <translation>Войти под ником:</translation>
+    </message>
+    <message>
+        <source>Loading conference description...</source>
+        <translation>Загрузка описания конференции...</translation>
+    </message>
+    <message>
+        <source>This conference is password protected</source>
+        <translation>Эта конференция защищена паролем</translation>
+    </message>
+    <message>
+        <source>This conference is not password protected</source>
+        <translation>Эта конференция не защищена паролем</translation>
+    </message>
+    <message>
+        <source>This conference is members only</source>
+        <translation>Эта конференция только для участников</translation>
+    </message>
+    <message>
+        <source>This conference is public</source>
+        <translation>Это публичная конференция</translation>
+    </message>
+    <message>
+        <source>This conference is semi anonymous</source>
+        <translation>Это полу-анонимная конференция</translation>
+    </message>
+    <message>
+        <source>This conference is not anonymous</source>
+        <translation>Это не анонимная конференция</translation>
+    </message>
+    <message>
+        <source>This conference is moderated</source>
+        <translation>Это модерируемая конференция</translation>
+    </message>
+    <message>
+        <source>This conference is not moderated</source>
+        <translation>Это не модерируемая конференция</translation>
+    </message>
+    <message>
+        <source>This conference is temporary</source>
+        <translation>Это временная конференция</translation>
+    </message>
+    <message>
+        <source>This conference is persistent</source>
+        <translation>Это постоянная конференция</translation>
+    </message>
+    <message>
+        <source>This conference is hidden</source>
+        <translation>Это скрытая конференция</translation>
+    </message>
+    <message>
+        <source>This conference is visible for all</source>
+        <translation>Это видимая всем конференция</translation>
+    </message>
+    <message>
+        <source>Failed to load conference description: %1</source>
+        <translation>Не удалось загрузить описание конференции: %1</translation>
+    </message>
+    <message>
+        <source>Conference description is not available or invalid</source>
+        <translation>Описание конференции не доступно или не корректно</translation>
+    </message>
+    <message>
+        <source>Register</source>
+        <translation>Зарегистрировать</translation>
+    </message>
+    <message>
+        <source>Registered</source>
+        <translation>Зарегистрирован</translation>
+    </message>
+    <message>
+        <source>Loading...</source>
+        <translation>Загрузка...</translation>
+    </message>
     <message>
         <source>Join conference</source>
         <translation>Войти в конференцию</translation>
     </message>
     <message>
-        <source>%1 as %2</source>
-        <comment>room as nick</comment>
-        <translation>%1 как %2</translation>
-    </message>
-    <message>
-        <source>Conference parameters is not acceptable.
-Check values and try again</source>
-        <translation>Недопустимые параметры конференции
-Проверте параметры и попробуйте еще раз</translation>
+        <source>Password is required</source>
+        <translation>Пароль обязателен</translation>
     </message>
 </context>
 <context>
-    <name>JoinMultiChatDialogClass</name>
+    <name>ManualPage</name>
     <message>
-        <source>Identity:</source>
-        <translation>Подключение:</translation>
+        <source>Join</source>
+        <translation>Войти</translation>
     </message>
     <message>
-        <source>Room:</source>
-        <translation>Комната:</translation>
+        <source>Conference parameters</source>
+        <translation>Параметры конференции</translation>
+    </message>
+    <message>
+        <source>Enter parameters to join or create the conference</source>
+        <translation>Укажите параметры для входа или создания конференции</translation>
+    </message>
+    <message>
+        <source>Conference as &apos;name@service.server.com&apos;</source>
+        <translation>Конференция в виде &apos;name@service.server.com&apos;</translation>
+    </message>
+    <message>
+        <source>Your nickname in conference</source>
+        <translation>Ваш ник в конференции</translation>
+    </message>
+    <message>
+        <source>Conference password if required</source>
+        <translation>Пароль конференции если требуется</translation>
+    </message>
+    <message>
+        <source>Account:</source>
+        <translation>Аккаунт:</translation>
+    </message>
+    <message>
+        <source>Conference:</source>
+        <translation>Конференция:</translation>
     </message>
     <message>
         <source>Nick:</source>
@@ -132,24 +323,71 @@ Check values and try again</source>
         <translation>Пароль:</translation>
     </message>
     <message>
-        <source>Resolve</source>
-        <translation>Определить</translation>
+        <source>Register</source>
+        <translation>Зарегитрировать</translation>
     </message>
     <message>
-        <source>History:</source>
-        <translation>История:</translation>
+        <source>Registered</source>
+        <translation>Зарегистрирован</translation>
     </message>
     <message>
-        <source>Delete</source>
-        <translation>Удалить</translation>
+        <source>Loading conference description...</source>
+        <translation>Загрузка описания конференции...</translation>
     </message>
     <message>
-        <source>Conference Parameters</source>
-        <translation>Параметры конференции</translation>
+        <source>Failed to load conference description</source>
+        <translation>Не удалось загрузить описание конференции</translation>
     </message>
     <message>
-        <source>Service:</source>
-        <translation>Сервис:</translation>
+        <source>Invalid conference ID</source>
+        <translation>Неверный идентификатор конференции</translation>
+    </message>
+    <message>
+        <source>Loading...</source>
+        <translation>Загрузка...</translation>
+    </message>
+    <message>
+        <source>This conference is password protected</source>
+        <translation>Эта конференция защищена паролем</translation>
+    </message>
+    <message>
+        <source>Conference description is not available or invalid</source>
+        <translation>Описание конференции не доступно или не корректно</translation>
+    </message>
+    <message>
+        <source>This conference does not exists and will be automatically created on join</source>
+        <translation>Эта конференция не существует и будет создана при входе</translation>
+    </message>
+    <message>
+        <source>Conference service &apos;%1&apos; is not available or does not exists</source>
+        <translation>Сервис конференций &apos;%1&apos; не доступен или не существует</translation>
+    </message>
+    <message>
+        <source>Failed to check conference existence: %1</source>
+        <translation>Не удалось проверить существование конференции: %1</translation>
+    </message>
+</context>
+<context>
+    <name>ModePage</name>
+    <message>
+        <source>Join to the conference or create a new one</source>
+        <translation>Войти в конференцию или создать новую</translation>
+    </message>
+    <message>
+        <source>This wizard will help you to join to existing conference or create a new one</source>
+        <translation>Этот мастер поможет вам войти в существующую конференцию или создать новую</translation>
+    </message>
+    <message>
+        <source>I want to join to the existing conference</source>
+        <translation>Я хочу войти в существующую конференцию</translation>
+    </message>
+    <message>
+        <source>I want to create a new conference</source>
+        <translation>Я сочу создать новую конференцию</translation>
+    </message>
+    <message>
+        <source>I want manually specify all parameters to join or create the conference</source>
+        <translation>Я хочу вручную указать параметры для входа или создания конференции</translation>
     </message>
 </context>
 <context>
@@ -647,6 +885,18 @@ Check values and try again</source>
         <source>Join Conference</source>
         <translation>Войти в конференцию</translation>
     </message>
+    <message>
+        <source>List of rooms</source>
+        <translation>Список комнат</translation>
+    </message>
+    <message>
+        <source>Contains the list of multi-user chat rooms</source>
+        <translation>Содержить список многопользовательских комнат</translation>
+    </message>
+    <message>
+        <source>Join Conference...</source>
+        <translation>Войти в конференцию...</translation>
+    </message>
 </context>
 <context>
     <name>MultiUserChatWindow</name>
@@ -1125,6 +1375,184 @@ Check values and try again</source>
     <message>
         <source>You have left the conference due to error: %1</source>
         <translation>Вы вышли из конференции из-за ошибки: %1</translation>
+    </message>
+    <message>
+        <source>Required parameter &lt;room nick&gt; is not specified</source>
+        <translation>Обязательный параметр &lt;ник&gt; не указан</translation>
+    </message>
+    <message>
+        <source>Required parameter &lt;user nick&gt; is not specified</source>
+        <translation>Обязательный параметр &lt;ник&gt; не указан</translation>
+    </message>
+    <message>
+        <source>Required parameter &lt;user jid&gt; is not specified</source>
+        <translation>Обязательный параметр &lt;jid&gt; не указан</translation>
+    </message>
+    <message>
+        <source>Required parameter &lt;room name&gt; is not specified</source>
+        <translation>Обязательный параметр &lt;имя&gt; не указан</translation>
+    </message>
+    <message>
+        <source>Required parameter &lt;new nick&gt; is not specified</source>
+        <translation>Обязательный параметр &lt;новый_ник&gt; не указан</translation>
+    </message>
+</context>
+<context>
+    <name>RoomPage</name>
+    <message>
+        <source>Conference name</source>
+        <translation>Имя конференции</translation>
+    </message>
+    <message>
+        <source>Search conferences</source>
+        <translation>Поиск конференции</translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation>Название</translation>
+    </message>
+    <message>
+        <source>Join to the conference:</source>
+        <translation>Войти в конференцию:</translation>
+    </message>
+    <message>
+        <source>Select a conference from the list or explicitly specify the name of the hidden one</source>
+        <translation>Выберите конференцию из списка или явно укажите имя скрытой</translation>
+    </message>
+    <message>
+        <source>Loading list of conferences...</source>
+        <translation>Загрузка списка конференций...</translation>
+    </message>
+    <message>
+        <source>Failed to load list of conferences</source>
+        <translation>Не удалось загрузить список конференций</translation>
+    </message>
+    <message>
+        <source>Create the conference:</source>
+        <translation>Создать конференцию:</translation>
+    </message>
+    <message>
+        <source>Enter unique name for the new conference</source>
+        <translation>Укажите уникальное имя новой конференции</translation>
+    </message>
+    <message>
+        <source>Loading conference description...</source>
+        <translation>Загрузка описания конференции...</translation>
+    </message>
+    <message>
+        <source>Checking conference existence...</source>
+        <translation>Проверка существования конференции...</translation>
+    </message>
+    <message>
+        <source>Failed to load conference description</source>
+        <translation>Не удалось загрузить описание конференции</translation>
+    </message>
+    <message>
+        <source>Failed to check conference existence</source>
+        <translation>Не удалось проверить существование конференции</translation>
+    </message>
+    <message>
+        <source>Invalid conference name</source>
+        <translation>Неверное имя конференции</translation>
+    </message>
+    <message>
+        <source>Failed to load conference description: %1</source>
+        <translation>Не удалось загрузить описание конференции: %1</translation>
+    </message>
+    <message>
+        <source>Failed to check conference existence: %1</source>
+        <translation>Не удалось проверить существование конференции: %1</translation>
+    </message>
+    <message>
+        <source>Conference &apos;%1@%2&apos; already exists, choose another name</source>
+        <translation>Конференция &apos;%1@%2&apos; уже существует, выберите другое имя</translation>
+    </message>
+    <message>
+        <source>Failed to load list of conferences: %1</source>
+        <translation>Не удалось загрузить список конференций: %1</translation>
+    </message>
+</context>
+<context>
+    <name>ServicePage</name>
+    <message>
+        <source>Conference location</source>
+        <translation>Расположение конференции</translation>
+    </message>
+    <message>
+        <source>Add...</source>
+        <translation>Добавить...</translation>
+    </message>
+    <message>
+        <source>Account:</source>
+        <translation>Аккаунт:</translation>
+    </message>
+    <message>
+        <source>Server:</source>
+        <translation>Сервер:</translation>
+    </message>
+    <message>
+        <source>Service:</source>
+        <translation>Сервис:</translation>
+    </message>
+    <message>
+        <source>Select account, server and service to join to the conference</source>
+        <translation>Выберите аккаунт, сервер и сервис для входа в конференцию</translation>
+    </message>
+    <message>
+        <source>Select the account to join to the conference</source>
+        <translation>Выберите аккаунт для входа в конференцию</translation>
+    </message>
+    <message>
+        <source>You can join to the conference located at almost any Jabber-server, select one from the list or add your own</source>
+        <translation>Вы можете войти в конференцию находящююся практически на любом Jabber-сервере, выберите один из списка или укажите свой</translation>
+    </message>
+    <message>
+        <source>Each Jabber-server can have multiple conference services, select one of the available</source>
+        <translation>На каждом Jabber-сервере может быть несколько сервисов с конференциями, выберите один из имеющихся</translation>
+    </message>
+    <message>
+        <source>Select account, server, and service to create the conference</source>
+        <translation>Выберите аккаунт, сервер и сервис для создания конференции</translation>
+    </message>
+    <message>
+        <source>Select the account to create a conference</source>
+        <translation>Выберите аккаунт для создания конференции</translation>
+    </message>
+    <message>
+        <source>You can create a conference at almost any Jabber-server, select one from the list or add your own</source>
+        <translation>Вы можете создать конференцию практически на любом Jabber-сервере, выберите один из списка или укажите свой</translation>
+    </message>
+    <message>
+        <source>Searching for conference services (%1)...</source>
+        <translation>Поиск сервисов конференций (%1)...</translation>
+    </message>
+    <message>
+        <source>Conference services are not found on this server</source>
+        <translation>Сервисы конференций не найдены на этом сервере</translation>
+    </message>
+    <message>
+        <source>Loading list of available services...</source>
+        <translation>Загрузка списка доступных сервисов...</translation>
+    </message>
+    <message>
+        <source>Failed to load list of services</source>
+        <translation>Не удалось загрузить список сервисов</translation>
+    </message>
+    <message>
+        <source>Account or server is not selected</source>
+        <translation>Аккаунт или сервер не выбраны</translation>
+    </message>
+    <message>
+        <source>Append Server</source>
+        <translation>Добавить сервер</translation>
+    </message>
+    <message>
+        <source>Enter server domain:</source>
+        <translation>Укажите домен сервера:</translation>
+    </message>
+    <message>
+        <source>Failed to load a list of services: %1</source>
+        <translation>Не удалось загрузить список сервисов: %1</translation>
     </message>
 </context>
 </TS>

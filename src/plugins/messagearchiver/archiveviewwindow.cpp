@@ -299,7 +299,13 @@ Jid ArchiveViewWindow::gatewayJid(const Jid &AContactJid) const
 
 bool ArchiveViewWindow::isConferencePrivateChat(const Jid &AWith) const
 {
-	return !AWith.resource().isEmpty() && AWith.pDomain().startsWith("conference.");
+	static const QStringList ConferenceServiceDomains = QStringList() << "conference" << "conf" << "irc";
+	if (!AWith.resource().isEmpty())
+	{
+		QString service = AWith.pDomain().split('.').value(0);
+		return ConferenceServiceDomains.contains(service);
+	}
+	return false;
 }
 
 bool ArchiveViewWindow::isJidMatched(const Jid &ARequestWith, const Jid &AHeaderWith) const

@@ -1293,7 +1293,7 @@ void SessionNegotiation::onAcceptDialogAccepted()
 			LOG_STRM_INFO(session.streamJid,QString("Stanza session accept approved by user, with=%1, sid=%2").arg(session.contactJid.full(),session.sessionId));
 			if (dialog->formWidget()->dataForm().type == DATAFORM_TYPE_FORM)
 			{
-				IDataForm submit = FDataForms->dataSubmit(dialog->formWidget()->userDataForm());
+				IDataForm submit = dialog->formWidget()->submitDataForm();
 				updateFields(submit,session.form,false,false);
 				processApply(session,submit);
 			}
@@ -1317,7 +1317,7 @@ void SessionNegotiation::onAcceptDialogAccepted()
 			}
 			else if (request.type == DATAFORM_TYPE_FORM)
 			{
-				IDataForm submit = FDataForms->dataSubmit(dialog->formWidget()->userDataForm());
+				IDataForm submit = dialog->formWidget()->submitDataForm();
 				updateFields(submit,session.form,false,false);
 				processApply(session,submit);
 			}

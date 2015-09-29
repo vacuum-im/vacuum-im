@@ -459,7 +459,7 @@ void CaptchaForms::onChallengeDialogAccepted()
 	if (!cid.isEmpty())
 	{
 		const ChallengeItem &item = FChallenges.value(cid);
-		submitChallenge(cid,FDataForms->dataSubmit(item.dialog->formWidget()->userDataForm()));
+		submitChallenge(cid,item.dialog->formWidget()->submitDataForm());
 	}
 	else
 	{

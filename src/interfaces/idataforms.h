@@ -191,12 +191,14 @@ class IDataFormWidget
 {
 public:
 	virtual QWidget *instance() =0;
+	virtual bool isSubmitValid() const =0;
 	virtual bool checkForm(bool AAllowInvalid) const =0;
 	virtual IDataTableWidget *tableWidget() const =0;
 	virtual IDataFieldWidget *fieldWidget(int AIndex) const =0;
 	virtual IDataFieldWidget *fieldWidget(const QString &AVar) const =0;
-	virtual IDataForm userDataForm() const =0;
 	virtual const IDataForm &dataForm() const =0;
+	virtual IDataForm userDataForm() const =0;
+	virtual IDataForm submitDataForm() const =0;
 protected:
 	virtual void cellActivated(int ARow, int AColumn) =0;
 	virtual void cellChanged(int ARow, int AColumn, int APrevRow, int APrevColumn) =0;
@@ -293,4 +295,4 @@ Q_DECLARE_INTERFACE(IDataDialogWidget,"Vacuum.Plugin.IDataDialogWidget/1.0")
 Q_DECLARE_INTERFACE(IDataLocalizer,"Vacuum.Plugin.IDataLocalizer/1.0")
 Q_DECLARE_INTERFACE(IDataForms,"Vacuum.Plugin.IDataForms/1.3")
 
-#endif
+#endif //IDATAFORMS_H

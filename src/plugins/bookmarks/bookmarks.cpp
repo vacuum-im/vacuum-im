@@ -1041,7 +1041,7 @@ void Bookmarks::onMultiChatWindowAddBookmarkActionTriggered(bool)
 			if (bookmark.type == IBookmark::None)
 			{
 				bookmark.type = IBookmark::Conference;
-				bookmark.name = window->multiUserChat()->roomName();
+				bookmark.name = window->multiUserChat()->roomTitle();
 				bookmark.conference.roomJid = window->contactJid();
 				bookmark.conference.nick = window->multiUserChat()->nickName();
 				bookmark.conference.password = window->multiUserChat()->password();

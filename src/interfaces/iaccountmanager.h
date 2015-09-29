@@ -15,6 +15,7 @@ class IAccount
 public:
 	virtual QObject *instance() = 0;
 	virtual QUuid accountId() const =0;
+	virtual int accountOrder() const =0;
 	virtual Jid accountJid() const =0;
 	virtual Jid streamJid() const =0;
 	virtual bool isActive() const =0;

@@ -81,6 +81,7 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatManager *AMultiChatManage
 
 	FStateLoaded = false;
 	FShownDetached = false;
+	FInitializeConfig = false;
 	FDestroyOnChatClosed = false;
 
 	FStartCompletePos = 0;
@@ -91,7 +92,7 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatManager *AMultiChatManage
 	FMultiChat = AMultiChat;
 	FMultiChat->instance()->setParent(this);
 	connect(FMultiChat->instance(),SIGNAL(stateChanged(int)),SLOT(onMultiChatStateChanged(int)));
-	connect(FMultiChat->instance(),SIGNAL(roomNameChanged(const QString &)),SLOT(onMultiChatRoomNameChanged(const QString &)));
+	connect(FMultiChat->instance(),SIGNAL(roomTitleChanged(const QString &)),SLOT(onMultiChatRoomTitleChanged(const QString &)));
 	connect(FMultiChat->instance(),SIGNAL(requestFailed(const QString &, const XmppError &)),SLOT(onMultiChatRequestFailed(const QString &, const XmppError &)));
 	connect(FMultiChat->instance(),SIGNAL(presenceChanged(const IPresenceItem &)),SLOT(onMultiChatPresenceChanged(const IPresenceItem &)));
 	connect(FMultiChat->instance(),SIGNAL(invitationDeclined(const Jid &, const QString &)),SLOT(onMultiChatInvitationDeclined(const Jid &, const QString &)));
@@ -135,6 +136,9 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatManager *AMultiChatManage
 
 	FMultiChat->setAutoPresence(true);
 	updateMultiChatWindow();
+	
+	if (FMultiChat->isOpen())
+		onMultiChatStateChanged(FMultiChat->state());
 }
 
 MultiUserChatWindow::~MultiUserChatWindow()
@@ -507,6 +511,8 @@ bool MultiUserChatWindow::messageDisplay(const Message &AMessage, int ADirection
 			if (window)
 			{
 				displayed = true;
+				if (!AMessage.isDelayed())
+					updateRecentItemActiveTime(window);
 				if (FHistoryRequests.values().contains(window))
 					FPendingMessages[window].append(AMessage);
 				showPrivateChatMessage(window,AMessage);
@@ -1238,109 +1244,118 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
 {
 	bool hasCommand = false;
 
-	if (AText.startsWith("/kick "))
+	if (AText.startsWith("/kick ") || AText=="/kick")
 	{
-		QStringList parts = AText.split(" ");
-		parts.removeFirst();
-
-		QString nick = parts.takeFirst();
-
-		FRoleRequestId = FMultiChat->setUserRole(nick,MUC_ROLE_NONE,parts.join(" "));
-		if (!FRoleRequestId.isEmpty())
-			showMultiChatStatusMessage(tr("Kick user %1 request was sent").arg(nick),IMessageStyleContentOptions::TypeNotification);
-		else if (FMultiChat->isOpen())
-			showMultiChatStatusMessage(tr("Failed to send kick user %1 request").arg(nick),IMessageStyleContentOptions::TypeNotification,IMessageStyleContentOptions::StatusError);
-		
-		hasCommand = true;
-	}
-	else if (AText.startsWith("/ban "))
-	{
-		QStringList parts = AText.split(" ");
-		parts.removeFirst();
-
-		QString nick = parts.takeFirst();
-
-		FAffilRequestId = FMultiChat->setUserAffiliation(nick,MUC_AFFIL_OUTCAST,parts.join(" "));
-		if (!FAffilRequestId.isEmpty())
-			showMultiChatStatusMessage(tr("Ban user %1 request was sent").arg(nick),IMessageStyleContentOptions::TypeNotification);
-		else if (FMultiChat->isOpen())
-			showMultiChatStatusMessage(tr("Failed to send ban user %1 request").arg(nick),IMessageStyleContentOptions::TypeNotification,IMessageStyleContentOptions::StatusError);
-
-		hasCommand = true;
-	}
-	else if (AText.startsWith("/invite "))
-	{
-		QStringList parts = AText.split(" ");
-		parts.removeFirst();
-
-		QString userJid = parts.takeFirst();
-
-		if (FMultiChat->sendInvitation(userJid,parts.join(" ")))
-			showMultiChatStatusMessage(tr("Invitation was sent to user %1").arg(userJid),IMessageStyleContentOptions::TypeNotification);
-		else if (FMultiChat->isOpen())
-			showMultiChatStatusMessage(tr("Failed to send invitation to user %1").arg(userJid),IMessageStyleContentOptions::TypeNotification,IMessageStyleContentOptions::StatusError);
-
-		hasCommand = true;
-	}
-	else if (AText.startsWith("/join "))
-	{
-		QStringList parts = AText.split(" ");
-		parts.removeFirst();
-
-		Jid joinJid = Jid::fromUserInput(parts.takeFirst() + "@" + FMultiChat->roomJid().domain());
-		FMultiChatManager->showJoinMultiChatDialog(streamJid(),joinJid,FMultiChat->nickName(),parts.join(" "));
-
-		hasCommand = true;
-	}
-	else if (AText.startsWith("/msg "))
-	{
-		QStringList parts = AText.split(" ");
-		parts.removeFirst();
-
-		QString nick = parts.takeFirst();
-
-		Message message;
-		message.setBody(parts.join(" "));
-
-		if (FMultiChat->sendMessage(message,nick))
-			showMultiChatStatusMessage(tr("Private message was sent to user %1").arg(nick),IMessageStyleContentOptions::TypeNotification);
-		else if (FMultiChat->isOpen())
-			showMultiChatStatusMessage(tr("Failed to send private message to user %1").arg(nick),IMessageStyleContentOptions::TypeNotification,IMessageStyleContentOptions::StatusError);
-
-		hasCommand = true;
-	}
-	else if (AText.startsWith("/nick "))
-	{
-		QStringList parts = AText.split(" ");
-		parts.removeFirst();
-
-		QString nick = parts.join(" ");
-
-		if (FMultiChat->setNickName(nick))
-			showMultiChatStatusMessage(tr("You nickname was changed to %1").arg(nick),IMessageStyleContentOptions::TypeNotification);
+		QStringList params = AText.split(" ");
+		QString nick = params.value(1);
+		if (!nick.isEmpty())
+		{
+			QString reason = QStringList(params.mid(2)).join(" ");
+			FRoleRequestId = FMultiChat->setUserRole(nick,MUC_ROLE_NONE,reason);
+			if (!FRoleRequestId.isEmpty())
+				showMultiChatStatusMessage(tr("Kick user %1 request was sent").arg(nick),IMessageStyleContentOptions::TypeNotification);
+			else if (FMultiChat->isOpen())
+				showMultiChatStatusMessage(tr("Failed to send kick user %1 request").arg(nick),IMessageStyleContentOptions::TypeNotification,IMessageStyleContentOptions::StatusError);
+		}
 		else
-			showMultiChatStatusMessage(tr("Failed to change your nickname to %1").arg(nick),IMessageStyleContentOptions::TypeNotification,IMessageStyleContentOptions::StatusError);
-
+		{
+			showMultiChatStatusMessage(tr("Required parameter <room nick> is not specified"),IMessageStyleContentOptions::TypeNotification,IMessageStyleContentOptions::StatusError);
+		}
 		hasCommand = true;
 	}
-	else if (AText.startsWith("/part ") || AText.startsWith("/leave ") || AText=="/part" || AText=="/leave")
+	else if (AText.startsWith("/ban ") || AText=="/ban")
 	{
-		QStringList parts = AText.split(" ");
-		parts.removeFirst();
-
-		QString status = parts.join(" ");
-
-		FMultiChat->sendPresence(IPresence::Offline,status,0);
-		exitAndDestroy(QString::null);
-
+		QStringList params = AText.split(" ");
+		QString nick = params.value(1);
+		if (!nick.isEmpty())
+		{
+			QString reason = QStringList(params.mid(2)).join(" ");
+			FAffilRequestId = FMultiChat->setUserAffiliation(nick,MUC_AFFIL_OUTCAST,reason);
+			if (!FAffilRequestId.isEmpty())
+				showMultiChatStatusMessage(tr("Ban user %1 request was sent").arg(nick),IMessageStyleContentOptions::TypeNotification);
+			else if (FMultiChat->isOpen())
+				showMultiChatStatusMessage(tr("Failed to send ban user %1 request").arg(nick),IMessageStyleContentOptions::TypeNotification,IMessageStyleContentOptions::StatusError);
+		}
+		else
+		{
+			showMultiChatStatusMessage(tr("Required parameter <user nick> is not specified"),IMessageStyleContentOptions::TypeNotification,IMessageStyleContentOptions::StatusError);
+		}
 		hasCommand = true;
 	}
-	else if (AText.startsWith("/topic "))
+	else if (AText.startsWith("/invite ") || AText=="/invite")
 	{
-		QStringList parts = AText.split(" ");
-		parts.removeFirst();
-
-		QString subject = parts.join(" ");
+		QStringList params = AText.split(" ");
+		Jid userJid = params.value(1);
+		if (userJid.isValid())
+		{
+			QString reason = QStringList(params.mid(2)).join(" ");
+			if (FMultiChat->sendInvitation(userJid,reason))
+				showMultiChatStatusMessage(tr("Invitation was sent to user %1").arg(userJid.full()),IMessageStyleContentOptions::TypeNotification);
+			else if (FMultiChat->isOpen())
+				showMultiChatStatusMessage(tr("Failed to send invitation to user %1").arg(userJid.full()),IMessageStyleContentOptions::TypeNotification,IMessageStyleContentOptions::StatusError);
+		}
+		else
+		{
+			showMultiChatStatusMessage(tr("Required parameter <user jid> is not specified"),IMessageStyleContentOptions::TypeNotification,IMessageStyleContentOptions::StatusError);
+		}
+		hasCommand = true;
+	}
+	else if (AText.startsWith("/join ") || AText=="/join")
+	{
+		QStringList params = AText.split(" ");
+		QString room = params.value(1);
+		if (!room.isEmpty())
+		{
+			QString password = QStringList(params.mid(2)).join(" ");
+			QString roomJid = !room.contains('@') ? room + "@" + FMultiChat->roomJid().domain() : room;
+			FMultiChatManager->showJoinMultiChatWizard(streamJid(),Jid::fromUserInput(roomJid),FMultiChat->nickName(),password);
+		}
+		else
+		{
+			showMultiChatStatusMessage(tr("Required parameter <room name> is not specified"),IMessageStyleContentOptions::TypeNotification,IMessageStyleContentOptions::StatusError);
+		}
+		hasCommand = true;
+	}
+	else if (AText.startsWith("/msg ") || AText=="/msg")
+	{
+		QStringList params = AText.split(" ");
+		QString nick = params.value(1);
+		if (!nick.isEmpty() && params.count()>2)
+		{
+			Message message;
+			message.setBody(QStringList(params.mid(2)).join(" "));
+			if (FMultiChat->sendMessage(message,nick))
+				showMultiChatStatusMessage(tr("Private message was sent to user %1").arg(nick),IMessageStyleContentOptions::TypeNotification);
+			else if (FMultiChat->isOpen())
+				showMultiChatStatusMessage(tr("Failed to send private message to user %1").arg(nick),IMessageStyleContentOptions::TypeNotification,IMessageStyleContentOptions::StatusError);
+		}
+		else
+		{
+			showMultiChatStatusMessage(tr("Required parameter <room nick> is not specified"),IMessageStyleContentOptions::TypeNotification,IMessageStyleContentOptions::StatusError);
+		}
+		hasCommand = true;
+	}
+	else if (AText.startsWith("/nick ") || AText=="/nick")
+	{
+		QStringList params = AText.split(" ");
+		QString nick = QStringList(params.mid(1)).join(" ");
+		if (!nick.isEmpty())
+		{
+			if (FMultiChat->setNickName(nick))
+				showMultiChatStatusMessage(tr("You nickname was changed to %1").arg(nick),IMessageStyleContentOptions::TypeNotification);
+			else
+				showMultiChatStatusMessage(tr("Failed to change your nickname to %1").arg(nick),IMessageStyleContentOptions::TypeNotification,IMessageStyleContentOptions::StatusError);
+		}
+		else
+		{
+			showMultiChatStatusMessage(tr("Required parameter <new nick> is not specified"),IMessageStyleContentOptions::TypeNotification,IMessageStyleContentOptions::StatusError);
+		}
+		hasCommand = true;
+	}
+	else if (AText.startsWith("/topic ") || AText=="/topic")
+	{
+		QStringList params = AText.split(" ");
+		QString subject = QStringList(params.mid(1)).join(" ");
 
 		if (FMultiChat->sendSubject(subject))
 			showMultiChatStatusMessage(tr("Change subject request was sent"),IMessageStyleContentOptions::TypeNotification);
@@ -1349,10 +1364,20 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
 
 		hasCommand = true;
 	}
+	else if (AText.startsWith("/part ") || AText.startsWith("/leave ") || AText=="/part" || AText=="/leave")
+	{
+		QStringList params = AText.split(" ");
+		QString status = QStringList(params.mid(1)).join(" ");
+		
+		FMultiChat->sendPresence(IPresence::Offline,status,0);
+		exitAndDestroy(QString::null);
+		
+		hasCommand = true;
+	}
 	else if (AText == "/help")
 	{
-		showMultiChatStatusMessage(
-			tr("Supported list of commands: \n"
+		showMultiChatStatusMessage(tr(
+			"Supported list of commands: \n"
 			" /ban <roomnick> [comment] \n"
 			" /invite <jid> [comment] \n"
 			" /join <roomname> [pass] \n"
@@ -1360,7 +1385,8 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
 			" /msg <roomnick> <foo> \n"
 			" /nick <newnick> \n"
 			" /leave [comment] \n"
-			" /topic <foo>"),IMessageStyleContentOptions::TypeNotification
+			" /topic <foo>"),
+			IMessageStyleContentOptions::TypeNotification
 		);
 
 		hasCommand = true;
@@ -1649,7 +1675,7 @@ void MultiUserChatWindow::requestMultiChatHistory()
 
 void MultiUserChatWindow::updateMultiChatWindow()
 {
-	FInfoWidget->setFieldValue(IMessageInfoWidget::Name,FMultiChat->roomName());
+	FInfoWidget->setFieldValue(IMessageInfoWidget::Name,FMultiChat->roomTitle());
 
 	QIcon statusIcon = FStatusIcons!=NULL ? FStatusIcons->iconByJidStatus(contactJid(),FMultiChat->roomPresence().show,SUBSCRIPTION_BOTH,false) : QIcon();
 	FInfoWidget->setFieldValue(IMessageInfoWidget::StatusIcon,statusIcon);
@@ -1660,8 +1686,8 @@ void MultiUserChatWindow::updateMultiChatWindow()
 		tabIcon = FTabPageNotifier->notifyById(FTabPageNotifier->activeNotify()).icon;
 
 	setWindowIcon(tabIcon);
-	setWindowIconText(QString("%1 (%2)").arg(FMultiChat->roomShortName()).arg(FUsers.count()));
-	setWindowTitle(tr("%1 - Conference").arg(FMultiChat->roomName()));
+	setWindowIconText(QString("%1 (%2)").arg(FMultiChat->roomName()).arg(FUsers.count()));
+	setWindowTitle(tr("%1 - Conference").arg(FMultiChat->roomTitle()));
 
 	emit tabPageChanged();
 }
@@ -1846,7 +1872,7 @@ void MultiUserChatWindow::updatePrivateChatWindow(IMessageChatWindow *AWindow)
 				AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::Avatar,FAvatars->emptyAvatarImage(FAvatars->avatarSize(IAvatars::AvatarSmall)));
 		}
 
-		QString name = tr("[%1] in [%2]").arg(user->nick(),FMultiChat->roomShortName());
+		QString name = tr("[%1] in [%2]").arg(user->nick(),FMultiChat->roomName());
 		AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::Name,name);
 
 		QIcon statusIcon = FStatusIcons!=NULL ? FStatusIcons->iconByJidStatus(user->userJid(),user->presence().show,SUBSCRIPTION_BOTH,false) : QIcon();
@@ -1986,6 +2012,7 @@ void MultiUserChatWindow::onMultiChatStateChanged(int AState)
 			FSHIAnyStanza = FStanzaProcessor->insertStanzaHandle(shandle);
 		}
 
+		updateRecentItemActiveTime(NULL);
 		showMultiChatStatusMessage(tr("You have joined the conference"),IMessageStyleContentOptions::TypeEvent,IMessageStyleContentOptions::StatusOnline);
 
 		if (FMultiChat->mainUser()->role() == MUC_ROLE_VISITOR)
@@ -2000,7 +2027,8 @@ void MultiUserChatWindow::onMultiChatStateChanged(int AState)
 		}
 		else if (FMultiChat->statusCodes().contains(MUC_SC_ROOM_CREATED))
 		{
-			FLoadConfigRequestId = FMultiChat->loadRoomConfig();
+			FInitializeConfig = true;
+			FConfigLoadRequestId = FMultiChat->loadRoomConfig();
 		}
 	}
 	else if (AState == IMultiUserChat::Closed)
@@ -2038,9 +2066,9 @@ void MultiUserChatWindow::onMultiChatStateChanged(int AState)
 	}
 }
 
-void MultiUserChatWindow::onMultiChatRoomNameChanged(const QString &AName)
+void MultiUserChatWindow::onMultiChatRoomTitleChanged(const QString &ATitle)
 {
-	Q_UNUSED(AName);
+	Q_UNUSED(ATitle);
 	updateMultiChatWindow();
 }
 
@@ -2050,9 +2078,9 @@ void MultiUserChatWindow::onMultiChatRequestFailed(const QString &AId, const Xmp
 		showMultiChatStatusMessage(tr("Failed to change user role: %1").arg(AError.errorMessage()),IMessageStyleContentOptions::TypeNotification,IMessageStyleContentOptions::StatusError);
 	else if (AId == FAffilRequestId)
 		showMultiChatStatusMessage(tr("Failed to change user affiliation: %1").arg(AError.errorMessage()),IMessageStyleContentOptions::TypeNotification,IMessageStyleContentOptions::StatusError);
-	else if (AId == FLoadConfigRequestId)
+	else if (AId == FConfigLoadRequestId)
 		showMultiChatStatusMessage(tr("Failed to load conference configuration: %1").arg(AError.errorMessage()),IMessageStyleContentOptions::TypeNotification,IMessageStyleContentOptions::StatusError);
-	else if (AId == FUpdateConfigRequestId)
+	else if (AId == FConfigUpdateRequestId)
 		showMultiChatStatusMessage(tr("Failed to update conference configuration: %1").arg(AError.errorMessage()),IMessageStyleContentOptions::TypeNotification,IMessageStyleContentOptions::StatusError);
 	else if (AId == FDestroyRequestId)
 		showMultiChatStatusMessage(tr("Failed to destroy this conference: %1").arg(AError.errorMessage()),IMessageStyleContentOptions::TypeNotification,IMessageStyleContentOptions::StatusError);
@@ -2251,13 +2279,14 @@ void MultiUserChatWindow::onMultiChatUserBanned(const QString &ANick, const QStr
 
 void MultiUserChatWindow::onMultiChatRoomConfigLoaded(const QString &AId, const IDataForm &AForm)
 {
-	if (FDataForms && AId==FLoadConfigRequestId)
+	if (FDataForms && AId==FConfigLoadRequestId)
 	{
 		IDataForm localizedForm = FDataForms->localizeForm(AForm);
 		localizedForm.title = QString("%1 (%2)").arg(localizedForm.title, FMultiChat->roomJid().uBare());
 
 		IDataDialogWidget *dialog = FDataForms->dialogWidget(localizedForm,this);
 		connect(dialog->instance(),SIGNAL(accepted()),SLOT(onRoomConfigFormDialogAccepted()));
+		connect(dialog->instance(),SIGNAL(rejected()),SLOT(onRoomConfigFormDialogRejected()));
 		connect(FMultiChat->instance(),SIGNAL(stateChanged(int)),dialog->instance(),SLOT(reject()));
 		dialog->instance()->show();
 	}
@@ -2266,8 +2295,11 @@ void MultiUserChatWindow::onMultiChatRoomConfigLoaded(const QString &AId, const 
 void MultiUserChatWindow::onMultiChatRoomConfigUpdated(const QString &AId, const IDataForm &AForm)
 {
 	Q_UNUSED(AForm);
-	if (AId == FUpdateConfigRequestId)
+	if (AId == FConfigUpdateRequestId)
+	{
+		FInitializeConfig = false;
 		showMultiChatStatusMessage(tr("Conference configuration accepted"),IMessageStyleContentOptions::TypeNotification);
+	}
 }
 
 void MultiUserChatWindow::onMultiChatRoomDestroyed(const QString &AId, const QString &AReason)
@@ -2535,7 +2567,7 @@ void MultiUserChatWindow::onRoomActionTriggered(bool)
 	Action *action = qobject_cast<Action *>(sender());
 	if (action == FChangeNick)
 	{
-		QString nick = QInputDialog::getText(this,tr("Change Nickname - %1").arg(FMultiChat->roomShortName()),tr("Enter your new nickname:"),QLineEdit::Normal,FMultiChat->nickName());
+		QString nick = QInputDialog::getText(this,tr("Change Nickname - %1").arg(FMultiChat->roomName()),tr("Enter your new nickname:"),QLineEdit::Normal,FMultiChat->nickName());
 		if (!nick.isEmpty())
 			FMultiChat->setNickName(nick);
 	}
@@ -2544,7 +2576,7 @@ void MultiUserChatWindow::onRoomActionTriggered(bool)
 		if (FMultiChat->isOpen())
 		{
 			QString newSubject = FMultiChat->subject();
-			InputTextDialog *dialog = new InputTextDialog(this,tr("Change Topic - %1").arg(FMultiChat->roomShortName()),tr("Enter new topic:"), newSubject);
+			InputTextDialog *dialog = new InputTextDialog(this,tr("Change Topic - %1").arg(FMultiChat->roomName()),tr("Enter new topic:"), newSubject);
 			if (dialog->exec() == QDialog::Accepted)
 				FMultiChat->sendSubject(newSubject);
 		}
@@ -2565,11 +2597,11 @@ void MultiUserChatWindow::onRoomActionTriggered(bool)
 	{
 		if (FMultiChat->isOpen())
 		{
-			Jid userJid = QInputDialog::getText(this,tr("Invite User - %1").arg(FMultiChat->roomShortName()),tr("Enter user Jabber ID:"));
+			Jid userJid = QInputDialog::getText(this,tr("Invite User - %1").arg(FMultiChat->roomName()),tr("Enter user Jabber ID:"));
 			if (userJid.isValid())
 			{
 				QString reason = tr("Please, enter this conference.");
-				reason = QInputDialog::getText(this,tr("Invite User - %1").arg(FMultiChat->roomShortName()),tr("Enter a message:"),QLineEdit::Normal,reason);
+				reason = QInputDialog::getText(this,tr("Invite User - %1").arg(FMultiChat->roomName()),tr("Enter a message:"),QLineEdit::Normal,reason);
 				FMultiChat->sendInvitation(userJid,reason);
 			}
 		}
@@ -2596,14 +2628,14 @@ void MultiUserChatWindow::onRoomActionTriggered(bool)
 	}
 	else if (action == FConfigRoom)
 	{
-		FLoadConfigRequestId = FMultiChat->loadRoomConfig();
+		FConfigLoadRequestId = FMultiChat->loadRoomConfig();
 	}
 	else if (action == FDestroyRoom)
 	{
 		if (FMultiChat->isOpen())
 		{
 			bool ok = false;
-			QString reason = QInputDialog::getText(this,tr("Destroy Conference - %1").arg(FMultiChat->roomShortName()),tr("Enter a message:"),QLineEdit::Normal,QString::null,&ok);
+			QString reason = QInputDialog::getText(this,tr("Destroy Conference - %1").arg(FMultiChat->roomName()),tr("Enter a message:"),QLineEdit::Normal,QString::null,&ok);
 			if (ok)
 				FDestroyRequestId = FMultiChat->destroyRoom(reason);
 		}
@@ -2700,7 +2732,17 @@ void MultiUserChatWindow::onRoomConfigFormDialogAccepted()
 {
 	IDataDialogWidget *dialog = qobject_cast<IDataDialogWidget *>(sender());
 	if (dialog)
-		FUpdateConfigRequestId = FMultiChat->updateRoomConfig(FDataForms->dataSubmit(dialog->formWidget()->userDataForm()));
+		FConfigUpdateRequestId = FMultiChat->updateRoomConfig(dialog->formWidget()->submitDataForm());
+}
+
+void MultiUserChatWindow::onRoomConfigFormDialogRejected()
+{
+	if (FInitializeConfig)
+	{
+		IDataForm form;
+		form.type = DATAFORM_TYPE_SUBMIT;
+		FConfigUpdateRequestId = FMultiChat->updateRoomConfig(form);
+	}
 }
 
 void MultiUserChatWindow::onOptionsChanged(const OptionsNode &ANode)

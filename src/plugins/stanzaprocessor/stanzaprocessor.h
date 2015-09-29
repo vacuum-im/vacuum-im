@@ -10,8 +10,8 @@
 
 struct StanzaRequest {
 	StanzaRequest() {
-		timer=NULL;
-		owner=NULL;
+		timer = NULL;
+		owner = NULL;
 	}
 	Jid streamJid;
 	Jid contactJid;
@@ -77,8 +77,8 @@ private:
 	IXmppStreamManager *FXmppStreamManager;
 private:
 	QMap<int, IStanzaHandle> FHandles;
-	QMap<QString, StanzaRequest> FRequests;
 	QMultiMap<int, int> FHandleIdByOrder;
+	QMap<QString, StanzaRequest> FRequests;
 };
 
 #endif // STANZAPROCESSOR_H

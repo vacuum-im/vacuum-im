@@ -33,7 +33,7 @@ public:
 	virtual Jid streamJid() const;
 	virtual Jid roomJid() const;
 	virtual QString roomName() const;
-	virtual QString roomShortName() const;
+	virtual QString roomTitle() const;
 	virtual int state() const;
 	virtual bool isOpen() const;
 	virtual bool isIsolated() const;
@@ -77,7 +77,7 @@ signals:
 	void stateChanged(int AState);
 	void chatDestroyed();
 	//Common
-	void roomNameChanged(const QString &AName);
+	void roomTitleChanged(const QString &ATitle);
 	void streamJidChanged(const Jid &ABefore, const Jid &AAfter);
 	void requestFailed(const QString &AId, const XmppError &AError);
 	//Occupant
@@ -138,7 +138,7 @@ private:
 	QString FSubject;
 	QString FNickName;
 	QString FPassword;
-	QString FRoomName;
+	QString FRoomTitle;
 	MultiUser *FMainUser;
 	XmppError FRoomError;
 	IPresenceItem FRoomPresence;
