@@ -1471,6 +1471,10 @@
         <source>Failed to load list of conferences: %1</source>
         <translation>Не удалось загрузить список конференций: %1</translation>
     </message>
+    <message>
+        <source>Conference description is not available or invalid</source>
+        <translation>Описание конференции не доступно или не корректно</translation>
+    </message>
 </context>
 <context>
     <name>ServicePage</name>

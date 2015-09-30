@@ -1,5 +1,6 @@
 #include "createmultichatwizard.h"
 
+#include <QSpacerItem>
 #include <QGridLayout>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -450,7 +451,7 @@ void ServicePage::processDiscoInfo(const IDiscoInfo &AInfo)
 	{
 		IDiscoIdentity ident = AInfo.identity.value(index);
 		if (!ident.name.isEmpty())
-			cmbService->addItem(QString("%1 (%2)").arg(ident.name,AInfo.contactJid.domain()), AInfo.contactJid.pDomain());
+			cmbService->addItem(QString("%1 (%2)").arg(ident.name.trimmed(),AInfo.contactJid.domain()), AInfo.contactJid.pDomain());
 		else
 			cmbService->addItem(AInfo.contactJid.domain(), AInfo.contactJid.pDomain());
 		emit completeChanged();
@@ -766,11 +767,20 @@ void RoomPage::onDiscoInfoRecieved(const IDiscoInfo &AInfo)
 		{
 			if (AInfo.error.isNull())
 			{
-				QString name = AInfo.identity.value(0).name;
-				lblInfo->setText(name.isEmpty() ? Jid(roomJid()).uBare() : name);
+				IServiceDiscovery *discovery = PluginHelper::pluginInstance<IServiceDiscovery>();
+				int index = discovery!=NULL ? discovery->findIdentity(AInfo.identity,DIC_CONFERENCE,DIT_CONFERENCE_TEXT) : -1;
+				if (index >= 0)
+				{
+					IDiscoIdentity ident = AInfo.identity.value(index);
+					lblInfo->setText(Qt::escape(!ident.name.isEmpty() ? ident.name.trimmed() : AInfo.contactJid.uNode()));
 
-				FRoomChecked = true;
-				emit completeChanged();
+					FRoomChecked = true;
+					emit completeChanged();
+				}
+				else
+				{
+					lblInfo->setText(tr("Conference description is not available or invalid"));
+				}
 			}
 			else
 			{
@@ -1006,7 +1016,7 @@ void ConfigPage::setError(const QString &AMessage)
 	else
 		lblCaption->setText(QString("<h2>%1</h2>").arg(tr("Conference is not configured :(")));
 
-	lblInfo->setText(AMessage);
+	lblInfo->setText(Qt::escape(AMessage));
 }
 
 void ConfigPage::onConfigFormFieldChanged()
@@ -1115,6 +1125,9 @@ JoinPage::JoinPage(QWidget *AParent) : QWizardPage(AParent)
 	lblRegister = new QLabel(this);
 	connect(lblRegister,SIGNAL(linkActivated(const QString &)),SLOT(onRegisterNickLinkActivated()));
 
+	lblRoomJid = new QLabel(this);
+	lblRoomJid->setWordWrap(true);
+
 	lblRoomName = new QLabel(this);
 	lblRoomName->setWordWrap(true);
 
@@ -1146,6 +1159,7 @@ JoinPage::JoinPage(QWidget *AParent) : QWizardPage(AParent)
 	QVBoxLayout *layout = new QVBoxLayout(this);
 	layout->addLayout(nickLayout);
 	layout->addSpacing(10);
+	layout->addWidget(lblRoomJid);
 	layout->addWidget(lblRoomName);
 	layout->addLayout(passwordLayout);
 	layout->addWidget(lblMucMembersOnly);
@@ -1180,6 +1194,8 @@ void JoinPage::initializePage()
 {
 	FRoomChecked = false;
 	processDiscoInfo(IDiscoInfo());
+
+	lblRoomJid->setText(QString("<b>%1</b>").arg(Qt::escape(roomJid().uBare())));
 
 	IServiceDiscovery *discovery = PluginHelper::pluginInstance<IServiceDiscovery>();
 	if (discovery && discovery->requestDiscoInfo(streamJid(),roomJid()))
@@ -1254,12 +1270,15 @@ void JoinPage::processDiscoInfo(const IDiscoInfo &AInfo)
 	if (index>=0 && AInfo.error.isNull())
 	{
 		IDiscoIdentity ident = AInfo.identity.value(index);
-
-		if (!ident.name.isEmpty())
-			lblRoomName->setText(QString("%1 (%2)").arg(ident.name, AInfo.contactJid.uNode()));
+		if (!ident.name.isEmpty() && ident.name!=AInfo.contactJid.node())
+		{
+			lblRoomName->setText(Qt::escape(ident.name.trimmed()));
+			lblRoomName->setVisible(true);
+		}
 		else
-			lblRoomName->setText(AInfo.contactJid.uBare());
-		lblRoomName->setVisible(true);
+		{
+			lblRoomName->setVisible(false);
+		}
 
 		if (AInfo.features.contains(MUC_FEATURE_PASSWORD) || AInfo.features.contains(MUC_FEATURE_PASSWORDPROTECTED))
 		{
@@ -1516,7 +1535,8 @@ ManualPage::ManualPage(QWidget *AParent) : QWizardPage(AParent)
 	layout->addWidget(lblRegister,2,2);
 	layout->addWidget(new QLabel(tr("Password:")),3,0);
 	layout->addWidget(lneRoomPassword,3,1,1,2);
-	layout->addWidget(lblInfo,4,0,1,3);
+	layout->addItem(new QSpacerItem(10,10),4,0);
+	layout->addWidget(lblInfo,5,0,1,3);
 	layout->setMargin(0);
 
 	QWidget::setTabOrder(cmbAccount, lneRoomJid);
@@ -1722,11 +1742,7 @@ void ManualPage::onDiscoInfoRecieved(const IDiscoInfo &AInfo)
 			if (index >= 0)
 			{
 				IDiscoIdentity ident = AInfo.identity.value(index);
-
-				if (!ident.name.isEmpty())
-					lblInfo->setText(QString("%1 (%2)").arg(ident.name, AInfo.contactJid.uNode()));
-				else
-					lblInfo->setText(AInfo.contactJid.uBare());
+				lblInfo->setText(Qt::escape(!ident.name.isEmpty() ? ident.name.trimmed() : AInfo.contactJid.uNode()));
 
 				if (AInfo.features.contains(MUC_FEATURE_PASSWORD) || AInfo.features.contains(MUC_FEATURE_PASSWORDPROTECTED))
 					lblInfo->setText(QString("%1\n%2").arg(lblInfo->text(),tr("This conference is password protected")));

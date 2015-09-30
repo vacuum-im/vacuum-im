@@ -224,6 +224,7 @@ protected slots:
 private:
 	QLineEdit *lneNick;
 	QLabel *lblRegister;
+	QLabel *lblRoomJid;
 	QLabel *lblRoomName;
 	QLineEdit *lnePassword;
 	QLabel *lblMucPassword;
