@@ -2386,7 +2386,17 @@ void MultiUserChatWindow::onMultiChatViewWidgetContextMenu(const QPoint &APositi
 	QTextDocumentFragment fragmet = FViewWidget->textFragmentAt(APosition);
 	IMultiUser *user = FMultiChat!=NULL ? FMultiChat->findUser(fragmet.toPlainText()) : NULL;
 	if (user!=NULL && user!=FMultiChat->mainUser())
+	{
+		Action *userNick = new Action(AMenu);
+		userNick->setText(user->nick());
+		userNick->setEnabled(false);
+		QFont userFont = userNick->font();
+		userFont.setBold(true);
+		userNick->setFont(userFont);
+		AMenu->addAction(userNick,0);
+
 		contextMenuForUser(user,AMenu);
+	}
 }
 
 void MultiUserChatWindow::onMultiChatUserItemNotifyActivated(int ANotifyId)
