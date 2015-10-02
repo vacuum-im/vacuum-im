@@ -14,12 +14,12 @@ static const QList<QString> EscStrings = QList<QString>() <<"\\5c"<<"\\20"<<"\\2
 QHash<QString,Jid> Jid::FJidCache;
 const Jid Jid::null;
 
-void registerJidStreamOperators()
+static bool JidStreamOperatorsRegistered = false;
+inline void registerJidStreamOperators()
 {
-	static bool typeStreamOperatorsRegistered = false;
-	if (!typeStreamOperatorsRegistered)
+	if (!JidStreamOperatorsRegistered)
 	{
-		typeStreamOperatorsRegistered = true;
+		JidStreamOperatorsRegistered = true;
 		qRegisterMetaTypeStreamOperators<Jid>("Jid");
 	}
 }
@@ -241,16 +241,15 @@ bool Jid::operator>(const Jid &AJid) const
 
 Jid Jid::fromUserInput(const QString &AJidStr)
 {
-	if (!AJidStr.isEmpty())
+	QString jidStr = AJidStr.trimmed();
+	if (!jidStr.isEmpty())
 	{
-		int at = AJidStr.indexOf(CharDog);
-		int slash = AJidStr.lastIndexOf(CharSlash);
+		int at = jidStr.indexOf(CharDog);
+		int slash = jidStr.lastIndexOf(CharSlash);
 		if (slash==-1 || slash<at)
-			slash = AJidStr.size();
-		at = AJidStr.lastIndexOf(CharDog,slash-AJidStr.size()-1);
-		if (at > 0)
-			return Jid(escape(unescape(AJidStr.left(at))) + AJidStr.right(AJidStr.size()-at));
-		return Jid(AJidStr);
+			slash = jidStr.size();
+		at = jidStr.lastIndexOf(CharDog, slash-jidStr.size()-1);
+		return at>0 ? Jid(escape(unescape(jidStr.left(at))) + jidStr.right(jidStr.size()-at)) : Jid(jidStr);
 	}
 	return Jid::null;
 }
@@ -262,7 +261,7 @@ QString Jid::escape(const QString &AUserNode)
 	{
 		escNode.reserve(AUserNode.length()*3);
 
-		for (int i = 0; i<AUserNode.length(); i++)
+		for (int i=0; i<AUserNode.length(); i++)
 		{
 			int index = EscChars.indexOf(AUserNode.at(i));
 			if (index==0 && EscStrings.indexOf(AUserNode.mid(i,3))>=0)
@@ -286,12 +285,12 @@ QString Jid::unescape(const QString &AEscNode)
 		nodeStr.reserve(AEscNode.length());
 
 		int index;
-		for (int i = 0; i<AEscNode.length(); i++)
+		for (int i=0; i<AEscNode.length(); i++)
 		{
 			if (AEscNode.at(i)=='\\' && (index = EscStrings.indexOf(AEscNode.mid(i,3)))>=0)
 			{
 				nodeStr.append(EscChars.at(index));
-				i+=2;
+				i += 2;
 			}
 			else
 			{
@@ -391,7 +390,7 @@ Jid &Jid::parseFromString(const QString &AJidStr)
 {
 	if (!FJidCache.contains(AJidStr))
 	{
-		if (!d)
+		if (d == NULL)
 			d = new JidData;
 		JidData *dd = d.data();
 
@@ -400,7 +399,7 @@ Jid &Jid::parseFromString(const QString &AJidStr)
 			int slash = AJidStr.indexOf(CharSlash);
 			if (slash == -1)
 				slash = AJidStr.size();
-			int at = AJidStr.lastIndexOf(CharDog,slash-AJidStr.size()-1);
+			int at = AJidStr.lastIndexOf(CharDog, slash-AJidStr.size()-1);
 
 			// Build normal JID
 			dd->FFull = QString::null;
