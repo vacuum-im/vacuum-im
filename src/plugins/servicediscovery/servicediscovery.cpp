@@ -33,7 +33,7 @@
 
 #define DIC_CLIENT              "client"
 
-#define QUEUE_TIMER_INTERVAL    2000
+#define QUEUE_TIMEOUT           2000
 #define QUEUE_REQUEST_WAIT      5000
 #define QUEUE_REQUEST_START     QDateTime::currentDateTime().addMSecs(QUEUE_REQUEST_WAIT)
 
@@ -59,11 +59,12 @@ ServiceDiscovery::ServiceDiscovery()
 	FDataForms = NULL;
 	FXmppUriQueries = NULL;
 
+	FDiscoMenu = NULL;
 	FUpdateSelfCapsStarted = false;
 
-	FDiscoMenu = NULL;
-	FQueueTimer.setSingleShot(false);
-	FQueueTimer.setInterval(QUEUE_TIMER_INTERVAL);
+
+	FQueueTimer.setSingleShot(true);
+	FQueueTimer.setInterval(QUEUE_TIMEOUT);
 	connect(&FQueueTimer,SIGNAL(timeout()),SLOT(onQueueTimerTimeout()));
 
 	connect(this,SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
@@ -1522,17 +1523,18 @@ void ServiceDiscovery::onDiscoItemsWindowDestroyed(IDiscoItemsWindow *AWindow)
 
 void ServiceDiscovery::onQueueTimerTimeout()
 {
-	bool sent = false;
+	bool requstSent = false;
 	QMultiMap<QDateTime,DiscoveryRequest>::iterator it = FQueuedRequests.begin();
-	while (!sent && it!=FQueuedRequests.end() && it.key()<QDateTime::currentDateTime())
+	while (!requstSent && it!=FQueuedRequests.end() && it.key()<QDateTime::currentDateTime())
 	{
 		DiscoveryRequest request = it.value();
-		sent = requestDiscoInfo(request.streamJid,request.contactJid,request.node);
+		if (requestDiscoInfo(request.streamJid,request.contactJid,request.node))
+		{
+			requstSent = true;
+			FQueueTimer.start();
+		}
 		it = FQueuedRequests.erase(it);
 	}
-
-	if (FQueuedRequests.isEmpty())
-		FQueueTimer.stop();
 }
 
 void ServiceDiscovery::onSelfCapsChanged()

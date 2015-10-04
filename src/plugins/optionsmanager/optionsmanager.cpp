@@ -37,14 +37,16 @@
 
 #define ADR_PROFILE                     Action::DR_Parametr1
 
+#define AUTO_SAVE_TIMEOUT               5*60*1000
+
 OptionsManager::OptionsManager()
 {
 	FPluginManager = NULL;
 	FTrayManager = NULL;
 	FMainWindowPlugin = NULL;
 
-	FAutoSaveTimer.setInterval(5*60*1000);
 	FAutoSaveTimer.setSingleShot(false);
+	FAutoSaveTimer.setInterval(AUTO_SAVE_TIMEOUT);
 	connect(&FAutoSaveTimer, SIGNAL(timeout()),SLOT(onAutoSaveTimerTimeout()));
 
 	qsrand(QDateTime::currentDateTime().toTime_t());

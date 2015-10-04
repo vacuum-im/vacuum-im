@@ -36,7 +36,7 @@
 #define DEFAULT_IMAGE_FORMAT     "PNG"
 
 #define UPDATE_VCARD_DAYS         7
-#define UPDATE_REQUEST_TIMEOUT    5000
+#define UPDATE_TIMEOUT            5000
 
 #define ADR_STREAM_JID            Action::DR_StreamJid
 #define ADR_CONTACT_JID           Action::DR_Parametr1
@@ -60,8 +60,8 @@ VCardManager::VCardManager()
 	FRosterSearch = NULL;
 	FOptionsManager = NULL;
 
-	FUpdateTimer.setSingleShot(false);
-	FUpdateTimer.start(UPDATE_REQUEST_TIMEOUT);
+	FUpdateTimer.setSingleShot(true);
+	FUpdateTimer.start(UPDATE_TIMEOUT);
 	connect(&FUpdateTimer,SIGNAL(timeout()),SLOT(onUpdateTimerTimeout()));
 }
 
@@ -768,7 +768,13 @@ void VCardManager::onUpdateTimerTimeout()
 	{
 		QFileInfo info(vcardFileName(it.value()));
 		if (!info.exists() || info.lastModified().daysTo(QDateTime::currentDateTime())>UPDATE_VCARD_DAYS)
-			requestSent = requestVCard(it.key(),it.value());
+		{
+			if (requestVCard(it.key(),it.value()))
+			{
+				requestSent = true;
+				FUpdateTimer.start();
+			}
+		}
 		it = FUpdateQueue.erase(it);
 	}
 }
@@ -790,7 +796,11 @@ void VCardManager::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AIt
 	if (ARoster->isOpen() && ABefore.isNull())
 	{
 		if (!FUpdateQueue.contains(ARoster->streamJid(),AItem.itemJid))
+		{
+			if (!FUpdateTimer.isActive())
+				FUpdateTimer.start();
 			FUpdateQueue.insertMulti(ARoster->streamJid(),AItem.itemJid);
+		}
 	}
 }
 

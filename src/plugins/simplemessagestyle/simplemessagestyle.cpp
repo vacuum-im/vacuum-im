@@ -130,37 +130,38 @@ bool SimpleMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOpti
 	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
 	if (view && AOptions.styleId==styleId())
 	{
-		if (!FWidgetStatus.contains(view))
+		bool isNewView = !FWidgetStatus.contains(view);
+		if (AClear || isNewView)
 		{
-			AClear = true;
-			FWidgetStatus[view].scrollStarted = false;
-			view->installEventFilter(this);
-			connect(view,SIGNAL(anchorClicked(const QUrl &)),SLOT(onStyleWidgetLinkClicked(const QUrl &)));
-			connect(view,SIGNAL(destroyed(QObject *)),SLOT(onStyleWidgetDestroyed(QObject *)));
-			emit widgetAdded(AWidget);
+			WidgetStatus &wstatus = FWidgetStatus[view];
+			wstatus.lastKind = -1;
+			wstatus.lastId = QString::null;
+			wstatus.lastTime = QDateTime();
+			wstatus.scrollStarted = false;
+			wstatus.content.clear();
+
+			if (isNewView)
+			{
+				view->installEventFilter(this);
+				connect(view,SIGNAL(anchorClicked(const QUrl &)),SLOT(onStyleWidgetLinkClicked(const QUrl &)));
+				connect(view,SIGNAL(destroyed(QObject *)),SLOT(onStyleWidgetDestroyed(QObject *)));
+				emit widgetAdded(view);
+			}
+
+			QString html = makeStyleTemplate();
+			fillStyleKeywords(html,AOptions);
+			view->setHtml(html);
+
+			QTextCursor cursor(view->document());
+			cursor.movePosition(QTextCursor::End);
+			wstatus.contentStartPosition = cursor.position();
 		}
 		else
 		{
 			FWidgetStatus[view].lastKind = -1;
 		}
 
-		if (AClear)
-		{
-			WidgetStatus &wstatus = FWidgetStatus[view];
-			wstatus.lastKind = -1;
-			wstatus.lastId = QString::null;
-			wstatus.lastTime = QDateTime();
-			wstatus.content.clear();
-
-			QString html = makeStyleTemplate();
-			fillStyleKeywords(html,AOptions);
-			view->setHtml(html);
-			setVariant(AWidget, AOptions.extended.value(MSO_VARIANT).toString());
-
-			QTextCursor cursor(view->document());
-			cursor.movePosition(QTextCursor::End);
-			wstatus.contentStartPosition = cursor.position();
-		}
+		setVariant(view, AOptions.extended.value(MSO_VARIANT).toString());
 
 		QFont font;
 		int fontSize = AOptions.extended.value(MSO_FONT_SIZE).toInt();
@@ -171,7 +172,7 @@ bool SimpleMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOpti
 			font.setFamily(fontFamily);
 		view->document()->setDefaultFont(font);
 
-		emit optionsChanged(AWidget,AOptions,AClear);
+		emit optionsChanged(view,AOptions,AClear);
 		return true;
 	}
 	else if (view == NULL)
@@ -183,7 +184,7 @@ bool SimpleMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOpti
 
 bool SimpleMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, const IMessageStyleContentOptions &AOptions)
 {
-	StyleViewer *view = FWidgetStatus.contains(AWidget) ? qobject_cast<StyleViewer *>(AWidget) : NULL;
+	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
 	if (view)
 	{
 		WidgetStatus &wstatus = FWidgetStatus[AWidget];
@@ -331,18 +332,10 @@ bool SimpleMessageStyle::isSameSender(QWidget *AWidget, const IMessageStyleConte
 	return true;
 }
 
-void SimpleMessageStyle::setVariant(QWidget *AWidget, const QString &AVariant)
+void SimpleMessageStyle::setVariant(StyleViewer *AView, const QString &AVariant)
 {
-	StyleViewer *view = FWidgetStatus.contains(AWidget) ? qobject_cast<StyleViewer *>(AWidget) : NULL;
-	if (view)
-	{
-		QString variant = QString("Variants/%1.css").arg(!FVariants.contains(AVariant) ? FInfo.value(MSIV_DEFAULT_VARIANT,"main").toString() : AVariant);
-		view->document()->setDefaultStyleSheet(loadFileData(FStylePath+"/"+variant,QString::null));
-	}
-	else
-	{
-		REPORT_ERROR("Failed to change simple style variant: Invalid style view");
-	}
+	QString variant = QString("Variants/%1.css").arg(!FVariants.contains(AVariant) ? FInfo.value(MSIV_DEFAULT_VARIANT,"main").toString() : AVariant);
+	AView->document()->setDefaultStyleSheet(loadFileData(FStylePath+"/"+variant,QString::null));
 }
 
 QString SimpleMessageStyle::makeStyleTemplate() const
