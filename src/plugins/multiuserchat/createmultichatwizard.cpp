@@ -263,6 +263,7 @@ ServicePage::ServicePage(QWidget *AParent) : QWizardPage(AParent)
 
 	lblInfo = new QLabel(this);
 	lblInfo->setWordWrap(true);
+	lblInfo->setTextFormat(Qt::PlainText);
 
 	cmbAccount = new QComboBox(this);
 	cmbServer = new QComboBox(this);
@@ -598,9 +599,11 @@ RoomPage::RoomPage(QWidget *AParent) : QWizardPage(AParent)
 	connect(lneRoomNode,SIGNAL(textChanged(const QString &)),SLOT(onRoomNodeTextChanged()));
 
 	lblRoomDomain = new QLabel(this);
+	lblRoomDomain->setTextFormat(Qt::PlainText);
 
 	lblInfo = new QLabel(this);
 	lblInfo->setWordWrap(true);
+	lblInfo->setTextFormat(Qt::PlainText);
 
 	FRoomNodeTimer.setSingleShot(true);
 	connect(&FRoomNodeTimer,SIGNAL(timeout()),SLOT(onRoomNodeTimerTimeout()));
@@ -772,7 +775,7 @@ void RoomPage::onDiscoInfoRecieved(const IDiscoInfo &AInfo)
 				if (index >= 0)
 				{
 					IDiscoIdentity ident = AInfo.identity.value(index);
-					lblInfo->setText(Qt::escape(!ident.name.isEmpty() ? ident.name.trimmed() : AInfo.contactJid.uNode()));
+					lblInfo->setText(!ident.name.isEmpty() ? ident.name.trimmed() : AInfo.contactJid.uNode());
 
 					FRoomChecked = true;
 					emit completeChanged();
@@ -887,6 +890,7 @@ ConfigPage::ConfigPage(QWidget *AParent) : QWizardPage(AParent)
 	FRoomNick = QUuid::createUuid().toString();
 
 	lblCaption = new QLabel(this);
+	lblCaption->setTextFormat(Qt::RichText);
 	lblCaption->setAlignment(Qt::AlignCenter);
 
 	wdtConfig = new QWidget(this);
@@ -900,6 +904,7 @@ ConfigPage::ConfigPage(QWidget *AParent) : QWizardPage(AParent)
 
 	lblInfo = new QLabel(this);
 	lblInfo->setWordWrap(true);
+	lblInfo->setTextFormat(Qt::PlainText);
 
 	QVBoxLayout *layout = new QVBoxLayout(this);
 	layout->addStretch();
@@ -1016,7 +1021,7 @@ void ConfigPage::setError(const QString &AMessage)
 	else
 		lblCaption->setText(QString("<h2>%1</h2>").arg(tr("Conference is not configured :(")));
 
-	lblInfo->setText(Qt::escape(AMessage));
+	lblInfo->setText(AMessage);
 }
 
 void ConfigPage::onConfigFormFieldChanged()
@@ -1123,13 +1128,16 @@ JoinPage::JoinPage(QWidget *AParent) : QWizardPage(AParent)
 	connect(lneNick,SIGNAL(textChanged(const QString &)),SLOT(onRoomNickTextChanged()));
 
 	lblRegister = new QLabel(this);
+	lblRegister->setTextFormat(Qt::RichText);
 	connect(lblRegister,SIGNAL(linkActivated(const QString &)),SLOT(onRegisterNickLinkActivated()));
 
 	lblRoomJid = new QLabel(this);
 	lblRoomJid->setWordWrap(true);
+	lblRoomJid->setTextFormat(Qt::RichText);
 
 	lblRoomName = new QLabel(this);
 	lblRoomName->setWordWrap(true);
+	lblRoomName->setTextFormat(Qt::PlainText);
 
 	lnePassword = new QLineEdit(this);
 	lnePassword->setVisible(false);
@@ -1146,6 +1154,7 @@ JoinPage::JoinPage(QWidget *AParent) : QWizardPage(AParent)
 
 	lblInfo = new QLabel(this);
 	lblInfo->setWordWrap(true);
+	lblInfo->setTextFormat(Qt::PlainText);
 
 	QHBoxLayout *nickLayout = new QHBoxLayout;
 	nickLayout->addWidget(new QLabel(tr("Join with nick:"),this));
@@ -1195,7 +1204,7 @@ void JoinPage::initializePage()
 	FRoomChecked = false;
 	processDiscoInfo(IDiscoInfo());
 
-	lblRoomJid->setText(QString("<b>%1</b>").arg(Qt::escape(roomJid().uBare())));
+	lblRoomJid->setText(QString("<b>%1</b>").arg(roomJid().uBare()));
 
 	IServiceDiscovery *discovery = PluginHelper::pluginInstance<IServiceDiscovery>();
 	if (discovery && discovery->requestDiscoInfo(streamJid(),roomJid()))
@@ -1272,7 +1281,7 @@ void JoinPage::processDiscoInfo(const IDiscoInfo &AInfo)
 		IDiscoIdentity ident = AInfo.identity.value(index);
 		if (!ident.name.isEmpty() && ident.name!=AInfo.contactJid.node())
 		{
-			lblRoomName->setText(Qt::escape(ident.name.trimmed()));
+			lblRoomName->setText(ident.name.trimmed());
 			lblRoomName->setVisible(true);
 		}
 		else
@@ -1516,6 +1525,7 @@ ManualPage::ManualPage(QWidget *AParent) : QWizardPage(AParent)
 	lneRoomNick->setPlaceholderText(tr("Your nickname in conference"));
 
 	lblRegister = new QLabel(this);
+	lblRegister->setTextFormat(Qt::RichText);
 	connect(lblRegister,SIGNAL(linkActivated(const QString &)),SLOT(onRegisterNickLinkActivated()));
 
 	lneRoomPassword = new QLineEdit(this);
@@ -1524,6 +1534,7 @@ ManualPage::ManualPage(QWidget *AParent) : QWizardPage(AParent)
 
 	lblInfo = new QLabel(this);
 	lblInfo->setWordWrap(true);
+	lblInfo->setTextFormat(Qt::PlainText);
 
 	QGridLayout *layout = new QGridLayout(this);
 	layout->addWidget(new QLabel(tr("Account:")),0,0);
@@ -1742,7 +1753,7 @@ void ManualPage::onDiscoInfoRecieved(const IDiscoInfo &AInfo)
 			if (index >= 0)
 			{
 				IDiscoIdentity ident = AInfo.identity.value(index);
-				lblInfo->setText(Qt::escape(!ident.name.isEmpty() ? ident.name.trimmed() : AInfo.contactJid.uNode()));
+				lblInfo->setText(!ident.name.isEmpty() ? ident.name.trimmed() : AInfo.contactJid.uNode());
 
 				if (AInfo.features.contains(MUC_FEATURE_PASSWORD) || AInfo.features.contains(MUC_FEATURE_PASSWORDPROTECTED))
 					lblInfo->setText(QString("%1\n%2").arg(lblInfo->text(),tr("This conference is password protected")));
