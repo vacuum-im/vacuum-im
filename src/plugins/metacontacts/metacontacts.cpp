@@ -590,7 +590,7 @@ AdvancedDelegateEditProxy *MetaContacts::rosterEditProxy(int AOrder, int ADataRo
 
 bool MetaContacts::recentItemValid(const IRecentItem &AItem) const
 {
-	return FMetaContacts.contains(AItem.streamJid) ? FMetaContacts.value(AItem.streamJid).contains(AItem.reference) : true;
+	return !AItem.reference.isEmpty() && (FMetaContacts.contains(AItem.streamJid) ? FMetaContacts.value(AItem.streamJid).contains(AItem.reference) : true);
 }
 
 bool MetaContacts::recentItemCanShow(const IRecentItem &AItem) const
@@ -601,13 +601,12 @@ bool MetaContacts::recentItemCanShow(const IRecentItem &AItem) const
 QIcon MetaContacts::recentItemIcon(const IRecentItem &AItem) const
 {
 	Q_UNUSED(AItem);
-	return QIcon();
+	return FStatusIcons!=NULL ? FStatusIcons->iconByStatus(IPresence::Offline,SUBSCRIPTION_NONE,false) : QIcon();
 }
 
 QString MetaContacts::recentItemName(const IRecentItem &AItem) const
 {
-	QString name = AItem.properties.value(REIP_NAME).toString();
-	return !name.isEmpty() ? name : AItem.reference;
+	return AItem.reference;
 }
 
 IRecentItem MetaContacts::recentItemForIndex(const IRosterIndex *AIndex) const
@@ -2199,10 +2198,11 @@ void MetaContacts::onRecentItemChanged(const IRecentItem &AItem)
 		if (AItem.type == REIT_METACONTACT)
 		{
 			IRosterIndex *sRoot = getMetaIndexRoot(AItem.streamJid);
+			
+			bool isFavorite = AItem.properties.value(REIP_FAVORITE).toBool();
 			IRecentItem prevItem = FMetaRecentItems.value(sRoot).value(AItem.reference);
-			if (!prevItem.isNull() && prevItem.properties.value(REIP_FAVORITE)!=AItem.properties.value(REIP_FAVORITE))
+			if (!prevItem.isNull() && prevItem.properties.value(REIP_FAVORITE)!=isFavorite)
 			{
-				bool isFavorite = AItem.properties.value(REIP_FAVORITE).toBool();
 				foreach(const IRecentItem &item, findMetaRecentContacts(AItem.streamJid,AItem.reference))
 				{
 					if (FRecentContacts->isReady(item.streamJid))
@@ -2213,6 +2213,7 @@ void MetaContacts::onRecentItemChanged(const IRecentItem &AItem)
 				}
 				FUpdatingRecentItem = IRecentItem();
 			}
+
 			FMetaRecentItems[sRoot].insert(AItem.reference,AItem);
 		}
 		else if (AItem.type == REIT_CONTACT)
@@ -2232,6 +2233,7 @@ void MetaContacts::onRecentItemRemoved(const IRecentItem &AItem)
 		{
 			IRosterIndex *sRoot = getMetaIndexRoot(AItem.streamJid);
 			FMetaRecentItems[sRoot].remove(AItem.reference);
+
 			foreach(const IRecentItem &item, findMetaRecentContacts(AItem.streamJid,AItem.reference))
 			{
 				if (FRecentContacts->isReady(item.streamJid))
