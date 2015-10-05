@@ -95,7 +95,8 @@ public:
 		ImageScale
 	};
 	struct WidgetStatus {
-		int wait;
+		bool ready;
+		bool failed;
 		int lastKind;
 		QString lastId;
 		QDateTime lastTime;
@@ -133,7 +134,7 @@ public:
 protected:
 	QWebHitTestResult hitTest(QWidget *AWidget, const QPoint &APosition) const;
 	bool isSameSender(QWidget *AWidget, const IMessageStyleContentOptions &AOptions) const;
-	void setVariant(QWidget *AWidget, const QString  &AVariant);
+	void setVariant(StyleViewer *AView, const QString  &AVariant);
 	QString makeStyleTemplate(const IMessageStyleOptions &AOptions);
 	void fillStyleKeywords(QString &AHtml, const IMessageStyleOptions &AOptions) const;
 	QString makeContentTemplate(const IMessageStyleContentOptions &AOptions, bool ASameSender) const;
@@ -148,15 +149,15 @@ protected:
 protected:
 	bool eventFilter(QObject *AWatched, QEvent *AEvent);
 protected slots:
+	void onScrollTimerTimeout();
+	void onContentTimerTimeout();
 	void onLinkClicked(const QUrl &AUrl);
-	void onScrollAfterResize();
-	void onEvaluateNextPendingScript();
 	void onStyleWidgetAdded(IMessageStyle *AStyle, QWidget *AWidget);
 	void onStyleWidgetLoadFinished(bool AOk);
 	void onStyleWidgetDestroyed(QObject *AObject);
 private:
 	QTimer FScrollTimer;
-	QTimer FPendingTimer;
+	QTimer FContentTimer;
 	bool FCombineConsecutive;
 	bool FUsingCustomTemplate;
 	bool FAllowCustomBackground;

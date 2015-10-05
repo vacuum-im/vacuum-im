@@ -1045,6 +1045,7 @@ void MultiUserChatManager::updateRecentChatItemProperties(IRosterIndex *AIndex)
 	if (FRecentContacts && FRecentContacts->isReady(AIndex->data(RDR_STREAM_JID).toString()))
 	{
 		IRecentItem item = recentItemForIndex(AIndex);
+		FRecentContacts->setItemProperty(item,REIP_NAME,AIndex->data(RDR_NAME).toString());
 		FRecentContacts->setItemProperty(item,REIP_CONFERENCE_NICK,AIndex->data(RDR_MUC_NICK).toString());
 		FRecentContacts->setItemProperty(item,REIP_CONFERENCE_PASSWORD,AIndex->data(RDR_MUC_PASSWORD).toString());
 	}

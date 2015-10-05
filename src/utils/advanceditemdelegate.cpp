@@ -424,10 +424,6 @@ AdvancedItemDelegate::AdvancedItemDelegate(QObject *AParent) : QStyledItemDelega
 	
 	FBlinkOpacity = 1.0;
 	FBlinkMode = BlinkHide;
-	FBlinkTimer.setSingleShot(false);
-	FBlinkTimer.setInterval(BlinkStepsTime/BlinkStepsCount);
-	connect(&FBlinkTimer,SIGNAL(timeout()),SLOT(onBlinkTimerTimeout()));
-	FBlinkTimer.start();
 }
 
 AdvancedItemDelegate::~AdvancedItemDelegate()
@@ -493,6 +489,22 @@ QMargins AdvancedItemDelegate::contentsMargins() const
 void AdvancedItemDelegate::setContentsMargings(const QMargins &AMargins)
 {
 	FMargins = AMargins;
+}
+
+int AdvancedItemDelegate::blinkInterval() const
+{
+	return BlinkStepsTime/BlinkStepsCount;
+}
+
+bool AdvancedItemDelegate::blinkNeedUpdate() const
+{
+	qreal blinkOpacity = FBlinkMode==BlinkHide ? BlinkHideSteps[BLINK_STEP] : BlinkFadeSteps[BLINK_STEP];
+	if (qAbs(FBlinkOpacity-blinkOpacity) > 0.01)
+	{
+		FBlinkOpacity = blinkOpacity;
+		return true;
+	}
+	return false;
 }
 
 AdvancedItemDelegate::BlinkMode AdvancedItemDelegate::blinkMode() const
@@ -1163,14 +1175,4 @@ bool AdvancedItemDelegate::editorEvent(QEvent *AEvent, QAbstractItemModel *AMode
 		state =  Qt::Unchecked;
 
 	return AModel->setData(AIndex, state, Qt::CheckStateRole);
-}
-
-void AdvancedItemDelegate::onBlinkTimerTimeout()
-{
-	qreal blinkOpacity = FBlinkMode==BlinkHide ? BlinkHideSteps[BLINK_STEP] : BlinkFadeSteps[BLINK_STEP];
-	if (qAbs(FBlinkOpacity-blinkOpacity) > 0.01)
-	{
-		FBlinkOpacity = blinkOpacity;
-		emit updateBlinkItems();
-	}
 }

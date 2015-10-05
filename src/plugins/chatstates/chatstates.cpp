@@ -38,6 +38,8 @@
 #define INACTIVE_TIMEOUT          2*60
 #define GONE_TIMEOUT              10*60
 
+#define UPDATE_TIMEOUT            10000
+
 ChatStates::ChatStates()
 {
 	FPresenceManager = NULL;
@@ -52,7 +54,7 @@ ChatStates::ChatStates()
 	FMultiChatManager = NULL;
 
 	FUpdateTimer.setSingleShot(false);
-	FUpdateTimer.setInterval(5000);
+	FUpdateTimer.setInterval(UPDATE_TIMEOUT);
 	connect(&FUpdateTimer,SIGNAL(timeout()),SLOT(onUpdateSelfStates()));
 }
 

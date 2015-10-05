@@ -44,6 +44,7 @@ Gateways::Gateways()
 	FRegistration = NULL;
 
 	FKeepTimer.setSingleShot(false);
+	FKeepTimer.setInterval(KEEP_INTERVAL);
 	connect(&FKeepTimer,SIGNAL(timeout()),SLOT(onKeepTimerTimeout()));
 }
 
@@ -183,6 +184,12 @@ bool Gateways::initObjects()
 		registerDiscoFeatures();
 		FDiscovery->insertFeatureHandler(NS_JABBER_GATEWAY,this,DFO_DEFAULT);
 	}
+	return true;
+}
+
+bool Gateways::startPlugin()
+{
+	FKeepTimer.start(KEEP_INTERVAL);
 	return true;
 }
 
@@ -851,7 +858,6 @@ void Gateways::onPresenceOpened(IPresence *APresence)
 		else
 			LOG_STRM_WARNING(APresence->streamJid(),QString("Failed to send load gateways with keep connection request"));
 	}
-	FKeepTimer.start(KEEP_INTERVAL);
 }
 
 void Gateways::onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline)
@@ -984,8 +990,7 @@ void Gateways::onPrivateDataChanged(const Jid &AStreamJid, const QString &ATagNa
 
 void Gateways::onKeepTimerTimeout()
 {
-	QList<Jid> streamJids = FKeepConnections.uniqueKeys();
-	foreach(const Jid &streamJid, streamJids)
+	foreach(const Jid &streamJid, FKeepConnections.uniqueKeys())
 	{
 		IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(streamJid) : NULL;
 		IPresence *presence = FPresenceManager!=NULL ? FPresenceManager->findPresence(streamJid) : NULL;

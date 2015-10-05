@@ -91,6 +91,10 @@ bool DefaultConnection::connectToHost()
 		}
 		return true;
 	}
+	else
+	{
+		LOG_ERROR("Failed to start connection to host: Previous connection is not finished");
+	}
 	return false;
 }
 
@@ -110,6 +114,7 @@ void DefaultConnection::disconnectFromHost()
 		if (FSocket.state() != QSslSocket::UnconnectedState)
 		{
 			LOG_INFO(QString("Disconnecting from host=%1").arg(FSocket.peerName()));
+
 			if (FSocket.state() == QSslSocket::ConnectedState)
 			{
 				emit aboutToDisconnect();
@@ -383,7 +388,7 @@ void DefaultConnection::onSocketError(QAbstractSocket::SocketError AError)
 			emit error(XmppError(IERR_CONNECTIONMANAGER_CONNECT_ERROR,FSocket.errorString()));
 			emit disconnected();
 		}
-		else
+		else if (!FDisconnecting || AError!=QAbstractSocket::RemoteHostClosedError)
 		{
 			emit error(XmppError(IERR_CONNECTIONMANAGER_CONNECT_ERROR,FSocket.errorString()));
 		}

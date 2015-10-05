@@ -131,6 +131,8 @@ public:
 	void setDefaultBranchItemEnabled(bool AEnabled);
 	QMargins contentsMargins() const;
 	void setContentsMargings(const QMargins &AMargins);
+	int blinkInterval() const;
+	bool blinkNeedUpdate() const;
 	BlinkMode blinkMode() const;
 	void setBlinkMode(BlinkMode AMode);
 public:
@@ -159,8 +161,6 @@ public:
 	QRect itemRect(quint32 AItemId, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
 	quint32 itemAt(const QPoint &APoint, const ItemsLayout *ALayout, const QRect &AGeometry) const;
 	quint32 itemAt(const QPoint &APoint, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
-signals:
-	void updateBlinkItems();
 public:
 	static bool isItemVisible(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AItemOption);
 	static QSize itemSizeHint(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AItemOption);
@@ -169,8 +169,6 @@ protected:
 	void drawFocusRect(QPainter *APainter, const QStyleOptionViewItemV4 &AIndexOption, const QRect &ARect) const;
 protected:
 	bool editorEvent(QEvent *AEvent, QAbstractItemModel *AModel, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex);
-protected slots:
-	void onBlinkTimerTimeout();
 private:
 	int FItemsRole;
 	int FVerticalSpacing;
@@ -179,9 +177,8 @@ private:
 	bool FDefaultBranchEnabled;
 	QMargins FMargins;
 private:
-	qreal FBlinkOpacity;
 	BlinkMode FBlinkMode;
-	QTimer FBlinkTimer;
+	mutable qreal FBlinkOpacity;
 private:
 	int FEditRole;
 	quint32 FEditItemId;
