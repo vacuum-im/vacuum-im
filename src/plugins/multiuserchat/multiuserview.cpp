@@ -31,8 +31,7 @@ MultiUserView::MultiUserView(IMultiUserChat *AMultiChat, QWidget *AParent) : QTr
 	FDelegate->setHorizontalSpacing(2);
 	FDelegate->setItemsRole(MUDR_LABEL_ITEMS);
 	FDelegate->setDefaultBranchItemEnabled(true);
-	FDelegate->setBlinkMode(AdvancedItemDelegate::BlinkHide);
-	connect(FDelegate,SIGNAL(updateBlinkItems()),SLOT(onUpdateBlinkLabels()));
+	FDelegate->setBlinkMode(AdvancedItemDelegate::BlinkFade);
 	setItemDelegate(FDelegate);
 
 	FModel = new AdvancedItemModel(this);
@@ -41,6 +40,10 @@ MultiUserView::MultiUserView(IMultiUserChat *AMultiChat, QWidget *AParent) : QTr
 	FModel->insertItemDataHolder(MUDHO_MULTIUSERCHAT, this);
 	FModel->insertItemSortHandler(MUSHO_MULTIUSERVIEW, this);
 	setModel(FModel);
+
+	FBlinkTimer.setSingleShot(false);
+	FBlinkTimer.setInterval(FDelegate->blinkInterval());
+	connect(&FBlinkTimer,SIGNAL(timeout()),SLOT(onBlinkTimerTimeout()));
 
 	FMultiChat = AMultiChat;
 	connect(FMultiChat->instance(),SIGNAL(userChanged(IMultiUser *, int, const QVariant &)),SLOT(onMultiUserChanged(IMultiUser *, int, const QVariant &)));
@@ -223,22 +226,30 @@ void MultiUserView::insertGeneralLabel(const AdvancedDelegateItem &ALabel)
 
 void MultiUserView::removeGeneralLabel(quint32 ALabelId)
 {
-	LOG_STRM_DEBUG(FMultiChat->streamJid(),QString("Removing general label, label=%1, room=%2").arg(ALabelId).arg(FMultiChat->roomJid().bare()));
-	FGeneralLabels.remove(ALabelId);
-	removeItemLabel(ALabelId);
+	if (ALabelId != AdvancedDelegateItem::NullId)
+	{
+		LOG_STRM_DEBUG(FMultiChat->streamJid(),QString("Removing general label, label=%1, room=%2").arg(ALabelId).arg(FMultiChat->roomJid().bare()));
+		FGeneralLabels.remove(ALabelId);
+		removeItemLabel(ALabelId);
+	}
+	else
+	{
+		REPORT_ERROR("Failed to remove general label: Invalid label");
+	}
 }
 
 void MultiUserView::insertItemLabel(const AdvancedDelegateItem &ALabel, QStandardItem *AItem)
 {
 	if (ALabel.d->id != AdvancedDelegateItem::NullId)
 	{
-		if (ALabel.d->flags & AdvancedDelegateItem::Blink)
-			FBlinkLabels += ALabel.d->id;
-		else
-			FBlinkLabels -= ALabel.d->id;
-
 		if (!FLabelItems.contains(ALabel.d->id,AItem))
 			FLabelItems.insertMulti(ALabel.d->id,AItem);
+
+		if ((ALabel.d->flags & AdvancedDelegateItem::Blink) == 0)
+			FBlinkItems.remove(ALabel.d->id,AItem);
+		else if (!FBlinkItems.contains(ALabel.d->id, AItem))
+			FBlinkItems.insertMulti(ALabel.d->id,AItem);
+		updateBlinkTimer();
 
 		AdvancedDelegateItems labelItems = AItem->data(MUDR_LABEL_ITEMS).value<AdvancedDelegateItems>();
 		labelItems.insert(ALabel.d->id, ALabel);
@@ -252,19 +263,27 @@ void MultiUserView::insertItemLabel(const AdvancedDelegateItem &ALabel, QStandar
 
 void MultiUserView::removeItemLabel(quint32 ALabelId, QStandardItem *AItem)
 {
-	if (AItem == NULL)
+	if (ALabelId != AdvancedDelegateItem::NullId)
 	{
-		foreach(QStandardItem *item, FLabelItems.values(ALabelId))
-			removeItemLabel(ALabelId,item);
-	}
-	else if (FLabelItems.contains(ALabelId,AItem))
-	{
-		FBlinkLabels -= ALabelId;
-		FLabelItems.remove(ALabelId,AItem);
+		if (AItem == NULL)
+		{
+			foreach(QStandardItem *item, FLabelItems.values(ALabelId))
+				removeItemLabel(ALabelId,item);
+		}
+		else if (FLabelItems.contains(ALabelId,AItem))
+		{
+			FLabelItems.remove(ALabelId,AItem);
+			FBlinkItems.remove(ALabelId,AItem);
+			updateBlinkTimer();
 
-		AdvancedDelegateItems labelItems = AItem->data(MUDR_LABEL_ITEMS).value<AdvancedDelegateItems>();
-		labelItems.remove(ALabelId);
-		AItem->setData(QVariant::fromValue<AdvancedDelegateItems>(labelItems),MUDR_LABEL_ITEMS);
+			AdvancedDelegateItems labelItems = AItem->data(MUDR_LABEL_ITEMS).value<AdvancedDelegateItems>();
+			labelItems.remove(ALabelId);
+			AItem->setData(QVariant::fromValue<AdvancedDelegateItems>(labelItems),MUDR_LABEL_ITEMS);
+		}
+	}
+	else
+	{
+		REPORT_ERROR("Failed to remove item label: Invalid label");
 	}
 }
 
@@ -346,6 +365,14 @@ void MultiUserView::toolTipsForItem(QStandardItem *AItem, QMap<int,QString> &ATo
 {
 	LOG_STRM_DEBUG(FMultiChat->streamJid(),QString("Requesting tool tips for item, user=%1").arg(AItem->data(MUDR_USER_JID).toString()));
 	emit itemToolTips(AItem,AToolTips);
+}
+
+void MultiUserView::updateBlinkTimer()
+{
+	if (!FBlinkTimer.isActive() && !FBlinkItems.isEmpty())
+		FBlinkTimer.start();
+	else if (FBlinkTimer.isActive() && FBlinkItems.isEmpty())
+		FBlinkTimer.stop();
 }
 
 void MultiUserView::updateUserItem(IMultiUser *AUser)
@@ -616,11 +643,13 @@ void MultiUserView::onMultiUserChanged(IMultiUser *AUser, int AData, const QVari
 		emitItemDataChanged(userItem, AData);
 }
 
-void MultiUserView::onUpdateBlinkLabels()
+void MultiUserView::onBlinkTimerTimeout()
 {
-	foreach(quint32 labelId, FBlinkLabels)
-		foreach(QStandardItem *item, FLabelItems.values(labelId))
-			repaintUserItem(item);
+	if (FDelegate->blinkNeedUpdate())
+	{
+		for (QMultiMap<quint32, QStandardItem *>::const_iterator it=FBlinkItems.constBegin(); it!=FBlinkItems.constEnd(); ++it)
+			repaintUserItem(it.value());
+	}
 }
 
 void MultiUserView::onStatusIconsChanged()

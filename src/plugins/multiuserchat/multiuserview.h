@@ -60,6 +60,7 @@ signals:
 	void itemContextMenu(QStandardItem *AItem, Menu *AMenu);
 	void itemToolTips(QStandardItem *AItem, QMap<int,QString> &AToolTips);
 protected:
+	void updateBlinkTimer();
 	void updateUserItem(IMultiUser *AUser);
 	void updateItemNotify(QStandardItem *AItem);
 	void repaintUserItem(const QStandardItem *AItem);
@@ -69,7 +70,7 @@ protected:
 protected slots:
 	void onMultiUserChanged(IMultiUser *AUser, int AData, const QVariant &ABefore);
 protected slots:
-	void onUpdateBlinkLabels();
+	void onBlinkTimerTimeout();
 	void onStatusIconsChanged();
 	void onAvatarChanged(const Jid &AContactJid);
 private:
@@ -77,7 +78,8 @@ private:
 	IMultiUserChat *FMultiChat;
 	IStatusIcons *FStatusIcons;
 private:
-	QSet<quint32> FBlinkLabels;
+	QTimer FBlinkTimer;
+	QMultiMap<quint32, QStandardItem *> FBlinkItems;
 	QMultiMap<quint32, QStandardItem *> FLabelItems;
 	QMap<quint32, AdvancedDelegateItem> FGeneralLabels;
 private:

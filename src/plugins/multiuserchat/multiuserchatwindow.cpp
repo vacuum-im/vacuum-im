@@ -21,6 +21,7 @@
 #include <definitions/stanzahandlerorders.h>
 #include <definitions/multiuseritemkinds.h>
 #include <definitions/multiuserdataroles.h>
+#include <definitions/multiusernotifyorders.h>
 #include <definitions/multiusertooltiporders.h>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
@@ -603,13 +604,17 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 						delete FDestroyTimers.take(window);
 					FActiveChatMessages.insertMulti(window,messageId);
 
-					IMultiUserViewNotify notify;
-					notify.flags |= IMultiUserViewNotify::Blink;
-					notify.icon = iconStorage->getIcon(MNI_MUC_PRIVATE_MESSAGE);
-
 					QStandardItem *userItem = FUsersView->findUserItem(FMultiChat->findUser(userJid.resource()));
-					int notifyId = FUsersView->insertItemNotify(notify,userItem);
-					FActiveChatMessageNotify.insert(messageId, notifyId);
+					if (userItem != NULL)
+					{
+						IMultiUserViewNotify notify;
+						notify.order = MUNO_PRIVATE_MESSAGE;
+						notify.flags |= IMultiUserViewNotify::Blink;
+						notify.icon = iconStorage->getIcon(MNI_MUC_PRIVATE_MESSAGE);
+
+						int notifyId = FUsersView->insertItemNotify(notify,userItem);
+						FActiveChatMessageNotify.insert(messageId, notifyId);
+					}
 				}
 				else
 				{
