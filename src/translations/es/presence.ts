@@ -10,11 +10,11 @@
     <name>PresenceManager</name>
     <message>
         <source>Presence Manager</source>
-        <translation type="unfinished"/>
+        <translation>Administrador de presencia</translation>
     </message>
     <message>
         <source>Allows other modules to obtain information about the status of contacts in the roster</source>
-        <translation type="unfinished"/>
+        <translation>Permite a otros módulos obtener información del estado de los contactos en la lista</translation>
     </message>
 </context>
 </TS>

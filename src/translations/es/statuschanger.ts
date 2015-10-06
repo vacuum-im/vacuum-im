@@ -110,11 +110,11 @@
     </message>
     <message>
         <source>Connect to server on startup</source>
-        <translation type="unfinished"/>
+        <translation>Conectar al servidor al iniciar</translation>
     </message>
     <message>
         <source>Reconnect to server on connection errors</source>
-        <translation type="unfinished"/>
+        <translation>Reconectar al servidor si ocurren errores de conexión</translation>
     </message>
     <message>
         <source>Standard and users statuses</source>
@@ -125,39 +125,39 @@
     <name>StatusOptionsWidget</name>
     <message>
         <source>Add</source>
-        <translation type="unfinished"/>
+        <translation>Añadir</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"/>
+        <translation>Eliminar</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation type="unfinished"/>
+        <translation>Estado</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished"/>
+        <translation>Nombre</translation>
     </message>
     <message>
         <source>Message</source>
-        <translation type="unfinished"/>
+        <translation>Mensaje</translation>
     </message>
     <message>
         <source>Priority</source>
-        <translation type="unfinished"/>
+        <translation>Prioridad</translation>
     </message>
     <message>
         <source>Can&apos;t delete status</source>
-        <translation type="unfinished"/>
+        <translation>No se puede borrar el estado</translation>
     </message>
     <message>
         <source>You can not delete standard statuses.</source>
-        <translation type="unfinished"/>
+        <translation>No puedes borrar los estados estándares.</translation>
     </message>
     <message>
         <source>You can not delete active statuses.</source>
-        <translation type="unfinished"/>
+        <translation>No puedes borrar los estados activos.</translation>
     </message>
 </context>
 </TS>

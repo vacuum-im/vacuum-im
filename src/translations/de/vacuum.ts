@@ -2,7 +2,15 @@
 <context>
     <name>AboutBox</name>
     <message>
-        <source>Version: %1.%2 %3</source>
+        <source>Version: %1 %2 of %3</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Revision: %1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Version: %1 %2</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -22,10 +30,6 @@
     <message>
         <source>Wrong plugin interface</source>
         <translation>Falsches Plugin Interface</translation>
-    </message>
-    <message>
-        <source>Dependences not found</source>
-        <translation>Abhängigkeiten nicht gefunden</translation>
     </message>
     <message>
         <source>Conflict with plugin %1</source>
@@ -55,6 +59,10 @@
         <source>Application shortcuts</source>
         <translation type="unfinished"/>
     </message>
+    <message>
+        <source>Dependencies not found</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>SetupPluginsDialog</name>
@@ -74,24 +82,28 @@
         <source>With errors (%1)</source>
         <translation type="unfinished"/>
     </message>
-    <message numerus="yes">
-        <source>This plugin depends on %n other plugins.</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
-    </message>
     <message>
         <source>This plugin does not depend on other plugins.</source>
         <translation type="unfinished"/>
-    </message>
-    <message numerus="yes">
-        <source>Other %n plugins depend on this plugin.</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
     <message>
         <source>Other plugins don&apos;t depend on this plugin.</source>
         <translation type="unfinished"/>
     </message>
     <message numerus="yes">
-        <source>Not found %n dependences.</source>
+        <source>This plugin depends on %n other plugin(s).</source>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>Other %n plugin(s) depend on this plugin.</source>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+    </message>
+    <message>
+        <source>Another plugin depends on this plugin.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message numerus="yes">
+        <source>%n dependency(ies) not found.</source>
         <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
 </context>
