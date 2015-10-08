@@ -150,8 +150,8 @@ public:
 	virtual bool isUserPresent(const Jid &AContactJid) const =0;
 	virtual void abortConnection(const QString &AStatus, bool AError=true) =0;
 	// Occupant
-	virtual QString nickName() const =0;
-	virtual bool setNickName(const QString &ANick) =0;
+	virtual QString nickname() const =0;
+	virtual bool setNickname(const QString &ANick) =0;
 	virtual QString password() const =0;
 	virtual void setPassword(const QString &APassword) =0;
 	virtual IMultiUserChatHistory historyScope() const =0;
@@ -184,7 +184,9 @@ protected:
 	// Occupant
 	virtual void messageSent(const Message &AMessage) =0;
 	virtual void messageReceived(const Message &AMessage) =0;
+	virtual void passwordChanged(const QString &APassword) =0;
 	virtual void presenceChanged(const IPresenceItem &APresence) =0;
+	virtual void nicknameChanged(const QString &ANick, const XmppError &AError) =0;
 	virtual void invitationDeclined(const Jid &AContactJid, const QString &AReason) =0;
 	virtual void userChanged(IMultiUser *AUser, int AData, const QVariant &ABefore) =0;
 	// Moderator
@@ -279,6 +281,7 @@ class IMultiUserChatManager
 {
 public:
 	virtual QObject *instance() = 0;
+	virtual bool isReady(const Jid &AStreamJid) const =0;
 	virtual QList<IMultiUserChat *> multiUserChats() const =0;
 	virtual IMultiUserChat *findMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid) const =0;
 	virtual IMultiUserChat *getMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword, bool AIsolated) =0;

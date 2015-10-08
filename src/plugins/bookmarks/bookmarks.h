@@ -51,12 +51,11 @@ public:
 	virtual bool setModelData(const AdvancedItemDelegate *ADelegate, QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex);
 	//IBookmarks
 	virtual bool isReady(const Jid &AStreamJid) const;
-	virtual bool isValidBookmark(const IBookmark &ABookmark) const;
 	virtual QList<IBookmark> bookmarks(const Jid &AStreamJid) const;
 	virtual bool addBookmark(const Jid &AStreamJid, const IBookmark &ABookmark);
 	virtual bool setBookmarks(const Jid &AStreamJid, const QList<IBookmark> &ABookmarks);
-	virtual int execEditBookmarkDialog(IBookmark *ABookmark, QWidget *AParent) const;
-	virtual void showEditBookmarksDialog(const Jid &AStreamJid);
+	virtual QDialog *showEditBookmarkDialog(IBookmark *ABookmark, QWidget *AParent = NULL);
+	virtual QDialog *showEditBookmarksDialog(const Jid &AStreamJid, QWidget *AParent = NULL);
 signals:
 	void bookmarksOpened(const Jid &AStreamJid);
 	void bookmarksClosed(const Jid &AStreamJid);
@@ -64,11 +63,13 @@ signals:
 	//IRosterDataHolder
 	void rosterDataChanged(IRosterIndex *AIndex, int ARole);
 protected:
-	void updateConferenceIndexes(const Jid &AStreamJid);
+	void updateRoomIndexes(const Jid &AStreamJid);
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
+	void renameBookmark(const Jid &AStreamJid, const IBookmark &ABookmark);
+protected:
 	QList<IBookmark> loadBookmarksFromXML(const QDomElement &AElement) const;
 	void saveBookmarksToXML(QDomElement &AElement, const QList<IBookmark> &ABookmarks) const;
-	void renameBookmark(const Jid &AStreamJid, const IBookmark &ABookmark);
+protected:
 	void autoStartBookmarks(const Jid &AStreamJid) const;
 	void startBookmark(const Jid &AStreamJid, const IBookmark &ABookmark, bool AShowWindow) const;
 protected slots:
@@ -81,11 +82,16 @@ protected slots:
 	void onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
 	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 protected slots:
+	void onMultiChatPropertiesChanged();
+	void onMultiChatWindowAddBookmarkActionTriggered(bool);
+	void onMultiChatWindowCreated(IMultiUserChatWindow *AWindow);
+protected slots:
+	void onDiscoWindowAddBookmarkActionTriggered(bool);
+	void onDiscoIndexContextMenu(const QModelIndex &AIndex, Menu *AMenu);
+	void onDiscoItemsWindowCreated(IDiscoItemsWindow *AWindow);
+protected slots:
 	void onPresenceOpened(IPresence *APresence);
 	void onRosterIndexDestroyed(IRosterIndex *AIndex);
-	void onMultiChatWindowCreated(IMultiUserChatWindow *AWindow);
-	void onDiscoItemsWindowCreated(IDiscoItemsWindow *AWindow);
-	void onDiscoIndexContextMenu(const QModelIndex &AIndex, Menu *AMenu);
 	void onStartBookmarkActionTriggered(bool);
 	void onEditBookmarkActionTriggered(bool);
 	void onRenameBookmarkActionTriggered(bool);
@@ -93,8 +99,6 @@ protected slots:
 	void onAddBookmarksActionTriggered(bool);
 	void onRemoveBookmarksActionTriggered(bool);
 	void onEditBookmarksActionTriggered(bool);
-	void onMultiChatWindowAddBookmarkActionTriggered(bool);
-	void onDiscoWindowAddBookmarkActionTriggered(bool);
 	void onEditBookmarksDialogDestroyed();
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 private:
@@ -106,12 +110,11 @@ private:
 	IOptionsManager *FOptionsManager;
 	IRostersModel *FRostersModel;
 	IRostersView *FRostersView;
-	IRostersViewPlugin *FRostersViewPlugin;
 	IPresenceManager *FPresenceManager;
 private:
 	QMap<Jid, QList<IBookmark> > FBookmarks;
 	QMap<Jid, EditBookmarksDialog *> FDialogs;
-	QMap<Jid, QMap<IRosterIndex *, IBookmark> > FBookmarkIndexes;
+	QMap<Jid, QMap<IRosterIndex *, IBookmark> > FRoomIndexes;
 };
 
 #endif // BOOKMARKS_H

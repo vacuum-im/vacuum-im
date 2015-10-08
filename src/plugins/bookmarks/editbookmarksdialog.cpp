@@ -75,10 +75,10 @@ IBookmark EditBookmarksDialog::getBookmarkFromRow(int ARow) const
 	QTableWidgetItem *tableItem = ui.tbwBookmarks->item(ARow,COL_NAME);
 	bookmark.type = tableItem->data(TDR_TYPE).toInt();
 	bookmark.name = tableItem->data(TDR_NAME).toString();
-	bookmark.conference.roomJid = tableItem->data(TDR_ROOMJID).toString();
-	bookmark.conference.autojoin = tableItem->data(TDR_AUTO).toBool();
-	bookmark.conference.nick = tableItem->data(TDR_NICK).toString();
-	bookmark.conference.password = tableItem->data(TDR_PASSWORD).toString();
+	bookmark.room.roomJid = tableItem->data(TDR_ROOMJID).toString();
+	bookmark.room.autojoin = tableItem->data(TDR_AUTO).toBool();
+	bookmark.room.nick = tableItem->data(TDR_NICK).toString();
+	bookmark.room.password = tableItem->data(TDR_PASSWORD).toString();
 	bookmark.url.url = tableItem->data(TDR_URL).toString();
 	return bookmark;
 }
@@ -88,12 +88,12 @@ void EditBookmarksDialog::setBookmarkToRow(int ARow, const IBookmark &ABookmark)
 	QTableWidgetItem *nameItem = new QTableWidgetItem;
 	nameItem->setText(ABookmark.name);
 
-	if (ABookmark.type == IBookmark::Url)
+	if (ABookmark.type == IBookmark::TypeUrl)
 		nameItem->setIcon(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_BOOKMARKS_URL));
 	else
 		nameItem->setIcon(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_BOOKMARKS_ROOM));
 
-	if (ABookmark.type==IBookmark::Conference && ABookmark.conference.autojoin)
+	if (ABookmark.type==IBookmark::TypeRoom && ABookmark.room.autojoin)
 	{
 		QFont font = nameItem->font();
 		font.setBold(true);
@@ -102,19 +102,19 @@ void EditBookmarksDialog::setBookmarkToRow(int ARow, const IBookmark &ABookmark)
 
 	nameItem->setData(TDR_TYPE,ABookmark.type);
 	nameItem->setData(TDR_NAME,ABookmark.name);
-	nameItem->setData(TDR_ROOMJID,ABookmark.conference.roomJid.bare());
-	nameItem->setData(TDR_AUTO,ABookmark.conference.autojoin);
-	nameItem->setData(TDR_NICK,ABookmark.conference.nick);
-	nameItem->setData(TDR_PASSWORD,ABookmark.conference.password);
+	nameItem->setData(TDR_ROOMJID,ABookmark.room.roomJid.bare());
+	nameItem->setData(TDR_AUTO,ABookmark.room.autojoin);
+	nameItem->setData(TDR_NICK,ABookmark.room.nick);
+	nameItem->setData(TDR_PASSWORD,ABookmark.room.password);
 	nameItem->setData(TDR_URL,ABookmark.url.url.toString());
 	ui.tbwBookmarks->setItem(ARow,COL_NAME,nameItem);
 
 	QTableWidgetItem *valueItem = new QTableWidgetItem;
-	valueItem->setText(ABookmark.type==IBookmark::Url ? ABookmark.url.url.toString() : ABookmark.conference.roomJid.uBare());
+	valueItem->setText(ABookmark.type==IBookmark::TypeUrl ? ABookmark.url.url.toString() : ABookmark.room.roomJid.uBare());
 	ui.tbwBookmarks->setItem(nameItem->row(),COL_VALUE,valueItem);
 
 	QTableWidgetItem *nickItem = new QTableWidgetItem;
-	nickItem->setText(ABookmark.conference.nick);
+	nickItem->setText(ABookmark.room.nick);
 	ui.tbwBookmarks->setItem(nameItem->row(),COL_NICK,nickItem);
 
 	QTableWidgetItem *sortItem = new QTableWidgetItem;
@@ -128,7 +128,7 @@ void EditBookmarksDialog::onEditButtonClicked()
 	if (button == ui.pbtAdd)
 	{
 		IBookmark bookmark;
-		if (FBookmarks->execEditBookmarkDialog(&bookmark,this) == QDialog::Accepted)
+		if (FBookmarks->showEditBookmarkDialog(&bookmark,this)->exec() == QDialog::Accepted)
 		{
 			ui.tbwBookmarks->setRowCount(ui.tbwBookmarks->rowCount()+1);
 			setBookmarkToRow(ui.tbwBookmarks->rowCount()-1,bookmark);
@@ -140,7 +140,7 @@ void EditBookmarksDialog::onEditButtonClicked()
 		if (row >= 0)
 		{
 			IBookmark bookmark = getBookmarkFromRow(row);
-			if (FBookmarks->execEditBookmarkDialog(&bookmark,this) == QDialog::Accepted)
+			if (FBookmarks->showEditBookmarkDialog(&bookmark,this)->exec() == QDialog::Accepted)
 				setBookmarkToRow(row,bookmark);
 		}
 	}
@@ -185,7 +185,7 @@ void EditBookmarksDialog::onDialogAccepted()
 		bookmarks.append(getBookmarkFromRow(row));
 
 	if (!FBookmarks->setBookmarks(FStreamJid,bookmarks))
-		QMessageBox::warning(this,tr("Bookmarks not saved"),tr("Cant save bookmarks to server"));
+		QMessageBox::warning(this,tr("Error"),tr("Cant save bookmarks to server"));
 	else
 		accept();
 }
@@ -193,7 +193,7 @@ void EditBookmarksDialog::onDialogAccepted()
 void EditBookmarksDialog::onTableItemDoubleClicked(QTableWidgetItem *AItem)
 {
 	IBookmark bookmark = getBookmarkFromRow(AItem->row());
-	if (FBookmarks->execEditBookmarkDialog(&bookmark,this) == QDialog::Accepted)
+	if (FBookmarks->showEditBookmarkDialog(&bookmark,this)->exec() == QDialog::Accepted)
 		setBookmarkToRow(AItem->row(),bookmark);
 }
 

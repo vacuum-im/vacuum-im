@@ -114,6 +114,7 @@
 #define MNI_MUC_INVITE                  "mucInvite"
 #define MNI_MUC_CHANGE_NICK             "mucChangeNick"
 #define MNI_MUC_CHANGE_TOPIC            "mucChangeTopic"
+#define MNI_MUC_CHANGE_PASSWORD         "mucChangePassword"
 #define MNI_MUC_CLEAR_CHAT              "mucClearChat"
 #define MNI_MUC_ENTER_ROOM              "mucEnterRoom"
 #define MNI_MUC_EXIT_ROOM               "mucExitRoom"

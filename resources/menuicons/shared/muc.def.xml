@@ -21,6 +21,10 @@
     <object mime="image/png">mucchangetopic.png</object>
   </icon>
   <icon>
+    <key>mucChangePassword</key>
+    <object mime="image/png">mucchangepassword.png</object>
+  </icon>
+  <icon>
     <key>mucClearChat</key>
     <object mime="image/png">mucclearchat.png</object>
   </icon>

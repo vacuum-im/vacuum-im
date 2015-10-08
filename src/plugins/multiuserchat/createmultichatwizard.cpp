@@ -123,8 +123,8 @@ void CreateMultiChatWizard::accept()
 				else if (wizardMode == CreateMultiChatWizard::ModeManual)
 					REPORT_EVENT(SEVP_MUC_WIZARD_MANUAL,1)
 
-				if (chatWindow->multiUserChat()->nickName() != roomNick)
-					chatWindow->multiUserChat()->setNickName(roomNick);
+				if (chatWindow->multiUserChat()->nickname() != roomNick)
+					chatWindow->multiUserChat()->setNickname(roomNick);
 				else
 					chatWindow->multiUserChat()->sendStreamPresence();
 				chatWindow->showTabPage();

@@ -933,16 +933,8 @@
         <translation>Изменить членство</translation>
     </message>
     <message>
-        <source>%1 changed nick to %2</source>
-        <translation>%1 изменил ник на %2</translation>
-    </message>
-    <message>
         <source>Subject: %1</source>
         <translation>Тема: %1</translation>
-    </message>
-    <message>
-        <source> by %1</source>
-        <translation> пользователем %1</translation>
     </message>
     <message>
         <source>%1 - Conference</source>
@@ -1137,10 +1129,6 @@
         <translation>Не удалось отправить личное сообщение пользователю %1</translation>
     </message>
     <message>
-        <source>You nickname was changed to %1</source>
-        <translation>Ваш ник был изменен на %1</translation>
-    </message>
-    <message>
         <source>Failed to change your nickname to %1</source>
         <translation>Не удалось изменить ваш ник на %1</translation>
     </message>
@@ -1273,10 +1261,6 @@
         <translation>Пользователь %1 был выгнан из конференции%2 %3</translation>
     </message>
     <message>
-        <source> by user %1</source>
-        <translation> пользователем %1</translation>
-    </message>
-    <message>
         <source>User %1 has been banned in the conference%2 %3</source>
         <translation>Пользователь %1 был заблокирован в конференции%2 %3</translation>
     </message>
@@ -1289,32 +1273,12 @@
         <translation>Эта конференция была удалена владельцем. %1</translation>
     </message>
     <message>
-        <source>Change Nickname - %1</source>
-        <translation>Изменить ник - %1</translation>
-    </message>
-    <message>
-        <source>Enter your new nickname:</source>
-        <translation>Введите ваш новый ник:</translation>
-    </message>
-    <message>
-        <source>Change Topic - %1</source>
-        <translation>Изменить тему - %1</translation>
-    </message>
-    <message>
         <source>Enter new topic:</source>
         <translation>Введите новую тему:</translation>
     </message>
     <message>
-        <source>Invite User - %1</source>
-        <translation>Пригласить пользователя - %1</translation>
-    </message>
-    <message>
         <source>Enter user Jabber ID:</source>
         <translation>Введите Jabber ID пользователя:</translation>
-    </message>
-    <message>
-        <source>Please, enter this conference.</source>
-        <translation>Пожалуйста, войдите в эту конференцию.</translation>
     </message>
     <message>
         <source>Enter a message:</source>
@@ -1331,10 +1295,6 @@
     <message>
         <source>Request for voice in the conference was sent</source>
         <translation>Запрос голоса в конференции был отправлен</translation>
-    </message>
-    <message>
-        <source>Destroy Conference - %1</source>
-        <translation>Удалить конференцию - %1</translation>
     </message>
     <message>
         <source>Kick User - %1</source>
@@ -1395,6 +1355,106 @@
     <message>
         <source>Required parameter &lt;new nick&gt; is not specified</source>
         <translation>Обязательный параметр &lt;новый_ник&gt; не указан</translation>
+    </message>
+    <message>
+        <source>Change Nickname</source>
+        <translation>Изменить ник</translation>
+    </message>
+    <message>
+        <source>Enter new nickname:</source>
+        <translation>Укажите новый ник:</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Ошибка</translation>
+    </message>
+    <message>
+        <source>Failed to change nickname to %1</source>
+        <translation>Не удалось изменить ник на %1</translation>
+    </message>
+    <message>
+        <source>Enter password:</source>
+        <translation>Укажите пароль:</translation>
+    </message>
+    <message>
+        <source>You have been kicked from this conference, you may %1 or %2</source>
+        <translation>Вы были выгнаны из этой конференции, выможете %1 или %2</translation>
+    </message>
+    <message>
+        <source>return</source>
+        <translation>вернуться</translation>
+    </message>
+    <message>
+        <source>exit</source>
+        <translation>выйти</translation>
+    </message>
+    <message>
+        <source>You have been banned in this conference, you can not return only %1</source>
+        <translation>Вы были заблокированы в этой конференции, вы не можете вернуться, только %1</translation>
+    </message>
+    <message>
+        <source>You have left the conference: %1</source>
+        <translation>Вы вышли из конференции: %1</translation>
+    </message>
+    <message>
+        <source>Nickname &apos;%1&apos; is in use or registered by another user, you may %2 or %3</source>
+        <translation>Ник &apos;%1&apos; уже используется или рарегистрирован другим пользователем, вы можете %2 или %3</translation>
+    </message>
+    <message>
+        <source>change nick</source>
+        <translation>изменить ник</translation>
+    </message>
+    <message>
+        <source>This conference is members only but you are not one of them, you may %1 or %2</source>
+        <translation>Эта конференция только для участников, а вы не оди из них, вы можете %1 или %2</translation>
+    </message>
+    <message>
+        <source>retry</source>
+        <translation>повторить</translation>
+    </message>
+    <message>
+        <source>This conference does not exists or does not configured yet by owner, you may %1 or %2</source>
+        <translation>Это конференция не существует или еще не настроена владельцем, вы можете %1 или %2</translation>
+    </message>
+    <message>
+        <source>This conference does not exists and creation is restricted, you may %1 or %2</source>
+        <translation>Эта конференция не существует и создание новых запрещено, вы можете %1 или %2</translation>
+    </message>
+    <message>
+        <source>The maximum number of users has been reached, you may %1 or %2</source>
+        <translation>Достигнуто максимальное количество пользователей в конференции, вы можете %1 или %2</translation>
+    </message>
+    <message>
+        <source>Failed to change your nickname to %1: %2</source>
+        <translation>Не удалось изменить ник на %1: %2</translation>
+    </message>
+    <message>
+        <source>%1 changed nickname to %2</source>
+        <translation>%1 изменил ник на %2</translation>
+    </message>
+    <message>
+        <source> by moderator %1</source>
+        <translation>модератором %1</translation>
+    </message>
+    <message>
+        <source>Invite User</source>
+        <translation>Пригласить пользователя</translation>
+    </message>
+    <message>
+        <source>Your nickname changed to %1</source>
+        <translation>Ваш ник изменен на %1</translation>
+    </message>
+    <message>
+        <source>Change Password</source>
+        <translation>Изменить пароль</translation>
+    </message>
+    <message>
+        <source>This conference is password protected and you provided incorrect password, you may %1 or %2</source>
+        <translation>Эта конференция защищена паролем и вы указали неверный пароль, вы можете %1 или %2</translation>
+    </message>
+    <message>
+        <source>change password</source>
+        <translation>изменить пароль</translation>
     </message>
 </context>
 <context>

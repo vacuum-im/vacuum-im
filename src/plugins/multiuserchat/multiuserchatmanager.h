@@ -85,6 +85,7 @@ public:
 	virtual IRecentItem recentItemForIndex(const IRosterIndex *AIndex) const;
 	virtual QList<IRosterIndex *> recentItemProxyIndexes(const IRecentItem &AItem) const;
 	//IMultiUserChatManager
+	virtual bool isReady(const Jid &AStreamJid) const;
 	virtual QList<IMultiUserChat *> multiUserChats() const;
 	virtual IMultiUserChat *findMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid) const;
 	virtual IMultiUserChat *getMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick,const QString &APassword, bool AIsolated);
@@ -114,20 +115,23 @@ signals:
 	void recentItemUpdated(const IRecentItem &AItem);
 protected:
 	void registerDiscoFeatures();
-	bool isReady(const Jid &AStreamJid) const;
-	void updateRecentChatItem(IRosterIndex *AIndex);
-	void updateRecentChatItemProperties(IRosterIndex *AIndex);
-	void updateChatRosterIndex(IMultiUserChatWindow *AWindow);
-	void updateRecentUserItem(IMultiUserChat *AChat, const QString &ANick);
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
+	IMultiUser *findMultiChatWindowUser(const Jid &AStreamJid, const Jid &AContactJid) const;
+protected:
+	IRosterIndex *getConferencesGroupIndex(const Jid &AStreamJid);
+	void updateMultiChatRosterIndex(const Jid &AStreamJid, const Jid &ARoomJid);
+	IMultiUserChatWindow *findMultiChatWindowForIndex(const IRosterIndex *AIndex) const;
+	IMultiUserChatWindow *getMultiChatWindowForIndex(const IRosterIndex *AIndex);
+protected:
+	void updateMultiChatRecentItem(IRosterIndex *AChatIndex);
+	void updateMultiChatRecentItemProperties(IMultiUserChat *AChat);
+	void updateMultiUserRecentItems(IMultiUserChat *AChat, const QString &ANick = QString::null);
+	QString multiChatRecentName(const Jid &AStreamJid, const Jid &ARoomJid) const;
+	IRecentItem multiChatRecentItem(IMultiUserChat *AChat, const QString &ANick = QString::null) const;
+protected:
 	Action *createWizardAction(QWidget *AParent) const;
 	Menu *createInviteMenu(const Jid &AContactJid, QWidget *AParent) const;
 	Action *createJoinAction(const Jid &AStreamJid, const Jid &ARoomJid, QWidget *AParent) const;
-	IRosterIndex *getConferencesGroupIndex(const Jid &AStreamJid) const;
-	IMultiUserChatWindow *findMultiChatWindowForIndex(const IRosterIndex *AIndex) const;
-	IMultiUserChatWindow *getMultiChatWindowForIndex(const IRosterIndex *AIndex);
-	IMultiUser *findMultiChatWindowUser(const Jid &AStreamJid, const Jid &AContactJid) const;
-	QString getMultiChatName(const Jid &AStreamJid, const Jid &ARoomJid) const;
 protected slots:
 	void onWizardRoomActionTriggered(bool);
 	void onJoinRoomActionTriggered(bool);
@@ -141,14 +145,14 @@ protected slots:
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 protected slots:
 	void onMultiChatDestroyed();
+	void onMultiChatPropertiesChanged();
+	void onMultiChatUserChanged(IMultiUser *AUser, int AData, const QVariant &ABefore);
+protected slots:
 	void onMultiChatWindowDestroyed();
-	void onMultiChatTitleChanged(const QString &ATitle);
-	void onMultiChatPresenceChanged(const IPresenceItem &APresence);
-	void onMultiChatContextMenu(Menu *AMenu);
-	void onMultiUserContextMenu(IMultiUser *AUser, Menu *AMenu);
-	void onMultiUserToolTips(IMultiUser *AUser, QMap<int,QString> &AToolTips);
-	void onMultiUserPrivateChatWindowChanged(IMessageChatWindow *AWindow);
-	void onMultiUserChanged(IMultiUser *AUser, int AData, const QVariant &ABefore);
+	void onMultiChatWindowContextMenu(Menu *AMenu);
+	void onMultiChatWindowUserContextMenu(IMultiUser *AUser, Menu *AMenu);
+	void onMultiChatWindowUserToolTips(IMultiUser *AUser, QMap<int,QString> &AToolTips);
+	void onMultiChatWindowPrivateWindowChanged(IMessageChatWindow *AWindow);
 protected slots:
 	void onMultiChatWindowInfoContextMenu(Menu *AMenu);
 	void onMultiChatWindowInfoToolTips(QMap<int,QString> &AToolTips);
@@ -162,8 +166,8 @@ protected slots:
 	void onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips);
 	void onRostersViewIndexClipboardMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 protected slots:
-	void onInviteDialogFinished(int AResult);
 	void onInviteActionTriggered(bool);
+	void onInviteDialogFinished(int AResult);
 private:
 	IMessageWidgets *FMessageWidgets;
 	IMessageProcessor *FMessageProcessor;

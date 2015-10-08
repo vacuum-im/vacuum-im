@@ -164,6 +164,7 @@ protected slots:
 	void onMultiChatRequestFailed(const QString &AId, const XmppError &AError);
 	//Occupant
 	void onMultiChatPresenceChanged(const IPresenceItem &APresence);
+	void onMultiChatNicknameChanged(const QString &ANick, const XmppError &AError);
 	void onMultiChatInvitationDeclined(const Jid &AContactJid, const QString &AReason);
 	void onMultiChatUserChanged(IMultiUser *AUser, int AData, const QVariant &ABefore);
 	//Moderator
@@ -204,7 +205,6 @@ protected slots:
 	void onChangeUserAffiliationActionTriggered(bool);
 protected slots:
 	void onStatusIconsChanged();
-	void onAutoRejoinAfterKick();
 	void onRoomConfigFormDialogAccepted();
 	void onRoomConfigFormDialogRejected();
 	void onOptionsChanged(const OptionsNode &ANode);
@@ -218,13 +218,14 @@ private:
 	Action *FEnterRoom;
 	Action *FExitRoom;
 	Action *FChangeNick;
+	Action *FChangePassword;
 	Action *FInviteContact;
 	Action *FRequestVoice;
 	Action *FChangeTopic;
 	Action *FEditAffiliations;
 	Action *FConfigRoom;
 	Action *FDestroyRoom;
-	Action *FUsersHide;
+	Action *FHideUserView;
 private:
 	IAvatars *FAvatars;
 	IDataForms *FDataForms;

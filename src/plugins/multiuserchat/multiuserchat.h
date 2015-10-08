@@ -49,8 +49,8 @@ public:
 	virtual bool isUserPresent(const Jid &AContactJid) const;
 	virtual void abortConnection(const QString &AStatus, bool AError=true);
 	//Occupant
-	virtual QString nickName() const;
-	virtual bool setNickName(const QString &ANick);
+	virtual QString nickname() const;
+	virtual bool setNickname(const QString &ANick);
 	virtual QString password() const;
 	virtual void setPassword(const QString &APassword);
 	virtual IMultiUserChatHistory historyScope() const;
@@ -83,7 +83,9 @@ signals:
 	//Occupant
 	void messageSent(const Message &AMessage);
 	void messageReceived(const Message &AMessage);
+	void passwordChanged(const QString &APassword);
 	void presenceChanged(const IPresenceItem &APresence);
+	void nicknameChanged(const QString &ANick, const XmppError &AError);
 	void invitationDeclined(const Jid &AContactJid, const QString &AReason);
 	void userChanged(IMultiUser *AUser, int AData, const QVariant &ABefore);
 	//Moderator
@@ -105,6 +107,7 @@ protected:
 	bool processMessage(const Stanza &AStanza);
 	bool processPresence(const Stanza &AStanza);
 	void closeRoom(const IPresenceItem &APresence);
+	Stanza makePresenceStanza(const QString &ANick, int AShow, const QString &AStatus, int APriority) const;
 protected slots:
 	void onUserChanged(int AData, const QVariant &ABefore);
 	void onDiscoveryInfoReceived(const IDiscoInfo &AInfo);
@@ -121,6 +124,7 @@ private:
 private:
 	int FSHIMessage;
 	int FSHIPresence;
+	QString FRequestedNick;
 	QList<QString> FConfigLoadId;
 	QMap<QString, IDataForm> FConfigUpdateId;
 	QMap<QString, QString> FRoleUpdateId;
@@ -136,7 +140,7 @@ private:
 	Jid FRoomJid;
 	ChatState FState;
 	QString FSubject;
-	QString FNickName;
+	QString FNickname;
 	QString FPassword;
 	QString FRoomTitle;
 	MultiUser *FMainUser;

@@ -15,16 +15,16 @@ EditBookmarkDialog::EditBookmarkDialog(IBookmark *ABookmark, QWidget *AParent) :
 
 	FBookmark = ABookmark;
 	ui.lneName->setText(ABookmark->name);
-	if (ABookmark->type == IBookmark::Conference)
+	if (ABookmark->type == IBookmark::TypeRoom)
 	{
 		ui.grbURL->setChecked(false);
 		ui.grbConference->setChecked(true);
-		ui.lneRoom->setText(ABookmark->conference.roomJid.uBare());
-		ui.lneNick->setText(ABookmark->conference.nick);
-		ui.lnePassword->setText(ABookmark->conference.password);
-		ui.chbAutoJoin->setChecked(ABookmark->conference.autojoin);
+		ui.lneRoom->setText(ABookmark->room.roomJid.uBare());
+		ui.lneNick->setText(ABookmark->room.nick);
+		ui.lnePassword->setText(ABookmark->room.password);
+		ui.chbAutoJoin->setChecked(ABookmark->room.autojoin);
 	}
-	else if (ABookmark->type == IBookmark::Url)
+	else if (ABookmark->type == IBookmark::TypeUrl)
 	{
 		ui.grbURL->setChecked(true);
 		ui.grbConference->setChecked(false);
@@ -59,36 +59,36 @@ void EditBookmarkDialog::onDialogAccepted()
 		{
 			if (!ui.lneRoom->text().isEmpty())
 			{
-				FBookmark->type = IBookmark::Conference;
+				FBookmark->type = IBookmark::TypeRoom;
 				FBookmark->name = ui.lneName->text();
-				FBookmark->conference.roomJid = Jid::fromUserInput(ui.lneRoom->text()).bare();
-				FBookmark->conference.nick = ui.lneNick->text();
-				FBookmark->conference.password = ui.lnePassword->text();
-				FBookmark->conference.autojoin = ui.chbAutoJoin->isChecked();
+				FBookmark->room.roomJid = Jid::fromUserInput(ui.lneRoom->text()).bare();
+				FBookmark->room.nick = ui.lneNick->text();
+				FBookmark->room.password = ui.lnePassword->text();
+				FBookmark->room.autojoin = ui.chbAutoJoin->isChecked();
 				accept();
 			}
 			else
 			{
-				QMessageBox::warning(this,tr("Bookmark is not valid"),tr("In conference bookmark field 'Room' should not be empty"));
+				QMessageBox::warning(this,tr("Error"),tr("In conference bookmark field 'Room' should not be empty"));
 			}
 		}
-		else
+		else if (ui.grbURL->isChecked())
 		{
 			if (!ui.lneUrl->text().isEmpty())
 			{
-				FBookmark->type = IBookmark::Url;
+				FBookmark->type = IBookmark::TypeUrl;
 				FBookmark->name = ui.lneName->text();
 				FBookmark->url.url = QUrl::fromUserInput(ui.lneUrl->text());
 				accept();
 			}
 			else
 			{
-				QMessageBox::warning(this,tr("Bookmark is not valid"),tr("In URL bookmark field 'URL' should not be empty"));
+				QMessageBox::warning(this,tr("Error"),tr("In URL bookmark field 'URL' should not be empty"));
 			}
 		}
 	}
 	else
 	{
-		QMessageBox::warning(this,tr("Bookmark is not valid"),tr("Field 'Name' should not be empty"));
+		QMessageBox::warning(this,tr("Error"),tr("Field 'Name' should not be empty"));
 	}
 }

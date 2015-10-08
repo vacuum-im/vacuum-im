@@ -414,7 +414,7 @@ bool RemoteControl::processLeaveMUC(const ICommandRequest &ARequest)
 			{
 				if (muc->isOpen() && muc->streamJid()==ARequest.streamJid)
 				{
-					opt.label = tr("%1 on %2").arg(muc->nickName()).arg(muc->roomJid().uBare());
+					opt.label = tr("%1 on %2").arg(muc->nickname()).arg(muc->roomJid().uBare());
 					opt.value = muc->roomJid().bare();
 					field.options.append(opt);
 				}
