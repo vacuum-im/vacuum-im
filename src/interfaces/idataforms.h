@@ -258,7 +258,8 @@ public:
 	virtual bool isFieldValid(const IDataField &AField, const QString &AFormType) const =0;
 	virtual bool isFormValid(const IDataForm &AForm) const =0;
 	virtual bool isSubmitValid(const IDataForm &AForm, const IDataForm &ASubmit) const =0;
-	virtual bool isSupportedUri(const IDataMediaURI &AUri) const =0;
+	virtual bool isSupportedMedia(const IDataMedia &AMedia) const =0;
+	virtual bool isSupportedMediaUri(const IDataMediaURI &AUri) const =0;
 	//Localization
 	virtual IDataForm localizeForm(const IDataForm &AForm) const =0;
 	virtual IDataLocalizer *dataLocalizer(const QString &AFormType) const =0;

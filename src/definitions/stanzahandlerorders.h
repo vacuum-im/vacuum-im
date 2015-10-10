@@ -23,4 +23,7 @@
 //Iq Message Presence In
 #define SHO_IMPI_BITSOFBINARY         100
 
+//Iq Message Presence Out
+#define SHO_IMPO_CAPTCHAFORMS         100
+
 #endif // DEF_STANZAHANDLERORDERS_H

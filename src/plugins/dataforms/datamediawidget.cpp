@@ -42,7 +42,7 @@ void DataMediaWidget::loadNextUri()
 	if (FUriIndex < FMedia.uris.count())
 	{
 		const IDataMediaURI &uri = FMedia.uris.at(FUriIndex);
-		if (FDataForms->isSupportedUri(uri))
+		if (FDataForms->isSupportedMediaUri(uri))
 		{
 			setToolTip(uri.url.toString());
 			setText(tr("Loading data..."));
