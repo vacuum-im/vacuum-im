@@ -2,6 +2,7 @@
 
 #include <QVariant>
 #include <QTextCursor>
+#include <definitions/namespaces.h>
 #include <definitions/messagedataroles.h>
 #include <definitions/messagewriterorders.h>
 #include <definitions/notificationdataroles.h>
@@ -11,9 +12,10 @@
 
 MessageProcessor::MessageProcessor()
 {
-	FXmppStreamManager = NULL;
-	FStanzaProcessor = NULL;
+	FDiscovery = NULL;
 	FNotifications = NULL;
+	FStanzaProcessor = NULL;
+	FXmppStreamManager = NULL;
 }
 
 MessageProcessor::~MessageProcessor()
@@ -52,6 +54,12 @@ bool MessageProcessor::initConnections(IPluginManager *APluginManager, int &AIni
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 	}
 
+	plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
+	if (plugin)
+	{
+		FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
+	}
+
 	plugin = APluginManager->pluginInterface("INotifications").value(0,NULL);
 	if (plugin)
 	{
@@ -70,6 +78,17 @@ bool MessageProcessor::initObjects()
 {
 	insertMessageWriter(MWO_MESSAGEPROCESSOR,this);
 	insertMessageWriter(MWO_MESSAGEPROCESSOR_ANCHORS,this);
+
+	if (FDiscovery)
+	{
+		IDiscoFeature dfeature;
+		dfeature.active = true;
+		dfeature.var = NS_JABBER_X_OOB;
+		dfeature.name = tr("Out of Band Data");
+		dfeature.description = tr("Supports to communicate a URI to another user or application");
+		FDiscovery->insertDiscoFeature(dfeature);
+	}
+
 	return true;
 }
 
@@ -97,6 +116,24 @@ void MessageProcessor::writeMessageToText(int AOrder, Message &AMessage, QTextDo
 	{
 		QTextCursor cursor(ADocument);
 		cursor.insertHtml(prepareBodyForReceive(AMessage.body(ALang)));
+
+		for (QDomElement oobElem = AMessage.stanza().firstElement("x",NS_JABBER_X_OOB); !oobElem.isNull(); oobElem=oobElem.nextSiblingElement("x"))
+		{
+			if (oobElem.namespaceURI() == NS_JABBER_X_OOB)
+			{
+				QString desc = oobElem.firstChildElement("desc").text().trimmed();
+				QUrl url = QUrl::fromUserInput(oobElem.firstChildElement("url").text());
+				if (!url.isEmpty())
+				{
+					QTextCharFormat linkFormat;
+					linkFormat.setAnchor(true);
+					linkFormat.setToolTip(url.toString());
+					linkFormat.setAnchorHref(url.toEncoded());
+					cursor.insertHtml("<br>");
+					cursor.insertText(desc.isEmpty() ? url.toString() : desc, linkFormat);
+				}
+			}
+		}
 	}
 	else if (AOrder == MWO_MESSAGEPROCESSOR_ANCHORS)
 	{
@@ -104,14 +141,14 @@ void MessageProcessor::writeMessageToText(int AOrder, Message &AMessage, QTextDo
 		regexp.setCaseSensitivity(Qt::CaseInsensitive);
 		for (QTextCursor cursor = ADocument->find(regexp); !cursor.isNull(); cursor = ADocument->find(regexp,cursor))
 		{
-			QString link = cursor.selectedText();
-			if (QUrl(link).scheme().isEmpty())
-				link.prepend("http://");
-
 			QTextCharFormat linkFormat = cursor.charFormat();
-			linkFormat.setAnchor(true);
-			linkFormat.setAnchorHref(link);
-			cursor.setCharFormat(linkFormat);
+			if (!linkFormat.isAnchor())
+			{
+				QUrl url = QUrl::fromUserInput(cursor.selectedText());
+				linkFormat.setAnchor(true);
+				linkFormat.setAnchorHref(url.toEncoded());
+				cursor.setCharFormat(linkFormat);
+			}
 		}
 	}
 }
