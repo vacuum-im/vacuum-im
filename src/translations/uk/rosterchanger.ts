@@ -132,10 +132,6 @@
         <translation>Видалити контакт</translation>
     </message>
     <message>
-        <source>You are assured that wish to remove a contact &lt;b&gt;%1&lt;/b&gt; from roster?</source>
-        <translation>Ви впевнені, що хочете видалити контакт &lt;b&gt;%1&lt;/b&gt; з ростеру?</translation>
-    </message>
-    <message>
         <source>You are now subscribed for %1 presence.</source>
         <translation>%1 авторизував вас на отримання статусу.</translation>
     </message>
@@ -148,16 +144,8 @@
         <translation>Підписатись на отримання статусу контакту</translation>
     </message>
     <message>
-        <source>You are assured that wish to subscribe for a contact &lt;b&gt;%1&lt;/b&gt; presence?</source>
-        <translation>Ви впевнені, що хочете підписатись на отримання статусу контакту &lt;b&gt;%1&lt;/b&gt;?</translation>
-    </message>
-    <message>
         <source>Unsubscribe from contact presence</source>
         <translation>Відписатись від отримання статусу контакту</translation>
-    </message>
-    <message>
-        <source>You are assured that wish to unsubscribe from a contact &lt;b&gt;%1&lt;/b&gt; presence?</source>
-        <translation>Ви впевнені, що хочете відписатись на отримання статусу контакту &lt;b&gt;%1&lt;/b&gt;?</translation>
     </message>
     <message>
         <source>Roster Editor</source>
@@ -192,10 +180,6 @@
     <message>
         <source>When receiving authorization request</source>
         <translation>При отриманні запиту на авторизацію</translation>
-    </message>
-    <message numerus="yes">
-        <source>You are assured that wish to remove &lt;b&gt;%n contact(s)&lt;/b&gt; from roster?</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
     <message>
         <source>Add Contact</source>
@@ -302,10 +286,6 @@
         <translation>Перейменувати групу</translation>
     </message>
     <message>
-        <source>In this Group</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
         <source>Contacts list management</source>
         <translation type="unfinished"/>
     </message>
@@ -321,6 +301,26 @@
         <source>Del</source>
         <comment>Remove contact/group from roster</comment>
         <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Into this Group</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Are you sure you wish to remove a contact &lt;b&gt;%1&lt;/b&gt; from the roster?</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Are you sure you wish to subscribe for a contact &lt;b&gt;%1&lt;/b&gt; presence?</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Are you sure you wish to unsubscribe from a contact &lt;b&gt;%1&lt;/b&gt; presence?</source>
+        <translation type="unfinished"/>
+    </message>
+    <message numerus="yes">
+        <source>Are you sure you wish to remove &lt;b&gt;%n contact(s)&lt;/b&gt; from the roster?</source>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
 </context>
 <context>

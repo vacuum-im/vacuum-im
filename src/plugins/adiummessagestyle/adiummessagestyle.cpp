@@ -178,6 +178,7 @@ bool AdiumMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptio
 			WidgetStatus &wstatus = FWidgetStatus[view];
 			wstatus.ready = false;
 			wstatus.failed = false;
+			wstatus.start = false;
 			wstatus.lastKind = -1;
 			wstatus.lastId = QString::null;
 			wstatus.lastTime = QDateTime();
@@ -196,6 +197,10 @@ bool AdiumMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptio
 			QString html = makeStyleTemplate(AOptions);
 			fillStyleKeywords(html,AOptions);
 			view->setHtml(html);
+
+			// If previous template load is not finished then
+			// onStyleWidgetLoadFinished will be called with ok=false
+			wstatus.start = true;
 		}
 		else
 		{
@@ -801,7 +806,7 @@ void AdiumMessageStyle::onStyleWidgetLoadFinished(bool AOk)
 	if (view)
 	{
 		WidgetStatus &wstatus = FWidgetStatus[view];
-		if (!wstatus.ready && !wstatus.failed)
+		if (wstatus.start && !wstatus.ready && !wstatus.failed)
 		{
 			if (AOk)
 			{
@@ -812,7 +817,7 @@ void AdiumMessageStyle::onStyleWidgetLoadFinished(bool AOk)
 			else
 			{
 				wstatus.failed = true;
-				view->setHtml(QString("<body>%1</body>").arg(tr("Failed to load message style. Press clear window button to retry.")));
+				view->setHtml(QString("<html><body>%1</body></html>").arg(tr("Failed to load message style. Press clear window button to retry.")));
 				REPORT_ERROR(QString("Failed to load adium style template, styleId=%1").arg(styleId()));
 			}
 		}

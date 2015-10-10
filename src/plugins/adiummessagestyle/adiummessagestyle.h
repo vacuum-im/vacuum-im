@@ -95,6 +95,7 @@ public:
 		ImageScale
 	};
 	struct WidgetStatus {
+		bool start;
 		bool ready;
 		bool failed;
 		int lastKind;

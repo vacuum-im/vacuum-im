@@ -134,7 +134,7 @@
     </message>
     <message>
         <source>Wizard checks possibility to connect with the specified credentials</source>
-        <translation type="unfinished"/>
+        <translation>El asistente comprueba la posibilidad de conectar con las credenciales especificadas</translation>
     </message>
     <message>
         <source>Show account settings window</source>

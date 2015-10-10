@@ -287,10 +287,6 @@
         <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
     <message>
-        <source>Phrase was not found</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
         <source>Remove conversation history</source>
         <translation type="unfinished"/>
     </message>
@@ -398,10 +394,6 @@
         <source>with &lt;b&gt;%1&lt;/b&gt; for all time?</source>
         <translation type="unfinished"/>
     </message>
-    <message numerus="yes">
-        <source>And %n other conversations</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
-    </message>
     <message>
         <source>Do you want to remove the following conversations?</source>
         <translation type="unfinished"/>
@@ -441,6 +433,14 @@
     <message>
         <source>Export</source>
         <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Phrase not found</source>
+        <translation type="unfinished"/>
+    </message>
+    <message numerus="yes">
+        <source>And %n other conversation(s)</source>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
 </context>
 <context>

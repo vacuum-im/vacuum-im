@@ -35,27 +35,27 @@
     </message>
     <message>
         <source>Recent contacts</source>
-        <translation type="unfinished"/>
+        <translation>Contactos recientes</translation>
     </message>
     <message>
         <source>Hide inactive contacts</source>
-        <translation type="unfinished"/>
+        <translation>Ocultar los contactos inactivos</translation>
     </message>
     <message>
         <source>Sort contacts by last activity</source>
-        <translation type="unfinished"/>
+        <translation>Ordenar por la última actividad</translation>
     </message>
     <message>
         <source>Always show offline contacts</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar siempre los contactos desconectados</translation>
     </message>
     <message>
         <source>Show only favorite contacts</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar solo los contactos favoritos</translation>
     </message>
     <message>
         <source>Simplify recent contacts view</source>
-        <translation type="unfinished"/>
+        <translation>Simplificar la vista de contactos recientes</translation>
     </message>
 </context>
 </TS>
