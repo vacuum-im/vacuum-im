@@ -88,11 +88,6 @@ void EditBookmarksDialog::setBookmarkToRow(int ARow, const IBookmark &ABookmark)
 	QTableWidgetItem *nameItem = new QTableWidgetItem;
 	nameItem->setText(ABookmark.name);
 
-	if (ABookmark.type == IBookmark::TypeUrl)
-		nameItem->setIcon(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_BOOKMARKS_URL));
-	else
-		nameItem->setIcon(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_BOOKMARKS_ROOM));
-
 	if (ABookmark.type==IBookmark::TypeRoom && ABookmark.room.autojoin)
 	{
 		QFont font = nameItem->font();

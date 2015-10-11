@@ -23,10 +23,10 @@
 //Bookmarks
 #define MNI_BOOKMARKS                   "bookmarks"
 #define MNI_BOOKMARKS_ADD               "bookmarksAdd"
-#define MNI_BOOKMARKS_REMOVE            "bookmarksRemove"
-#define MNI_BOOKMARKS_ROOM              "bookmarksRoom"
-#define MNI_BOOKMARKS_URL               "bookmarksURL"
 #define MNI_BOOKMARKS_EDIT              "bookmarksEdit"
+#define MNI_BOOKMARKS_REMOVE            "bookmarksRemove"
+#define MNI_BOOKMARKS_EMPTY             "bookmarksEmpty"
+#define MNI_BOOKMARKS_AUTO_JOIN         "bookmarksAutoJoin"
 
 //CaptchaForms
 #define MNI_CAPTCHAFORMS                "captchaforms"

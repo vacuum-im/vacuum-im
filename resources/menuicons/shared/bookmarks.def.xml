@@ -9,19 +9,19 @@
     <object mime="image/png">bookmarksadd.png</object>
   </icon>
   <icon>
+    <key>bookmarksEdit</key>
+    <object mime="image/png">bookmarksedit.png</object>
+  </icon>
+  <icon>
     <key>bookmarksRemove</key>
     <object mime="image/png">bookmarksremove.png</object>
   </icon>
   <icon>
-    <key>bookmarksRoom</key>
-    <object mime="image/png">bookmarksroom.png</object>
+    <key>bookmarksEmpty</key>
+    <object mime="image/png">bookmarksempty.png</object>
   </icon>
   <icon>
-    <key>bookmarksURL</key>
-    <object mime="image/png">bookmarksurl.png</object>
-  </icon>
-  <icon>
-    <key>bookmarksEdit</key>
-    <object mime="image/png">bookmarksedit.png</object>
+    <key>bookmarksAutoJoin</key>
+    <object mime="image/png">bookmarksautojoin.png</object>
   </icon>
 </icondef>

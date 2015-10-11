@@ -64,6 +64,8 @@ signals:
 	void rosterDataChanged(IRosterIndex *AIndex, int ARole);
 protected:
 	void updateRoomIndexes(const Jid &AStreamJid);
+	void updateMultiChatWindows(const Jid &AStreamJid);
+	void updateMultiChatWindow(IMultiUserChatWindow *AWindow);
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 	void renameBookmark(const Jid &AStreamJid, const IBookmark &ABookmark);
 protected:
@@ -83,7 +85,7 @@ protected slots:
 	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 protected slots:
 	void onMultiChatPropertiesChanged();
-	void onMultiChatWindowAddBookmarkActionTriggered(bool);
+	void onMultiChatWindowBookmarkActionTriggered(bool);
 	void onMultiChatWindowCreated(IMultiUserChatWindow *AWindow);
 protected slots:
 	void onDiscoWindowAddBookmarkActionTriggered(bool);
@@ -94,7 +96,6 @@ protected slots:
 	void onRosterIndexDestroyed(IRosterIndex *AIndex);
 	void onStartBookmarkActionTriggered(bool);
 	void onEditBookmarkActionTriggered(bool);
-	void onRenameBookmarkActionTriggered(bool);
 	void onChangeBookmarkAutoJoinActionTriggered(bool);
 	void onAddBookmarksActionTriggered(bool);
 	void onRemoveBookmarksActionTriggered(bool);
