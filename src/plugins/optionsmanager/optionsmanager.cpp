@@ -403,9 +403,14 @@ bool OptionsManager::changeProfilePassword(const QString &AProfile, const QStrin
 		keyText.toText().setData(keyValue.toBase64());
 
 		if (saveProfile(AProfile, profileDoc))
+		{
 			LOG_INFO(QString("Profile password changed, profile=%1").arg(AProfile));
+			return true;
+		}
 		else
+		{
 			LOG_ERROR(QString("Failed to change profile password, profile=%1: Profile not saved").arg(AProfile));
+		}
 	}
 	return false;
 }
