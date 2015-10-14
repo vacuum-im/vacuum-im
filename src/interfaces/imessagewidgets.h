@@ -21,6 +21,8 @@
 
 #define MESSAGEWIDGETS_UUID "{89de35ee-bd44-49fc-8495-edd2cfebb685}"
 
+class IMessageWindow;
+
 class IMessageAddress
 {
 public:
@@ -40,7 +42,6 @@ protected:
 	virtual void streamJidChanged(const Jid &ABefore, const Jid &AAfter) =0;
 };
 
-class IMessageWindow;
 class IMessageWidget
 {
 public:
@@ -55,7 +56,7 @@ class IMessageInfoWidget :
 public:
 	enum Field {
 		Avatar,
-		Name,
+		Caption,
 		StatusIcon,
 		StatusText,
 		UserField = 16
@@ -65,10 +66,13 @@ public:
 	virtual Menu *addressMenu() const =0;
 	virtual bool isAddressMenuVisible() const =0;
 	virtual void setAddressMenuVisible(bool AVisible) =0;
+	virtual bool isCaptionClickable() const =0;
+	virtual void setCaptionClickable(bool AEnabled) =0;
 	virtual QVariant fieldValue(int AField) const =0;
 	virtual void setFieldValue(int AField, const QVariant &AValue) =0;
 	virtual ToolBarChanger *infoToolBarChanger() const =0;
 protected:
+	virtual void captionFieldClicked() =0;
 	virtual void fieldValueChanged(int AField) =0;
 	virtual void addressMenuVisibleChanged(bool AVisible) =0;
 	virtual void addressMenuRequested(Menu *AMenu) =0;

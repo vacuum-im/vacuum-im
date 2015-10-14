@@ -3,6 +3,7 @@
 #include <QIcon>
 #include <QMovie>
 #include <QTimer>
+#include <QCursor>
 #include <QToolTip>
 #include <QHelpEvent>
 #include <QHBoxLayout>
@@ -20,10 +21,13 @@ InfoWidget::InfoWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow
 
 	FWindow = AWindow;
 	FMessageWidgets = AMessageWidgets;
+	
+	FCaptionClickable = false;
+	FAddressMenuVisible = false;
+	FInfoLabelUnderMouse = false;
 
 	FAvatars = PluginHelper::pluginInstance<IAvatars>();
 
-	FAddressMenuVisible = false;
 	ui.lblAvatar->setVisible(false);
 	ui.lblIcon->setVisible(false);
 	ui.wdtInfoToolBar->setVisible(false);
@@ -48,6 +52,11 @@ InfoWidget::InfoWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow
 
 	FAddressMenu = new Menu(this);
 	connect(FAddressMenu,SIGNAL(aboutToShow()),SLOT(onAddressMenuAboutToShow()));
+
+	ui.lblInfo->installEventFilter(this);
+	ui.lblInfo->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(ui.lblInfo,SIGNAL(linkActivated(const QString &)),SLOT(onInfoLabelLinkActivated(const QString &)));
+	connect(ui.lblInfo,SIGNAL(customContextMenuRequested(const QPoint &)),SLOT(onInfoLabelCustomContextMenuRequested(const QPoint &)));
 
 	onUpdateInfoToolBarVisibility();
 }
@@ -84,35 +93,30 @@ void InfoWidget::setAddressMenuVisible(bool AVisible)
 		FAddressMenuVisible = AVisible;
 		if (AVisible)
 		{
-			if (messageWindow()->editWidget())
-			{
-				QAction *sendHandle = messageWindow()->editWidget()->editToolBarChanger()->groupItems(TBG_MWEWTB_SENDMESSAGE).value(0);
-				QToolButton *button = qobject_cast<QToolButton *>(messageWindow()->editWidget()->editToolBarChanger()->handleWidget(sendHandle));
-				if (button)
-				{
-					button->setMenu(FAddressMenu);
-					button->setPopupMode(QToolButton::MenuButtonPopup);
-					button->setIconSize(messageWindow()->editWidget()->editToolBarChanger()->toolBar()->iconSize());
-				}
-			}
-
 			QToolButton *button = FInfoToolBar->insertAction(FAddressMenu->menuAction(),TBG_MWIWTB_ADDRESSMENU);
 			button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 			button->setPopupMode(QToolButton::InstantPopup);
 		}
 		else
 		{
-			if (messageWindow()->editWidget())
-			{
-				QAction *sendHandle = messageWindow()->editWidget()->editToolBarChanger()->groupItems(TBG_MWEWTB_SENDMESSAGE).value(0);
-				QToolButton *button = qobject_cast<QToolButton *>(messageWindow()->editWidget()->editToolBarChanger()->handleWidget(sendHandle));
-				if (button)
-					button->setMenu(NULL);
-			}
-
 			FInfoToolBar->removeItem(FInfoToolBar->actionHandle(FAddressMenu->menuAction()));
 		}
 		emit addressMenuVisibleChanged(AVisible);
+	}
+}
+
+bool InfoWidget::isCaptionClickable() const
+{
+	return FCaptionClickable;
+}
+
+void InfoWidget::setCaptionClickable(bool AEnabled)
+{
+	if (FCaptionClickable != AEnabled)
+	{
+		FCaptionClickable = AEnabled;
+		updateFieldView(Caption);
+		captionClickableChanged(AEnabled);
 	}
 }
 
@@ -186,19 +190,31 @@ void InfoWidget::updateFieldView(int AField)
 			ui.lblAvatar->setVisible(avatarVisible);
 			break;
 		}
-	case IMessageInfoWidget::Name:
+	case IMessageInfoWidget::Caption:
 	case IMessageInfoWidget::StatusText:
 		{
-			QString info;
-			QString name = fieldValue(IMessageInfoWidget::Name).toString();
+			static const QString htmlTemplate = "<html><style>a { color: %1; text-decoration: %2; }</style><body>%3</body></html>";
+			static const QString captionClickTemplate = "<big><b><a href='info-caption'>%1</a></b></big>";
+			static const QString captionPlainTemplate = "<big><b>%1</b></big>";
+
+			QString caption = fieldValue(IMessageInfoWidget::Caption).toString();
 			QString status = fieldValue(IMessageInfoWidget::StatusText).toString();
-			if (!name.isEmpty() && !status.isEmpty())
-				info = QString("<big><b>%1</b></big> - %2").arg(Qt::escape(name),Qt::escape(status));
-			else if (!name.isEmpty())
-				info = QString("<big><b>%1</b></big>").arg(Qt::escape(name));
+			QString captionTemplate = FCaptionClickable ? captionClickTemplate : captionPlainTemplate;
+
+			QString info;
+			if (!caption.isEmpty() && !status.isEmpty())
+				info = QString("%1 - %2").arg(captionTemplate.arg(Qt::escape(caption))).arg(Qt::escape(status));
+			else if (!caption.isEmpty())
+				info = captionTemplate.arg(Qt::escape(caption));
 			else if (!status.isEmpty())
 				info = Qt::escape(status);
-			ui.lblInfo->setText(info);
+
+			QPalette::ColorGroup colorGroup = ui.lblInfo->isEnabled() ? (isActiveWindow() ? QPalette::Active : QPalette::Inactive) : QPalette::Disabled;
+			QString colorName = ui.lblInfo->palette().color(colorGroup, QPalette::WindowText).name();
+
+			QString textDecoration = FCaptionClickable && FInfoLabelUnderMouse ? "underline" : "none";
+
+			ui.lblInfo->setText(htmlTemplate.arg(colorName,textDecoration,info));
 			break;
 		}
 	case IMessageInfoWidget::StatusIcon:
@@ -233,6 +249,18 @@ void InfoWidget::updateFieldView(int AField)
 	}
 }
 
+void InfoWidget::showContextMenu(const QPoint &AGlobalPos)
+{
+	Menu *menu = new Menu(this);
+	menu->setAttribute(Qt::WA_DeleteOnClose,true);
+	emit contextMenuRequested(menu);
+
+	if (!menu->isEmpty())
+		menu->popup(AGlobalPos);
+	else
+		delete menu;
+}
+
 bool InfoWidget::event(QEvent *AEvent)
 {
 	if (AEvent->type() == QEvent::ToolTip)
@@ -253,17 +281,27 @@ bool InfoWidget::event(QEvent *AEvent)
 	return QWidget::event(AEvent);
 }
 
+bool InfoWidget::eventFilter(QObject *AObject, QEvent *AEvent)
+{
+	if (FCaptionClickable && AObject==ui.lblInfo)
+	{
+		if (AEvent->type() == QEvent::Enter)
+		{
+			FInfoLabelUnderMouse = true;
+			updateFieldView(Caption);
+		}
+		else if (AEvent->type() == QEvent::Leave)
+		{
+			FInfoLabelUnderMouse = false;
+			updateFieldView(Caption);
+		}
+	}
+	return QWidget::eventFilter(AObject,AEvent);
+}
+
 void InfoWidget::contextMenuEvent(QContextMenuEvent *AEvent)
 {
-	Menu *menu = new Menu(this);
-	menu->setAttribute(Qt::WA_DeleteOnClose,true);
-
-	emit contextMenuRequested(menu);
-
-	if (!menu->isEmpty())
-		menu->popup(AEvent->globalPos());
-	else
-		delete menu;
+	showContextMenu(AEvent->globalPos());
 }
 
 void InfoWidget::onAddressMenuAboutToShow()
@@ -275,4 +313,15 @@ void InfoWidget::onAddressMenuAboutToShow()
 void InfoWidget::onUpdateInfoToolBarVisibility()
 {
 	ui.wdtInfoToolBar->setVisible(!FInfoToolBar->isEmpty());
+}
+
+void InfoWidget::onInfoLabelLinkActivated(const QString &ALink)
+{
+	if (ALink == "info-caption")
+		emit captionFieldClicked();
+}
+
+void InfoWidget::onInfoLabelCustomContextMenuRequested(const QPoint &APos)
+{
+	showContextMenu(ui.lblInfo->mapToGlobal(APos));
 }

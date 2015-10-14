@@ -545,7 +545,7 @@ void ChatMessageHandler::updateWindow(IMessageChatWindow *AWindow)
 	}
 
 	QString name = FMessageStyleManager!=NULL ? FMessageStyleManager->contactName(AWindow->streamJid(),AWindow->contactJid()) : AWindow->contactJid().uFull();
-	AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::Name,name);
+	AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::Caption,name);
 	
 	QIcon statusIcon = FStatusIcons!=NULL ? FStatusIcons->iconByJid(AWindow->streamJid(),AWindow->contactJid()) : QIcon();
 	AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::StatusIcon,statusIcon);

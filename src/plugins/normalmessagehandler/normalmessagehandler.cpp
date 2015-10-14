@@ -666,7 +666,7 @@ void NormalMessageHandler::updateWindow(IMessageNormalWindow *AWindow) const
 	}
 
 	QString name = FMessageStyleManager!=NULL ? FMessageStyleManager->contactName(AWindow->streamJid(),AWindow->contactJid()) : AWindow->contactJid().uFull();
-	AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::Name,name);
+	AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::Caption,name);
 
 	QIcon statusIcon;
 	if (FStatusIcons && AWindow->mode()==IMessageNormalWindow::ReadMode)

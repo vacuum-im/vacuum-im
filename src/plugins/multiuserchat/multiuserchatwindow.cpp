@@ -1731,7 +1731,7 @@ void MultiUserChatWindow::requestMultiChatHistory()
 
 void MultiUserChatWindow::updateMultiChatWindow()
 {
-	FInfoWidget->setFieldValue(IMessageInfoWidget::Name,FMultiChat->roomTitle());
+	FInfoWidget->setFieldValue(IMessageInfoWidget::Caption,FMultiChat->roomTitle());
 
 	QIcon statusIcon = FStatusIcons!=NULL ? FStatusIcons->iconByJidStatus(contactJid(),FMultiChat->roomPresence().show,SUBSCRIPTION_BOTH,false) : QIcon();
 	FInfoWidget->setFieldValue(IMessageInfoWidget::StatusIcon,statusIcon);
@@ -1929,7 +1929,7 @@ void MultiUserChatWindow::updatePrivateChatWindow(IMessageChatWindow *AWindow)
 		}
 
 		QString name = tr("[%1] in [%2]").arg(user->nick(),FMultiChat->roomName());
-		AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::Name,name);
+		AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::Caption,name);
 
 		QIcon statusIcon = FStatusIcons!=NULL ? FStatusIcons->iconByJidStatus(user->userJid(),user->presence().show,SUBSCRIPTION_BOTH,false) : QIcon();
 		AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::StatusIcon,statusIcon);
