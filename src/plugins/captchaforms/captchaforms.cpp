@@ -133,7 +133,8 @@ bool CaptchaForms::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 		else if (!isSupportedChallenge(form))
 		{
 			LOG_STRM_WARNING(AStreamJid,QString("Received unsupported challenge from=%1, id=%2").arg(AStanza.from(),AStanza.id()));
-			FStanzaProcessor->sendStanzaOut(AStreamJid,FStanzaProcessor->makeReplyError(AStanza,XmppStanzaError::EC_NOT_ACCEPTABLE));
+			Stanza error = FStanzaProcessor->makeReplyError(AStanza,XmppStanzaError::EC_NOT_ACCEPTABLE);
+			FStanzaProcessor->sendStanzaOut(AStreamJid,error);
 		}
 		else
 		{
