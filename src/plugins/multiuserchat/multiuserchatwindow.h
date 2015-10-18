@@ -134,6 +134,9 @@ protected:
 	void showDateSeparator(IMessageViewWidget *AView, const QDateTime &ADateTime);
 	void showHTMLStatusMessage(IMessageViewWidget *AView, const QString &AHtml, int AType=0, int AStatus=0, const QDateTime &ATime=QDateTime::currentDateTime());
 protected:
+	IMultiUser *userAtViewPosition(const QPoint &APosition) const;
+	void insertUserMention(IMultiUser *AUser, bool ASetFocus = false) const;
+protected:
 	bool isMentionMessage(const Message &AMessage) const;
 	void setMultiChatMessageStyle();
 	void showMultiChatTopic(const QString &ATopic, const QString &ANick = QString::null);
@@ -187,6 +190,7 @@ protected slots:
 	void onMultiChatUserItemToolTips(QStandardItem *AItem, QMap<int,QString> &AToolTips);
 	void onMultiChatContentAppended(const QString &AHtml, const IMessageStyleContentOptions &AOptions);
 	void onMultiChatMessageStyleOptionsChanged(const IMessageStyleOptions &AOptions, bool ACleared);
+	void onMultiChatMessageStyleChanged(IMessageStyle *ABefore, const IMessageStyleOptions &AOptions);
 protected slots:
 	void onPrivateChatWindowActivated();
 	void onPrivateChatWindowClosed();
@@ -259,6 +263,9 @@ private:
 	bool FInitializeConfig;
 	bool FDestroyOnChatClosed;
 	QDateTime FLastStanzaTime;
+private:
+	QPoint FMousePressedPos;
+	QWidget *FViewWidgetViewport;
 private:
 	QString FRoleRequestId;
 	QString FAffilRequestId;

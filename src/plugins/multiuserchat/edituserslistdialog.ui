@@ -18,6 +18,13 @@
     <number>5</number>
    </property>
    <item>
+    <widget class="SearchLineEdit" name="sleSearch">
+     <property name="placeholderText">
+      <string>Search users</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <layout class="QVBoxLayout" name="verticalLayout">
      <property name="spacing">
       <number>0</number>
@@ -33,13 +40,6 @@
       </widget>
      </item>
     </layout>
-   </item>
-   <item>
-    <widget class="SearchLineEdit" name="sleSearch">
-     <property name="placeholderText">
-      <string>Search in lists</string>
-     </property>
-    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout">
@@ -97,6 +97,7 @@
  </customwidgets>
  <tabstops>
   <tabstop>sleSearch</tabstop>
+  <tabstop>tbvItems</tabstop>
   <tabstop>pbtAdd</tabstop>
   <tabstop>pbtDelete</tabstop>
   <tabstop>dbbButtons</tabstop>

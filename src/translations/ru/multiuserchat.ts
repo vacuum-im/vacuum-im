@@ -90,10 +90,6 @@
 <context>
     <name>EditUsersListDialog</name>
     <message>
-        <source>Edit Users Affiliations - %1</source>
-        <translation>Редактировать членство пользователей - %1</translation>
-    </message>
-    <message>
         <source>Owners</source>
         <translation>Владельцы</translation>
     </message>
@@ -165,6 +161,10 @@
             <numerusform>Удалить %n пользователей</numerusform>
         </translation>
     </message>
+    <message>
+        <source>Users Lists - %1</source>
+        <translation>Списки пользователей - %1</translation>
+    </message>
 </context>
 <context>
     <name>EditUsersListDialogClass</name>
@@ -177,8 +177,8 @@
         <translation>Удалить</translation>
     </message>
     <message>
-        <source>Search in lists</source>
-        <translation>Поиск по спискам</translation>
+        <source>Search users</source>
+        <translation>Поиск пользователей</translation>
     </message>
 </context>
 <context>
@@ -790,14 +790,6 @@
         <translation>%1 от %2</translation>
     </message>
     <message>
-        <source>Enter</source>
-        <translation>Войти</translation>
-    </message>
-    <message>
-        <source>Exit</source>
-        <translation>Выйти</translation>
-    </message>
-    <message>
         <source>Open Conference Dialog</source>
         <translation>Открыть диалог конференции</translation>
     </message>
@@ -896,6 +888,18 @@
     <message>
         <source>Join Conference...</source>
         <translation>Войти в конференцию...</translation>
+    </message>
+    <message>
+        <source>Join to Conference</source>
+        <translation>Присоединиться к конференции</translation>
+    </message>
+    <message>
+        <source>Exit from Conference</source>
+        <translation>Выйти из конференции</translation>
+    </message>
+    <message>
+        <source>Enter to Conference</source>
+        <translation>Войти в конференцию</translation>
     </message>
 </context>
 <context>
@@ -1005,10 +1009,6 @@
         <translation>Выйти</translation>
     </message>
     <message>
-        <source>Open Chat Dialog</source>
-        <translation>Открыть диалог чата</translation>
-    </message>
-    <message>
         <source>Change Nick</source>
         <translation>Изменить ник</translation>
     </message>
@@ -1095,10 +1095,6 @@
     <message>
         <source>User %1 requests a voice in the conference</source>
         <translation>Пользователь %1 запрашивает голос в конференции</translation>
-    </message>
-    <message>
-        <source>Edit Users Affiliations</source>
-        <translation>Редактировать членство пользователей</translation>
     </message>
     <message>
         <source>Clear window</source>
@@ -1455,6 +1451,18 @@
     <message>
         <source>change password</source>
         <translation>изменить пароль</translation>
+    </message>
+    <message>
+        <source>Open Private Chat</source>
+        <translation>Открыть приватный чат</translation>
+    </message>
+    <message>
+        <source>Moderate</source>
+        <translation>Модерировать</translation>
+    </message>
+    <message>
+        <source>Edit Users Lists</source>
+        <translation>Редактировать списки пользователей</translation>
     </message>
 </context>
 <context>

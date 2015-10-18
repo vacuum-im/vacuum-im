@@ -38,7 +38,7 @@ EditUsersListDialog::EditUsersListDialog(IMultiUserChat *AMultiChat, const QStri
 	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
-	setWindowTitle(tr("Edit Users Affiliations - %1").arg(AMultiChat->roomJid().bare()));
+	setWindowTitle(tr("Users Lists - %1").arg(AMultiChat->roomJid().bare()));
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_MUC_EDIT_AFFILIATIONS,0,0,"windowIcon");
 
 	FMultiChat = AMultiChat;

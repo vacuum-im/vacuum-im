@@ -841,6 +841,7 @@ void MultiUserChatWindow::contextMenuForRoom(Menu *AMenu)
 {
 	QString role = FMultiChat->isOpen() ? FMultiChat->mainUser()->role() : MUC_ROLE_NONE;
 	QString affiliation = FMultiChat->isOpen() ? FMultiChat->mainUser()->affiliation() : MUC_AFFIL_NONE;
+
 	if (affiliation == MUC_AFFIL_OWNER)
 	{
 		AMenu->addAction(FChangeNick,AG_RVCM_MULTIUSERCHAT_COMMON);
@@ -883,106 +884,112 @@ void MultiUserChatWindow::contextMenuForRoom(Menu *AMenu)
 
 void MultiUserChatWindow::contextMenuForUser(IMultiUser *AUser, Menu *AMenu)
 {
-	if (FUsers.contains(AUser))
+	if (FUsers.contains(AUser) && AUser!=FMultiChat->mainUser())
 	{
-		if (FMultiChat->isOpen() && AUser!=FMultiChat->mainUser())
+		IMessageChatWindow *window = findPrivateChatWindow(AUser->userJid());
+		if (window==NULL || !window->isActiveTabPage())
 		{
 			Action *openChat = new Action(AMenu);
 			openChat->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_PRIVATE_MESSAGE);
-			openChat->setText(tr("Open Chat Dialog"));
+			openChat->setText(tr("Open Private Chat"));
 			openChat->setData(ADR_USER_NICK,AUser->nick());
 			connect(openChat,SIGNAL(triggered(bool)),SLOT(onOpenPrivateChatWindowActionTriggered(bool)));
 			AMenu->addAction(openChat,AG_MUCM_MULTIUSERCHAT_PRIVATE,true);
+		}
 
-			if (FMultiChat->mainUser()->role() == MUC_ROLE_MODERATOR)
+		if (FMultiChat->mainUser()->role() == MUC_ROLE_MODERATOR)
+		{
+			Menu *moderate = new Menu(AMenu);
+			moderate->setTitle(tr("Moderate"));
+			moderate->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_MODERATE);
+			AMenu->addAction(moderate->menuAction(),AG_MUCM_MULTIUSERCHAT_UTILS,true);
+
+			Action *setRoleNone = new Action(moderate);
+			setRoleNone->setText(tr("Kick"));
+			setRoleNone->setData(ADR_USER_NICK,AUser->nick());
+			setRoleNone->setData(ADR_USER_ROLE,MUC_ROLE_NONE);
+			connect(setRoleNone,SIGNAL(triggered(bool)),SLOT(onChangeUserRoleActionTriggeted(bool)));
+			moderate->addAction(setRoleNone);
+
+			Action *setAffilOutcast = new Action(moderate);
+			setAffilOutcast->setText(tr("Ban"));
+			setAffilOutcast->setData(ADR_USER_NICK,AUser->nick());
+			setAffilOutcast->setData(ADR_USER_AFFIL,MUC_AFFIL_OUTCAST);
+			connect(setAffilOutcast,SIGNAL(triggered(bool)),SLOT(onChangeUserAffiliationActionTriggered(bool)));
+			moderate->addAction(setAffilOutcast);
+
+			Menu *changeRole = new Menu(moderate);
+			changeRole->setTitle(tr("Change Role"));
 			{
-				Action *setRoleNone = new Action(AMenu);
-				setRoleNone->setText(tr("Kick"));
-				setRoleNone->setData(ADR_USER_NICK,AUser->nick());
-				setRoleNone->setData(ADR_USER_ROLE,MUC_ROLE_NONE);
-				connect(setRoleNone,SIGNAL(triggered(bool)),SLOT(onChangeUserRoleActionTriggeted(bool)));
-				AMenu->addAction(setRoleNone,AG_MUCM_MULTIUSERCHAT_UTILS,false);
+				Action *setRoleVisitor = new Action(changeRole);
+				setRoleVisitor->setCheckable(true);
+				setRoleVisitor->setText(tr("Visitor"));
+				setRoleVisitor->setData(ADR_USER_NICK,AUser->nick());
+				setRoleVisitor->setData(ADR_USER_ROLE,MUC_ROLE_VISITOR);
+				setRoleVisitor->setChecked(AUser->role() == MUC_ROLE_VISITOR);
+				connect(setRoleVisitor,SIGNAL(triggered(bool)),SLOT(onChangeUserRoleActionTriggeted(bool)));
+				changeRole->addAction(setRoleVisitor,AG_DEFAULT,false);
 
-				Action *setAffilOutcast = new Action(AMenu);
-				setAffilOutcast->setText(tr("Ban"));
-				setAffilOutcast->setData(ADR_USER_NICK,AUser->nick());
-				setAffilOutcast->setData(ADR_USER_AFFIL,MUC_AFFIL_OUTCAST);
-				connect(setAffilOutcast,SIGNAL(triggered(bool)),SLOT(onChangeUserAffiliationActionTriggered(bool)));
-				AMenu->addAction(setAffilOutcast,AG_MUCM_MULTIUSERCHAT_UTILS,false);
+				Action *setRoleParticipant = new Action(changeRole);
+				setRoleParticipant->setCheckable(true);
+				setRoleParticipant->setText(tr("Participant"));
+				setRoleParticipant->setData(ADR_USER_NICK,AUser->nick());
+				setRoleParticipant->setData(ADR_USER_ROLE,MUC_ROLE_PARTICIPANT);
+				setRoleParticipant->setChecked(AUser->role() == MUC_ROLE_PARTICIPANT);
+				connect(setRoleParticipant,SIGNAL(triggered(bool)),SLOT(onChangeUserRoleActionTriggeted(bool)));
+				changeRole->addAction(setRoleParticipant,AG_DEFAULT,false);
 
-				Menu *changeRole = new Menu(AMenu);
-				changeRole->setTitle(tr("Change Role"));
-				{
-					Action *setRoleVisitor = new Action(changeRole);
-					setRoleVisitor->setCheckable(true);
-					setRoleVisitor->setText(tr("Visitor"));
-					setRoleVisitor->setData(ADR_USER_NICK,AUser->nick());
-					setRoleVisitor->setData(ADR_USER_ROLE,MUC_ROLE_VISITOR);
-					setRoleVisitor->setChecked(AUser->role() == MUC_ROLE_VISITOR);
-					connect(setRoleVisitor,SIGNAL(triggered(bool)),SLOT(onChangeUserRoleActionTriggeted(bool)));
-					changeRole->addAction(setRoleVisitor,AG_DEFAULT,false);
-
-					Action *setRoleParticipant = new Action(changeRole);
-					setRoleParticipant->setCheckable(true);
-					setRoleParticipant->setText(tr("Participant"));
-					setRoleParticipant->setData(ADR_USER_NICK,AUser->nick());
-					setRoleParticipant->setData(ADR_USER_ROLE,MUC_ROLE_PARTICIPANT);
-					setRoleParticipant->setChecked(AUser->role() == MUC_ROLE_PARTICIPANT);
-					connect(setRoleParticipant,SIGNAL(triggered(bool)),SLOT(onChangeUserRoleActionTriggeted(bool)));
-					changeRole->addAction(setRoleParticipant,AG_DEFAULT,false);
-
-					Action *setRoleModerator = new Action(changeRole);
-					setRoleModerator->setCheckable(true);
-					setRoleModerator->setText(tr("Moderator"));
-					setRoleModerator->setData(ADR_USER_NICK,AUser->nick());
-					setRoleModerator->setData(ADR_USER_ROLE,MUC_ROLE_MODERATOR);
-					setRoleModerator->setChecked(AUser->role() == MUC_ROLE_MODERATOR);
-					connect(setRoleModerator,SIGNAL(triggered(bool)),SLOT(onChangeUserRoleActionTriggeted(bool)));
-					changeRole->addAction(setRoleModerator,AG_DEFAULT,false);
-				}
-				AMenu->addAction(changeRole->menuAction(),AG_MUCM_MULTIUSERCHAT_UTILS,false);
-
-				Menu *changeAffiliation = new Menu(AMenu);
-				changeAffiliation->setTitle(tr("Change Affiliation"));
-				{
-					Action *setAffilNone = new Action(changeAffiliation);
-					setAffilNone->setCheckable(true);
-					setAffilNone->setText(tr("None"));
-					setAffilNone->setData(ADR_USER_NICK,AUser->nick());
-					setAffilNone->setData(ADR_USER_AFFIL,MUC_AFFIL_NONE);
-					setAffilNone->setChecked(AUser->affiliation() == MUC_AFFIL_NONE);
-					connect(setAffilNone,SIGNAL(triggered(bool)),SLOT(onChangeUserAffiliationActionTriggered(bool)));
-					changeAffiliation->addAction(setAffilNone,AG_DEFAULT,false);
-
-					Action *setAffilMember = new Action(changeAffiliation);
-					setAffilMember->setCheckable(true);
-					setAffilMember->setText(tr("Member"));
-					setAffilMember->setData(ADR_USER_NICK,AUser->nick());
-					setAffilMember->setData(ADR_USER_AFFIL,MUC_AFFIL_MEMBER);
-					setAffilMember->setChecked(AUser->affiliation() == MUC_AFFIL_MEMBER);
-					connect(setAffilMember,SIGNAL(triggered(bool)),SLOT(onChangeUserAffiliationActionTriggered(bool)));
-					changeAffiliation->addAction(setAffilMember,AG_DEFAULT,false);
-
-					Action *setAffilAdmin = new Action(changeAffiliation);
-					setAffilAdmin->setCheckable(true);
-					setAffilAdmin->setText(tr("Administrator"));
-					setAffilAdmin->setData(ADR_USER_NICK,AUser->nick());
-					setAffilAdmin->setData(ADR_USER_AFFIL,MUC_AFFIL_ADMIN);
-					setAffilAdmin->setChecked(AUser->affiliation() == MUC_AFFIL_ADMIN);
-					connect(setAffilAdmin,SIGNAL(triggered(bool)),SLOT(onChangeUserAffiliationActionTriggered(bool)));
-					changeAffiliation->addAction(setAffilAdmin,AG_DEFAULT,false);
-
-					Action *setAffilOwner = new Action(changeAffiliation);
-					setAffilOwner->setCheckable(true);
-					setAffilOwner->setText(tr("Owner"));
-					setAffilOwner->setData(ADR_USER_NICK,AUser->nick());
-					setAffilOwner->setData(ADR_USER_AFFIL,MUC_AFFIL_OWNER);
-					setAffilOwner->setChecked(AUser->affiliation() == MUC_AFFIL_OWNER);
-					connect(setAffilOwner,SIGNAL(triggered(bool)),SLOT(onChangeUserAffiliationActionTriggered(bool)));
-					changeAffiliation->addAction(setAffilOwner,AG_DEFAULT,false);
-				}
-				AMenu->addAction(changeAffiliation->menuAction(),AG_MUCM_MULTIUSERCHAT_UTILS,false);
+				Action *setRoleModerator = new Action(changeRole);
+				setRoleModerator->setCheckable(true);
+				setRoleModerator->setText(tr("Moderator"));
+				setRoleModerator->setData(ADR_USER_NICK,AUser->nick());
+				setRoleModerator->setData(ADR_USER_ROLE,MUC_ROLE_MODERATOR);
+				setRoleModerator->setChecked(AUser->role() == MUC_ROLE_MODERATOR);
+				connect(setRoleModerator,SIGNAL(triggered(bool)),SLOT(onChangeUserRoleActionTriggeted(bool)));
+				changeRole->addAction(setRoleModerator,AG_DEFAULT,false);
 			}
+			moderate->addAction(changeRole->menuAction());
+
+			Menu *changeAffiliation = new Menu(moderate);
+			changeAffiliation->setTitle(tr("Change Affiliation"));
+			{
+				Action *setAffilNone = new Action(changeAffiliation);
+				setAffilNone->setCheckable(true);
+				setAffilNone->setText(tr("None"));
+				setAffilNone->setData(ADR_USER_NICK,AUser->nick());
+				setAffilNone->setData(ADR_USER_AFFIL,MUC_AFFIL_NONE);
+				setAffilNone->setChecked(AUser->affiliation() == MUC_AFFIL_NONE);
+				connect(setAffilNone,SIGNAL(triggered(bool)),SLOT(onChangeUserAffiliationActionTriggered(bool)));
+				changeAffiliation->addAction(setAffilNone,AG_DEFAULT,false);
+
+				Action *setAffilMember = new Action(changeAffiliation);
+				setAffilMember->setCheckable(true);
+				setAffilMember->setText(tr("Member"));
+				setAffilMember->setData(ADR_USER_NICK,AUser->nick());
+				setAffilMember->setData(ADR_USER_AFFIL,MUC_AFFIL_MEMBER);
+				setAffilMember->setChecked(AUser->affiliation() == MUC_AFFIL_MEMBER);
+				connect(setAffilMember,SIGNAL(triggered(bool)),SLOT(onChangeUserAffiliationActionTriggered(bool)));
+				changeAffiliation->addAction(setAffilMember,AG_DEFAULT,false);
+
+				Action *setAffilAdmin = new Action(changeAffiliation);
+				setAffilAdmin->setCheckable(true);
+				setAffilAdmin->setText(tr("Administrator"));
+				setAffilAdmin->setData(ADR_USER_NICK,AUser->nick());
+				setAffilAdmin->setData(ADR_USER_AFFIL,MUC_AFFIL_ADMIN);
+				setAffilAdmin->setChecked(AUser->affiliation() == MUC_AFFIL_ADMIN);
+				connect(setAffilAdmin,SIGNAL(triggered(bool)),SLOT(onChangeUserAffiliationActionTriggered(bool)));
+				changeAffiliation->addAction(setAffilAdmin,AG_DEFAULT,false);
+
+				Action *setAffilOwner = new Action(changeAffiliation);
+				setAffilOwner->setCheckable(true);
+				setAffilOwner->setText(tr("Owner"));
+				setAffilOwner->setData(ADR_USER_NICK,AUser->nick());
+				setAffilOwner->setData(ADR_USER_AFFIL,MUC_AFFIL_OWNER);
+				setAffilOwner->setChecked(AUser->affiliation() == MUC_AFFIL_OWNER);
+				connect(setAffilOwner,SIGNAL(triggered(bool)),SLOT(onChangeUserAffiliationActionTriggered(bool)));
+				changeAffiliation->addAction(setAffilOwner,AG_DEFAULT,false);
+			}
+			moderate->addAction(changeAffiliation->menuAction());
 		}
 		emit multiUserContextMenu(AUser,AMenu);
 	}
@@ -1127,6 +1134,8 @@ void MultiUserChatWindow::createMessageWidgets()
 			SLOT(onMultiChatContentAppended(const QString &, const IMessageStyleContentOptions &)));
 		connect(FViewWidget->instance(),SIGNAL(messageStyleOptionsChanged(const IMessageStyleOptions &, bool)),
 			SLOT(onMultiChatMessageStyleOptionsChanged(const IMessageStyleOptions &, bool)));
+		connect(FViewWidget->instance(),SIGNAL(messageStyleChanged(IMessageStyle *, const IMessageStyleOptions &)),
+			SLOT(onMultiChatMessageStyleChanged(IMessageStyle *, const IMessageStyleOptions &)));
 		FViewSplitter->insertWidget(MUCWW_VIEWWIDGET,FViewWidget->instance(),100);
 		FWindowStatus[FViewWidget].createTime = QDateTime::currentDateTime();
 
@@ -1187,7 +1196,7 @@ void MultiUserChatWindow::createStaticRoomActions()
 	connect(FRequestVoice,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
 
 	FEditAffiliations = new Action(this);
-	FEditAffiliations->setText(tr("Edit Users Affiliations"));
+	FEditAffiliations->setText(tr("Edit Users Lists"));
 	FEditAffiliations->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_EDIT_AFFILIATIONS);
 	connect(FEditAffiliations,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
 
@@ -1511,6 +1520,23 @@ void MultiUserChatWindow::showHTMLStatusMessage(IMessageViewWidget *AView, const
 	AView->appendHtml(AHtml,options);
 }
 
+IMultiUser *MultiUserChatWindow::userAtViewPosition(const QPoint &APosition) const
+{
+	QTextDocumentFragment fragmet = FViewWidget->textFragmentAt(APosition);
+	return FMultiChat!=NULL ? FMultiChat->findUser(fragmet.toPlainText()) : NULL;
+}
+
+void MultiUserChatWindow::insertUserMention(IMultiUser *AUser, bool ASetFocus) const
+{
+	if (AUser && FEditWidget && AUser!=FMultiChat->mainUser())
+	{
+		if (ASetFocus)
+			FEditWidget->textEdit()->setFocus();
+		QString sufix = FEditWidget->textEdit()->textCursor().atBlockStart() ? Options::node(OPV_MUC_GROUPCHAT_NICKNAMESUFFIX).value().toString() : QString(" ");
+		FEditWidget->textEdit()->textCursor().insertText(AUser->nick() + sufix);
+	}
+}
+
 bool MultiUserChatWindow::isMentionMessage(const Message &AMessage) const
 {
 	QString message = AMessage.body();
@@ -1676,7 +1702,7 @@ void MultiUserChatWindow::showMultiChatUserMessage(const Message &AMessage, cons
 		options.timeFormat = FMessageStyleManager->timeFormat(options.time);
 
 	options.senderName = Qt::escape(ANick);
-	options.senderId = options.senderName;
+	options.senderId = ANick;
 
 	IMultiUser *user = FMultiChat->nickname()!=ANick ? FMultiChat->findUser(ANick) : FMultiChat->mainUser();
 	if (user)
@@ -2027,19 +2053,40 @@ bool MultiUserChatWindow::eventFilter(QObject *AObject, QEvent *AEvent)
 {
 	if (FUsersView && AObject==FUsersView->instance()->viewport())
 	{
-		if (AEvent->type() == QEvent::MouseButtonPress)
+		if (AEvent->type()==QEvent::MouseButtonPress || AEvent->type()==QEvent::MouseButtonRelease)
 		{
 			QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(AEvent);
-			if (FEditWidget!=NULL && mouseEvent!=NULL)
+			if (mouseEvent!=NULL && mouseEvent->button()==Qt::MidButton)
 			{
-				QStandardItem *userItem = FUsersView->itemFromIndex(FUsersView->instance()->indexAt(mouseEvent->pos()));
-				if(mouseEvent->button()==Qt::MidButton && userItem!=NULL)
+				if (AEvent->type() == QEvent::MouseButtonPress)
 				{
-					QString sufix = FEditWidget->textEdit()->textCursor().atBlockStart() ? Options::node(OPV_MUC_GROUPCHAT_NICKNAMESUFFIX).value().toString() : QString(" ");
-					FEditWidget->textEdit()->textCursor().insertText(userItem->text() + sufix);
-					FEditWidget->textEdit()->setFocus();
-					AEvent->accept();
-					return true;
+					FMousePressedPos = mouseEvent->pos();
+				}
+				else if ((FMousePressedPos - mouseEvent->pos()).manhattanLength() < QApplication::startDragDistance())
+				{
+					IMultiUser *user = FUsersView->findItemUser(FUsersView->itemFromIndex(FUsersView->instance()->indexAt(FMousePressedPos)));
+					if (user != NULL)
+						insertUserMention(user,true);
+				}
+			}
+		}
+	}
+	else if (FViewWidget && AObject==FViewWidgetViewport)
+	{
+		if (AEvent->type()==QEvent::MouseButtonPress || AEvent->type()==QEvent::MouseButtonRelease)
+		{
+			QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(AEvent);
+			if (mouseEvent!=NULL && mouseEvent->button()==Qt::MidButton)
+			{
+				if (AEvent->type() == QEvent::MouseButtonPress)
+				{
+					FMousePressedPos = mouseEvent->pos();
+				}
+				else if ((FMousePressedPos - mouseEvent->pos()).manhattanLength() < QApplication::startDragDistance())
+				{
+					IMultiUser *user = userAtViewPosition(FMousePressedPos);
+					if (user != NULL)
+						insertUserMention(user,true);
 				}
 			}
 		}
@@ -2428,7 +2475,7 @@ void MultiUserChatWindow::onMultiChatRoomConfigLoaded(const QString &AId, const 
 	if (FDataForms && AId==FConfigLoadRequestId)
 	{
 		IDataForm localizedForm = FDataForms->localizeForm(AForm);
-		localizedForm.title = QString("%1 (%2)").arg(localizedForm.title, FMultiChat->roomJid().uBare());
+		localizedForm.title = QString("%1 - %2").arg(localizedForm.title, FMultiChat->roomJid().uBare());
 
 		IDataDialogWidget *dialog = FDataForms->dialogWidget(localizedForm,this);
 		connect(dialog->instance(),SIGNAL(accepted()),SLOT(onRoomConfigFormDialogAccepted()));
@@ -2538,19 +2585,20 @@ void MultiUserChatWindow::onMultiChatEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bo
 
 void MultiUserChatWindow::onMultiChatViewWidgetContextMenu(const QPoint &APosition, Menu *AMenu)
 {
-	QTextDocumentFragment fragmet = FViewWidget->textFragmentAt(APosition);
-	IMultiUser *user = FMultiChat!=NULL ? FMultiChat->findUser(fragmet.toPlainText()) : NULL;
-	if (user!=NULL && user!=FMultiChat->mainUser())
+	IMultiUser *user = userAtViewPosition(APosition);
+	if (user)
 	{
-		Action *userNick = new Action(AMenu);
-		userNick->setText(QString("<%1>").arg(user->nick()));
-		userNick->setEnabled(false);
-		QFont userFont = userNick->font();
-		userFont.setBold(true);
-		userNick->setFont(userFont);
-		AMenu->addAction(userNick,0);
-
 		contextMenuForUser(user,AMenu);
+		if (!AMenu->isEmpty())
+		{
+			Action *userNick = new Action(AMenu);
+			userNick->setText(QString("<%1>").arg(user->nick()));
+			userNick->setEnabled(false);
+			QFont userFont = userNick->font();
+			userFont.setBold(true);
+			userNick->setFont(userFont);
+			AMenu->addAction(userNick,0);
+		}
 	}
 }
 
@@ -2574,7 +2622,7 @@ void MultiUserChatWindow::onMultiChatUserItemDoubleClicked(const QModelIndex &AI
 void MultiUserChatWindow::onMultiChatUserItemContextMenu(QStandardItem *AItem, Menu *AMenu)
 {
 	IMultiUser *user = FUsersView->findItemUser(AItem);
-	if (user!=NULL && user!=FMultiChat->mainUser())
+	if (user)
 		contextMenuForUser(user,AMenu);
 }
 
@@ -2607,6 +2655,17 @@ void MultiUserChatWindow::onMultiChatMessageStyleOptionsChanged(const IMessageSt
 		if (ACleared)
 			FWindowStatus[FViewWidget].lastDateSeparator = QDate();
 		LOG_STRM_DEBUG(streamJid(),QString("Multi chat window style options changed, room=%1, cleared=%2").arg(contactJid().bare()).arg(ACleared));
+	}
+}
+
+void MultiUserChatWindow::onMultiChatMessageStyleChanged(IMessageStyle *ABefore, const IMessageStyleOptions &AOptions)
+{
+	Q_UNUSED(ABefore); Q_UNUSED(AOptions);
+	if (FViewWidget->styleWidget() != NULL)
+	{
+		QAbstractScrollArea *viewScroll = qobject_cast<QAbstractScrollArea *>(FViewWidget->styleWidget());
+		FViewWidgetViewport = viewScroll!=NULL ? viewScroll->viewport() : FViewWidget->styleWidget();
+		FViewWidgetViewport->installEventFilter(this);
 	}
 }
 
@@ -2767,7 +2826,7 @@ void MultiUserChatWindow::onRoomActionTriggered(bool)
 	{
 		if (FMultiChat->isOpen())
 		{
-			Jid userJid = QInputDialog::getText(this,tr("Invite User").arg(FMultiChat->roomName()),tr("Enter user Jabber ID:"));
+			Jid userJid = QInputDialog::getText(this,tr("Invite User"),tr("Enter user Jabber ID:"));
 			if (userJid.isValid())
 				FMultiChat->sendInvitation(userJid);
 		}

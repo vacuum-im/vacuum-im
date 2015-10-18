@@ -125,6 +125,7 @@
 #define MNI_MUC_MESSAGE                 "mucMessage"
 #define MNI_MUC_PRIVATE_MESSAGE         "mucPrivateMessage"
 #define MNI_MUC_USERS_HIDE              "mucUsersHide"
+#define MNI_MUC_MODERATE                "mucModerate"
 
 //NormalMessageHandler
 #define MNI_NORMALMHANDLER_MESSAGE      "normalmessagehandlerMessage"

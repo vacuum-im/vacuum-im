@@ -1208,21 +1208,25 @@ Menu *MultiUserChatManager::createInviteMenu(const Jid &AContactJid, QWidget *AP
 	Menu *inviteMenu = new Menu(AParent);
 	inviteMenu->setTitle(tr("Invite to"));
 	inviteMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_INVITE);
+
+	QSet<Jid> invited;
 	foreach(IMultiUserChatWindow *window, FChatWindows)
 	{
 		IMultiUserChat *mchat = window->multiUserChat();
-		if (mchat->isOpen() && mchat->mainUser()->role()!=MUC_ROLE_VISITOR && !mchat->isUserPresent(AContactJid))
+		if (!invited.contains(mchat->roomJid()) && mchat->isOpen() && mchat->mainUser()->role()!=MUC_ROLE_VISITOR && !mchat->isUserPresent(AContactJid))
 		{
 			Action *action = new Action(inviteMenu);
 			action->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CONFERENCE);
-			action->setText(tr("%1 from %2").arg(window->contactJid().uBare()).arg(window->multiUserChat()->nickname()));
+			action->setText(TextManager::getElidedString(mchat->roomTitle(),Qt::ElideRight,50));
 			action->setData(ADR_STREAM_JID,window->streamJid().full());
 			action->setData(ADR_CONTACT_JID,AContactJid.full());
 			action->setData(ADR_ROOM_JID,window->multiUserChat()->roomJid().bare());
 			connect(action,SIGNAL(triggered(bool)),SLOT(onInviteActionTriggered(bool)));
 			inviteMenu->addAction(action,AG_DEFAULT,true);
+			invited += mchat->roomJid();
 		}
 	}
+
 	return inviteMenu;
 }
 
@@ -1559,18 +1563,18 @@ void MultiUserChatManager::onRostersViewIndexContextMenu(const QList<IRosterInde
 				data.insert(ADR_NICK,rolesMap.value(RDR_MUC_NICK));
 				data.insert(ADR_PASSWORD,rolesMap.value(RDR_MUC_PASSWORD));
 
-				Action *enter = new Action(AMenu);
-				enter->setText(tr("Enter"));
-				enter->setData(data);
-				enter->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_ENTER_ROOM);
-				connect(enter,SIGNAL(triggered(bool)),SLOT(onEnterRoomActionTriggered(bool)));
-				AMenu->addAction(enter,AG_RVCM_MULTIUSERCHAT_EXIT);
+				Action *join = new Action(AMenu);
+				join->setData(data);
+				join->setText(tr("Join to Conference"));
+				join->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_ENTER_ROOM);
+				connect(join,SIGNAL(triggered(bool)),SLOT(onEnterRoomActionTriggered(bool)));
+				AMenu->addAction(join,AG_RVCM_MULTIUSERCHAT_EXIT);
 
 				if (isMultiSelection)
 				{
 					Action *exit = new Action(AMenu);
-					exit->setText(tr("Exit"));
 					exit->setData(data);
+					exit->setText(tr("Exit from Conference"));
 					exit->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_EXIT_ROOM);
 					connect(exit,SIGNAL(triggered(bool)),SLOT(onExitRoomActionTriggered(bool)));
 					AMenu->addAction(exit,AG_RVCM_MULTIUSERCHAT_EXIT);
@@ -1578,19 +1582,22 @@ void MultiUserChatManager::onRostersViewIndexContextMenu(const QList<IRosterInde
 			}
 			else
 			{
-				Action *open = new Action(AMenu);
-				open->setText(tr("Open Conference Dialog"));
-				open->setData(ADR_STREAM_JID,index->data(RDR_STREAM_JID));
-				open->setData(ADR_ROOM_JID,index->data(RDR_PREP_BARE_JID));
-				open->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_MESSAGE);
-				open->setShortcutId(SCT_ROSTERVIEW_SHOWCHATDIALOG);
-				connect(open,SIGNAL(triggered(bool)),SLOT(onOpenRoomActionTriggered(bool)));
-				AMenu->addAction(open,AG_RVCM_MULTIUSERCHAT_OPEN);
+				if (!window->isActiveTabPage())
+				{
+					Action *open = new Action(AMenu);
+					open->setText(tr("Open Conference Dialog"));
+					open->setData(ADR_STREAM_JID,index->data(RDR_STREAM_JID));
+					open->setData(ADR_ROOM_JID,index->data(RDR_PREP_BARE_JID));
+					open->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_MESSAGE);
+					open->setShortcutId(SCT_ROSTERVIEW_SHOWCHATDIALOG);
+					connect(open,SIGNAL(triggered(bool)),SLOT(onOpenRoomActionTriggered(bool)));
+					AMenu->addAction(open,AG_RVCM_MULTIUSERCHAT_OPEN);
+				}
 
 				if (window->multiUserChat()->state() == IMultiUserChat::Closed)
 				{
 					Action *enter = new Action(AMenu);
-					enter->setText(tr("Enter"));
+					enter->setText(tr("Enter to Conference"));
 					enter->setData(ADR_STREAM_JID,QStringList()<<index->data(RDR_STREAM_JID).toString());
 					enter->setData(ADR_ROOM_JID,QStringList()<<index->data(RDR_PREP_BARE_JID).toString());
 					enter->setData(ADR_NICK,QStringList()<<index->data(RDR_MUC_NICK).toString());
@@ -1601,7 +1608,7 @@ void MultiUserChatManager::onRostersViewIndexContextMenu(const QList<IRosterInde
 				}
 
 				Action *exit = new Action(AMenu);
-				exit->setText(tr("Exit"));
+				exit->setText(tr("Exit from Conference"));
 				exit->setData(ADR_STREAM_JID,QStringList()<<index->data(RDR_STREAM_JID).toString());
 				exit->setData(ADR_ROOM_JID,QStringList()<<index->data(RDR_PREP_BARE_JID).toString());
 				exit->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_EXIT_ROOM);
@@ -1611,7 +1618,26 @@ void MultiUserChatManager::onRostersViewIndexContextMenu(const QList<IRosterInde
 				window->contextMenuForRoom(AMenu);
 			}
 		}
-		else if (index->kind()==RIK_RECENT_ITEM && index->data(RDR_RECENT_TYPE).toString()==REIT_CONFERENCE_PRIVATE)
+		else if (!isMultiSelection && index->kind()==RIK_RECENT_ITEM && index->data(RDR_RECENT_TYPE).toString()==REIT_CONFERENCE)
+		{
+			if (FRecentContacts && isReady(index->data(RDR_STREAM_JID).toString()))
+			{
+				IRecentItem item = FRecentContacts->rosterIndexItem(index);
+				if (!item.isNull() && recentItemProxyIndexes(item).isEmpty())
+				{
+					Action *join = new Action(AMenu);
+					join->setText(tr("Join to Conference"));
+					join->setData(ADR_STREAM_JID,QStringList()<<index->data(RDR_STREAM_JID).toString());
+					join->setData(ADR_ROOM_JID,QStringList()<<index->data(RDR_RECENT_REFERENCE).toString());
+					join->setData(ADR_NICK,QStringList()<<FRecentContacts->itemProperty(item,REIP_CONFERENCE_NICK).toString());
+					join->setData(ADR_PASSWORD,QStringList()<<FRecentContacts->itemProperty(item,REIP_CONFERENCE_PASSWORD).toString());
+					join->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_ENTER_ROOM);
+					connect(join,SIGNAL(triggered(bool)),SLOT(onEnterRoomActionTriggered(bool)));
+					AMenu->addAction(join,AG_RVCM_MULTIUSERCHAT_EXIT);
+				}
+			}
+		}
+		else if (!isMultiSelection && index->kind()==RIK_RECENT_ITEM && index->data(RDR_RECENT_TYPE).toString()==REIT_CONFERENCE_PRIVATE)
 		{
 			IMultiUserChatWindow *window = findMultiChatWindowForIndex(index);
 			IMultiUser *user = window!=NULL ? window->multiUserChat()->findUser(Jid(index->data(RDR_RECENT_REFERENCE).toString()).resource()) : NULL;
