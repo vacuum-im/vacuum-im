@@ -244,7 +244,7 @@ bool MultiUserChatManager::initObjects()
 		groupchatType.order = NTO_MUC_GROUPCHAT_MESSAGE;
 		groupchatType.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MUC_MESSAGE);
 		groupchatType.title = tr("When receiving a new message in conference");
-		groupchatType.kindMask = INotification::RosterNotify|INotification::TrayNotify|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized;
+		groupchatType.kindMask = INotification::RosterNotify|INotification::TrayNotify|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized|INotification::AutoActivate;
 		groupchatType.kindDefs = groupchatType.kindMask & ~(INotification::PopupWindow|INotification::ShowMinimized|INotification::AutoActivate);
 		FNotifications->registerNotificationType(NNT_MUC_MESSAGE_GROUPCHAT,groupchatType);
 
@@ -252,7 +252,7 @@ bool MultiUserChatManager::initObjects()
 		mentionType.order = NTO_MUC_MENTION_MESSAGE;
 		mentionType.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MUC_MESSAGE);
 		mentionType.title = tr("When referring to you at the conference");
-		mentionType.kindMask = INotification::TrayNotify|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized|INotification::AutoActivate;
+		mentionType.kindMask = INotification::RosterNotify|INotification::TrayNotify|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized|INotification::AutoActivate;
 		mentionType.kindDefs = mentionType.kindMask & ~(INotification::AutoActivate);
 		FNotifications->registerNotificationType(NNT_MUC_MESSAGE_MENTION,mentionType);
 	}
@@ -284,14 +284,15 @@ bool MultiUserChatManager::initObjects()
 
 bool MultiUserChatManager::initSettings()
 {
-	Options::setDefaultValue(OPV_MUC_GROUPCHAT_SHOWENTERS,true);
-	Options::setDefaultValue(OPV_MUC_GROUPCHAT_SHOWSTATUS,true);
-	Options::setDefaultValue(OPV_MUC_GROUPCHAT_ARCHIVESTATUS,false);
-	Options::setDefaultValue(OPV_MUC_GROUPCHAT_QUITONWINDOWCLOSE,false);
-	Options::setDefaultValue(OPV_MUC_GROUPCHAT_REJOINAFTERKICK,false);
-	Options::setDefaultValue(OPV_MUC_GROUPCHAT_REFERENUMERATION,false);
-	Options::setDefaultValue(OPV_MUC_GROUPCHAT_NICKNAMESUFFIX,", ");
-	Options::setDefaultValue(OPV_MUC_GROUPCHAT_USERVIEWMODE,IMultiUserView::ViewSimple);
+	Options::setDefaultValue(OPV_MUC_SHOWENTERS,true);
+	Options::setDefaultValue(OPV_MUC_SHOWSTATUS,true);
+	Options::setDefaultValue(OPV_MUC_ARCHIVESTATUS,false);
+	Options::setDefaultValue(OPV_MUC_QUITONWINDOWCLOSE,false);
+	Options::setDefaultValue(OPV_MUC_REJOINAFTERKICK,false);
+	Options::setDefaultValue(OPV_MUC_REFERENUMERATION,false);
+	Options::setDefaultValue(OPV_MUC_NICKNAMESUFFIX,",");
+	Options::setDefaultValue(OPV_MUC_USERVIEWMODE,IMultiUserView::ViewSimple);
+	Options::setDefaultValue(OPV_MUC_GROUPCHAT_NOTIFYSILENCE,false);
 
 	if (FOptionsManager)
 	{
@@ -309,12 +310,12 @@ QMultiMap<int, IOptionsDialogWidget *> MultiUserChatManager::optionsDialogWidget
 	if (FOptionsManager && ANodeId==OPN_CONFERENCES)
 	{
 		widgets.insertMulti(OHO_CONFERENCES_MESSAGES,FOptionsManager->newOptionsDialogHeader(tr("Messages"),AParent));
-		widgets.insertMulti(OWO_CONFERENCES_SHOWENTERS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_GROUPCHAT_SHOWENTERS),tr("Show users connections and disconnections"),AParent));
-		widgets.insertMulti(OWO_CONFERENCES_SHOWSTATUS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_GROUPCHAT_SHOWSTATUS),tr("Show users status changes"),AParent));
-		widgets.insertMulti(OWO_CONFERENCES_ARCHIVESTATUS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_GROUPCHAT_ARCHIVESTATUS),tr("Save users status messages in history"),AParent));
-		widgets.insertMulti(OWO_CONFERENCES_QUITONWINDOWCLOSE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_GROUPCHAT_QUITONWINDOWCLOSE),tr("Leave the conference when window closed"),AParent));
-		widgets.insertMulti(OWO_CONFERENCES_REJOINAFTERKICK,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_GROUPCHAT_REJOINAFTERKICK),tr("Automatically rejoin to conference after kick"),AParent));
-		widgets.insertMulti(OWO_CONFERENCES_REFERENUMERATION,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_GROUPCHAT_REFERENUMERATION),tr("Select a user to refer by enumeration in the input field"),AParent));
+		widgets.insertMulti(OWO_CONFERENCES_SHOWENTERS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_SHOWENTERS),tr("Show users connections and disconnections"),AParent));
+		widgets.insertMulti(OWO_CONFERENCES_SHOWSTATUS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_SHOWSTATUS),tr("Show users status changes"),AParent));
+		widgets.insertMulti(OWO_CONFERENCES_ARCHIVESTATUS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_ARCHIVESTATUS),tr("Save users status messages in history"),AParent));
+		widgets.insertMulti(OWO_CONFERENCES_QUITONWINDOWCLOSE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_QUITONWINDOWCLOSE),tr("Leave the conference when window closed"),AParent));
+		widgets.insertMulti(OWO_CONFERENCES_REJOINAFTERKICK,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_REJOINAFTERKICK),tr("Automatically rejoin to conference after kick"),AParent));
+		widgets.insertMulti(OWO_CONFERENCES_REFERENUMERATION,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_REFERENUMERATION),tr("Select a user to refer by enumeration in the input field"),AParent));
 
 		widgets.insertMulti(OHO_CONFERENCES_USERVIEW,FOptionsManager->newOptionsDialogHeader(tr("Participants List"),AParent));
 
@@ -322,7 +323,7 @@ QMultiMap<int, IOptionsDialogWidget *> MultiUserChatManager::optionsDialogWidget
 		cmbViewMode->addItem(tr("Full"), IMultiUserView::ViewFull);
 		cmbViewMode->addItem(tr("Simplified"), IMultiUserView::ViewSimple);
 		cmbViewMode->addItem(tr("Compact"), IMultiUserView::ViewCompact);
-		widgets.insertMulti(OWO_CONFERENCES_USERVIEWMODE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_GROUPCHAT_USERVIEWMODE),tr("Participants list view:"),cmbViewMode,AParent));
+		widgets.insertMulti(OWO_CONFERENCES_USERVIEWMODE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_USERVIEWMODE),tr("Participants list view:"),cmbViewMode,AParent));
 	}
 	return widgets;
 }

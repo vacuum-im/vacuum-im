@@ -230,6 +230,7 @@ private:
 	Action *FConfigRoom;
 	Action *FDestroyRoom;
 	Action *FHideUserView;
+	Action *FToggleSilence;
 private:
 	IAvatars *FAvatars;
 	IDataForms *FDataForms;

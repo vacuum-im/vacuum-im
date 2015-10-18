@@ -118,16 +118,18 @@
 #define OPV_MESSAGES_SPELL_ENABLED                      "messages.spell.enabled"
 
 // MultiUserChat
-#define OPV_MUC_GROUPCHAT_SHOWENTERS                    "muc.groupchat.show-enters"
-#define OPV_MUC_GROUPCHAT_SHOWSTATUS                    "muc.groupchat.show-status"
-#define OPV_MUC_GROUPCHAT_ARCHIVESTATUS                 "muc.groupchat.archive-status"
-#define OPV_MUC_GROUPCHAT_REJOINAFTERKICK               "muc.groupchat.rejoin-after-kick"
-#define OPV_MUC_GROUPCHAT_QUITONWINDOWCLOSE             "muc.groupchat.quit-on-window-close"
-#define OPV_MUC_GROUPCHAT_REFERENUMERATION              "muc.groupchat.refer-enumeration"
-#define OPV_MUC_GROUPCHAT_NICKNAMESUFFIX                "muc.groupchat.nickname-suffix"
-#define OPV_MUC_GROUPCHAT_USERVIEWMODE                  "muc.groupchat.user-view-mode"
+#define OPV_MUC_SHOWENTERS                              "muc.show-enters"
+#define OPV_MUC_SHOWSTATUS                              "muc.show-status"
+#define OPV_MUC_ARCHIVESTATUS                           "muc.archive-status"
+#define OPV_MUC_REJOINAFTERKICK                         "muc.rejoin-after-kick"
+#define OPV_MUC_QUITONWINDOWCLOSE                       "muc.quit-on-window-close"
+#define OPV_MUC_REFERENUMERATION                        "muc.refer-enumeration"
+#define OPV_MUC_NICKNAMESUFFIX                          "muc.nickname-suffix"
+#define OPV_MUC_USERVIEWMODE                            "muc.user-view-mode"
+#define OPV_MUC_GROUPCHAT_ITEM                          "muc.groupchat"
+#define OPV_MUC_GROUPCHAT_NOTIFYSILENCE                 "muc.groupchat.notify-silence"
 // Bookmarks
-#define OPV_MUC_GROUPCHAT_SHOWAUTOJOINED                "muc.groupchat.show-auto-joined"
+#define OPV_MUC_SHOWAUTOJOINED                          "muc.show-auto-joined"
 
 // MessageArchiver
 #define OPV_HISTORY_ENGINE_ITEM                         "history.engine"

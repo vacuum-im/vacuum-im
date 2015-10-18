@@ -786,10 +786,6 @@
         <translation>Пригласить в</translation>
     </message>
     <message>
-        <source>%1 from %2</source>
-        <translation>%1 от %2</translation>
-    </message>
-    <message>
         <source>Open Conference Dialog</source>
         <translation>Открыть диалог конференции</translation>
     </message>
@@ -1463,6 +1459,10 @@
     <message>
         <source>Edit Users Lists</source>
         <translation>Редактировать списки пользователей</translation>
+    </message>
+    <message>
+        <source>Notify only about messages addressed to you personally</source>
+        <translation>Уведомлять только о сообщениях адресованных лично вам</translation>
     </message>
 </context>
 <context>

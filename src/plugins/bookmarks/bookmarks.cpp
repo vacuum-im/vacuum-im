@@ -189,7 +189,7 @@ bool Bookmarks::initObjects()
 bool Bookmarks::initSettings()
 {
 	Options::setDefaultValue(OPV_ACCOUNT_IGNOREAUTOJOIN, false);
-	Options::setDefaultValue(OPV_MUC_GROUPCHAT_SHOWAUTOJOINED,false);
+	Options::setDefaultValue(OPV_MUC_SHOWAUTOJOINED,false);
 	return true;
 }
 
@@ -207,7 +207,7 @@ QMultiMap<int, IOptionsDialogWidget *> Bookmarks::optionsDialogWidgets(const QSt
 		}
 		else if (ANodeId == OPN_CONFERENCES)
 		{
-			widgets.insertMulti(OWO_CONFERENCES_SHOWAUTOJOINED, FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_GROUPCHAT_SHOWAUTOJOINED),tr("Show windows of auto joined conferences at startup"),AParent));
+			widgets.insertMulti(OWO_CONFERENCES_SHOWAUTOJOINED, FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_SHOWAUTOJOINED),tr("Show windows of auto joined conferences at startup"),AParent));
 		}
 	}
 	return widgets;
@@ -610,7 +610,7 @@ void Bookmarks::autoStartBookmarks(const Jid &AStreamJid) const
 		if (account!=NULL && !account->optionsNode().value("ignore-autojoin").toBool())
 		{
 			LOG_STRM_INFO(AStreamJid,"Auto joining bookmark conferences");
-			bool showAutoJoined = Options::node(OPV_MUC_GROUPCHAT_SHOWAUTOJOINED).value().toBool();
+			bool showAutoJoined = Options::node(OPV_MUC_SHOWAUTOJOINED).value().toBool();
 			foreach(const IBookmark &bookmark, FBookmarks.value(AStreamJid))
 			{
 				if (bookmark.type==IBookmark::TypeRoom && bookmark.room.autojoin)

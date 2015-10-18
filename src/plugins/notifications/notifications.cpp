@@ -805,7 +805,7 @@ void Notifications::onOptionsOpened()
 
 void Notifications::onOptionsChanged(const OptionsNode &ANode)
 {
-	if (Options::cleanNSpaces(ANode.path()) == OPV_NOTIFICATIONS_KINDENABLED_ITEM)
+	if (ANode.cleanPath() == OPV_NOTIFICATIONS_KINDENABLED_ITEM)
 	{
 		if (ANode.nspace().toInt() == INotification::SoundPlay)
 		{

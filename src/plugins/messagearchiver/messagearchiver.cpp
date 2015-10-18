@@ -2897,7 +2897,7 @@ void MessageArchiver::onToolBarWidgetCreated(IMessageToolBarWidget *AWidget)
 
 void MessageArchiver::onOptionsChanged(const OptionsNode &ANode)
 {
-	if (Options::cleanNSpaces(ANode.path()) == OPV_HISTORY_ENGINE_ENABLED)
+	if (ANode.cleanPath() == OPV_HISTORY_ENGINE_ENABLED)
 	{
 		QUuid id = ANode.parent().nspace();
 		emit archiveEngineEnableChanged(id,ANode.value().toBool());

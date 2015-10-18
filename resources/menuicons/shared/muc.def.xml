@@ -80,4 +80,8 @@
     <key>mucModerate</key>
     <object mime="image/png">mucmoderate.png</object>
   </icon>
+  <icon>
+    <key>mucNotifySilence</key>
+    <object mime="image/png">mucnotifysilence.png</object>
+  </icon>
 </icondef>
