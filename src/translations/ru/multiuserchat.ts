@@ -1057,10 +1057,6 @@
         <translation>[%1] в [%2]</translation>
     </message>
     <message>
-        <source>Hide/Show Participants List</source>
-        <translation>Скрыть/Показать список участников</translation>
-    </message>
-    <message>
         <source>User %1 was not found in the conference</source>
         <translation>Пользователь %1 не найден в конференции</translation>
     </message>
@@ -1463,6 +1459,10 @@
     <message>
         <source>Notify only about messages addressed to you personally</source>
         <translation>Уведомлять только о сообщениях адресованных лично вам</translation>
+    </message>
+    <message>
+        <source>Show participants list</source>
+        <translation>Показать список участников</translation>
     </message>
 </context>
 <context>

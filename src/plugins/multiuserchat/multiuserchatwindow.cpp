@@ -1238,7 +1238,7 @@ void MultiUserChatWindow::createStaticRoomActions()
 
 	FHideUserView = new Action(this);
 	FHideUserView->setCheckable(true);
-	FHideUserView->setToolTip(tr("Hide/Show Participants List"));
+	FHideUserView->setToolTip(tr("Show participants list"));
 	FHideUserView->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_USERS_HIDE);
 	connect(FHideUserView,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
 	FToolBarWidget->toolBarChanger()->insertAction(FHideUserView,TBG_MCWTBW_USERS_HIDE);
@@ -1249,6 +1249,8 @@ void MultiUserChatWindow::createStaticRoomActions()
 	FToggleSilence->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_NOTIFY_SILENCE);
 	connect(FToggleSilence,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
 	FToolBarWidget->toolBarChanger()->insertAction(FToggleSilence,TBG_MCWTBW_NOTIFY_SILENCE);
+
+	FToggleSilence->setChecked(Options::node(OPV_MUC_GROUPCHAT_ITEM,contactJid().pBare()).node("notify-silence").value().toBool());
 }
 
 void MultiUserChatWindow::saveWindowState()
@@ -1281,8 +1283,6 @@ void MultiUserChatWindow::loadWindowState()
 		FCentralSplitter->setHandleSize(MUCWW_USERSHANDLE,DEFAULT_USERS_LIST_WIDTH);
 	FHideUserView->setChecked(!hidden);
 	
-	FToggleSilence->setChecked(Options::node(OPV_MUC_GROUPCHAT_ITEM,FMultiChat->roomJid().pBare()).node("notify-silence").value().toBool());
-
 	FStateLoaded = true;
 }
 
@@ -2895,7 +2895,7 @@ void MultiUserChatWindow::onRoomActionTriggered(bool)
 	}
 	else if (action == FToggleSilence)
 	{
-		Options::node(OPV_MUC_GROUPCHAT_ITEM,FMultiChat->roomJid().pBare()).node("notify-silence").setValue(FToggleSilence->isChecked());
+		Options::node(OPV_MUC_GROUPCHAT_ITEM,contactJid().pBare()).node("notify-silence").setValue(FToggleSilence->isChecked());
 	}
 }
 
