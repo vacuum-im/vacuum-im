@@ -158,6 +158,8 @@
 #define OPV_MESSAGESTYLE_STYLE_VARIANT                  "message-styles.message-type.context.engine.style.variant"
 #define OPV_MESSAGESTYLE_STYLE_FONTFAMILY               "message-styles.message-type.context.engine.style.font-family"
 #define OPV_MESSAGESTYLE_STYLE_FONTSIZE                 "message-styles.message-type.context.engine.style.font-size"
+#define OPV_MESSAGESTYLE_STYLE_SELFCOLOR                "message-styles.message-type.context.engine.style.self-color"
+#define OPV_MESSAGESTYLE_STYLE_CONTACTCOLOR             "message-styles.message-type.context.engine.style.contact-color"
 #define OPV_MESSAGESTYLE_STYLE_BGCOLOR                  "message-styles.message-type.context.engine.style.bg-color"
 #define OPV_MESSAGESTYLE_STYLE_BGIMAGEFILE              "message-styles.message-type.context.engine.style.bg-image-file"
 #define OPV_MESSAGESTYLE_STYLE_BGIMAGELAYOUT            "message-styles.message-type.context.engine.style.bg-image-layout"

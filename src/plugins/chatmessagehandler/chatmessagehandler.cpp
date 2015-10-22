@@ -719,22 +719,20 @@ void ChatMessageHandler::fillContentOptions(const Jid &AStreamJid, const Jid &AC
 
 	if (AOptions.direction == IMessageStyleContentOptions::DirectionIn)
 	{
-		AOptions.senderId = AContactJid.full();
+		AOptions.senderId = AContactJid.pFull();
 		AOptions.senderAvatar = FMessageStyleManager->contactAvatar(AContactJid);
 		AOptions.senderIcon = FMessageStyleManager->contactIcon(AStreamJid,AContactJid);
 		AOptions.senderName = Qt::escape(FMessageStyleManager->contactName(AStreamJid,AContactJid));
-		AOptions.senderColor = "blue";
 	}
 	else
 	{
-		AOptions.senderId = AStreamJid.full();
+		AOptions.senderId = AStreamJid.pFull();
 		AOptions.senderAvatar = FMessageStyleManager->contactAvatar(AStreamJid);
 		AOptions.senderIcon = FMessageStyleManager->contactIcon(AStreamJid);
 		if (AStreamJid.pBare() != AContactJid.pBare())
 			AOptions.senderName = Qt::escape(FMessageStyleManager->contactName(AStreamJid));
 		else
 			AOptions.senderName = Qt::escape(!AStreamJid.resource().isEmpty() ? AStreamJid.resource() : AStreamJid.uNode());
-		AOptions.senderColor = "red";
 	}
 }
 

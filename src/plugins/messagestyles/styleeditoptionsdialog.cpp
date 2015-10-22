@@ -83,17 +83,15 @@ void StyleEditOptionsDialog::createViewContent()
 	i_options.noScroll = true;
 	i_options.kind = IMessageStyleContentOptions::KindMessage;
 	i_options.direction = IMessageStyleContentOptions::DirectionIn;
-	i_options.senderId = "remote";
-	i_options.senderName = tr("Receiver");
-	i_options.senderColor = "blue";
+	i_options.senderId = "contact@example.com";
+	i_options.senderName = tr("Contact");
 	i_options.senderIcon = FMessageStyleManager->contactIcon(i_options.senderId,IPresence::Chat,SUBSCRIPTION_BOTH,false);
 
 	o_options.noScroll = true;
 	o_options.kind = IMessageStyleContentOptions::KindMessage;
 	o_options.direction = IMessageStyleContentOptions::DirectionOut;
-	o_options.senderId = "myself";
-	o_options.senderName = tr("Sender");
-	o_options.senderColor = "red";
+	o_options.senderId = "you@example.com";
+	o_options.senderName = tr("You");
 	o_options.senderIcon = FMessageStyleManager->contactIcon(i_options.senderId,IPresence::Online,SUBSCRIPTION_BOTH,false);
 
 	if (FMessageType==Message::Normal || FMessageType==Message::Headline || FMessageType==Message::Error)
@@ -120,6 +118,11 @@ void StyleEditOptionsDialog::createViewContent()
 	else if (FMessageType==Message::Chat || FMessageType==Message::GroupChat)
 	{
 		if (FMessageType==Message::GroupChat)
+		{
+			i_options.senderColor = FStyle->senderColorById(i_options.senderName);
+			o_options.senderColor = FStyle->senderColorById(o_options.senderName);
+		}
+		else
 		{
 			i_options.senderColor.clear();
 			o_options.senderColor.clear();

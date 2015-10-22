@@ -89,7 +89,7 @@ public:
 	virtual QString styleId() const =0;
 	virtual QList<QWidget *> styleWidgets() const =0;
 	virtual QWidget *createWidget(const IMessageStyleOptions &AOptions, QWidget *AParent) =0;
-	virtual QString senderColor(const QString &ASenderId) const =0;
+	virtual QString senderColorById(const QString &ASenderId) const =0;
 	virtual QTextDocumentFragment selection(QWidget *AWidget) const =0;
 	virtual QTextCharFormat textFormatAt(QWidget *AWidget, const QPoint &APosition) const =0;
 	virtual QTextDocumentFragment textFragmentAt(QWidget *AWidget, const QPoint &APosition) const =0;

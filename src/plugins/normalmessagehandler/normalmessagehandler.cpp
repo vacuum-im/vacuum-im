@@ -754,8 +754,7 @@ void NormalMessageHandler::setMessageStyle(IMessageNormalWindow *AWindow)
 
 void NormalMessageHandler::fillContentOptions(IMessageNormalWindow *AWindow, IMessageStyleContentOptions &AOptions) const
 {
-	AOptions.senderColor = "blue";
-	AOptions.senderId = AWindow->contactJid().full();
+	AOptions.senderId = AWindow->contactJid().pFull();
 	AOptions.senderName = Qt::escape(FMessageStyleManager->contactName(AWindow->streamJid(),AWindow->contactJid()));
 	AOptions.senderAvatar = FMessageStyleManager->contactAvatar(AWindow->contactJid());
 	AOptions.senderIcon = FMessageStyleManager->contactIcon(AWindow->streamJid(),AWindow->contactJid());

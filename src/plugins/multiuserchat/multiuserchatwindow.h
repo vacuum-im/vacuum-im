@@ -131,11 +131,11 @@ protected:
 	void refreshCompleteNicks();
 	bool execShortcutCommand(const QString &AText);
 	void updateRecentItemActiveTime(IMessageChatWindow *AWindow);
-	void showDateSeparator(IMessageViewWidget *AView, const QDateTime &ADateTime);
-	void showHTMLStatusMessage(IMessageViewWidget *AView, const QString &AHtml, int AType=0, int AStatus=0, const QDateTime &ATime=QDateTime::currentDateTime());
-protected:
 	IMultiUser *userAtViewPosition(const QPoint &APosition) const;
 	void insertUserMention(IMultiUser *AUser, bool ASetFocus = false) const;
+protected:
+	void showDateSeparator(IMessageViewWidget *AView, const QDateTime &ADateTime);
+	void showHTMLStatusMessage(IMessageViewWidget *AView, const QString &AHtml, int AType=0, int AStatus=0, const QDateTime &ATime=QDateTime::currentDateTime());
 protected:
 	bool isMentionMessage(const Message &AMessage) const;
 	void setMultiChatMessageStyle();

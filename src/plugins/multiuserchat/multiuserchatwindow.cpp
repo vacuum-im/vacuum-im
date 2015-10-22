@@ -1492,13 +1492,30 @@ void MultiUserChatWindow::updateRecentItemActiveTime(IMessageChatWindow *AWindow
 	}
 }
 
+IMultiUser *MultiUserChatWindow::userAtViewPosition(const QPoint &APosition) const
+{
+	QTextDocumentFragment fragmet = FViewWidget->textFragmentAt(APosition);
+	return FMultiChat!=NULL ? FMultiChat->findUser(fragmet.toPlainText()) : NULL;
+}
+
+void MultiUserChatWindow::insertUserMention(IMultiUser *AUser, bool ASetFocus) const
+{
+	if (AUser && FEditWidget && AUser!=FMultiChat->mainUser())
+	{
+		if (ASetFocus)
+			FEditWidget->textEdit()->setFocus();
+		QString sufix = FEditWidget->textEdit()->textCursor().atBlockStart() ? Options::node(OPV_MUC_NICKNAMESUFFIX).value().toString().trimmed() : QString::null;
+		FEditWidget->textEdit()->textCursor().insertText(AUser->nick() + sufix + " ");
+	}
+}
+
 void MultiUserChatWindow::showDateSeparator(IMessageViewWidget *AView, const QDateTime &ADateTime)
 {
-	if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
+	if (FMessageStyleManager && Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
 	{
 		QDate sepDate = ADateTime.date();
 		WindowStatus &wstatus = FWindowStatus[AView];
-		if (FMessageStyleManager && sepDate.isValid() && wstatus.lastDateSeparator!=sepDate)
+		if (sepDate.isValid() && wstatus.lastDateSeparator!=sepDate)
 		{
 			IMessageStyleContentOptions options;
 			options.kind = IMessageStyleContentOptions::KindStatus;
@@ -1517,36 +1534,22 @@ void MultiUserChatWindow::showDateSeparator(IMessageViewWidget *AView, const QDa
 
 void MultiUserChatWindow::showHTMLStatusMessage(IMessageViewWidget *AView, const QString &AHtml, int AType, int AStatus, const QDateTime &ATime)
 {
-	IMessageStyleContentOptions options;
-	options.kind = IMessageStyleContentOptions::KindStatus;
-	options.type |= AType;
-	options.status = AStatus;
-	options.direction = IMessageStyleContentOptions::DirectionIn;
-
-	options.time = ATime;
-	if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
-		options.timeFormat = FMessageStyleManager->timeFormat(options.time,options.time);
-	else
-		options.timeFormat = FMessageStyleManager->timeFormat(options.time);
-
-	showDateSeparator(FViewWidget,options.time);
-	AView->appendHtml(AHtml,options);
-}
-
-IMultiUser *MultiUserChatWindow::userAtViewPosition(const QPoint &APosition) const
-{
-	QTextDocumentFragment fragmet = FViewWidget->textFragmentAt(APosition);
-	return FMultiChat!=NULL ? FMultiChat->findUser(fragmet.toPlainText()) : NULL;
-}
-
-void MultiUserChatWindow::insertUserMention(IMultiUser *AUser, bool ASetFocus) const
-{
-	if (AUser && FEditWidget && AUser!=FMultiChat->mainUser())
+	if (FMessageStyleManager)
 	{
-		if (ASetFocus)
-			FEditWidget->textEdit()->setFocus();
-		QString sufix = FEditWidget->textEdit()->textCursor().atBlockStart() ? Options::node(OPV_MUC_NICKNAMESUFFIX).value().toString().trimmed() : QString::null;
-		FEditWidget->textEdit()->textCursor().insertText(AUser->nick() + sufix + " ");
+		IMessageStyleContentOptions options;
+		options.kind = IMessageStyleContentOptions::KindStatus;
+		options.type = AType;
+		options.status = AStatus;
+		options.direction = IMessageStyleContentOptions::DirectionIn;
+
+		options.time = ATime;
+		if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
+			options.timeFormat = FMessageStyleManager->timeFormat(options.time,options.time);
+		else
+			options.timeFormat = FMessageStyleManager->timeFormat(options.time);
+
+		showDateSeparator(FViewWidget,options.time);
+		AView->appendHtml(AHtml,options);
 	}
 }
 
@@ -1583,39 +1586,46 @@ void MultiUserChatWindow::setMultiChatMessageStyle()
 
 void MultiUserChatWindow::showMultiChatTopic(const QString &ATopic, const QString &ANick)
 {
-	Q_UNUSED(ANick);
+	if (FMessageStyleManager)
+	{
+		IMessageStyleContentOptions options;
+		options.kind = IMessageStyleContentOptions::KindTopic;
+		options.type = IMessageStyleContentOptions::TypeGroupchat;
+		options.direction = IMessageStyleContentOptions::DirectionIn;
 
-	IMessageStyleContentOptions options;
-	options.kind = IMessageStyleContentOptions::KindTopic;
-	options.type |= IMessageStyleContentOptions::TypeGroupchat;
-	options.direction = IMessageStyleContentOptions::DirectionIn;
+		options.time = QDateTime::currentDateTime();
+		options.timeFormat = FMessageStyleManager->timeFormat(options.time);
 
-	options.time = QDateTime::currentDateTime();
-	options.timeFormat = FMessageStyleManager->timeFormat(options.time);
+		options.senderId = QString::null;
+		options.senderName = Qt::escape(ANick);
 
-	showDateSeparator(FViewWidget,options.time);
-	FViewWidget->appendText(tr("Subject: %1").arg(ATopic),options);
+		showDateSeparator(FViewWidget,options.time);
+		FViewWidget->appendText(tr("Subject: %1").arg(ATopic),options);
+	}
 }
 
 void MultiUserChatWindow::showMultiChatStatusMessage(const QString &AMessage, int AType, int AStatus, bool ADontSave, const QDateTime &ATime)
 {
-	IMessageStyleContentOptions options;
-	options.kind = IMessageStyleContentOptions::KindStatus;
-	options.type |= AType;
-	options.status = AStatus;
-	options.direction = IMessageStyleContentOptions::DirectionIn;
+	if (FMessageStyleManager)
+	{
+		IMessageStyleContentOptions options;
+		options.kind = IMessageStyleContentOptions::KindStatus;
+		options.type = AType;
+		options.status = AStatus;
+		options.direction = IMessageStyleContentOptions::DirectionIn;
 
-	options.time = ATime;
-	if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
-		options.timeFormat = FMessageStyleManager->timeFormat(options.time,options.time);
-	else
-		options.timeFormat = FMessageStyleManager->timeFormat(options.time);
+		options.time = ATime;
+		if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
+			options.timeFormat = FMessageStyleManager->timeFormat(options.time,options.time);
+		else
+			options.timeFormat = FMessageStyleManager->timeFormat(options.time);
 
-	if (!ADontSave && FMessageArchiver && Options::node(OPV_MUC_ARCHIVESTATUS).value().toBool())
-		FMessageArchiver->saveNote(FMultiChat->streamJid(), FMultiChat->roomJid(), AMessage);
+		if (!ADontSave && FMessageArchiver && Options::node(OPV_MUC_ARCHIVESTATUS).value().toBool())
+			FMessageArchiver->saveNote(FMultiChat->streamJid(), FMultiChat->roomJid(), AMessage);
 
-	showDateSeparator(FViewWidget,options.time);
-	FViewWidget->appendText(AMessage,options);
+		showDateSeparator(FViewWidget,options.time);
+		FViewWidget->appendText(AMessage,options);
+	}
 }
 
 bool MultiUserChatWindow::showMultiChatStatusCodes(const QList<int> &ACodes, const QString &ANick, const QString &AMessage)
@@ -1701,46 +1711,51 @@ bool MultiUserChatWindow::showMultiChatStatusCodes(const QList<int> &ACodes, con
 
 void MultiUserChatWindow::showMultiChatUserMessage(const Message &AMessage, const QString &ANick)
 {
-	IMessageStyleContentOptions options;
-	options.kind = IMessageStyleContentOptions::KindMessage;
-
-	options.type |= IMessageStyleContentOptions::TypeGroupchat;
-	if (AMessage.isDelayed())
-		options.type |= IMessageStyleContentOptions::TypeHistory;
-
-	options.time = AMessage.dateTime();
-	if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
-		options.timeFormat = FMessageStyleManager->timeFormat(options.time,options.time);
-	else
-		options.timeFormat = FMessageStyleManager->timeFormat(options.time);
-
-	options.senderName = Qt::escape(ANick);
-	options.senderId = ANick;
-
-	IMultiUser *user = FMultiChat->nickname()!=ANick ? FMultiChat->findUser(ANick) : FMultiChat->mainUser();
-	if (user)
+	if (FMessageStyleManager)
 	{
-		options.senderAvatar = FMessageStyleManager->contactAvatar(user->userJid());
-		options.senderIcon = FMessageStyleManager->contactIcon(user->userJid(),user->presence().show,SUBSCRIPTION_BOTH,false);
-	}
-	else
-	{
-		options.senderIcon = FMessageStyleManager->contactIcon(Jid::null,IPresence::Offline,SUBSCRIPTION_BOTH,false);
-	}
+		IMessageStyleContentOptions options;
+		options.kind = IMessageStyleContentOptions::KindMessage;
+		options.type = IMessageStyleContentOptions::TypeGroupchat;
 
-	if (FMultiChat->nickname() != ANick)
-	{
-		if (isMentionMessage(AMessage))
-			options.type |= IMessageStyleContentOptions::TypeMention;
-		options.direction = IMessageStyleContentOptions::DirectionIn;
-	}
-	else
-	{
-		options.direction = IMessageStyleContentOptions::DirectionOut;
-	}
+		if (AMessage.isDelayed())
+			options.type |= IMessageStyleContentOptions::TypeHistory;
 
-	showDateSeparator(FViewWidget,options.time);
-	FViewWidget->appendMessage(AMessage,options);
+		options.time = AMessage.dateTime();
+		if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
+			options.timeFormat = FMessageStyleManager->timeFormat(options.time,options.time);
+		else
+			options.timeFormat = FMessageStyleManager->timeFormat(options.time);
+
+		options.senderName = Qt::escape(ANick);
+		options.senderColor = FViewWidget->messageStyle()!=NULL ? FViewWidget->messageStyle()->senderColorById(ANick) : QString::null;
+
+		IMultiUser *user = FMultiChat->findUser(ANick);
+		if (user)
+		{
+			options.senderId = user->userJid().pFull();
+			options.senderAvatar = FMessageStyleManager->contactAvatar(user->userJid());
+			options.senderIcon = FMessageStyleManager->contactIcon(user->userJid(),user->presence().show,SUBSCRIPTION_BOTH,false);
+		}
+		else
+		{
+			options.senderId = FMultiChat->roomJid().pBare() + "/" +FMultiChat->nickname();
+			options.senderIcon = FMessageStyleManager->contactIcon(Jid::null,IPresence::Offline,SUBSCRIPTION_BOTH,false);
+		}
+
+		if (FMultiChat->nickname() != ANick)
+		{
+			if (isMentionMessage(AMessage))
+				options.type |= IMessageStyleContentOptions::TypeMention;
+			options.direction = IMessageStyleContentOptions::DirectionIn;
+		}
+		else
+		{
+			options.direction = IMessageStyleContentOptions::DirectionOut;
+		}
+
+		showDateSeparator(FViewWidget,options.time);
+		FViewWidget->appendMessage(AMessage,options);
+	}
 }
 
 void MultiUserChatWindow::requestMultiChatHistory()
@@ -1881,47 +1896,59 @@ void MultiUserChatWindow::fillPrivateChatContentOptions(IMessageChatWindow *AWin
 
 	if (AOptions.direction == IMessageStyleContentOptions::DirectionIn)
 	{
-		AOptions.senderColor = "blue";
+		AOptions.senderId = AWindow->contactJid().pFull();
 		AOptions.senderName = Qt::escape(AWindow->contactJid().resource());
 	}
 	else
 	{
-		AOptions.senderColor = "red";
+		if (FMultiChat->mainUser() != NULL)
+			AOptions.senderId = FMultiChat->mainUser()->userJid().pFull();
+		else
+			AOptions.senderId = FMultiChat->roomJid().pBare() + "/" + FMultiChat->nickname();
 		AOptions.senderName = Qt::escape(FMultiChat->nickname());
 	}
-	AOptions.senderId = AOptions.senderName;
 }
 
 void MultiUserChatWindow::showPrivateChatStatusMessage(IMessageChatWindow *AWindow, const QString &AMessage, int AStatus, const QDateTime &ATime)
 {
-	IMessageStyleContentOptions options;
-	options.kind = IMessageStyleContentOptions::KindStatus;
-	options.status = AStatus;
-	options.direction = IMessageStyleContentOptions::DirectionIn;
-	options.time = ATime;
+	if (FMessageStyleManager)
+	{
+		IMessageStyleContentOptions options;
+		options.kind = IMessageStyleContentOptions::KindStatus;
+		options.type = IMessageStyleContentOptions::TypeEmpty;
+		options.status = AStatus;
+		options.direction = IMessageStyleContentOptions::DirectionIn;
 
-	fillPrivateChatContentOptions(AWindow,options);
-	showDateSeparator(AWindow->viewWidget(),options.time);
-	AWindow->viewWidget()->appendText(AMessage,options);
+		options.time = ATime;
+		fillPrivateChatContentOptions(AWindow,options);
+
+		showDateSeparator(AWindow->viewWidget(),options.time);
+		AWindow->viewWidget()->appendText(AMessage,options);
+	}
 }
 
 void MultiUserChatWindow::showPrivateChatMessage(IMessageChatWindow *AWindow, const Message &AMessage)
 {
-	IMessageStyleContentOptions options;
-	options.kind = IMessageStyleContentOptions::KindMessage;
-	options.time = AMessage.dateTime();
+	if (FMessageStyleManager)
+	{
+		IMessageStyleContentOptions options;
+		options.kind = IMessageStyleContentOptions::KindMessage;
+		options.type = IMessageStyleContentOptions::TypeEmpty;
 
-	if (options.time.secsTo(FWindowStatus.value(AWindow->viewWidget()).createTime)>HISTORY_TIME_DELTA)
-		options.type |= IMessageStyleContentOptions::TypeHistory;
+		if (options.time.secsTo(FWindowStatus.value(AWindow->viewWidget()).createTime)>HISTORY_TIME_DELTA)
+			options.type |= IMessageStyleContentOptions::TypeHistory;
 
-	if (AMessage.data(MDR_MESSAGE_DIRECTION).toInt() == IMessageProcessor::DirectionOut)
-		options.direction = IMessageStyleContentOptions::DirectionOut;
-	else
-		options.direction = IMessageStyleContentOptions::DirectionIn;
+		if (AMessage.data(MDR_MESSAGE_DIRECTION).toInt() == IMessageProcessor::DirectionOut)
+			options.direction = IMessageStyleContentOptions::DirectionOut;
+		else
+			options.direction = IMessageStyleContentOptions::DirectionIn;
 
-	fillPrivateChatContentOptions(AWindow,options);
-	showDateSeparator(AWindow->viewWidget(),options.time);
-	AWindow->viewWidget()->appendMessage(AMessage,options);
+		options.time = AMessage.dateTime();
+		fillPrivateChatContentOptions(AWindow,options);
+
+		showDateSeparator(AWindow->viewWidget(),options.time);
+		AWindow->viewWidget()->appendMessage(AMessage,options);
+	}
 }
 
 void MultiUserChatWindow::requestPrivateChatHistory(IMessageChatWindow *AWindow)

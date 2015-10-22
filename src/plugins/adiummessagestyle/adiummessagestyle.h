@@ -19,9 +19,11 @@
 #define MSIV_DEFAULT_FONT_SIZE              "DefaultFontSize"
 #define MSIV_SHOW_USER_ICONS                "ShowsUserIcons"
 #define MSIV_ALLOW_TEXT_COLORS              "AllowTextColors"
-#define MSIV_DISABLE_COMBINE_CONSECUTIVE    "DisableCombineConsecutive"
+#define MSIV_DEFAULT_SELF_COLOR             "DefaultSelfColor"
+#define MSIV_DEFAULT_CONTACT_COLOR          "DefaultContactColor"
 #define MSIV_DEFAULT_BACKGROUND_COLOR       "DefaultBackgroundColor"
 #define MSIV_DISABLE_CUSTOM_BACKGROUND      "DisableCustomBackground"
+#define MSIV_DISABLE_COMBINE_CONSECUTIVE    "DisableCombineConsecutive"
 #define MSIV_BACKGROUND_TRANSPARENT         "DefaultBackgroundIsTransparent"
 #define MSIV_IMAGE_MASK                     "ImageMask"
 
@@ -103,6 +105,7 @@ public:
 		QDateTime lastTime;
 		bool scrollStarted;
 		QList<QString> pending;
+		QMap<QString, QVariant> options;
 	};
 public:
 	AdiumMessageStyle(const QString &AStylePath, QNetworkAccessManager *ANetworkAccessManager, QObject *AParent);
@@ -113,7 +116,7 @@ public:
 	virtual QString styleId() const;
 	virtual QList<QWidget *> styleWidgets() const;
 	virtual QWidget *createWidget(const IMessageStyleOptions &AOptions, QWidget *AParent);
-	virtual QString senderColor(const QString &ASenderId) const;
+	virtual QString senderColorById(const QString &ASenderId) const;
 	virtual QTextDocumentFragment selection(QWidget *AWidget) const;
 	virtual QTextCharFormat textFormatAt(QWidget *AWidget, const QPoint &APosition) const;
 	virtual QTextDocumentFragment textFragmentAt(QWidget *AWidget, const QPoint &APosition) const;
@@ -133,20 +136,22 @@ public:
 	static QList<QString> styleVariants(const QString &AStylePath);
 	static QMap<QString, QVariant> styleInfo(const QString &AStylePath);
 protected:
-	QWebHitTestResult hitTest(QWidget *AWidget, const QPoint &APosition) const;
-	bool isSameSender(QWidget *AWidget, const IMessageStyleContentOptions &AOptions) const;
-	void setVariant(StyleViewer *AView, const QString  &AVariant);
-	QString makeStyleTemplate(const IMessageStyleOptions &AOptions);
-	void fillStyleKeywords(QString &AHtml, const IMessageStyleOptions &AOptions) const;
-	QString makeContentTemplate(const IMessageStyleContentOptions &AOptions, bool ASameSender) const;
-	void fillContentKeywords(QString &AHtml, const IMessageStyleContentOptions &AOptions, bool ASameSender) const;
-	void escapeStringForScript(QString &AText) const;
-	QString scriptForAppendContent(bool ASameSender, bool ANoScroll) const;
-	QString prepareMessage(const QString &AHtml, const IMessageStyleContentOptions &AOptions) const;
-	QString loadFileData(const QString &AFileName, const QString &DefValue) const;
+	void initStyleSettings();
 	void loadTemplates();
 	void loadSenderColors();
-	void initStyleSettings();
+	QString loadFileData(const QString &AFileName, const QString &DefValue) const;
+protected:
+	void escapeStringForScript(QString &AText) const;
+	QString makeStyleTemplate(const IMessageStyleOptions &AOptions);
+	void fillStyleKeywords(QString &AHtml, const IMessageStyleOptions &AOptions) const;
+	void setVariant(StyleViewer *AView, const QString &AVariant);
+protected:
+	QWebHitTestResult hitTest(QWidget *AWidget, const QPoint &APosition) const;
+	bool isConsecutive(const IMessageStyleContentOptions &AOptions, const WidgetStatus &AStatus) const;
+	QString makeContentTemplate(const IMessageStyleContentOptions &AOptions, const WidgetStatus &AStatus) const;
+	void fillContentKeywords(QString &AHtml, const IMessageStyleContentOptions &AOptions, const WidgetStatus &AStatus) const;
+	QString scriptForAppendContent(const IMessageStyleContentOptions &AOptions, const WidgetStatus &AStatus) const;
+	QString prepareMessage(const QString &AHtml, const IMessageStyleContentOptions &AOptions) const;
 protected:
 	bool eventFilter(QObject *AWatched, QEvent *AEvent);
 protected slots:

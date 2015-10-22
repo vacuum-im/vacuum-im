@@ -52,6 +52,8 @@ enum HistoryDataRoles {
 static const int HistoryTimeCount = 8;
 static const int HistoryTime[HistoryTimeCount] = { -1, -3, -6, -12, -24, -36, -48, -60 };
 
+static const QStringList ConferenceServiceNames = QStringList() << "conference" << "conf" << "irc";
+
 SortFilterProxyModel::SortFilterProxyModel(QObject *AParent) : QSortFilterProxyModel(AParent)
 {
 
@@ -241,7 +243,7 @@ void ArchiveViewWindow::setAddresses(const QMultiMap<Jid,Jid> &AAddresses)
 		for (QMultiMap<Jid,Jid>::const_iterator it=FAddresses.constBegin(); it!=FAddresses.constEnd(); ++it)
 		{
 			if (!it.value().isEmpty())
-				namesList.append(contactName(it.key(),it.value(),isConferencePrivateChat(it.value())));
+				namesList.append(contactName(it.key(),it.value(),isConferenceDomain(it.value())));
 		}
 		namesList = namesList.toSet().toList(); qSort(namesList);
 		setWindowTitle(tr("Conversation History") + (!namesList.isEmpty() ? " - " + namesList.join(", ") : QString::null));
@@ -297,15 +299,15 @@ Jid ArchiveViewWindow::gatewayJid(const Jid &AContactJid) const
 	return AContactJid;
 }
 
+bool ArchiveViewWindow::isConferenceDomain(const Jid &AWith) const
+{
+	QString service = AWith.pDomain().split('.').value(0);
+	return ConferenceServiceNames.contains(service);
+}
+
 bool ArchiveViewWindow::isConferencePrivateChat(const Jid &AWith) const
 {
-	static const QStringList ConferenceServiceDomains = QStringList() << "conference" << "conf" << "irc";
-	if (!AWith.resource().isEmpty())
-	{
-		QString service = AWith.pDomain().split('.').value(0);
-		return ConferenceServiceDomains.contains(service);
-	}
-	return false;
+	return !AWith.resource().isEmpty() && isConferenceDomain(AWith);
 }
 
 bool ArchiveViewWindow::isJidMatched(const Jid &ARequestWith, const Jid &AHeaderWith) const
@@ -408,7 +410,7 @@ QMultiMap<Jid,Jid> ArchiveViewWindow::itemAddresses(const QStandardItem *AItem) 
 	{
 		Jid streamJid = AItem->data(HDR_HEADER_STREAM).toString();
 		Jid contactJid = AItem->data(HDR_HEADER_WITH).toString();
-		address.insertMulti(streamJid,isConferencePrivateChat(contactJid) ? contactJid : contactJid.bare());
+		address.insertMulti(streamJid,isConferenceDomain(contactJid) ? contactJid : contactJid.bare());
 	}
 	return address;
 }
@@ -803,35 +805,31 @@ void ArchiveViewWindow::showCollection(const ArchiveCollection &ACollection)
 	{
 		ui.tbrMessages->clear();
 
-		FViewOptions.isPrivateChat = isConferencePrivateChat(ACollection.header.with);
-
+		FViewOptions.style = NULL;
 		FViewOptions.isGroupChat = false;
-		if (!FViewOptions.isPrivateChat)
-			for (int i=0; !FViewOptions.isGroupChat && i<ACollection.body.messages.count(); i++)
-				FViewOptions.isGroupChat = ACollection.body.messages.at(i).type()==Message::GroupChat;
-
-		if (FMessageStyleManager)
-		{
-			IMessageStyleOptions soptions = FMessageStyleManager->styleOptions(FViewOptions.isGroupChat ? Message::GroupChat : Message::Chat);
-			FViewOptions.style = FViewOptions.isGroupChat ? FMessageStyleManager->styleForOptions(soptions) : NULL;
-		}
-		else
-		{
-			FViewOptions.style = NULL;
-		}
-
 		FViewOptions.lastInfo = QString::null;
 		FViewOptions.lastSubject = QString::null;
+
+		FViewOptions.isPrivateChat = isConferencePrivateChat(ACollection.header.with);
 	}
 
 	FViewOptions.lastTime = QDateTime();
 	FViewOptions.lastSenderId = QString::null;
 
-	if (!FViewOptions.isPrivateChat)
-		FViewOptions.senderName = Qt::escape(FMessageStyleManager!=NULL ? FMessageStyleManager->contactName(ACollection.header.stream,ACollection.header.with) : contactName(ACollection.header.stream,ACollection.header.with));
-	else
+	for (int i=0; !FViewOptions.isGroupChat && i<ACollection.body.messages.count(); i++)
+	{
+		if (ACollection.body.messages.at(i).type() == Message::GroupChat)
+		{
+			FViewOptions.isGroupChat = true;
+			FViewOptions.style = FMessageStyleManager!=NULL ? FMessageStyleManager->styleForOptions(FMessageStyleManager->styleOptions(Message::GroupChat)) : NULL;
+		}
+	}
+
+	if (FViewOptions.isPrivateChat)
 		FViewOptions.senderName = Qt::escape(ACollection.header.with.resource());
-	FViewOptions.selfName = Qt::escape(FMessageStyleManager!=NULL ? FMessageStyleManager->contactName(ACollection.header.stream) : ACollection.header.stream.uBare());
+	else if (!FViewOptions.isGroupChat)
+		FViewOptions.senderName = Qt::escape(FMessageStyleManager!=NULL ? FMessageStyleManager->contactName(ACollection.header.stream,ACollection.header.with) : contactName(ACollection.header.stream,ACollection.header.with));
+	FViewOptions.selfName = Qt::escape(FMessageStyleManager!=NULL ? FMessageStyleManager->contactName(ACollection.header.stream) : ACollection.header.stream.uNode());
 
 	QString html = showInfo(ACollection);
 
@@ -845,33 +843,46 @@ void ArchiveViewWindow::showCollection(const ArchiveCollection &ACollection)
 			int direction = messageIt->data(MDR_MESSAGE_DIRECTION).toInt();
 			Jid senderJid = direction==IMessageProcessor::DirectionIn ? messageIt->from() : ACollection.header.stream;
 
-			options.type = IMessageStyleContentOptions::TypeEmpty;
 			options.kind = IMessageStyleContentOptions::KindMessage;
-			options.senderId = senderJid.full();
+			options.type = IMessageStyleContentOptions::TypeEmpty;
+			options.senderId = senderJid.pFull();
 			options.time = messageIt->dateTime();
 			options.timeFormat = FMessageStyleManager!=NULL ? FMessageStyleManager->timeFormat(options.time,ACollection.header.start) : QString::null;
 
 			if (FViewOptions.isGroupChat)
 			{
-				options.type |= IMessageStyleContentOptions::TypeGroupchat;
-				options.direction = IMessageStyleContentOptions::DirectionIn;
-				options.senderName = Qt::escape(!senderJid.resource().isEmpty() ? senderJid.resource() : senderJid.uNode());
-				options.senderColor = FViewOptions.style!=NULL ? FViewOptions.style->senderColor(options.senderName) : "blue";
+				if (!senderJid.resource().isEmpty())
+				{
+					options.type |= IMessageStyleContentOptions::TypeGroupchat;
+					options.direction = IMessageStyleContentOptions::DirectionIn;
+					options.senderName = Qt::escape(senderJid.resource());
+					options.senderColor = FViewOptions.style!=NULL ? FViewOptions.style->senderColorById(options.senderName) : "blue";
+					html += showMessage(*messageIt,options);
+				}
+				else
+				{
+					options.kind = IMessageStyleContentOptions::KindStatus;
+					options.direction = IMessageStyleContentOptions::DirectionIn;
+					options.senderName = QString::null;
+					options.senderColor = QString::null;
+					html += showNote(messageIt->body(),options);
+				}
 			}
 			else if (direction == IMessageProcessor::DirectionIn)
 			{
 				options.direction = IMessageStyleContentOptions::DirectionIn;
 				options.senderName = FViewOptions.senderName;
-				options.senderColor = "blue";
+				options.senderColor = QColor(Qt::blue).name();
+				html += showMessage(*messageIt,options);
 			}
 			else
 			{
 				options.direction = IMessageStyleContentOptions::DirectionOut;
 				options.senderName = FViewOptions.selfName;
-				options.senderColor = "red";
+				options.senderColor = QColor(Qt::red).name();
+				html += showMessage(*messageIt,options);
 			}
 
-			html += showMessage(*messageIt,options);
 			++messageIt;
 		}
 		else if (noteIt != ACollection.body.notes.constEnd())
@@ -880,6 +891,7 @@ void ArchiveViewWindow::showCollection(const ArchiveCollection &ACollection)
 			options.type = IMessageStyleContentOptions::TypeEmpty;
 			options.senderId = QString::null;
 			options.senderName = QString::null;
+			options.senderColor = QString::null;
 			options.time = noteIt.key();
 			options.timeFormat = FMessageStyleManager!=NULL ? FMessageStyleManager->timeFormat(options.time,ACollection.header.start) : QString::null;
 
