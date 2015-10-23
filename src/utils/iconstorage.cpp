@@ -165,6 +165,7 @@ void IconStorage::initAnimation(QObject *AObject, IconUpdateParams *AParams)
 				AParams->animation->frameCount = AParams->animation->frames.count();
 			else
 				AParams->animation->reader = new QImageReader(file);
+			AParams->animation->timer->setSingleShot(true);
 		}
 		if (AParams->animation)
 		{

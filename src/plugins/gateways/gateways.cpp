@@ -43,6 +43,7 @@ Gateways::Gateways()
 	FRegistration = NULL;
 
 	FKeepTimer.setSingleShot(false);
+	FKeepTimer.setInterval(KEEP_INTERVAL);
 	connect(&FKeepTimer,SIGNAL(timeout()),SLOT(onKeepTimerTimeout()));
 }
 
@@ -182,6 +183,12 @@ bool Gateways::initObjects()
 		registerDiscoFeatures();
 		FDiscovery->insertFeatureHandler(NS_JABBER_GATEWAY,this,DFO_DEFAULT);
 	}
+	return true;
+}
+
+bool Gateways::startPlugin()
+{
+	FKeepTimer.start(KEEP_INTERVAL);
 	return true;
 }
 
@@ -689,13 +696,13 @@ void Gateways::onRemoveActionTriggered(bool)
 		{
 			Jid serviceJid = services.first();
 			button = QMessageBox::question(NULL,tr("Remove transport and its contacts"),
-				tr("You are assured that wish to remove a transport '<b>%1</b>' and its <b>%n contacts</b> from roster?","",serviceContacts(streams.first(),serviceJid).count()).arg(serviceJid.domain().toHtmlEscaped()),
+				tr("Are you sure you wish to remove transport '<b>%1</b>' and its <b>%n contact(s)</b> from the roster?","",serviceContacts(streams.first(),serviceJid).count()).arg(serviceJid.domain().toHtmlEscaped()),
 				QMessageBox::Yes | QMessageBox::No);
 		}
 		else if (services.count() > 1)
 		{
 			button = QMessageBox::question(NULL,tr("Remove transports and their contacts"),
-				tr("You are assured that wish to remove <b>%n transports</b> and their contacts from roster?","",services.count()),
+				tr("Are you sure you wish to remove <b>%n transport(s)</b> and their contacts from the roster?","",services.count()),
 				QMessageBox::Yes | QMessageBox::No);
 		}
 
@@ -850,7 +857,6 @@ void Gateways::onPresenceOpened(IPresence *APresence)
 		else
 			LOG_STRM_WARNING(APresence->streamJid(),QString("Failed to send load gateways with keep connection request"));
 	}
-	FKeepTimer.start(KEEP_INTERVAL);
 }
 
 void Gateways::onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline)
@@ -983,8 +989,7 @@ void Gateways::onPrivateDataChanged(const Jid &AStreamJid, const QString &ATagNa
 
 void Gateways::onKeepTimerTimeout()
 {
-	QList<Jid> streamJids = FKeepConnections.uniqueKeys();
-	foreach(const Jid &streamJid, streamJids)
+	foreach(const Jid &streamJid, FKeepConnections.uniqueKeys())
 	{
 		IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(streamJid) : NULL;
 		IPresence *presence = FPresenceManager!=NULL ? FPresenceManager->findPresence(streamJid) : NULL;

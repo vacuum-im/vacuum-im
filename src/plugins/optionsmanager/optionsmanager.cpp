@@ -37,14 +37,16 @@
 
 #define ADR_PROFILE                     Action::DR_Parametr1
 
+#define AUTO_SAVE_TIMEOUT               5*60*1000
+
 OptionsManager::OptionsManager()
 {
 	FPluginManager = NULL;
 	FTrayManager = NULL;
 	FMainWindowPlugin = NULL;
 
-	FAutoSaveTimer.setInterval(5*60*1000);
 	FAutoSaveTimer.setSingleShot(false);
+	FAutoSaveTimer.setInterval(AUTO_SAVE_TIMEOUT);
 	connect(&FAutoSaveTimer, SIGNAL(timeout()),SLOT(onAutoSaveTimerTimeout()));
 
 	qsrand(QDateTime::currentDateTime().toTime_t());
@@ -401,9 +403,14 @@ bool OptionsManager::changeProfilePassword(const QString &AProfile, const QStrin
 		keyText.toText().setData(keyValue.toBase64());
 
 		if (saveProfile(AProfile, profileDoc))
+		{
 			LOG_INFO(QString("Profile password changed, profile=%1").arg(AProfile));
+			return true;
+		}
 		else
+		{
 			LOG_ERROR(QString("Failed to change profile password, profile=%1: Profile not saved").arg(AProfile));
+		}
 	}
 	return false;
 }

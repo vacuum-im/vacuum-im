@@ -7,9 +7,18 @@
 #include <QDesktopWidget>
 #include <QNetworkAccessManager>
 #include <interfaces/ipluginmanager.h>
+#include <interfaces/ibookmarks.h>
 #include <interfaces/istatistics.h>
+#include <interfaces/iclientinfo.h>
+#include <interfaces/istatuschanger.h>
+#include <interfaces/imultiuserchat.h>
+#include <interfaces/irostermanager.h>
 #include <interfaces/ioptionsmanager.h>
+#include <interfaces/iaccountmanager.h>
+#include <interfaces/imessagewidgets.h>
+#include <interfaces/iservicediscovery.h>
 #include <interfaces/iconnectionmanager.h>
+#include <interfaces/ixmppstreammanager.h>
 
 class Statistics : 
 	public QObject,
@@ -43,16 +52,25 @@ protected:
 protected:
 	QUrl buildHitUrl(const IStatisticsHit &AHit) const;
 	QString getStatisticsFilePath(const QString &AFileName) const;
+protected:
+	IStatisticsHit makeViewHit() const;
+	IStatisticsHit makeEventHit(const QString &AParams, int AValue=1) const;
+	IStatisticsHit makeSessionEvent(const QString &AParams, int ASession) const;
+	void sendServerInfoHit(const QString &AName, const QString &AVersion);
 protected slots:
+	void onPendingHitsTimerTimeout();
 	void onNetworkManagerFinished(QNetworkReply *AReply);
+	void onNetworkManagerSSLErrors(QNetworkReply *AReply, const QList<QSslError> &AErrors);
 	void onNetworkManagerProxyAuthenticationRequired(const QNetworkProxy &AProxy, QAuthenticator *AAuth);
+	void onDefaultConnectionProxyChanged(const QUuid &AProxyId);
 protected slots:
 	void onOptionsOpened();
 	void onOptionsClosed();
 	void onOptionsChanged(const OptionsNode &ANode);
-	void onPendingTimerTimeout();
 	void onSessionTimerTimeout();
-	void onDefaultConnectionProxyChanged(const QUuid &AProxyId);
+protected slots:
+	void onXmppStreamOpened(IXmppStream *AXmppStream);
+	void onSoftwareInfoChanged(const Jid &AContactJid);
 protected slots:
 	void onLoggerViewReported(const QString &AClass);
 	void onLoggerErrorReported(const QString &AClass, const QString &AMessage, bool AFatal);
@@ -60,8 +78,20 @@ protected slots:
 	void onLoggerTimingReported(const QString &AClass, const QString &ACategory, const QString &AVariable, const QString &ALabel, qint64 ATime);
 private:
 	IPluginManager *FPluginManager;
-	IOptionsManager *FOptionsManager;
 	IConnectionManager *FConnectionManager;
+private:
+	IBookmarks *FBookmarks;
+	IClientInfo *FClientInfo;
+	IServiceDiscovery *FDiscovery;
+	IStatusChanger *FStatusChanger;
+	IRosterManager *FRosterManager;
+	IMessageWidgets *FMessageWidgets;
+	IOptionsManager *FOptionsManager;
+	IAccountManager *FAccountManager;
+	IXmppStreamManager *FXmppStreamManager;
+	IMultiUserChatManager *FMultiChatManager;
+private:
+	QMap<Jid,Jid> FSoftwareRequests;
 private:
 	QUuid FProfileId;
 	QDesktopWidget *FDesktopWidget;

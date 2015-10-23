@@ -11,7 +11,7 @@
     </message>
     <message>
         <source>Message windows</source>
-        <translation type="unfinished"/>
+        <translation>Ventana de mensajes</translation>
     </message>
     <message>
         <source>Do not convert text smileys to images</source>

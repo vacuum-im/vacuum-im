@@ -305,10 +305,6 @@
         </translation>
     </message>
     <message>
-        <source>Phrase was not found</source>
-        <translation>Фраза не найдена</translation>
-    </message>
-    <message>
         <source>Remove conversation history</source>
         <translation>Удалить историю разговоров</translation>
     </message>
@@ -424,14 +420,6 @@
         <source>with &lt;b&gt;%1&lt;/b&gt; for all time?</source>
         <translation>с &lt;b&gt;%1&lt;/b&gt; за все время?</translation>
     </message>
-    <message numerus="yes">
-        <source>And %n other conversations</source>
-        <translation>
-            <numerusform>И еще %n разговор</numerusform>
-            <numerusform>И еще %n разговора</numerusform>
-            <numerusform>И еще %n разговоров</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Do you want to remove the following conversations?</source>
         <translation>Вы хотиде удалить следующие разговоры?</translation>
@@ -471,6 +459,18 @@
     <message>
         <source>Export</source>
         <translation>Экспорт</translation>
+    </message>
+    <message>
+        <source>Phrase not found</source>
+        <translation>Фраза не найдена</translation>
+    </message>
+    <message numerus="yes">
+        <source>And %n other conversation(s)</source>
+        <translation>
+            <numerusform>И еще %n разговор</numerusform>
+            <numerusform>И еще %n разговора</numerusform>
+            <numerusform>И еще %n разговоров</numerusform>
+        </translation>
     </message>
 </context>
 <context>

@@ -457,7 +457,7 @@ IRegisterFields Registration::readFields(const Jid &AServiceJid, const QDomEleme
 	QDomElement oob = AQuery.firstChildElement("x");
 	while (!oob.isNull())
 	{
-		if (oob.namespaceURI() == NS_JABBER_OOB)
+		if (oob.namespaceURI() == NS_JABBER_X_OOB)
 		{
 			fields.fieldMask |= IRegisterFields::Redirect;
 			fields.redirect = oob.firstChildElement("url").text();

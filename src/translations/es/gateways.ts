@@ -79,14 +79,6 @@
         <source>Logout from transport</source>
         <translation>Finalizar sesión del transporte</translation>
     </message>
-    <message numerus="yes">
-        <source>You are assured that wish to remove a transport &apos;&lt;b&gt;%1&lt;/b&gt;&apos; and its &lt;b&gt;%n contacts&lt;/b&gt; from roster?</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
-    </message>
-    <message numerus="yes">
-        <source>You are assured that wish to remove &lt;b&gt;%n transports&lt;/b&gt; and their contacts from roster?</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
-    </message>
     <message>
         <source>Remove transport and its contacts</source>
         <translation>Borrar transporte y sus contactos</translation>
@@ -94,6 +86,14 @@
     <message>
         <source>Remove transports and their contacts</source>
         <translation>Borrar transportes y sus contactos</translation>
+    </message>
+    <message numerus="yes">
+        <source>Are you sure you wish to remove transport &apos;&lt;b&gt;%1&lt;/b&gt;&apos; and its &lt;b&gt;%n contact(s)&lt;/b&gt; from the roster?</source>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>Are you sure you wish to remove &lt;b&gt;%n transport(s)&lt;/b&gt; and their contacts from the roster?</source>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
 </context>
 </TS>

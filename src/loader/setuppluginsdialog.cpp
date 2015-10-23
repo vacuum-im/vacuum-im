@@ -233,13 +233,15 @@ void SetupPluginsDialog::onCurrentPluginChanged(const QModelIndex &ACurrent, con
 		{
 			QStringList dependsFor = ACurrent.data(PDR_DEPENDS_FOR).toStringList();
 			if (!dependsFor.isEmpty())
-				ui.lblDependsFor->setText(QString("<a href='depend-for'>%1</a>").arg(tr("This plugin depends on %n other plugins.","",dependsFor.count())));
+				ui.lblDependsFor->setText(QString("<a href='depend-for'>%1</a>").arg(tr("This plugin depends on %n other plugin(s).","",dependsFor.count())));
 			else
 				ui.lblDependsFor->setText(tr("This plugin does not depend on other plugins."));
 
 			QStringList dependsOn = ACurrent.data(PDR_DEPENDS_ON).toStringList();
 			if (!dependsOn.isEmpty())
-				ui.lblDependsOn->setText(QString("<a href='depend-on'>%1</a>").arg(tr("Other %n plugins depend on this plugin.","",dependsOn.count())));
+			{
+				ui.lblDependsOn->setText(QString("<a href='depend-on'>%1</a>").arg((dependsOn.count()>1)?tr("Other %n plugin(s) depend on this plugin.","",dependsOn.count()):tr("Another plugin depends on this plugin.")));
+			}
 			else
 				ui.lblDependsOn->setText(tr("Other plugins don't depend on this plugin."));
 		}
@@ -260,7 +262,7 @@ void SetupPluginsDialog::onCurrentPluginChanged(const QModelIndex &ACurrent, con
 			pluginItem->setData(dependsFailed,PDR_DEPENDS_FAILED);
 
 			if (!dependsFailed.isEmpty())
-				ui.lblDependsFor->setText(QString("<a href='depend-failed'>%1</a>").arg(tr("Not found %n dependences.","",dependsFailed.count())));
+				ui.lblDependsFor->setText(QString("<a href='depend-failed'>%1</a>").arg(tr("%n dependency(ies) not found.","",dependsFailed.count())));
 			else
 				ui.lblDependsFor->setText(QString::null);
 			ui.lblDependsOn->setText(QString::null);

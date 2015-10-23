@@ -5,4 +5,4 @@
 #define MWO_MESSAGEPROCESSOR_ANCHORS          200
 #define MWO_EMOTICONS                         500
 
-#endif
+#endif // DEF_MESSAGEWRITERORDERS_H

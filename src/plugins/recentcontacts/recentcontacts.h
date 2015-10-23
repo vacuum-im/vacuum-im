@@ -100,7 +100,6 @@ protected:
 	void updateItemIndex(const IRecentItem &AItem);
 	void removeItemIndex(const IRecentItem &AItem);
 	void updateItemProxy(const IRecentItem &AItem);
-	void updateItemProperties(const IRecentItem &AItem);
 	IRecentItem &findRealItem(const IRecentItem &AItem);
 	IRecentItem findRealItem(const IRecentItem &AItem) const;
 	void mergeRecentItems(const Jid &AStreamJid, const QList<IRecentItem> &AItems, bool AReplace);
@@ -173,6 +172,7 @@ private:
 private:
 	QTimer FSaveTimer;
 	QSet<Jid> FSaveStreams;
+	QList<Jid> FReadyStreams;
 	QMap<Jid, QString> FLoadRequestId;
 private:
 	QMap<int, int> FProxyToIndexNotify;

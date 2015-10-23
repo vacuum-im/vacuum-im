@@ -101,7 +101,7 @@ public:
 	static QMap<QString, QVariant> styleInfo(const QString &AStylePath);
 protected:
 	bool isSameSender(QWidget *AWidget, const IMessageStyleContentOptions &AOptions) const;
-	void setVariant(QWidget *AWidget, const QString  &AVariant);
+	void setVariant(StyleViewer *AView, const QString  &AVariant);
 	QString makeStyleTemplate() const;
 	void fillStyleKeywords(QString &AHtml, const IMessageStyleOptions &AOptions) const;
 	QString makeContentTemplate(const IMessageStyleContentOptions &AOptions, bool ASameSender) const;

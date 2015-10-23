@@ -86,23 +86,23 @@
     </message>
     <message>
         <source>Add Profile</source>
-        <translation type="unfinished"/>
+        <translation>Añadir perfil</translation>
     </message>
     <message>
         <source>Change Password</source>
-        <translation type="unfinished"/>
+        <translation>Cambiar contraseña</translation>
     </message>
     <message>
         <source>Rename Profile</source>
-        <translation type="unfinished"/>
+        <translation>Renombrar perfil</translation>
     </message>
     <message>
         <source>Delete Profile</source>
-        <translation type="unfinished"/>
+        <translation>Borrar perfil</translation>
     </message>
     <message>
         <source>Profiles Settings</source>
-        <translation type="unfinished"/>
+        <translation>Ajustes de perfil</translation>
     </message>
 </context>
 <context>
@@ -140,7 +140,7 @@
     </message>
     <message>
         <source>Settings...</source>
-        <translation type="unfinished"/>
+        <translation>Ajustes...</translation>
     </message>
 </context>
 <context>
@@ -174,31 +174,31 @@
     </message>
     <message>
         <source>Common settings</source>
-        <translation type="unfinished"/>
+        <translation>Ajustes comunes</translation>
     </message>
     <message>
         <source>Auto run application on system startup</source>
-        <translation type="unfinished"/>
+        <translation>Ejecutar automáticamente la aplicación al iniciar el sistema</translation>
     </message>
     <message>
         <source>Localization</source>
-        <translation type="unfinished"/>
+        <translation>Localización</translation>
     </message>
     <message>
         <source>&lt;System Language&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;Idioma del sistema&gt;</translation>
     </message>
     <message>
         <source>Language:</source>
-        <translation type="unfinished"/>
+        <translation>Idioma:</translation>
     </message>
     <message>
         <source>Common</source>
-        <translation type="unfinished"/>
+        <translation>Comú</translation>
     </message>
     <message>
         <source>Appearance</source>
-        <translation type="unfinished"/>
+        <translation>Apariencia</translation>
     </message>
 </context>
 </TS>

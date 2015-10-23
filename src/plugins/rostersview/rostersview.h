@@ -118,6 +118,8 @@ signals:
 	void rosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex = NULL);
 protected:
 	void clearLabels();
+	void updateBlinkTimer();
+	bool hasBlinkLableIndexes() const;
 	void appendBlinkItem(quint32 ALabelId, int ANotifyId);
 	void removeBlinkItem(quint32 ALabelId, int ANotifyId);
 	void setDropIndicatorRect(const QRect &ARect);
@@ -151,7 +153,7 @@ protected slots:
 	void onIndexDestroyed(IRosterIndex *AIndex);
 	void onUpdateIndexNotifyTimeout();
 	void onRemoveIndexNotifyTimeout();
-	void onUpdateBlinkLabels();
+	void onBlinkTimerTimeout();
 	void onDragExpandTimer();
 private:
 	IRostersModel *FRostersModel;
@@ -164,6 +166,7 @@ private:
 	QMap<quint32, AdvancedDelegateItem> FLabelItems;
 	QMultiMap<IRosterIndex *, quint32> FIndexLabels;
 private:
+	QTimer FBlinkTimer;
 	QSet<int> FBlinkNotifies;
 	QMap<QTimer *, int> FNotifyTimer;
 	QSet<IRosterIndex *> FNotifyUpdates;

@@ -132,10 +132,6 @@
         <translation>Borrar contacto</translation>
     </message>
     <message>
-        <source>You are assured that wish to remove a contact &lt;b&gt;%1&lt;/b&gt; from roster?</source>
-        <translation>¿Estás seguro de que deseas borrar el contacto &lt;b&gt;%1&lt;/b&gt; de la lista?</translation>
-    </message>
-    <message>
         <source>You are now subscribed for %1 presence.</source>
         <translation>%1 te ha autorizado a ver su estado.</translation>
     </message>
@@ -148,16 +144,8 @@
         <translation>Subscribirse a la presencia del contacto</translation>
     </message>
     <message>
-        <source>You are assured that wish to subscribe for a contact &lt;b&gt;%1&lt;/b&gt; presence?</source>
-        <translation>¿Estás seguro de que deseas subscribirte a la presencia del contacto &lt;b&gt;%1&lt;/b&gt;?</translation>
-    </message>
-    <message>
         <source>Unsubscribe from contact presence</source>
         <translation>Darse de baja de la presencia del contacto</translation>
-    </message>
-    <message>
-        <source>You are assured that wish to unsubscribe from a contact &lt;b&gt;%1&lt;/b&gt; presence?</source>
-        <translation>¿Estás seguro de que deseas darte de baja de la presencia del contacto &lt;b&gt;%1&lt;/b&gt;?</translation>
     </message>
     <message>
         <source>Roster Editor</source>
@@ -192,10 +180,6 @@
     <message>
         <source>When receiving authorization request</source>
         <translation>Al recibir una solicitud de autorización</translation>
-    </message>
-    <message numerus="yes">
-        <source>You are assured that wish to remove &lt;b&gt;%n contact(s)&lt;/b&gt; from roster?</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
     <message>
         <source>Add Contact</source>
@@ -321,6 +305,22 @@
     <message>
         <source>Into this Group</source>
         <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Are you sure you wish to remove a contact &lt;b&gt;%1&lt;/b&gt; from the roster?</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Are you sure you wish to subscribe for a contact &lt;b&gt;%1&lt;/b&gt; presence?</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Are you sure you wish to unsubscribe from a contact &lt;b&gt;%1&lt;/b&gt; presence?</source>
+        <translation type="unfinished"/>
+    </message>
+    <message numerus="yes">
+        <source>Are you sure you wish to remove &lt;b&gt;%n contact(s)&lt;/b&gt; from the roster?</source>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
 </context>
 <context>

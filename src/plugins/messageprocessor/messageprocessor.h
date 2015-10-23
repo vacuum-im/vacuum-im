@@ -4,8 +4,9 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessageprocessor.h>
 #include <interfaces/ixmppstreammanager.h>
-#include <interfaces/inotifications.h>
 #include <interfaces/istanzaprocessor.h>
+#include <interfaces/iservicediscovery.h>
+#include <interfaces/inotifications.h>
 
 class MessageProcessor :
 	public QObject,
@@ -78,9 +79,10 @@ protected slots:
 	void onXmppStreamActiveChanged(IXmppStream *AXmppStream, bool AActive);
 	void onXmppStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore);
 private:
-	IXmppStreamManager *FXmppStreamManager;
+	IServiceDiscovery *FDiscovery;
 	INotifications *FNotifications;
 	IStanzaProcessor *FStanzaProcessor;
+	IXmppStreamManager *FXmppStreamManager;
 private:
 	QMap<int, int> FNotifyId2MessageId;
 	QMap<int, Message> FNotifiedMessages;

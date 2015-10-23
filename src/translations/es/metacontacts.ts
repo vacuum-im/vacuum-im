@@ -58,20 +58,20 @@
     </message>
     <message>
         <source>Combine contacts</source>
-        <translation type="unfinished"/>
+        <translation>Fundir contactos</translation>
     </message>
     <message>
         <source>Ctrl+M</source>
         <comment>Combine contacts</comment>
-        <translation type="unfinished"/>
+        <translation>Ctrl+M</translation>
     </message>
     <message>
         <source>Destroy metacontact</source>
-        <translation type="unfinished"/>
+        <translation>Dividir metacontacto</translation>
     </message>
     <message>
         <source>Detach from metacontact</source>
-        <translation type="unfinished"/>
+        <translation>Separar del metacontacto</translation>
     </message>
 </context>
 </TS>

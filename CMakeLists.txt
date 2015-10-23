@@ -130,6 +130,12 @@ if (WIN32)
 		COMPONENT qt_libs
 		FILES_MATCHING
 		PATTERN "qwindows.dll")
+	install(DIRECTORY "${_qt5Core_install_prefix}/plugins/printsupport"
+		DESTINATION "${INSTALL_LIBS}"
+		COMPONENT qt_libs
+		FILES_MATCHING
+		PATTERN "*.dll"
+		PATTERN "*d.dll" EXCLUDE)
 	install(DIRECTORY "${_qt5Core_install_prefix}/plugins/sensors"
 		DESTINATION "${INSTALL_LIBS}"
 		COMPONENT qt_libs

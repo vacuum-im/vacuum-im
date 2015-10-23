@@ -80,7 +80,7 @@ NotifyKindOptionsWidget::NotifyKindOptionsWidget(INotifications *ANotifications,
 
 		QTableWidgetItem *sound = new QTableWidgetItem();
 		sound->setData(NTR_KIND, INotification::SoundPlay);
-		if (it->kindDefs & INotification::SoundPlay)
+		if (it->kindMask & INotification::SoundPlay)
 			sound->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable);
 		else
 			sound->setFlags(Qt::ItemIsUserCheckable);
@@ -89,7 +89,7 @@ NotifyKindOptionsWidget::NotifyKindOptionsWidget(INotifications *ANotifications,
 
 		QTableWidgetItem *popup = new QTableWidgetItem();
 		popup->setData(NTR_KIND, INotification::PopupWindow);
-		if (it->kindDefs & INotification::PopupWindow)
+		if (it->kindMask & INotification::PopupWindow)
 			popup->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable);
 		else
 			popup->setFlags(Qt::ItemIsUserCheckable);
@@ -98,7 +98,7 @@ NotifyKindOptionsWidget::NotifyKindOptionsWidget(INotifications *ANotifications,
 
 		QTableWidgetItem *minimized = new QTableWidgetItem();
 		minimized->setData(NTR_KIND, INotification::ShowMinimized);
-		if (it->kindDefs & INotification::ShowMinimized)
+		if (it->kindMask & INotification::ShowMinimized)
 			minimized->setFlags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable);
 		else
 			minimized->setFlags(Qt::ItemIsUserCheckable);

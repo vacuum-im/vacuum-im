@@ -155,11 +155,10 @@ void CreateAccountWizard::accept()
 	IAccount *account = accountManager!=NULL ? accountManager->createAccount(streamJid,streamJid.uBare()) : NULL;
 	if (account != NULL)
 	{
-		REPORT_EVENT(SEVP_ACCOUNT_CREATED,1);
-
 		bool showSettings = false;
 		if (field(WF_WIZARD_MODE).toInt() == ModeAppend)
 		{
+			REPORT_EVENT(SEVP_ACCOUNT_APPENDED,1);
 			AppendSettingsPage *settingsPage = qobject_cast<AppendSettingsPage *>(page(PageAppendSettings));
 			if (settingsPage != NULL)
 				settingsPage->saveAccountSettings(account);
@@ -167,6 +166,7 @@ void CreateAccountWizard::accept()
 		}
 		else if (field(WF_WIZARD_MODE).toInt() == ModeRegister)
 		{
+			REPORT_EVENT(SEVP_ACCOUNT_REGISTERED,1);
 			RegisterServerPage *serverPage = qobject_cast<RegisterServerPage *>(page(PageRegisterServer));
 			if (serverPage != NULL)
 				serverPage->saveAccountSettings(account);
@@ -831,6 +831,7 @@ void RegisterRequestPage::initializePage()
 void RegisterRequestPage::cleanupPage()
 {
 	FRegisterId.clear();
+	FChangedFields.clear();
 	FRegisterFields = IRegisterFields();
 	FRegisterSubmit = IRegisterSubmit();
 
@@ -846,19 +847,26 @@ bool RegisterRequestPage::validatePage()
 {
 	if (dfwRegisterForm != NULL)
 	{
+		IDataForm userForm = dfwRegisterForm->userDataForm();
+
+		foreach(const IDataField &userField, userForm.fields)
+		{
+			if (FDataForms->fieldValue(userField.var,FRegisterFields.form.fields) != userField.value)
+				FChangedFields.insert(userField.var,userField.value);
+		}
+
 		FRegisterSubmit.key = FRegisterFields.key;
 		FRegisterSubmit.serviceJid = FRegisterFields.serviceJid;
 		if (FRegisterFields.fieldMask & IRegisterFields::Form)
 		{
-			FRegisterSubmit.form = FDataForms->dataSubmit(dfwRegisterForm->userDataForm());
+			FRegisterSubmit.form = FDataForms->dataSubmit(userForm);
 			FRegisterSubmit.fieldMask = IRegisterFields::Form;
 		}
 		else
 		{
-			IDataForm form = dfwRegisterForm->userDataForm();
-			FRegisterSubmit.username = FDataForms->fieldValue("username",form.fields).toString();
-			FRegisterSubmit.password = FDataForms->fieldValue("password",form.fields).toString();
-			FRegisterSubmit.email = FDataForms->fieldValue("email",form.fields).toString();
+			FRegisterSubmit.username = FDataForms->fieldValue("username",userForm.fields).toString();
+			FRegisterSubmit.password = FDataForms->fieldValue("password",userForm.fields).toString();
+			FRegisterSubmit.email = FDataForms->fieldValue("email",userForm.fields).toString();
 			FRegisterSubmit.fieldMask = FRegisterFields.fieldMask;
 		}
 		return FRegistration->submitStreamRegistration(FXmppStream,FRegisterSubmit) == FRegisterId;
@@ -956,9 +964,12 @@ void RegisterRequestPage::onRegisterFields(const QString &AId, const IRegisterFi
 		}
 		else for (int i=0; i<FRegisterFields.form.fields.count(); i++)
 		{
-			QVariant value = FDataForms->fieldValue(FRegisterFields.form.fields.at(i).var,FRegisterSubmit.form.fields);
-			if (!value.isNull())
-				FRegisterFields.form.fields[i].value = value;
+			IDataField &field = FRegisterFields.form.fields[i];
+			if (field.type!=DATAFIELD_TYPE_HIDDEN && field.type!=DATAFIELD_TYPE_FIXED && field.media.uris.isEmpty())
+			{
+				if (FChangedFields.contains(field.var))
+					field.value = FChangedFields.value(field.var);
+			}
 		}
 
 		dfwRegisterForm = FDataForms->formWidget(FRegisterFields.form,this);

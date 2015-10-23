@@ -637,7 +637,7 @@ bool RosterChanger::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, c
 		if (roster && roster->isOpen() && roster->hasItem(AContactJid))
 		{
 			if (QMessageBox::question(NULL, tr("Remove contact"),
-				tr("You are assured that wish to remove a contact <b>%1</b> from roster?").arg(AContactJid.uBare().toHtmlEscaped()),
+				tr("Are you sure you wish to remove a contact <b>%1</b> from the roster?").arg(AContactJid.uBare().toHtmlEscaped()),
 				QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
 			{
 				roster->removeItem(AContactJid);
@@ -652,7 +652,7 @@ bool RosterChanger::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, c
 		if (roster && roster->isOpen() && ritem.subscription!=SUBSCRIPTION_BOTH && ritem.subscription!=SUBSCRIPTION_TO)
 		{
 			if (QMessageBox::question(NULL, tr("Subscribe for contact presence"),
-				tr("You are assured that wish to subscribe for a contact <b>%1</b> presence?").arg(AContactJid.uBare().toHtmlEscaped()),
+				tr("Are you sure you wish to subscribe for a contact <b>%1</b> presence?").arg(AContactJid.uBare().toHtmlEscaped()),
 				QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
 			{
 				roster->sendSubscription(AContactJid, IRoster::Subscribe);
@@ -667,7 +667,7 @@ bool RosterChanger::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, c
 		if (roster && roster->isOpen() && ritem.subscription!=SUBSCRIPTION_NONE && ritem.subscription!=SUBSCRIPTION_FROM)
 		{
 			if (QMessageBox::question(NULL, tr("Unsubscribe from contact presence"),
-				tr("You are assured that wish to unsubscribe from a contact <b>%1</b> presence?").arg(AContactJid.uBare().toHtmlEscaped()),
+				tr("Are you sure you wish to unsubscribe from a contact <b>%1</b> presence?").arg(AContactJid.uBare().toHtmlEscaped()),
 				QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
 			{
 				roster->sendSubscription(AContactJid, IRoster::Unsubscribe);
@@ -1179,7 +1179,7 @@ void RosterChanger::removeContactsFromRoster(const QStringList &AStreams, const 
 			if (!ritem.isNull())
 			{
 				button = QMessageBox::question(NULL,tr("Remove Contact"),
-					tr("You are assured that wish to remove a contact <b>%1</b> from roster?").arg(name.toHtmlEscaped()),
+					tr("Are you sure you wish to remove a contact <b>%1</b> from the roster?").arg(name.toHtmlEscaped()),
 					QMessageBox::Yes | QMessageBox::No);
 			}
 			else 
@@ -1190,7 +1190,7 @@ void RosterChanger::removeContactsFromRoster(const QStringList &AStreams, const 
 		else
 		{
 			button = QMessageBox::question(NULL,tr("Remove Contacts"),
-				tr("You are assured that wish to remove <b>%n contact(s)</b> from roster?","",AContacts.count()),
+				tr("Are you sure you wish to remove <b>%n contact(s)</b> from the roster?","",AContacts.count()),
 				QMessageBox::Yes | QMessageBox::No);
 		}
 
@@ -1317,7 +1317,7 @@ void RosterChanger::removeGroupsContacts(const QStringList &AStreams, const QStr
 		if (itemsCount > 0)
 		{
 			int button = QMessageBox::question(NULL,tr("Remove Contacts"),
-				tr("You are assured that wish to remove <b>%n contact(s)</b> from roster?","",itemsCount),
+				tr("Are you sure you wish to remove <b>%n contact(s)</b> from the roster?","",itemsCount),
 				QMessageBox::Yes | QMessageBox::No);
 
 			for(int i=0; button==QMessageBox::Yes && i<AStreams.count(); i++)

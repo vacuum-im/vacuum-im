@@ -34,10 +34,6 @@
    <translation>Wrong plugin interface</translation>
   </message>
   <message>
-   <source>Dependences not found</source>
-   <translation>Dependences not found</translation>
-  </message>
-  <message>
    <source>Conflict with plugin %1</source>
    <translation>Conflict with plugin %1</translation>
   </message>
@@ -65,6 +61,10 @@
    <source>Application shortcuts</source>
    <translation>Application shortcuts</translation>
   </message>
+  <message>
+   <source>Dependencies not found</source>
+   <translation>Dependencies not found</translation>
+  </message>
  </context>
  <context>
   <name>SetupPluginsDialog</name>
@@ -84,36 +84,40 @@
    <source>With errors (%1)</source>
    <translation>With errors (%1)</translation>
   </message>
-  <message numerus="yes">
-   <source>This plugin depends on %n other plugins.</source>
-   <translation>
-    <numerusform>This plugin depends on %n other plugins.</numerusform>
-    <numerusform>This plugin depends on %n other plugins.</numerusform>
-    <numerusform>This plugin depends on %n other plugins.</numerusform>
-   </translation>
-  </message>
   <message>
    <source>This plugin does not depend on other plugins.</source>
    <translation>This plugin does not depend on other plugins.</translation>
-  </message>
-  <message numerus="yes">
-   <source>Other %n plugins depend on this plugin.</source>
-   <translation>
-    <numerusform>Other %n plugins depend on this plugin.</numerusform>
-    <numerusform>Other %n plugins depend on this plugin.</numerusform>
-    <numerusform>Other %n plugins depend on this plugin.</numerusform>
-   </translation>
   </message>
   <message>
    <source>Other plugins don't depend on this plugin.</source>
    <translation>Other plugins don't depend on this plugin.</translation>
   </message>
   <message numerus="yes">
-   <source>Not found %n dependences.</source>
+   <source>This plugin depends on %n other plugin(s).</source>
    <translation>
-    <numerusform>Not found %n dependences.</numerusform>
-    <numerusform>Not found %n dependences.</numerusform>
-    <numerusform>Not found %n dependences.</numerusform>
+    <numerusform>This plugin depends on %n other plugin(s).</numerusform>
+    <numerusform>This plugin depends on %n other plugin(s).</numerusform>
+    <numerusform>This plugin depends on %n other plugin(s).</numerusform>
+   </translation>
+  </message>
+  <message numerus="yes">
+   <source>Other %n plugin(s) depend on this plugin.</source>
+   <translation>
+    <numerusform>Other %n plugin(s) depend on this plugin.</numerusform>
+    <numerusform>Other %n plugin(s) depend on this plugin.</numerusform>
+    <numerusform>Other %n plugin(s) depend on this plugin.</numerusform>
+   </translation>
+  </message>
+  <message>
+   <source>Another plugin depends on this plugin.</source>
+   <translation>Another plugin depends on this plugin.</translation>
+  </message>
+  <message numerus="yes">
+   <source>%n dependency(ies) not found.</source>
+   <translation>
+    <numerusform>%n dependency(ies) not found.</numerusform>
+    <numerusform>%n dependency(ies) not found.</numerusform>
+    <numerusform>%n dependency(ies) not found.</numerusform>
    </translation>
   </message>
  </context>

@@ -32,10 +32,6 @@
         <translation>Interfaz de complemento inválida</translation>
     </message>
     <message>
-        <source>Dependences not found</source>
-        <translation>Dependencias sin encontrar</translation>
-    </message>
-    <message>
         <source>Conflict with plugin %1</source>
         <translation>Conflicto con el componente %1</translation>
     </message>
@@ -57,10 +53,14 @@
     </message>
     <message>
         <source>Global shortcuts</source>
-        <translation type="unfinished"/>
+        <translation>Atajos globales</translation>
     </message>
     <message>
         <source>Application shortcuts</source>
+        <translation>Atajos de la aplicación</translation>
+    </message>
+    <message>
+        <source>Dependencies not found</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -76,30 +76,34 @@
     </message>
     <message>
         <source>Disabled (%1)</source>
-        <translation type="unfinished"/>
+        <translation>Inhabilitado (%1)</translation>
     </message>
     <message>
         <source>With errors (%1)</source>
-        <translation type="unfinished"/>
-    </message>
-    <message numerus="yes">
-        <source>This plugin depends on %n other plugins.</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>Con errores (%1)</translation>
     </message>
     <message>
         <source>This plugin does not depend on other plugins.</source>
-        <translation type="unfinished"/>
-    </message>
-    <message numerus="yes">
-        <source>Other %n plugins depend on this plugin.</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>Este complemento no depende de otros</translation>
     </message>
     <message>
         <source>Other plugins don&apos;t depend on this plugin.</source>
+        <translation>Otros complementos no dependen de este.</translation>
+    </message>
+    <message numerus="yes">
+        <source>This plugin depends on %n other plugin(s).</source>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>Other %n plugin(s) depend on this plugin.</source>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+    </message>
+    <message>
+        <source>Another plugin depends on this plugin.</source>
         <translation type="unfinished"/>
     </message>
     <message numerus="yes">
-        <source>Not found %n dependences.</source>
+        <source>%n dependency(ies) not found.</source>
         <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
 </context>
@@ -111,11 +115,11 @@
     </message>
     <message>
         <source>Search plugin</source>
-        <translation type="unfinished"/>
+        <translation>Buscar complemento</translation>
     </message>
     <message>
         <source>Plugin Information</source>
-        <translation type="unfinished"/>
+        <translation>Información del complemento</translation>
     </message>
 </context>
 </TS>

@@ -80,10 +80,6 @@
         <translation>%1 пропонує вам декілька змін в вашому ростері</translation>
     </message>
     <message numerus="yes">
-        <source>%n contact(s) have been sent</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
-    </message>
-    <message numerus="yes">
         <source>Failed to send %n contact(s)</source>
         <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
@@ -94,6 +90,10 @@
     <message>
         <source>Allow gateways and group services manage your contacts list</source>
         <translation type="unfinished"/>
+    </message>
+    <message numerus="yes">
+        <source>%n contact(s) sent</source>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
 </context>
 </TS>

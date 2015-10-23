@@ -11,6 +11,10 @@
         <source>hh:mm:ss</source>
         <translation>hh:mm:ss</translation>
     </message>
+    <message>
+        <source>Failed to load message style. Press clear window button to retry.</source>
+        <translation>Не удалось загрузить стиль сообщений. Нажмите кнопку очистки окна для повтора.</translation>
+    </message>
 </context>
 <context>
     <name>AdiumMessageStyleEngine</name>

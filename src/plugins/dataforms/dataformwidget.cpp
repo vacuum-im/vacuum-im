@@ -2,133 +2,150 @@
 
 #include <QLabel>
 #include <QGroupBox>
+#include <QTabWidget>
 #include <QScrollBar>
 #include <QScrollArea>
 #include <QVBoxLayout>
-#include <QTabWidget>
-#include <QTextDocument>
 #include <QMessageBox>
+#include <QTextDocument>
+#include <QApplication>
+#include <QDesktopWidget>
 
 class ScrollArea : 
-   public QScrollArea
+	public QScrollArea
 {
 public:
-   ScrollArea(QWidget *AParent = NULL): QScrollArea(AParent) { }
-   virtual QSize sizeHint() const 
-   {
-      QSize sh(2*frameWidth()+1,2*frameWidth()+1);
-      if (verticalScrollBar())
-         sh.setWidth(sh.width() + verticalScrollBar()->sizeHint().width());
-      if (horizontalScrollBar())
-         sh.setHeight(sh.height() + horizontalScrollBar()->sizeHint().height());
-      if (widget())
-         sh += widgetResizable() ? widget()->sizeHint() : widget()->size();
-      return sh;
-   }
+	ScrollArea(QWidget *AParent = NULL): QScrollArea(AParent)
+	{
+		setWidgetResizable(true);
+		setFrameShape(QFrame::NoFrame);
+	}
+	virtual QSize sizeHint() const
+	{
+		QSize sh(2*frameWidth()+1, 2*frameWidth()+1);
+		if (verticalScrollBar())
+			sh.rwidth() += verticalScrollBar()->sizeHint().width();
+		if (horizontalScrollBar())
+			sh.rheight() += horizontalScrollBar()->sizeHint().height();
+		if (widget())
+			sh += widgetResizable() ? widget()->sizeHint() : widget()->size();
+
+		QSize desktopSize = QApplication::desktop()->availableGeometry(this).size();
+		return sh.boundedTo(desktopSize/2);
+	}
+	virtual QSize minimumSizeHint() const
+	{
+		QSize desktopSize = QApplication::desktop()->availableGeometry(this).size();
+		return sizeHint().boundedTo(desktopSize/4);
+	}
+	virtual bool event(QEvent *AEvent)
+	{
+		if (AEvent->type() == QEvent::LayoutRequest)
+			updateGeometry();
+		return QScrollArea::event(AEvent);
+	}
 };
 
 DataFormWidget::DataFormWidget(IDataForms *ADataForms, const IDataForm &AForm, QWidget *AParent) : QWidget(AParent)
 {
 	FForm = AForm;
+	FTableWidget = NULL;
 	FDataForms = ADataForms;
 
-	if (FForm.table.columns.count()>0)
-	{
-		FTableWidget = FDataForms->tableWidget(FForm.table,this);
-		FTableWidget->instance()->setVisible(false);
-		connect(FTableWidget->instance(),SIGNAL(activated(int, int)),SIGNAL(cellActivated(int, int)));
-		connect(FTableWidget->instance(),SIGNAL(changed(int,int,int,int)),SIGNAL(cellChanged(int,int,int,int)));
-	}
-	else
-	{
-		FTableWidget = NULL;
-	}
-
-	foreach(const IDataField &field, FForm.fields)
-	{
-		IDataFieldWidget *fwidget = FDataForms->fieldWidget(field,!FForm.type.isEmpty() && FForm.type!=DATAFORM_TYPE_FORM,this);
-		fwidget->instance()->setVisible(false);
-		if (fwidget->mediaWidget() != NULL)
-		{
-			IDataMediaWidget *mwidget = fwidget->mediaWidget();
-			connect(mwidget->instance(),SIGNAL(mediaShown()),SLOT(onFieldMediaShown()));
-			connect(mwidget->instance(),SIGNAL(mediaError(const XmppError &)),SLOT(onFieldMediaError(const XmppError &)));
-		}
-		connect(fwidget->instance(),SIGNAL(changed()),SLOT(onFieldChanged()));
-		connect(fwidget->instance(),SIGNAL(focusIn(Qt::FocusReason)),SLOT(onFieldFocusIn(Qt::FocusReason)));
-		connect(fwidget->instance(),SIGNAL(focusOut(Qt::FocusReason)),SLOT(onFieldFocusOut(Qt::FocusReason)));
-		FFieldWidgets.append(fwidget);
-	}
-
-	setLayout(new QVBoxLayout(this));
-	layout()->setMargin(0);
+	QVBoxLayout *formLayout = new QVBoxLayout(this);
+	formLayout->setMargin(0);
 
 	foreach(const QString &text, FForm.instructions)
 	{
 		QLabel *label = new QLabel(this);
+		label->setText(text);
 		label->setWordWrap(true);
 		label->setTextFormat(Qt::PlainText);
 		label->setAlignment(Qt::AlignCenter);
-		label->setText(text);
-		layout()->addWidget(label);
+		formLayout->addWidget(label);
 	}
 
-	if (FForm.pages.count() < 2)
+	if (!FForm.fields.isEmpty() || !FForm.table.columns.isEmpty())
 	{
-		ScrollArea *scroll = new ScrollArea(this);
-		scroll->setWidgetResizable(true);
-		scroll->setFrameShape(QFrame::NoFrame);
-		layout()->addWidget(scroll);
-
-		QWidget *widget = new QWidget(scroll);
-		widget->setLayout(new QVBoxLayout(widget));
-		widget->layout()->setMargin(0);
-
-		bool stretch = true;
-		if (FForm.pages.count() == 0)
+		foreach(const IDataField &field, FForm.fields)
 		{
-			foreach(IDataFieldWidget *fwidget, FFieldWidgets)
+			IDataFieldWidget *fwidget = FDataForms->fieldWidget(field,!FForm.type.isEmpty() && FForm.type!=DATAFORM_TYPE_FORM,this);
+			fwidget->instance()->setVisible(false);
+			if (fwidget->mediaWidget() != NULL)
 			{
-				stretch &= !isStretch(fwidget);
-				widget->layout()->addWidget(fwidget->instance());
-				fwidget->instance()->setVisible(fwidget->dataField().type!=DATAFIELD_TYPE_HIDDEN);
+				IDataMediaWidget *mwidget = fwidget->mediaWidget();
+				connect(mwidget->instance(),SIGNAL(mediaShown()),SLOT(onFieldMediaShown()));
+				connect(mwidget->instance(),SIGNAL(mediaError(const XmppError &)),SLOT(onFieldMediaError(const XmppError &)));
+			}
+			connect(fwidget->instance(),SIGNAL(changed()),SLOT(onFieldChanged()));
+			connect(fwidget->instance(),SIGNAL(focusIn(Qt::FocusReason)),SLOT(onFieldFocusIn(Qt::FocusReason)));
+			connect(fwidget->instance(),SIGNAL(focusOut(Qt::FocusReason)),SLOT(onFieldFocusOut(Qt::FocusReason)));
+			FFieldWidgets.append(fwidget);
+		}
+
+		if (!FForm.table.columns.isEmpty())
+		{
+			FTableWidget = FDataForms->tableWidget(FForm.table,this);
+			FTableWidget->instance()->setVisible(false);
+			connect(FTableWidget->instance(),SIGNAL(activated(int, int)),SIGNAL(cellActivated(int, int)));
+			connect(FTableWidget->instance(),SIGNAL(changed(int,int,int,int)),SIGNAL(cellChanged(int,int,int,int)));
+		}
+
+		if (FForm.pages.count() < 2)
+		{
+			ScrollArea *scroll = new ScrollArea(this);
+			formLayout->addWidget(scroll);
+
+			QWidget *scrollWidget = new QWidget(scroll);
+			QVBoxLayout *scrollLayout = new QVBoxLayout(scrollWidget);
+			scrollLayout->setMargin(0);
+
+			bool stretch = true;
+			if (FForm.pages.count() == 0)
+			{
+				foreach(IDataFieldWidget *fwidget, FFieldWidgets)
+				{
+					stretch &= !isStretch(fwidget);
+					scrollLayout->addWidget(fwidget->instance());
+					fwidget->instance()->setVisible(fwidget->dataField().type != DATAFIELD_TYPE_HIDDEN);
+				}
+
+				if (FTableWidget)
+				{
+					stretch = false;
+					scrollLayout->addWidget(FTableWidget->instance());
+					FTableWidget->instance()->setVisible(true);
+				}
+			}
+			else
+			{
+				stretch = insertLayout(FForm.pages.first(),scrollWidget);
 			}
 
-			if (FTableWidget)
-			{
-				stretch = false;
-				widget->layout()->addWidget(FTableWidget->instance());
-				FTableWidget->instance()->setVisible(true);
-			}
+			if (stretch)
+				scrollLayout->addStretch();
+
+			scroll->setWidget(scrollWidget);
 		}
 		else
 		{
-			stretch = insertLayout(FForm.pages.first(),widget);
-		}
+			QTabWidget *tabs = new QTabWidget(this);
+			formLayout->addWidget(tabs);
 
-		if (stretch)
-			static_cast<QVBoxLayout *>(widget->layout())->addStretch();
+			foreach(const IDataLayout &page, FForm.pages)
+			{
+				ScrollArea *scroll = new ScrollArea(tabs);
+				tabs->addTab(scroll, !page.label.isEmpty() ? page.label : tr("Page %1").arg(tabs->count()+1));
 
-		scroll->setWidget(widget);
-	}
-	else
-	{
-		QTabWidget *tabs = new QTabWidget(this);
-		layout()->addWidget(tabs);
+				QWidget *scrollWidget = new QWidget(scroll);
+				QVBoxLayout *scrollLayout = new QVBoxLayout(scrollWidget);
+				scrollLayout->setMargin(0);
 
-		foreach(const IDataLayout &page, FForm.pages)
-		{
-			ScrollArea *scroll = new ScrollArea(tabs);
-			scroll->setWidgetResizable(true);
-			scroll->setFrameShape(QFrame::NoFrame);
-			tabs->addTab(scroll, !page.label.isEmpty() ? page.label : tr("Page %1").arg(tabs->count()+1));
+				if (insertLayout(page,scrollWidget))
+					scrollLayout->addStretch();
 
-			QWidget *pwidget = new QWidget(scroll);
-			pwidget->setLayout(new QVBoxLayout(pwidget));
-			if (insertLayout(page,pwidget))
-				static_cast<QVBoxLayout *>(pwidget->layout())->addStretch();
-
-			scroll->setWidget(pwidget);
+				scroll->setWidget(scrollWidget);
+			}
 		}
 	}
 }
@@ -166,7 +183,7 @@ bool DataFormWidget::checkForm(bool AAllowInvalid) const
 
 IDataTableWidget *DataFormWidget::tableWidget() const
 {
-   return FTableWidget;
+	return FTableWidget;
 }
 
 IDataFieldWidget *DataFormWidget::fieldWidget(int AIndex) const
@@ -189,7 +206,7 @@ IDataForm DataFormWidget::userDataForm() const
 
 const IDataForm &DataFormWidget::dataForm() const
 {
-   return FForm;
+	return FForm;
 }
 
 bool DataFormWidget::isStretch(IDataFieldWidget *AWidget) const

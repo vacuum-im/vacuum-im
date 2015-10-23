@@ -278,6 +278,8 @@ QVariant RostersViewPlugin::rosterData(int AOrder, const IRosterIndex *AIndex, i
 		{
 			if (AIndex->kind() == RIK_STREAM_ROOT)
 				return 1;
+			else if (AIndex->kind() == RIK_AGENT)
+				return 1;
 		}
 	}
 	return QVariant();

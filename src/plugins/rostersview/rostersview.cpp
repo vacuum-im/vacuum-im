@@ -62,8 +62,11 @@ RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
 	FAdvancedItemDelegate->setItemsRole(RDR_LABEL_ITEMS);
 	FAdvancedItemDelegate->setDefaultBranchItemEnabled(true);
 	FAdvancedItemDelegate->setBlinkMode(AdvancedItemDelegate::BlinkHide);
-	connect(FAdvancedItemDelegate,SIGNAL(updateBlinkItems()),SLOT(onUpdateBlinkLabels()));
 	setItemDelegate(FAdvancedItemDelegate);
+
+	FBlinkTimer.setSingleShot(false);
+	FBlinkTimer.setInterval(FAdvancedItemDelegate->blinkInterval());
+	connect(&FBlinkTimer,SIGNAL(timeout()),SLOT(onBlinkTimerTimeout()));
 
 	FDragExpandTimer.setSingleShot(true);
 	FDragExpandTimer.setInterval(500);
@@ -759,6 +762,7 @@ void RostersView::insertLabel(quint32 ALabelId, IRosterIndex *AIndex)
 	{
 		FIndexLabels.insertMulti(AIndex,ALabelId);
 		emit rosterDataChanged(AIndex,RDR_LABEL_ITEMS);
+		updateBlinkTimer();
 	}
 }
 
@@ -768,11 +772,13 @@ void RostersView::removeLabel(quint32 ALabelId, IRosterIndex *AIndex)
 	{
 		foreach(IRosterIndex *index, FIndexLabels.keys(ALabelId))
 			removeLabel(ALabelId,index);
+		updateBlinkTimer();
 	}
 	else if (FIndexLabels.contains(AIndex,ALabelId))
 	{
 		FIndexLabels.remove(AIndex,ALabelId);
 		emit rosterDataChanged(AIndex,RDR_LABEL_ITEMS);
+		updateBlinkTimer();
 	}
 }
 
@@ -1001,18 +1007,40 @@ void RostersView::clearLabels()
 		removeLabel(labelId);
 }
 
+void RostersView::updateBlinkTimer()
+{
+	if (FBlinkTimer.isActive() && FBlinkNotifies.isEmpty() && FBlinkLabels.isEmpty())
+		FBlinkTimer.stop();
+	else if (!FBlinkTimer.isActive() && !FBlinkNotifies.isEmpty())
+		FBlinkTimer.start();
+	else if (FBlinkTimer.isActive() && FBlinkNotifies.isEmpty() && !hasBlinkLableIndexes())
+		FBlinkTimer.stop();
+	else if (!FBlinkTimer.isActive() && hasBlinkLableIndexes())
+		FBlinkTimer.start();
+}
+
+bool RostersView::hasBlinkLableIndexes() const
+{
+	foreach(quint32 labelId, FBlinkLabels)
+		if (FIndexLabels.key(labelId) != NULL)
+			return true;
+	return false;
+}
+
 void RostersView::appendBlinkItem(quint32 ALabelId, int ANotifyId)
 {
 	if (ALabelId > 0)
 		FBlinkLabels += ALabelId;
 	if (ANotifyId > 0)
 		FBlinkNotifies += ANotifyId;
+	updateBlinkTimer();
 }
 
 void RostersView::removeBlinkItem(quint32 ALabelId, int ANotifyId)
 {
 	FBlinkLabels -= ALabelId;
 	FBlinkNotifies -= ANotifyId;
+	updateBlinkTimer();
 }
 
 void RostersView::setDropIndicatorRect(const QRect &ARect)
@@ -1384,6 +1412,7 @@ void RostersView::onIndexDestroyed(IRosterIndex *AIndex)
 	FIndexNotifies.remove(AIndex);
 	FActiveNotifies.remove(AIndex);
 	FNotifyUpdates -= AIndex;
+	updateBlinkTimer();
 }
 
 void RostersView::onUpdateIndexNotifyTimeout()
@@ -1419,15 +1448,22 @@ void RostersView::onRemoveIndexNotifyTimeout()
 	removeNotify(FNotifyTimer.value(timer));
 }
 
-void RostersView::onUpdateBlinkLabels()
+void RostersView::onBlinkTimerTimeout()
 {
-	foreach(quint32 labelId, FBlinkLabels)
-		foreach(IRosterIndex *index, FIndexLabels.keys(labelId))
-			repaintRosterIndex(index);
+	if (FAdvancedItemDelegate->blinkNeedUpdate())
+	{
+		foreach(quint32 labelId, FBlinkLabels)
+		{
+			foreach(IRosterIndex *index, FIndexLabels.keys(labelId))
+				repaintRosterIndex(index);
+		}
 
-	foreach(int notifyId, FBlinkNotifies)
-		foreach(IRosterIndex *index, FActiveNotifies.keys(notifyId))
-			repaintRosterIndex(index);
+		foreach(int notifyId, FBlinkNotifies)
+		{
+			foreach(IRosterIndex *index, FActiveNotifies.keys(notifyId))
+				repaintRosterIndex(index);
+		}
+	}
 }
 
 void RostersView::onDragExpandTimer()

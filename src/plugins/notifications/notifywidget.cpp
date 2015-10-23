@@ -28,6 +28,8 @@
 
 #define UNDER_MOUSE_ADD_TIMEOUT   15
 
+#define ONE_SECOND_TIMEOUT        1000
+
 QRect NotifyWidget::FDisplay = QRect();
 QList<NotifyWidget *> NotifyWidget::FWidgets;
 QDesktopWidget *NotifyWidget::FDesktop = new QDesktopWidget;
@@ -135,8 +137,8 @@ NotifyWidget::NotifyWidget(const INotification &ANotification)
 		ui.wdtButtons->setVisible(false);
 	}
 
-	FCloseTimer.setInterval(1000);
 	FCloseTimer.setSingleShot(false);
+	FCloseTimer.setInterval(ONE_SECOND_TIMEOUT);
 	connect(&FCloseTimer,SIGNAL(timeout()),SLOT(onCloseTimerTimeout()));
 
 	updateElidedText();

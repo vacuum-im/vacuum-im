@@ -134,10 +134,6 @@
         <translation>Удалить контакт</translation>
     </message>
     <message>
-        <source>You are assured that wish to remove a contact &lt;b&gt;%1&lt;/b&gt; from roster?</source>
-        <translation>Вы уверены, что хотите удалить контакт &lt;b&gt;%1&lt;/b&gt; из контакт-листа?</translation>
-    </message>
-    <message>
         <source>You are now subscribed for %1 presence.</source>
         <translation>%1 авторизовал вас на получение статуса.</translation>
     </message>
@@ -150,16 +146,8 @@
         <translation>Подписаться на получение статуса контакта</translation>
     </message>
     <message>
-        <source>You are assured that wish to subscribe for a contact &lt;b&gt;%1&lt;/b&gt; presence?</source>
-        <translation>Вы уверены, что хотите подписаться на получение статуса контакта &lt;b&gt;%1&lt;/b&gt;?</translation>
-    </message>
-    <message>
         <source>Unsubscribe from contact presence</source>
         <translation>Отписаться от получения статуса контакта</translation>
-    </message>
-    <message>
-        <source>You are assured that wish to unsubscribe from a contact &lt;b&gt;%1&lt;/b&gt; presence?</source>
-        <translation>Вы уверены, что хотите отписаться от получения статуса контакта &lt;b&gt;%1&lt;/b&gt;?</translation>
     </message>
     <message>
         <source>Roster Editor</source>
@@ -194,14 +182,6 @@
     <message>
         <source>When receiving authorization request</source>
         <translation>При получении запроса авторизации</translation>
-    </message>
-    <message numerus="yes">
-        <source>You are assured that wish to remove &lt;b&gt;%n contact(s)&lt;/b&gt; from roster?</source>
-        <translation>
-            <numerusform>Вы уверены, что хотите удалить &lt;b&gt;%n контакт&lt;/b&gt; из списка контактов?</numerusform>
-            <numerusform>Вы уверены, что хотите удалить &lt;b&gt;%n контакта&lt;/b&gt; из списка контактов?</numerusform>
-            <numerusform>Вы уверены, что хотите удалить &lt;b&gt;%n контактов&lt;/b&gt; из списка контактов?</numerusform>
-        </translation>
     </message>
     <message>
         <source>Add Contact</source>
@@ -329,21 +309,24 @@
         <translation>В эту группу</translation>
     </message>
     <message>
-        <source>Contacts list management</source>
-        <translation>Управление списком контактов</translation>
+        <source>Are you sure you wish to remove a contact &lt;b&gt;%1&lt;/b&gt; from the roster?</source>
+        <translation>Вы уверены, что хотите удалить контакт &lt;b&gt;%1&lt;/b&gt; из контакт-листа?</translation>
     </message>
     <message>
-        <source>Automatically accept all subscription requests</source>
-        <translation>Автоматически принимать все запросы на авторизацию</translation>
+        <source>Are you sure you wish to subscribe for a contact &lt;b&gt;%1&lt;/b&gt; presence?</source>
+        <translation>Вы уверены, что хотите подписаться на получение статуса контакта &lt;b&gt;%1&lt;/b&gt;?</translation>
     </message>
     <message>
-        <source>Remove subscription when you was deleted from contacts list</source>
-        <translation>Удалять авторизацию при удалении вас из списка контактов</translation>
+        <source>Are you sure you wish to unsubscribe from a contact &lt;b&gt;%1&lt;/b&gt; presence?</source>
+        <translation>Вы уверены, что хотите отписаться от получения статуса контакта &lt;b&gt;%1&lt;/b&gt;?</translation>
     </message>
-    <message>
-        <source>Del</source>
-        <comment>Remove contact/group from roster</comment>
-        <translation>Del</translation>
+    <message numerus="yes">
+        <source>Are you sure you wish to remove &lt;b&gt;%n contact(s)&lt;/b&gt; from the roster?</source>
+        <translation>
+            <numerusform>Вы уверены, что хотите удалить &lt;b&gt;%n контакт&lt;/b&gt; из списка контактов?</numerusform>
+            <numerusform>Вы уверены, что хотите удалить &lt;b&gt;%n контакта&lt;/b&gt; из списка контактов?</numerusform>
+            <numerusform>Вы уверены, что хотите удалить &lt;b&gt;%n контактов&lt;/b&gt; из списка контактов?</numerusform>
+        </translation>
     </message>
 </context>
 <context>
