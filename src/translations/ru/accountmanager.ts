@@ -375,12 +375,12 @@
         <translation>Вы успешно зарегистрировались!</translation>
     </message>
     <message>
-        <source>Account %1@%2 successfully registered, click &apos;Finish&apos; button to add the account.</source>
-        <translation>Аккаунт %1@%2 успешно зарегистрирован, нажмите кнопку &apos;Завершить&apos; для добавления аккаунта.</translation>
-    </message>
-    <message>
         <source>Wizard waiting for registration confirmation from server</source>
         <translation>Мастер ожидает подтверждения регистрации от сервера</translation>
+    </message>
+    <message>
+        <source>Account %1 successfully registered, click &apos;Finish&apos; button to add the account.</source>
+        <translation>Аккаунт %1 успешно зарегистрирован, нажмите кнопку &apos;Завершить&apos; для добавления аккаунта.</translation>
     </message>
 </context>
 <context>

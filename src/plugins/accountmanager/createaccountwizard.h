@@ -4,6 +4,7 @@
 #include <QMap>
 #include <QLabel>
 #include <QWizard>
+#include <QLineEdit>
 #include <QComboBox>
 #include <QCheckBox>
 #include <QVBoxLayout>
@@ -55,7 +56,8 @@ public:
 	};
 	enum Mode {
 		ModeAppend,
-		ModeRegister
+		ModeRegister,
+		Mode_Count
 	};
 	enum ServiceType {
 		ServiceJabber,
@@ -79,6 +81,8 @@ class WizardStartPage :
 	Q_PROPERTY(int wizardMode READ wizardMode WRITE setWizardMode);
 public:
 	WizardStartPage(QWidget *AParent);
+	void initializePage();
+	bool isComplete() const;
 	int nextId() const;
 public:
 	int wizardMode() const;
@@ -97,6 +101,9 @@ class AppendServicePage :
 public:
 	AppendServicePage(QWidget *AParent);
 public:
+	void initializePage();
+	bool isComplete() const;
+public:
 	int serviceType() const;
 	void setServiceType(int AType);
 protected slots:
@@ -111,18 +118,27 @@ class AppendSettingsPage :
 	public QWizardPage
 {
 	Q_OBJECT;
+	Q_PROPERTY(QString accountNode READ accountNode WRITE setAccountNode);
 	Q_PROPERTY(QString accountDomain READ accountDomain WRITE setAccountDomain);
+	Q_PROPERTY(QString accountPassword READ accountPassword WRITE setAccountPassword);
 public:
 	AppendSettingsPage(QWidget *AParent);
 	void initializePage();
 	bool isComplete() const;
 	bool validatePage();
 public:
+	Jid streamJid() const;
+	QString accountNode() const;
+	void setAccountNode(const QString &ANode);
 	QString accountDomain() const;
 	void setAccountDomain(const QString &ADomain);
+	QString accountPassword() const;
+	void setAccountPassword(const QString &APassword);
 	void saveAccountSettings(IAccount *AAccount) const;
 private:
+	QLineEdit *lneNode;
 	QComboBox *cmbDomain;
+	QLineEdit *lnePassword;
 	ConnectionOptionsWidget *cowConnOptions;
 };
 
@@ -139,6 +155,7 @@ public:
 	bool isComplete() const;
 	int nextId() const;
 protected:
+	Jid streamJid() const;
 	IXmppStream *createXmppStream() const;
 protected slots:
 	void onXmppStreamOpened();
@@ -163,6 +180,7 @@ class RegisterServerPage :
 public:
 	RegisterServerPage(QWidget *AParent);
 	void initializePage();
+	bool isComplete() const;
 	bool validatePage();
 public:
 	QString accountDomain() const;
@@ -189,6 +207,7 @@ public:
 	bool isComplete() const;
 	bool validatePage();
 public:
+	Jid streamJid() const;
 	QString registerId() const;
 	void setRegisterId(const QString &AId);
 	QString accountNode() const;
@@ -230,9 +249,11 @@ public:
 	void initializePage();
 	bool isComplete() const;
 	int nextId() const;
+public:
+	Jid streamJid() const;
 protected slots:
-	void onRegisterError(const QString &AId, const XmppError &AError);
 	void onRegisterSuccess(const QString &AId);
+	void onRegisterError(const QString &AId, const XmppError &AError);
 private:
 	QLabel *lblError;
 	QLabel *lblCaption;
