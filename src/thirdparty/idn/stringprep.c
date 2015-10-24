@@ -364,7 +364,7 @@ stringprep (char *in,
   int rc;
   char *utf8 = NULL;
   uint32_t *ucs4 = NULL;
-  size_t ucs4len, maxucs4len, adducs4len = 50;
+  size_t ucs4len = 0, maxucs4len, adducs4len = 50;
 
   do
     {
