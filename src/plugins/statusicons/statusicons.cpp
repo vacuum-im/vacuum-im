@@ -314,44 +314,32 @@ QIcon StatusIcons::iconByJidStatus(const Jid &AContactJid, int AShow, const QStr
 
 QString StatusIcons::iconsetByJid(const Jid &AContactJid) const
 {
-	if (!FJid2Storage.contains(AContactJid))
+	QString &substorage = FJid2Storage[AContactJid];
+	if (substorage.isEmpty())
 	{
 		QRegExp regExp;
-		regExp.setCaseSensitivity(Qt::CaseInsensitive);
+		regExp.setCaseSensitivity(Qt::CaseSensitive);
 
-		QString substorage;
-		foreach (const QString &pattern, FUserRules.keys())
+		QString contactStr = AContactJid.pFull();
+
+		for (QMap<QString, QString>::const_iterator it=FUserRules.constBegin(); substorage.isEmpty() && it!=FUserRules.constEnd(); ++it)
 		{
-			regExp.setPattern(pattern);
-			if (AContactJid.pFull().contains(regExp))
-			{
-				substorage = FUserRules.value(pattern);
-				break;
-			}
+			regExp.setPattern(it.key());
+			if (contactStr.contains(regExp))
+				substorage = it.value();
+		}
+
+		for (QMap<QString, QString>::const_iterator it=FDefaultRules.constBegin(); substorage.isEmpty() && it!=FDefaultRules.constEnd(); ++it)
+		{
+			regExp.setPattern(it.key());
+			if (contactStr.contains(regExp))
+				substorage = it.value();
 		}
 
 		if (substorage.isEmpty())
-		{
-			foreach (const QString &pattern, FDefaultRules.keys())
-			{
-				regExp.setPattern(pattern);
-				if (AContactJid.pFull().contains(regExp))
-				{
-					substorage = FDefaultRules.value(pattern);
-					break;
-				}
-			}
-		}
-
-		if (substorage.isEmpty())
-		{
 			substorage = FDefaultStorage!=NULL ? FDefaultStorage->subStorage() : FILE_STORAGE_SHARED_DIR;
-		}
-
-		FJid2Storage.insert(AContactJid,substorage);
-		return substorage;
 	}
-	return FJid2Storage.value(AContactJid);
+	return substorage;
 }
 
 QString StatusIcons::iconKeyByJid(const Jid &AStreamJid, const Jid &AContactJid) const
@@ -559,8 +547,8 @@ void StatusIcons::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIn
 void StatusIcons::onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu)
 {
 	Q_UNUSED(AWindow);
-	QString rule = QString(".*@%1/%2").arg(QRegExp::escape(AUser->contactJid().domain())).arg(QRegExp::escape(AUser->nickName()));
-	updateCustomIconMenu(QStringList()<<rule);
+	QString pattern = QString(".*@%1/%2").arg(QRegExp::escape(AUser->contactJid().pDomain())).arg(QRegExp::escape(AUser->nickName()));
+	updateCustomIconMenu(QStringList() << pattern);
 	FCustomIconMenu->setIcon(iconByJidStatus(AUser->contactJid(),IPresence::Online,SUBSCRIPTION_BOTH,false));
 	AMenu->addAction(FCustomIconMenu->menuAction(),AG_MUCM_STATUSICONS,true);
 }
