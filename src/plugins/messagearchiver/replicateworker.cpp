@@ -173,7 +173,7 @@ void ReplicateTaskSaveModifications::run(QSqlDatabase &ADatabase)
 				SET_ERROR_AND_EXIT(insertHeaderQuery);
 
 			QSqlQuery updateVersionQuery(ADatabase);
-			if (!updateVersionQuery.prepare("UPDATE versions SET version=:version1, modification=:modification WHERE archive_id==:archive_id AND header_id==:header_id AND version!=:version2 AND (version<:version3 OR :version4=="DELETED_HEADER_VERSION_STR")"))
+			if (!updateVersionQuery.prepare("UPDATE versions SET version=:version1, modification=:modification WHERE archive_id==:archive_id AND header_id==:header_id AND version!=:version2 AND (version<:version3 OR :version4==" DELETED_HEADER_VERSION_STR ")"))
 				SET_ERROR_AND_EXIT(insertHeaderQuery);
 
 			QSqlQuery updateHeaderQuery(ADatabase);
@@ -337,7 +337,7 @@ void ReplicateTaskLoadModifications::run(QSqlDatabase &ADatabase)
 		if (!loadModificationsQuery.prepare(QString(
 			"SELECT header_peers.with, header_peers.start, header_seeds.modification, header_seeds.version, header_seeds.engines, group_concat(header_peers.engine_id,',') "
 			"FROM header_peers JOIN header_seeds ON header_peers.header_id==header_seeds.header_id "
-			"WHERE (header_seeds.version!="DELETED_HEADER_VERSION_STR" OR (header_peers.version IS NOT NULL AND header_seeds.version!=header_peers.version)) AND header_peers.engine_id IN (%1) "
+			"WHERE (header_seeds.version!=" DELETED_HEADER_VERSION_STR " OR (header_peers.version IS NOT NULL AND header_seeds.version!=header_peers.version)) AND header_peers.engine_id IN (%1) "
 			"GROUP BY header_peers.header_id "
 			"ORDER BY header_peers.start DESC").arg(enginesPlaceholders)))
 		{

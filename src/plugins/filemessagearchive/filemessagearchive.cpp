@@ -751,7 +751,7 @@ QString FileMessageArchive::databaseArchiveFile(const Jid &AStreamJid) const
 {
 	QString archiveDir = AStreamJid.isValid() ? FArchiver->archiveDirPath(AStreamJid) : QString::null;
 	if (!archiveDir.isEmpty())
-		return archiveDir +"/"DATABASE_FILE_NAME;
+		return archiveDir + "/" DATABASE_FILE_NAME;
 	return QString::null;
 }
 
