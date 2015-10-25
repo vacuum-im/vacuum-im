@@ -471,7 +471,7 @@ void XmppStream::processFeatures()
 void XmppStream::clearActiveFeatures()
 {
 	foreach(IXmppFeature *feature, FActiveFeatures.toSet())
-		feature->instance()->deleteLater();
+		delete feature->instance();
 	FActiveFeatures.clear();
 }
 

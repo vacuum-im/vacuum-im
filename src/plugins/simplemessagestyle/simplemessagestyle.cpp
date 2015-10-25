@@ -40,7 +40,7 @@ SimpleMessageStyle::SimpleMessageStyle(const QString &AStylePath, QNetworkAccess
 	if (FSharedPath.isEmpty())
 	{
 		if (QDir::isRelativePath(SHARED_STYLE_PATH))
-			FSharedPath = qApp->applicationDirPath()+"/"SHARED_STYLE_PATH;
+			FSharedPath = qApp->applicationDirPath() + "/" SHARED_STYLE_PATH;
 		else
 			FSharedPath = SHARED_STYLE_PATH;
 	}
