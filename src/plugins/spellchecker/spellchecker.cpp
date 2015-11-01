@@ -237,68 +237,67 @@ void SpellChecker::onEditWidgetCreated(IMessageEditWidget *AWidget)
 void SpellChecker::onEditWidgetContextMenuRequested(const QPoint &APosition, Menu *AMenu)
 {
 	IMessageEditWidget *editWidget = qobject_cast<IMessageEditWidget *>(sender());
-	if (editWidget)
+	if (!editWidget) return;
+
+	FCurrentTextEdit = editWidget->textEdit();
+	if (isSpellEnabled() && isSpellAvailable())
 	{
-		FCurrentTextEdit = editWidget->textEdit();
-		if (isSpellEnabled() && isSpellAvailable())
+		QTextCursor cursor = FCurrentTextEdit->cursorForPosition(APosition);
+		FCurrentCursorPosition = cursor.position();
+		cursor.select(QTextCursor::WordUnderCursor);
+		const QString word = cursor.selectedText();
+
+		if (!isCorrectWord(word))
 		{
-			QTextCursor cursor = FCurrentTextEdit->cursorForPosition(APosition);
-			FCurrentCursorPosition = cursor.position();
-			cursor.select(QTextCursor::WordUnderCursor);
-			const QString word = cursor.selectedText();
-
-			if (!isCorrectWord(word))
+			QList<QString> suggests = wordSuggestions(word);
+			for(int i=0; i<suggests.count() && i<MAX_SUGGESTIONS; i++)
 			{
-				QList<QString> suggests = wordSuggestions(word);
-				for(int i=0; i<suggests.count() && i<MAX_SUGGESTIONS; i++)
-				{
-					Action *suggestAction = new Action(AMenu);
-					suggestAction->setText(suggests.at(i));
-					suggestAction->setProperty("suggestion", suggests.at(i));
-					connect(suggestAction,SIGNAL(triggered()),SLOT(onRepairWordUnderCursor()));
-					AMenu->addAction(suggestAction,AG_MWEWCM_SPELLCHECKER_SUGGESTS);
-				}
+				Action *suggestAction = new Action(AMenu);
+				suggestAction->setText(suggests.at(i));
+				suggestAction->setProperty("suggestion", suggests.at(i));
+				connect(suggestAction,SIGNAL(triggered()),SLOT(onRepairWordUnderCursor()));
+				AMenu->addAction(suggestAction,AG_MWEWCM_SPELLCHECKER_SUGGESTS);
+			}
 
-				if (canAddWordToPersonalDict(word))
-				{
-					Action *appendAction = new Action(AMenu);
-					appendAction->setText(tr("Add '%1' to Dictionary").arg(word));
-					appendAction->setProperty("word",word);
-					connect(appendAction,SIGNAL(triggered()),SLOT(onAddUnknownWordToDictionary()));
-					AMenu->addAction(appendAction,AG_MWEWCM_SPELLCHECKER_SUGGESTS);
-				}
+			if (canAddWordToPersonalDict(word))
+			{
+				Action *appendAction = new Action(AMenu);
+				appendAction->setText(tr("Add '%1' to Dictionary").arg(word));
+				appendAction->setProperty("word",word);
+				connect(appendAction,SIGNAL(triggered()),SLOT(onAddUnknownWordToDictionary()));
+				AMenu->addAction(appendAction,AG_MWEWCM_SPELLCHECKER_SUGGESTS);
 			}
 		}
+	}
 
-		Action *enableAction = new Action(AMenu);
-		enableAction->setText(tr("Spell Check"));
-		enableAction->setCheckable(true);
-		enableAction->setChecked(isSpellEnabled() && isSpellAvailable());
-		enableAction->setEnabled(isSpellAvailable());
-		connect(enableAction,SIGNAL(triggered()),SLOT(onChangeSpellEnable()));
-		AMenu->addAction(enableAction,AG_MWEWCM_SPELLCHECKER_OPTIONS);
+	Action *enableAction = new Action(AMenu);
+	enableAction->setText(tr("Spell Check"));
+	enableAction->setCheckable(true);
+	enableAction->setChecked(isSpellEnabled() && isSpellAvailable());
+	enableAction->setEnabled(isSpellAvailable());
+	connect(enableAction,SIGNAL(triggered()),SLOT(onChangeSpellEnable()));
+	AMenu->addAction(enableAction,AG_MWEWCM_SPELLCHECKER_OPTIONS);
 
-		if (isSpellEnabled() && isSpellAvailable())
+	if (isSpellEnabled())
+	{
+		Menu *dictsMenu = new Menu(AMenu);
+		dictsMenu->setTitle(tr("Dictionary"));
+		AMenu->addAction(dictsMenu->menuAction(),AG_MWEWCM_SPELLCHECKER_OPTIONS);
+		QActionGroup *dictGroup = new QActionGroup(dictsMenu);
+
+		QString curDict = currentDictionary();
+		foreach(const QString &dict, availDictionaries())
 		{
-			Menu *dictsMenu = new Menu(AMenu);
-			dictsMenu->setTitle(tr("Dictionary"));
-			AMenu->addAction(dictsMenu->menuAction(),AG_MWEWCM_SPELLCHECKER_OPTIONS);
-			QActionGroup *dictGroup = new QActionGroup(dictsMenu);
-
-			QString curDict = currentDictionary();
-			foreach(const QString &dict, availDictionaries())
-			{
-				Action *action = new Action(dictsMenu);
-				action->setText(dictionaryName(dict));
-				action->setProperty("dictionary", dict);
-				action->setCheckable(true);
-				action->setChecked(curDict==dict);
-				dictGroup->addAction(action);
-				connect(action,SIGNAL(triggered()),SLOT(onChangeDictionary()));
-				dictsMenu->addAction(action,AG_DEFAULT,true);
-			}
-			dictsMenu->setEnabled(!dictsMenu->isEmpty());
+			Action *action = new Action(dictsMenu);
+			action->setText(dictionaryName(dict));
+			action->setProperty("dictionary", dict);
+			action->setCheckable(true);
+			action->setChecked(curDict==dict);
+			dictGroup->addAction(action);
+			connect(action,SIGNAL(triggered()),SLOT(onChangeDictionary()));
+			dictsMenu->addAction(action,AG_DEFAULT,true);
 		}
+		dictsMenu->setEnabled(!dictsMenu->isEmpty());
 	}
 }
 
