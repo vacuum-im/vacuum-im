@@ -16,7 +16,7 @@
 #include <utils/xmpperror.h>
 #include <utils/logger.h>
 
-#define SHC_STANZA_SESSION            "/message/feature[@xmlns='"NS_FEATURENEG"']"
+#define SHC_STANZA_SESSION            "/message/feature[@xmlns='" NS_FEATURENEG "']"
 
 #define SFP_DISCLOSURE                "disclosure"
 #define SFP_MULTISESSION              "multisession"

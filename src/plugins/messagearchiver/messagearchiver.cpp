@@ -32,8 +32,8 @@
 #define ARCHIVE_REQUEST_TIMEOUT    30000
 
 #define SHC_MESSAGE_BODY           "/message/body"
-#define SHC_PREFS                  "/iq[@type='set']/pref[@xmlns="NS_ARCHIVE"]"
-#define SHC_PREFS_OLD              "/iq[@type='set']/pref[@xmlns="NS_ARCHIVE_OLD"]"
+#define SHC_PREFS                  "/iq[@type='set']/pref[@xmlns=" NS_ARCHIVE "]"
+#define SHC_PREFS_OLD              "/iq[@type='set']/pref[@xmlns=" NS_ARCHIVE_OLD "]"
 
 #define ADR_STREAM_JID             Action::DR_StreamJid
 #define ADR_CONTACT_JID            Action::DR_Parametr1
