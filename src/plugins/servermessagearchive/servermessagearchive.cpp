@@ -93,6 +93,7 @@ void ServerMessageArchive::stanzaRequestResult(const Jid &AStreamJid, const Stan
 		{
 			LOG_STRM_DEBUG(AStreamJid,QString("Headers loaded, id=%1").arg(AStanza.id()));
 
+			int skipHeadersCount = 0;
 			QList<IArchiveHeader> headers;
 			QDomElement listElem = AStanza.firstElement("list");
 			QDomElement chatElem = listElem.firstChildElement("chat");
@@ -105,9 +106,17 @@ void ServerMessageArchive::stanzaRequestResult(const Jid &AStreamJid, const Stan
 				header.subject = chatElem.attribute("subject");
 				header.threadId = chatElem.attribute("thread");
 				header.version = chatElem.attribute("version").toInt();
-				headers.append(header);
+				
+				if (checkRequestHeader(header,request))
+					headers.append(header);
+				else
+					skipHeadersCount++;
+				
 				chatElem = chatElem.nextSiblingElement("chat");
 			}
+
+			if (skipHeadersCount > 0)
+				LOG_STRM_WARNING(AStreamJid,QString("Received %1 headers not matching the request, id=%2").arg(skipHeadersCount).arg(AStanza.id()));
 
 			if (request.order == Qt::AscendingOrder)
 				qSort(headers.begin(),headers.end(),qLess<IArchiveHeader>());
@@ -117,7 +126,7 @@ void ServerMessageArchive::stanzaRequestResult(const Jid &AStreamJid, const Stan
 			if ((quint32)headers.count() > request.maxItems)
 				headers = headers.mid(0,request.maxItems);
 
-			QString nextRef = getNextRef(readResultSetAnswer(listElem),headers.count(),MAX_HEADER_ITEMS,request.maxItems,request.order);
+			QString nextRef = getNextRef(readResultSetAnswer(listElem),headers.count()+skipHeadersCount,MAX_HEADER_ITEMS,request.maxItems,request.order);
 			emit serverHeadersLoaded(AStanza.id(),headers,nextRef);
 		}
 		else
@@ -133,11 +142,13 @@ void ServerMessageArchive::stanzaRequestResult(const Jid &AStreamJid, const Stan
 		if (AStanza.type() == "result")
 		{
 			LOG_STRM_DEBUG(AStreamJid,QString("Collection saved, id=%1").arg(AStanza.id()));
+			
 			QDomElement chatElem = AStanza.firstElement("save").firstChildElement("chat");
 			request.collection.header.engineId = engineId();
 			request.collection.header.subject = chatElem.attribute("subject",request.collection.header.subject);
 			request.collection.header.threadId = chatElem.attribute("thread",request.collection.header.threadId);
 			request.collection.header.version = chatElem.attribute("version",QString::number(request.collection.header.version)).toInt();
+			
 			emit serverCollectionSaved(AStanza.id(),request.collection,request.nextRef);
 		}
 		else
@@ -153,6 +164,7 @@ void ServerMessageArchive::stanzaRequestResult(const Jid &AStreamJid, const Stan
 		if (AStanza.type() == "result")
 		{
 			LOG_STRM_DEBUG(AStreamJid,QString("Collection loaded, id=%1").arg(AStanza.id()));
+			
 			IArchiveCollection collection;
 			QDomElement chatElem = AStanza.firstElement("chat");
 			FArchiver->elementToCollection(AStreamJid,chatElem,collection);
@@ -650,6 +662,32 @@ QString ServerMessageArchive::getNextRef(const ResultSet &AResultSet, quint32 AC
 	return nextRef;
 }
 
+bool ServerMessageArchive::checkRequestHeader(const IArchiveHeader &AHeader, const IArchiveRequest &ARequest) const
+{
+	if (ARequest.start.isValid() && ARequest.start>AHeader.start)
+		return false;
+
+	if (ARequest.end.isValid() && ARequest.end<AHeader.start)
+		return false;
+
+	if (!ARequest.threadId.isEmpty() && ARequest.threadId!=AHeader.threadId)
+		return false;
+
+	if (ARequest.with.isValid() && ARequest.with!=AHeader.with)
+	{
+		if (ARequest.exactmatch)
+			return false;
+
+		if (!ARequest.with.pNode().isEmpty() && ARequest.with.pNode()!=AHeader.with.pNode())
+			return false;
+
+		if (!ARequest.with.pResource().isEmpty() && ARequest.with.pResource()!=AHeader.with.pResource())
+			return false;
+	}
+
+	return true;
+}
+
 void ServerMessageArchive::onArchivePrefsOpened(const Jid &AStreamJid)
 {
 	FNamespaces.insert(AStreamJid,FArchiver->prefsNamespace(AStreamJid));
@@ -693,16 +731,21 @@ void ServerMessageArchive::onServerHeadersLoaded(const QString &AId, const QList
 		LocalHeadersRequest request = FLocalLoadHeadersRequests.take(AId);
 		request.headers += AHeaders;
 
-		if (!ANextRef.isEmpty() && (quint32)request.headers.count()<request.request.maxItems)
+		if (!ANextRef.isEmpty() && ANextRef!=request.lastRef && (quint32)request.headers.count()<request.request.maxItems)
 		{
 			IArchiveRequest nextRequest = request.request;
 			nextRequest.maxItems -= request.headers.count();
 
 			QString id = loadServerHeaders(request.streamJid,nextRequest,ANextRef);
 			if (!id.isEmpty())
+			{
+				request.lastRef = ANextRef;
 				FLocalLoadHeadersRequests.insert(id,request);
+			}
 			else
+			{
 				emit requestFailed(request.id,XmppError(IERR_HISTORY_HEADERS_LOAD_ERROR));
+			}
 		}
 		else
 		{
@@ -716,13 +759,18 @@ void ServerMessageArchive::onServerCollectionSaved(const QString &AId, const IAr
 	if (FLocalSaveCollectionRequests.contains(AId))
 	{
 		LocalCollectionRequest request = FLocalSaveCollectionRequests.take(AId);
-		if (!ANextRef.isEmpty())
+		if (!ANextRef.isEmpty() && ANextRef!=request.lastRef)
 		{
 			QString id = saveServerCollection(request.streamJid,request.collection,ANextRef);
 			if (!id.isEmpty())
+			{
+				request.lastRef = ANextRef;
 				FLocalSaveCollectionRequests.insert(id,request);
+			}
 			else
+			{
 				emit requestFailed(request.id,XmppError(IERR_HISTORY_CONVERSATION_SAVE_ERROR));
+			}
 		}
 		else
 		{
@@ -739,13 +787,18 @@ void ServerMessageArchive::onServerCollectionLoaded(const QString &AId, const IA
 		request.collection.header = ACollection.header;
 		request.collection.body.messages += ACollection.body.messages;
 		request.collection.body.notes += ACollection.body.notes;
-		if (!ANextRef.isEmpty())
+		if (!ANextRef.isEmpty() && ANextRef!=request.lastRef)
 		{
 			QString id = loadServerCollection(request.streamJid,ACollection.header,ANextRef);
 			if (!id.isEmpty())
+			{
+				request.lastRef = ANextRef;
 				FLocalLoadCollectionRequests.insert(id,request);
+			}
 			else
+			{
 				emit requestFailed(request.id,XmppError(IERR_HISTORY_CONVERSATION_LOAD_ERROR));
+			}
 		}
 		else
 		{
@@ -763,14 +816,19 @@ void ServerMessageArchive::onServerModificationsLoaded(const QString &AId, const
 		request.modifications.next = AModifs.next;
 		request.modifications.items += AModifs.items;
 
-		if (!ANextRef.isEmpty() && (quint32)request.modifications.items.count()<request.count)
+		if (!ANextRef.isEmpty() && ANextRef!=request.lastRef && (quint32)request.modifications.items.count()<request.count)
 		{
 			quint32 nextCount = request.count-request.modifications.items.count();
 			QString id = loadServerModifications(request.streamJid,request.start,nextCount,ANextRef);
 			if (!id.isEmpty())
+			{
+				request.lastRef = ANextRef;
 				FLocalLoadModificationsRequests.insert(id,request);
+			}
 			else
+			{
 				emit requestFailed(request.id,XmppError(IERR_HISTORY_MODIFICATIONS_LOAD_ERROR));
+			}
 		}
 		else
 		{

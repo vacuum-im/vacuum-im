@@ -32,6 +32,7 @@ struct ServerModificationsRequest {
 struct LocalHeadersRequest {
 	QString id;
 	Jid streamJid;
+	QString lastRef;
 	IArchiveRequest request;
 	QList<IArchiveHeader> headers;
 };
@@ -39,6 +40,7 @@ struct LocalHeadersRequest {
 struct LocalCollectionRequest {
 	QString id;
 	Jid streamJid;
+	QString lastRef;
 	IArchiveCollection collection;
 };
 
@@ -47,6 +49,7 @@ struct LocalModificationsRequest {
 	Jid streamJid;
 	quint32 count;
 	QDateTime start;
+	QString lastRef;
 	IArchiveModifications modifications;
 };
 
@@ -110,6 +113,7 @@ protected:
 	ResultSet readResultSetAnswer(const QDomElement &AElem) const;
 	void insertResultSetRequest(QDomElement &AElem, const QString &ANextRef, quint32 ALimit, quint32 AMax=0xFFFFFFFF, Qt::SortOrder AOrder=Qt::AscendingOrder) const;
 	QString getNextRef(const ResultSet &AResultSet, quint32 ACount, quint32 ALimit, quint32 AMax=0xFFFFFFFF, Qt::SortOrder AOrder=Qt::AscendingOrder) const;
+	bool checkRequestHeader(const IArchiveHeader &AHeader, const IArchiveRequest &ARequest) const;
 protected slots:
 	void onArchivePrefsOpened(const Jid &AStreamJid);
 	void onArchivePrefsClosed(const Jid &AStreamJid);
