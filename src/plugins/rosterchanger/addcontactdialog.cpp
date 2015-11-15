@@ -184,11 +184,11 @@ void AddContactDialog::onToolBarActionTriggered(bool)
 	{
 		if (action == FShowChat)
 		{
-			FMessageProcessor->createMessageWindow(FStreamJid,contactJid(),Message::Chat,IMessageHandler::SM_SHOW);
+			FMessageProcessor->getMessageWindow(FStreamJid,contactJid(),Message::Chat,IMessageProcessor::ActionShowNormal);
 		}
 		else if (action == FSendMessage)
 		{
-			FMessageProcessor->createMessageWindow(FStreamJid,contactJid(),Message::Normal,IMessageHandler::SM_SHOW);
+			FMessageProcessor->getMessageWindow(FStreamJid,contactJid(),Message::Normal,IMessageProcessor::ActionShowNormal);
 		}
 		else if (action == FShowVCard)
 		{

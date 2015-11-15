@@ -15,6 +15,7 @@
 #define TBG_MWTBW_FILETRANSFER                                  500
 #define TBG_MWTBW_ARCHIVE_VIEW                                  700
 #define TBG_MWTBW_VCARD_VIEW                                    900
+#define TBG_MWTBW_MULTIUSERCHAT_INVITE                          1000
 #define TBG_MWTBW_CLEAR_WINDOW                                  1800
 #define TBG_MWTBW_CHATSTATES                                    10100
 

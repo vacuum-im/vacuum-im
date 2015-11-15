@@ -15,8 +15,10 @@
 #include <interfaces/ipresencemanager.h>
 #include <interfaces/irecentcontacts.h>
 #include <interfaces/istanzaprocessor.h>
+#include <interfaces/irostermanager.h>
 #include "multiuserview.h"
 #include "inputtextdialog.h"
+#include "inviteusersmenu.h"
 #include "edituserslistdialog.h"
 
 struct WindowStatus {
@@ -84,8 +86,8 @@ public:
 	virtual bool messageCheck(int AOrder, const Message &AMessage, int ADirection);
 	virtual bool messageDisplay(const Message &AMessage, int ADirection);
 	virtual INotification messageNotify(INotifications *ANotifications, const Message &AMessage, int ADirection);
-	virtual bool messageShowWindow(int AMessageId);
-	virtual bool messageShowWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode);
+	virtual IMessageWindow *messageShowNotified(int AMessageId);
+	virtual IMessageWindow *messageGetWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType);
 	//IMultiUserChatWindow
 	virtual IMultiUserChat *multiUserChat() const;
 	virtual IMultiUserView *multiUserView() const;
@@ -133,6 +135,7 @@ protected:
 	void updateRecentItemActiveTime(IMessageChatWindow *AWindow);
 	IMultiUser *userAtViewPosition(const QPoint &APosition) const;
 	void insertUserMention(IMultiUser *AUser, bool ASetFocus = false) const;
+	QStringList findContactsName(const QList<Jid> &AContacts) const;
 protected:
 	void showDateSeparator(IMessageViewWidget *AView, const QDateTime &ADateTime);
 	void showHTMLStatusMessage(IMessageViewWidget *AView, const QString &AHtml, int AType=0, int AStatus=0, const QDateTime &ATime=QDateTime::currentDateTime());
@@ -168,6 +171,7 @@ protected slots:
 	//Occupant
 	void onMultiChatPresenceChanged(const IPresenceItem &APresence);
 	void onMultiChatNicknameChanged(const QString &ANick, const XmppError &AError);
+	void onMultiChatInvitationSent(const QList<Jid> &AContacts, const QString &AReason);
 	void onMultiChatInvitationDeclined(const Jid &AContactJid, const QString &AReason);
 	void onMultiChatUserChanged(IMultiUser *AUser, int AData, const QVariant &ABefore);
 	//Moderator
@@ -207,6 +211,7 @@ protected slots:
 	void onOpenPrivateChatWindowActionTriggered(bool);
 	void onChangeUserRoleActionTriggeted(bool);
 	void onChangeUserAffiliationActionTriggered(bool);
+	void onInviteUserMenuAccepted(const QMultiMap<Jid, Jid> &AAddresses);
 protected slots:
 	void onStatusIconsChanged();
 	void onRoomConfigFormDialogAccepted();
@@ -218,12 +223,12 @@ protected slots:
 	void onArchiveMessagesLoaded(const QString &AId, const IArchiveCollectionBody &ABody);
 	void onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext);
 private:
+	Menu *FInviteUsers;
 	Action *FClearChat;
 	Action *FEnterRoom;
 	Action *FExitRoom;
 	Action *FChangeNick;
 	Action *FChangePassword;
-	Action *FInviteContact;
 	Action *FRequestVoice;
 	Action *FChangeTopic;
 	Action *FEditAffiliations;
@@ -236,6 +241,7 @@ private:
 	IDataForms *FDataForms;
 	IStatusIcons *FStatusIcons;
 	IStatusChanger *FStatusChanger;
+	IRosterManager *FRosterManager;
 	IMessageWidgets *FMessageWidgets;
 	IRecentContacts *FRecentContacts;
 	IStanzaProcessor *FStanzaProcessor;

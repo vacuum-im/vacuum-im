@@ -670,18 +670,6 @@
         <translation>Получено приглашение</translation>
     </message>
     <message>
-        <source>You are invited to the conference %1 by %2.&lt;br&gt;Reason: %3</source>
-        <translation>%2 приглашает вас в конференцию %1. &lt;br&gt;Причина: %3</translation>
-    </message>
-    <message>
-        <source>Do you want to join this conference?</source>
-        <translation>Вы хотите присоединиться к этой конференции?</translation>
-    </message>
-    <message>
-        <source>Invite</source>
-        <translation>Пригласить</translation>
-    </message>
-    <message>
         <source>Supports the multi-user conferences</source>
         <translation>Поддерживает многопользовательские конференции</translation>
     </message>
@@ -790,10 +778,6 @@
         <translation>Открыть диалог конференции</translation>
     </message>
     <message>
-        <source>I&apos;m too busy right now</source>
-        <translation>Я слишком занят сейчас</translation>
-    </message>
-    <message>
         <source>&lt;b&gt;Conference:&lt;/b&gt; %1</source>
         <translation>&lt;b&gt;Конференция:&lt;/b&gt; %1</translation>
     </message>
@@ -854,22 +838,6 @@
         <translation>Минимальный интервал между запросами голоса (в секундах)</translation>
     </message>
     <message>
-        <source>Decline Invite - %1</source>
-        <translation>Отклонить приглашение - %1</translation>
-    </message>
-    <message>
-        <source>Enter a message:</source>
-        <translation>Введите сообщение:</translation>
-    </message>
-    <message>
-        <source>Please, enter this conference.</source>
-        <translation>Пожалуйста, войдите в эту конференцию.</translation>
-    </message>
-    <message>
-        <source>Invite User - %1</source>
-        <translation>Приглавить пользователя - %1</translation>
-    </message>
-    <message>
         <source>Join Conference</source>
         <translation>Войти в конференцию</translation>
     </message>
@@ -896,6 +864,26 @@
     <message>
         <source>Enter to Conference</source>
         <translation>Войти в конференцию</translation>
+    </message>
+    <message>
+        <source>You are invited to the conference &lt;b&gt;%1&lt;/b&gt; by user &lt;b&gt;%2&lt;/b&gt;.</source>
+        <translation>Вы приглашены в конференцию &lt;b&gt;%1&lt;/b&gt; пользователем &lt;b&gt;%2&lt;/b&gt;.</translation>
+    </message>
+    <message>
+        <source>Do you want to join to the conference?</source>
+        <translation>Вы хотите присоединиться к конференции?</translation>
+    </message>
+    <message>
+        <source>Invitation to Conference</source>
+        <translation>Приглашение в конференцию</translation>
+    </message>
+    <message>
+        <source>Direct Invitations to Conferences</source>
+        <translation>Непосредственные приглашения в конференции</translation>
+    </message>
+    <message>
+        <source>Supports the direct invitations to conferences</source>
+        <translation>Поддерживает непосредственные приглашения в конференции</translation>
     </message>
 </context>
 <context>
@@ -1265,10 +1253,6 @@
         <translation>Введите новую тему:</translation>
     </message>
     <message>
-        <source>Enter user Jabber ID:</source>
-        <translation>Введите Jabber ID пользователя:</translation>
-    </message>
-    <message>
         <source>Enter a message:</source>
         <translation>Введите сообщение:</translation>
     </message>
@@ -1425,10 +1409,6 @@
         <translation>модератором %1</translation>
     </message>
     <message>
-        <source>Invite User</source>
-        <translation>Пригласить пользователя</translation>
-    </message>
-    <message>
         <source>Your nickname changed to %1</source>
         <translation>Ваш ник изменен на %1</translation>
     </message>
@@ -1463,6 +1443,18 @@
     <message>
         <source>Show participants list</source>
         <translation>Показать список участников</translation>
+    </message>
+    <message numerus="yes">
+        <source>You invited %1 and %n other contact(s) to this conference. %2</source>
+        <translation>
+            <numerusform>Вы пригласили %1 и еще %n контакт в эту конференцию. %2</numerusform>
+            <numerusform>Вы пригласили %1 и еще %n контакта в эту конференцию. %2</numerusform>
+            <numerusform>Вы пригласили %1 и еще %n контактов в эту конференцию. %2</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>You invited %1 to this conference. %2</source>
+        <translation>Вы пригласили %1 в эту конференцию. %2</translation>
     </message>
 </context>
 <context>

@@ -5,6 +5,7 @@
 #define SHO_MI_REMOTECONTROL          100
 #define SHO_MI_PRIVATESTORAGE         300
 #define SHO_MI_CAPTCHAFORMS           300
+#define SHO_MI_MULTIUSERCHAT_INVITE   300
 #define SHO_MI_CHATSTATES             400
 #define SHO_MI_MULTIUSERCHAT          500
 

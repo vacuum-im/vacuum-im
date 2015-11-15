@@ -113,8 +113,8 @@ void CreateMultiChatWizard::accept()
 		{
 			LOG_STRM_INFO(streamJid,QString("Entering conference by wizard, room=%1, nick=%2").arg(roomJid, roomNick));
 
-			IMultiUserChatWindow *chatWindow = multiChatManager->getMultiChatWindow(streamJid,roomJid,roomNick,roomPassword);
-			if (chatWindow)
+			IMultiUserChatWindow *window = multiChatManager->getMultiChatWindow(streamJid,roomJid,roomNick,roomPassword);
+			if (window)
 			{
 				if (wizardMode == CreateMultiChatWizard::ModeJoin)
 					REPORT_EVENT(SEVP_MUC_WIZARD_JOIN,1)
@@ -123,11 +123,11 @@ void CreateMultiChatWizard::accept()
 				else if (wizardMode == CreateMultiChatWizard::ModeManual)
 					REPORT_EVENT(SEVP_MUC_WIZARD_MANUAL,1)
 
-				if (chatWindow->multiUserChat()->nickname() != roomNick)
-					chatWindow->multiUserChat()->setNickname(roomNick);
+				if (window->multiUserChat()->nickname() != roomNick)
+					window->multiUserChat()->setNickname(roomNick);
 				else
-					chatWindow->multiUserChat()->sendStreamPresence();
-				chatWindow->showTabPage();
+					window->multiUserChat()->sendStreamPresence();
+				window->showTabPage();
 
 				if (!serverJid.isEmpty())
 					Options::setFileValue(serverJid,OFV_LAST_SERVER);

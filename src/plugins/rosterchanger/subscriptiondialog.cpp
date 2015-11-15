@@ -130,18 +130,18 @@ void SubscriptionDialog::onDialogRejected()
 	reject();
 }
 
-void SubscriptionDialog::onToolBarActionTriggered( bool )
+void SubscriptionDialog::onToolBarActionTriggered(bool)
 {
 	Action *action = qobject_cast<Action *>(sender());
 	if (action!=NULL && FContactJid.isValid())
 	{
 		if (action == FShowChat)
 		{
-			FMessageProcessor->createMessageWindow(FStreamJid,FContactJid,Message::Chat,IMessageHandler::SM_SHOW);
+			FMessageProcessor->getMessageWindow(FStreamJid,FContactJid,Message::Chat,IMessageProcessor::ActionShowNormal);
 		}
 		else if (action == FSendMessage)
 		{
-			FMessageProcessor->createMessageWindow(FStreamJid,FContactJid,Message::Normal,IMessageHandler::SM_SHOW);
+			FMessageProcessor->getMessageWindow(FStreamJid,FContactJid,Message::Normal,IMessageProcessor::ActionShowNormal);
 		}
 		else if (action == FShowVCard)
 		{

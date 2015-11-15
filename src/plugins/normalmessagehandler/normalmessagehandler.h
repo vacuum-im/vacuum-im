@@ -56,8 +56,8 @@ public:
 	virtual bool messageCheck(int AOrder, const Message &AMessage, int ADirection);
 	virtual bool messageDisplay(const Message &AMessage, int ADirection);
 	virtual INotification messageNotify(INotifications *ANotifications, const Message &AMessage, int ADirection);
-	virtual bool messageShowWindow(int AMessageId);
-	virtual bool messageShowWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode);
+	virtual IMessageWindow *messageShowNotified(int AMessageId);
+	virtual IMessageWindow *messageGetWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType);
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IRostersClickHooker
@@ -66,6 +66,7 @@ public:
 	//IXmppUriHandler
 	virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
 protected:
+	IMessageNormalWindow *showWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageNormalWindow::Mode AMode);
 	IMessageNormalWindow *getWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageNormalWindow::Mode AMode);
 	IMessageNormalWindow *findWindow(const Jid &AStreamJid, const Jid &AContactJid) const;
 	Menu *createWindowMenu(IMessageNormalWindow *AWindow) const;

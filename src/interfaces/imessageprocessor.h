@@ -2,8 +2,8 @@
 #define IMESSAGEPROCESSOR_H
 
 #include <QTextDocument>
-#include <interfaces/irostersmodel.h>
 #include <interfaces/inotifications.h>
+#include <interfaces/imessagewidgets.h>
 #include <utils/jid.h>
 #include <utils/message.h>
 
@@ -12,17 +12,11 @@
 class IMessageHandler
 {
 public:
-	enum ShowMode {
-		SM_ASSIGN,
-		SM_SHOW,
-		SM_MINIMIZED
-	};
-public:
 	virtual bool messageCheck(int AOrder, const Message &AMessage, int ADirection) =0;
 	virtual bool messageDisplay(const Message &AMessage, int ADirection) =0;
 	virtual INotification messageNotify(INotifications *ANotifications, const Message &AMessage, int ADirection) =0;
-	virtual bool messageShowWindow(int AMessageId) =0;
-	virtual bool messageShowWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode) =0;
+	virtual IMessageWindow *messageShowNotified(int AMessageId) =0;
+	virtual IMessageWindow *messageGetWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType) =0;
 };
 
 class IMessageWriter
@@ -45,6 +39,12 @@ public:
 		DirectionIn,
 		DirectionOut
 	};
+	enum WindowAction {
+		ActionNone,
+		ActionAssign,
+		ActionShowNormal,
+		ActionShowMinimized
+	};
 public:
 	virtual QObject *instance() = 0;
 	virtual QList<Jid> activeStreams() const =0;
@@ -62,7 +62,7 @@ public:
 	virtual void removeMessageNotify(int AMessageId) =0;
 	virtual void textToMessage(Message &AMessage, const QTextDocument *ADocument, const QString &ALang = QString::null) const =0;
 	virtual void messageToText(QTextDocument *ADocument, const Message &AMessage, const QString &ALang = QString::null) const =0;
-	virtual bool createMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode) const =0;
+	virtual IMessageWindow *getMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AAction) const =0;
 	virtual QMultiMap<int, IMessageHandler *> messageHandlers() const =0;
 	virtual void insertMessageHandler(int AOrder, IMessageHandler *AHandler) =0;
 	virtual void removeMessageHandler(int AOrder, IMessageHandler *AHandler) =0;

@@ -49,7 +49,7 @@ public:
 	virtual void removeMessageNotify(int AMessageId);
 	virtual void textToMessage(Message &AMessage, const QTextDocument *ADocument, const QString &ALang = QString::null) const;
 	virtual void messageToText(QTextDocument *ADocument, const Message &AMessage, const QString &ALang = QString::null) const;
-	virtual bool createMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode) const;
+	virtual IMessageWindow *getMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AAction) const;
 	virtual QMultiMap<int, IMessageHandler *> messageHandlers() const;
 	virtual void insertMessageHandler(int AOrder, IMessageHandler *AHandler);
 	virtual void removeMessageHandler(int AOrder, IMessageHandler *AHandler);

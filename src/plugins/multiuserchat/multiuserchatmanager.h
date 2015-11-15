@@ -37,15 +37,15 @@ class MultiUserChatManager :
 	public IMultiUserChatManager,
 	public IXmppUriHandler,
 	public IDiscoFeatureHandler,
-	public IMessageHandler,
 	public IDataLocalizer,
 	public IOptionsDialogHolder,
 	public IRostersClickHooker,
 	public IRecentItemHandler,
+	public IStanzaHandler,
 	public IStanzaRequestOwner
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IMultiUserChatManager IXmppUriHandler IDiscoFeatureHandler IMessageHandler IDataLocalizer IOptionsDialogHolder IRostersClickHooker IRecentItemHandler IStanzaRequestOwner);
+	Q_INTERFACES(IPlugin IMultiUserChatManager IXmppUriHandler IDiscoFeatureHandler IDataLocalizer IOptionsDialogHolder IRostersClickHooker IRecentItemHandler IStanzaHandler IStanzaRequestOwner);
 public:
 	MultiUserChatManager();
 	~MultiUserChatManager();
@@ -59,6 +59,8 @@ public:
 	virtual bool startPlugin() { return true; }
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
+	//IStanzaHandler
+	virtual bool stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept);
 	//IStanzaRequestOwner
 	virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
 	//IRostersClickHooker
@@ -71,12 +73,6 @@ public:
 	virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
 	//IDataLocalizer
 	virtual IDataFormLocale dataFormLocale(const QString &AFormType);
-	//IMessageHandler
-	virtual bool messageCheck(int AOrder, const Message &AMessage, int ADirection);
-	virtual bool messageDisplay(const Message &AMessage, int ADirection);
-	virtual INotification messageNotify(INotifications *ANotifications, const Message &AMessage, int ADirection);
-	virtual bool messageShowWindow(int AMessageId);
-	virtual bool messageShowWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode);
 	//IRecentItemHandler
 	virtual bool recentItemValid(const IRecentItem &AItem) const;
 	virtual bool recentItemCanShow(const IRecentItem &AItem) const;
@@ -130,8 +126,8 @@ protected:
 	IRecentItem multiChatRecentItem(IMultiUserChat *AChat, const QString &ANick = QString::null) const;
 protected:
 	Action *createWizardAction(QWidget *AParent) const;
-	Menu *createInviteMenu(const Jid &AContactJid, QWidget *AParent) const;
 	Action *createJoinAction(const Jid &AStreamJid, const Jid &ARoomJid, QWidget *AParent) const;
+	Menu *createInviteMenu(const QStringList &AStreams, const QStringList &AContacts, QWidget *AParent) const;
 protected slots:
 	void onWizardRoomActionTriggered(bool);
 	void onJoinRoomActionTriggered(bool);
@@ -157,6 +153,9 @@ protected slots:
 	void onMultiChatWindowInfoContextMenu(Menu *AMenu);
 	void onMultiChatWindowInfoToolTips(QMap<int,QString> &AToolTips);
 protected slots:
+	void onXmppStreamOpened(IXmppStream *AXmppStream);
+	void onXmppStreamClosed(IXmppStream *AXmppStream);
+protected slots:
 	void onRostersModelStreamsLayoutChanged(int ABefore);
 	void onRostersModelIndexDestroyed(IRosterIndex *AIndex);
 	void onRostersModelIndexDataChanged(IRosterIndex *AIndex, int ARole);
@@ -168,6 +167,8 @@ protected slots:
 protected slots:
 	void onInviteActionTriggered(bool);
 	void onInviteDialogFinished(int AResult);
+	void onNotificationActivated(int ANotifyId);
+	void onNotificationRemoved(int ANotifyId);
 private:
 	IMessageWidgets *FMessageWidgets;
 	IMessageProcessor *FMessageProcessor;
@@ -184,12 +185,15 @@ private:
 	IStanzaProcessor *FStanzaProcessor;
 private:
 	QList<IMultiUserChat *> FChats;
-	QMap<int, Message> FActiveInvites;
 	QList<IRosterIndex *> FChatIndexes;
-	QList<QString> FDiscoNickRequests;
-	QMap<QString,QString> FRegisterNickRequests;
 	QList<IMultiUserChatWindow *> FChatWindows;
-	QMap<QMessageBox *,InviteFields> FInviteDialogs;
+private:
+	QList<QString> FDiscoNickRequests;
+	QMap<QString, QString> FRegisterNickRequests;
+private:
+	QMap<Jid, int> FSHIInvite;
+	QMap<int, Stanza> FInviteNotify;
+	QMap<QMessageBox *, InviteFields> FInviteDialogs;
 };
 
 #endif // MULTIUSERCHATMANAGER_H

@@ -6,6 +6,7 @@
 #include <QTreeView>
 #include <QTextBrowser>
 #include <QTextDocument>
+#include <QAbstractProxyModel>
 #include <interfaces/imainwindow.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagestylemanager.h>
@@ -149,9 +150,14 @@ public:
 	virtual QList<Jid> availStreams() const =0;
 	virtual QTreeView *receiversView() const =0;
 	virtual AdvancedItemModel *receiversModel() const =0;
+	virtual QList<QAbstractProxyModel *> proxyModels() const =0;
+	virtual void insertProxyModel(QAbstractProxyModel *AProxy) =0;
+	virtual void removeProxyModel(QAbstractProxyModel *AProxy) =0;
 	virtual QModelIndex mapModelToView(QStandardItem *AItem) =0;
 	virtual QStandardItem *mapViewToModel(const QModelIndex &AIndex) =0;
 	virtual void contextMenuForItems(QList<QStandardItem *> AItems, Menu *AMenu) =0;
+	virtual bool isOfflineContactsVisible() const =0;
+	virtual void setOfflineContactsVisible(bool AVisible) =0;
 	virtual QMultiMap<Jid, Jid> selectedAddresses() const =0;
 	virtual void setGroupSelection(const Jid &AStreamJid, const QString &AGroup, bool ASelected) =0;
 	virtual void setAddressSelection(const Jid &AStreamJid, const Jid &AContactJid, bool ASelected) =0;
@@ -159,6 +165,8 @@ public:
 protected:
 	virtual void availStreamsChanged() =0;
 	virtual void addressSelectionChanged() =0;
+	virtual void proxyModelsAboutToBeChanged() =0;
+	virtual void proxyModelsChanged(bool AViewModelChanged) =0;
 	virtual void contextMenuForItemsRequested(QList<QStandardItem *> AItems, Menu *AMenu) =0;
 };
 

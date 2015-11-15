@@ -58,7 +58,7 @@ public:
 	virtual bool sendStreamPresence();
 	virtual bool sendPresence(int AShow, const QString &AStatus, int APriority);
 	virtual bool sendMessage(const Message &AMessage, const QString &AToNick = QString::null);
-	virtual bool sendInvitation(const Jid &AContactJid, const QString &AMessage = QString::null);
+	virtual bool sendInvitation(const QList<Jid> &AContacts, const QString &AReason = QString::null);
 	virtual bool sendVoiceRequest();
 	//Moderator
 	virtual QString subject() const;
@@ -86,6 +86,7 @@ signals:
 	void passwordChanged(const QString &APassword);
 	void presenceChanged(const IPresenceItem &APresence);
 	void nicknameChanged(const QString &ANick, const XmppError &AError);
+	void invitationSent(const QList<Jid> &AContacts, const QString &AReason);
 	void invitationDeclined(const Jid &AContactJid, const QString &AReason);
 	void userChanged(IMultiUser *AUser, int AData, const QVariant &ABefore);
 	//Moderator

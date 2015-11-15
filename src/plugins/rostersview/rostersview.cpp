@@ -554,6 +554,11 @@ QMap<int, QStringList> RostersView::indexesRolesMap(const QList<IRosterIndex *> 
 	return map;
 }
 
+QList<QAbstractProxyModel *> RostersView::proxyModels() const
+{
+	return FProxyModels.values();
+}
+
 void RostersView::insertProxyModel(QAbstractProxyModel *AProxyModel, int AOrder)
 {
 	if (AProxyModel && !FProxyModels.values().contains(AProxyModel))
@@ -602,11 +607,6 @@ void RostersView::insertProxyModel(QAbstractProxyModel *AProxyModel, int AOrder)
 
 		emit proxyModelInserted(AProxyModel);
 	}
-}
-
-QList<QAbstractProxyModel *> RostersView::proxyModels() const
-{
-	return FProxyModels.values();
 }
 
 void RostersView::removeProxyModel(QAbstractProxyModel *AProxyModel)

@@ -1,5 +1,6 @@
 FORMS = edituserslistdialog.ui \
-        inputtextdialog.ui
+        inputtextdialog.ui \
+        inviteuserswidget.ui
         
 HEADERS = multiuser.h \
           multiuserchat.h \
@@ -8,7 +9,9 @@ HEADERS = multiuser.h \
           multiuserchatwindow.h \
           edituserslistdialog.h \
           inputtextdialog.h \
-          multiuserview.h
+          multiuserview.h \
+          inviteuserswidget.h \
+          inviteusersmenu.h
 
 
 SOURCES = multiuser.cpp \
@@ -18,4 +21,6 @@ SOURCES = multiuser.cpp \
           multiuserchatwindow.cpp \
           edituserslistdialog.cpp \
           inputtextdialog.cpp \
-          multiuserview.cpp
+          multiuserview.cpp \
+          inviteuserswidget.cpp \
+          inviteusersmenu.cpp

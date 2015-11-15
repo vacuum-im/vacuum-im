@@ -51,8 +51,8 @@ public:
 	virtual bool setSelectedRosterIndexes(const QList<IRosterIndex *> &AIndexes, bool APartial=true);
 	virtual QMap<int, QStringList> indexesRolesMap(const QList<IRosterIndex *> &AIndexes, const QList<int> &ARoles, int AUniqueRole=-1, int AGroupByRole=-1) const;
 	//--ProxyModels
-	virtual void insertProxyModel(QAbstractProxyModel *AProxyModel, int AOrder);
 	virtual QList<QAbstractProxyModel *> proxyModels() const;
+	virtual void insertProxyModel(QAbstractProxyModel *AProxyModel, int AOrder);
 	virtual void removeProxyModel(QAbstractProxyModel *AProxyModel);
 	virtual QModelIndex mapToModel(const QModelIndex &AProxyIndex) const;
 	virtual QModelIndex mapFromModel(const QModelIndex &AModelIndex) const;

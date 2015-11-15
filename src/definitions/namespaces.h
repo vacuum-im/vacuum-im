@@ -25,6 +25,7 @@
 #define NS_JABBER_PRIVACY                       "jabber:iq:privacy"
 #define NS_JABBER_X_AVATAR                      "jabber:x:avatar"
 #define NS_JABBER_IQ_AVATAR                     "jabber:iq:avatar"
+#define NS_JABBER_X_CONFERENCE                  "jabber:x:conference"
 
 #define NS_VCARD_TEMP                           "vcard-temp"
 #define NS_VCARD_UPDATE                         "vcard-temp:x:update"
@@ -93,4 +94,4 @@
 
 #define NS_VACUUM_PRIVATESTORAGE_UPDATE         "vacuum:privatestorage:update"
 
-#endif
+#endif // DEF_NAMESPACES_H

@@ -70,6 +70,7 @@
 #define AG_RVCM_MULTIUSERCHAT_JOIN                              300
 #define AG_RVCM_BOOKMARS_MENU                                   350
 #define AG_RVCM_CLIENTINFO                                      400
+#define AG_RVCM_MULTIUSERCHAT_INVITE                            400
 #define AG_RVCM_DISCOVERY_FEATURES                              400
 #define AG_RVCM_AVATARS                                         500
 #define AG_RVCM_ANNOTATIONS                                     500

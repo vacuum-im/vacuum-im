@@ -101,6 +101,7 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatManager *AMultiChatManage
 	connect(FMultiChat->instance(),SIGNAL(requestFailed(const QString &, const XmppError &)),SLOT(onMultiChatRequestFailed(const QString &, const XmppError &)));
 	connect(FMultiChat->instance(),SIGNAL(presenceChanged(const IPresenceItem &)),SLOT(onMultiChatPresenceChanged(const IPresenceItem &)));
 	connect(FMultiChat->instance(),SIGNAL(nicknameChanged(const QString &, const XmppError &)),SLOT(onMultiChatNicknameChanged(const QString &, const XmppError &)));
+	connect(FMultiChat->instance(),SIGNAL(invitationSent(const QList<Jid> &, const QString &)),SLOT(onMultiChatInvitationSent(const QList<Jid> &, const QString &)));
 	connect(FMultiChat->instance(),SIGNAL(invitationDeclined(const Jid &, const QString &)),SLOT(onMultiChatInvitationDeclined(const Jid &, const QString &)));
 	connect(FMultiChat->instance(),SIGNAL(userChanged(IMultiUser *, int, const QVariant &)),SLOT(onMultiChatUserChanged(IMultiUser *, int, const QVariant &)));
 	connect(FMultiChat->instance(),SIGNAL(voiceRequestReceived(const Message &)),SLOT(onMultiChatVoiceRequestReceived(const Message &)));
@@ -157,7 +158,7 @@ MultiUserChatWindow::~MultiUserChatWindow()
 
 	if (FMessageProcessor)
 	{
-		FMessageProcessor->removeMessageHandler(MHO_MULTIUSERCHAT_GROUPCHAT,this);
+		FMessageProcessor->removeMessageHandler(MHO_MULTIUSERCHAT,this);
 	}
 
 	if (FMessageWidgets)
@@ -745,61 +746,36 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 	return notify;
 }
 
-bool MultiUserChatWindow::messageShowWindow(int AMessageId)
+IMessageWindow *MultiUserChatWindow::messageShowNotified(int AMessageId)
 {
 	if (FActiveMessages.contains(AMessageId))
 	{
 		showTabPage();
-		return true;
+		return this;
 	}
 	else if (FActiveChatMessages.values().contains(AMessageId))
 	{
 		IMessageChatWindow *window = FActiveChatMessages.key(AMessageId);
 		window->showTabPage();
-		return true;
+		return window;
 	}
 	else
 	{
 		REPORT_ERROR("Failed to show notified conference message window: Window not found");
 	}
-	return false;
+	return NULL;
 }
 
-bool MultiUserChatWindow::messageShowWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode)
+IMessageWindow *MultiUserChatWindow::messageGetWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType)
 {
-	Q_UNUSED(AOrder);
 	if (streamJid()==AStreamJid && contactJid().pBare()==AContactJid.pBare())
 	{
 		if (AType == Message::GroupChat)
-		{
-			if (AShowMode == IMessageHandler::SM_ASSIGN)
-				assignTabPage();
-			else if (AShowMode == IMessageHandler::SM_SHOW)
-				showTabPage();
-			else if (AShowMode == IMessageHandler::SM_MINIMIZED)
-				showMinimizedTabPage();
-			return true;
-		}
+			return this;
 		else if (AType == Message::Chat)
-		{
-			IMessageChatWindow *window = getPrivateChatWindow(AContactJid);
-			if (window)
-			{
-				if (AShowMode == IMessageHandler::SM_ASSIGN)
-					window->assignTabPage();
-				else if (AShowMode == IMessageHandler::SM_SHOW)
-					window->showTabPage();
-				else if (AShowMode == IMessageHandler::SM_MINIMIZED)
-					window->showMinimizedTabPage();
-				return true;
-			}
-			else
-			{
-				LOG_STRM_WARNING(AStreamJid,QString("Failed to show private chat window, nick=%1, room=%2: Private chat window not created").arg(AContactJid.resource(),contactJid().bare()));
-			}
-		}
+			return getPrivateChatWindow(AContactJid);
 	}
-	return false;
+	return NULL;
 }
 
 IMultiUserChat *MultiUserChatWindow::multiUserChat() const
@@ -829,8 +805,10 @@ SplitterWidget *MultiUserChatWindow::centralWidgetsBox() const
 
 IMessageChatWindow *MultiUserChatWindow::openPrivateChatWindow(const Jid &AContactJid)
 {
-	messageShowWindow(MHO_MULTIUSERCHAT_GROUPCHAT,streamJid(),AContactJid,Message::Chat,IMessageHandler::SM_SHOW);
-	return findPrivateChatWindow(AContactJid);
+	IMessageChatWindow *window = getPrivateChatWindow(AContactJid);
+	if (window)
+		window->showTabPage();
+	return window;
 }
 
 IMessageChatWindow *MultiUserChatWindow::findPrivateChatWindow(const Jid &AContactJid) const
@@ -850,7 +828,6 @@ void MultiUserChatWindow::contextMenuForRoom(Menu *AMenu)
 	{
 		AMenu->addAction(FChangeNick,AG_RVCM_MULTIUSERCHAT_COMMON);
 		AMenu->addAction(FChangeTopic,AG_RVCM_MULTIUSERCHAT_COMMON);
-		AMenu->addAction(FInviteContact,AG_RVCM_MULTIUSERCHAT_COMMON);
 		AMenu->addAction(FEditAffiliations,AG_RVCM_MULTIUSERCHAT_TOOLS);
 		AMenu->addAction(FConfigRoom,AG_RVCM_MULTIUSERCHAT_TOOLS);
 		AMenu->addAction(FDestroyRoom,AG_RVCM_MULTIUSERCHAT_TOOLS);
@@ -859,7 +836,6 @@ void MultiUserChatWindow::contextMenuForRoom(Menu *AMenu)
 	{
 		AMenu->addAction(FChangeNick,AG_RVCM_MULTIUSERCHAT_COMMON);
 		AMenu->addAction(FChangeTopic,AG_RVCM_MULTIUSERCHAT_COMMON);
-		AMenu->addAction(FInviteContact,AG_RVCM_MULTIUSERCHAT_COMMON);
 		AMenu->addAction(FEditAffiliations,AG_RVCM_MULTIUSERCHAT_TOOLS);
 	}
 	else if (role == MUC_ROLE_VISITOR)
@@ -871,7 +847,6 @@ void MultiUserChatWindow::contextMenuForRoom(Menu *AMenu)
 	{
 		AMenu->addAction(FChangeNick,AG_RVCM_MULTIUSERCHAT_COMMON);
 		AMenu->addAction(FChangeTopic,AG_RVCM_MULTIUSERCHAT_COMMON);
-		AMenu->addAction(FInviteContact,AG_RVCM_MULTIUSERCHAT_COMMON);
 	}
 	else
 	{
@@ -1096,7 +1071,7 @@ void MultiUserChatWindow::initialize()
 	FMessageProcessor = PluginHelper::pluginInstance<IMessageProcessor>();
 	if (FMessageProcessor)
 	{
-		FMessageProcessor->insertMessageHandler(MHO_MULTIUSERCHAT_GROUPCHAT,this);
+		FMessageProcessor->insertMessageHandler(MHO_MULTIUSERCHAT,this);
 	}
 
 	FMessageStyleManager = PluginHelper::pluginInstance<IMessageStyleManager>();
@@ -1117,6 +1092,7 @@ void MultiUserChatWindow::initialize()
 
 	FAvatars = PluginHelper::pluginInstance<IAvatars>();
 	FDataForms = PluginHelper::pluginInstance<IDataForms>();
+	FRosterManager = PluginHelper::pluginInstance<IRosterManager>();
 	FStatusChanger = PluginHelper::pluginInstance<IStatusChanger>();
 	FRecentContacts = PluginHelper::pluginInstance<IRecentContacts>();
 	FStanzaProcessor = PluginHelper::pluginInstance<IStanzaProcessor>();
@@ -1174,6 +1150,13 @@ void MultiUserChatWindow::createMessageWidgets()
 
 void MultiUserChatWindow::createStaticRoomActions()
 {
+	FInviteUsers = new InviteUsersMenu(this);
+	FInviteUsers->setTitle(tr("Invite to Conference"));
+	FInviteUsers->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_INVITE);
+	connect(FInviteUsers,SIGNAL(inviteAccepted(const QMultiMap<Jid, Jid> &)),SLOT(onInviteUserMenuAccepted(const QMultiMap<Jid, Jid> &)));
+	QToolButton *inviteUsersButton = FToolBarWidget->toolBarChanger()->insertAction(FInviteUsers->menuAction(),TBG_MWTBW_MULTIUSERCHAT_INVITE);
+	inviteUsersButton->setPopupMode(QToolButton::InstantPopup);
+
 	FChangeNick = new Action(this);
 	FChangeNick->setText(tr("Change Nick"));
 	FChangeNick->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CHANGE_NICK);
@@ -1188,11 +1171,6 @@ void MultiUserChatWindow::createStaticRoomActions()
 	FChangeTopic->setText(tr("Change Topic"));
 	FChangeTopic->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CHANGE_TOPIC);
 	connect(FChangeTopic,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
-
-	FInviteContact = new Action(this);
-	FInviteContact->setText(tr("Invite to Conference"));
-	FInviteContact->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_INVITE);
-	connect(FInviteContact,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
 
 	FRequestVoice = new Action(this);
 	FRequestVoice->setText(tr("Request Voice"));
@@ -1249,8 +1227,8 @@ void MultiUserChatWindow::createStaticRoomActions()
 	FToggleSilence->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_NOTIFY_SILENCE);
 	connect(FToggleSilence,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
 	FToolBarWidget->toolBarChanger()->insertAction(FToggleSilence,TBG_MCWTBW_NOTIFY_SILENCE);
-
 	FToggleSilence->setChecked(Options::node(OPV_MUC_GROUPCHAT_ITEM,contactJid().pBare()).node("notify-silence").value().toBool());
+
 }
 
 void MultiUserChatWindow::saveWindowState()
@@ -1369,7 +1347,7 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
 		if (userJid.isValid())
 		{
 			QString reason = QStringList(params.mid(2)).join(" ");
-			if (FMultiChat->sendInvitation(userJid,reason))
+			if (FMultiChat->sendInvitation(QList<Jid>() << userJid,reason))
 				showMultiChatStatusMessage(tr("Invitation was sent to user %1").arg(userJid.full()),IMessageStyleContentOptions::TypeNotification);
 			else if (FMultiChat->isOpen())
 				showMultiChatStatusMessage(tr("Failed to send invitation to user %1").arg(userJid.full()),IMessageStyleContentOptions::TypeNotification,IMessageStyleContentOptions::StatusError);
@@ -1507,6 +1485,41 @@ void MultiUserChatWindow::insertUserMention(IMultiUser *AUser, bool ASetFocus) c
 		QString sufix = FEditWidget->textEdit()->textCursor().atBlockStart() ? Options::node(OPV_MUC_NICKNAMESUFFIX).value().toString().trimmed() : QString::null;
 		FEditWidget->textEdit()->textCursor().insertText(AUser->nick() + sufix + " ");
 	}
+}
+
+QStringList MultiUserChatWindow::findContactsName(const QList<Jid> &AContacts) const
+{
+	QStringList names;
+	
+	QList<Jid> streams = FMessageProcessor!=NULL ? FMessageProcessor->activeStreams() : QList<Jid>()<<streamJid();
+	foreach(const Jid &contact, AContacts)
+	{
+		QString name;
+		foreach(const Jid stream, streams)
+		{
+			if (FMultiChatManager->findMultiChatWindow(stream, contact.bare()))
+			{
+				if (!contact.resource().isEmpty())
+					name = contact.resource();
+				else
+					name = contact.uNode();
+				break;
+			}
+			else if (FRosterManager)
+			{
+				IRoster *roster = FRosterManager->findRoster(stream);
+				IRosterItem ritem = roster!=NULL ? roster->findItem(contact) : IRosterItem();
+				if (!ritem.isNull())
+				{
+					name = ritem.name;
+					break;
+				}
+			}
+		}
+		names.append(name.isEmpty() ? contact.uNode() : name);
+	}
+
+	return names;
 }
 
 void MultiUserChatWindow::showDateSeparator(IMessageViewWidget *AView, const QDateTime &ADateTime)
@@ -2140,6 +2153,10 @@ void MultiUserChatWindow::onMultiChatStateChanged(int AState)
 	if (enterHandler)
 		enterHandler->setVisible(AState == IMultiUserChat::Closed);
 
+	QAction *inviteHandle = FToolBarWidget->toolBarChanger()->actionHandle(FInviteUsers->menuAction());
+	if (inviteHandle)
+		inviteHandle->setEnabled(AState == IMultiUserChat::Opened);
+
 	if (AState == IMultiUserChat::Opened)
 	{
 		if (FStanzaProcessor)
@@ -2336,10 +2353,25 @@ void MultiUserChatWindow::onMultiChatNicknameChanged(const QString &ANick, const
 	}
 }
 
+void MultiUserChatWindow::onMultiChatInvitationSent(const QList<Jid> &AContacts, const QString &AReason)
+{
+	QStringList sent = findContactsName(AContacts);
+	if (sent.count() > 3)
+	{
+		QString names = QStringList(sent.mid(0,2)).join(", ");
+		showMultiChatStatusMessage(tr("You invited %1 and %n other contact(s) to this conference. %2","",sent.count()-2).arg(names,AReason),IMessageStyleContentOptions::TypeNotification);
+	}
+	else if (!sent.isEmpty())
+	{
+		QString names = sent.join(", ");
+		showMultiChatStatusMessage(tr("You invited %1 to this conference. %2").arg(names,AReason),IMessageStyleContentOptions::TypeNotification);
+	}
+}
+
 void MultiUserChatWindow::onMultiChatInvitationDeclined(const Jid &AContactJid, const QString &AReason)
 {
-	QString nick = contactJid().pBare()==AContactJid.pBare() ? AContactJid.resource() : AContactJid.uFull();
-	showMultiChatStatusMessage(tr("User %1 has declined your invite to this conference. %2").arg(nick).arg(AReason),IMessageStyleContentOptions::TypeNotification);
+	QString name = findContactsName(QList<Jid>() << AContactJid).value(0);
+	showMultiChatStatusMessage(tr("User %1 has declined your invite to this conference. %2").arg(name).arg(AReason),IMessageStyleContentOptions::TypeNotification);
 }
 
 void MultiUserChatWindow::onMultiChatUserChanged(IMultiUser *AUser, int AData, const QVariant &ABefore)
@@ -2646,7 +2678,7 @@ void MultiUserChatWindow::onMultiChatUserItemNotifyActivated(int ANotifyId)
 {
 	int messageId = FActiveChatMessageNotify.key(ANotifyId);
 	if (messageId > 0)
-		messageShowWindow(messageId);
+		messageShowNotified(messageId);
 }
 
 void MultiUserChatWindow::onMultiChatUserItemDoubleClicked(const QModelIndex &AIndex)
@@ -2862,15 +2894,6 @@ void MultiUserChatWindow::onRoomActionTriggered(bool)
 	{
 		exitAndDestroy(QString::null);
 	}
-	else if (action == FInviteContact)
-	{
-		if (FMultiChat->isOpen())
-		{
-			Jid userJid = QInputDialog::getText(this,tr("Invite User"),tr("Enter user Jabber ID:"));
-			if (userJid.isValid())
-				FMultiChat->sendInvitation(userJid);
-		}
-	}
 	else if (action == FRequestVoice)
 	{
 		if (FMultiChat->isOpen())
@@ -2984,6 +3007,13 @@ void MultiUserChatWindow::onChangeUserAffiliationActionTriggered(bool)
 		if (ok)
 			FAffilRequestId = FMultiChat->setUserAffiliation(nick,affiliation,reason);
 	}
+}
+
+void MultiUserChatWindow::onInviteUserMenuAccepted(const QMultiMap<Jid, Jid> &AAddresses)
+{
+	QList<Jid> contacts = AAddresses.values().toSet().toList();
+	if (!contacts.isEmpty())
+		FMultiChat->sendInvitation(contacts);
 }
 
 void MultiUserChatWindow::onStatusIconsChanged()

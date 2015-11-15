@@ -532,10 +532,6 @@ bool MultiUserChat::sendPresence(int AShow, const QString &AStatus, int APriorit
 			return true;
 		}
 	}
-	else
-	{
-		REPORT_ERROR("Failed to send presence to conference: Required interfaces not found");
-	}
 	return false;
 }
 
@@ -563,32 +559,48 @@ bool MultiUserChat::sendMessage(const Message &AMessage, const QString &AToNick)
 			LOG_STRM_WARNING(FStreamJid,QString("Failed to send message to conference, room=%1").arg(FRoomJid.bare()));
 		}
 	}
+	else
+	{
+		LOG_STRM_WARNING(FStreamJid,QString("Failed to send message to conference, room=%1: Conference is closed").arg(FRoomJid.bare()));
+	}
 	return false;
 }
 
-bool MultiUserChat::sendInvitation(const Jid &AContactJid, const QString &AMessage)
+bool MultiUserChat::sendInvitation(const QList<Jid> &AContacts, const QString &AReason)
 {
-	if (FStanzaProcessor && isOpen())
+	if (FStanzaProcessor && isOpen() && !AContacts.isEmpty())
 	{
-		Message message;
-		message.setTo(FRoomJid.bare());
+		Stanza invite("message");
+		invite.setTo(FRoomJid.bare());
 
-		Stanza &mstanza = message.stanza();
-		QDomElement invElem = mstanza.addElement("x",NS_MUC_USER).appendChild(mstanza.createElement("invite")).toElement();
-		invElem.setAttribute("to",AContactJid.full());
-		
-		if (!AMessage.isEmpty())
-			invElem.appendChild(mstanza.createElement("reason")).appendChild(mstanza.createTextNode(AMessage));
-
-		if (FStanzaProcessor->sendStanzaOut(FStreamJid, mstanza))
+		QList<Jid> invited;
+		QDomElement xElem = invite.addElement("x",NS_MUC_USER);
+		foreach(const Jid &contact, AContacts)
 		{
-			LOG_STRM_INFO(FStreamJid,QString("Conference invite sent, contact=%1, room=%2").arg(AContactJid.full(),FRoomJid.bare()));
+			if (!invited.contains(contact) && !isUserPresent(contact))
+			{
+				QDomElement invElem = xElem.appendChild(invite.createElement("invite")).toElement();
+				if (!AReason.isEmpty())
+					invElem.appendChild(invite.createElement("reason")).appendChild(invite.createTextNode(AReason));
+				invElem.setAttribute("to",contact.full());
+				invited.append(contact);
+			}
+		}
+
+		if (FStanzaProcessor->sendStanzaOut(FStreamJid, invite))
+		{
+			LOG_STRM_INFO(FStreamJid,QString("Conference invite sent, room=%1, contacts=%2").arg(FRoomJid.bare()).arg(AContacts.count()));
+			emit invitationSent(invited,AReason);
 			return true;
 		}
 		else
 		{
-			LOG_STRM_WARNING(FStreamJid,QString("Failed to send conference invite, contact=%1, room=%2").arg(AContactJid.full(),FRoomJid.bare()));
+			LOG_STRM_WARNING(FStreamJid,QString("Failed to send conference invite, room=%1, contact=%2").arg(FRoomJid.bare()).arg(AContacts.count()));
 		}
+	}
+	else if (!isOpen())
+	{
+		LOG_STRM_WARNING(FStreamJid,QString("Failed to send conference invite, room=%1, contact=%2: Conference is closed").arg(FRoomJid.bare()).arg(AContacts.count()));
 	}
 	return false;
 }
@@ -625,6 +637,10 @@ bool MultiUserChat::sendVoiceRequest()
 			LOG_STRM_WARNING(FStreamJid,QString("Failed to send voice request to conference, room=%1").arg(FRoomJid.bare()));
 		}
 	}
+	else if (!isOpen())
+	{
+		LOG_STRM_WARNING(FStreamJid,QString("Failed to send voice request to conference, room=%1: Conference is closed").arg(FRoomJid.bare()));
+	}
 	return false;
 }
 
@@ -649,6 +665,10 @@ bool MultiUserChat::sendSubject(const QString &ASubject)
 			LOG_STRM_WARNING(FStreamJid,QString("Failed to send conference subject message, room=%1").arg(FRoomJid.bare()));
 		}
 	}
+	else if (!isOpen())
+	{
+		LOG_STRM_WARNING(FStreamJid,QString("Failed to send conference subject message, room=%1: Conference is closed").arg(FRoomJid.bare()));
+	}
 	return false;
 }
 
@@ -668,6 +688,10 @@ bool MultiUserChat::sendVoiceApproval(const Message &AMessage)
 		{
 			LOG_STRM_WARNING(FStreamJid,QString("Failed to send conference voice approval, room=%1").arg(FRoomJid.bare()));
 		}
+	}
+	else if (!isOpen())
+	{
+		LOG_STRM_WARNING(FStreamJid,QString("Failed to send conference voice approval, room=%1: Conference is closed").arg(FRoomJid.bare()));
 	}
 	return false;
 }
@@ -692,6 +716,14 @@ QString MultiUserChat::loadAffiliationList(const QString &AAffiliation)
 		{
 			LOG_STRM_WARNING(FStreamJid,QString("Failed to send load affiliation list request, affiliation=%1, room=%2").arg(AAffiliation,FRoomJid.bare()));
 		}
+	}
+	else if (!isOpen())
+	{
+		LOG_STRM_WARNING(FStreamJid,QString("Failed to load affiliation list, affiliation=%1, room=%2: Conference is closed").arg(AAffiliation,FRoomJid.bare()));
+	}
+	else if (AAffiliation == MUC_AFFIL_NONE)
+	{
+		REPORT_ERROR("Failed to load affiliation list: Affiliation is none");
 	}
 	return QString::null;
 }
@@ -723,6 +755,10 @@ QString MultiUserChat::updateAffiliationList(const QList<IMultiUserListItem> &AI
 		{
 			LOG_STRM_WARNING(FStreamJid,QString("Failed to send update affiliation list request, room=%1").arg(FRoomJid.bare()));
 		}
+	}
+	else if (!isOpen())
+	{
+		LOG_STRM_WARNING(FStreamJid,QString("Failed to update affiliation list, room=%1: Conference is closed").arg(FRoomJid.bare()));
 	}
 	return QString::null;
 }
@@ -759,6 +795,10 @@ QString MultiUserChat::setUserRole(const QString &ANick, const QString &ARole, c
 		{
 			LOG_STRM_WARNING(FStreamJid,QString("Failed to change user role, nick=%1, room=%2: User not found").arg(ANick,FRoomJid.bare()));
 		}
+	}
+	else if (!isOpen())
+	{
+		LOG_STRM_WARNING(FStreamJid,QString("Failed to change user role, nick=%1, room=%2: Conference is closed").arg(ANick,FRoomJid.bare()));
 	}
 	return QString::null;
 }
@@ -799,6 +839,10 @@ QString MultiUserChat::setUserAffiliation(const QString &ANick, const QString &A
 			LOG_STRM_WARNING(FStreamJid,QString("Failed to change user affiliation, nick=%1, room=%2: User not found").arg(ANick,FRoomJid.bare()));
 		}
 	}
+	else if (!isOpen())
+	{
+		LOG_STRM_WARNING(FStreamJid,QString("Failed to change user affiliation, nick=%1, room=%2: Conference is closed").arg(ANick,FRoomJid.bare()));
+	}
 	return QString::null;
 }
 
@@ -820,6 +864,10 @@ QString MultiUserChat::loadRoomConfig()
 		{
 			LOG_STRM_WARNING(FStreamJid,QString("Failed to send load conference configuration request, room=%1").arg(FRoomJid.bare()));
 		}
+	}
+	else if (!isOpen())
+	{
+		LOG_STRM_WARNING(FStreamJid,QString("Failed to load conference configuration, room=%1: Conference is closed").arg(FRoomJid.bare()));
 	}
 	return QString::null;
 }
@@ -844,6 +892,10 @@ QString MultiUserChat::updateRoomConfig(const IDataForm &AForm)
 		{
 			LOG_STRM_WARNING(FStreamJid,QString("Failed to send update conference configuration request, room=%1").arg(FRoomJid.bare()));
 		}
+	}
+	else if (!isOpen())
+	{
+		LOG_STRM_WARNING(FStreamJid,QString("Failed to update conference configuration, room=%1: Conference is closed").arg(FRoomJid.bare()));
 	}
 	return QString::null;
 }
@@ -872,6 +924,11 @@ QString MultiUserChat::destroyRoom(const QString &AReason)
 			LOG_STRM_WARNING(FStreamJid,QString("Failed to send conference destruction request, room=%1").arg(FRoomJid.bare()));
 		}
 	}
+	else if (!isOpen())
+	{
+		LOG_STRM_WARNING(FStreamJid,QString("Failed to destroy conference, room=%1: Conference is closed").arg(FRoomJid.bare()));
+	}
+
 	return QString::null;
 }
 

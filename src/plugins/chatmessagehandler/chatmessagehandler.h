@@ -62,14 +62,15 @@ public:
 	virtual bool messageCheck(int AOrder, const Message &AMessage, int ADirection);
 	virtual bool messageDisplay(const Message &AMessage, int ADirection);
 	virtual INotification messageNotify(INotifications *ANotifications, const Message &AMessage, int ADirection);
-	virtual bool messageShowWindow(int AMessageId);
-	virtual bool messageShowWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode);
+	virtual IMessageWindow *messageShowNotified(int AMessageId);
+	virtual IMessageWindow *messageGetWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType);
 	//IRostersClickHooker
 	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
 	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
 	//IXmppUriHandler
 	virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
 protected:
+	IMessageChatWindow *showWindow(const Jid &AStreamJid, const Jid &AContactJid);
 	IMessageChatWindow *getWindow(const Jid &AStreamJid, const Jid &AContactJid);
 	IMessageChatWindow *findWindow(const Jid &AStreamJid, const Jid &AContactJid) const;
 	void updateWindow(IMessageChatWindow *AWindow);

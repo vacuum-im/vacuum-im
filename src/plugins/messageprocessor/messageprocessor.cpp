@@ -277,9 +277,9 @@ int MessageProcessor::messageByNotify(int ANotifyId) const
 
 void MessageProcessor::showNotifiedMessage(int AMessageId)
 {
-	IMessageHandler *handler = FHandlerForMessage.value(AMessageId,NULL);
+	IMessageHandler *handler = FHandlerForMessage.value(AMessageId);
 	if (handler)
-		handler->messageShowWindow(AMessageId);
+		handler->messageShowNotified(AMessageId);
 }
 
 void MessageProcessor::removeMessageNotify(int AMessageId)
@@ -320,12 +320,23 @@ void MessageProcessor::messageToText(QTextDocument *ADocument, const Message &AM
 	}
 }
 
-bool MessageProcessor::createMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode) const
+IMessageWindow *MessageProcessor::getMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AAction) const
 {
 	for (QMultiMap<int, IMessageHandler *>::const_iterator it = FMessageHandlers.constBegin(); it!=FMessageHandlers.constEnd(); ++it)
-		if (it.value()->messageShowWindow(it.key(),AStreamJid,AContactJid,AType,AShowMode))
-			return true;
-	return false;
+	{
+		IMessageWindow *window = it.value()->messageGetWindow(AStreamJid,AContactJid,AType);
+		if (window)
+		{
+			if (AAction == ActionAssign)
+				window->assignTabPage();
+			else if (AAction == ActionShowNormal)
+				window->showTabPage();
+			else if (AAction == ActionShowMinimized)
+				window->showMinimizedTabPage();
+			return window;
+		}
+	}
+	return NULL;
 }
 
 QMultiMap<int, IMessageHandler *> MessageProcessor::messageHandlers() const

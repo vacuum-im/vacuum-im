@@ -148,7 +148,7 @@ public:
 	virtual QList<IMultiUser *> allUsers() const =0;
 	virtual IMultiUser *findUser(const QString &ANick) const =0;
 	virtual bool isUserPresent(const Jid &AContactJid) const =0;
-	virtual void abortConnection(const QString &AStatus, bool AError=true) =0;
+	virtual void abortConnection(const QString &AStatus, bool AError = true) =0;
 	// Occupant
 	virtual QString nickname() const =0;
 	virtual bool setNickname(const QString &ANick) =0;
@@ -158,8 +158,8 @@ public:
 	virtual void setHistoryScope(const IMultiUserChatHistory &AHistory) =0;
 	virtual bool sendStreamPresence() =0;
 	virtual bool sendPresence(int AShow, const QString &AStatus, int APriority) =0;
-	virtual bool sendMessage(const Message &AMessage, const QString &AToNick = QString::null) =0;
-	virtual bool sendInvitation(const Jid &AContactJid, const QString &AMessage = QString::null) =0;
+	virtual bool sendMessage(const Message &AMessage, const QString &AToNick=QString::null) =0;
+	virtual bool sendInvitation(const QList<Jid> &AContacts, const QString &AReason = QString::null) =0;
 	virtual bool sendVoiceRequest() =0;
 	// Moderator
 	virtual QString subject() const =0;
@@ -187,6 +187,7 @@ protected:
 	virtual void passwordChanged(const QString &APassword) =0;
 	virtual void presenceChanged(const IPresenceItem &APresence) =0;
 	virtual void nicknameChanged(const QString &ANick, const XmppError &AError) =0;
+	virtual void invitationSent(const QList<Jid> &AContacts, const QString &AReason) =0;
 	virtual void invitationDeclined(const Jid &AContactJid, const QString &AReason) =0;
 	virtual void userChanged(IMultiUser *AUser, int AData, const QVariant &ABefore) =0;
 	// Moderator

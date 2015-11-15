@@ -522,7 +522,11 @@ void ServiceDiscovery::showDiscoItems(const Jid &AStreamJid, const Jid &AContact
 bool ServiceDiscovery::checkDiscoFeature(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, const QString &AFeature, bool ADefault)
 {
 	IDiscoInfo dinfo = discoInfo(AStreamJid,AContactJid,ANode);
-	return !dinfo.error.isNull() || !dinfo.contactJid.isValid() ? ADefault : dinfo.features.contains(AFeature);
+	if (!dinfo.error.isNull())
+		return ADefault;
+	if (!dinfo.contactJid.isValid())
+		return ADefault;
+	return dinfo.features.contains(AFeature);
 }
 
 QList<IDiscoInfo> ServiceDiscovery::findDiscoInfo(const Jid &AStreamJid, const IDiscoIdentity &AIdentity, const QStringList &AFeatures, const IDiscoItem &AParent) const
