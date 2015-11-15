@@ -1468,6 +1468,7 @@ void MultiUserChatManager::onRostersModelStreamsLayoutChanged(int ABefore)
 		IRosterIndex *chatGroup = getConferencesGroupIndex((*it)->data(RDR_STREAM_JID).toString());
 		if (chatGroup)
 			FRostersModel->insertRosterIndex(*it,chatGroup);
+		updateMultiChatRecentItem(*it);
 	}
 }
 
