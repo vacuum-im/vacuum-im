@@ -27,9 +27,9 @@
 #define SCROLL_TIMEOUT                      100
 #define CONTENT_TIMEOUT                     10
 
-#define SHARED_STYLE_PATH                   RESOURCES_DIR " / " RSR_STORAGE_ADIUMMESSAGESTYLES " / " FILE_STORAGE_SHARED_DIR
+#define SHARED_STYLE_PATH                   RESOURCES_DIR "/" RSR_STORAGE_ADIUMMESSAGESTYLES "/" FILE_STORAGE_SHARED_DIR
 #define STYLE_CONTENTS_PATH                 "Contents"
-#define STYLE_RESOURCES_PATH                STYLE_CONTENTS_PATH"/Resources"
+#define STYLE_RESOURCES_PATH                STYLE_CONTENTS_PATH "/Resources"
 
 #define APPEND_MESSAGE_WITH_SCROLL          "checkIfScrollToBottomIsNeeded(); appendMessage(\"%1\"); scrollToBottomIfNeeded();"
 #define APPEND_NEXT_MESSAGE_WITH_SCROLL     "checkIfScrollToBottomIsNeeded(); appendNextMessage(\"%1\"); scrollToBottomIfNeeded();"
