@@ -885,6 +885,15 @@
         <source>Supports the direct invitations to conferences</source>
         <translation>Поддерживает непосредственные приглашения в конференции</translation>
     </message>
+    <message>
+        <source>Show/Hide conference participants list</source>
+        <translation>Показать/Скрыть список участников конференции</translation>
+    </message>
+    <message>
+        <source>Ctrl+U</source>
+        <comment>Show/Hide conference participants list</comment>
+        <translation>Ctrl+U</translation>
+    </message>
 </context>
 <context>
     <name>MultiUserChatWindow</name>

@@ -1218,6 +1218,7 @@ void MultiUserChatWindow::createStaticRoomActions()
 	FHideUserView->setCheckable(true);
 	FHideUserView->setToolTip(tr("Show participants list"));
 	FHideUserView->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_USERS_HIDE);
+	FHideUserView->setShortcutId(SCT_MESSAGEWINDOWS_SHOWMUCUSERS);
 	connect(FHideUserView,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
 	FToolBarWidget->toolBarChanger()->insertAction(FHideUserView,TBG_MCWTBW_USERS_HIDE);
 

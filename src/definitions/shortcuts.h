@@ -11,14 +11,12 @@
 #define   SCT_GLOBAL_TOGGLESOUND                                   "global.toggle-sound"
 #define   SCT_GLOBAL_ACTIVATELASTNOTIFICATION                      "global.activate-last-notification"
 
-
 //PluginManager
 #define SCTG_APPLICATION                                           "application"
 //MultiUserChat
 #define   SCT_APP_MUCJOIN                                          "application.muc-join"
 //FileStreamsManager
 #define   SCT_APP_SHOWFILETRANSFERS                                "application.show-filetransfers"
-
 
 //RosterView
 #define SCTG_ROSTERVIEW                                            "roster-view"
@@ -46,7 +44,6 @@
 #define   SCT_ROSTERVIEW_DESTROYMETACONTACT                        "roster-view.destroy-metacontact"
 #define   SCT_ROSTERVIEW_DETACHFROMMETACONTACT                     "roster-view.detach-from-metacontact"
 
-
 //MessageWidgets
 #define SCTG_MESSAGEWINDOWS                                        "message-windows"
 #define   SCT_MESSAGEWINDOWS_QUOTE                                 "message-windows.quote"
@@ -61,7 +58,8 @@
 #define   SCT_MESSAGEWINDOWS_SHOWHISTORY                           "message-windows.show-history"
 //vCard
 #define   SCT_MESSAGEWINDOWS_SHOWVCARD                             "message-windows.show-vcard"
-
+//MultiUserChat
+#define   SCT_MESSAGEWINDOWS_SHOWMUCUSERS                          "message-windows.show-muc-users"
 
 //MessageWidgets
 #define SCTG_TABWINDOW                                             "tab-window"

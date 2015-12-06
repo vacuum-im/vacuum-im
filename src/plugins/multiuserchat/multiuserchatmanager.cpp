@@ -211,6 +211,7 @@ bool MultiUserChatManager::initConnections(IPluginManager *APluginManager, int &
 bool MultiUserChatManager::initObjects()
 {
 	Shortcuts::declareShortcut(SCT_APP_MUCJOIN, tr("Join conference"), tr("Ctrl+J","Join conference"), Shortcuts::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SHOWMUCUSERS, tr("Show/Hide conference participants list"), tr("Ctrl+U","Show/Hide conference participants list"));
 	Shortcuts::insertWidgetShortcut(SCT_APP_MUCJOIN,qApp->desktop());
 
 	if (FDataForms)
