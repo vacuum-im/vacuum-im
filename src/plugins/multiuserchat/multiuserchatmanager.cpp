@@ -1553,12 +1553,19 @@ void MultiUserChatManager::onRostersViewIndexContextMenu(const QList<IRosterInde
 				data.insert(ADR_NICK,rolesMap.value(RDR_MUC_NICK));
 				data.insert(ADR_PASSWORD,rolesMap.value(RDR_MUC_PASSWORD));
 
-				Action *join = new Action(AMenu);
-				join->setData(data);
-				join->setText(tr("Join to Conference"));
-				join->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_ENTER_ROOM);
-				connect(join,SIGNAL(triggered(bool)),SLOT(onEnterRoomActionTriggered(bool)));
-				AMenu->addAction(join,AG_RVCM_MULTIUSERCHAT_EXIT);
+				foreach(const Jid &streamJid, rolesMap.value(RDR_STREAM_JID))
+				{
+					if (isReady(streamJid))
+					{
+						Action *join = new Action(AMenu);
+						join->setData(data);
+						join->setText(tr("Join to Conference"));
+						join->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_ENTER_ROOM);
+						connect(join,SIGNAL(triggered(bool)),SLOT(onEnterRoomActionTriggered(bool)));
+						AMenu->addAction(join,AG_RVCM_MULTIUSERCHAT_EXIT);
+						break;
+					}
+				}
 
 				if (isMultiSelection)
 				{
@@ -1584,7 +1591,7 @@ void MultiUserChatManager::onRostersViewIndexContextMenu(const QList<IRosterInde
 					AMenu->addAction(open,AG_RVCM_MULTIUSERCHAT_OPEN);
 				}
 
-				if (window->multiUserChat()->state() == IMultiUserChat::Closed)
+				if (isReady(window->streamJid()) && window->multiUserChat()->state()==IMultiUserChat::Closed)
 				{
 					Action *enter = new Action(AMenu);
 					enter->setText(tr("Enter to Conference"));

@@ -266,11 +266,13 @@ public:
 	virtual SplitterWidget *centralWidgetsBox() const =0;
 	virtual IMessageChatWindow *openPrivateChatWindow(const Jid &AContactJid) =0;
 	virtual IMessageChatWindow *findPrivateChatWindow(const Jid &AContactJid) const =0;
+	virtual Menu *roomToolsMenu() const =0;
 	virtual void contextMenuForRoom(Menu *AMenu) =0;
 	virtual void contextMenuForUser(IMultiUser *AUser, Menu *AMenu) =0;
 	virtual void toolTipsForUser(IMultiUser *AUser, QMap<int,QString> &AToolTips) =0;
 	virtual void exitAndDestroy(const QString &AStatus, int AWaitClose = 5000) =0;
 protected:
+	virtual void roomToolsMenuAboutToShow() =0;
 	virtual void multiChatContextMenu(Menu *AMenu) =0;
 	virtual void multiUserContextMenu(IMultiUser *AUser, Menu *AMenu) =0;
 	virtual void multiUserToolTips(IMultiUser *AUser, QMap<int,QString> &AToolTips) =0;

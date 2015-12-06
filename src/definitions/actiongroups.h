@@ -59,6 +59,19 @@
 #define AG_MUCM_MULTIUSERCHAT_UTILS                             700
 #define AG_MUCM_VCARD                                           900
 
+//MultiuserChat - ToolsMenu
+#define AG_MUTM_BOOKMARKS_AUTOJOIN                              400
+#define AG_MUTM_MULTIUSERCHAT_NOTIFYSILENCE                     400
+#define AG_MUTM_MULTIUSERCHAT_CHANGENICK                        600
+#define AG_MUTM_MULTIUSERCHAT_CHANGETOPIC                       600
+#define AG_MUTM_MULTIUSERCHAT_CHANGEPASSWORD                    600
+#define AG_MUTM_MULTIUSERCHAT_REQUESTVOICE                      600
+#define AG_MUTM_MULTIUSERCHAT_AFFILIATIONS                      800
+#define AG_MUTM_MULTIUSERCHAT_CONFIGROOM                        800
+#define AG_MUTM_MULTIUSERCHAT_DESTROYROOM                       800
+#define AG_MUTM_MULTIUSERCHAT_ENTERROOM                         1000
+#define AG_MUTM_MULTIUSERCHAT_EXITROOM                          1000
+
 //RostersView - ContextMenu
 #define AG_RVCM_ROSTERSVIEW_STREAMS                             100
 #define AG_RVCM_CHATMESSAGEHANDLER                              200
@@ -81,10 +94,8 @@
 #define AG_RVCM_STATUSICONS                                     500
 #define AG_RVCM_RECENT_FAVORITES                                600
 #define AG_RVCM_BOOKMARS_TOOLS                                  600
-#define AG_RVCM_MULTIUSERCHAT_COMMON                            650
 #define AG_RVCM_ACCOUNTMANAGER                                  700
 #define AG_RVCM_RCHANGER                                        700
-#define AG_RVCM_MULTIUSERCHAT_TOOLS                             700
 #define AG_RVCM_RECENT_OPTIONS                                  700
 #define AG_RVCM_METACONTACTS                                    700
 #define AG_RVCM_GATEWAYS_LOGIN                                  800

@@ -9,6 +9,10 @@
     <object mime="image/png">mucjoin.png</object>
   </icon>
   <icon>
+    <key>mucTools</key>
+    <object mime="image/png">muctools.png</object>
+  </icon>
+  <icon>
     <key>mucInvite</key>
     <object mime="image/png">mucinvite.png</object>
   </icon>

@@ -819,45 +819,13 @@ IMessageChatWindow *MultiUserChatWindow::findPrivateChatWindow(const Jid &AConta
 	return NULL;
 }
 
+Menu *MultiUserChatWindow::roomToolsMenu() const
+{
+	return FToolsMenu;
+}
+
 void MultiUserChatWindow::contextMenuForRoom(Menu *AMenu)
 {
-	QString role = FMultiChat->isOpen() ? FMultiChat->mainUser()->role() : MUC_ROLE_NONE;
-	QString affiliation = FMultiChat->isOpen() ? FMultiChat->mainUser()->affiliation() : MUC_AFFIL_NONE;
-
-	if (affiliation == MUC_AFFIL_OWNER)
-	{
-		AMenu->addAction(FChangeNick,AG_RVCM_MULTIUSERCHAT_COMMON);
-		AMenu->addAction(FChangeTopic,AG_RVCM_MULTIUSERCHAT_COMMON);
-		AMenu->addAction(FEditAffiliations,AG_RVCM_MULTIUSERCHAT_TOOLS);
-		AMenu->addAction(FConfigRoom,AG_RVCM_MULTIUSERCHAT_TOOLS);
-		AMenu->addAction(FDestroyRoom,AG_RVCM_MULTIUSERCHAT_TOOLS);
-	}
-	else if (affiliation == MUC_AFFIL_ADMIN)
-	{
-		AMenu->addAction(FChangeNick,AG_RVCM_MULTIUSERCHAT_COMMON);
-		AMenu->addAction(FChangeTopic,AG_RVCM_MULTIUSERCHAT_COMMON);
-		AMenu->addAction(FEditAffiliations,AG_RVCM_MULTIUSERCHAT_TOOLS);
-	}
-	else if (role == MUC_ROLE_VISITOR)
-	{
-		AMenu->addAction(FChangeNick,AG_RVCM_MULTIUSERCHAT_COMMON);
-		AMenu->addAction(FRequestVoice,AG_RVCM_MULTIUSERCHAT_COMMON);
-	}
-	else if (FMultiChat->isOpen())
-	{
-		AMenu->addAction(FChangeNick,AG_RVCM_MULTIUSERCHAT_COMMON);
-		AMenu->addAction(FChangeTopic,AG_RVCM_MULTIUSERCHAT_COMMON);
-	}
-	else
-	{
-		AMenu->addAction(FChangeNick,AG_RVCM_MULTIUSERCHAT_COMMON);
-	}
-
-	if (FMultiChat->roomError().toStanzaError().conditionCode() == XmppStanzaError::EC_NOT_AUTHORIZED)
-	{
-		AMenu->addAction(FChangePassword,AG_RVCM_MULTIUSERCHAT_COMMON);
-	}
-
 	emit multiChatContextMenu(AMenu);
 }
 
@@ -1154,82 +1122,89 @@ void MultiUserChatWindow::createStaticRoomActions()
 	FInviteUsers->setTitle(tr("Invite to Conference"));
 	FInviteUsers->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_INVITE);
 	connect(FInviteUsers,SIGNAL(inviteAccepted(const QMultiMap<Jid, Jid> &)),SLOT(onInviteUserMenuAccepted(const QMultiMap<Jid, Jid> &)));
-	QToolButton *inviteUsersButton = FToolBarWidget->toolBarChanger()->insertAction(FInviteUsers->menuAction(),TBG_MWTBW_MULTIUSERCHAT_INVITE);
-	inviteUsersButton->setPopupMode(QToolButton::InstantPopup);
-
-	FChangeNick = new Action(this);
-	FChangeNick->setText(tr("Change Nick"));
-	FChangeNick->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CHANGE_NICK);
-	connect(FChangeNick,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
-
-	FChangePassword = new Action(this);
-	FChangePassword->setText(tr("Change Password"));
-	FChangePassword->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CHANGE_PASSWORD);
-	connect(FChangePassword,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
-
-	FChangeTopic = new Action(this);
-	FChangeTopic->setText(tr("Change Topic"));
-	FChangeTopic->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CHANGE_TOPIC);
-	connect(FChangeTopic,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
-
-	FRequestVoice = new Action(this);
-	FRequestVoice->setText(tr("Request Voice"));
-	FRequestVoice->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_REQUEST_VOICE);
-	connect(FRequestVoice,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
-
-	FEditAffiliations = new Action(this);
-	FEditAffiliations->setText(tr("Edit Users Lists"));
-	FEditAffiliations->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_EDIT_AFFILIATIONS);
-	connect(FEditAffiliations,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
-
-	FConfigRoom = new Action(this);
-	FConfigRoom->setText(tr("Configure Conference"));
-	FConfigRoom->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CONFIGURE_ROOM);
-	connect(FConfigRoom,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
-
-	FDestroyRoom = new Action(this);
-	FDestroyRoom->setText(tr("Destroy Conference"));
-	FDestroyRoom->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_DESTROY_ROOM);
-	connect(FDestroyRoom,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
-
-	FClearChat = new Action(this);
-	FClearChat->setToolTip(tr("Clear window"));
-	FClearChat->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CLEAR_CHAT);
-	connect(FClearChat,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
-	FToolBarWidget->toolBarChanger()->insertAction(FClearChat,TBG_MWTBW_CLEAR_WINDOW);
-
-	FEnterRoom = new Action(this);
-	FEnterRoom->setText(tr("Enter"));
-	FEnterRoom->setToolTip(tr("Enter conference"));
-	FEnterRoom->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_ENTER_ROOM);
-	connect(FEnterRoom,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
-	QToolButton *enterButton = FToolBarWidget->toolBarChanger()->insertAction(FEnterRoom, TBG_MCWTBW_ROOM_ENTER);
-	enterButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-
-	FExitRoom = new Action(this);
-	FExitRoom->setText(tr("Exit"));
-	FExitRoom->setToolTip(tr("Exit conference"));
-	FExitRoom->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_EXIT_ROOM);
-	connect(FExitRoom,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
-	QToolButton *exitButton = FToolBarWidget->toolBarChanger()->insertAction(FExitRoom, TBG_MCWTBW_ROOM_EXIT);
-	exitButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+	FToolBarWidget->toolBarChanger()->insertAction(FInviteUsers->menuAction(),TBG_MWTBW_MULTIUSERCHAT_INVITE)->setPopupMode(QToolButton::InstantPopup);
 
 	FHideUserView = new Action(this);
 	FHideUserView->setCheckable(true);
-	FHideUserView->setToolTip(tr("Show participants list"));
+	FHideUserView->setText(tr("Show participants list"));
 	FHideUserView->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_USERS_HIDE);
 	FHideUserView->setShortcutId(SCT_MESSAGEWINDOWS_SHOWMUCUSERS);
 	connect(FHideUserView,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
 	FToolBarWidget->toolBarChanger()->insertAction(FHideUserView,TBG_MCWTBW_USERS_HIDE);
 
+	FClearChat = new Action(this);
+	FClearChat->setText(tr("Clear Window"));
+	FClearChat->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CLEAR_CHAT);
+	connect(FClearChat,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
+	FToolBarWidget->toolBarChanger()->insertAction(FClearChat,TBG_MWTBW_CLEAR_WINDOW);
+
+	FToolsMenu = new Menu(this);
+	FToolsMenu->setTitle(tr("Conference Tools"));
+	FToolsMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_TOOLS);
+	connect(FToolsMenu,SIGNAL(aboutToShow()),SIGNAL(roomToolsMenuAboutToShow()));
+	FToolBarWidget->toolBarChanger()->insertAction(FToolsMenu->menuAction(),TBG_MCWTBW_ROOM_TOOLS)->setPopupMode(QToolButton::InstantPopup);
+
+	FEditAffiliations = new Action(this);
+	FEditAffiliations->setText(tr("Edit Users Lists"));
+	FEditAffiliations->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_EDIT_AFFILIATIONS);
+	connect(FEditAffiliations,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
+	FToolsMenu->addAction(FEditAffiliations,AG_MUTM_MULTIUSERCHAT_AFFILIATIONS,true);
+
+	FConfigRoom = new Action(this);
+	FConfigRoom->setText(tr("Configure Conference"));
+	FConfigRoom->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CONFIGURE_ROOM);
+	connect(FConfigRoom,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
+	FToolsMenu->addAction(FConfigRoom,AG_MUTM_MULTIUSERCHAT_CONFIGROOM,true);
+
+	FDestroyRoom = new Action(this);
+	FDestroyRoom->setText(tr("Destroy Conference"));
+	FDestroyRoom->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_DESTROY_ROOM);
+	connect(FDestroyRoom,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
+	FToolsMenu->addAction(FDestroyRoom,AG_MUTM_MULTIUSERCHAT_DESTROYROOM,true);
+
+	FChangeNick = new Action(this);
+	FChangeNick->setText(tr("Change Nick"));
+	FChangeNick->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CHANGE_NICK);
+	connect(FChangeNick,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
+	FToolsMenu->addAction(FChangeNick,AG_MUTM_MULTIUSERCHAT_CHANGENICK,true);
+
+	FChangeTopic = new Action(this);
+	FChangeTopic->setText(tr("Change Topic"));
+	FChangeTopic->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CHANGE_TOPIC);
+	connect(FChangeTopic,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
+	FToolsMenu->addAction(FChangeTopic,AG_MUTM_MULTIUSERCHAT_CHANGETOPIC,true);
+
+	FChangePassword = new Action(this);
+	FChangePassword->setText(tr("Change Password"));
+	FChangePassword->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CHANGE_PASSWORD);
+	connect(FChangePassword,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
+	FToolsMenu->addAction(FChangePassword,AG_MUTM_MULTIUSERCHAT_CHANGEPASSWORD,true);
+
+	FRequestVoice = new Action(this);
+	FRequestVoice->setText(tr("Request Voice"));
+	FRequestVoice->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_REQUEST_VOICE);
+	connect(FRequestVoice,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
+	FToolsMenu->addAction(FRequestVoice,AG_MUTM_MULTIUSERCHAT_REQUESTVOICE,true);
+
 	FToggleSilence = new Action(this);
 	FToggleSilence->setCheckable(true);
-	FToggleSilence->setToolTip(tr("Notify only about messages addressed to you personally"));
+	FToggleSilence->setText(tr("Disable Notifications"));
 	FToggleSilence->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_NOTIFY_SILENCE);
-	connect(FToggleSilence,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
-	FToolBarWidget->toolBarChanger()->insertAction(FToggleSilence,TBG_MCWTBW_NOTIFY_SILENCE);
 	FToggleSilence->setChecked(Options::node(OPV_MUC_GROUPCHAT_ITEM,contactJid().pBare()).node("notify-silence").value().toBool());
+	connect(FToggleSilence,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
+	FToolsMenu->addAction(FToggleSilence,AG_MUTM_MULTIUSERCHAT_NOTIFYSILENCE);
 
+	FEnterRoom = new Action(this);
+	FEnterRoom->setText(tr("Enter to Conference"));
+	FEnterRoom->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_ENTER_ROOM);
+	connect(FEnterRoom,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
+	FToolsMenu->addAction(FEnterRoom,AG_MUTM_MULTIUSERCHAT_ENTERROOM);
+
+	FExitRoom = new Action(this);
+	FExitRoom->setText(tr("Exit from Conference"));
+	FExitRoom->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_EXIT_ROOM);
+	connect(FExitRoom,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
+	FToolsMenu->addAction(FExitRoom,AG_MUTM_MULTIUSERCHAT_EXITROOM);
 }
 
 void MultiUserChatWindow::saveWindowState()
@@ -1297,6 +1272,26 @@ void MultiUserChatWindow::refreshCompleteNicks()
 
 	int curNickIndex = FCompleteNicks.indexOf(FCompleteNickLast);
 	FCompleteIt = FCompleteNicks.constBegin() + (curNickIndex >= 0 ? curNickIndex : 0);
+}
+
+void MultiUserChatWindow::updateStaticRoomActions()
+{
+	QString role = FMultiChat->isOpen() ? FMultiChat->mainUser()->role() : MUC_ROLE_NONE;
+	QString affiliation = FMultiChat->isOpen() ? FMultiChat->mainUser()->affiliation() : MUC_AFFIL_NONE;
+
+	FConfigRoom->setVisible(affiliation == MUC_AFFIL_OWNER);
+	FDestroyRoom->setVisible(affiliation == MUC_AFFIL_OWNER);
+	FEditAffiliations->setVisible(affiliation==MUC_AFFIL_OWNER || affiliation==MUC_AFFIL_ADMIN);
+
+	FRequestVoice->setVisible(role == MUC_ROLE_VISITOR);
+	FChangeTopic->setVisible(affiliation==MUC_AFFIL_OWNER || affiliation==MUC_AFFIL_ADMIN || affiliation==MUC_AFFIL_MEMBER);
+	FChangePassword->setVisible(FMultiChat->roomError().toStanzaError().conditionCode() == XmppStanzaError::EC_NOT_AUTHORIZED);
+
+	QAction *inviteHandle = FToolBarWidget->toolBarChanger()->actionHandle(FInviteUsers->menuAction());
+	if (inviteHandle)
+		inviteHandle->setEnabled(FMultiChat->state() == IMultiUserChat::Opened);
+
+	FEnterRoom->setVisible(FMultiChatManager->isReady(streamJid()) && FMultiChat->state()==IMultiUserChat::Closed);
 }
 
 bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
@@ -2150,14 +2145,6 @@ bool MultiUserChatWindow::eventFilter(QObject *AObject, QEvent *AEvent)
 
 void MultiUserChatWindow::onMultiChatStateChanged(int AState)
 {
-	QAction *enterHandler = FToolBarWidget->toolBarChanger()->actionHandle(FEnterRoom);
-	if (enterHandler)
-		enterHandler->setVisible(AState == IMultiUserChat::Closed);
-
-	QAction *inviteHandle = FToolBarWidget->toolBarChanger()->actionHandle(FInviteUsers->menuAction());
-	if (inviteHandle)
-		inviteHandle->setEnabled(AState == IMultiUserChat::Opened);
-
 	if (AState == IMultiUserChat::Opened)
 	{
 		if (FStanzaProcessor)
@@ -2173,7 +2160,6 @@ void MultiUserChatWindow::onMultiChatStateChanged(int AState)
 			FSHIAnyStanza = FStanzaProcessor->insertStanzaHandle(shandle);
 		}
 
-		updateRecentItemActiveTime(NULL);
 		showMultiChatStatusMessage(tr("You have joined the conference"),IMessageStyleContentOptions::TypeEvent,IMessageStyleContentOptions::StatusOnline);
 
 		if (FMultiChat->mainUser()->role() == MUC_ROLE_VISITOR)
@@ -2191,6 +2177,8 @@ void MultiUserChatWindow::onMultiChatStateChanged(int AState)
 			FInitializeConfig = true;
 			FConfigLoadRequestId = FMultiChat->loadRoomConfig();
 		}
+
+		updateRecentItemActiveTime(NULL);
 	}
 	else if (AState == IMultiUserChat::Closed)
 	{
@@ -2312,6 +2300,8 @@ void MultiUserChatWindow::onMultiChatStateChanged(int AState)
 			deleteLater();
 		}
 	}
+
+	updateStaticRoomActions();
 }
 
 void MultiUserChatWindow::onMultiChatRoomTitleChanged(const QString &ATitle)
@@ -2478,11 +2468,15 @@ void MultiUserChatWindow::onMultiChatUserChanged(IMultiUser *AUser, int AData, c
 	}
 	else if (AData == MUDR_ROLE)
 	{
+		if (AUser == FMultiChat->mainUser())
+			updateStaticRoomActions();
 		if (AUser->role()!=MUC_ROLE_NONE && ABefore!=MUC_ROLE_NONE)
 			showMultiChatStatusMessage(tr("%1 changed role from %2 to %3").arg(AUser->nick()).arg(ABefore.toString()).arg(AUser->role()),IMessageStyleContentOptions::TypeEvent);
 	}
 	else if (AData == MUDR_AFFILIATION)
 	{
+		if (AUser == FMultiChat->mainUser())
+			updateStaticRoomActions();
 		if (FUsers.contains(AUser))
 			showMultiChatStatusMessage(tr("%1 changed affiliation from %2 to %3").arg(AUser->nick()).arg(ABefore.toString()).arg(AUser->affiliation()),IMessageStyleContentOptions::TypeEvent);
 	}

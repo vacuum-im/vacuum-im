@@ -85,6 +85,7 @@ protected slots:
 	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 protected slots:
 	void onMultiChatPropertiesChanged();
+	void onMultiChatWindowToolsMenuAboutToShow();
 	void onMultiChatWindowBookmarkActionTriggered(bool);
 	void onMultiChatWindowCreated(IMultiUserChatWindow *AWindow);
 protected slots:

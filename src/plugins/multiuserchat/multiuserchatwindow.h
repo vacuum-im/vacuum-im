@@ -96,6 +96,7 @@ public:
 	virtual SplitterWidget *centralWidgetsBox() const;
 	virtual IMessageChatWindow *openPrivateChatWindow(const Jid &AContactJid);
 	virtual IMessageChatWindow *findPrivateChatWindow(const Jid &AContactJid) const;
+	virtual Menu *roomToolsMenu() const;
 	virtual void contextMenuForRoom(Menu *AMenu);
 	virtual void contextMenuForUser(IMultiUser *AUser, Menu *AMenu);
 	virtual void toolTipsForUser(IMultiUser *AUser, QMap<int,QString> &AToolTips);
@@ -115,6 +116,7 @@ signals:
 	//IMessageWindow
 	void widgetLayoutChanged();
 	//IMultiUserChatWindow
+	void roomToolsMenuAboutToShow();
 	void multiChatContextMenu(Menu *AMenu);
 	void multiUserContextMenu(IMultiUser *AUser, Menu *AMenu);
 	void multiUserToolTips(IMultiUser *AUser, QMap<int,QString> &AToolTips);
@@ -131,6 +133,7 @@ protected:
 	void loadWindowGeometry();
 protected:
 	void refreshCompleteNicks();
+	void updateStaticRoomActions();
 	bool execShortcutCommand(const QString &AText);
 	void updateRecentItemActiveTime(IMessageChatWindow *AWindow);
 	IMultiUser *userAtViewPosition(const QPoint &APosition) const;
@@ -225,17 +228,18 @@ protected slots:
 private:
 	Menu *FInviteUsers;
 	Action *FClearChat;
-	Action *FEnterRoom;
-	Action *FExitRoom;
-	Action *FChangeNick;
-	Action *FChangePassword;
-	Action *FRequestVoice;
-	Action *FChangeTopic;
-	Action *FEditAffiliations;
+	Action *FHideUserView;
+	Menu *FToolsMenu;
 	Action *FConfigRoom;
 	Action *FDestroyRoom;
-	Action *FHideUserView;
+	Action *FEditAffiliations;
+	Action *FChangeNick;
+	Action *FChangeTopic;
+	Action *FChangePassword;
+	Action *FRequestVoice;
 	Action *FToggleSilence;
+	Action *FEnterRoom;
+	Action *FExitRoom;
 private:
 	IAvatars *FAvatars;
 	IDataForms *FDataForms;

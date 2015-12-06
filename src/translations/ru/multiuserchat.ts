@@ -994,14 +994,6 @@
         <translation>Не удалось загрузить историю: %1</translation>
     </message>
     <message>
-        <source>Enter</source>
-        <translation>Войти</translation>
-    </message>
-    <message>
-        <source>Exit</source>
-        <translation>Выйти</translation>
-    </message>
-    <message>
         <source>Change Nick</source>
         <translation>Изменить ник</translation>
     </message>
@@ -1024,14 +1016,6 @@
     <message>
         <source>Destroy Conference</source>
         <translation>Удалить конференцию</translation>
-    </message>
-    <message>
-        <source>Enter conference</source>
-        <translation>Войти в конференцию</translation>
-    </message>
-    <message>
-        <source>Exit conference</source>
-        <translation>Выйти из конференции</translation>
     </message>
     <message>
         <source>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</source>
@@ -1446,10 +1430,6 @@
         <translation>Редактировать списки пользователей</translation>
     </message>
     <message>
-        <source>Notify only about messages addressed to you personally</source>
-        <translation>Уведомлять только о сообщениях адресованных лично вам</translation>
-    </message>
-    <message>
         <source>Show participants list</source>
         <translation>Показать список участников</translation>
     </message>
@@ -1464,6 +1444,26 @@
     <message>
         <source>You invited %1 to this conference. %2</source>
         <translation>Вы пригласили %1 в эту конференцию. %2</translation>
+    </message>
+    <message>
+        <source>Clear Window</source>
+        <translation>Очистить окно</translation>
+    </message>
+    <message>
+        <source>Conference Tools</source>
+        <translation>Инструмены конференции</translation>
+    </message>
+    <message>
+        <source>Disable Notifications</source>
+        <translation>Отключить уведомления</translation>
+    </message>
+    <message>
+        <source>Enter to Conference</source>
+        <translation>Войти в конференцию</translation>
+    </message>
+    <message>
+        <source>Exit from Conference</source>
+        <translation>Выйти из конференции</translation>
     </message>
 </context>
 <context>

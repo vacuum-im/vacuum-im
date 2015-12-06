@@ -862,6 +862,36 @@ void Bookmarks::onMultiChatPropertiesChanged()
 	}
 }
 
+void Bookmarks::onMultiChatWindowToolsMenuAboutToShow()
+{
+	IMultiUserChatWindow *window = qobject_cast<IMultiUserChatWindow *>(sender());
+	if (window && isReady(window->streamJid()))
+	{
+		Menu *toolsMenu = window->roomToolsMenu();
+
+		IBookmark ref;
+		ref.type = IBookmark::TypeRoom;
+		ref.room.roomJid = window->multiUserChat()->roomJid();
+
+		QList<IBookmark> bookmarkList = FBookmarks.value(window->streamJid());
+		IBookmark bookmark = bookmarkList.value(bookmarkList.indexOf(ref));
+
+		Action *autoJoinAction = new Action(toolsMenu);
+		autoJoinAction->setCheckable(true);
+		autoJoinAction->setChecked(bookmark.room.autojoin);
+		autoJoinAction->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_AUTO_JOIN);
+		autoJoinAction->setText(tr("Join to Conference at Startup"));
+		autoJoinAction->setData(ADR_STREAM_JID,window->streamJid().full());
+		autoJoinAction->setData(ADR_BOOKMARK_NAME,window->multiUserChat()->roomName());
+		autoJoinAction->setData(ADR_BOOKMARK_ROOM_JID,window->multiUserChat()->roomJid().pBare());
+		autoJoinAction->setData(ADR_BOOKMARK_ROOM_NICK,window->multiUserChat()->nickname());
+		autoJoinAction->setData(ADR_BOOKMARK_ROOM_PASSWORD,window->multiUserChat()->password());
+		connect(autoJoinAction,SIGNAL(triggered(bool)),SLOT(onChangeBookmarkAutoJoinActionTriggered(bool)));
+		connect(toolsMenu,SIGNAL(aboutToHide()),autoJoinAction,SLOT(deleteLater()));
+		toolsMenu->addAction(autoJoinAction,AG_MUTM_BOOKMARKS_AUTOJOIN,true);
+	}
+}
+
 void Bookmarks::onMultiChatWindowBookmarkActionTriggered(bool)
 {
 	Action *action = qobject_cast<Action *>(sender());
@@ -904,6 +934,8 @@ void Bookmarks::onMultiChatWindowCreated(IMultiUserChatWindow *AWindow)
 	action->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_ADD);
 	connect(action,SIGNAL(triggered(bool)),SLOT(onMultiChatWindowBookmarkActionTriggered(bool)));
 	AWindow->infoWidget()->infoToolBarChanger()->insertAction(action,TBG_MWIWTB_BOOKMARKS);
+
+	connect(AWindow->instance(),SIGNAL(roomToolsMenuAboutToShow()),SLOT(onMultiChatWindowToolsMenuAboutToShow()));
 
 	connect(AWindow->multiUserChat()->instance(),SIGNAL(passwordChanged(const QString &)),SLOT(onMultiChatPropertiesChanged()));
 	connect(AWindow->multiUserChat()->instance(),SIGNAL(nicknameChanged(const QString &, const XmppError &)),SLOT(onMultiChatPropertiesChanged()));

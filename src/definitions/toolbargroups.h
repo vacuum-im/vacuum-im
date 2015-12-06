@@ -30,10 +30,8 @@
 #define TBG_MWNWTB_WINDOWMENU                                   15000
 
 //MultiChatWindow - ToolBarWidget
-#define TBG_MCWTBW_NOTIFY_SILENCE                               10120
 #define TBG_MCWTBW_USERS_HIDE                                   10190
-#define TBG_MCWTBW_ROOM_ENTER                                   10990
-#define TBG_MCWTBW_ROOM_EXIT                                    10995
+#define TBG_MCWTBW_ROOM_TOOLS                                   11000
 
 //SeriveDiscovery - DiscoItemsWindow
 #define TBG_DIWT_DISCOVERY_NAVIGATE                             100
