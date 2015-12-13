@@ -723,15 +723,18 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 			notify.data.insert(NDR_ROSTER_SEARCH_DATA,searchData);
 		}
 
-		if ((notify.kinds & INotification::PopupWindow)>0 && !Options::node(OPV_NOTIFICATIONS_HIDEMESSAGE).value().toBool())
+		if (!isEmptyMessage && (notify.kinds & INotification::PopupWindow)>0 && !Options::node(OPV_NOTIFICATIONS_HIDEMESSAGE).value().toBool())
 		{
-			if (FMessageProcessor)
+			if (!notify.data.contains(NDR_POPUP_HTML) && !notify.data.contains(NDR_POPUP_TEXT))
 			{
-				QTextDocument doc;
-				FMessageProcessor->messageToText(&doc,AMessage);
-				notify.data.insert(NDR_POPUP_HTML,TextManager::getDocumentBody(doc));
+				if (FMessageProcessor)
+				{
+					QTextDocument doc;
+					FMessageProcessor->messageToText(&doc,AMessage);
+					notify.data.insert(NDR_POPUP_HTML,TextManager::getDocumentBody(doc));
+				}
+				notify.data.insert(NDR_POPUP_TEXT,AMessage.body());
 			}
-			notify.data.insert(NDR_POPUP_TEXT,AMessage.body());
 		}
 			
 		if (page)
