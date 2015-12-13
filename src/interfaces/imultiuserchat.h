@@ -92,6 +92,7 @@ struct IMultiUserViewNotify
 {
 	enum Flags {
 		Blink          = 0x01,
+		HookClicks     = 0x02,
 	};
 	IMultiUserViewNotify() {
 		order = -1;

@@ -59,10 +59,6 @@
         <translation>Отвлёкся</translation>
     </message>
     <message>
-        <source>User chat status</source>
-        <translation>Активность собеседника в чате</translation>
-    </message>
-    <message>
         <source>Always send</source>
         <translation>Всегда отправлять</translation>
     </message>
@@ -77,6 +73,34 @@
     <message>
         <source>Gone %1</source>
         <translation>Ушёл %1</translation>
+    </message>
+    <message>
+        <source>User activity in chat</source>
+        <translation>Активность собеседника в чате</translation>
+    </message>
+    <message>
+        <source>Users activity in conference</source>
+        <translation>Активность участников в конференции</translation>
+    </message>
+    <message>
+        <source>and %1 other</source>
+        <translation>и еще %1</translation>
+    </message>
+    <message numerus="yes">
+        <source>Paused %n</source>
+        <translation>
+            <numerusform>Отвлекся %n</numerusform>
+            <numerusform>Отвлеклись %n</numerusform>
+            <numerusform>Отвлеклись %n</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Active %n</source>
+        <translation>
+            <numerusform>Активен %n</numerusform>
+            <numerusform>Активных %n</numerusform>
+            <numerusform>Активных %n</numerusform>
+        </translation>
     </message>
 </context>
 </TS>

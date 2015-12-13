@@ -1168,15 +1168,16 @@ void RostersView::mouseDoubleClickEvent(QMouseEvent *AEvent)
 			IRosterIndex *index = FRostersModel->rosterIndexFromModelIndex(mapToModel(viewIndex));
 			if (index != NULL)
 			{
-				int notifyId = FActiveNotifies.value(index,-1);
-				if (notifyId<0 || (FNotifyItems.value(notifyId).flags & IRostersNotify::HookClicks)==0)
-				{
-					hooked = doubleClickOnIndex(index,AEvent);
-				}
-				else
+				int notifyId = FActiveNotifies.value(index);
+				bool activate = notifyId>0 ? (FNotifyItems.value(notifyId).flags & IRostersNotify::HookClicks)>0 : false;
+				if (activate)
 				{
 					hooked = true;
 					emit notifyActivated(notifyId);
+				}
+				else
+				{
+					hooked = doubleClickOnIndex(index,AEvent);
 				}
 			}
 		}

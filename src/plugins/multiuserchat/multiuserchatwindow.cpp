@@ -648,7 +648,7 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 					{
 						IMultiUserViewNotify notify;
 						notify.order = MUNO_PRIVATE_MESSAGE;
-						notify.flags |= IMultiUserViewNotify::Blink;
+						notify.flags = IMultiUserViewNotify::Blink|IMultiUserViewNotify::HookClicks;
 						notify.icon = iconStorage->getIcon(MNI_MUC_PRIVATE_MESSAGE);
 
 						int notifyId = FUsersView->insertItemNotify(notify,userItem);
@@ -2683,7 +2683,8 @@ void MultiUserChatWindow::onMultiChatUserItemDoubleClicked(const QModelIndex &AI
 {
 	QStandardItem *item = FUsersView->itemFromIndex(AIndex);
 	int notifyId = FUsersView->itemNotifies(item).value(0);
-	if (notifyId > 0)
+	bool activate = notifyId>0 ? (FUsersView->itemNotify(notifyId).flags & IMultiUserViewNotify::HookClicks)>0 : false;
+	if (activate)
 		FUsersView->activateItemNotify(notifyId);
 	else if (item->data(MUDR_KIND).toInt() == MUIK_USER)
 		openPrivateChatWindow(item->data(MUDR_USER_JID).toString());

@@ -3,17 +3,20 @@
 #include <QDateTime>
 #include <definitions/menuicons.h>
 #include <definitions/resources.h>
+#include <utils/textmanager.h>
 #include <utils/iconstorage.h>
 #include <utils/menu.h>
 
 #define ADR_PERMIT_STATUS     Action::DR_Parametr1
 
-StateWidget::StateWidget(IChatStates *AChatStates, IMessageChatWindow *AWindow, QWidget *AParent) : QToolButton(AParent)
+StateWidget::StateWidget(IChatStates *AChatStates, IMessageWindow *AWindow, QWidget *AParent) : QToolButton(AParent)
 {
 	FWindow = AWindow;
 	FChatStates = AChatStates;
+	FMultiWindow = qobject_cast<IMultiUserChatWindow *>(AWindow->instance());
 
 	FMenu = new Menu(this);
+	setMenu(FMenu);
 
 	Action *action = new Action(FMenu);
 	action->setCheckable(true);
@@ -36,16 +39,19 @@ StateWidget::StateWidget(IChatStates *AChatStates, IMessageChatWindow *AWindow, 
 	connect(action,SIGNAL(triggered(bool)),SLOT(onStatusActionTriggered(bool)));
 	FMenu->addAction(action);
 
-	setMenu(FMenu);
-	setToolTip(tr("User chat status"));
+	connect(FChatStates->instance(),SIGNAL(permitStatusChanged(const Jid &, int)),SLOT(onPermitStatusChanged(const Jid &, int)));
+	connect(FWindow->address()->instance(),SIGNAL(addressChanged(const Jid &, const Jid &)),SLOT(onWindowAddressChanged(const Jid &, const Jid &)));
 
-	connect(FChatStates->instance(),SIGNAL(permitStatusChanged(const Jid &, int)),
-		SLOT(onPermitStatusChanged(const Jid &, int)));
-	connect(FChatStates->instance(),SIGNAL(userChatStateChanged(const Jid &, const Jid &, int)),
-		SLOT(onUserChatStateChanged(const Jid &, const Jid &, int)));
-
-	connect(FWindow->address()->instance(),SIGNAL(addressChanged(const Jid &, const Jid &)),
-		SLOT(onWindowAddressChanged(const Jid &, const Jid &)));
+	if (FMultiWindow == NULL)
+	{
+		setToolTip(tr("User activity in chat"));
+		connect(FChatStates->instance(),SIGNAL(userChatStateChanged(const Jid &, const Jid &, int)),SLOT(onUserChatStateChanged(const Jid &, const Jid &, int)));
+	}
+	else
+	{
+		setToolTip(tr("Users activity in conference"));
+		connect(FChatStates->instance(),SIGNAL(userRoomStateChanged(const Jid &, const Jid &, int)),SLOT(onUserRoomStateChanged(const Jid &, const Jid &, int)));
+	}
 
 	onWindowAddressChanged(FWindow->streamJid(),FWindow->contactJid());
 }
@@ -117,9 +123,79 @@ void StateWidget::onUserChatStateChanged(const Jid &AStreamJid, const Jid &ACont
 	}
 }
 
+void StateWidget::onUserRoomStateChanged(const Jid &AStreamJid, const Jid &AUserJid, int AState)
+{
+	if (FWindow->streamJid()==AStreamJid && FWindow->contactJid().pBare()==AUserJid.pBare())
+	{
+		QString state;
+		QString iconKey;
+
+		IMultiUser *user = FMultiWindow->multiUserChat()->findUser(AUserJid.resource());
+		if (FMultiWindow->multiUserChat()->mainUser() != user)
+		{
+			if (AState == IChatStates::StateActive)
+				FActive += AUserJid;
+			else
+				FActive -= AUserJid;
+
+			if (AState == IChatStates::StateComposing)
+				FComposing += AUserJid;
+			else
+				FComposing -= AUserJid;
+
+			if (AState == IChatStates::StatePaused)
+				FPaused += AUserJid;
+			else
+				FPaused -= AUserJid;
+		}
+
+		if (!FComposing.isEmpty())
+		{
+			int hidden = 0;
+			foreach(const Jid &userJid, FComposing)
+			{
+				QString nick = TextManager::getElidedString(userJid.resource(),Qt::ElideRight,10);
+				if (state.isEmpty())
+					state = nick;
+				else if (state.length() < 20)
+					state += QString(", %1").arg(nick);
+				else
+					hidden++;
+			}
+			if (hidden > 0)
+			{
+				state += " ";
+				state += tr("and %1 other").arg(hidden);
+			}
+			iconKey = MNI_CHATSTATES_COMPOSING;
+		}
+		else if (!FPaused.isEmpty())
+		{
+			state = tr("Paused %n",0,FPaused.count());
+			iconKey = MNI_CHATSTATES_PAUSED;
+		}
+		else if (!FActive.isEmpty())
+		{
+			state = tr("Active %n",0,FActive.count());
+			iconKey = MNI_CHATSTATES_ACTIVE;
+		}
+		else
+		{
+			state = tr("Unknown");
+			iconKey = MNI_CHATSTATES_UNKNOWN;
+		}
+
+		setText(state);
+		IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,iconKey);
+	}
+}
+
 void StateWidget::onWindowAddressChanged(const Jid &AStreamBefore, const Jid &AContactBefore)
 {
 	Q_UNUSED(AStreamBefore); Q_UNUSED(AContactBefore);
+	if (FMultiWindow == NULL)
+		onUserChatStateChanged(FWindow->streamJid(),FWindow->contactJid(),FChatStates->userChatState(FWindow->streamJid(),FWindow->contactJid()));
+	else
+		onUserRoomStateChanged(FWindow->streamJid(),FWindow->contactJid(),IChatStates::StateUnknown);
 	onPermitStatusChanged(FWindow->contactJid(),FChatStates->permitStatus(FWindow->contactJid()));
-	onUserChatStateChanged(FWindow->streamJid(),FWindow->contactJid(),FChatStates->userChatState(FWindow->streamJid(),FWindow->contactJid()));
 }

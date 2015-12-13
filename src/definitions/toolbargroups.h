@@ -17,7 +17,7 @@
 #define TBG_MWTBW_VCARD_VIEW                                    900
 #define TBG_MWTBW_MULTIUSERCHAT_INVITE                          1000
 #define TBG_MWTBW_CLEAR_WINDOW                                  1800
-#define TBG_MWTBW_CHATSTATES                                    10100
+#define TBG_MWTBW_CHATSTATES                                    10050
 
 //MessageWidgets - InfowWidgetToolBar
 #define TBG_MWIWTB_ADDRESSMENU                                  500
