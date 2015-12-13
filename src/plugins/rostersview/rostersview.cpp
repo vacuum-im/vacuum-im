@@ -179,18 +179,21 @@ AdvancedDelegateItem RostersView::rosterLabel(int AOrder, quint32 ALabelId, cons
 	IRosterIndex *index = const_cast<IRosterIndex *>(AIndex);
 	if (AOrder==RLHO_ROSTERSVIEW_NOTIFY && ALabelId==AdvancedDelegateItem::DecorationId)
 	{
+		const IRostersNotify &notify = FNotifyItems.value(FActiveNotifies.value(index));
 		label.d->id = AdvancedDelegateItem::DecorationId;
 		label.d->kind = AdvancedDelegateItem::Decoration;
-		label.d->flags = AdvancedDelegateItem::Blink;
+		if (notify.flags & IRostersNotify::Blink)
+			label.d->flags |= AdvancedDelegateItem::Blink;
 		label.d->data = FNotifyItems.value(FActiveNotifies.value(index)).icon;
 	}
 	else if (AOrder==RLHO_ROSTERSVIEW_NOTIFY && ALabelId==RLID_ROSTERSVIEW_STATUS)
 	{
+		const IRostersNotify &notify = FNotifyItems.value(FActiveNotifies.value(index));
 		label.d->id = RLID_ROSTERSVIEW_STATUS;
 		label.d->kind = AdvancedDelegateItem::CustomData;
 		label.d->hints.insert(AdvancedDelegateItem::FontSizeDelta,-1);
 		label.d->hints.insert(AdvancedDelegateItem::FontItalic,true);
-		label.d->data = FNotifyItems.value(FActiveNotifies.value(index)).footer;
+		label.d->data = notify.footer;
 	}
 	return label;
 }
