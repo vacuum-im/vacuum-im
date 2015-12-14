@@ -1725,6 +1725,9 @@ void MultiUserChatWindow::showMultiChatUserMessage(const Message &AMessage, cons
 {
 	if (FMessageStyleManager)
 	{
+		IMultiUser *user = FMultiChat->findUser(ANick);
+		Jid userJid = user!=NULL ? user->userJid().full() : FMultiChat->roomJid().bare()+"/"+ANick;
+
 		IMessageStyleContentOptions options;
 		options.kind = IMessageStyleContentOptions::KindMessage;
 		options.type = IMessageStyleContentOptions::TypeGroupchat;
@@ -1738,21 +1741,15 @@ void MultiUserChatWindow::showMultiChatUserMessage(const Message &AMessage, cons
 		else
 			options.timeFormat = FMessageStyleManager->timeFormat(options.time);
 
+		options.senderId = userJid.pFull();
 		options.senderName = Qt::escape(ANick);
+		options.senderAvatar = FMessageStyleManager->contactAvatar(userJid);
 		options.senderColor = FViewWidget->messageStyle()!=NULL ? FViewWidget->messageStyle()->senderColorById(ANick) : QString::null;
 
-		IMultiUser *user = FMultiChat->findUser(ANick);
 		if (user)
-		{
-			options.senderId = user->userJid().pFull();
-			options.senderAvatar = FMessageStyleManager->contactAvatar(user->userJid());
 			options.senderIcon = FMessageStyleManager->contactIcon(user->userJid(),user->presence().show,SUBSCRIPTION_BOTH,false);
-		}
 		else
-		{
-			options.senderId = FMultiChat->roomJid().pBare() + "/" +FMultiChat->nickname();
 			options.senderIcon = FMessageStyleManager->contactIcon(Jid::null,IPresence::Offline,SUBSCRIPTION_BOTH,false);
-		}
 
 		if (FMultiChat->nickname() != ANick)
 		{
