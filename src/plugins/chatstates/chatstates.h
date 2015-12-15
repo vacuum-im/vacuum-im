@@ -131,13 +131,11 @@ protected slots:
 	void onChatWindowCreated(IMessageChatWindow *AWindow);
 	void onChatWindowActivated();
 	void onChatWindowTextChanged();
-	void onChatWindowClosed();
 	void onChatWindowDestroyed(IMessageChatWindow *AWindow);
 protected slots:
 	void onMultiChatWindowCreated(IMultiUserChatWindow *AWindow);
 	void onMultiChatWindowActivated();
 	void onMultiChatWindowTextChanged();
-	void onMultiChatWindowClosed();
 	void onMultiChatUserChanged(IMultiUser *AUser, int AData, const QVariant &ABefore);
 	void onMultiChatWindowDestroyed(IMultiUserChatWindow *AWindow);
 protected slots:

@@ -43,10 +43,6 @@
         <translation>По умолчанию</translation>
     </message>
     <message>
-        <source>Unknown</source>
-        <translation>Нет данных</translation>
-    </message>
-    <message>
         <source>Active</source>
         <translation>Активен</translation>
     </message>
@@ -57,14 +53,6 @@
     <message>
         <source>Paused</source>
         <translation>Отвлёкся</translation>
-    </message>
-    <message>
-        <source>Always send</source>
-        <translation>Всегда отправлять</translation>
-    </message>
-    <message>
-        <source>Never send</source>
-        <translation>Никогда не отправлять</translation>
     </message>
     <message>
         <source>Inactive %1</source>
@@ -79,28 +67,20 @@
         <translation>Активность собеседника в чате</translation>
     </message>
     <message>
-        <source>Users activity in conference</source>
-        <translation>Активность участников в конференции</translation>
-    </message>
-    <message>
         <source>and %1 other</source>
         <translation>и еще %1</translation>
     </message>
-    <message numerus="yes">
-        <source>Paused %n</source>
-        <translation>
-            <numerusform>Отвлекся %n</numerusform>
-            <numerusform>Отвлеклись %n</numerusform>
-            <numerusform>Отвлеклись %n</numerusform>
-        </translation>
+    <message>
+        <source>Always send my chat activity</source>
+        <translation>Всегда отправлять мою активность в чате</translation>
     </message>
-    <message numerus="yes">
-        <source>Active %n</source>
-        <translation>
-            <numerusform>Активен %n</numerusform>
-            <numerusform>Активных %n</numerusform>
-            <numerusform>Активных %n</numerusform>
-        </translation>
+    <message>
+        <source>Never send my chat activity</source>
+        <translation>Никогда не отправлять мою активность в чате</translation>
+    </message>
+    <message>
+        <source>Participants activity in conference</source>
+        <translation>Активность участников в конференции</translation>
     </message>
 </context>
 </TS>

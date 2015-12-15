@@ -18,26 +18,26 @@ StateWidget::StateWidget(IChatStates *AChatStates, IMessageWindow *AWindow, QWid
 	FMenu = new Menu(this);
 	setMenu(FMenu);
 
-	Action *action = new Action(FMenu);
-	action->setCheckable(true);
-	action->setText(tr("Default"));
-	action->setData(ADR_PERMIT_STATUS, IChatStates::StatusDefault);
-	connect(action,SIGNAL(triggered(bool)),SLOT(onStatusActionTriggered(bool)));
-	FMenu->addAction(action);
+	Action *permitDefault = new Action(FMenu);
+	permitDefault->setCheckable(true);
+	permitDefault->setText(tr("Default"));
+	permitDefault->setData(ADR_PERMIT_STATUS, IChatStates::StatusDefault);
+	connect(permitDefault,SIGNAL(triggered(bool)),SLOT(onStatusActionTriggered(bool)));
+	FMenu->addAction(permitDefault);
 
-	action = new Action(FMenu);
-	action->setCheckable(true);
-	action->setText(tr("Always send"));
-	action->setData(ADR_PERMIT_STATUS, IChatStates::StatusEnable);
-	connect(action,SIGNAL(triggered(bool)),SLOT(onStatusActionTriggered(bool)));
-	FMenu->addAction(action);
+	Action *permitEnable = new Action(FMenu);
+	permitEnable->setCheckable(true);
+	permitEnable->setText(tr("Always send my chat activity"));
+	permitEnable->setData(ADR_PERMIT_STATUS, IChatStates::StatusEnable);
+	connect(permitEnable,SIGNAL(triggered(bool)),SLOT(onStatusActionTriggered(bool)));
+	FMenu->addAction(permitEnable);
 
-	action = new Action(FMenu);
-	action->setCheckable(true);
-	action->setText(tr("Never send"));
-	action->setData(ADR_PERMIT_STATUS, IChatStates::StatusDisable);
-	connect(action,SIGNAL(triggered(bool)),SLOT(onStatusActionTriggered(bool)));
-	FMenu->addAction(action);
+	Action *permitDisable = new Action(FMenu);
+	permitDisable->setCheckable(true);
+	permitDisable->setText(tr("Never send my chat activity"));
+	permitDisable->setData(ADR_PERMIT_STATUS, IChatStates::StatusDisable);
+	connect(permitDisable,SIGNAL(triggered(bool)),SLOT(onStatusActionTriggered(bool)));
+	FMenu->addAction(permitDisable);
 
 	connect(FChatStates->instance(),SIGNAL(permitStatusChanged(const Jid &, int)),SLOT(onPermitStatusChanged(const Jid &, int)));
 	connect(FWindow->address()->instance(),SIGNAL(addressChanged(const Jid &, const Jid &)),SLOT(onWindowAddressChanged(const Jid &, const Jid &)));
@@ -49,7 +49,7 @@ StateWidget::StateWidget(IChatStates *AChatStates, IMessageWindow *AWindow, QWid
 	}
 	else
 	{
-		setToolTip(tr("Users activity in conference"));
+		setToolTip(tr("Participants activity in conference"));
 		connect(FChatStates->instance(),SIGNAL(userRoomStateChanged(const Jid &, const Jid &, int)),SLOT(onUserRoomStateChanged(const Jid &, const Jid &, int)));
 	}
 
@@ -114,7 +114,6 @@ void StateWidget::onUserChatStateChanged(const Jid &AStreamJid, const Jid &ACont
 		}
 		else
 		{
-			state = tr("Unknown");
 			iconKey = MNI_CHATSTATES_UNKNOWN;
 		}
 
@@ -169,19 +168,8 @@ void StateWidget::onUserRoomStateChanged(const Jid &AStreamJid, const Jid &AUser
 			}
 			iconKey = MNI_CHATSTATES_COMPOSING;
 		}
-		else if (!FPaused.isEmpty())
-		{
-			state = tr("Paused %n",0,FPaused.count());
-			iconKey = MNI_CHATSTATES_PAUSED;
-		}
-		else if (!FActive.isEmpty())
-		{
-			state = tr("Active %n",0,FActive.count());
-			iconKey = MNI_CHATSTATES_ACTIVE;
-		}
 		else
 		{
-			state = tr("Unknown");
 			iconKey = MNI_CHATSTATES_UNKNOWN;
 		}
 

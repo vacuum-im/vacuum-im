@@ -46,7 +46,7 @@
 #define INACTIVE_TIMEOUT          2*60
 #define GONE_TIMEOUT              10*60
 
-#define UPDATE_TIMEOUT            10000
+#define UPDATE_TIMEOUT            1000
 
 ChatStates::ChatStates()
 {
@@ -644,7 +644,10 @@ void ChatStates::setChatSelfState(const Jid &AStreamJid, const Jid &AContactJid,
 	if (isReady(AStreamJid))
 	{
 		ChatParams &chatParams = FChatParams[AStreamJid][AContactJid];
-		chatParams.self.lastActive = QDateTime::currentDateTime().toTime_t();
+
+		if (AState==IChatStates::StateActive || AState==IChatStates::StateComposing)
+			chatParams.self.lastActive = QDateTime::currentDateTime().toTime_t();
+
 		if (chatParams.self.state != AState)
 		{
 			LOG_STRM_DEBUG(AStreamJid,QString("Self chat state changed, contact=%1, state=%2").arg(AContactJid.full()).arg(AState));
@@ -724,7 +727,10 @@ void ChatStates::setRoomSelfState(const Jid &AStreamJid, const Jid &ARoomJid, in
 	if (isReady(AStreamJid) && ARoomJid.resource().isEmpty())
 	{
 		RoomParams &roomParams = FRoomParams[AStreamJid][ARoomJid];
-		roomParams.self.lastActive = QDateTime::currentDateTime().toTime_t();
+
+		if (AState==IChatStates::StateActive || AState==IChatStates::StateComposing)
+			roomParams.self.lastActive = QDateTime::currentDateTime().toTime_t();
+
 		if (roomParams.self.state != AState)
 		{
 			LOG_STRM_DEBUG(AStreamJid,QString("Room self state changed, room=%1, state=%2").arg(ARoomJid.full()).arg(AState));
@@ -905,7 +911,6 @@ void ChatStates::onChatWindowCreated(IMessageChatWindow *AWindow)
 
 	connect(AWindow->instance(),SIGNAL(tabPageActivated()),SLOT(onChatWindowActivated()));
 	connect(AWindow->editWidget()->textEdit(),SIGNAL(textChanged()),SLOT(onChatWindowTextChanged()));
-	connect(AWindow->instance(),SIGNAL(tabPageClosed()),SLOT(onChatWindowClosed()));
 	FChatByEditor.insert(AWindow->editWidget()->textEdit(),AWindow);
 }
 
@@ -935,19 +940,6 @@ void ChatStates::onChatWindowTextChanged()
 	}
 }
 
-void ChatStates::onChatWindowClosed()
-{
-	IMessageChatWindow *window = qobject_cast<IMessageChatWindow *>(sender());
-	if (window)
-	{
-		int state = selfChatState(window->streamJid(),window->contactJid());
-		if (state == IChatStates::StateComposing)
-			setChatSelfState(window->streamJid(),window->contactJid(),IChatStates::StatePaused);
-		else if (state != IChatStates::StateGone)
-			setChatSelfState(window->streamJid(),window->contactJid(),IChatStates::StateInactive);
-	}
-}
-
 void ChatStates::onChatWindowDestroyed(IMessageChatWindow *AWindow)
 {
 	setChatSelfState(AWindow->streamJid(),AWindow->contactJid(),IChatStates::StateGone);
@@ -963,7 +955,6 @@ void ChatStates::onMultiChatWindowCreated(IMultiUserChatWindow *AWindow)
 
 	connect(AWindow->instance(),SIGNAL(tabPageActivated()),SLOT(onMultiChatWindowActivated()));
 	connect(AWindow->editWidget()->textEdit(),SIGNAL(textChanged()),SLOT(onMultiChatWindowTextChanged()));
-	connect(AWindow->instance(),SIGNAL(tabPageClosed()),SLOT(onMultiChatWindowClosed()));
 	connect(AWindow->multiUserChat()->instance(),SIGNAL(userChanged(IMultiUser *, int, const QVariant &)),
 		SLOT(onMultiChatUserChanged(IMultiUser *, int, const QVariant &)));
 	FRoomByEditor.insert(AWindow->editWidget()->textEdit(),AWindow);
@@ -992,19 +983,6 @@ void ChatStates::onMultiChatWindowTextChanged()
 			setRoomSelfState(window->streamJid(),window->contactJid(),IChatStates::StateComposing);
 		else
 			setRoomSelfState(window->streamJid(),window->contactJid(),IChatStates::StateActive);
-	}
-}
-
-void ChatStates::onMultiChatWindowClosed()
-{
-	IMultiUserChatWindow *window = qobject_cast<IMultiUserChatWindow *>(sender());
-	if (window)
-	{
-		int state = selfChatState(window->streamJid(),window->contactJid());
-		if (state == IChatStates::StateComposing)
-			setRoomSelfState(window->streamJid(),window->contactJid(),IChatStates::StatePaused);
-		else
-			setRoomSelfState(window->streamJid(),window->contactJid(),IChatStates::StateInactive);
 	}
 }
 
@@ -1062,11 +1040,15 @@ void ChatStates::onUpdateSelfStates()
 			{
 				setChatSelfState(window->streamJid(),window->contactJid(),IChatStates::StateActive);
 			}
-			else if (chatParams.self.state==IChatStates::StateComposing && timePassed>PAUSED_TIMEOUT)
+			else if (chatParams.self.state==IChatStates::StateComposing && timePassed>=PAUSED_TIMEOUT)
 			{
 				setChatSelfState(window->streamJid(),window->contactJid(),IChatStates::StatePaused);
 			}
-			else if ((chatParams.self.state==IChatStates::StateActive || chatParams.self.state==IChatStates::StatePaused) && timePassed>INACTIVE_TIMEOUT)
+			else if (chatParams.self.state==IChatStates::StateActive && timePassed>=INACTIVE_TIMEOUT)
+			{
+				setChatSelfState(window->streamJid(),window->contactJid(),IChatStates::StateInactive);
+			}
+			else if (chatParams.self.state==IChatStates::StatePaused && timePassed>=INACTIVE_TIMEOUT)
 			{
 				setChatSelfState(window->streamJid(),window->contactJid(),IChatStates::StateInactive);
 			}
@@ -1088,11 +1070,15 @@ void ChatStates::onUpdateSelfStates()
 			{
 				setRoomSelfState(window->streamJid(),window->contactJid(),IChatStates::StateActive);
 			}
-			else if (roomParams.self.state==IChatStates::StateComposing && timePassed>PAUSED_TIMEOUT)
+			else if (roomParams.self.state==IChatStates::StateComposing && timePassed>=PAUSED_TIMEOUT)
 			{
 				setRoomSelfState(window->streamJid(),window->contactJid(),IChatStates::StatePaused);
 			}
-			else if ((roomParams.self.state==IChatStates::StateActive || roomParams.self.state==IChatStates::StatePaused) && timePassed>INACTIVE_TIMEOUT)
+			else if (roomParams.self.state==IChatStates::StateActive && timePassed>=INACTIVE_TIMEOUT)
+			{
+				setRoomSelfState(window->streamJid(),window->contactJid(),IChatStates::StateInactive);
+			}
+			else if (roomParams.self.state==IChatStates::StatePaused && timePassed>=INACTIVE_TIMEOUT)
 			{
 				setRoomSelfState(window->streamJid(),window->contactJid(),IChatStates::StateInactive);
 			}
