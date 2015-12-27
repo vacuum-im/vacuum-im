@@ -210,7 +210,7 @@ bool ServiceDiscovery::initObjects()
 
 	if (FTrayManager)
 	{
-		FTrayManager->contextMenu()->addAction(FDiscoMenu->menuAction(),AG_TMTM_DISCOVERY,true);
+		FTrayManager->contextMenu()->addAction(FDiscoMenu->menuAction(),AG_TMTM_DISCOVERY_ITEMS,true);
 	}
 
 	if (FMainWindowPlugin)
@@ -1437,7 +1437,7 @@ void ServiceDiscovery::onRostersViewIndexContextMenu(const QList<IRosterIndex *>
 			if (indexKind==RIK_STREAM_ROOT || indexKind==RIK_AGENT)
 			{
 				Action *action = createDiscoItemsAction(streamJid,contactJid,QString::null,AMenu);
-				AMenu->addAction(action,AG_RVCM_DISCOVERY,true);
+				AMenu->addAction(action,AG_RVCM_DISCOVERY_ITEMS,true);
 			}
 
 			QStringList resources = index->data(RDR_RESOURCES).toStringList();

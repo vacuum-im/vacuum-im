@@ -930,7 +930,7 @@ void Avatars::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexe
 			connect(clear,SIGNAL(triggered(bool)),SLOT(onClearAvatarByAction(bool)));
 			avatar->addAction(clear,AG_DEFAULT,false);
 
-			AMenu->addAction(avatar->menuAction(),AG_RVCM_AVATARS,true);
+			AMenu->addAction(avatar->menuAction(),AG_RVCM_AVATARS_CHANGE,true);
 		}
 		else
 		{
@@ -952,7 +952,7 @@ void Avatars::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexe
 			connect(clear,SIGNAL(triggered(bool)),SLOT(onClearAvatarByAction(bool)));
 			picture->addAction(clear,AG_DEFAULT,false);
 
-			AMenu->addAction(picture->menuAction(),AG_RVCM_AVATARS,true);
+			AMenu->addAction(picture->menuAction(),AG_RVCM_AVATARS_CUSTOM,true);
 		}
 	}
 }

@@ -540,7 +540,7 @@ void StatusIcons::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIn
 		else if (AIndexes.count() == 1)
 			FCustomIconMenu->setIcon(iconByJidStatus(AIndexes.first()->data(RDR_FULL_JID).toString(),IPresence::Online,SUBSCRIPTION_BOTH,false));
 
-		AMenu->addAction(FCustomIconMenu->menuAction(),AG_RVCM_STATUSICONS,true);
+		AMenu->addAction(FCustomIconMenu->menuAction(),AG_RVCM_STATUSICONS_CUSTOM,true);
 	}
 }
 
@@ -550,7 +550,7 @@ void StatusIcons::onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUs
 	QString pattern = QString(".*@%1/%2").arg(QRegExp::escape(AUser->userJid().pDomain())).arg(QRegExp::escape(AUser->nick()));
 	updateCustomIconMenu(QStringList() << pattern);
 	FCustomIconMenu->setIcon(iconByJidStatus(AUser->userJid(),IPresence::Online,SUBSCRIPTION_BOTH,false));
-	AMenu->addAction(FCustomIconMenu->menuAction(),AG_MUCM_STATUSICONS,true);
+	AMenu->addAction(FCustomIconMenu->menuAction(),AG_MUCM_STATUSICONS_CUSTOM,true);
 }
 
 void StatusIcons::onOptionsOpened()

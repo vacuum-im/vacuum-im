@@ -726,7 +726,7 @@ void ClientInfo::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AInd
 				if (show==IPresence::Offline || show==IPresence::Error)
 				{
 					Action *action = createInfoAction(streamJid,contactJid,NS_JABBER_LAST,AMenu);
-					AMenu->addAction(action,AG_RVCM_CLIENTINFO,true);
+					AMenu->addAction(action,AG_RVCM_CLIENTINFO_SHOW,true);
 				}
 			}
 		}

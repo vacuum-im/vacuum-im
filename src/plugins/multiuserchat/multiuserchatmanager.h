@@ -20,6 +20,7 @@
 #include <interfaces/istatusicons.h>
 #include <interfaces/irecentcontacts.h>
 #include <interfaces/istanzaprocessor.h>
+#include <interfaces/imainwindow.h>
 #include "multiuserchat.h"
 #include "multiuserchatwindow.h"
 #include "createmultichatwizard.h"
@@ -183,6 +184,7 @@ private:
 	IStatusIcons *FStatusIcons;
 	IRecentContacts *FRecentContacts;
 	IStanzaProcessor *FStanzaProcessor;
+	IMainWindowPlugin *FMainWindowPlugin;
 private:
 	QList<IMultiUserChat *> FChats;
 	QList<IRosterIndex *> FChatIndexes;

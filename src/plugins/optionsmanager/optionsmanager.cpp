@@ -110,14 +110,14 @@ bool OptionsManager::initObjects()
 
 	if (FMainWindowPlugin)
 	{
-		FMainWindowPlugin->mainWindow()->mainMenu()->addAction(FChangeProfileAction,AG_MMENU_OPTIONS,true);
-		FMainWindowPlugin->mainWindow()->mainMenu()->addAction(FShowOptionsDialogAction,AG_MMENU_OPTIONS,true);
+		FMainWindowPlugin->mainWindow()->mainMenu()->addAction(FChangeProfileAction,AG_MMENU_OPTIONS_PROFILE,true);
+		FMainWindowPlugin->mainWindow()->mainMenu()->addAction(FShowOptionsDialogAction,AG_MMENU_OPTIONS_OPTIONS,true);
 	}
 
 	if (FTrayManager)
 	{
-		FTrayManager->contextMenu()->addAction(FChangeProfileAction,AG_TMTM_OPTIONS,true);
-		FTrayManager->contextMenu()->addAction(FShowOptionsDialogAction,AG_TMTM_OPTIONS,true);
+		FTrayManager->contextMenu()->addAction(FChangeProfileAction,AG_TMTM_OPTIONS_OPTIONS,true);
+		FTrayManager->contextMenu()->addAction(FShowOptionsDialogAction,AG_TMTM_OPTIONS_PROFILE,true);
 	}
 
 	return true;

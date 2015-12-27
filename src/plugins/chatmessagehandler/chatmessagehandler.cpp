@@ -1125,7 +1125,7 @@ void ChatMessageHandler::onRostersViewIndexContextMenu(const QList<IRosterIndex 
 		action->setData(ADR_STREAM_JID,AIndexes.first()->data(RDR_STREAM_JID));
 		action->setData(ADR_CONTACT_JID,AIndexes.first()->data(RDR_FULL_JID));
 		action->setShortcutId(SCT_ROSTERVIEW_SHOWCHATDIALOG);
-		AMenu->addAction(action,AG_RVCM_CHATMESSAGEHANDLER,true);
+		AMenu->addAction(action,AG_RVCM_CHATMHANDLER_OPEN,true);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onShowWindowAction(bool)));
 	}
 }

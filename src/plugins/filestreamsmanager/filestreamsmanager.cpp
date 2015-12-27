@@ -82,7 +82,7 @@ bool FileStreamsManager::initConnections(IPluginManager *APluginManager, int &AI
 
 bool FileStreamsManager::initObjects()
 {
-	Shortcuts::declareShortcut(SCT_APP_SHOWFILETRANSFERS,tr("Show file transfers"),tr("Ctrl+T","Show file transfers"),Shortcuts::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_APP_FILETRANSFERS_SHOW,tr("Show file transfers"),tr("Ctrl+T","Show file transfers"),Shortcuts::ApplicationShortcut);
 
 	XmppError::registerError(NS_INTERNAL_ERROR,IERR_FILESTREAMS_STREAM_FILE_IO_ERROR,tr("File input/output error"));
 	XmppError::registerError(NS_INTERNAL_ERROR,IERR_FILESTREAMS_STREAM_FILE_SIZE_CHANGED,tr("File size unexpectedly changed"));
@@ -99,14 +99,14 @@ bool FileStreamsManager::initObjects()
 		Action *action = new Action(this);
 		action->setText(tr("File Transfers"));
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_FILESTREAMSMANAGER);
-		action->setShortcutId(SCT_APP_SHOWFILETRANSFERS);
+		action->setShortcutId(SCT_APP_FILETRANSFERS_SHOW);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onShowFileStreamsWindow(bool)));
 	
 		if (FMainWindowPlugin)
-			FMainWindowPlugin->mainWindow()->mainMenu()->addAction(action,AG_MMENU_FILESTREAMSMANAGER,true);
+			FMainWindowPlugin->mainWindow()->mainMenu()->addAction(action,AG_MMENU_FILESTREAMS_TRANSFER,true);
 		
 		if (FTrayManager)
-			FTrayManager->contextMenu()->addAction(action, AG_TMTM_FILESTREAMSMANAGER, true);
+			FTrayManager->contextMenu()->addAction(action, AG_TMTM_FILESTREAMS_TRANSFER, true);
 	}
 	
 	return true;

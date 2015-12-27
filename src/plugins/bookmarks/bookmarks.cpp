@@ -765,7 +765,7 @@ void Bookmarks::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AInde
 			}
 
 			if (!bookmarksMenu->isEmpty())
-				AMenu->addAction(bookmarksMenu->menuAction(),AG_RVCM_BOOKMARS_MENU);
+				AMenu->addAction(bookmarksMenu->menuAction(),AG_RVCM_BOOKMARS_LIST);
 			else
 				delete bookmarksMenu;
 
@@ -776,7 +776,7 @@ void Bookmarks::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AInde
 				editAction->setText(tr("Edit Bookmarks"));
 				editAction->setData(ADR_STREAM_JID,index->data(RDR_STREAM_JID).toString());
 				connect(editAction,SIGNAL(triggered(bool)),SLOT(onEditBookmarksActionTriggered(bool)));
-				AMenu->addAction(editAction,AG_RVCM_BOOKMARS_MENU);
+				AMenu->addAction(editAction,AG_RVCM_BOOKMARS_EDIT);
 			}
 		}
 		else if (index->kind() == RIK_MUC_ITEM)

@@ -928,7 +928,7 @@ Menu *PrivacyLists::createPrivacyMenu(Menu *AMenu) const
 	Menu *pmenu = new Menu(AMenu);
 	pmenu->setTitle(tr("Privacy"));
 	pmenu->setIcon(RSR_STORAGE_MENUICONS,MNI_PRIVACYLISTS);
-	AMenu->addAction(pmenu->menuAction(),AG_RVCM_PRIVACYLISTS,true);
+	AMenu->addAction(pmenu->menuAction(),AG_RVCM_PRIVACYLISTS_OPTIONS,true);
 	return pmenu;
 }
 

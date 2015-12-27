@@ -424,7 +424,7 @@ void AccountManager::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 			action->setText(tr("Modify account"));
 			action->setData(ADR_ACCOUNT_ID,account->accountId().toString());
 			connect(action,SIGNAL(triggered(bool)),SLOT(onShowAccountOptions(bool)));
-			AMenu->addAction(action,AG_RVCM_ACCOUNTMANAGER,true);
+			AMenu->addAction(action,AG_RVCM_ACCOUNTMANAGER_EDIT,true);
 		}
 	}
 }

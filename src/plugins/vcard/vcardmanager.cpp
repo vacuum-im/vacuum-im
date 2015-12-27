@@ -640,7 +640,7 @@ void VCardManager::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AI
 			action->setData(ADR_STREAM_JID,streamJid.full());
 			action->setData(ADR_CONTACT_JID,contactJid.bare());
 			action->setShortcutId(SCT_ROSTERVIEW_SHOWVCARD);
-			AMenu->addAction(action,AG_RVCM_VCARD,true);
+			AMenu->addAction(action,AG_RVCM_VCARD_SHOW,true);
 			connect(action,SIGNAL(triggered(bool)),SLOT(onShowVCardDialogByAction(bool)));
 		}
 	}
@@ -697,7 +697,7 @@ void VCardManager::onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiU
 		action->setData(ADR_CONTACT_JID,AUser->realJid().bare());
 	else
 		action->setData(ADR_CONTACT_JID,AUser->userJid().full());
-	AMenu->addAction(action,AG_MUCM_VCARD,true);
+	AMenu->addAction(action,AG_MUCM_VCARD_SHOW,true);
 	connect(action,SIGNAL(triggered(bool)),SLOT(onShowVCardDialogByAction(bool)));
 }
 

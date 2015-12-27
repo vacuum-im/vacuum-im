@@ -14,9 +14,9 @@
 //PluginManager
 #define SCTG_APPLICATION                                           "application"
 //MultiUserChat
-#define   SCT_APP_MUCJOIN                                          "application.muc-join"
+#define   SCT_APP_MULTIUSERCHAT_WIZARD                             "application.muc-wizard"
 //FileStreamsManager
-#define   SCT_APP_SHOWFILETRANSFERS                                "application.show-filetransfers"
+#define   SCT_APP_FILETRANSFERS_SHOW                               "application.show-filetransfers"
 
 //RosterView
 #define SCTG_ROSTERVIEW                                            "roster-view"

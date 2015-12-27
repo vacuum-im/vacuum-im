@@ -76,7 +76,7 @@ bool MainWindowPlugin::initObjects()
 	quitAction->setText(tr("Quit"));
 	quitAction->setIcon(RSR_STORAGE_MENUICONS,MNI_MAINWINDOW_QUIT);
 	connect(quitAction,SIGNAL(triggered()),FPluginManager->instance(),SLOT(quit()));
-	FMainWindow->mainMenu()->addAction(quitAction,AG_MMENU_MAINWINDOW,true);
+	FMainWindow->mainMenu()->addAction(quitAction,AG_MMENU_MAINWINDOW_QUIT,true);
 
 	if (FTrayManager)
 	{
@@ -84,7 +84,7 @@ bool MainWindowPlugin::initObjects()
 		showRosterAction->setText(tr("Show roster"));
 		showRosterAction->setIcon(RSR_STORAGE_MENUICONS,MNI_MAINWINDOW_SHOW_ROSTER);
 		connect(showRosterAction,SIGNAL(triggered(bool)),SLOT(onShowMainWindowByAction(bool)));
-		FTrayManager->contextMenu()->addAction(showRosterAction,AG_TMTM_MAINWINDOW,true);
+		FTrayManager->contextMenu()->addAction(showRosterAction,AG_TMTM_MAINWINDOW_SHOW,true);
 	}
 
 	return true;

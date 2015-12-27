@@ -69,6 +69,7 @@ MultiUserChatManager::MultiUserChatManager()
 	FOptionsManager = NULL;
 	FStatusIcons = NULL;
 	FRecentContacts = NULL;
+	FMainWindowPlugin = NULL;
 }
 
 MultiUserChatManager::~MultiUserChatManager()
@@ -203,6 +204,12 @@ bool MultiUserChatManager::initConnections(IPluginManager *APluginManager, int &
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 	}
 
+	plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
+	if (plugin)
+	{
+		FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
+	}
+
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
 
 	return FXmppStreamManager!=NULL;
@@ -210,9 +217,8 @@ bool MultiUserChatManager::initConnections(IPluginManager *APluginManager, int &
 
 bool MultiUserChatManager::initObjects()
 {
-	Shortcuts::declareShortcut(SCT_APP_MUCJOIN, tr("Join conference"), tr("Ctrl+J","Join conference"), Shortcuts::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_APP_MULTIUSERCHAT_WIZARD, tr("Join conference"), tr("Ctrl+J","Join conference"), Shortcuts::ApplicationShortcut);
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SHOWMUCUSERS, tr("Show/Hide conference participants list"), tr("Ctrl+U","Show/Hide conference participants list"));
-	Shortcuts::insertWidgetShortcut(SCT_APP_MUCJOIN,qApp->desktop());
 
 	if (FDataForms)
 	{
@@ -284,6 +290,12 @@ bool MultiUserChatManager::initObjects()
 	{
 		FRecentContacts->registerItemHandler(REIT_CONFERENCE,this);
 		FRecentContacts->registerItemHandler(REIT_CONFERENCE_PRIVATE,this);
+	}
+
+	if (FMainWindowPlugin)
+	{
+		Menu *menu = FMainWindowPlugin->mainWindow()->mainMenu();
+		menu->addAction(createWizardAction(menu),AG_MMENU_MULTIUSERCHAT_JOIN,true);
 	}
 
 	return true;
@@ -1137,6 +1149,7 @@ Action *MultiUserChatManager::createWizardAction(QWidget *AParent) const
 	Action *action = new Action(AParent);
 	action->setText(tr("Join Conference..."));
 	action->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_JOIN);
+	action->setShortcutId(SCT_APP_MULTIUSERCHAT_WIZARD);
 	connect(action,SIGNAL(triggered(bool)),SLOT(onWizardRoomActionTriggered(bool)));
 	return action;
 }
@@ -1292,7 +1305,7 @@ void MultiUserChatManager::onActiveXmppStreamRemoved(const Jid &AStreamJid)
 
 void MultiUserChatManager::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
-	if (FXmppStreamManager!=NULL && AId==SCT_APP_MUCJOIN)
+	if (FXmppStreamManager!=NULL && AId==SCT_APP_MULTIUSERCHAT_WIZARD)
 	{
 		foreach(IXmppStream *xmppStream, FXmppStreamManager->xmppStreams())
 		{
@@ -1692,7 +1705,7 @@ void MultiUserChatManager::onRostersViewIndexClipboardMenu(const QList<IRosterIn
 					subjectAction->setText(TextManager::getElidedString(subject,Qt::ElideRight,50));
 					subjectAction->setData(ADR_CLIPBOARD_DATA,subject);
 					connect(subjectAction,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
-					AMenu->addAction(subjectAction, AG_RVCBM_MUC_SUBJECT, true);
+					AMenu->addAction(subjectAction, AG_RVCBM_MULTIUSERCHAT_SUBJECT, true);
 				}
 			}
 		}

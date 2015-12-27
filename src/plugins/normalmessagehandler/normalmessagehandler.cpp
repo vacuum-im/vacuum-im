@@ -1145,7 +1145,7 @@ void NormalMessageHandler::onRostersViewIndexContextMenu(const QList<IRosterInde
 		action->setData(ADR_CONTACT_JID,rolesMap.value(RDR_PREP_BARE_JID));
 		action->setData(ADR_GROUP,rolesMap.value(RDR_GROUP));
 		action->setShortcutId(SCT_ROSTERVIEW_SHOWNORMALDIALOG);
-		AMenu->addAction(action,AG_RVCM_NORMALMESSAGEHANDLER,true);
+		AMenu->addAction(action,AG_RVCM_NORMALMHANDLER_OPEN,true);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onShowWindowAction(bool)));
 	}
 }
