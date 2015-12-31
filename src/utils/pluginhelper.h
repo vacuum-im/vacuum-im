@@ -78,11 +78,11 @@ private:
 	mutable bool FHasInstance;
 };
 
-template <class I> inline bool operator==(const PluginPointer<I> &p1, const I *p2) { return p1.operator->() == p2 }
-template <class I> inline bool operator!=(const PluginPointer<I> &p1, const I *p2) { return p1.operator->() != p2 }
+template <class I> inline bool operator==(const PluginPointer<I> &p1, const I *p2) { return p1.operator->() == p2; }
+template <class I> inline bool operator!=(const PluginPointer<I> &p1, const I *p2) { return p1.operator->() != p2; }
 template <class I> inline bool operator==(const I *p1, const PluginPointer<I> &p2) { return p1 == p2.operator->(); }
 template <class I> inline bool operator!=(const I *p1, const PluginPointer<I> &p2) { return p1 != p2.operator->(); }
-template <class I> inline bool operator==(const PluginPointer<I> &p1, const PluginPointer<I> &p2) { return p1.operator->() == p2->operator->() }
-template <class I> inline bool operator!=(const PluginPointer<I> &p1, const PluginPointer<I> &p2) { return p1.operator->() != p2->operator->() }
+template <class I> inline bool operator==(const PluginPointer<I> &p1, const PluginPointer<I> &p2) { return p1.operator->() == p2->operator->(); }
+template <class I> inline bool operator!=(const PluginPointer<I> &p1, const PluginPointer<I> &p2) { return p1.operator->() != p2->operator->(); }
 
 #endif // PLUGINHELPER_H
