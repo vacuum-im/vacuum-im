@@ -5,7 +5,7 @@
 
 InviteUsersMenu::InviteUsersMenu(IMultiUserChatWindow *AWindow, QWidget *AParent) : Menu(AParent)
 {
-	FMucWindow = AWindow;
+	FMultiUserWindow = AWindow;
 
 	setLayout(new QVBoxLayout());
 	layout()->setMargin(0);
@@ -25,7 +25,7 @@ QSize InviteUsersMenu::sizeHint() const
 
 void InviteUsersMenu::onAboutToShow()
 {
-	InviteUsersWidget *widget = new InviteUsersWidget(FMucWindow,this);
+	InviteUsersWidget *widget = new InviteUsersWidget(FMultiUserWindow,this);
 	connect(widget,SIGNAL(inviteAccepted(const QMultiMap<Jid,Jid> &)),SLOT(onInviteUsersWidgetAccepted(const QMultiMap<Jid,Jid> &)));
 	connect(widget,SIGNAL(inviteRejected()),SLOT(onInviteUsersWidgetRejected()));
 

@@ -4,6 +4,7 @@
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/istatusicons.h>
 #include <interfaces/iavatars.h>
+#include <utils/pluginhelper.h>
 
 class MultiUserView :
 	public QTreeView,
@@ -74,9 +75,9 @@ protected slots:
 	void onStatusIconsChanged();
 	void onAvatarChanged(const Jid &AContactJid);
 private:
-	IAvatars *FAvatars;
-	IMultiUserChat *FMultiChat;
-	IStatusIcons *FStatusIcons;
+	PluginPointer<IAvatars> FAvatars;
+	PluginPointer<IStatusIcons> FStatusIcons;
+	PluginPointer<IMultiUserChat> FMultiChat;
 private:
 	QTimer FBlinkTimer;
 	QMultiMap<quint32, QStandardItem *> FBlinkItems;

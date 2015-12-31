@@ -8,6 +8,7 @@
 #include <interfaces/ixmppstreammanager.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/ipresencemanager.h>
+#include <utils/pluginhelper.h>
 #include "multiuser.h"
 
 class MultiUserChat :
@@ -117,11 +118,12 @@ protected slots:
 	void onXmppStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore);
 	void onPresenceChanged(IPresence *APresence, int AShow, const QString &AStatus, int APriority);
 private:
-	IDataForms *FDataForms;
-	IServiceDiscovery *FDiscovery;
-	IPresenceManager *FPresenceManager;
-	IStanzaProcessor *FStanzaProcessor;
-	IMessageProcessor *FMessageProcessor;
+	PluginPointer<IDataForms> FDataForms;
+	PluginPointer<IServiceDiscovery> FDiscovery;
+	PluginPointer<IPresenceManager> FPresenceManager;
+	PluginPointer<IStanzaProcessor> FStanzaProcessor;
+	PluginPointer<IMessageProcessor> FMessageProcessor;
+	PluginPointer<IXmppStreamManager> FXmppStreamManager;
 private:
 	int FSHIMessage;
 	int FSHIPresence;

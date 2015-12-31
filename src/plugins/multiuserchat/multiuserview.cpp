@@ -9,7 +9,6 @@
 #include <definitions/multiuseritemlabels.h>
 #include <definitions/multiuserdataholderorders.h>
 #include <definitions/multiusersorthandlerorders.h>
-#include <utils/pluginhelper.h>
 #include <utils/logger.h>
 
 MultiUserView::MultiUserView(IMultiUserChat *AMultiChat, QWidget *AParent) : QTreeView(AParent)
@@ -48,11 +47,9 @@ MultiUserView::MultiUserView(IMultiUserChat *AMultiChat, QWidget *AParent) : QTr
 	FMultiChat = AMultiChat;
 	connect(FMultiChat->instance(),SIGNAL(userChanged(IMultiUser *, int, const QVariant &)),SLOT(onMultiUserChanged(IMultiUser *, int, const QVariant &)));
 
-	FStatusIcons = PluginHelper::pluginInstance<IStatusIcons>();
 	if (FStatusIcons)
 		connect(FStatusIcons->instance(),SIGNAL(statusIconsChanged()),SLOT(onStatusIconsChanged()));
 
-	FAvatars = PluginHelper::pluginInstance<IAvatars>();
 	if (FAvatars)
 		connect(FAvatars->instance(),SIGNAL(avatarChanged(const Jid &)),SLOT(onAvatarChanged(const Jid &)));
 }

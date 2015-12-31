@@ -21,7 +21,7 @@ protected slots:
 	void onInviteUsersWidgetAccepted(const QMultiMap<Jid, Jid> &AAddresses);
 	void onInviteUsersWidgetRejected();
 private:
-	IMultiUserChatWindow *FMucWindow;
+	IMultiUserChatWindow *FMultiUserWindow;
 };
 
 #endif // INVITEUSERSMENU_H

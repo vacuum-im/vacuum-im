@@ -57,19 +57,7 @@
 
 MultiUserChatManager::MultiUserChatManager()
 {
-	FMessageWidgets = NULL;
-	FMessageProcessor = NULL;
-	FRostersViewPlugin = NULL;
-	FRostersModel = NULL;
-	FXmppStreamManager = NULL;
-	FDiscovery = NULL;
-	FNotifications = NULL;
-	FDataForms = NULL;
-	FXmppUriQueries = NULL;
-	FOptionsManager = NULL;
-	FStatusIcons = NULL;
-	FRecentContacts = NULL;
-	FMainWindowPlugin = NULL;
+
 }
 
 MultiUserChatManager::~MultiUserChatManager()
@@ -90,124 +78,47 @@ void MultiUserChatManager::pluginInfo(IPluginInfo *APluginInfo)
 
 bool MultiUserChatManager::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
-	Q_UNUSED(AInitOrder);
-	IPlugin *plugin = APluginManager->pluginInterface("IMessageProcessor").value(0,NULL);
-	if (plugin)
+	Q_UNUSED(APluginManager); Q_UNUSED(AInitOrder); 
+
+	if (FMessageProcessor)
 	{
-		FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
-		if (FMessageProcessor)
-		{
-			connect(FMessageProcessor->instance(),SIGNAL(activeStreamRemoved(const Jid &)),SLOT(onActiveXmppStreamRemoved(const Jid &)));
-		}
+		connect(FMessageProcessor->instance(),SIGNAL(activeStreamRemoved(const Jid &)),SLOT(onActiveXmppStreamRemoved(const Jid &)));
 	}
 
-	plugin = APluginManager->pluginInterface("IXmppStreamManager").value(0,NULL);
-	if (plugin)
+	if (FXmppStreamManager)
 	{
-		FXmppStreamManager = qobject_cast<IXmppStreamManager *>(plugin->instance());
-		if (FXmppStreamManager)
-		{
-			connect(FXmppStreamManager->instance(),SIGNAL(streamOpened(IXmppStream *)),SLOT(onXmppStreamOpened(IXmppStream *)));
-			connect(FXmppStreamManager->instance(),SIGNAL(streamClosed(IXmppStream *)),SLOT(onXmppStreamClosed(IXmppStream *)));
-		}
+		connect(FXmppStreamManager->instance(),SIGNAL(streamOpened(IXmppStream *)),SLOT(onXmppStreamOpened(IXmppStream *)));
+		connect(FXmppStreamManager->instance(),SIGNAL(streamClosed(IXmppStream *)),SLOT(onXmppStreamClosed(IXmppStream *)));
+	}
+	
+	if (FStatusIcons)
+	{
+		connect(FStatusIcons->instance(),SIGNAL(statusIconsChanged()),SLOT(onStatusIconsChanged()));
 	}
 
-	plugin = APluginManager->pluginInterface("IDataForms").value(0,NULL);
-	if (plugin)
+	if (FRostersModel)
 	{
-		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
+		connect(FRostersModel->instance(),SIGNAL(streamsLayoutChanged(int)),SLOT(onRostersModelStreamsLayoutChanged(int)));
+		connect(FRostersModel->instance(),SIGNAL(indexDestroyed(IRosterIndex *)),SLOT(onRostersModelIndexDestroyed(IRosterIndex *)));
+		connect(FRostersModel->instance(),SIGNAL(indexDataChanged(IRosterIndex *, int)),SLOT(onRostersModelIndexDataChanged(IRosterIndex *, int)));
 	}
 
-	plugin = APluginManager->pluginInterface("IMessageWidgets").value(0,NULL);
-	if (plugin)
+	if (FRostersViewPlugin)
 	{
-		FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
+		connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)), 
+			SLOT(onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
+		connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
+			SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
+		connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexClipboardMenu(const QList<IRosterIndex *> &, quint32, Menu *)),
+			SLOT(onRostersViewIndexClipboardMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
+		connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)),
+			SLOT(onRostersViewIndexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)));
 	}
 
-	plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
-	if (plugin)
+	if (FNotifications)
 	{
-		FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
-	}
-
-	plugin = APluginManager->pluginInterface("IXmppUriQueries").value(0,NULL);
-	if (plugin)
-	{
-		FXmppUriQueries = qobject_cast<IXmppUriQueries *>(plugin->instance());
-	}
-
-	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
-	if (plugin)
-	{
-		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
-	}
-
-	plugin = APluginManager->pluginInterface("IStatusIcons").value(0,NULL);
-	if (plugin)
-	{
-		FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
-		if (FStatusIcons)
-		{
-			connect(FStatusIcons->instance(),SIGNAL(statusIconsChanged()),SLOT(onStatusIconsChanged()));
-		}
-	}
-
-	plugin = APluginManager->pluginInterface("IRecentContacts").value(0,NULL);
-	if (plugin)
-	{
-		FRecentContacts = qobject_cast<IRecentContacts *>(plugin->instance());
-	}
-
-	plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
-	if (plugin)
-	{
-		FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
-		if (FRostersModel)
-		{
-			connect(FRostersModel->instance(),SIGNAL(streamsLayoutChanged(int)),SLOT(onRostersModelStreamsLayoutChanged(int)));
-			connect(FRostersModel->instance(),SIGNAL(indexDestroyed(IRosterIndex *)),SLOT(onRostersModelIndexDestroyed(IRosterIndex *)));
-			connect(FRostersModel->instance(),SIGNAL(indexDataChanged(IRosterIndex *, int)),SLOT(onRostersModelIndexDataChanged(IRosterIndex *, int)));
-		}
-	}
-
-	plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
-	if (plugin)
-	{
-		FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
-		if (FRostersViewPlugin)
-		{
-			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)), 
-				SLOT(onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
-			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
-				SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
-			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexClipboardMenu(const QList<IRosterIndex *> &, quint32, Menu *)),
-				SLOT(onRostersViewIndexClipboardMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
-			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)),
-				SLOT(onRostersViewIndexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)));
-		}
-	}
-
-	plugin = APluginManager->pluginInterface("INotifications").value(0,NULL);
-	if (plugin)
-	{
-		FNotifications = qobject_cast<INotifications *>(plugin->instance());
-		if (FNotifications)
-		{
-			connect(FNotifications->instance(),SIGNAL(notificationActivated(int)),SLOT(onNotificationActivated(int)));
-			connect(FNotifications->instance(),SIGNAL(notificationRemoved(int)),SLOT(onNotificationRemoved(int)));
-		}
-	}
-
-	plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
-	if (plugin)
-	{
-		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
-	}
-
-	plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
-	if (plugin)
-	{
-		FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
+		connect(FNotifications->instance(),SIGNAL(notificationActivated(int)),SLOT(onNotificationActivated(int)));
+		connect(FNotifications->instance(),SIGNAL(notificationRemoved(int)),SLOT(onNotificationRemoved(int)));
 	}
 
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));

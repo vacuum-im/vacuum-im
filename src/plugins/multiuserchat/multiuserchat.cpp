@@ -5,7 +5,6 @@
 #include <definitions/multiuserdataroles.h>
 #include <definitions/messageeditororders.h>
 #include <definitions/stanzahandlerorders.h>
-#include <utils/pluginhelper.h>
 #include <utils/xmpperror.h>
 #include <utils/logger.h>
 
@@ -33,7 +32,6 @@ MultiUserChat::MultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const Q
 	FNickname = ANickName;
 	FPassword = APassword;
 
-	FStanzaProcessor = PluginHelper::pluginInstance<IStanzaProcessor>();
 	if (FStanzaProcessor)
 	{
 		IStanzaHandle shandle;
@@ -45,7 +43,6 @@ MultiUserChat::MultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const Q
 		FSHIPresence = FStanzaProcessor->insertStanzaHandle(shandle);
 	}
 
-	FMessageProcessor = PluginHelper::pluginInstance<IMessageProcessor>();
 	if (FIsolated && FStanzaProcessor)
 	{
 		IStanzaHandle shandle;
@@ -61,26 +58,21 @@ MultiUserChat::MultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const Q
 		FMessageProcessor->insertMessageEditor(MEO_MULTIUSERCHAT,this);
 	}
 
-	FPresenceManager = PluginHelper::pluginInstance<IPresenceManager>();
 	if (FPresenceManager)
 	{
 		connect(FPresenceManager->instance(),SIGNAL(presenceChanged(IPresence *, int, const QString &, int)),SLOT(onPresenceChanged(IPresence *, int, const QString &, int)));
 	}
 
-	IXmppStreamManager *xmppStreamManager = PluginHelper::pluginInstance<IXmppStreamManager>();
-	if (xmppStreamManager)
+	if (FXmppStreamManager)
 	{
-		connect(xmppStreamManager->instance(),SIGNAL(streamClosed(IXmppStream *)),SLOT(onXmppStreamClosed(IXmppStream *)));
-		connect(xmppStreamManager->instance(),SIGNAL(streamJidChanged(IXmppStream *,const Jid &)),SLOT(onXmppStreamJidChanged(IXmppStream *,const Jid &)));
+		connect(FXmppStreamManager->instance(),SIGNAL(streamClosed(IXmppStream *)),SLOT(onXmppStreamClosed(IXmppStream *)));
+		connect(FXmppStreamManager->instance(),SIGNAL(streamJidChanged(IXmppStream *,const Jid &)),SLOT(onXmppStreamJidChanged(IXmppStream *,const Jid &)));
 	}
 
-	FDiscovery = PluginHelper::pluginInstance<IServiceDiscovery>();
 	if (FDiscovery)
 	{
 		connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoveryInfoReceived(const IDiscoInfo &)));
 	}
-
-	FDataForms = PluginHelper::pluginInstance<IDataForms>();
 }
 
 MultiUserChat::~MultiUserChat()

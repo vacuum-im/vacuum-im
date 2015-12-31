@@ -34,7 +34,6 @@
 #include <definitions/messageviewurlhandlerorders.h>
 #include <definitions/messageeditsendhandlerorders.h>
 #include <utils/widgetmanager.h>
-#include <utils/pluginhelper.h>
 #include <utils/textmanager.h>
 #include <utils/shortcuts.h>
 #include <utils/xmpperror.h>
@@ -1024,7 +1023,6 @@ void MultiUserChatWindow::exitAndDestroy(const QString &AStatus, int AWaitClose)
 
 void MultiUserChatWindow::initialize()
 {
-	FMessageWidgets = PluginHelper::pluginInstance<IMessageWidgets>();
 	if (FMessageWidgets)
 	{
 		FMessageWidgets->insertViewUrlHandler(MVUHO_MULTIUSERCHAT,this);
@@ -1033,26 +1031,22 @@ void MultiUserChatWindow::initialize()
 		FMessageWidgets->insertEditSendHandler(MESHO_MULTIUSERCHATWINDOW_PRIVATECHAT,this);
 	}
 
-	FStatusIcons = PluginHelper::pluginInstance<IStatusIcons>();
 	if (FStatusIcons)
 	{
 		connect(FStatusIcons->instance(),SIGNAL(statusIconsChanged()),SLOT(onStatusIconsChanged()));
 	}
 
-	FMessageProcessor = PluginHelper::pluginInstance<IMessageProcessor>();
 	if (FMessageProcessor)
 	{
 		FMessageProcessor->insertMessageHandler(MHO_MULTIUSERCHAT,this);
 	}
 
-	FMessageStyleManager = PluginHelper::pluginInstance<IMessageStyleManager>();
 	if (FMessageStyleManager)
 	{
 		connect(FMessageStyleManager->instance(),SIGNAL(styleOptionsChanged(const IMessageStyleOptions &, int, const QString &)),
 			SLOT(onStyleOptionsChanged(const IMessageStyleOptions &, int, const QString &)));
 	}
 
-	FMessageArchiver = PluginHelper::pluginInstance<IMessageArchiver>();
 	if (FMessageArchiver)
 	{
 		connect(FMessageArchiver->instance(),SIGNAL(messagesLoaded(const QString &, const IArchiveCollectionBody &)),
@@ -1060,13 +1054,6 @@ void MultiUserChatWindow::initialize()
 		connect(FMessageArchiver->instance(),SIGNAL(requestFailed(const QString &, const XmppError &)),
 			SLOT(onArchiveRequestFailed(const QString &, const XmppError &)));
 	}
-
-	FAvatars = PluginHelper::pluginInstance<IAvatars>();
-	FDataForms = PluginHelper::pluginInstance<IDataForms>();
-	FRosterManager = PluginHelper::pluginInstance<IRosterManager>();
-	FStatusChanger = PluginHelper::pluginInstance<IStatusChanger>();
-	FRecentContacts = PluginHelper::pluginInstance<IRecentContacts>();
-	FStanzaProcessor = PluginHelper::pluginInstance<IStanzaProcessor>();
 }
 
 void MultiUserChatWindow::createMessageWidgets()

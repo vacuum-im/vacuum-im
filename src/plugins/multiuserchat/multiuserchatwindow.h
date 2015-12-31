@@ -16,6 +16,7 @@
 #include <interfaces/irecentcontacts.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/irostermanager.h>
+#include <utils/pluginhelper.h>
 #include "multiuserview.h"
 #include "inputtextdialog.h"
 #include "inviteusersmenu.h"
@@ -241,18 +242,18 @@ private:
 	Action *FEnterRoom;
 	Action *FExitRoom;
 private:
-	IAvatars *FAvatars;
-	IDataForms *FDataForms;
-	IStatusIcons *FStatusIcons;
-	IStatusChanger *FStatusChanger;
-	IRosterManager *FRosterManager;
-	IMessageWidgets *FMessageWidgets;
-	IRecentContacts *FRecentContacts;
-	IStanzaProcessor *FStanzaProcessor;
-	IMessageArchiver *FMessageArchiver;
-	IMessageProcessor *FMessageProcessor;
-	IMultiUserChatManager *FMultiChatManager;
-	IMessageStyleManager *FMessageStyleManager;
+	PluginPointer<IAvatars> FAvatars;
+	PluginPointer<IDataForms> FDataForms;
+	PluginPointer<IStatusIcons> FStatusIcons;
+	PluginPointer<IStatusChanger> FStatusChanger;
+	PluginPointer<IRosterManager> FRosterManager;
+	PluginPointer<IMessageWidgets> FMessageWidgets;
+	PluginPointer<IRecentContacts> FRecentContacts;
+	PluginPointer<IStanzaProcessor> FStanzaProcessor;
+	PluginPointer<IMessageArchiver> FMessageArchiver;
+	PluginPointer<IMessageProcessor> FMessageProcessor;
+	PluginPointer<IMultiUserChatManager> FMultiChatManager;
+	PluginPointer<IMessageStyleManager> FMessageStyleManager;
 private:
 	SplitterWidget *FMainSplitter;
 	SplitterWidget *FCentralSplitter;

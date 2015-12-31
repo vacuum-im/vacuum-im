@@ -21,6 +21,7 @@
 #include <interfaces/irecentcontacts.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/imainwindow.h>
+#include <utils/pluginhelper.h>
 #include "multiuserchat.h"
 #include "multiuserchatwindow.h"
 #include "createmultichatwizard.h"
@@ -171,20 +172,20 @@ protected slots:
 	void onNotificationActivated(int ANotifyId);
 	void onNotificationRemoved(int ANotifyId);
 private:
-	IMessageWidgets *FMessageWidgets;
-	IMessageProcessor *FMessageProcessor;
-	IRostersViewPlugin *FRostersViewPlugin;
-	IRostersModel *FRostersModel;
-	IXmppStreamManager *FXmppStreamManager;
-	IServiceDiscovery *FDiscovery;
-	INotifications *FNotifications;
-	IDataForms *FDataForms;
-	IXmppUriQueries *FXmppUriQueries;
-	IOptionsManager *FOptionsManager;
-	IStatusIcons *FStatusIcons;
-	IRecentContacts *FRecentContacts;
-	IStanzaProcessor *FStanzaProcessor;
-	IMainWindowPlugin *FMainWindowPlugin;
+	PluginPointer<IDataForms> FDataForms;
+	PluginPointer<IStatusIcons> FStatusIcons;
+	PluginPointer<IRostersModel> FRostersModel;
+	PluginPointer<IServiceDiscovery> FDiscovery;
+	PluginPointer<INotifications> FNotifications;
+	PluginPointer<IXmppUriQueries> FXmppUriQueries;
+	PluginPointer<IOptionsManager> FOptionsManager;
+	PluginPointer<IRecentContacts> FRecentContacts;
+	PluginPointer<IMessageWidgets> FMessageWidgets;
+	PluginPointer<IStanzaProcessor> FStanzaProcessor;
+	PluginPointer<IMainWindowPlugin> FMainWindowPlugin;
+	PluginPointer<IMessageProcessor> FMessageProcessor;
+	PluginPointer<IRostersViewPlugin> FRostersViewPlugin;
+	PluginPointer<IXmppStreamManager> FXmppStreamManager;
 private:
 	QList<IMultiUserChat *> FChats;
 	QList<IRosterIndex *> FChatIndexes;
