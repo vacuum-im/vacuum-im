@@ -343,30 +343,42 @@ void PrivateStorage::removeOptionsElement(const Jid &AStreamJid, const QString &
 
 void PrivateStorage::onXmppStreamOpened(IXmppStream *AXmppStream)
 {
-	LOG_STRM_INFO(AXmppStream->streamJid(),"Private storage opened");
-	FStreamElements.insert(AXmppStream->streamJid(),FStorage.appendChild(FStorage.createElement("stream")).toElement());
-	emit storageOpened(AXmppStream->streamJid());
+	if (!isOpen(AXmppStream->streamJid()))
+	{
+		LOG_STRM_INFO(AXmppStream->streamJid(),"Private storage opened");
+		FStreamElements.insert(AXmppStream->streamJid(),FStorage.appendChild(FStorage.createElement("stream")).toElement());
+		emit storageOpened(AXmppStream->streamJid());
+	}
 }
 
 void PrivateStorage::onXmppStreamAboutToClose(IXmppStream *AXmppStream)
 {
-	LOG_STRM_INFO(AXmppStream->streamJid(),"Private storage about to close");
-	emit storageAboutToClose(AXmppStream->streamJid());
+	if (isOpen(AXmppStream->streamJid()))
+	{
+		LOG_STRM_INFO(AXmppStream->streamJid(),"Private storage about to close");
+		emit storageAboutToClose(AXmppStream->streamJid());
+	}
 }
 
 void PrivateStorage::onXmppStreamClosed(IXmppStream *AXmppStream)
 {
-	LOG_STRM_INFO(AXmppStream->streamJid(),"Private storage closed");
-	FPreClosedStreams -= AXmppStream->streamJid();
-	emit storageClosed(AXmppStream->streamJid());
-	FStorage.removeChild(FStreamElements.take(AXmppStream->streamJid()));
+	if (isOpen(AXmppStream->streamJid()))
+	{
+		LOG_STRM_INFO(AXmppStream->streamJid(),"Private storage closed");
+		FPreClosedStreams -= AXmppStream->streamJid();
+		emit storageClosed(AXmppStream->streamJid());
+		FStorage.removeChild(FStreamElements.take(AXmppStream->streamJid()));
+	}
 }
 
 void PrivateStorage::onPresenceAboutToClose(IPresence *APresence, int AShow, const QString &AStatus)
 {
 	Q_UNUSED(AShow); Q_UNUSED(AStatus);
-	FPreClosedStreams += APresence->streamJid();
-	emit storageNotifyAboutToClose(APresence->streamJid());
+	if (isOpen(APresence->streamJid()))
+	{
+		FPreClosedStreams += APresence->streamJid();
+		emit storageNotifyAboutToClose(APresence->streamJid());
+	}
 }
 
 Q_EXPORT_PLUGIN2(plg_privatestorage, PrivateStorage)
