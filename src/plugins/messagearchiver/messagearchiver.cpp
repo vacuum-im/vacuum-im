@@ -449,7 +449,7 @@ QMultiMap<int, IOptionsDialogWidget *> MessageArchiver::optionsDialogWidgets(con
 				widgets.insertMulti(OWO_ACCOUNTS_HISTORY_REPLICATION,FOptionsManager->newOptionsDialogWidget(options.node("history-replicate"),tr("Synchronize history between archives"),AParent));
 			}
 
-			if (isArchiveAutoSave(account->streamJid()))
+			if (isSupported(account->streamJid(), NS_ARCHIVE_AUTO))
 			{
 				widgets.insertMulti(OHO_ACCOUNTS_HISTORY_REPLICATION,FOptionsManager->newOptionsDialogHeader(tr("Archive synchronization"),AParent));
 				widgets.insertMulti(OWO_ACCOUNTS_HISTORY_DUPLICATION,FOptionsManager->newOptionsDialogWidget(options.node("history-duplicate"),tr("Duplicate messages in local archive (not recommended)"),AParent));
