@@ -3,7 +3,7 @@
     <name>AutoRulesOptionsDialog</name>
     <message>
         <source>Auto Status Rules</source>
-        <translation>Reglas de estado automático</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Time</source>

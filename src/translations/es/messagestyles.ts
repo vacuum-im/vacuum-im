@@ -126,7 +126,7 @@
     </message>
     <message>
         <source>Message Style - %1 - %2</source>
-        <translation>Estilo de mensaje - %1 - %2</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Receiver</source>
