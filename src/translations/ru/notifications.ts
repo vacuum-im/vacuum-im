@@ -98,6 +98,10 @@
         <source>Show the corresponding window minimized in the taskbar</source>
         <translation>Показывать соответствующее окно свернутым в панели задач</translation>
     </message>
+    <message>
+        <source>Display a notification icon in the system tray</source>
+        <translation>Показывать иконку уведомления в системном трее</translation>
+    </message>
 </context>
 <context>
     <name>NotifyWidget</name>

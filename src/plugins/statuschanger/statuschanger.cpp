@@ -210,7 +210,7 @@ bool StatusChanger::initObjects()
 	{
 		INotificationType notifyType;
 		notifyType.order = NTO_CONNECTION_ERROR;
-		notifyType.icon = FStatusIcons!=NULL ? FStatusIcons->iconByStatus(IPresence::Error,QString::null,false) : QIcon();
+		notifyType.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_SCHANGER_CONNECTION_ERROR);
 		notifyType.title = tr("On loss of connection to the server");
 		notifyType.kindMask = INotification::PopupWindow|INotification::SoundPlay;
 		notifyType.kindDefs = notifyType.kindMask;

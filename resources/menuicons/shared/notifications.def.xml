@@ -32,4 +32,8 @@
     <key>notificationsShowMinimized</key>
     <object mime="image/png">notificationsshowminimized.png</object>
   </icon>
+  <icon>
+    <key>notificationsTrayIcon</key>
+    <object mime="image/png">notificationstrayicon.png</object>
+  </icon>
 </icondef>

@@ -98,6 +98,10 @@
    <source>Show the corresponding window minimized in the taskbar</source>
    <translation>Show the corresponding window minimized in the taskbar</translation>
   </message>
+  <message>
+   <source>Display a notification icon in the system tray</source>
+   <translation>Display a notification icon in the system tray</translation>
+  </message>
  </context>
  <context>
   <name>NotifyWidget</name>
