@@ -119,6 +119,10 @@
         <source>hh:mm:ss</source>
         <translation>hh:mm:ss</translation>
     </message>
+    <message>
+        <source>Use monospaced font for unformatted text</source>
+        <translation>Использовать моноширный шрифт для неформатированного текста</translation>
+    </message>
 </context>
 <context>
     <name>StyleEditOptionsDialog</name>
@@ -205,6 +209,10 @@
     <message>
         <source>Outgoing consecutive message</source>
         <translation>Исходящее последовательное сообщение</translation>
+    </message>
+    <message>
+        <source>speaks of himself in the third person</source>
+        <translation>говорит о себе в третьем лице</translation>
     </message>
 </context>
 <context>
