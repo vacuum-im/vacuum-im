@@ -206,6 +206,10 @@
    <source>Outgoing consecutive message</source>
    <translation>Outgoing consecutive message</translation>
   </message>
+  <message>
+   <source>speaks of himself in the third person</source>
+   <translation>speaks of himself in the third person</translation>
+  </message>
  </context>
  <context>
   <name>StyleSelectOptionsWidget</name>
