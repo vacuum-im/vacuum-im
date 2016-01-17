@@ -128,8 +128,7 @@ bool SASLAuthFeature::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, in
 			}
 			QByteArray responseData = serializeResponse(responseMap);
 
-			Stanza response("response");
-			response.setAttribute("xmlns",NS_FEATURE_SASL);
+			Stanza response("response",NS_FEATURE_SASL);
 			response.element().appendChild(response.createTextNode(responseData.toBase64()));
 			FXmppStream->sendStanza(response);
 
@@ -224,8 +223,7 @@ bool SASLAuthFeature::start(const QDomElement &AElem)
 
 void SASLAuthFeature::sendAuthRequest(const QStringList &AMechanisms)
 {
-	Stanza auth("auth");
-	auth.setAttribute("xmlns",NS_FEATURE_SASL);
+	Stanza auth("auth",NS_FEATURE_SASL);
 	if (AMechanisms.contains(AUTH_DIGEST_MD5))
 	{
 		auth.setAttribute("mechanism",AUTH_DIGEST_MD5);

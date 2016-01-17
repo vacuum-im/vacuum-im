@@ -72,8 +72,7 @@ bool StartTLSFeature::start(const QDomElement &AElem)
 	{
 		if (FXmppStream->connection()->isEncryptionSupported() && !FXmppStream->connection()->isEncrypted())
 		{
-			Stanza request("starttls");
-			request.setAttribute("xmlns",NS_FEATURE_STARTTLS);
+			Stanza request("starttls",NS_FEATURE_STARTTLS);
 			FXmppStream->insertXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 			FXmppStream->sendStanza(request);
 			LOG_STRM_INFO(FXmppStream->streamJid(),"StartTLS negotiation request sent");

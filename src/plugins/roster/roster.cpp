@@ -165,7 +165,7 @@ bool Roster::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
 	if (!FVerSupported && !isOpen() && FXmppStream==AXmppStream && AOrder==XSHO_XMPP_FEATURE)
 	{
-		if (AStanza.element().nodeName()=="stream:features" && !AStanza.firstElement("ver",NS_FEATURE_ROSTER_VER).isNull())
+		if (AStanza.namespaceURI()==NS_JABBER_STREAMS && AStanza.tagName()=="features" && !AStanza.firstElement("ver",NS_FEATURE_ROSTER_VER).isNull())
 		{
 			FVerSupported = true;
 			LOG_STRM_INFO(streamJid(),"Roster versioning is supported by server");

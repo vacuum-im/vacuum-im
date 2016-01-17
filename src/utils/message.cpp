@@ -1,6 +1,9 @@
 #include "message.h"
 
-MessageData::MessageData() : FStanza("message")
+#define MESSAGE_NS_DELAY       "urn:xmpp:delay"
+#define MESSAGE_NS_X_DELAY     "jabber:x:delay"
+
+MessageData::MessageData() : FStanza(STANZA_KIND_MESSAGE,STANZA_NS_CLIENT)
 {
 	FDateTime = QDateTime::currentDateTime();
 }
@@ -9,9 +12,9 @@ MessageData::MessageData(const Stanza &AStanza) : FStanza(AStanza)
 {
 	FDateTime = QDateTime::currentDateTime();
 
-	QDomElement delayElem = FStanza.firstElement("delay","urn:xmpp:delay");
+	QDomElement delayElem = FStanza.firstElement("delay",MESSAGE_NS_DELAY);
 	if (delayElem.isNull())
-		delayElem = FStanza.firstElement("x","jabber:x:delay");
+		delayElem = FStanza.firstElement("x",MESSAGE_NS_X_DELAY);
 	if (!delayElem.isNull())
 	{
 		DateTime dateTime(delayElem.attribute("stamp"));
@@ -36,11 +39,6 @@ Message::Message(const Stanza &AStanza)
 	d = new MessageData(AStanza);
 }
 
-Message::~Message()
-{
-
-}
-
 void Message::detach()
 {
 	d.detach();
@@ -57,37 +55,40 @@ const Stanza &Message::stanza() const
 	return d->FStanza;
 }
 
-Message &Message::setStanza(const Stanza &AStanza)
+Message::MessageType Message::type() const
 {
-	d->FStanza = AStanza;
+	if (d->FStanza.type() == MESSAGE_TYPE_CHAT)
+		return Message::Chat;
+	if (d->FStanza.type() == MESSAGE_TYPE_GROUPCHAT)
+		return Message::GroupChat;
+	if (d->FStanza.type() == MESSAGE_TYPE_HEADLINE)
+		return Message::Headline;
+	if (d->FStanza.type() == STANZA_TYPE_ERROR)
+		return Message::Error;
+	return Message::Normal;
+}
+
+Message &Message::setType(MessageType AType)
+{
+	switch (AType)
+	{
+	case Message::Normal:
+		d->FStanza.setType(MESSAGE_TYPE_NORMAL);
+		break;
+	case Message::Chat:
+		d->FStanza.setType(MESSAGE_TYPE_CHAT);
+		break;
+	case Message::GroupChat:
+		d->FStanza.setType(MESSAGE_TYPE_GROUPCHAT);
+		break;
+	case Message::Headline:
+		d->FStanza.setType(MESSAGE_TYPE_HEADLINE);
+		break;
+	case Message::Error:
+		d->FStanza.setType(STANZA_TYPE_ERROR);
+		break;
+	}
 	return *this;
-}
-
-QVariant Message::data(int ARole)  const
-{
-	return d->FData.value(ARole);
-}
-
-void Message::setData(int ARole, const QVariant &AData)
-{
-	QVariant before = data(ARole);
-	if (before != AData)
-	{
-		if (AData.isValid())
-			d->FData.insert(ARole,AData);
-		else
-			d->FData.remove(ARole);
-	}
-}
-
-void Message::setData(const QHash<int, QVariant> &AData)
-{
-	QHash<int,QVariant>::const_iterator it = AData.constBegin();
-	while (it != AData.constEnd())
-	{
-		setData(it.key(),it.value());
-		++it;
-	}
 }
 
 QString Message::id() const
@@ -101,15 +102,9 @@ Message &Message::setId(const QString &AId)
 	return *this;
 }
 
-QString Message::from() const
+Jid Message::toJid() const
 {
-	return d->FStanza.from();
-}
-
-Message &Message::setFrom(const QString &AFrom)
-{
-	d->FStanza.setFrom(AFrom);
-	return *this;
+	return d->FStanza.toJid();
 }
 
 QString Message::to() const
@@ -120,6 +115,22 @@ QString Message::to() const
 Message &Message::setTo(const QString &ATo)
 {
 	d->FStanza.setTo(ATo);
+	return *this;
+}
+
+Jid Message::fromJid() const
+{
+	return d->FStanza.fromJid();
+}
+
+QString Message::from() const
+{
+	return d->FStanza.from();
+}
+
+Message &Message::setFrom(const QString &AFrom)
+{
+	d->FStanza.setFrom(AFrom);
 	return *this;
 }
 
@@ -134,48 +145,9 @@ Message &Message::setDefLang(const QString &ALang)
 	return *this;
 }
 
-Message::MessageType Message::type() const
-{
-	if (d->FStanza.type() == "chat")
-		return Chat;
-	else if (d->FStanza.type() == "groupchat")
-		return GroupChat;
-	else if (d->FStanza.type() == "headline")
-		return Headline;
-	else if (d->FStanza.type() == "error")
-		return Error;
-	else
-		return Normal;
-}
-
-Message &Message::setType(MessageType AType)
-{
-	switch (AType)
-	{
-	case Normal:
-		d->FStanza.setType("normal");
-		break;
-	case Chat:
-		d->FStanza.setType("chat");
-		break;
-	case GroupChat:
-		d->FStanza.setType("groupchat");
-		break;
-	case Headline:
-		d->FStanza.setType("headline");
-		break;
-	case Error:
-		d->FStanza.setType("error");
-		break;
-	default:
-		break;
-	}
-	return *this;
-}
-
 bool Message::isDelayed() const
 {
-	return !d->FStanza.firstElement("delay","urn:xmpp:delay").isNull() || !d->FStanza.firstElement("x","jabber:x:delay").isNull();
+	return !d->FStanza.firstElement("delay",MESSAGE_NS_DELAY).isNull() || !d->FStanza.firstElement("x",MESSAGE_NS_X_DELAY).isNull();
 }
 
 QDateTime Message::dateTime() const
@@ -189,11 +161,11 @@ Message &Message::setDateTime(const QDateTime &ADateTime, bool ADelayed)
 	if (ADelayed)
 	{
 		d->FStanza.detach();
-		QDomElement elem = d->FStanza.firstElement("delay","urn:xmpp:delay");
+		QDomElement elem = d->FStanza.firstElement("delay",MESSAGE_NS_DELAY);
 		if (elem.isNull())
-			elem = d->FStanza.firstElement("x","jabber:x:delay");
+			elem = d->FStanza.firstElement("x",MESSAGE_NS_X_DELAY);
 		if (elem.isNull())
-			elem = d->FStanza.addElement("delay","urn:xmpp:delay");
+			elem = d->FStanza.addElement("delay",MESSAGE_NS_DELAY);
 		elem.setAttribute("stamp",DateTime(ADateTime).toX85UTC());
 	}
 	return *this;
@@ -255,6 +227,29 @@ Message &Message::setThreadId(const QString &AThreadId)
 	return *this;
 }
 
+QVariant Message::data(int ARole)  const
+{
+	return d->FData.value(ARole);
+}
+
+void Message::setData(int ARole, const QVariant &AData)
+{
+	QVariant before = data(ARole);
+	if (before != AData)
+	{
+		if (AData.isValid())
+			d->FData.insert(ARole,AData);
+		else
+			d->FData.remove(ARole);
+	}
+}
+
+void Message::setData(const QHash<int, QVariant> &AData)
+{
+	for (QHash<int,QVariant>::const_iterator it = AData.constBegin(); it != AData.constEnd(); ++it)
+		setData(it.key(),it.value());
+}
+
 QStringList Message::availableLangs(const QDomElement &AParent, const QString &ATagName) const
 {
 	QStringList langs;
@@ -280,7 +275,7 @@ QDomElement Message::findChidByLang(const QDomElement &AParent, const QString &A
 	return elem;
 }
 
-// Be sure that d->FStanza.detach() is called before gettings AParent element for this function
+// Be sure that d->FStanza.detach() is called before sending AParent element for this function
 QDomElement Message::addChildByLang(const QDomElement &AParent, const QString &ATagName, const QString &ALang, const QString &AText)
 {
 	QDomElement elem = findChidByLang(AParent,ATagName,ALang);
@@ -290,10 +285,12 @@ QDomElement Message::addChildByLang(const QDomElement &AParent, const QString &A
 		if (!ALang.isEmpty() && ALang!=defLang())
 			elem.setAttribute("xml:lang",ALang);
 	}
+	
 	if (!AText.isEmpty())
 		setTextToElem(elem,AText);
 	else if (!elem.isNull())
 		d->FStanza.element().removeChild(elem);
+	
 	return elem;
 }
 

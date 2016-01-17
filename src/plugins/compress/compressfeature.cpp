@@ -87,8 +87,7 @@ bool CompressFeature::start(const QDomElement &AElem)
 				if (startZlib())
 				{
 					LOG_STRM_INFO(FXmppStream->streamJid(),QString("Starting stream compression with ZLib=%1").arg(ZLIB_VERSION));
-					Stanza compress("compress");
-					compress.setAttribute("xmlns",NS_PROTOCOL_COMPRESS);
+					Stanza compress("compress",NS_PROTOCOL_COMPRESS);
 					compress.addElement("method").appendChild(compress.createTextNode("zlib"));
 					FXmppStream->insertXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 					FXmppStream->sendStanza(compress);
