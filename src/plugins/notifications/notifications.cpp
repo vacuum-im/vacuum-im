@@ -557,10 +557,10 @@ ushort Notifications::typeNotificationKinds(const QString &ATypeId) const
 {
 	if (FTypeRecords.contains(ATypeId))
 	{
-		TypeRecord &typeRecord = FTypeRecords[ATypeId];
-		if (typeRecord.kinds == UNDEFINED_KINDS)
-			typeRecord.kinds = Options::node(OPV_NOTIFICATIONS_TYPEKINDS_ITEM,ATypeId).value().toInt() ^ typeRecord.type.kindDefs;
-		return typeRecord.kinds;
+		TypeRecord &rec = FTypeRecords[ATypeId];
+		if (rec.kinds == UNDEFINED_KINDS)
+			rec.kinds = Options::node(OPV_NOTIFICATIONS_TYPEKINDS_ITEM,ATypeId).value().toInt() ^ rec.type.kindDefs;
+		return rec.kinds & rec.type.kindMask;
 	}
 	return 0;
 }
@@ -574,9 +574,9 @@ void Notifications::setTypeNotificationKinds(const QString &ATypeId, ushort AKin
 {
 	if (FTypeRecords.contains(ATypeId))
 	{
-		TypeRecord &typeRecord = FTypeRecords[ATypeId];
-		typeRecord.kinds = AKinds & typeRecord.type.kindMask;
-		Options::node(OPV_NOTIFICATIONS_TYPEKINDS_ITEM,ATypeId).setValue(typeRecord.kinds ^ typeRecord.type.kindDefs);
+		TypeRecord &rec = FTypeRecords[ATypeId];
+		rec.kinds = AKinds & rec.type.kindMask;
+		Options::node(OPV_NOTIFICATIONS_TYPEKINDS_ITEM,ATypeId).setValue(rec.kinds ^ rec.type.kindDefs);
 	}
 }
 
