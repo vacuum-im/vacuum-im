@@ -124,6 +124,7 @@ bool FileStreamsManager::initSettings()
 	{
 		FOptionsManager->insertOptionsDialogHolder(this);
 	}
+
 	return true;
 }
 
@@ -150,15 +151,15 @@ QMultiMap<int, IOptionsDialogWidget *> FileStreamsManager::optionsDialogWidgets(
 	return widgets;
 }
 
-QString FileStreamsManager::profileNS() const
+QString FileStreamsManager::dataStreamProfile() const
 {
 	return NS_SI_FILETRANSFER;
 }
 
-bool FileStreamsManager::requestDataStream(const QString &AStreamId, Stanza &ARequest) const
+bool FileStreamsManager::dataStreamMakeRequest(const QString &AStreamId, Stanza &ARequest) const
 {
-	IFileStream *stream = streamById(AStreamId);
-	if (stream && stream->streamKind()==IFileStream::SendFile)
+	IFileStream *stream = findStream(AStreamId);
+	if (stream!=NULL && stream->streamKind()==IFileStream::SendFile)
 	{
 		if (!stream->fileName().isEmpty() && stream->fileSize()>0)
 		{
@@ -200,18 +201,18 @@ bool FileStreamsManager::requestDataStream(const QString &AStreamId, Stanza &ARe
 	return false;
 }
 
-bool FileStreamsManager::responceDataStream(const QString &AStreamId, Stanza &AResponce) const
+bool FileStreamsManager::dataStreamMakeResponse(const QString &AStreamId, Stanza &AResponse) const
 {
-	IFileStream *stream = streamById(AStreamId);
-	if (stream && stream->streamKind()==IFileStream::ReceiveFile)
+	IFileStream *stream = findStream(AStreamId);
+	if (stream!=NULL && stream->streamKind()==IFileStream::ReceiveFile)
 	{
 		if (stream->isRangeSupported() && (stream->rangeOffset()>0 || stream->rangeLength()>0))
 		{
-			QDomElement siElem = AResponce.firstElement("si",NS_STREAM_INITIATION);
+			QDomElement siElem = AResponse.firstElement("si",NS_STREAM_INITIATION);
 			if (!siElem.isNull())
 			{
-				QDomElement fileElem = siElem.appendChild(AResponce.createElement("file",NS_SI_FILETRANSFER)).toElement();
-				QDomElement rangeElem = fileElem.appendChild(AResponce.createElement("range")).toElement();
+				QDomElement fileElem = siElem.appendChild(AResponse.createElement("file",NS_SI_FILETRANSFER)).toElement();
+				QDomElement rangeElem = fileElem.appendChild(AResponse.createElement("range")).toElement();
 				if (stream->rangeOffset()>0)
 					rangeElem.setAttribute("offset",stream->rangeOffset());
 				if (stream->rangeLength()>0)
@@ -235,24 +236,21 @@ bool FileStreamsManager::responceDataStream(const QString &AStreamId, Stanza &AR
 	return false;
 }
 
-bool FileStreamsManager::dataStreamRequest(const QString &AStreamId, const Stanza &ARequest, const QList<QString> &AMethods)
+bool FileStreamsManager::dataStreamProcessRequest(const QString &AStreamId, const Stanza &ARequest, const QList<QString> &AMethods)
 {
-	if (!FStreams.contains(AStreamId))
+	if (!AMethods.isEmpty() && !FStreams.contains(AStreamId))
 	{
-		if (!AMethods.isEmpty())
+		for (QMultiMap<int, IFileStreamHandler *>::const_iterator it = FHandlers.constBegin(); it!=FHandlers.constEnd(); ++it)
 		{
-			for (QMultiMap<int, IFileStreamsHandler *>::const_iterator it = FHandlers.constBegin(); it!=FHandlers.constEnd(); ++it)
-			{
-				IFileStreamsHandler *handler = it.value();
-				if (handler->fileStreamRequest(it.key(),AStreamId,ARequest,AMethods))
-					return true;
-			}
-			LOG_STRM_WARNING(ARequest.to(),QString("Failed to process file stream request, sid=%1: Stream handler not found").arg(AStreamId));
+			IFileStreamHandler *handler = it.value();
+			if (handler->fileStreamProcessRequest(it.key(),AStreamId,ARequest,AMethods))
+				return true;
 		}
-		else
-		{
-			LOG_STRM_ERROR(ARequest.to(),QString("Failed to process file stream request, sid=%1: No valid stream methods").arg(AStreamId));
-		}
+		LOG_STRM_WARNING(ARequest.to(),QString("Failed to process file stream request, sid=%1: Stream handler not found").arg(AStreamId));
+	}
+	else if (AMethods.isEmpty())
+	{
+		LOG_STRM_ERROR(ARequest.to(),QString("Failed to process file stream request, sid=%1: No valid stream methods").arg(AStreamId));
 	}
 	else
 	{
@@ -261,20 +259,20 @@ bool FileStreamsManager::dataStreamRequest(const QString &AStreamId, const Stanz
 	return false;
 }
 
-bool FileStreamsManager::dataStreamResponce(const QString &AStreamId, const Stanza &AResponce, const QString &AMethod)
+bool FileStreamsManager::dataStreamProcessResponse(const QString &AStreamId, const Stanza &AResponse, const QString &AMethod)
 {
-	IFileStreamsHandler *handler = streamHandler(AStreamId);
-	if (handler)
-		return handler->fileStreamResponce(AStreamId,AResponce,AMethod);
+	IFileStreamHandler *handler = streamHandler(AStreamId);
+	if (handler != NULL)
+		return handler->fileStreamProcessResponse(AStreamId,AResponse,AMethod);
 	else
-		LOG_STRM_ERROR(AResponce.to(),QString("Failed to process file stream response, sid=%1: Stream handler not found").arg(AStreamId));
+		LOG_STRM_ERROR(AResponse.to(),QString("Failed to process file stream response, sid=%1: Stream handler not found").arg(AStreamId));
 	return false;
 }
 
-bool FileStreamsManager::dataStreamError(const QString &AStreamId, const XmppError &AError)
+bool FileStreamsManager::dataStreamProcessError(const QString &AStreamId, const XmppError &AError)
 {
-	IFileStream *stream = streamById(AStreamId);
-	if (stream)
+	IFileStream *stream = findStream(AStreamId);
+	if (stream != NULL)
 	{
 		stream->abortStream(AError);
 		return true;
@@ -291,25 +289,32 @@ QList<IFileStream *> FileStreamsManager::streams() const
 	return FStreams.values();
 }
 
-IFileStream *FileStreamsManager::streamById(const QString &AStreamId) const
+IFileStream *FileStreamsManager::findStream(const QString &AStreamId) const
 {
-	return FStreams.value(AStreamId, NULL);
+	return FStreams.value(AStreamId);
 }
 
-IFileStream *FileStreamsManager::createStream(IFileStreamsHandler *AHandler, const QString &AStreamId, const Jid &AStreamJid,
-    const Jid &AContactJid, IFileStream::StreamKind AKind, QObject *AParent)
+IFileStreamHandler *FileStreamsManager::streamHandler(const QString &AStreamId) const
+{
+	return FStreamHandler.value(AStreamId);
+}
+
+IFileStream *FileStreamsManager::createStream(IFileStreamHandler *AHandler, const QString &AStreamId, const Jid &AStreamJid, const Jid &AContactJid, IFileStream::StreamKind AKind, QObject *AParent)
 {
 	if (FDataManager && AHandler && !AStreamId.isEmpty() && !FStreams.contains(AStreamId))
 	{
 		LOG_STRM_INFO(AStreamJid,QString("Creating file stream, sid=%1, with=%2, kind=%3").arg(AStreamId,AContactJid.full()).arg(AKind));
+		
 		IFileStream *stream = new FileStream(FDataManager,AStreamId,AStreamJid,AContactJid,AKind,AParent);
 		connect(stream->instance(),SIGNAL(streamDestroyed()),SLOT(onStreamDestroyed()));
+		
 		FStreams.insert(AStreamId,stream);
 		FStreamHandler.insert(AStreamId,AHandler);
+		
 		emit streamCreated(stream);
 		return stream;
 	}
-	else if (FDataManager)
+	else if (FDataManager && AHandler)
 	{
 		LOG_STRM_ERROR(AStreamJid,QString("Failed to create file stream, sid=%1: Invalid params").arg(AStreamId));
 	}
@@ -317,26 +322,33 @@ IFileStream *FileStreamsManager::createStream(IFileStreamsHandler *AHandler, con
 	return NULL;
 }
 
-IFileStreamsHandler *FileStreamsManager::streamHandler(const QString &AStreamId) const
+QList<IFileStreamHandler *> FileStreamsManager::streamHandlers() const
 {
-	return FStreamHandler.value(AStreamId);
+	return FHandlers.values();
 }
 
-void FileStreamsManager::insertStreamsHandler(IFileStreamsHandler *AHandler, int AOrder)
+void FileStreamsManager::insertStreamsHandler(int AOrder, IFileStreamHandler *AHandler)
 {
-	if (AHandler!=NULL)
+	if (AHandler!=NULL && !FHandlers.contains(AOrder,AHandler))
+	{
 		FHandlers.insertMulti(AOrder,AHandler);
+		emit streamHandlerInserted(AOrder, AHandler);
+	}
 }
 
-void FileStreamsManager::removeStreamsHandler(IFileStreamsHandler *AHandler, int AOrder)
+void FileStreamsManager::removeStreamsHandler(int AOrder, IFileStreamHandler *AHandler)
 {
-	FHandlers.remove(AOrder,AHandler);
+	if (FHandlers.contains(AOrder,AHandler))
+	{
+		FHandlers.remove(AOrder,AHandler);
+		emit streamHandlerRemoved(AOrder,AHandler);
+	}
 }
 
 void FileStreamsManager::onStreamDestroyed()
 {
 	IFileStream *stream = qobject_cast<IFileStream *>(sender());
-	if (stream)
+	if (stream != NULL)
 	{
 		LOG_STRM_INFO(stream->streamJid(),QString("File stream destroyed, sid=%1").arg(stream->streamId()));
 		FStreams.remove(stream->streamId());

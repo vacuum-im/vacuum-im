@@ -284,7 +284,7 @@ bool InBandStream::open(QIODevice::OpenMode AMode)
 	if (FStanzaProcessor && streamState()==IDataStreamSocket::Closed)
 	{
 		setStreamError(XmppError::null);
-		if (streamKind() == IDataStreamSocket::Initiator)
+		if (streamKind() == IDataStream::Initiator)
 		{
 			Stanza openRequest("iq");
 			openRequest.setType("set").setId(FStanzaProcessor->newId()).setTo(FContactJid.full());

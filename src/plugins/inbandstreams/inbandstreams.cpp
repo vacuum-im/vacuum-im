@@ -100,7 +100,7 @@ QString InBandStreams::methodDescription() const
 	return tr("Data is broken down into smaller chunks and transported in-band over XMPP");
 }
 
-IDataStreamSocket *InBandStreams::dataStreamSocket(const QString &AStreamId, const Jid &AStreamJid, const Jid &AContactJid, IDataStreamSocket::StreamKind AKind, QObject *AParent)
+IDataStreamSocket *InBandStreams::dataStreamSocket(const QString &AStreamId, const Jid &AStreamJid, const Jid &AContactJid, IDataStream::Kind AKind, QObject *AParent)
 {
 	if (FStanzaProcessor)
 	{

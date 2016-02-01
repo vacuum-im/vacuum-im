@@ -528,7 +528,7 @@ bool RemoteControl::processFileTransfers(const ICommandRequest &ARequest)
 			{
 				foreach(const QString &streamId, ARequest.form.fields.value(index).value.toStringList())
 				{
-					IFileStream *stream = FFileStreamManager->streamById(streamId);
+					IFileStream *stream = FFileStreamManager->findStream(streamId);
 					QString defaultMethod = Options::node(OPV_FILESTREAMS_DEFAULTMETHOD).value().toString();
 					if (stream->acceptableMethods().contains(defaultMethod))
 					{

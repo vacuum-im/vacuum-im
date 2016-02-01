@@ -627,7 +627,7 @@ bool SocksStream::negotiateConnection(int ACommand)
 	{
 		FHosts.clear();
 		FHostIndex = INT_MAX;
-		if (streamKind() == IDataStreamSocket::Initiator)
+		if (streamKind() == IDataStream::Initiator)
 		{
 			FConnectKey = FSocksStreams->connectionKey(FStreamId, FStreamJid, FContactJid);
 			if (requestProxyAddress() || sendAvailHosts())
@@ -686,7 +686,7 @@ bool SocksStream::negotiateConnection(int ACommand)
 		}
 		else if (ACommand == NCMD_ACTIVATE_STREAM)
 		{
-			if (streamKind() == IDataStreamSocket::Initiator)
+			if (streamKind() == IDataStream::Initiator)
 			{
 				if (activateStream())
 					return true;
@@ -956,7 +956,7 @@ void SocksStream::onHostSocketDisconnected()
 	LOG_STRM_DEBUG(FStreamJid,QString("Socks stream disconnected from host, address=%1, sid=%2").arg(FTcpSocket->peerAddress().toString(),FStreamId));
 
 	FHostIndex++;
-	if (streamKind() == IDataStreamSocket::Initiator)
+	if (streamKind() == IDataStream::Initiator)
 		abort(XmppError(IERR_SOCKS5_STREAM_HOST_NOT_CONNECTED));
 	else
 		negotiateConnection(NCMD_CHECK_NEXT_HOST);

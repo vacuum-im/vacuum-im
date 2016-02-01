@@ -35,22 +35,26 @@ public:
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IDataStreamProfile
-	virtual QString profileNS() const;
-	virtual bool requestDataStream(const QString &AStreamId, Stanza &ARequest) const;
-	virtual bool responceDataStream(const QString &AStreamId, Stanza &AResponce) const;
-	virtual bool dataStreamRequest(const QString &AStreamId, const Stanza &ARequest, const QList<QString> &AMethods);
-	virtual bool dataStreamResponce(const QString &AStreamId, const Stanza &AResponce, const QString &AMethod);
-	virtual bool dataStreamError(const QString &AStreamId, const XmppError &AError);
+	virtual QString dataStreamProfile() const;
+	virtual bool dataStreamMakeRequest(const QString &AStreamId, Stanza &ARequest) const;
+	virtual bool dataStreamMakeResponse(const QString &AStreamId, Stanza &AResponse) const;
+	virtual bool dataStreamProcessRequest(const QString &AStreamId, const Stanza &ARequest, const QList<QString> &AMethods);
+	virtual bool dataStreamProcessResponse(const QString &AStreamId, const Stanza &AResponse, const QString &AMethod);
+	virtual bool dataStreamProcessError(const QString &AStreamId, const XmppError &AError);
 	//IFileTransferManager
 	virtual QList<IFileStream *> streams() const;
-	virtual IFileStream *streamById(const QString &ASessionId) const;
-	virtual IFileStream *createStream(IFileStreamsHandler *AHandler, const QString &AStreamId, const Jid &AStreamJid, const Jid &AContactJid, IFileStream::StreamKind AKind, QObject *AParent = NULL);
-	virtual IFileStreamsHandler *streamHandler(const QString &AStreamId) const;
-	virtual void insertStreamsHandler(IFileStreamsHandler *AHandler, int AOrder);
-	virtual void removeStreamsHandler(IFileStreamsHandler *AHandler, int AOrder);
+	virtual IFileStream *findStream(const QString &ASessionId) const;
+	virtual IFileStreamHandler *streamHandler(const QString &AStreamId) const;
+	virtual IFileStream *createStream(IFileStreamHandler *AHandler, const QString &AStreamId, const Jid &AStreamJid, const Jid &AContactJid, IFileStream::StreamKind AKind, QObject *AParent = NULL);
+	// Stream Handlers
+	virtual QList<IFileStreamHandler *> streamHandlers() const;
+	virtual void insertStreamsHandler(int AOrder, IFileStreamHandler *AHandler);
+	virtual void removeStreamsHandler(int AOrder, IFileStreamHandler *AHandler);
 signals:
 	void streamCreated(IFileStream *AStream);
 	void streamDestroyed(IFileStream *AStream);
+	void streamHandlerInserted(int AOrder, IFileStreamHandler *AHandler);
+	void streamHandlerRemoved(int AOrder, IFileStreamHandler *AHandler);
 protected slots:
 	void onStreamDestroyed();
 	void onShowFileStreamsWindow(bool);
@@ -62,8 +66,8 @@ private:
 	IMainWindowPlugin *FMainWindowPlugin;
 private:
 	QMap<QString, IFileStream *> FStreams;
-	QMultiMap<int, IFileStreamsHandler *> FHandlers;
-	QMap<QString, IFileStreamsHandler *> FStreamHandler;
+	QMultiMap<int, IFileStreamHandler *> FHandlers;
+	QMap<QString, IFileStreamHandler *> FStreamHandler;
 private:
 	QPointer<FileStreamsWindow> FFileStreamsWindow;
 };
