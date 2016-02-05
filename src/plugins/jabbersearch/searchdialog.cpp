@@ -108,7 +108,7 @@ void SearchDialog::resetDialog()
 		FCurrentForm->instance()->deleteLater();
 		FCurrentForm = NULL;
 	}
-	ui.tbwResult->clear();
+	ui.tbwResult->clearContents();
 	ui.lblInstructions->setText(QString::null);
 	ui.lblFirst->setVisible(false);
 	ui.lneFirst->setVisible(false);
@@ -261,19 +261,25 @@ void SearchDialog::onSearchResult(const QString &AId, const ISearchResult &AResu
 			{
 				QTableWidgetItem *itemJid = new QTableWidgetItem(item.itemJid.uFull());
 				itemJid->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
+
 				QTableWidgetItem *itemFirst = new QTableWidgetItem(item.firstName);
 				itemFirst->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
+				
 				QTableWidgetItem *itemLast = new QTableWidgetItem(item.lastName);
 				itemLast->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
+				
 				QTableWidgetItem *itemNick = new QTableWidgetItem(item.nick);
 				itemNick->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
+				
 				QTableWidgetItem *itemEmail = new QTableWidgetItem(item.email);
 				itemEmail->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
+				
 				ui.tbwResult->setItem(row,COL_JID,itemJid);
 				ui.tbwResult->setItem(row,COL_FIRST,itemFirst);
 				ui.tbwResult->setItem(row,COL_LAST,itemLast);
 				ui.tbwResult->setItem(row,COL_NICK,itemNick);
 				ui.tbwResult->setItem(row,COL_EMAIL,itemEmail);
+
 				row++;
 			}
 			ui.tbwResult->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);

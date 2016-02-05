@@ -156,6 +156,8 @@ void JabberSearch::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 				item.nick = itemElem.firstChildElement("nick").text();
 				item.email = itemElem.firstChildElement("email").text();
 				result.items.append(item);
+
+				itemElem = itemElem.nextSiblingElement("item");
 			}
 
 			if (FDataForms)
