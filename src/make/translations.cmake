@@ -52,34 +52,36 @@ macro(add_translations outvar tsname)
 	add_dependencies(updatets updatets_${tsname})
 	foreach(LANG ${USED_LANGS})
 		set(TS "${CMAKE_SOURCE_DIR}/src/translations/${LANG}/${tsname}.ts")
-		if (APPLE)
-			set(QM "${CMAKE_BINARY_DIR}/${INSTALL_TRANSLATIONS}/${LANG}/${tsname}.qm")
-		else (APPLE)
-			set(QM "${CMAKE_BINARY_DIR}/translations/${LANG}/${tsname}.qm")
-		endif (APPLE)
-		# Update *.ts
-		add_custom_command(TARGET updatets_${tsname} POST_BUILD
-				COMMAND "${QT_LUPDATE_EXECUTABLE}" ${LUPDATE_OPTS} ${TS_SRCS} -ts "${TS}" 
-				DEPENDS ${TS_SRCS}
-				WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-				COMMENT "Updating ${TS}")
-		# Generate *.qm
-		file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/translations/${LANG}")
-		add_custom_command(OUTPUT ${QM}
-				COMMAND "${QT_LRELEASE_EXECUTABLE}" ${LRELEASE_OPTS} "${TS}" -qm "${QM}"
-				DEPENDS ${TS})
-		set(QMS ${QMS} "${QM}")
-		# Install *.qm
-		if (NOT APPLE) # on Mac OS X they are writted to the bundle directly
-			install(FILES "${QM}" DESTINATION "${INSTALL_TRANSLATIONS}/${LANG}"
-				COMPONENT ${PLUGIN_NAME}_${LANG})
-		endif (NOT APPLE)
-		lang_display_name(LANG_NAME ${LANG})
-		cpack_add_component(${PLUGIN_NAME}_${LANG}
-			DISPLAY_NAME "${PLUGIN_DISPLAY_NAME}"
-			DESCRIPTION "${LANG_NAME} translation for ${PLUGIN_DISPLAY_NAME}"
-			GROUP ${LANG}_translation
-			DEPENDS ${PLUGIN_NAME})
+		if (EXISTS ${TS})
+			if (APPLE)
+				set(QM "${CMAKE_BINARY_DIR}/${INSTALL_TRANSLATIONS}/${LANG}/${tsname}.qm")
+			else (APPLE)
+				set(QM "${CMAKE_BINARY_DIR}/translations/${LANG}/${tsname}.qm")
+			endif (APPLE)
+			# Update *.ts
+			add_custom_command(TARGET updatets_${tsname} POST_BUILD
+					COMMAND "${QT_LUPDATE_EXECUTABLE}" ${LUPDATE_OPTS} ${TS_SRCS} -ts "${TS}" 
+					DEPENDS ${TS_SRCS}
+					WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+					COMMENT "Updating ${TS}")
+			# Generate *.qm
+			file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/translations/${LANG}")
+			add_custom_command(OUTPUT ${QM}
+					COMMAND "${QT_LRELEASE_EXECUTABLE}" ${LRELEASE_OPTS} "${TS}" -qm "${QM}"
+					DEPENDS ${TS})
+			set(QMS ${QMS} "${QM}")
+			# Install *.qm
+			if (NOT APPLE) # on Mac OS X they are writted to the bundle directly
+				install(FILES "${QM}" DESTINATION "${INSTALL_TRANSLATIONS}/${LANG}"
+					COMPONENT ${PLUGIN_NAME}_${LANG})
+			endif (NOT APPLE)
+			lang_display_name(LANG_NAME ${LANG})
+			cpack_add_component(${PLUGIN_NAME}_${LANG}
+				DISPLAY_NAME "${PLUGIN_DISPLAY_NAME}"
+				DESCRIPTION "${LANG_NAME} translation for ${PLUGIN_DISPLAY_NAME}"
+				GROUP ${LANG}_translation
+				DEPENDS ${PLUGIN_NAME})
+		endif (EXISTS ${TS})
 	endforeach(LANG)
 	set(${outvar} "${QMS}")
 endmacro(add_translations)
