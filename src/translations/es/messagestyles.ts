@@ -204,6 +204,10 @@
         <source>Outgoing consecutive message</source>
         <translation>Mensaje consecutivo de salida</translation>
     </message>
+    <message>
+        <source>speaks of himself in the third person</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>StyleSelectOptionsWidget</name>
