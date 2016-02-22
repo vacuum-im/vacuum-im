@@ -16,10 +16,6 @@
    <translation>The profile is not understood or invalid</translation>
   </message>
   <message>
-   <source>Invalid profile settings</source>
-   <translation>Invalid profile settings</translation>
-  </message>
-  <message>
    <source>Data Streams Initiation</source>
    <translation>Data Streams Initiation</translation>
   </message>
@@ -50,6 +46,10 @@
   <message>
    <source>Transfer method %1</source>
    <translation>Transfer method %1</translation>
+  </message>
+  <message>
+   <source>Unsupported stream initiation request</source>
+   <translation>Unsupported stream initiation request</translation>
   </message>
  </context>
 </TS>

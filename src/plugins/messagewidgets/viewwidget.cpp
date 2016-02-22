@@ -99,41 +99,54 @@ void ViewWidget::setMessageStyle(IMessageStyle *AStyle, const IMessageStyleOptio
 	}
 }
 
-void ViewWidget::appendHtml(const QString &AHtml, const IMessageStyleContentOptions &AOptions)
+bool ViewWidget::appendHtml(const QString &AHtml, const IMessageStyleContentOptions &AOptions)
 {
-	if (FMessageStyle)
-		FMessageStyle->appendContent(FStyleWidget,AHtml,AOptions);
+	return FMessageStyle!=NULL && !AHtml.isEmpty() ? FMessageStyle->appendContent(FStyleWidget,AHtml,AOptions) : false;
 }
 
-void ViewWidget::appendText(const QString &AText, const IMessageStyleContentOptions &AOptions)
+bool ViewWidget::appendText(const QString &AText, const IMessageStyleContentOptions &AOptions)
 {
-	Message message;
-	message.setBody(AText);
-	appendMessage(message,AOptions);
+	if (!AText.isEmpty())
+	{
+		Message message;
+		message.setBody(AText);
+		return appendMessage(message,AOptions);
+	}
+	return false;
 }
 
-void ViewWidget::appendMessage(const Message &AMessage, const IMessageStyleContentOptions &AOptions)
+bool ViewWidget::appendMessage(const Message &AMessage, const IMessageStyleContentOptions &AOptions)
 {
+	bool hasText = false;
+
 	QTextDocument doc;
 	if (FMessageProcessor)
-		FMessageProcessor->messageToText(&doc,AMessage);
-	else
-		doc.setPlainText(AMessage.body());
-
-	// "/me" command
-	IMessageStyleContentOptions options = AOptions;
-	if (AOptions.kind==IMessageStyleContentOptions::KindMessage && !AOptions.senderName.isEmpty())
 	{
-		QTextCursor cursor(&doc);
-		cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor,4);
-		if (cursor.selectedText() == "/me ")
-		{
-			options.kind = IMessageStyleContentOptions::KindMeCommand;
-			cursor.removeSelectedText();
-		}
+		hasText = FMessageProcessor->messageToText(AMessage,&doc);
+	}
+	else if (!AMessage.body().isEmpty())
+	{
+		hasText = true;
+		doc.setPlainText(AMessage.body());
 	}
 
-	appendHtml(TextManager::getDocumentBody(doc),options);
+	if (hasText)
+	{
+		// "/me" command
+		IMessageStyleContentOptions options = AOptions;
+		if (AOptions.kind==IMessageStyleContentOptions::KindMessage && !AOptions.senderName.isEmpty())
+		{
+			QTextCursor cursor(&doc);
+			cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor,4);
+			if (cursor.selectedText() == "/me ")
+			{
+				options.kind = IMessageStyleContentOptions::KindMeCommand;
+				cursor.removeSelectedText();
+			}
+		}
+		return appendHtml(TextManager::getDocumentBody(doc),options);
+	}
+	return false;
 }
 
 void ViewWidget::contextMenuForView(const QPoint &APosition, Menu *AMenu)
@@ -191,7 +204,7 @@ void ViewWidget::dragEnterEvent(QDragEnterEvent *AEvent)
 {
 	FActiveDropHandlers.clear();
 	foreach(IMessageViewDropHandler *handler, FMessageWidgets->viewDropHandlers())
-		if (handler->messagaeViewDragEnter(this, AEvent))
+		if (handler->messageViewDragEnter(this, AEvent))
 			FActiveDropHandlers.append(handler);
 
 	if (!FActiveDropHandlers.isEmpty())

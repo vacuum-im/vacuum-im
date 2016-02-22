@@ -18,11 +18,11 @@ class IXmppUriQueries
 public:
 	virtual QObject *instance() =0;
 	virtual bool openXmppUri(const Jid &AStreamJid, const QUrl &AUrl) const =0;
-	virtual void insertUriHandler(IXmppUriHandler *AHandler, int AOrder) =0;
-	virtual void removeUriHandler(IXmppUriHandler *AHandler, int AOrder) =0;
+	virtual void insertUriHandler(int AOrder, IXmppUriHandler *AHandler) =0;
+	virtual void removeUriHandler(int AOrder, IXmppUriHandler *AHandler) =0;
 protected:
-	virtual void uriHandlerInserted(IXmppUriHandler *AHandler, int AOrder) =0;
-	virtual void uriHandlerRemoved(IXmppUriHandler *AHandler, int AOrder) =0;
+	virtual void uriHandlerInserted(int AOrder, IXmppUriHandler *AHandler) =0;
+	virtual void uriHandlerRemoved(int AOrder, IXmppUriHandler *AHandler) =0;
 };
 
 Q_DECLARE_INTERFACE(IXmppUriHandler,"Vacuum.Plugin.IXmppUriHandler/1.0")

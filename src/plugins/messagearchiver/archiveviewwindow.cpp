@@ -29,6 +29,8 @@
 #define MAX_HILIGHT_ITEMS            10
 #define LOAD_COLLECTION_TIMEOUT      100
 
+#define HISTORY_DUBLICATE_DELTA      2*60
+
 enum HistoryItemType {
 	HIT_CONTACT,
 	HIT_DATEGROUP,
@@ -951,8 +953,9 @@ QString ArchiveViewWindow::showInfo(const ArchiveCollection &ACollection)
 		{
 			Message message;
 			message.setBody(ACollection.header.subject);
+
 			QTextDocument doc;
-			FMessageProcessor->messageToText(&doc,message);
+			FMessageProcessor->messageToText(message,&doc);
 			subject += TextManager::getDocumentBody(doc);
 		}
 		else
@@ -1000,66 +1003,78 @@ QString ArchiveViewWindow::showNote(const QString &ANote, const IMessageStyleCon
 QString ArchiveViewWindow::showMessage(const Message &AMessage, const IMessageStyleContentOptions &AOptions)
 {
 	QString html;
-	bool meMessage = false;
-	if (!AOptions.senderName.isEmpty() && AMessage.body().startsWith("/me "))
-	{
-		static const QString meMessageTmpl =
-			"<table width='100%' cellpadding='0' cellspacing='0' style='margin-top:5px;'>"
-			"  <tr>"
-			"    <td style='padding-left:10px; white-space:pre-wrap;'><b><i>*&nbsp;<span style='color:%senderColor%;'>%sender%</span></i></b>&nbsp;%message%</td>"
-			"    <td width='5%' align='right' style='white-space:nowrap; font-size:small; color:gray;'>[%time%]</td>"
-			"  </tr>"
-			"</table>";
-		meMessage = true;
-		html = meMessageTmpl;
-	}
-	else if (AOptions.senderId.isEmpty() || AOptions.senderId!=FViewOptions.lastSenderId || qAbs(FViewOptions.lastTime.secsTo(AOptions.time))>2*60)
-	{
-		static const QString firstMessageTmpl =
-			"<table width='100%' cellpadding='0' cellspacing='0' style='margin-top:5px;'>"
-			"  <tr>"
-			"    <td style='color:%senderColor%; white-space:nowrap; font-weight:bold;'>%sender%</td>"
-			"    <td width='5%' align='right' style='white-space:nowrap; font-size:small; color:gray;'>[%time%]</td>"
-			"  </tr>"
-			"  <tr>"
-			"    <td colspan='2' style='padding-left:10px; white-space:pre-wrap;'>%message%</td>"
-			"  </tr>"
-			"</table>";
-		html = firstMessageTmpl;
-	}
-	else
-	{
-		static const QString nextMessageTmpl =
-			"<table width='100%' cellpadding='0' cellspacing='0'>"
-			"  <tr>"
-			"    <td style='padding-left:10px; white-space:pre-wrap;'>%message%</td>"
-			"  </tr>"
-			"</table>";
-		html = nextMessageTmpl;
-	}
-
-	FViewOptions.lastTime = AOptions.time;
-	FViewOptions.lastSenderId = AOptions.senderId;
-
-	html.replace("%sender%",AOptions.senderName);
-	html.replace("%senderColor%",AOptions.senderColor);
-	html.replace("%time%",AOptions.time.toString(AOptions.timeFormat));
-
+	bool hasText = false;
+	
 	QTextDocument doc;
 	if (FMessageProcessor)
-		FMessageProcessor->messageToText(&doc,AMessage);
-	else
-		doc.setPlainText(AMessage.body());
-
-	if (meMessage)
 	{
-		QTextCursor cursor(&doc);
-		cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor,4);
-		if (cursor.selectedText() == "/me ")
-			cursor.removeSelectedText();
+		hasText = FMessageProcessor->messageToText(AMessage,&doc);
+	}
+	else
+	{
+		hasText = true;
+		doc.setPlainText(AMessage.body());
 	}
 
-	html.replace("%message%",TextManager::getDocumentBody(doc));
+	if (hasText)
+	{
+		bool meMessage = false;
+		if (!AOptions.senderName.isEmpty())
+		{
+			QTextCursor cursor(&doc);
+			cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor,4);
+			if (cursor.selectedText() == "/me ")
+			{
+				meMessage = true;
+				cursor.removeSelectedText();
+			}
+		}
+
+		if (meMessage)
+		{
+			static const QString meMessageTmpl =
+				"<table width='100%' cellpadding='0' cellspacing='0' style='margin-top:5px;'>"
+				"  <tr>"
+				"    <td style='padding-left:10px; white-space:pre-wrap;'><b><i>*&nbsp;<span style='color:%senderColor%;'>%sender%</span></i></b>&nbsp;%message%</td>"
+				"    <td width='5%' align='right' style='white-space:nowrap; font-size:small; color:gray;'>[%time%]</td>"
+				"  </tr>"
+				"</table>";
+			meMessage = true;
+			html = meMessageTmpl;
+		}
+		else if (AOptions.senderId.isEmpty() || AOptions.senderId!=FViewOptions.lastSenderId || qAbs(FViewOptions.lastTime.secsTo(AOptions.time))>HISTORY_DUBLICATE_DELTA)
+		{
+			static const QString firstMessageTmpl =
+				"<table width='100%' cellpadding='0' cellspacing='0' style='margin-top:5px;'>"
+				"  <tr>"
+				"    <td style='color:%senderColor%; white-space:nowrap; font-weight:bold;'>%sender%</td>"
+				"    <td width='5%' align='right' style='white-space:nowrap; font-size:small; color:gray;'>[%time%]</td>"
+				"  </tr>"
+				"  <tr>"
+				"    <td colspan='2' style='padding-left:10px; white-space:pre-wrap;'>%message%</td>"
+				"  </tr>"
+				"</table>";
+			html = firstMessageTmpl;
+		}
+		else
+		{
+			static const QString nextMessageTmpl =
+				"<table width='100%' cellpadding='0' cellspacing='0'>"
+				"  <tr>"
+				"    <td style='padding-left:10px; white-space:pre-wrap;'>%message%</td>"
+				"  </tr>"
+				"</table>";
+			html = nextMessageTmpl;
+		}
+
+		FViewOptions.lastTime = AOptions.time;
+		FViewOptions.lastSenderId = AOptions.senderId;
+
+		html.replace("%sender%",AOptions.senderName);
+		html.replace("%senderColor%",AOptions.senderColor);
+		html.replace("%time%",AOptions.time.toString(AOptions.timeFormat));
+		html.replace("%message%",TextManager::getDocumentBody(doc));
+	}
 
 	return html;
 }

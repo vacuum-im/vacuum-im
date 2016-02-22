@@ -55,10 +55,6 @@
  <context>
   <name>EditBookmarkDialog</name>
   <message>
-   <source>Bookmark is not valid</source>
-   <translation>Bookmark is not valid</translation>
-  </message>
-  <message>
    <source>Field 'Name' should not be empty</source>
    <translation>Field 'Name' should not be empty</translation>
   </message>
@@ -70,28 +66,16 @@
    <source>In conference bookmark field 'Room' should not be empty</source>
    <translation>In conference bookmark field 'Room' should not be empty</translation>
   </message>
+  <message>
+   <source>Error</source>
+   <translation>Error</translation>
+  </message>
  </context>
  <context>
   <name>EditBookmarkDialogClass</name>
   <message>
    <source>Edit bookmark</source>
    <translation>Edit bookmark</translation>
-  </message>
-  <message>
-   <source>Name:</source>
-   <translation>Name:</translation>
-  </message>
-  <message>
-   <source>Conference bookmark</source>
-   <translation>Conference bookmark</translation>
-  </message>
-  <message>
-   <source>Room:</source>
-   <translation>Room:</translation>
-  </message>
-  <message>
-   <source>Nick:</source>
-   <translation>Nick:</translation>
   </message>
   <message>
    <source>Password:</source>
@@ -102,20 +86,52 @@
    <translation>Auto join</translation>
   </message>
   <message>
-   <source>URL bookmark</source>
-   <translation>URL bookmark</translation>
+   <source>Conference:</source>
+   <translation>Conference:</translation>
   </message>
   <message>
-   <source>URL:</source>
-   <translation>URL:</translation>
+   <source>Conference as 'name@service.server.com'</source>
+   <translation>Conference as 'name@service.server.com'</translation>
+  </message>
+  <message>
+   <source>Nickname:</source>
+   <translation>Nickname:</translation>
+  </message>
+  <message>
+   <source>Your nickname in conference</source>
+   <translation>Your nickname in conference</translation>
+  </message>
+  <message>
+   <source>Conference password if required</source>
+   <translation>Conference password if required</translation>
+  </message>
+  <message>
+   <source>Name:</source>
+   <translation>Name:</translation>
+  </message>
+  <message>
+   <source>Bookmark to Conference</source>
+   <translation>Bookmark to Conference</translation>
+  </message>
+  <message>
+   <source>Bookmark to Link</source>
+   <translation>Bookmark to Link</translation>
+  </message>
+  <message>
+   <source>Link:</source>
+   <translation>Link:</translation>
+  </message>
+  <message>
+   <source>Any valid link</source>
+   <translation>Any valid link</translation>
+  </message>
+  <message>
+   <source>Bookmark name</source>
+   <translation>Bookmark name</translation>
   </message>
  </context>
  <context>
   <name>EditBookmarksDialog</name>
-  <message>
-   <source>Bookmarks not saved</source>
-   <translation>Bookmarks not saved</translation>
-  </message>
   <message>
    <source>Cant save bookmarks to server</source>
    <translation>Cant save bookmarks to server</translation>
@@ -123,6 +139,10 @@
   <message>
    <source>Edit bookmarks - %1</source>
    <translation>Edit bookmarks - %1</translation>
+  </message>
+  <message>
+   <source>Error</source>
+   <translation>Error</translation>
   </message>
  </context>
  <context>

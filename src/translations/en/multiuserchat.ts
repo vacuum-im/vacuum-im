@@ -2,11 +2,93 @@
 <!DOCTYPE TS>
 <TS version="2.0" sourcelanguage="en" language="en">
  <context>
-  <name>EditUsersListDialog</name>
+  <name>ConfigPage</name>
   <message>
-   <source>Edit Users Affiliations - %1</source>
-   <translation>Edit Users Affiliations - %1</translation>
+   <source>Conference settings</source>
+   <translation>Conference settings</translation>
   </message>
+  <message>
+   <source>Enter the desired parameters of the new conference</source>
+   <translation>Enter the desired parameters of the new conference</translation>
+  </message>
+  <message>
+   <source>Creating conference...</source>
+   <translation>Creating conference...</translation>
+  </message>
+  <message>
+   <source>Failed to create conference</source>
+   <translation>Failed to create conference</translation>
+  </message>
+  <message>
+   <source>Failed to create conference instance</source>
+   <translation>Failed to create conference instance</translation>
+  </message>
+  <message>
+   <source>Error</source>
+   <translation>Error</translation>
+  </message>
+  <message>
+   <source>Conference is not created :(</source>
+   <translation>Conference is not created :(</translation>
+  </message>
+  <message>
+   <source>Conference is not configured :(</source>
+   <translation>Conference is not configured :(</translation>
+  </message>
+  <message>
+   <source>Failed to create conference: %1</source>
+   <translation>Failed to create conference: %1</translation>
+  </message>
+  <message>
+   <source>Saving conference settings...</source>
+   <translation>Saving conference settings...</translation>
+  </message>
+  <message>
+   <source>Failed to send conference settings</source>
+   <translation>Failed to send conference settings</translation>
+  </message>
+  <message>
+   <source>Loading settings...</source>
+   <translation>Loading settings...</translation>
+  </message>
+  <message>
+   <source>Failed to load conference settings</source>
+   <translation>Failed to load conference settings</translation>
+  </message>
+  <message>
+   <source>Failed to change default conference settings</source>
+   <translation>Failed to change default conference settings</translation>
+  </message>
+  <message>
+   <source>Failed to load conference settings: %1</source>
+   <translation>Failed to load conference settings: %1</translation>
+  </message>
+  <message>
+   <source>Failed to update conference settings: %1</source>
+   <translation>Failed to update conference settings: %1</translation>
+  </message>
+ </context>
+ <context>
+  <name>CreateMultiChatWizard</name>
+  <message>
+   <source>Error</source>
+   <translation>Error</translation>
+  </message>
+  <message>
+   <source>Failed to join to the conference: Conference windows is not created</source>
+   <translation>Failed to join to the conference: Conference windows is not created</translation>
+  </message>
+  <message>
+   <source>Create Conference Wizard</source>
+   <translation>Create Conference Wizard</translation>
+  </message>
+  <message>
+   <source>Failed to join to the conference: Not all required parameters is specified</source>
+   <translation>Failed to join to the conference: Not all required parameters is specified</translation>
+  </message>
+ </context>
+ <context>
+  <name>EditUsersListDialog</name>
   <message>
    <source>Owners</source>
    <translation>Owners</translation>
@@ -79,6 +161,10 @@
     <numerusform>Delete %n user(s)</numerusform>
    </translation>
   </message>
+  <message>
+   <source>Users Lists - %1</source>
+   <translation>Users Lists - %1</translation>
+  </message>
  </context>
  <context>
   <name>EditUsersListDialogClass</name>
@@ -91,37 +177,142 @@
    <translation>Delete</translation>
   </message>
   <message>
-   <source>Search in lists</source>
-   <translation>Search in lists</translation>
+   <source>Search users</source>
+   <translation>Search users</translation>
   </message>
  </context>
  <context>
-  <name>JoinMultiChatDialog</name>
+  <name>JoinPage</name>
+  <message>
+   <source>Join</source>
+   <translation>Join</translation>
+  </message>
+  <message>
+   <source>Enter parameters to join to the conference</source>
+   <translation>Enter parameters to join to the conference</translation>
+  </message>
+  <message>
+   <source>Nick</source>
+   <translation>Nick</translation>
+  </message>
+  <message>
+   <source>Join with nick:</source>
+   <translation>Join with nick:</translation>
+  </message>
+  <message>
+   <source>Loading conference description...</source>
+   <translation>Loading conference description...</translation>
+  </message>
+  <message>
+   <source>This conference is password protected</source>
+   <translation>This conference is password protected</translation>
+  </message>
+  <message>
+   <source>This conference is not password protected</source>
+   <translation>This conference is not password protected</translation>
+  </message>
+  <message>
+   <source>This conference is members only</source>
+   <translation>This conference is members only</translation>
+  </message>
+  <message>
+   <source>This conference is public</source>
+   <translation>This conference is public</translation>
+  </message>
+  <message>
+   <source>This conference is semi anonymous</source>
+   <translation>This conference is semi anonymous</translation>
+  </message>
+  <message>
+   <source>This conference is not anonymous</source>
+   <translation>This conference is not anonymous</translation>
+  </message>
+  <message>
+   <source>This conference is moderated</source>
+   <translation>This conference is moderated</translation>
+  </message>
+  <message>
+   <source>This conference is not moderated</source>
+   <translation>This conference is not moderated</translation>
+  </message>
+  <message>
+   <source>This conference is temporary</source>
+   <translation>This conference is temporary</translation>
+  </message>
+  <message>
+   <source>This conference is persistent</source>
+   <translation>This conference is persistent</translation>
+  </message>
+  <message>
+   <source>This conference is hidden</source>
+   <translation>This conference is hidden</translation>
+  </message>
+  <message>
+   <source>This conference is visible for all</source>
+   <translation>This conference is visible for all</translation>
+  </message>
+  <message>
+   <source>Failed to load conference description: %1</source>
+   <translation>Failed to load conference description: %1</translation>
+  </message>
+  <message>
+   <source>Conference description is not available or invalid</source>
+   <translation>Conference description is not available or invalid</translation>
+  </message>
+  <message>
+   <source>Register</source>
+   <translation>Register</translation>
+  </message>
+  <message>
+   <source>Registered</source>
+   <translation>Registered</translation>
+  </message>
+  <message>
+   <source>Loading...</source>
+   <translation>Loading...</translation>
+  </message>
   <message>
    <source>Join conference</source>
    <translation>Join conference</translation>
   </message>
   <message>
-   <source>%1 as %2</source>
-   <comment>room as nick</comment>
-   <translation>%1 as %2</translation>
-  </message>
-  <message>
-   <source>Conference parameters is not acceptable.
-Check values and try again</source>
-   <translation>Conference parameters is not acceptable.
-Check values and try again</translation>
+   <source>Password is required</source>
+   <translation>Password is required</translation>
   </message>
  </context>
  <context>
-  <name>JoinMultiChatDialogClass</name>
+  <name>ManualPage</name>
   <message>
-   <source>Identity:</source>
-   <translation>Identity:</translation>
+   <source>Join</source>
+   <translation>Join</translation>
   </message>
   <message>
-   <source>Room:</source>
-   <translation>Room:</translation>
+   <source>Conference parameters</source>
+   <translation>Conference parameters</translation>
+  </message>
+  <message>
+   <source>Enter parameters to join or create the conference</source>
+   <translation>Enter parameters to join or create the conference</translation>
+  </message>
+  <message>
+   <source>Conference as 'name@service.server.com'</source>
+   <translation>Conference as 'name@service.server.com'</translation>
+  </message>
+  <message>
+   <source>Your nickname in conference</source>
+   <translation>Your nickname in conference</translation>
+  </message>
+  <message>
+   <source>Conference password if required</source>
+   <translation>Conference password if required</translation>
+  </message>
+  <message>
+   <source>Account:</source>
+   <translation>Account:</translation>
+  </message>
+  <message>
+   <source>Conference:</source>
+   <translation>Conference:</translation>
   </message>
   <message>
    <source>Nick:</source>
@@ -132,24 +323,71 @@ Check values and try again</translation>
    <translation>Password:</translation>
   </message>
   <message>
-   <source>Resolve</source>
-   <translation>Resolve</translation>
+   <source>Register</source>
+   <translation>Register</translation>
   </message>
   <message>
-   <source>History:</source>
-   <translation>History:</translation>
+   <source>Registered</source>
+   <translation>Registered</translation>
   </message>
   <message>
-   <source>Delete</source>
-   <translation>Delete</translation>
+   <source>Loading conference description...</source>
+   <translation>Loading conference description...</translation>
   </message>
   <message>
-   <source>Conference Parameters</source>
-   <translation>Conference Parameters</translation>
+   <source>Failed to load conference description</source>
+   <translation>Failed to load conference description</translation>
   </message>
   <message>
-   <source>Service:</source>
-   <translation>Service:</translation>
+   <source>Invalid conference ID</source>
+   <translation>Invalid conference ID</translation>
+  </message>
+  <message>
+   <source>Loading...</source>
+   <translation>Loading...</translation>
+  </message>
+  <message>
+   <source>This conference is password protected</source>
+   <translation>This conference is password protected</translation>
+  </message>
+  <message>
+   <source>Conference description is not available or invalid</source>
+   <translation>Conference description is not available or invalid</translation>
+  </message>
+  <message>
+   <source>This conference does not exists and will be automatically created on join</source>
+   <translation>This conference does not exists and will be automatically created on join</translation>
+  </message>
+  <message>
+   <source>Conference service '%1' is not available or does not exists</source>
+   <translation>Conference service '%1' is not available or does not exists</translation>
+  </message>
+  <message>
+   <source>Failed to check conference existence: %1</source>
+   <translation>Failed to check conference existence: %1</translation>
+  </message>
+ </context>
+ <context>
+  <name>ModePage</name>
+  <message>
+   <source>Join to the conference or create a new one</source>
+   <translation>Join to the conference or create a new one</translation>
+  </message>
+  <message>
+   <source>This wizard will help you to join to existing conference or create a new one</source>
+   <translation>This wizard will help you to join to existing conference or create a new one</translation>
+  </message>
+  <message>
+   <source>I want to join to the existing conference</source>
+   <translation>I want to join to the existing conference</translation>
+  </message>
+  <message>
+   <source>I want to create a new conference</source>
+   <translation>I want to create a new conference</translation>
+  </message>
+  <message>
+   <source>I want manually specify all parameters to join or create the conference</source>
+   <translation>I want manually specify all parameters to join or create the conference</translation>
   </message>
  </context>
  <context>
@@ -432,18 +670,6 @@ Check values and try again</translation>
    <translation>Invitation received</translation>
   </message>
   <message>
-   <source>You are invited to the conference %1 by %2.&lt;br>Reason: %3</source>
-   <translation>You are invited to the conference %1 by %2.&lt;br>Reason: %3</translation>
-  </message>
-  <message>
-   <source>Do you want to join this conference?</source>
-   <translation>Do you want to join this conference?</translation>
-  </message>
-  <message>
-   <source>Invite</source>
-   <translation>Invite</translation>
-  </message>
-  <message>
    <source>Supports the multi-user conferences</source>
    <translation>Supports the multi-user conferences</translation>
   </message>
@@ -548,24 +774,8 @@ Check values and try again</translation>
    <translation>Invite to</translation>
   </message>
   <message>
-   <source>%1 from %2</source>
-   <translation>%1 from %2</translation>
-  </message>
-  <message>
-   <source>Enter</source>
-   <translation>Enter</translation>
-  </message>
-  <message>
-   <source>Exit</source>
-   <translation>Exit</translation>
-  </message>
-  <message>
    <source>Open Conference Dialog</source>
    <translation>Open Conference Dialog</translation>
-  </message>
-  <message>
-   <source>I'm too busy right now</source>
-   <translation>I'm too busy right now</translation>
   </message>
   <message>
    <source>&lt;b>Conference:&lt;/b> %1</source>
@@ -628,24 +838,61 @@ Check values and try again</translation>
    <translation>Minimum interval between voice requests (in seconds)</translation>
   </message>
   <message>
-   <source>Decline Invite - %1</source>
-   <translation>Decline Invite - %1</translation>
-  </message>
-  <message>
-   <source>Enter a message:</source>
-   <translation>Enter a message:</translation>
-  </message>
-  <message>
-   <source>Please, enter this conference.</source>
-   <translation>Please, enter this conference.</translation>
-  </message>
-  <message>
-   <source>Invite User - %1</source>
-   <translation>Invite User - %1</translation>
-  </message>
-  <message>
    <source>Join Conference</source>
    <translation>Join Conference</translation>
+  </message>
+  <message>
+   <source>List of rooms</source>
+   <translation>List of rooms</translation>
+  </message>
+  <message>
+   <source>Contains the list of multi-user chat rooms</source>
+   <translation>Contains the list of multi-user chat rooms</translation>
+  </message>
+  <message>
+   <source>Join Conference...</source>
+   <translation>Join Conference...</translation>
+  </message>
+  <message>
+   <source>Join to Conference</source>
+   <translation>Join to Conference</translation>
+  </message>
+  <message>
+   <source>Exit from Conference</source>
+   <translation>Exit from Conference</translation>
+  </message>
+  <message>
+   <source>Enter to Conference</source>
+   <translation>Enter to Conference</translation>
+  </message>
+  <message>
+   <source>You are invited to the conference &lt;b>%1&lt;/b> by user &lt;b>%2&lt;/b>.</source>
+   <translation>You are invited to the conference &lt;b>%1&lt;/b> by user &lt;b>%2&lt;/b>.</translation>
+  </message>
+  <message>
+   <source>Do you want to join to the conference?</source>
+   <translation>Do you want to join to the conference?</translation>
+  </message>
+  <message>
+   <source>Invitation to Conference</source>
+   <translation>Invitation to Conference</translation>
+  </message>
+  <message>
+   <source>Direct Invitations to Conferences</source>
+   <translation>Direct Invitations to Conferences</translation>
+  </message>
+  <message>
+   <source>Supports the direct invitations to conferences</source>
+   <translation>Supports the direct invitations to conferences</translation>
+  </message>
+  <message>
+   <source>Show/Hide conference participants list</source>
+   <translation>Show/Hide conference participants list</translation>
+  </message>
+  <message>
+   <source>Ctrl+U</source>
+   <comment>Show/Hide conference participants list</comment>
+   <translation>Ctrl+U</translation>
   </message>
  </context>
  <context>
@@ -683,16 +930,8 @@ Check values and try again</translation>
    <translation>Change Affiliation</translation>
   </message>
   <message>
-   <source>%1 changed nick to %2</source>
-   <translation>%1 changed nick to %2</translation>
-  </message>
-  <message>
    <source>Subject: %1</source>
    <translation>Subject: %1</translation>
-  </message>
-  <message>
-   <source> by %1</source>
-   <translation> by %1</translation>
   </message>
   <message>
    <source>%1 - Conference</source>
@@ -755,18 +994,6 @@ Check values and try again</translation>
    <translation>Failed to load history: %1</translation>
   </message>
   <message>
-   <source>Enter</source>
-   <translation>Enter</translation>
-  </message>
-  <message>
-   <source>Exit</source>
-   <translation>Exit</translation>
-  </message>
-  <message>
-   <source>Open Chat Dialog</source>
-   <translation>Open Chat Dialog</translation>
-  </message>
-  <message>
    <source>Change Nick</source>
    <translation>Change Nick</translation>
   </message>
@@ -791,14 +1018,6 @@ Check values and try again</translation>
    <translation>Destroy Conference</translation>
   </message>
   <message>
-   <source>Enter conference</source>
-   <translation>Enter conference</translation>
-  </message>
-  <message>
-   <source>Exit conference</source>
-   <translation>Exit conference</translation>
-  </message>
-  <message>
    <source>&lt;b>Jabber ID:&lt;/b> %1</source>
    <translation>&lt;b>Jabber ID:&lt;/b> %1</translation>
   </message>
@@ -817,10 +1036,6 @@ Check values and try again</translation>
   <message>
    <source>[%1] in [%2]</source>
    <translation>[%1] in [%2]</translation>
-  </message>
-  <message>
-   <source>Hide/Show Participants List</source>
-   <translation>Hide/Show Participants List</translation>
   </message>
   <message>
    <source>User %1 was not found in the conference</source>
@@ -855,10 +1070,6 @@ Check values and try again</translation>
    <translation>User %1 requests a voice in the conference</translation>
   </message>
   <message>
-   <source>Edit Users Affiliations</source>
-   <translation>Edit Users Affiliations</translation>
-  </message>
-  <message>
    <source>Clear window</source>
    <translation>Clear window</translation>
   </message>
@@ -885,10 +1096,6 @@ Check values and try again</translation>
   <message>
    <source>Failed to send private message to user %1</source>
    <translation>Failed to send private message to user %1</translation>
-  </message>
-  <message>
-   <source>You nickname was changed to %1</source>
-   <translation>You nickname was changed to %1</translation>
   </message>
   <message>
    <source>Failed to change your nickname to %1</source>
@@ -1023,10 +1230,6 @@ Check values and try again</translation>
    <translation>User %1 has been kicked from the conference%2 %3</translation>
   </message>
   <message>
-   <source> by user %1</source>
-   <translation> by user %1</translation>
-  </message>
-  <message>
    <source>User %1 has been banned in the conference%2 %3</source>
    <translation>User %1 has been banned in the conference%2 %3</translation>
   </message>
@@ -1039,32 +1242,8 @@ Check values and try again</translation>
    <translation>This conference was destroyed by owner. %1</translation>
   </message>
   <message>
-   <source>Change Nickname - %1</source>
-   <translation>Change Nickname - %1</translation>
-  </message>
-  <message>
-   <source>Enter your new nickname:</source>
-   <translation>Enter your new nickname:</translation>
-  </message>
-  <message>
-   <source>Change Topic - %1</source>
-   <translation>Change Topic - %1</translation>
-  </message>
-  <message>
    <source>Enter new topic:</source>
    <translation>Enter new topic:</translation>
-  </message>
-  <message>
-   <source>Invite User - %1</source>
-   <translation>Invite User - %1</translation>
-  </message>
-  <message>
-   <source>Enter user Jabber ID:</source>
-   <translation>Enter user Jabber ID:</translation>
-  </message>
-  <message>
-   <source>Please, enter this conference.</source>
-   <translation>Please, enter this conference.</translation>
   </message>
   <message>
    <source>Enter a message:</source>
@@ -1081,10 +1260,6 @@ Check values and try again</translation>
   <message>
    <source>Request for voice in the conference was sent</source>
    <translation>Request for voice in the conference was sent</translation>
-  </message>
-  <message>
-   <source>Destroy Conference - %1</source>
-   <translation>Destroy Conference - %1</translation>
   </message>
   <message>
    <source>Kick User - %1</source>
@@ -1125,6 +1300,332 @@ Check values and try again</translation>
   <message>
    <source>You have left the conference due to error: %1</source>
    <translation>You have left the conference due to error: %1</translation>
+  </message>
+  <message>
+   <source>Required parameter &lt;room nick> is not specified</source>
+   <translation>Required parameter &lt;room nick> is not specified</translation>
+  </message>
+  <message>
+   <source>Required parameter &lt;user nick> is not specified</source>
+   <translation>Required parameter &lt;user nick> is not specified</translation>
+  </message>
+  <message>
+   <source>Required parameter &lt;user jid> is not specified</source>
+   <translation>Required parameter &lt;user jid> is not specified</translation>
+  </message>
+  <message>
+   <source>Required parameter &lt;room name> is not specified</source>
+   <translation>Required parameter &lt;room name> is not specified</translation>
+  </message>
+  <message>
+   <source>Required parameter &lt;new nick> is not specified</source>
+   <translation>Required parameter &lt;new nick> is not specified</translation>
+  </message>
+  <message>
+   <source>Change Nickname</source>
+   <translation>Change Nickname</translation>
+  </message>
+  <message>
+   <source>Enter new nickname:</source>
+   <translation>Enter new nickname:</translation>
+  </message>
+  <message>
+   <source>Error</source>
+   <translation>Error</translation>
+  </message>
+  <message>
+   <source>Failed to change nickname to %1</source>
+   <translation>Failed to change nickname to %1</translation>
+  </message>
+  <message>
+   <source>Enter password:</source>
+   <translation>Enter password:</translation>
+  </message>
+  <message>
+   <source>You have been kicked from this conference, you may %1 or %2</source>
+   <translation>You have been kicked from this conference, you may %1 or %2</translation>
+  </message>
+  <message>
+   <source>return</source>
+   <translation>return</translation>
+  </message>
+  <message>
+   <source>exit</source>
+   <translation>exit</translation>
+  </message>
+  <message>
+   <source>You have been banned in this conference, you can not return only %1</source>
+   <translation>You have been banned in this conference, you can not return only %1</translation>
+  </message>
+  <message>
+   <source>You have left the conference: %1</source>
+   <translation>You have left the conference: %1</translation>
+  </message>
+  <message>
+   <source>Nickname '%1' is in use or registered by another user, you may %2 or %3</source>
+   <translation>Nickname '%1' is in use or registered by another user, you may %2 or %3</translation>
+  </message>
+  <message>
+   <source>change nick</source>
+   <translation>change nick</translation>
+  </message>
+  <message>
+   <source>This conference is members only but you are not one of them, you may %1 or %2</source>
+   <translation>This conference is members only but you are not one of them, you may %1 or %2</translation>
+  </message>
+  <message>
+   <source>retry</source>
+   <translation>retry</translation>
+  </message>
+  <message>
+   <source>This conference does not exists or does not configured yet by owner, you may %1 or %2</source>
+   <translation>This conference does not exists or does not configured yet by owner, you may %1 or %2</translation>
+  </message>
+  <message>
+   <source>This conference does not exists and creation is restricted, you may %1 or %2</source>
+   <translation>This conference does not exists and creation is restricted, you may %1 or %2</translation>
+  </message>
+  <message>
+   <source>The maximum number of users has been reached, you may %1 or %2</source>
+   <translation>The maximum number of users has been reached, you may %1 or %2</translation>
+  </message>
+  <message>
+   <source>Failed to change your nickname to %1: %2</source>
+   <translation>Failed to change your nickname to %1: %2</translation>
+  </message>
+  <message>
+   <source>%1 changed nickname to %2</source>
+   <translation>%1 changed nickname to %2</translation>
+  </message>
+  <message>
+   <source> by moderator %1</source>
+   <translation> by moderator %1</translation>
+  </message>
+  <message>
+   <source>Your nickname changed to %1</source>
+   <translation>Your nickname changed to %1</translation>
+  </message>
+  <message>
+   <source>Change Password</source>
+   <translation>Change Password</translation>
+  </message>
+  <message>
+   <source>This conference is password protected and you provided incorrect password, you may %1 or %2</source>
+   <translation>This conference is password protected and you provided incorrect password, you may %1 or %2</translation>
+  </message>
+  <message>
+   <source>change password</source>
+   <translation>change password</translation>
+  </message>
+  <message>
+   <source>Open Private Chat</source>
+   <translation>Open Private Chat</translation>
+  </message>
+  <message>
+   <source>Moderate</source>
+   <translation>Moderate</translation>
+  </message>
+  <message>
+   <source>Edit Users Lists</source>
+   <translation>Edit Users Lists</translation>
+  </message>
+  <message>
+   <source>Show participants list</source>
+   <translation>Show participants list</translation>
+  </message>
+  <message numerus="yes">
+   <source>You invited %1 and %n other contact(s) to this conference. %2</source>
+   <translation>
+    <numerusform>You invited %1 and %n other contact(s) to this conference. %2</numerusform>
+    <numerusform>You invited %1 and %n other contact(s) to this conference. %2</numerusform>
+    <numerusform>You invited %1 and %n other contact(s) to this conference. %2</numerusform>
+   </translation>
+  </message>
+  <message>
+   <source>You invited %1 to this conference. %2</source>
+   <translation>You invited %1 to this conference. %2</translation>
+  </message>
+  <message>
+   <source>Clear Window</source>
+   <translation>Clear Window</translation>
+  </message>
+  <message>
+   <source>Conference Tools</source>
+   <translation>Conference Tools</translation>
+  </message>
+  <message>
+   <source>Disable Notifications</source>
+   <translation>Disable Notifications</translation>
+  </message>
+  <message>
+   <source>Enter to Conference</source>
+   <translation>Enter to Conference</translation>
+  </message>
+  <message>
+   <source>Exit from Conference</source>
+   <translation>Exit from Conference</translation>
+  </message>
+ </context>
+ <context>
+  <name>RoomPage</name>
+  <message>
+   <source>Conference name</source>
+   <translation>Conference name</translation>
+  </message>
+  <message>
+   <source>Search conferences</source>
+   <translation>Search conferences</translation>
+  </message>
+  <message>
+   <source>Title</source>
+   <translation>Title</translation>
+  </message>
+  <message>
+   <source>Join to the conference:</source>
+   <translation>Join to the conference:</translation>
+  </message>
+  <message>
+   <source>Select a conference from the list or explicitly specify the name of the hidden one</source>
+   <translation>Select a conference from the list or explicitly specify the name of the hidden one</translation>
+  </message>
+  <message>
+   <source>Loading list of conferences...</source>
+   <translation>Loading list of conferences...</translation>
+  </message>
+  <message>
+   <source>Failed to load list of conferences</source>
+   <translation>Failed to load list of conferences</translation>
+  </message>
+  <message>
+   <source>Create the conference:</source>
+   <translation>Create the conference:</translation>
+  </message>
+  <message>
+   <source>Enter unique name for the new conference</source>
+   <translation>Enter unique name for the new conference</translation>
+  </message>
+  <message>
+   <source>Loading conference description...</source>
+   <translation>Loading conference description...</translation>
+  </message>
+  <message>
+   <source>Checking conference existence...</source>
+   <translation>Checking conference existence...</translation>
+  </message>
+  <message>
+   <source>Failed to load conference description</source>
+   <translation>Failed to load conference description</translation>
+  </message>
+  <message>
+   <source>Failed to check conference existence</source>
+   <translation>Failed to check conference existence</translation>
+  </message>
+  <message>
+   <source>Invalid conference name</source>
+   <translation>Invalid conference name</translation>
+  </message>
+  <message>
+   <source>Failed to load conference description: %1</source>
+   <translation>Failed to load conference description: %1</translation>
+  </message>
+  <message>
+   <source>Failed to check conference existence: %1</source>
+   <translation>Failed to check conference existence: %1</translation>
+  </message>
+  <message>
+   <source>Conference '%1@%2' already exists, choose another name</source>
+   <translation>Conference '%1@%2' already exists, choose another name</translation>
+  </message>
+  <message>
+   <source>Failed to load list of conferences: %1</source>
+   <translation>Failed to load list of conferences: %1</translation>
+  </message>
+  <message>
+   <source>Conference description is not available or invalid</source>
+   <translation>Conference description is not available or invalid</translation>
+  </message>
+ </context>
+ <context>
+  <name>ServicePage</name>
+  <message>
+   <source>Conference location</source>
+   <translation>Conference location</translation>
+  </message>
+  <message>
+   <source>Add...</source>
+   <translation>Add...</translation>
+  </message>
+  <message>
+   <source>Account:</source>
+   <translation>Account:</translation>
+  </message>
+  <message>
+   <source>Server:</source>
+   <translation>Server:</translation>
+  </message>
+  <message>
+   <source>Service:</source>
+   <translation>Service:</translation>
+  </message>
+  <message>
+   <source>Select account, server and service to join to the conference</source>
+   <translation>Select account, server and service to join to the conference</translation>
+  </message>
+  <message>
+   <source>Select the account to join to the conference</source>
+   <translation>Select the account to join to the conference</translation>
+  </message>
+  <message>
+   <source>You can join to the conference located at almost any Jabber-server, select one from the list or add your own</source>
+   <translation>You can join to the conference located at almost any Jabber-server, select one from the list or add your own</translation>
+  </message>
+  <message>
+   <source>Each Jabber-server can have multiple conference services, select one of the available</source>
+   <translation>Each Jabber-server can have multiple conference services, select one of the available</translation>
+  </message>
+  <message>
+   <source>Select account, server, and service to create the conference</source>
+   <translation>Select account, server, and service to create the conference</translation>
+  </message>
+  <message>
+   <source>Select the account to create a conference</source>
+   <translation>Select the account to create a conference</translation>
+  </message>
+  <message>
+   <source>You can create a conference at almost any Jabber-server, select one from the list or add your own</source>
+   <translation>You can create a conference at almost any Jabber-server, select one from the list or add your own</translation>
+  </message>
+  <message>
+   <source>Searching for conference services (%1)...</source>
+   <translation>Searching for conference services (%1)...</translation>
+  </message>
+  <message>
+   <source>Conference services are not found on this server</source>
+   <translation>Conference services are not found on this server</translation>
+  </message>
+  <message>
+   <source>Loading list of available services...</source>
+   <translation>Loading list of available services...</translation>
+  </message>
+  <message>
+   <source>Failed to load list of services</source>
+   <translation>Failed to load list of services</translation>
+  </message>
+  <message>
+   <source>Account or server is not selected</source>
+   <translation>Account or server is not selected</translation>
+  </message>
+  <message>
+   <source>Append Server</source>
+   <translation>Append Server</translation>
+  </message>
+  <message>
+   <source>Enter server domain:</source>
+   <translation>Enter server domain:</translation>
+  </message>
+  <message>
+   <source>Failed to load a list of services: %1</source>
+   <translation>Failed to load a list of services: %1</translation>
   </message>
  </context>
 </TS>

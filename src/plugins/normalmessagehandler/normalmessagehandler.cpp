@@ -198,7 +198,7 @@ bool NormalMessageHandler::initObjects()
 	}
 	if (FXmppUriQueries)
 	{
-		FXmppUriQueries->insertUriHandler(this,XUHO_DEFAULT);
+		FXmppUriQueries->insertUriHandler(XUHO_DEFAULT,this);
 	}
 	if (FRostersView)
 	{
@@ -233,25 +233,28 @@ bool NormalMessageHandler::messageEditSendProcesse(int AOrder, IMessageEditWidge
 	if (AOrder == MESHO_NORMALMESSAGEHANDLER)
 	{
 		IMessageNormalWindow *window = qobject_cast<IMessageNormalWindow *>(AWidget->messageWindow()->instance());
-		if (FMessageProcessor && window && window->mode()==IMessageNormalWindow::WriteMode)
+		if (FMessageProcessor && FWindows.contains(window) && window->mode()==IMessageNormalWindow::WriteMode)
 		{
-			Message message;
-			message.setType(Message::Normal).setSubject(window->subject()).setThreadId(window->threadId());
-			FMessageProcessor->textToMessage(message,AWidget->document());
-			if (!message.body().isEmpty())
+			bool sent = false;
+			QMultiMap<Jid, Jid> addresses = window->receiversWidget()->selectedAddresses();
+			for (QMultiMap<Jid, Jid>::const_iterator it=addresses.constBegin(); it!=addresses.constEnd(); ++it)
 			{
-				bool sent = false;
-				QMultiMap<Jid, Jid> addresses = window->receiversWidget()->selectedAddresses();
-				for (QMultiMap<Jid, Jid>::const_iterator it=addresses.constBegin(); it!=addresses.constEnd(); ++it)
+				Message message;
+				message.setType(Message::Normal).setTo(it->full()).setSubject(window->subject()).setThreadId(window->threadId());
+				if (FMessageProcessor->textToMessage(AWidget->document(),message))
 				{
-					message.setTo(it->full());
 					if (!FMessageProcessor->sendMessage(it.key(),message,IMessageProcessor::DirectionOut))
-						LOG_STRM_WARNING(it.key(),QString("Failed to send message to=%1").arg(it->full()));
+					{
+						sent = false;
+						break;
+					}
 					else
+					{
 						sent = true;
+					}
 				}
-				return sent;
 			}
+			return sent;
 		}
 	}
 	return false;
@@ -260,7 +263,16 @@ bool NormalMessageHandler::messageEditSendProcesse(int AOrder, IMessageEditWidge
 bool NormalMessageHandler::messageCheck(int AOrder, const Message &AMessage, int ADirection)
 {
 	Q_UNUSED(AOrder); Q_UNUSED(ADirection);
-	return AMessage.type()!=Message::GroupChat && (!AMessage.body().isEmpty() || !AMessage.subject().isEmpty());
+	if (AMessage.type() != Message::GroupChat)
+	{
+		if (!AMessage.subject().isEmpty())
+			return true;
+		else if (FMessageProcessor)
+			return FMessageProcessor->messageHasText(AMessage);
+		else if (!AMessage.body().isEmpty())
+			return true;
+	}
+	return false;
 }
 
 bool NormalMessageHandler::messageDisplay(const Message &AMessage, int ADirection)
@@ -330,12 +342,9 @@ INotification NormalMessageHandler::messageNotify(INotifications *ANotifications
 
 				if (!Options::node(OPV_NOTIFICATIONS_HIDEMESSAGE).value().toBool())
 				{
-					if (FMessageProcessor)
-					{
-						QTextDocument doc;
-						FMessageProcessor->messageToText(&doc,AMessage);
+					QTextDocument doc;
+					if (FMessageProcessor && FMessageProcessor->messageToText(AMessage,&doc))
 						notify.data.insert(NDR_POPUP_HTML,TextManager::getDocumentBody(doc));
-					}
 					notify.data.insert(NDR_POPUP_TEXT,AMessage.body());
 				}
 
@@ -378,9 +387,7 @@ IMessageWindow *NormalMessageHandler::messageShowNotified(int AMessageId)
 
 IMessageWindow *NormalMessageHandler::messageGetWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType)
 {
-	if (AType != Message::GroupChat)
-		return getWindow(AStreamJid,AContactJid,IMessageNormalWindow::WriteMode);
-	return NULL;
+	return AType!=Message::GroupChat ? getWindow(AStreamJid,AContactJid,IMessageNormalWindow::WriteMode) : NULL;
 }
 
 QMultiMap<int, IOptionsDialogWidget *> NormalMessageHandler::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
@@ -1010,7 +1017,7 @@ void NormalMessageHandler::onWindowMenuForwardMessage()
 		window->setMode(IMessageNormalWindow::WriteMode);
 		window->setSubject(tr("Fw: %1").arg(message.subject()));
 		window->setThreadId(message.threadId());
-		FMessageProcessor->messageToText(window->editWidget()->document(),message);
+		FMessageProcessor->messageToText(message,window->editWidget()->document());
 		window->editWidget()->textEdit()->setFocus();
 		window->receiversWidget()->clearSelection();
 		updateWindow(window);

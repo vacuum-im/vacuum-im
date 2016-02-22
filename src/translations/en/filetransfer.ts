@@ -96,6 +96,18 @@
    <source>Hide file transfer dialog after transfer started</source>
    <translation>Hide file transfer dialog after transfer started</translation>
   </message>
+  <message numerus="yes">
+   <source>/me share %n file(s): %1</source>
+   <translation>
+    <numerusform>/me share %n file(s): %1</numerusform>
+    <numerusform>/me share %n file(s): %1</numerusform>
+    <numerusform>/me share %n file(s): %1</numerusform>
+   </translation>
+  </message>
+  <message>
+   <source>Select Files</source>
+   <translation>Select Files</translation>
+  </message>
  </context>
  <context>
   <name>StreamDialog</name>

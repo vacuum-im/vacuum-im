@@ -357,12 +357,12 @@
    <translation>You have successfully registered!</translation>
   </message>
   <message>
-   <source>Account %1@%2 successfully registered, click 'Finish' button to add the account.</source>
-   <translation>Account %1@%2 successfully registered, click 'Finish' button to add the account.</translation>
-  </message>
-  <message>
    <source>Wizard waiting for registration confirmation from server</source>
    <translation>Wizard waiting for registration confirmation from server</translation>
+  </message>
+  <message>
+   <source>Account %1 successfully registered, click 'Finish' button to add the account.</source>
+   <translation>Account %1 successfully registered, click 'Finish' button to add the account.</translation>
   </message>
  </context>
  <context>

@@ -27,9 +27,9 @@ public:
 	virtual QWidget *styleWidget() const;
 	virtual IMessageStyle *messageStyle() const;
 	virtual void setMessageStyle(IMessageStyle *AStyle, const IMessageStyleOptions &AOptions);
-	virtual void appendHtml(const QString &AHtml, const IMessageStyleContentOptions &AOptions);
-	virtual void appendText(const QString &AText, const IMessageStyleContentOptions &AOptions);
-	virtual void appendMessage(const Message &AMessage, const IMessageStyleContentOptions &AOptions);
+	virtual bool appendHtml(const QString &AHtml, const IMessageStyleContentOptions &AOptions);
+	virtual bool appendText(const QString &AText, const IMessageStyleContentOptions &AOptions);
+	virtual bool appendMessage(const Message &AMessage, const IMessageStyleContentOptions &AOptions);
 	virtual void contextMenuForView(const QPoint &APosition, Menu *AMenu);
 	virtual QTextDocumentFragment selection() const;
 	virtual QTextCharFormat textFormatAt(const QPoint &APosition) const;

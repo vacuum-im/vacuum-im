@@ -90,9 +90,9 @@ public:
 	virtual QWidget *styleWidget() const =0;
 	virtual IMessageStyle *messageStyle() const =0;
 	virtual void setMessageStyle(IMessageStyle *AStyle, const IMessageStyleOptions &AOptions) =0;
-	virtual void appendHtml(const QString &AHtml, const IMessageStyleContentOptions &AOptions) =0;
-	virtual void appendText(const QString &AText, const IMessageStyleContentOptions &AOptions) =0;
-	virtual void appendMessage(const Message &AMessage, const IMessageStyleContentOptions &AOptions) =0;
+	virtual bool appendHtml(const QString &AHtml, const IMessageStyleContentOptions &AOptions) =0;
+	virtual bool appendText(const QString &AText, const IMessageStyleContentOptions &AOptions) =0;
+	virtual bool appendMessage(const Message &AMessage, const IMessageStyleContentOptions &AOptions) =0;
 	virtual void contextMenuForView(const QPoint &APosition, Menu *AMenu) =0;
 	virtual QTextDocumentFragment selection() const =0;
 	virtual QTextCharFormat textFormatAt(const QPoint &APosition) const =0;
@@ -337,7 +337,7 @@ public:
 class IMessageViewDropHandler
 {
 public:
-	virtual bool messagaeViewDragEnter(IMessageViewWidget *AWidget, const QDragEnterEvent *AEvent) =0;
+	virtual bool messageViewDragEnter(IMessageViewWidget *AWidget, const QDragEnterEvent *AEvent) =0;
 	virtual bool messageViewDragMove(IMessageViewWidget *AWidget, const QDragMoveEvent *AEvent) =0;
 	virtual void messageViewDragLeave(IMessageViewWidget *AWidget, const QDragLeaveEvent *AEvent) =0;
 	virtual bool messageViewDropAction(IMessageViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu) =0;

@@ -222,7 +222,7 @@ bool ServiceDiscovery::initObjects()
 
 	if (FXmppUriQueries)
 	{
-		FXmppUriQueries->insertUriHandler(this, XUHO_DEFAULT);
+		FXmppUriQueries->insertUriHandler(XUHO_DEFAULT,this);
 	}
 
 	insertFeatureHandler(NS_DISCO_INFO,this,DFO_DEFAULT);

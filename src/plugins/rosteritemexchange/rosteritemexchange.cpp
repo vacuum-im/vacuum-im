@@ -293,7 +293,7 @@ QMultiMap<int, IOptionsDialogWidget *> RosterItemExchange::optionsDialogWidgets(
 	return widgets;
 }
 
-bool RosterItemExchange::messagaeViewDragEnter(IMessageViewWidget *AWidget, const QDragEnterEvent *AEvent)
+bool RosterItemExchange::messageViewDragEnter(IMessageViewWidget *AWidget, const QDragEnterEvent *AEvent)
 {
 	return !dropDataContacts(AWidget->messageWindow()->streamJid(),AWidget->messageWindow()->contactJid(),AEvent->mimeData()).isEmpty();
 }

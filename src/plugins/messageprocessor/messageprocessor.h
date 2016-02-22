@@ -31,25 +31,32 @@ public:
 	//IStanzaHandler
 	virtual bool stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept);
 	//IMessageWriter
-	virtual void writeTextToMessage(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang);
-	virtual void writeMessageToText(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang);
+	virtual bool writeMessageHasText(int AOrder, Message &AMessage, const QString &ALang);
+	virtual bool writeMessageToText(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang);
+	virtual bool writeTextToMessage(int AOrder, QTextDocument *ADocument, Message &AMessage, const QString &ALang);
 	//IMessageProcessor
 	virtual QList<Jid> activeStreams() const;
 	virtual bool isActiveStream(const Jid &AStreamJid) const;
 	virtual void appendActiveStream(const Jid &AStreamJid);
 	virtual void removeActiveStream(const Jid &AStreamJid);
+	// Message Processing
 	virtual bool sendMessage(const Jid &AStreamJid, Message &AMessage, int ADirection);
 	virtual bool processMessage(const Jid &AStreamJid, Message &AMessage, int ADirection);
 	virtual bool displayMessage(const Jid &AStreamJid, Message &AMessage, int ADirection);
+	// Message Notification
 	virtual QList<int> notifiedMessages() const;
 	virtual Message notifiedMessage(int AMesssageId) const;
 	virtual int notifyByMessage(int AMessageId) const;
 	virtual int messageByNotify(int ANotifyId) const;
 	virtual void showNotifiedMessage(int AMessageId);
 	virtual void removeMessageNotify(int AMessageId);
-	virtual void textToMessage(Message &AMessage, const QTextDocument *ADocument, const QString &ALang = QString::null) const;
-	virtual void messageToText(QTextDocument *ADocument, const Message &AMessage, const QString &ALang = QString::null) const;
+	// Message Conversion
+	virtual bool messageHasText(const Message &AMessage, const QString &ALang=QString::null) const;
+	virtual bool messageToText(const Message &AMessage, QTextDocument *ADocument, const QString &ALang=QString::null) const;
+	virtual bool textToMessage(const QTextDocument *ADocument, Message &AMessage, const QString &ALang=QString::null) const;
+	// Message Windows
 	virtual IMessageWindow *getMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AAction) const;
+	// Message Handlers
 	virtual QMultiMap<int, IMessageHandler *> messageHandlers() const;
 	virtual void insertMessageHandler(int AOrder, IMessageHandler *AHandler);
 	virtual void removeMessageHandler(int AOrder, IMessageHandler *AHandler);
@@ -70,8 +77,8 @@ protected:
 	int newMessageId();
 	IMessageHandler *findMessageHandler(const Message &AMessage, int ADirection);
 	void notifyMessage(IMessageHandler *AHandler, const Message &AMessage, int ADirection);
-	QString prepareBodyForSend(const QString &AString) const;
-	QString prepareBodyForReceive(const QString &AString) const;
+	QString convertTextToBody(const QString &AString) const;
+	QString convertBodyToHtml(const QString &AString) const;
 protected slots:
 	void onNotificationActivated(int ANotifyId);
 	void onNotificationRemoved(int ANotifyId);

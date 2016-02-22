@@ -17,12 +17,17 @@
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/ioptionsmanager.h>
+#include <interfaces/imultiuserchat.h>
+#include <interfaces/imessageprocessor.h>
+#include <interfaces/ixmppuriqueries.h>
 #include "streamdialog.h"
 
 class FileTransfer :
 	public QObject,
 	public IPlugin,
 	public IFileTransfer,
+	public IMessageWriter,
+	public IXmppUriHandler,
 	public IFileStreamHandler,
 	public IOptionsDialogHolder,
 	public IDiscoFeatureHandler,
@@ -31,7 +36,7 @@ class FileTransfer :
 	public IPublicDataStreamHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IFileTransfer IFileStreamHandler IOptionsDialogHolder IDiscoFeatureHandler IRostersDragDropHandler IMessageViewDropHandler IPublicDataStreamHandler);
+	Q_INTERFACES(IPlugin IFileTransfer IMessageWriter IXmppUriHandler IFileStreamHandler IOptionsDialogHolder IDiscoFeatureHandler IRostersDragDropHandler IMessageViewDropHandler IPublicDataStreamHandler);
 public:
 	FileTransfer();
 	~FileTransfer();
@@ -55,10 +60,14 @@ public:
 	virtual void rosterDragLeave(const QDragLeaveEvent *AEvent);
 	virtual bool rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AIndex, Menu *AMenu);
 	//IMessageViewDropHandler
-	virtual bool messagaeViewDragEnter(IMessageViewWidget *AWidget, const QDragEnterEvent *AEvent);
+	virtual bool messageViewDragEnter(IMessageViewWidget *AWidget, const QDragEnterEvent *AEvent);
 	virtual bool messageViewDragMove(IMessageViewWidget *AWidget, const QDragMoveEvent *AEvent);
 	virtual void messageViewDragLeave(IMessageViewWidget *AWidget, const QDragLeaveEvent *AEvent);
 	virtual bool messageViewDropAction(IMessageViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu);
+	//IMessageWriter
+	virtual bool writeMessageHasText(int AOrder, Message &AMessage, const QString &ALang);
+	virtual bool writeMessageToText(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang);
+	virtual bool writeTextToMessage(int AOrder, QTextDocument *ADocument, Message &AMessage, const QString &ALang);
 	//IPublicDataStreamHandler
 	virtual bool publicDataStreamCanStart(const IPublicDataStream &AStream) const;
 	virtual bool publicDataStreamStart(const Jid &AStreamJid, const Jid AContactJid, const QString &ASessionId, const IPublicDataStream &AStream);
@@ -68,12 +77,14 @@ public:
 	virtual bool fileStreamProcessRequest(int AOrder, const QString &AStreamId, const Stanza &ARequest, const QList<QString> &AMethods);
 	virtual bool fileStreamProcessResponse(const QString &AStreamId, const Stanza &AResponce, const QString &AMethodNS);
 	virtual bool fileStreamShowDialog(const QString &AStreamId);
+	//IXmppUriHandler
+	virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
 	//IFileTransfer
 	virtual bool isSupported(const Jid &AStreamJid, const Jid &AContactJid) const;
 	virtual IFileStream *sendFile(const Jid &AStreamJid, const Jid &AContactJid, const QString &AFileName=QString::null, const QString &AFileDesc=QString::null);
 	//Send Public Files
 	virtual IPublicFile findPublicFile(const QString &AFileId) const;
-	virtual QList<IPublicFile> registeredPublicFiles(const Jid &AStreamJid=Jid::null) const;
+	virtual QList<IPublicFile> findPublicFiles(const Jid &AStreamJid=Jid::null, const QString &AFileName=QString::null) const;
 	virtual QString registerPublicFile(const Jid &AStreamJid, const QString &AFileName, const QString &AFileDesc=QString::null);
 	virtual void removePublicFile(const QString &AFileId);
 	//Receive Public Files
@@ -101,6 +112,7 @@ protected slots:
 	void onStreamDestroyed();
 	void onStreamDialogDestroyed();
 	void onShowSendFileDialogByAction(bool);
+	void onPublishFilesByAction(bool);
 protected slots:
 	void onPublicStreamStartAccepted(const QString &ARequestId, const QString &ASessionId);
 	void onPublicStreamStartRejected(const QString &ARequestId, const XmppError &AError);
@@ -109,6 +121,7 @@ protected slots:
 	void onNotificationActivated(int ANotifyId);
 	void onNotificationRemoved(int ANotifyId);
 protected slots:
+	void onMultiUserChatStateChanged(int AState);
 	void onDiscoInfoReceived(const IDiscoInfo &AInfo);
 	void onDiscoInfoRemoved(const IDiscoInfo &AInfo);
 protected slots:
@@ -121,11 +134,13 @@ private:
 	INotifications *FNotifications;
 	IDataStreamsManager *FDataManager;
 	IFileStreamsManager *FFileManager;
+	IDataStreamsPublisher *FDataPublisher;
 	IMessageWidgets *FMessageWidgets;
 	IMessageArchiver *FMessageArchiver;
 	IOptionsManager *FOptionsManager;
 	IRostersViewPlugin *FRostersViewPlugin;
-	IDataStreamsPublisher *FDataStreamsPublisher;
+	IMessageProcessor *FMessageProcessor;
+	IXmppUriQueries *FXmppUriQueries;
 private:
 	QMap<QString, int> FStreamNotify;
 	QMap<QString, StreamDialog *> FStreamDialog;

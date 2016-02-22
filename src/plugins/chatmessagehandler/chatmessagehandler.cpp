@@ -237,7 +237,7 @@ bool ChatMessageHandler::initObjects()
 	}
 	if (FXmppUriQueries)
 	{
-		FXmppUriQueries->insertUriHandler(this, XUHO_DEFAULT);
+		FXmppUriQueries->insertUriHandler(XUHO_DEFAULT,this);
 	}
 	if (FMessageWidgets)
 	{
@@ -266,9 +266,9 @@ bool ChatMessageHandler::messageEditSendProcesse(int AOrder, IMessageEditWidget 
 		if (FMessageProcessor && FWindows.contains(window))
 		{
 			Message message;
-			message.setTo(window->contactJid().full()).setType(Message::Chat);
-			FMessageProcessor->textToMessage(message,AWidget->document());
-			return !message.body().isEmpty() && FMessageProcessor->sendMessage(window->streamJid(),message,IMessageProcessor::DirectionOut);
+			message.setType(Message::Chat).setTo(window->contactJid().full());
+			if (FMessageProcessor->textToMessage(AWidget->document(),message))
+				return FMessageProcessor->sendMessage(window->streamJid(),message,IMessageProcessor::DirectionOut);
 		}
 	}
 	return false;
@@ -277,7 +277,9 @@ bool ChatMessageHandler::messageEditSendProcesse(int AOrder, IMessageEditWidget 
 bool ChatMessageHandler::messageCheck(int AOrder, const Message &AMessage, int ADirection)
 {
 	Q_UNUSED(AOrder); Q_UNUSED(ADirection);
-	return AMessage.type()==Message::Chat && !AMessage.body().isEmpty();
+	if (AMessage.type() == Message::Chat)
+		return FMessageProcessor!=NULL ? FMessageProcessor->messageHasText(AMessage) : !AMessage.body().isEmpty();
+	return false;
 }
 
 bool ChatMessageHandler::messageDisplay(const Message &AMessage, int ADirection)
@@ -359,12 +361,9 @@ INotification ChatMessageHandler::messageNotify(INotifications *ANotifications, 
 
 				if (!Options::node(OPV_NOTIFICATIONS_HIDEMESSAGE).value().toBool())
 				{
-					if (FMessageProcessor)
-					{
-						QTextDocument doc;
-						FMessageProcessor->messageToText(&doc,AMessage);
+					QTextDocument doc;
+					if (FMessageProcessor && FMessageProcessor->messageToText(AMessage,&doc))
 						notify.data.insert(NDR_POPUP_HTML,TextManager::getDocumentBody(doc));
-					}
 					notify.data.insert(NDR_POPUP_TEXT,AMessage.body());
 				}
 
@@ -396,9 +395,7 @@ IMessageWindow *ChatMessageHandler::messageShowNotified(int AMessageId)
 
 IMessageWindow *ChatMessageHandler::messageGetWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType)
 {
-	if (AType == Message::Chat)
-		return getWindow(AStreamJid,AContactJid);
-	return NULL;
+	return AType==Message::Chat ? getWindow(AStreamJid,AContactJid) : NULL;
 }
 
 bool ChatMessageHandler::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)

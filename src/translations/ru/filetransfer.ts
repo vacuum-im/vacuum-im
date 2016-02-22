@@ -96,6 +96,18 @@
         <source>Hide file transfer dialog after transfer started</source>
         <translation>Скрывать окно передачи файлов после начала передачи</translation>
     </message>
+    <message numerus="yes">
+        <source>/me share %n file(s): %1</source>
+        <translation>
+            <numerusform>/me открыл доступ к %n файлу :%1</numerusform>
+            <numerusform>/me открыл доступ к %n файлам: %1</numerusform>
+            <numerusform>/me открыл доступ к %n файлам: %1</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Select Files</source>
+        <translation>Выберите файлы</translation>
+    </message>
 </context>
 <context>
     <name>StreamDialog</name>

@@ -77,23 +77,23 @@ bool XmppUriQueries::openXmppUri(const Jid &AStreamJid, const QUrl &AUrl) const
 	return false;
 }
 
-void XmppUriQueries::insertUriHandler(IXmppUriHandler *AHandler, int AOrder)
+void XmppUriQueries::insertUriHandler(int AOrder, IXmppUriHandler *AHandler)
 {
 	if (!FHandlers.contains(AOrder, AHandler))
 	{
 		LOG_DEBUG(QString("URI handler inserted, order=%1, address=%2").arg(AOrder).arg((quint64)AHandler));
 		FHandlers.insertMulti(AOrder, AHandler);
-		emit uriHandlerInserted(AHandler, AOrder);
+		emit uriHandlerInserted(AOrder, AHandler);
 	}
 }
 
-void XmppUriQueries::removeUriHandler(IXmppUriHandler *AHandler, int AOrder)
+void XmppUriQueries::removeUriHandler(int AOrder, IXmppUriHandler *AHandler)
 {
 	if (FHandlers.contains(AOrder, AHandler))
 	{
 		LOG_DEBUG(QString("URI handler removed, order=%1, address=%2").arg(AOrder).arg((quint64)AHandler));
 		FHandlers.remove(AOrder, AHandler);
-		emit uriHandlerRemoved(AHandler, AOrder);
+		emit uriHandlerRemoved(AOrder, AHandler);
 	}
 }
 

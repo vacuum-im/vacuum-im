@@ -43,10 +43,6 @@
    <translation>Default</translation>
   </message>
   <message>
-   <source>Unknown</source>
-   <translation>Unknown</translation>
-  </message>
-  <message>
    <source>Active</source>
    <translation>Active</translation>
   </message>
@@ -59,24 +55,32 @@
    <translation>Paused</translation>
   </message>
   <message>
-   <source>User chat status</source>
-   <translation>User chat status</translation>
-  </message>
-  <message>
-   <source>Always send</source>
-   <translation>Always send</translation>
-  </message>
-  <message>
-   <source>Never send</source>
-   <translation>Never send</translation>
-  </message>
-  <message>
    <source>Inactive %1</source>
    <translation>Inactive %1</translation>
   </message>
   <message>
    <source>Gone %1</source>
    <translation>Gone %1</translation>
+  </message>
+  <message>
+   <source>User activity in chat</source>
+   <translation>User activity in chat</translation>
+  </message>
+  <message>
+   <source>and %1 other</source>
+   <translation>and %1 other</translation>
+  </message>
+  <message>
+   <source>Always send my chat activity</source>
+   <translation>Always send my chat activity</translation>
+  </message>
+  <message>
+   <source>Never send my chat activity</source>
+   <translation>Never send my chat activity</translation>
+  </message>
+  <message>
+   <source>Participants activity in conference</source>
+   <translation>Participants activity in conference</translation>
   </message>
  </context>
 </TS>

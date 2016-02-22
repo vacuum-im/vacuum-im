@@ -22,8 +22,9 @@ public:
 class IMessageWriter
 {
 public:
-	virtual void writeMessageToText(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang) =0;
-	virtual void writeTextToMessage(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang) =0;
+	virtual bool writeMessageHasText(int AOrder, Message &AMessage, const QString &ALang) =0;
+	virtual bool writeMessageToText(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang) =0;
+	virtual bool writeTextToMessage(int AOrder, QTextDocument *ADocument, Message &AMessage, const QString &ALang) =0;
 };
 
 class IMessageEditor
@@ -47,22 +48,29 @@ public:
 	};
 public:
 	virtual QObject *instance() = 0;
+	// Message Streams
 	virtual QList<Jid> activeStreams() const =0;
 	virtual bool isActiveStream(const Jid &AStreamJid) const =0;
 	virtual void appendActiveStream(const Jid &AStreamJid) =0;
 	virtual void removeActiveStream(const Jid &AStreamJid) =0;
+	// Message Processing
 	virtual bool sendMessage(const Jid &AStreamJid, Message &AMessage, int ADirection) =0;
 	virtual bool processMessage(const Jid &AStreamJid, Message &AMessage, int ADirection) =0;
 	virtual bool displayMessage(const Jid &AStreamJid, Message &AMessage, int ADirection) =0;
+	// Message Notification
 	virtual QList<int> notifiedMessages() const =0;
 	virtual Message notifiedMessage(int AMesssageId) const =0;
 	virtual int notifyByMessage(int AMessageId) const =0;
 	virtual int messageByNotify(int ANotifyId) const =0;
 	virtual void showNotifiedMessage(int AMessageId) =0;
 	virtual void removeMessageNotify(int AMessageId) =0;
-	virtual void textToMessage(Message &AMessage, const QTextDocument *ADocument, const QString &ALang = QString::null) const =0;
-	virtual void messageToText(QTextDocument *ADocument, const Message &AMessage, const QString &ALang = QString::null) const =0;
+	// Message Conversion
+	virtual bool messageHasText(const Message &AMessage, const QString &ALang=QString::null) const =0;
+	virtual bool messageToText(const Message &AMessage, QTextDocument *ADocument, const QString &ALang=QString::null) const =0;
+	virtual bool textToMessage(const QTextDocument *ADocument, Message &AMessage, const QString &ALang=QString::null) const =0;
+	// Message Windows
 	virtual IMessageWindow *getMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AAction) const =0;
+	// Message Handlers
 	virtual QMultiMap<int, IMessageHandler *> messageHandlers() const =0;
 	virtual void insertMessageHandler(int AOrder, IMessageHandler *AHandler) =0;
 	virtual void removeMessageHandler(int AOrder, IMessageHandler *AHandler) =0;

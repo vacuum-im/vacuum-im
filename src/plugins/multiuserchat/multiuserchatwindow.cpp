@@ -335,27 +335,23 @@ bool MultiUserChatWindow::messageEditSendProcesse(int AOrder, IMessageEditWidget
 	}
 	else if (AOrder == MESHO_MULTIUSERCHATWINDOW_GROUPCHAT)
 	{
-		if (AWidget==FEditWidget && FMultiChat->isOpen())
+		if (FMessageProcessor && AWidget==FEditWidget && FMultiChat->isOpen())
 		{
 			Message message;
-			if (FMessageProcessor)
-				FMessageProcessor->textToMessage(message,AWidget->document());
-			else
-				message.setBody(AWidget->document()->toPlainText());
-			return !message.body().isEmpty() && FMultiChat->sendMessage(message);
+			message.setType(Message::GroupChat).setTo(FMultiChat->roomJid().bare());
+			if (FMessageProcessor->textToMessage(AWidget->document(),message))
+				return FMultiChat->sendMessage(message);
 		}
 	}
 	else if (AOrder == MESHO_MULTIUSERCHATWINDOW_PRIVATECHAT)
 	{
 		IMessageChatWindow *window = qobject_cast<IMessageChatWindow *>(AWidget->messageWindow()->instance());
-		if (FPrivateChatWindows.contains(window) && FMultiChat->isOpen() && FMultiChat->findUser(window->contactJid().resource())!=NULL)
+		if (FMessageProcessor && FPrivateChatWindows.contains(window) && FMultiChat->isOpen() && FMultiChat->findUser(window->contactJid().resource())!=NULL)
 		{
 			Message message;
-			if (FMessageProcessor)
-				FMessageProcessor->textToMessage(message,AWidget->document());
-			else
-				message.setBody(AWidget->document()->toPlainText());
-			return !message.body().isEmpty() && FMultiChat->sendMessage(message,window->contactJid().resource());
+			message.setType(Message::Chat).setTo(window->contactJid().full());
+			if (FMessageProcessor->textToMessage(AWidget->document(),message))
+				return FMultiChat->sendMessage(message,window->contactJid().resource());
 		}
 	}
 	return false;
@@ -474,8 +470,9 @@ bool MultiUserChatWindow::messageDisplay(const Message &AMessage, int ADirection
 	else if (ADirection == IMessageProcessor::DirectionIn)
 	{
 		Jid userJid = AMessage.from();
-		bool isEmptyMessage = AMessage.body().isEmpty();
 		bool isServiceMessage = userJid.resource().isEmpty();
+		bool isEmptyBody =  AMessage.body().isEmpty();
+		bool isEmptyMessage = FMessageProcessor!=NULL ? !FMessageProcessor->messageHasText(AMessage) : isEmptyBody;
 
 		// Voice Requests
 		if (!AMessage.stanza().firstElement("x",DFT_MUC_REQUEST).isNull())
@@ -507,8 +504,9 @@ bool MultiUserChatWindow::messageDisplay(const Message &AMessage, int ADirection
 		// Service messages
 		else if (isServiceMessage)
 		{
-			if (!showMultiChatStatusCodes(FMultiChat->statusCodes(AMessage.stanza()),QString::null,AMessage.body()) && !isEmptyMessage)
+			if (!showMultiChatStatusCodes(FMultiChat->statusCodes(AMessage.stanza()),QString::null,AMessage.body()) && !isEmptyBody)
 				showMultiChatStatusMessage(AMessage.body(),IMessageStyleContentOptions::TypeNotification);
+			displayed = true;
 		}
 		// Private messages
 		else if (AMessage.type()!=Message::GroupChat && !isEmptyMessage)
@@ -542,9 +540,10 @@ bool MultiUserChatWindow::messageDisplay(const Message &AMessage, int ADirection
 	else if (ADirection == IMessageProcessor::DirectionOut)
 	{
 		Jid userJid = AMessage.to();
+		bool isEmptyMessage = FMessageProcessor!=NULL ? !FMessageProcessor->messageHasText(AMessage) : AMessage.body().isEmpty();
 
 		// Private chat messages
-		if (AMessage.type()!=Message::GroupChat && !AMessage.body().isEmpty())
+		if (AMessage.type()!=Message::GroupChat && !isEmptyMessage)
 		{
 			IMessageChatWindow *window = getPrivateChatWindow(userJid);
 			if (window)
@@ -571,8 +570,8 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 	if (ADirection==IMessageProcessor::DirectionIn && AMessage.type()!=Message::Error)
 	{
 		Jid userJid = AMessage.from();
-		bool isEmptyMessage = AMessage.body().isEmpty();
 		bool isServiceMessage = userJid.resource().isEmpty();
+		bool isEmptyMessage = FMessageProcessor!=NULL ? !FMessageProcessor->messageHasText(AMessage) : AMessage.body().isEmpty();
 		int messageId = AMessage.data(MDR_MESSAGE_ID).toInt();
 
 		IMessageTabPage *page = NULL;
@@ -726,12 +725,9 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 		{
 			if (!notify.data.contains(NDR_POPUP_HTML) && !notify.data.contains(NDR_POPUP_TEXT))
 			{
-				if (FMessageProcessor)
-				{
-					QTextDocument doc;
-					FMessageProcessor->messageToText(&doc,AMessage);
+				QTextDocument doc;
+				if (FMessageProcessor && FMessageProcessor->messageToText(AMessage,&doc))
 					notify.data.insert(NDR_POPUP_HTML,TextManager::getDocumentBody(doc));
-				}
 				notify.data.insert(NDR_POPUP_TEXT,AMessage.body());
 			}
 		}
