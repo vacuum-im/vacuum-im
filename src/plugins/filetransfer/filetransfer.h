@@ -84,8 +84,8 @@ public:
 	virtual IFileStream *sendFile(const Jid &AStreamJid, const Jid &AContactJid, const QString &AFileName=QString::null, const QString &AFileDesc=QString::null);
 	//Send Public Files
 	virtual IPublicFile findPublicFile(const QString &AFileId) const;
-	virtual QList<IPublicFile> findPublicFiles(const Jid &AStreamJid=Jid::null, const QString &AFileName=QString::null) const;
-	virtual QString registerPublicFile(const Jid &AStreamJid, const QString &AFileName, const QString &AFileDesc=QString::null);
+	virtual QList<IPublicFile> findPublicFiles(const Jid &AOwnerJid=Jid::null, const QString &AFileName=QString::null) const;
+	virtual QString registerPublicFile(const Jid &AOwnerJid, const QString &AFileName, const QString &AFileDesc=QString::null);
 	virtual void removePublicFile(const QString &AFileId);
 	//Receive Public Files
 	virtual QList<IPublicFile> readPublicFiles(const QDomElement &AParent) const;
@@ -96,7 +96,7 @@ signals:
 	void publicFileReceiveStarted(const QString &ARequestId, IFileStream *AStream);
 	void publicFileReceiveRejected(const QString &ARequestId, const XmppError &AError);
 protected:
-	void notifyStream(IFileStream *AStream, bool ANewStream = false);
+	void notifyStream(IFileStream *AStream, bool ANewStream, bool APublicStream);
 	bool autoStartStream(IFileStream *AStream) const;
 	void updateToolBarAction(IMessageToolBarWidget *AWidget);
 	QList<IMessageToolBarWidget *> findToolBarWidgets(const Jid &AContactJid) const;
@@ -116,6 +116,8 @@ protected slots:
 protected slots:
 	void onPublicStreamStartAccepted(const QString &ARequestId, const QString &ASessionId);
 	void onPublicStreamStartRejected(const QString &ARequestId, const XmppError &AError);
+protected slots:
+	void onDataStreamInitStarted(const IDataStream &AStream);
 	void onDataStreamInitFinished(const IDataStream &AStream, const XmppError &AError);
 protected slots:
 	void onNotificationActivated(int ANotifyId);
@@ -145,8 +147,8 @@ private:
 	QMap<QString, int> FStreamNotify;
 	QMap<QString, StreamDialog *> FStreamDialog;
 private:
-	QList<QString> FPublicRequests;
-	QMap<QString, QString> FPublicSessions;
+	QList<QString> FPublicReceiveRequests;
+	QMap<QString, QString> FPublicReceiveSessions;
 private:
 	QMap<IMessageToolBarWidget *, Action *> FToolBarActions;
 };

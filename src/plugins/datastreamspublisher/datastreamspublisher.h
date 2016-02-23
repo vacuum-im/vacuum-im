@@ -55,8 +55,8 @@ signals:
 	void streamHandlerInserted(int AOrder, IPublicDataStreamHandler *AHandler);
 	void streamHandlerRemoved(int AOrder, IPublicDataStreamHandler *AHandler);
 private:
-	 PluginPointer<IServiceDiscovery> FDiscovery;
-	 PluginPointer<IStanzaProcessor> FStanzaProcessor;
+	PluginPointer<IServiceDiscovery> FDiscovery;
+	PluginPointer<IStanzaProcessor> FStanzaProcessor;
 private:
 	int FSHIStreamStart;
 	QMap<QString, QString> FStartRequest;

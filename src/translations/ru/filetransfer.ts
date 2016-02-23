@@ -99,7 +99,7 @@
     <message numerus="yes">
         <source>/me share %n file(s): %1</source>
         <translation>
-            <numerusform>/me открыл доступ к %n файлу :%1</numerusform>
+            <numerusform>/me открыл доступ к %n файлу: %1</numerusform>
             <numerusform>/me открыл доступ к %n файлам: %1</numerusform>
             <numerusform>/me открыл доступ к %n файлам: %1</numerusform>
         </translation>

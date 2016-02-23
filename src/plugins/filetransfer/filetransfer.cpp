@@ -93,6 +93,7 @@ bool FileTransfer::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		FDataManager = qobject_cast<IDataStreamsManager *>(plugin->instance());
 		if (FDataManager)
 		{
+			connect(FDataManager->instance(),SIGNAL(streamInitStarted(const IDataStream &)),SLOT(onDataStreamInitStarted(const IDataStream &)));
 			connect(FDataManager->instance(),SIGNAL(streamInitFinished(const IDataStream &, const XmppError &)),SLOT(onDataStreamInitFinished(const IDataStream &, const XmppError &)));
 		}
 	}
@@ -386,12 +387,12 @@ bool FileTransfer::writeMessageToText(int AOrder, Message &AMessage, QTextDocume
 		QList<IPublicFile> publishedFiles;
 		foreach(const IPublicFile &file, readPublicFiles(AMessage.stanza().element()))
 		{
-			if (false && FMessageProcessor->activeStreams().contains(file.ownerJid))
+			if (FDataPublisher->streams().contains(file.id))
 			{
 				publishedFiles.append(file);
 				publishedNames.append(file.name);
 			}
-			else if (file.ownerJid != AMessage.to())
+			else
 			{
 				publicFiles.append(file);
 			}
@@ -414,8 +415,8 @@ bool FileTransfer::writeMessageToText(int AOrder, Message &AMessage, QTextDocume
 			foreach(const IPublicFile &file, publicFiles)
 			{
 				QUrl recvUrl;
-				recvUrl.setQueryDelimiters('=',';');
 				recvUrl.setScheme("xmpp");
+				recvUrl.setQueryDelimiters('=',';');
 				recvUrl.setPath(file.ownerJid.full());
 
 				QList< QPair<QString, QString> > query;
@@ -463,7 +464,7 @@ bool FileTransfer::publicDataStreamStart(const Jid &AStreamJid, const Jid AConta
 			if (stream->initStream(stream->acceptableMethods()))
 			{
 				LOG_STRM_INFO(AStreamJid,QString("Public file stream started, to=%1, sid=%2, id=%3").arg(AContactJid.full(),ASessionId,AStream.id));
-				notifyStream(stream, true);
+				notifyStream(stream,true,true);
 				emit publicFileSendStarted(AStream.id, stream);
 				return true;
 			}
@@ -569,10 +570,16 @@ bool FileTransfer::fileStreamProcessRequest(int AOrder, const QString &AStreamId
 				StreamDialog *dialog = getStreamDialog(stream);
 				dialog->setSelectableMethods(methods);
 
-				if (methods.contains(Options::node(OPV_FILESTREAMS_DEFAULTMETHOD).value().toString()))
+				if (!FPublicReceiveSessions.contains(AStreamId))
+				{
 					autoStartStream(stream);
+					notifyStream(stream,true,false);
+				}
+				else
+				{
+					notifyStream(stream,true,true);
+				}
 
-				notifyStream(stream, true);
 				return true;
 			}
 			else
@@ -632,8 +639,7 @@ bool FileTransfer::fileStreamShowDialog(const QString &AStreamId)
 	IFileStream *stream = FFileManager!=NULL ? FFileManager->findStream(AStreamId) : NULL;
 	if (stream!=NULL && FFileManager->streamHandler(AStreamId)==this)
 	{
-		StreamDialog *dialog = getStreamDialog(stream);
-		WidgetManager::showActivateRaiseWindow(dialog);
+		WidgetManager::showActivateRaiseWindow(getStreamDialog(stream));
 		return true;
 	}
 	else if (stream)
@@ -651,8 +657,16 @@ bool FileTransfer::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, co
 {
 	if (AAction == FILE_XMPP_URI_ACTION)
 	{
-		if (AParams.contains("sid"))
-			return !receivePublicFile(AStreamJid,AContactJid,AParams.value("sid")).isEmpty();
+		QString streamId = AParams.value("sid");
+		if (!streamId.isEmpty())
+		{
+			receivePublicFile(AStreamJid,AContactJid,streamId);
+			return true;
+		}
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to start public file receive by XMPP URI, from=%1: Public stream ID is empty").arg(AContactJid.full()));
+		}
 	}
 	return false;
 }
@@ -702,7 +716,7 @@ IPublicFile FileTransfer::findPublicFile(const QString &AFileId) const
 	return FDataPublisher!=NULL ? publicFileFromStream(FDataPublisher->findStream(AFileId)) : IPublicFile();
 }
 
-QList<IPublicFile> FileTransfer::findPublicFiles(const Jid &AStreamJid, const QString &AFileName) const
+QList<IPublicFile> FileTransfer::findPublicFiles(const Jid &AOwnerJid, const QString &AFileName) const
 {
 	QList<IPublicFile> files;
 	if (FDataPublisher)
@@ -712,7 +726,7 @@ QList<IPublicFile> FileTransfer::findPublicFiles(const Jid &AStreamJid, const QS
 			IPublicFile file = publicFileFromStream(FDataPublisher->findStream(streamId));
 			if (file.isValid())
 			{
-				if (AStreamJid.isEmpty() || AStreamJid.pBare()==file.ownerJid.pBare())
+				if (AOwnerJid.isEmpty() || AOwnerJid.pBare()==file.ownerJid.pBare())
 				{
 					if (AFileName.isEmpty() || AFileName==file.name)
 						files.append(file);
@@ -723,19 +737,19 @@ QList<IPublicFile> FileTransfer::findPublicFiles(const Jid &AStreamJid, const QS
 	return files;
 }
 
-QString FileTransfer::registerPublicFile(const Jid &AStreamJid, const QString &AFileName, const QString &AFileDesc)
+QString FileTransfer::registerPublicFile(const Jid &AOwnerJid, const QString &AFileName, const QString &AFileDesc)
 {
 	if (FDataPublisher)
 	{
 		QFileInfo file(AFileName);
 		if (file.exists() && file.isFile())
 		{
-			QList<IPublicFile> files = findPublicFiles(AStreamJid,AFileName);
+			QList<IPublicFile> files = findPublicFiles(AOwnerJid,AFileName);
 			if (files.isEmpty())
 			{
 				IPublicDataStream stream;
 				stream.id = QUuid::createUuid().toString();
-				stream.ownerJid = AStreamJid;
+				stream.ownerJid = AOwnerJid;
 				stream.profile = NS_SI_FILETRANSFER;
 				stream.params.insert(PDSP_FILETRANSFER_NAME, file.absoluteFilePath());
 				if (!AFileDesc.isEmpty())
@@ -745,12 +759,12 @@ QString FileTransfer::registerPublicFile(const Jid &AStreamJid, const QString &A
 
 				if (FDataPublisher->publishStream(stream))
 				{
-					LOG_STRM_INFO(AStreamJid,QString("Registered public file=%1, id=%2").arg(AFileName,stream.id));
+					LOG_INFO(QString("Registered public file=%1, owner=%2, id=%3").arg(AFileName,AOwnerJid.full(),stream.id));
 					return stream.id;
 				}
 				else
 				{
-					LOG_STRM_WARNING(AStreamJid,QString("Failed to register public file=%1: Stream not registered").arg(AFileName));
+					LOG_WARNING(QString("Failed to register public file=%1, owner=%2: Stream not registered").arg(AFileName,AOwnerJid.full()));
 				}
 			}
 			else
@@ -760,7 +774,7 @@ QString FileTransfer::registerPublicFile(const Jid &AStreamJid, const QString &A
 		}
 		else
 		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to register public file=%1: File not found").arg(AFileName));
+			LOG_WARNING(QString("Failed to register public file=%1, owner=%2: File not found").arg(AFileName,AOwnerJid.full()));
 		}
 	}
 	return QString::null;
@@ -806,27 +820,27 @@ QString FileTransfer::receivePublicFile(const Jid &AStreamJid, const Jid &AConta
 		QString reqId = FDataPublisher->startStream(AStreamJid,AContactJid,AFileId);
 		if (!reqId.isEmpty())
 		{
-			LOG_STRM_INFO(AStreamJid,QString("Start public file receive request sent to=%1, fid=%2, id=%3").arg(AContactJid.full(),AFileId,reqId));
-			FPublicRequests.append(reqId);
+			LOG_STRM_INFO(AStreamJid,QString("Start public file receive request sent to=%1, file=%2, id=%3").arg(AContactJid.full(),AFileId,reqId));
+			FPublicReceiveRequests.append(reqId);
 			return reqId;
 		}
 		else
 		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to receive public file from=%1, id=%2: Failed to start stream").arg(AContactJid.full(),AFileId));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed send start receive public file request to=%1, file=%2: Stream not started").arg(AContactJid.full(),AFileId));
 		}
 	}
 	else if (FDataPublisher)
 	{
-		LOG_STRM_WARNING(AStreamJid,QString("Failed to receive public file from=%1, id=%2: Not supported").arg(AContactJid.full(),AFileId));
+		LOG_STRM_WARNING(AStreamJid,QString("Failed send start receive public file request to=%1, id=%2: Not supported").arg(AContactJid.full(),AFileId));
 	}
 	return QString::null;
 }
 
-void FileTransfer::notifyStream(IFileStream *AStream, bool ANewStream)
+void FileTransfer::notifyStream(IFileStream *AStream, bool ANewStream, bool APublicStream)
 {
 	if (FNotifications)
 	{
-		StreamDialog *dialog = getStreamDialog(AStream);
+		StreamDialog *dialog = !APublicStream ? getStreamDialog(AStream) : NULL;
 		if (dialog==NULL || !dialog->isActiveWindow())
 		{
 			QString file = !AStream->fileName().isEmpty() ? AStream->fileName().split("/").last() : QString::null;
@@ -904,21 +918,18 @@ void FileTransfer::notifyStream(IFileStream *AStream, bool ANewStream)
 	{
 		QString note = AStream->streamKind()==IFileStream::SendFile ? tr("File '%1' successfully sent.") : tr("File '%1' successfully received.");
 		note = note.arg(!AStream->fileName().isEmpty() ? AStream->fileName().split("/").last() : QString::null);
-		
-		if (FMessageWidgets)
+
+		IMessageChatWindow *chatWindow = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStream->streamJid(),AStream->contactJid()) : NULL;
+		if (chatWindow)
 		{
-			IMessageChatWindow *window = FMessageWidgets->findChatWindow(AStream->streamJid(),AStream->contactJid());
-			if (window)
-			{
-				IMessageStyleContentOptions options;
-				options.kind = IMessageStyleContentOptions::KindStatus;
-				options.type |= IMessageStyleContentOptions::TypeEvent;
-				options.direction = IMessageStyleContentOptions::DirectionIn;
-				options.time = QDateTime::currentDateTime();
-				window->viewWidget()->appendText(note,options);
-			}
+			IMessageStyleContentOptions options;
+			options.kind = IMessageStyleContentOptions::KindStatus;
+			options.type |= IMessageStyleContentOptions::TypeEvent;
+			options.direction = IMessageStyleContentOptions::DirectionIn;
+			options.time = QDateTime::currentDateTime();
+			chatWindow->viewWidget()->appendText(note,options);
 		}
-		
+
 		if (FMessageArchiver)
 		{
 			FMessageArchiver->saveNote(AStream->streamJid(),AStream->contactJid(),note);
@@ -935,7 +946,11 @@ bool FileTransfer::autoStartStream(IFileStream *AStream) const
 			IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(AStream->streamJid()) : NULL;
 			IRosterItem ritem = roster!=NULL ? roster->findItem(AStream->contactJid()) : IRosterItem();
 			if (ritem.subscription==SUBSCRIPTION_BOTH || ritem.subscription==SUBSCRIPTION_FROM)
-				return AStream->startStream(Options::node(OPV_FILESTREAMS_DEFAULTMETHOD).value().toString());
+			{
+				QString method = Options::node(OPV_FILESTREAMS_DEFAULTMETHOD).value().toString();
+				if (AStream->acceptableMethods().contains(method))
+					return AStream->startStream(method);
+			}
 		}
 		else
 		{
@@ -1087,7 +1102,7 @@ void FileTransfer::onStreamStateChanged()
 			if (Options::node(OPV_FILETRANSFER_HIDEONSTART).value().toBool() && FStreamDialog.contains(stream->streamId()))
 				FStreamDialog.value(stream->streamId())->close();
 		}
-		notifyStream(stream);
+		notifyStream(stream,false,false);
 	}
 }
 
@@ -1133,29 +1148,55 @@ void FileTransfer::onShowSendFileDialogByAction(bool)
 void FileTransfer::onPublishFilesByAction(bool)
 {
 	Action *action = qobject_cast<Action *>(sender());
-	if (FDataPublisher!=NULL && FMessageProcessor!=NULL && action!=NULL)
+	if (action!=NULL && FDataPublisher!=NULL && FMessageProcessor!=NULL)
 	{
 		IMessageToolBarWidget *widget = FToolBarActions.key(action);
 		if (widget != NULL)
 		{
-			QStringList files = QFileDialog::getOpenFileNames(NULL,tr("Select Files"));
-			if (!files.isEmpty())
+			Message message;
+			message.setTo(widget->messageWindow()->contactJid().full());
+
+			Jid ownerJid;
+			IMessageChatWindow *chatWindow = qobject_cast<IMessageChatWindow *>(widget->messageWindow()->instance());
+			IMultiUserChatWindow *mucWindow = qobject_cast<IMultiUserChatWindow *>(widget->messageWindow()->instance());
+			if (chatWindow != NULL)
 			{
-				Message message;
-				if (qobject_cast<IMessageChatWindow *>(widget->messageWindow()->instance()))
-					message.setType(Message::Chat);
-				else if (qobject_cast<IMultiUserChatWindow *>(widget->messageWindow()->instance()))
-					message.setType(Message::GroupChat);
-				message.setTo(widget->messageWindow()->contactJid().full());
+				message.setType(Message::Chat);
+				ownerJid = chatWindow->streamJid();
+			}
+			else if (mucWindow!=NULL && mucWindow->multiUserChat()->isOpen())
+			{
+				message.setType(Message::GroupChat);
+				ownerJid = mucWindow->multiUserChat()->mainUser()->userJid();
+			}
 
-				foreach(const QString &file, files)
+			if (ownerJid.isValid())
+			{
+				QStringList files = QFileDialog::getOpenFileNames(widget->messageWindow()->instance(),tr("Select Files"));
+				if (!files.isEmpty())
 				{
-					QString fileId = registerPublicFile(widget->messageWindow()->streamJid(), file);
-					if (!fileId.isEmpty())
-						FDataPublisher->writeStream(fileId,message.stanza().element());
-				}
+					int registered = 0;
+					foreach(const QString &file, files)
+					{
+						QString fileId = registerPublicFile(ownerJid,file);
+						if (!fileId.isEmpty())
+						{
+							QDomElement messageElem = message.stanza().element();
+							if (FDataPublisher->writeStream(fileId,messageElem))
+								registered++;
+							else
+								LOG_ERROR(QString("Failed to write public file stream to message, file=%1").arg(fileId));
+						}
+					}
 
-				FMessageProcessor->sendMessage(widget->messageWindow()->streamJid(),message,IMessageProcessor::DirectionOut);
+					if (registered > 0)
+					{
+						if (FMessageProcessor->sendMessage(widget->messageWindow()->streamJid(),message,IMessageProcessor::DirectionOut))
+							LOG_STRM_INFO(widget->messageWindow()->streamJid(), QString("Sent %1 public file(s) to %2").arg(files.count()).arg(message.to()));
+						else
+							LOG_STRM_WARNING(widget->messageWindow()->streamJid(), QString("Failed to send %1 public file(s) to %2").arg(files.count()).arg(message.to()));
+					}
+				}
 			}
 		}
 	}
@@ -1163,38 +1204,57 @@ void FileTransfer::onPublishFilesByAction(bool)
 
 void FileTransfer::onPublicStreamStartAccepted(const QString &ARequestId, const QString &ASessionId)
 {
-	if (FPublicRequests.contains(ARequestId))
+	if (FPublicReceiveRequests.contains(ARequestId))
 	{
-		FPublicRequests.removeAll(ARequestId);
-		FPublicSessions.insert(ASessionId,ARequestId);
+		LOG_INFO(QString("Start public file receive request accepted, id=%1, sid=%2").arg(ARequestId,ASessionId));
+		FPublicReceiveRequests.removeAll(ARequestId);
+		FPublicReceiveSessions.insert(ASessionId,ARequestId);
 	}
 }
 
 void FileTransfer::onPublicStreamStartRejected(const QString &ARequestId, const XmppError &AError)
 {
-	if (FPublicRequests.contains(ARequestId))
+	if (FPublicReceiveRequests.contains(ARequestId))
 	{
-		FPublicRequests.removeAll(ARequestId);
+		LOG_INFO(QString("Start public file receive request rejected, id=%1: %2").arg(ARequestId,AError.condition()));
+		FPublicReceiveRequests.removeAll(ARequestId);
 		emit publicFileReceiveRejected(ARequestId,AError);
+	}
+}
+
+void FileTransfer::onDataStreamInitStarted(const IDataStream &AStream)
+{
+	if (FPublicReceiveSessions.contains(AStream.streamId))
+	{
+		QString reqId = FPublicReceiveSessions.take(AStream.streamId);
+		IFileStream *stream = FFileManager!=NULL ? FFileManager->findStream(AStream.streamId) : NULL;
+		if (stream)
+		{
+			getStreamDialog(stream)->show();
+			LOG_STRM_INFO(AStream.streamJid,QString("Public file receive started, id=%1, sid=%2").arg(reqId,stream->streamId()));
+			emit publicFileReceiveStarted(reqId,stream);
+		}
+		else
+		{
+			LOG_STRM_ERROR(AStream.streamJid,QString("Failed to start public file receive, id=%1: Stream not found").arg(reqId));
+			emit publicFileReceiveRejected(reqId,XmppStanzaError(XmppStanzaError::EC_ITEM_NOT_FOUND));
+		}
 	}
 }
 
 void FileTransfer::onDataStreamInitFinished(const IDataStream &AStream, const XmppError &AError)
 {
-	if (FPublicSessions.contains(AStream.streamId))
+	if (FPublicReceiveSessions.contains(AStream.streamId))
 	{
-		QString reqId = FPublicSessions.take(AStream.streamId);
-		if (AError.isNull())
+		QString reqId = FPublicReceiveSessions.take(AStream.streamId);
+		if (!AError.isNull())
 		{
-			IFileStream *stream = FFileManager!=NULL ? FFileManager->findStream(reqId) : NULL;
-			if (stream != NULL)
-				emit publicFileReceiveStarted(reqId,stream);
-			else
-				emit publicFileReceiveRejected(reqId,XmppStanzaError(XmppStanzaError::EC_ITEM_NOT_FOUND));
+			LOG_STRM_ERROR(AStream.streamJid,QString("Failed to start public file receive, id=%1: %2").arg(reqId,AError.condition()));
+			emit publicFileReceiveRejected(reqId,AError);
 		}
 		else
 		{
-			emit publicFileReceiveRejected(reqId,AError);
+			REPORT_ERROR("Receive public file stream initiation not handled on start");
 		}
 	}
 }

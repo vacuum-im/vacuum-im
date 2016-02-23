@@ -66,7 +66,7 @@ bool DataStreamsPublisher::stanzaReadWrite(int AHandleId, const Jid &AStreamJid,
 		AAccept = true;
 		QString streamId = AStanza.firstElement("start", NS_STREAM_PUBLICATION).attribute("id");
 		const IPublicDataStream stream = FStreams.value(streamId);
-		if (!stream.isNull() && AStreamJid.pBare()==stream.ownerJid.pBare())
+		if (!stream.isNull())
 		{
 			foreach(IPublicDataStreamHandler *handler, FHandlers)
 			{
@@ -108,14 +108,14 @@ void DataStreamsPublisher::stanzaRequestResult(const Jid &AStreamJid, const Stan
 		QString sessionId = FStartRequest.take(AStanza.id());
 		if (AStanza.type() == "result")
 		{
-			LOG_STRM_INFO(AStreamJid, QString("Start public data stream request accepted, sid=%1, id=%2").arg(sessionId,AStanza.id()));
+			LOG_STRM_INFO(AStreamJid,QString("Start public data stream request accepted, sid=%1, id=%2").arg(sessionId,AStanza.id()));
 			QDomElement startElem = AStanza.firstElement("starting", NS_STREAM_PUBLICATION);
 			emit streamStartAccepted(AStanza.id(),startElem.attribute("sid"));
 		}
 		else
 		{
 			XmppStanzaError err(AStanza);
-			LOG_STRM_INFO(AStreamJid, QString("Start public data stream request rejected, sid=%1, id=%2: %3").arg(sessionId,AStanza.id(),err.condition()));
+			LOG_STRM_INFO(AStreamJid,QString("Start public data stream request rejected, sid=%1, id=%2: %3").arg(sessionId,AStanza.id(),err.condition()));
 			emit streamStartRejected(AStanza.id(),err);
 		}
 	}
@@ -136,7 +136,7 @@ bool DataStreamsPublisher::publishStream(const IPublicDataStream &AStream)
 	if (AStream.isValid() && !FStreams.contains(AStream.id))
 	{
 		FStreams.insert(AStream.id,AStream);
-		LOG_STRM_INFO(AStream.ownerJid,QString("Registered public data stream, id=%1, profile=%2").arg(AStream.id, AStream.profile));
+		LOG_INFO(QString("Registered public data stream, owner=%1, id=%2, profile=%3").arg(AStream.ownerJid.full(),AStream.id,AStream.profile));
 		emit streamPublished(AStream);
 		return true;
 	}
@@ -148,7 +148,7 @@ void DataStreamsPublisher::removeStream(const QString &AStreamId)
 	if (FStreams.contains(AStreamId))
 	{
 		IPublicDataStream stream = FStreams.take(AStreamId);
-		LOG_STRM_INFO(stream.ownerJid,QString("Removed public data stream, id=%1, profile=%2").arg(stream.id, stream.profile));
+		LOG_INFO(QString("Removed public data stream, owner=%1, id=%2, profile=%3").arg(stream.ownerJid.full(),stream.id,stream.profile));
 		emit streamRemoved(stream);
 	}
 }
@@ -184,6 +184,10 @@ QList<IPublicDataStream> DataStreamsPublisher::readStreams(const QDomElement &AP
 			sipubElem = sipubElem.nextSiblingElement("sipub");
 		}
 	}
+	else
+	{
+		REPORT_ERROR("Failed to read public data streams: Invalid parameters");
+	}
 	return streamList;
 }
 
@@ -208,6 +212,12 @@ bool DataStreamsPublisher::writeStream(const QString &AStreamId, QDomElement &AP
 				return true;
 			}
 		}
+
+		LOG_WARNING(QString("Failed to write public data stream, id=%1: Handler not found").arg(AStreamId));
+	}
+	else if (stream.isValid())
+	{
+		REPORT_ERROR("Failed to write public data stream: Invalid parameters");
 	}
 	return false;
 }
