@@ -13,7 +13,6 @@
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/irostermanager.h>
 #include <interfaces/inotifications.h>
-#include <interfaces/imessagearchiver.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/ioptionsmanager.h>
@@ -33,10 +32,11 @@ class FileTransfer :
 	public IDiscoFeatureHandler,
 	public IRostersDragDropHandler,
 	public IMessageViewDropHandler,
+	public IMessageViewUrlHandler,
 	public IPublicDataStreamHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IFileTransfer IMessageWriter IXmppUriHandler IFileStreamHandler IOptionsDialogHolder IDiscoFeatureHandler IRostersDragDropHandler IMessageViewDropHandler IPublicDataStreamHandler);
+	Q_INTERFACES(IPlugin IFileTransfer IMessageWriter IXmppUriHandler IFileStreamHandler IOptionsDialogHolder IDiscoFeatureHandler IRostersDragDropHandler IMessageViewDropHandler IMessageViewUrlHandler IPublicDataStreamHandler);
 public:
 	FileTransfer();
 	~FileTransfer();
@@ -64,6 +64,8 @@ public:
 	virtual bool messageViewDragMove(IMessageViewWidget *AWidget, const QDragMoveEvent *AEvent);
 	virtual void messageViewDragLeave(IMessageViewWidget *AWidget, const QDragLeaveEvent *AEvent);
 	virtual bool messageViewDropAction(IMessageViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu);
+	//IMessageViewUrlHandler
+	virtual bool messageViewUrlOpen(int AOrder, IMessageViewWidget *AWidget, const QUrl &AUrl);
 	//IMessageWriter
 	virtual bool writeMessageHasText(int AOrder, Message &AMessage, const QString &ALang);
 	virtual bool writeMessageToText(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang);
@@ -96,7 +98,7 @@ signals:
 	void publicFileReceiveStarted(const QString &ARequestId, IFileStream *AStream);
 	void publicFileReceiveRejected(const QString &ARequestId, const XmppError &AError);
 protected:
-	void notifyStream(IFileStream *AStream, bool ANewStream, bool APublicStream);
+	void notifyStream(IFileStream *AStream);
 	bool autoStartStream(IFileStream *AStream) const;
 	void updateToolBarAction(IMessageToolBarWidget *AWidget);
 	QList<IMessageToolBarWidget *> findToolBarWidgets(const Jid &AContactJid) const;
@@ -104,14 +106,14 @@ protected:
 	IFileStream *createStream(const Jid &AStreamJid, const Jid &AContactJid, IFileStream::StreamKind AStreamKind, const QString &AStreamId);
 	QString dirNameByUserName(const QString &AUserName) const;
 	IPublicFile publicFileFromStream(const IPublicDataStream &AStream) const;
+	void showStatusEvent(IMessageViewWidget *AView, const QString &AHtml) const;
 protected:
 	bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:
 	void onStreamStateChanged();
-protected slots:
 	void onStreamDestroyed();
 	void onStreamDialogDestroyed();
-	void onShowSendFileDialogByAction(bool);
+	void onSendFileByAction(bool);
 	void onPublishFilesByAction(bool);
 protected slots:
 	void onPublicStreamStartAccepted(const QString &ARequestId, const QString &ASessionId);
@@ -130,6 +132,8 @@ protected slots:
 	void onToolBarWidgetCreated(IMessageToolBarWidget *AWidget);
 	void onToolBarWidgetAddressChanged(const Jid &AStreamBefore, const Jid &AContactBefore);
 	void onToolBarWidgetDestroyed(QObject *AObject);
+protected slots:
+	void onMessageViewWidgetDestroyed(QObject *AObject);
 private:
 	IRosterManager *FRosterManager;
 	IServiceDiscovery *FDiscovery;
@@ -138,17 +142,19 @@ private:
 	IFileStreamsManager *FFileManager;
 	IDataStreamsPublisher *FDataPublisher;
 	IMessageWidgets *FMessageWidgets;
-	IMessageArchiver *FMessageArchiver;
 	IOptionsManager *FOptionsManager;
 	IRostersViewPlugin *FRostersViewPlugin;
 	IMessageProcessor *FMessageProcessor;
 	IXmppUriQueries *FXmppUriQueries;
+	IMultiUserChatManager *FMultiChatManager;
 private:
 	QMap<QString, int> FStreamNotify;
 	QMap<QString, StreamDialog *> FStreamDialog;
 private:
+	QList<IFileStream *> FPublicStreams;
 	QList<QString> FPublicReceiveRequests;
 	QMap<QString, QString> FPublicReceiveSessions;
+	QMap<QString, IMessageViewWidget *> FPublicRequestView;
 private:
 	QMap<IMessageToolBarWidget *, Action *> FToolBarActions;
 };

@@ -85,7 +85,7 @@ public:
 	// File Streams
 	virtual QList<IFileStream *> streams() const =0;
 	virtual IFileStream *findStream(const QString &AStreamId) const =0;
-	virtual IFileStreamHandler *streamHandler(const QString &AStreamId) const =0;
+	virtual IFileStreamHandler *findStreamHandler(const QString &AStreamId) const =0;
 	virtual IFileStream *createStream(IFileStreamHandler *AHandler, const QString &AStreamId, const Jid &AStreamJid, const Jid &AContactJid, IFileStream::StreamKind AKind, QObject *AParent = NULL) =0;
 	// Stream Handlers
 	virtual QList<IFileStreamHandler *> streamHandlers() const =0;

@@ -292,7 +292,7 @@ void FileStreamsWindow::onStreamDestroyed(IFileStream *AStream)
 void FileStreamsWindow::onTableIndexActivated(const QModelIndex &AIndex)
 {
 	QString streamId = AIndex.data(IDR_STREAMID).toString();
-	IFileStreamHandler *handler = FManager->streamHandler(streamId);
+	IFileStreamHandler *handler = FManager->findStreamHandler(streamId);
 	if (handler)
 		handler->fileStreamShowDialog(streamId);
 }

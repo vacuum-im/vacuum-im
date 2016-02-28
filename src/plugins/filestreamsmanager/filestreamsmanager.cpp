@@ -261,7 +261,7 @@ bool FileStreamsManager::dataStreamProcessRequest(const QString &AStreamId, cons
 
 bool FileStreamsManager::dataStreamProcessResponse(const QString &AStreamId, const Stanza &AResponse, const QString &AMethod)
 {
-	IFileStreamHandler *handler = streamHandler(AStreamId);
+	IFileStreamHandler *handler = findStreamHandler(AStreamId);
 	if (handler != NULL)
 		return handler->fileStreamProcessResponse(AStreamId,AResponse,AMethod);
 	else
@@ -294,7 +294,7 @@ IFileStream *FileStreamsManager::findStream(const QString &AStreamId) const
 	return FStreams.value(AStreamId);
 }
 
-IFileStreamHandler *FileStreamsManager::streamHandler(const QString &AStreamId) const
+IFileStreamHandler *FileStreamsManager::findStreamHandler(const QString &AStreamId) const
 {
 	return FStreamHandler.value(AStreamId);
 }

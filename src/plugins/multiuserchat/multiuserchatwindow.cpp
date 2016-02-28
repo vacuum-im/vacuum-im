@@ -571,6 +571,7 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 	{
 		Jid userJid = AMessage.from();
 		bool isServiceMessage = userJid.resource().isEmpty();
+		bool isSelfMessage = FMultiChat->nickname()==userJid.resource();
 		bool isEmptyMessage = FMessageProcessor!=NULL ? !FMessageProcessor->messageHasText(AMessage) : AMessage.body().isEmpty();
 		int messageId = AMessage.data(MDR_MESSAGE_ID).toInt();
 
@@ -660,7 +661,7 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 			}
 		}
 		// Groupchat messages
-		else if (AMessage.type()==Message::GroupChat && !isServiceMessage && !isEmptyMessage && !AMessage.isDelayed())
+		else if (AMessage.type()==Message::GroupChat && !isServiceMessage && !isEmptyMessage && !isSelfMessage && !AMessage.isDelayed())
 		{
 			page = this;
 

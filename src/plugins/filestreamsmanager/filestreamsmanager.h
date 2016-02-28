@@ -44,7 +44,7 @@ public:
 	//IFileTransferManager
 	virtual QList<IFileStream *> streams() const;
 	virtual IFileStream *findStream(const QString &ASessionId) const;
-	virtual IFileStreamHandler *streamHandler(const QString &AStreamId) const;
+	virtual IFileStreamHandler *findStreamHandler(const QString &AStreamId) const;
 	virtual IFileStream *createStream(IFileStreamHandler *AHandler, const QString &AStreamId, const Jid &AStreamJid, const Jid &AContactJid, IFileStream::StreamKind AKind, QObject *AParent = NULL);
 	// Stream Handlers
 	virtual QList<IFileStreamHandler *> streamHandlers() const;

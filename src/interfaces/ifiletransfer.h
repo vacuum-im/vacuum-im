@@ -33,7 +33,7 @@ public:
 	virtual QObject *instance() =0;
 	// Send Files
 	virtual bool isSupported(const Jid &AStreamJid, const Jid &AContactJid) const =0;
-	virtual IFileStream *sendFile(const Jid &AStreamJid, const Jid &AContactJid, const QString &AFileName = QString::null, const QString &AFileDesc = QString::null) =0;
+	virtual IFileStream *sendFile(const Jid &AStreamJid, const Jid &AContactJid, const QString &AFileName=QString::null, const QString &AFileDesc=QString::null) =0;
 	//Send Public Files
 	virtual IPublicFile findPublicFile(const QString &AFileId) const =0;
 	virtual QList<IPublicFile> findPublicFiles(const Jid &AOwnerJid=Jid::null, const QString &AFileName=QString::null) const =0;

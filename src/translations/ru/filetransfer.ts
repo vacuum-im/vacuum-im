@@ -16,56 +16,12 @@
         <translation>Передача файла завершена</translation>
     </message>
     <message>
-        <source>Requested file transfer: %1</source>
-        <translation>Запрошена передача файла: %1</translation>
-    </message>
-    <message>
-        <source>You received a request to transfer the file</source>
-        <translation>Вы получили запрос на передачу файла</translation>
-    </message>
-    <message>
-        <source>Completed transferring file: %1</source>
-        <translation>Завершена передача файла : %1</translation>
-    </message>
-    <message>
-        <source>Canceled transferring file: %1</source>
-        <translation>Отменена передача файла: %1</translation>
-    </message>
-    <message>
-        <source>File transfer canceled: %1</source>
-        <translation>Передача файла отменена: %1</translation>
-    </message>
-    <message>
-        <source>Auto sending file: %1</source>
-        <translation>Автоматическая отправка файла: %1</translation>
-    </message>
-    <message>
-        <source>File sending is started automatically</source>
-        <translation>Отправка файла запущена автоматически</translation>
-    </message>
-    <message>
-        <source>Auto receiving file: %1</source>
-        <translation>Автоматическое получение файла: %1</translation>
-    </message>
-    <message>
-        <source>File receiving is started automatically</source>
-        <translation>Получение файла запущено автоматически</translation>
-    </message>
-    <message>
         <source>Allows to send a file to another contact</source>
         <translation>Позволяет передать файл другому контакту</translation>
     </message>
     <message>
         <source>Supports the sending of the file to another contact</source>
         <translation>Поддерживает передачу файла другому контакту</translation>
-    </message>
-    <message>
-        <source>File &apos;%1&apos; successfully sent.</source>
-        <translation>Файл &apos;%1&apos; успешно передан.</translation>
-    </message>
-    <message>
-        <source>File &apos;%1&apos; successfully received.</source>
-        <translation>Файл &apos;%1&apos; успешно получен.</translation>
     </message>
     <message>
         <source>Failed to start file transfer</source>
@@ -107,6 +63,58 @@
     <message>
         <source>Select Files</source>
         <translation>Выберите файлы</translation>
+    </message>
+    <message>
+        <source>Failed to send request for file &apos;%1&apos;</source>
+        <translation>Не удалось отправизь запрос файла &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <source>File transfer</source>
+        <translation>Передача файла</translation>
+    </message>
+    <message>
+        <source>File transfer request from %1</source>
+        <translation>Запрос передачи файла от %1</translation>
+    </message>
+    <message>
+        <source>%1 wants to send you a file &apos;%2&apos;</source>
+        <translation>%1 хочет отправить вам файл &apos;%2&apos;</translation>
+    </message>
+    <message>
+        <source>Sending file &apos;%1&apos; to %2 started automatically</source>
+        <translation>Отправка файла &apos;%1&apos; к %2 началась автоматически</translation>
+    </message>
+    <message>
+        <source>Receiving file &apos;%1&apos; from %2 started automatically</source>
+        <translation>Получение файла &apos;%1&apos; от %2 началось автоматически</translation>
+    </message>
+    <message>
+        <source>File &apos;%1&apos; successfully sent to %2</source>
+        <translation>Файл &apos;%1&apos; успешно отправлен к %2</translation>
+    </message>
+    <message>
+        <source>File &apos;%1&apos; successfully received from %2</source>
+        <translation>Файл &apos;%1&apos; успешно получен от %2</translation>
+    </message>
+    <message>
+        <source>File transfer failed</source>
+        <translation>Передача файла не удалась</translation>
+    </message>
+    <message>
+        <source>Failed to send file &apos;%1&apos; to %2: %3</source>
+        <translation>Не удалось отправить файл &apos;%1&apos; к %2: %3</translation>
+    </message>
+    <message>
+        <source>Failed to receive file &apos;%1&apos; from %2: %3</source>
+        <translation>Не удалось получить файл &apos;%1&apos; от %2: %3</translation>
+    </message>
+    <message>
+        <source>Select File</source>
+        <translation>Выберите файл</translation>
+    </message>
+    <message>
+        <source>File request rejected: %1</source>
+        <translation>Запрос файла отклонен: %1</translation>
     </message>
 </context>
 <context>

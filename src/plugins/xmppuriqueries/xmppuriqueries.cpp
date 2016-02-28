@@ -50,31 +50,63 @@ bool XmppUriQueries::messageViewUrlOpen(int AOrder, IMessageViewWidget *AWidget,
 
 bool XmppUriQueries::openXmppUri(const Jid &AStreamJid, const QUrl &AUrl) const
 {
-	if (AUrl.isValid() && AUrl.scheme()=="xmpp")
+	Jid contactJid;
+	QString action;
+	QMultiMap<QString, QString> params;
+	if (parseXmppUri(AUrl,contactJid,action,params))
 	{
-		QUrl url =  QUrl::fromEncoded(AUrl.toEncoded().replace(';','&'), QUrl::StrictMode);
-		Jid contactJid = url.path();
-		QList< QPair<QString, QString> > keyValues = url.queryItems();
-		if (keyValues.count() > 0)
+		LOG_STRM_INFO(AStreamJid,QString("Opening XMPP URI, url=%1").arg(AUrl.toString()));
+		foreach (IXmppUriHandler *handler, FHandlers)
 		{
-			QString action = keyValues.takeAt(0).first;
-			if (contactJid.isValid() && !action.isEmpty())
-			{
-				QMultiMap<QString, QString> params;
-				for (int i=0; i<keyValues.count(); i++)
-					params.insertMulti(keyValues.at(i).first, keyValues.at(i).second);
-
-				LOG_STRM_INFO(AStreamJid,QString("Opening XMPP URI, url=%1").arg(AUrl.toString()));
-				foreach (IXmppUriHandler *handler, FHandlers)
-				{
-					if (handler->xmppUriOpen(AStreamJid, contactJid, action, params))
-						return true;
-				}
-			}
+			if (handler->xmppUriOpen(AStreamJid, contactJid, action, params))
+				return true;
 		}
-		LOG_STRM_WARNING(AStreamJid,QString("Failed to open XMPP URI, url=%1").arg(url.toString()));
+		LOG_STRM_WARNING(AStreamJid,QString("Failed to open XMPP URI, url=%1").arg(AUrl.toString()));
 	}
 	return false;
+}
+
+bool XmppUriQueries::parseXmppUri(const QUrl &AUrl, Jid &AContactJid, QString &AAction, QMultiMap<QString, QString> &AParams) const
+{
+	if (AUrl.isValid() && AUrl.scheme()==XMPP_URI_SCHEME)
+	{
+		QUrl url =  QUrl::fromEncoded(AUrl.toEncoded().replace(';','&'), QUrl::StrictMode);
+
+		QList< QPair<QString, QString> > keyValues = url.queryItems();
+		if (!keyValues.isEmpty())
+		{
+			AContactJid = url.path();
+			AAction = keyValues.takeAt(0).first;
+			if (AContactJid.isValid() && !AAction.isEmpty())
+			{
+				for (int i=0; i<keyValues.count(); i++)
+					AParams.insertMulti(keyValues.at(i).first, keyValues.at(i).second);
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+QString XmppUriQueries::makeXmppUri(const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams) const
+{
+	if (AContactJid.isValid() && !AAction.isEmpty())
+	{
+		QUrl url;
+		url.setQueryDelimiters('=',';');
+
+		url.setScheme(XMPP_URI_SCHEME);
+		url.setPath(AContactJid.full());
+
+		QList< QPair<QString, QString> > query;
+		query.append(qMakePair<QString,QString>(AAction,QString::null));
+		for(QMultiMap<QString, QString>::const_iterator it=AParams.constBegin(); it!=AParams.end(); ++it)
+			query.append(qMakePair<QString,QString>(it.key(),it.value()));
+		url.setQueryItems(query);
+
+		return url.toString().replace(QString("?%1=;").arg(AAction),QString("?%1;").arg(AAction));
+	}
+	return QString::null;
 }
 
 void XmppUriQueries::insertUriHandler(int AOrder, IXmppUriHandler *AHandler)
