@@ -355,12 +355,12 @@
         <translation>¡Te has registrado satisfactoriamente!</translation>
     </message>
     <message>
-        <source>Account %1@%2 successfully registered, click &apos;Finish&apos; button to add the account.</source>
-        <translation>La cuenta %1@%2 se ha registrado satisfactoriamente, haz clic en el botón &quot;Terminar&quot; para añadir la cuenta.</translation>
-    </message>
-    <message>
         <source>Wizard waiting for registration confirmation from server</source>
         <translation>El asistente espera por la confirmación de registro desde el servidor</translation>
+    </message>
+    <message>
+        <source>Account %1 successfully registered, click &apos;Finish&apos; button to add the account.</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>

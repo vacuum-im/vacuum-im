@@ -12,4 +12,8 @@
     <key>schangerConnecting</key>
     <object mime="image/png">schangerconnecting.png</object>
   </icon>
+  <icon>
+    <key>schangerConnectionError</key>
+    <object mime="image/png">schangerconnectionerror.png</object>
+  </icon>
 </icondef>

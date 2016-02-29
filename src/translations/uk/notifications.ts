@@ -96,6 +96,10 @@
         <source>Show the corresponding window minimized in the taskbar</source>
         <translation type="unfinished"/>
     </message>
+    <message>
+        <source>Display a notification icon in the system tray</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>NotifyWidget</name>

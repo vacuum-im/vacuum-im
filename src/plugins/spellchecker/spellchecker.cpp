@@ -278,7 +278,7 @@ void SpellChecker::onEditWidgetContextMenuRequested(const QPoint &APosition, Men
 		connect(enableAction,SIGNAL(triggered()),SLOT(onChangeSpellEnable()));
 		AMenu->addAction(enableAction,AG_MWEWCM_SPELLCHECKER_OPTIONS);
 
-		if (isSpellEnabled() && isSpellAvailable())
+		if (isSpellEnabled())
 		{
 			Menu *dictsMenu = new Menu(AMenu);
 			dictsMenu->setTitle(tr("Dictionary"));

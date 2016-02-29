@@ -206,6 +206,10 @@
         <source>You</source>
         <translation>Вы</translation>
     </message>
+    <message>
+        <source>speaks of himself in the third person</source>
+        <translation>говорит о себе в третьем лице</translation>
+    </message>
 </context>
 <context>
     <name>StyleSelectOptionsWidget</name>

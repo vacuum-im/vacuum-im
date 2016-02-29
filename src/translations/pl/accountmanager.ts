@@ -355,11 +355,11 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Account %1@%2 successfully registered, click &apos;Finish&apos; button to add the account.</source>
+        <source>Wizard waiting for registration confirmation from server</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Wizard waiting for registration confirmation from server</source>
+        <source>Account %1 successfully registered, click &apos;Finish&apos; button to add the account.</source>
         <translation type="unfinished"/>
     </message>
 </context>

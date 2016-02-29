@@ -126,7 +126,7 @@
     </message>
     <message>
         <source>Message Style - %1 - %2</source>
-        <translation>Estilo de mensaje - %1 - %2</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>Receiver</source>
@@ -203,6 +203,10 @@
     <message>
         <source>Outgoing consecutive message</source>
         <translation>Mensaje consecutivo de salida</translation>
+    </message>
+    <message>
+        <source>speaks of himself in the third person</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>

@@ -40,10 +40,6 @@
    <translation>Activate Notification</translation>
   </message>
   <message>
-   <source>Use native popup notifications if available</source>
-   <translation>Use native popup notifications if available</translation>
-  </message>
-  <message>
    <source>Disable sounds and popup windows if status is 'Away'</source>
    <translation>Disable sounds and popup windows if status is 'Away'</translation>
   </message>
@@ -79,6 +75,10 @@
    <source>Highlight the corresponding window in the taskbar</source>
    <translation>Highlight the corresponding window in the taskbar</translation>
   </message>
+  <message>
+   <source>Use native popup notifications</source>
+   <translation>Use native popup notifications</translation>
+  </message>
  </context>
  <context>
   <name>NotifyKindOptionsWidget</name>
@@ -97,6 +97,10 @@
   <message>
    <source>Show the corresponding window minimized in the taskbar</source>
    <translation>Show the corresponding window minimized in the taskbar</translation>
+  </message>
+  <message>
+   <source>Display a notification icon in the system tray</source>
+   <translation>Display a notification icon in the system tray</translation>
   </message>
  </context>
  <context>

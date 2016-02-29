@@ -16,56 +16,12 @@
    <translation>File transfer completed</translation>
   </message>
   <message>
-   <source>Requested file transfer: %1</source>
-   <translation>Requested file transfer: %1</translation>
-  </message>
-  <message>
-   <source>You received a request to transfer the file</source>
-   <translation>You received a request to transfer the file</translation>
-  </message>
-  <message>
-   <source>Completed transferring file: %1</source>
-   <translation>Completed transferring file: %1</translation>
-  </message>
-  <message>
-   <source>Canceled transferring file: %1</source>
-   <translation>Canceled transferring file: %1</translation>
-  </message>
-  <message>
-   <source>File transfer canceled: %1</source>
-   <translation>File transfer canceled: %1</translation>
-  </message>
-  <message>
-   <source>Auto sending file: %1</source>
-   <translation>Auto sending file: %1</translation>
-  </message>
-  <message>
-   <source>File sending is started automatically</source>
-   <translation>File sending is started automatically</translation>
-  </message>
-  <message>
-   <source>Auto receiving file: %1</source>
-   <translation>Auto receiving file: %1</translation>
-  </message>
-  <message>
-   <source>File receiving is started automatically</source>
-   <translation>File receiving is started automatically</translation>
-  </message>
-  <message>
    <source>Allows to send a file to another contact</source>
    <translation>Allows to send a file to another contact</translation>
   </message>
   <message>
    <source>Supports the sending of the file to another contact</source>
    <translation>Supports the sending of the file to another contact</translation>
-  </message>
-  <message>
-   <source>File '%1' successfully sent.</source>
-   <translation>File '%1' successfully sent.</translation>
-  </message>
-  <message>
-   <source>File '%1' successfully received.</source>
-   <translation>File '%1' successfully received.</translation>
   </message>
   <message>
    <source>Failed to start file transfer</source>
@@ -107,6 +63,58 @@
   <message>
    <source>Select Files</source>
    <translation>Select Files</translation>
+  </message>
+  <message>
+   <source>Failed to send request for file '%1'</source>
+   <translation>Failed to send request for file '%1'</translation>
+  </message>
+  <message>
+   <source>File transfer</source>
+   <translation>File transfer</translation>
+  </message>
+  <message>
+   <source>File transfer request from %1</source>
+   <translation>File transfer request from %1</translation>
+  </message>
+  <message>
+   <source>%1 wants to send you a file '%2'</source>
+   <translation>%1 wants to send you a file '%2'</translation>
+  </message>
+  <message>
+   <source>Sending file '%1' to %2 started automatically</source>
+   <translation>Sending file '%1' to %2 started automatically</translation>
+  </message>
+  <message>
+   <source>Receiving file '%1' from %2 started automatically</source>
+   <translation>Receiving file '%1' from %2 started automatically</translation>
+  </message>
+  <message>
+   <source>File '%1' successfully sent to %2</source>
+   <translation>File '%1' successfully sent to %2</translation>
+  </message>
+  <message>
+   <source>File '%1' successfully received from %2</source>
+   <translation>File '%1' successfully received from %2</translation>
+  </message>
+  <message>
+   <source>File transfer failed</source>
+   <translation>File transfer failed</translation>
+  </message>
+  <message>
+   <source>Failed to send file '%1' to %2: %3</source>
+   <translation>Failed to send file '%1' to %2: %3</translation>
+  </message>
+  <message>
+   <source>Failed to receive file '%1' from %2: %3</source>
+   <translation>Failed to receive file '%1' from %2: %3</translation>
+  </message>
+  <message>
+   <source>Select File</source>
+   <translation>Select File</translation>
+  </message>
+  <message>
+   <source>File request rejected: %1</source>
+   <translation>File request rejected: %1</translation>
   </message>
  </context>
  <context>
