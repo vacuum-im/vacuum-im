@@ -106,7 +106,7 @@ void DataStreamsPublisher::stanzaRequestResult(const Jid &AStreamJid, const Stan
 	if (FStartRequest.contains(AStanza.id()))
 	{
 		QString sessionId = FStartRequest.take(AStanza.id());
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			LOG_STRM_INFO(AStreamJid,QString("Start public data stream request accepted, sid=%1, id=%2").arg(sessionId,AStanza.id()));
 			QDomElement startElem = AStanza.firstElement("starting", NS_STREAM_PUBLICATION);
@@ -231,8 +231,8 @@ QString DataStreamsPublisher::startStream(const Jid &AStreamJid, const Jid &ACon
 {
 	if (FStanzaProcessor && AStreamJid.isValid() && AContactJid.isValid() && !AStreamId.isEmpty())
 	{
-		Stanza request("iq");
-		request.setType("get").setTo(AContactJid.full()).setId(FStanzaProcessor->newId());
+		Stanza request(STANZA_KIND_IQ);
+		request.setType(STANZA_TYPE_GET).setTo(AContactJid.full()).setUniqueId();
 
 		QDomElement startElem = request.addElement("start",NS_STREAM_PUBLICATION);
 		startElem.setAttribute("id",AStreamId);

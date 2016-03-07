@@ -354,7 +354,7 @@ QString StatusIcons::iconKeyByJid(const Jid &AStreamJid, const Jid &AContactJid)
 		subscription = SUBSCRIPTION_BOTH;
 		show = presence!=NULL ? presence->show() : show;
 	}
-	else if (AStreamJid && AContactJid)
+	else if (AStreamJid.pBare() == AContactJid.pBare())
 	{
 		subscription = SUBSCRIPTION_BOTH;
 		show = presence!=NULL ? presence->findItem(AContactJid).show : show;

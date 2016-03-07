@@ -466,7 +466,7 @@ bool RecentContacts::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, 
 
 bool RecentContacts::recentItemValid(const IRecentItem &AItem) const
 {
-	return !AItem.reference.isEmpty() && AItem.streamJid.pBare()!=AItem.reference && !Jid(AItem.reference).node().isEmpty();
+	return !AItem.reference.isEmpty() && AItem.streamJid.pBare()!=AItem.reference && Jid(AItem.reference).hasNode();
 }
 
 bool RecentContacts::recentItemCanShow(const IRecentItem &AItem) const

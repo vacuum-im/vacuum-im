@@ -191,7 +191,7 @@ bool RemoteControl::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza
 	Q_UNUSED(AAccept);
 	if (AHandleId == FSHIMessageForward)
 	{
-		if (AStreamJid.pBare() == Jid(AStanza.from()).pBare())
+		if (AStreamJid.pBare() == AStanza.fromJid().pBare())
 		{
 			QDomElement addressElem = AStanza.firstElement("addresses",NS_ADDRESS).firstChildElement("address");
 			while(!addressElem.isNull() && addressElem.attribute("type")!="ofrom")
@@ -643,7 +643,7 @@ bool RemoteControl::processForwardMessages(const ICommandRequest &ARequest)
 				IDataOption opt;
 
 				QString name = FNotifications!=NULL ? FNotifications->contactName(ARequest.streamJid,it.key()) : it.key().uBare();
-				if (!it.key().resource().isEmpty())
+				if (it.key().hasResource())
 					name += "/" + it.key().resource();
 
 				opt.label = tr("%n message(s) from '%1'","",it.value()).arg(name);

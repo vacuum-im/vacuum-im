@@ -274,7 +274,7 @@ bool Avatars::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &ASt
 	}
 	else if (FSHIPresenceIn.value(AStreamJid) == AHandlerId)
 	{
-		static const QList<QString> acceptStanzaTypes = QList<QString>() << QString("") << QString("unavailable");
+		static const QList<QString> acceptStanzaTypes = QList<QString>() << QString(PRESENCE_TYPE_AVAILABLE) << QString(PRESENCE_TYPE_UNAVAILABLE);
 
 		Jid contactJid = AStanza.from();
 		if (!FStreamAvatars.contains(contactJid) && acceptStanzaTypes.contains(AStanza.type()))
@@ -300,7 +300,7 @@ bool Avatars::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &ASt
 			}
 			else if (AStreamJid.pBare() == contactJid.pBare())
 			{
-				if (AStanza.type().isEmpty() && !FBlockingResources.contains(AStreamJid,contactJid))
+				if (AStanza.type()==PRESENCE_TYPE_AVAILABLE && !FBlockingResources.contains(AStreamJid,contactJid))
 				{
 					LOG_STRM_INFO(AStreamJid,QString("Resource %1 is now blocking avatar update notify mechanism").arg(contactJid.resource()));
 					FBlockingResources.insertMulti(AStreamJid,contactJid);
@@ -310,7 +310,7 @@ bool Avatars::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &ASt
 						updatePresence(AStreamJid);
 					}
 				}
-				else if (AStanza.type()=="unavailable" && FBlockingResources.contains(AStreamJid,contactJid))
+				else if (AStanza.type()==PRESENCE_TYPE_UNAVAILABLE && FBlockingResources.contains(AStreamJid,contactJid))
 				{
 					LOG_STRM_INFO(AStreamJid,QString("Resource %1 is stopped blocking avatar update notify mechanism").arg(contactJid.resource()));
 					FBlockingResources.remove(AStreamJid,contactJid);
@@ -323,8 +323,8 @@ bool Avatars::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &ASt
 				QString hash = iqUpdate.firstChildElement("hash").text().toLower();
 				if (!updateIqAvatar(contactJid,hash))
 				{
-					Stanza query("iq");
-					query.setTo(contactJid.full()).setType("get").setId(FStanzaProcessor->newId());
+					Stanza query(STANZA_KIND_IQ);
+					query.setType(STANZA_TYPE_GET).setTo(contactJid.full()).setUniqueId();
 					query.addElement("query",NS_JABBER_IQ_AVATAR);
 					if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,query,AVATAR_IQ_TIMEOUT))
 					{
@@ -383,7 +383,7 @@ void Avatars::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 	if (FIqAvatarRequests.contains(AStanza.id()))
 	{
 		Jid contactJid = FIqAvatarRequests.take(AStanza.id());
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			LOG_STRM_INFO(AStreamJid,QString("Received iq avatar from contact, jid=%1").arg(AStanza.from()));
 			QDomElement dataElem = AStanza.firstElement("query",NS_JABBER_IQ_AVATAR).firstChildElement("data");
@@ -475,7 +475,7 @@ QString Avatars::avatarHash(const Jid &AContactJid, bool AExact) const
 		hash = FVCardAvatars.value(AContactJid);
 	if (hash == UNKNOWN_AVATAR_HASH)
 		hash = FIqAvatars.value(AContactJid);
-	if (hash == UNKNOWN_AVATAR_HASH && !AExact && !AContactJid.resource().isEmpty())
+	if (hash==UNKNOWN_AVATAR_HASH && !AExact && AContactJid.hasResource())
 		return avatarHash(AContactJid.bare(),true);
 	return hash;
 }

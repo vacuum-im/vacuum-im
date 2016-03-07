@@ -89,7 +89,7 @@ void ServerMessageArchive::stanzaRequestResult(const Jid &AStreamJid, const Stan
 	if (FServerLoadHeadersRequests.contains(AStanza.id()))
 	{
 		IArchiveRequest request = FServerLoadHeadersRequests.take(AStanza.id());
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			LOG_STRM_DEBUG(AStreamJid,QString("Headers loaded, id=%1").arg(AStanza.id()));
 
@@ -139,7 +139,7 @@ void ServerMessageArchive::stanzaRequestResult(const Jid &AStreamJid, const Stan
 	else if (FServerSaveCollectionRequests.contains(AStanza.id()))
 	{
 		ServerCollectionRequest request = FServerSaveCollectionRequests.take(AStanza.id());
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			LOG_STRM_DEBUG(AStreamJid,QString("Collection saved, id=%1").arg(AStanza.id()));
 			
@@ -161,7 +161,7 @@ void ServerMessageArchive::stanzaRequestResult(const Jid &AStreamJid, const Stan
 	else if (FServerLoadCollectionRequests.contains(AStanza.id()))
 	{
 		FServerLoadCollectionRequests.remove(AStanza.id());
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			LOG_STRM_DEBUG(AStreamJid,QString("Collection loaded, id=%1").arg(AStanza.id()));
 			
@@ -183,7 +183,7 @@ void ServerMessageArchive::stanzaRequestResult(const Jid &AStreamJid, const Stan
 	else if (FServerRemoveCollectionsRequests.contains(AStanza.id()))
 	{
 		IArchiveRequest request = FServerRemoveCollectionsRequests.take(AStanza.id());
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			LOG_STRM_DEBUG(AStreamJid,QString("Collections removed, id=%1").arg(AStanza.id()));
 			emit collectionsRemoved(AStanza.id(),request);
@@ -198,7 +198,7 @@ void ServerMessageArchive::stanzaRequestResult(const Jid &AStreamJid, const Stan
 	else if (FServerLoadModificationsRequests.contains(AStanza.id()))
 	{
 		ServerModificationsRequest request = FServerLoadModificationsRequests.take(AStanza.id());
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			LOG_STRM_DEBUG(AStreamJid,QString("Modifications loaded, id=%1").arg(AStanza.id()));
 
@@ -368,8 +368,8 @@ QString ServerMessageArchive::removeCollections(const Jid &AStreamJid, const IAr
 {
 	if (FStanzaProcessor && isCapable(AStreamJid,ArchiveManagement))
 	{
-		Stanza stanza("iq");
-		stanza.setType("set").setId(FStanzaProcessor->newId());
+		Stanza stanza(STANZA_KIND_IQ);
+		stanza.setType(STANZA_TYPE_SET).setUniqueId();
 
 		QDomElement removeElem = stanza.addElement("remove",FNamespaces.value(AStreamJid));
 		if (ARequest.with.isValid())
@@ -421,8 +421,8 @@ QString ServerMessageArchive::loadServerHeaders(const Jid &AStreamJid, const IAr
 {
 	if (FStanzaProcessor && isCapable(AStreamJid,ArchiveManagement))
 	{
-		Stanza stanza("iq");
-		stanza.setType("get").setId(FStanzaProcessor->newId());
+		Stanza stanza(STANZA_KIND_IQ);
+		stanza.setType(STANZA_TYPE_GET).setUniqueId();
 
 		QDomElement listElem = stanza.addElement("list",FNamespaces.value(AStreamJid));
 		if (ARequest.with.isValid())
@@ -457,8 +457,8 @@ QString ServerMessageArchive::saveServerCollection(const Jid &AStreamJid, const 
 {
 	if (FStanzaProcessor && isCapable(AStreamJid,ManualArchiving) && ACollection.header.with.isValid() && ACollection.header.start.isValid())
 	{
-		Stanza stanza("iq");
-		stanza.setType("set").setId(FStanzaProcessor->newId());
+		Stanza stanza(STANZA_KIND_IQ);
+		stanza.setType(STANZA_TYPE_SET).setUniqueId();
 
 		QDomElement chatElem = stanza.addElement("save",FNamespaces.value(AStreamJid)).appendChild(stanza.createElement("chat")).toElement();
 
@@ -543,8 +543,8 @@ QString ServerMessageArchive::loadServerCollection(const Jid &AStreamJid, const 
 {
 	if (FStanzaProcessor && isCapable(AStreamJid,ArchiveManagement) && AHeader.with.isValid() && AHeader.start.isValid())
 	{
-		Stanza stanza("iq");
-		stanza.setType("get").setId(FStanzaProcessor->newId());
+		Stanza stanza(STANZA_KIND_IQ);
+		stanza.setType(STANZA_TYPE_GET).setUniqueId();
 
 		QDomElement retrieveElem = stanza.addElement("retrieve",FNamespaces.value(AStreamJid));
 		retrieveElem.setAttribute("with",AHeader.with.full());
@@ -577,8 +577,8 @@ QString ServerMessageArchive::loadServerModifications(const Jid &AStreamJid, con
 {
 	if (FStanzaProcessor && isCapable(AStreamJid,ArchiveManagement) && AStart.isValid() && ACount>0)
 	{
-		Stanza stanza("iq");
-		stanza.setType("get").setId(FStanzaProcessor->newId());
+		Stanza stanza(STANZA_KIND_IQ);
+		stanza.setType(STANZA_TYPE_GET).setUniqueId();
 
 		QDomElement modifyElem = stanza.addElement("modified",FNamespaces.value(AStreamJid));
 		modifyElem.setAttribute("start",DateTime(AStart).toX85UTC());
@@ -678,10 +678,10 @@ bool ServerMessageArchive::checkRequestHeader(const IArchiveHeader &AHeader, con
 		if (ARequest.exactmatch)
 			return false;
 
-		if (!ARequest.with.pNode().isEmpty() && ARequest.with.pNode()!=AHeader.with.pNode())
+		if (ARequest.with.hasNode() && ARequest.with.pNode()!=AHeader.with.pNode())
 			return false;
 
-		if (!ARequest.with.pResource().isEmpty() && ARequest.with.pResource()!=AHeader.with.pResource())
+		if (ARequest.with.hasResource() && ARequest.with.pResource()!=AHeader.with.pResource())
 			return false;
 	}
 

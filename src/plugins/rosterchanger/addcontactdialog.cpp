@@ -207,7 +207,7 @@ void AddContactDialog::onToolBarActionTriggered(bool)
 
 void AddContactDialog::onVCardReceived(const Jid &AContactJid)
 {
-	if (FResolving && (AContactJid && contactJid()))
+	if (FResolving && AContactJid.pBare()== contactJid().pBare())
 	{
 		IVCard *vcard = FVCardManager->getVCard(AContactJid.bare());
 		if (vcard)

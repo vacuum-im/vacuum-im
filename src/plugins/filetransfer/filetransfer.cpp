@@ -922,7 +922,7 @@ void FileTransfer::notifyStream(IFileStream *AStream)
 	QString contactName = AStream->contactJid().uFull();
 	if (mucWindow)
 	{
-		if (!AStream->contactJid().resource().isEmpty())
+		if (AStream->contactJid().hasResource())
 			contactName = QString("[%1]").arg(AStream->contactJid().resource());
 	}
 	else if (chatWindow)
@@ -1105,7 +1105,7 @@ StreamDialog *FileTransfer::getStreamDialog(IFileStream *AStream)
 		if (FNotifications)
 		{
 			QString name = "<b>"+ Qt::escape(FNotifications->contactName(AStream->streamJid(), AStream->contactJid())) +"</b>";
-			if (!AStream->contactJid().resource().isEmpty())
+			if (AStream->contactJid().hasResource())
 				name += Qt::escape("/" + AStream->contactJid().resource());
 			dialog->setContactName(name);
 			dialog->installEventFilter(this);

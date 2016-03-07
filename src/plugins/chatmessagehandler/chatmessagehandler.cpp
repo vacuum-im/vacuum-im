@@ -538,7 +538,7 @@ void ChatMessageHandler::updateWindow(IMessageChatWindow *AWindow)
 	IPresenceItem pitem = presence!=NULL ? presence->findItem(AWindow->contactJid()) : IPresenceItem();
 	AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::StatusText,pitem.status);
 
-	QString resource = !AWindow->contactJid().resource().isEmpty() ? AWindow->contactJid().resource() : tr("<Absent>");
+	QString resource = AWindow->contactJid().hasResource() ? AWindow->contactJid().resource() : tr("<Absent>");
 	AWindow->infoWidget()->addressMenu()->setTitle(TextManager::getElidedString(resource,Qt::ElideRight,20));
 
 	QIcon tabIcon = statusIcon;
@@ -640,7 +640,7 @@ void ChatMessageHandler::requestHistory(IMessageChatWindow *AWindow)
 		for (QMultiMap<Jid,Jid>::const_iterator it=addresses.constBegin(); it!=addresses.constEnd(); ++it)
 		{
 			request.with = it.value();
-			request.exactmatch = request.with.node().isEmpty();
+			request.exactmatch = !request.with.hasNode();
 
 			QString reqId = FMessageArchiver->loadMessages(it.key(),request);
 			if (!reqId.isEmpty())
@@ -716,7 +716,7 @@ void ChatMessageHandler::fillContentOptions(const Jid &AStreamJid, const Jid &AC
 		if (AStreamJid.pBare() != AContactJid.pBare())
 			AOptions.senderName = Qt::escape(FMessageStyleManager->contactName(AStreamJid));
 		else
-			AOptions.senderName = Qt::escape(!AStreamJid.resource().isEmpty() ? AStreamJid.resource() : AStreamJid.uNode());
+			AOptions.senderName = Qt::escape(AStreamJid.hasResource() ? AStreamJid.resource() : AStreamJid.uNode());
 	}
 }
 
@@ -916,7 +916,7 @@ void ChatMessageHandler::onWindowAddressMenuRequested(Menu *AMenu)
 			foreach(const Jid &contactJid, addresses.value(streamJid))
 			{
 				QString addressName = FMessageStyleManager!=NULL ? FMessageStyleManager->contactName(streamJid,contactJid) : contactJid.uBare();
-				if (!contactJid.resource().isEmpty() && addressName!=contactJid.resource())
+				if (contactJid.hasResource() && addressName!=contactJid.resource())
 					addressName += "/" + contactJid.resource();
 
 				bool isCurAddress = streamJid==widget->messageWindow()->streamJid() && contactJid==widget->messageWindow()->contactJid();
@@ -1003,7 +1003,7 @@ void ChatMessageHandler::onStatusIconsChanged()
 void ChatMessageHandler::onAvatarChanged(const Jid &AContactJid)
 {
 	foreach(IMessageChatWindow *window, FWindows)
-		if (window->contactJid() && AContactJid)
+		if (window->contactJid().pBare() == AContactJid.pBare())
 			updateWindow(window);
 }
 
@@ -1028,7 +1028,7 @@ void ChatMessageHandler::onPresenceItemReceived(IPresence *APresence, const IPre
 			{
 				QString show = FStatusChanger ? FStatusChanger->nameByShow(AItem.show) : QString::null;
 				QString name = FMessageStyleManager!=NULL ? FMessageStyleManager->contactName(APresence->streamJid(),AItem.itemJid) : AItem.itemJid.uBare();
-				if (!AItem.itemJid.resource().isEmpty() && name!=AItem.itemJid.resource())
+				if (AItem.itemJid.hasResource() && name!=AItem.itemJid.resource())
 					name += "/" + AItem.itemJid.resource();
 				QString message = tr("%1 changed status to [%2] %3").arg(name,show,AItem.status);
 				showStyledStatus(window,message);

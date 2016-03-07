@@ -164,7 +164,7 @@ IAccount *AccountManager::findAccountByStream(const Jid &AStreamJid) const
 
 IAccount *AccountManager::createAccount(const Jid &AAccountJid, const QString &AName)
 {
-	if (AAccountJid.isValid() && !AAccountJid.node().isEmpty() && findAccountByStream(AAccountJid)==NULL)
+	if (AAccountJid.isValid() && AAccountJid.hasNode() && findAccountByStream(AAccountJid)==NULL)
 	{
 		QUuid accountId = QUuid::createUuid();
 		LOG_DEBUG(QString("Creating account, stream=%1, id=%2").arg(AAccountJid.pFull(), accountId.toString()));
@@ -176,7 +176,7 @@ IAccount *AccountManager::createAccount(const Jid &AAccountJid, const QString &A
 
 		return insertAccount(options);
 	}
-	else if (!AAccountJid.isValid() || AAccountJid.node().isEmpty())
+	else if (!AAccountJid.isValid() || !AAccountJid.hasNode())
 	{
 		REPORT_ERROR("Failed to create account: Invalid parameters");
 	}
@@ -208,7 +208,7 @@ void AccountManager::destroyAccount(const QUuid &AAccountId)
 IAccount *AccountManager::insertAccount(const OptionsNode &AOptions)
 {
 	Jid streamJid = AOptions.value("streamJid").toString();
-	if (streamJid.isValid() && !streamJid.node().isEmpty() && findAccountByStream(streamJid)==NULL)
+	if (streamJid.isValid() && streamJid.hasNode() && findAccountByStream(streamJid)==NULL)
 	{
 		Account *account = new Account(FXmppStreamManager,AOptions,this);
 		connect(account,SIGNAL(activeChanged(bool)),SLOT(onAccountActiveChanged(bool)));
@@ -221,7 +221,7 @@ IAccount *AccountManager::insertAccount(const OptionsNode &AOptions)
 
 		return account;
 	}
-	else if (!streamJid.isValid() || streamJid.node().isEmpty())
+	else if (!streamJid.isValid() || !streamJid.hasNode())
 	{
 		REPORT_ERROR("Failed to insert account: Invalid parameters");
 	}

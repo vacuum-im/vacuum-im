@@ -788,7 +788,7 @@ QList<int> RosterChanger::findNotifies(const Jid &AStreamJid, const Jid &AContac
 		foreach(int notifyId, FNotifySubsDialog.keys())
 		{
 			INotification notify = FNotifications->notificationById(notifyId);
-			if (AStreamJid==notify.data.value(NDR_STREAM_JID).toString() && (AContactJid && notify.data.value(NDR_CONTACT_JID).toString()))
+			if (AStreamJid==notify.data.value(NDR_STREAM_JID).toString() && AContactJid.isBareEqual(notify.data.value(NDR_CONTACT_JID).toString()))
 				notifies.append(notifyId);
 		}
 	}

@@ -123,13 +123,13 @@ bool Registration::initSettings()
 
 void Registration::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 {
-	XmppStanzaError err = AStanza.type()!="result" ? XmppStanzaError(AStanza) : XmppStanzaError::null;
+	XmppStanzaError err = !AStanza.isResult() ? XmppStanzaError(AStanza) : XmppStanzaError::null;
 
 	if (FSendRequests.contains(AStanza.id()))
 	{
 		QDomElement queryElem = AStanza.firstElement("query",NS_JABBER_REGISTER);
 		IRegisterFields fields = readFields(AStanza.from(),queryElem);
-		if (AStanza.type()=="result" || (fields.fieldMask & IRegisterFields::Form)>0)
+		if (AStanza.isResult() || (fields.fieldMask & IRegisterFields::Form)>0)
 		{
 			LOG_STRM_INFO(AStreamJid,QString("Registration fields loaded, from=%1, id=%2").arg(AStanza.from(),AStanza.id()));
 			emit registerFields(AStanza.id(),fields);
@@ -143,7 +143,7 @@ void Registration::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 	}
 	else if (FSubmitRequests.contains(AStanza.id()))
 	{
-		if (AStanza.type()=="result")
+		if (AStanza.isResult())
 		{
 			LOG_STRM_INFO(AStreamJid,QString("Registration submit accepted, from=%1, id=%2").arg(AStanza.from(),AStanza.id()));
 			emit registerSuccess(AStanza.id());
@@ -299,8 +299,8 @@ QString Registration::sendRegisterRequest(const Jid &AStreamJid, const Jid &ASer
 {
 	if (FStanzaProcessor && AStreamJid.isValid() && AServiceJid.isValid())
 	{
-		Stanza request("iq");
-		request.setTo(AServiceJid.full()).setType("get").setId(FStanzaProcessor->newId());
+		Stanza request(STANZA_KIND_IQ);
+		request.setType(STANZA_TYPE_GET).setTo(AServiceJid.full()).setUniqueId();
 		request.addElement("query",NS_JABBER_REGISTER);
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,REGISTRATION_TIMEOUT))
 		{
@@ -324,8 +324,8 @@ QString Registration::sendUnregisterRequest(const Jid &AStreamJid, const Jid &AS
 {
 	if (FStanzaProcessor && AStreamJid.isValid() && AServiceJid.isValid())
 	{
-		Stanza request("iq");
-		request.setTo(AServiceJid.full()).setType("set").setId(FStanzaProcessor->newId());
+		Stanza request(STANZA_KIND_IQ);
+		request.setType(STANZA_TYPE_SET).setTo(AServiceJid.full()).setUniqueId();
 		request.addElement("query",NS_JABBER_REGISTER).appendChild(request.createElement("remove"));
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,REGISTRATION_TIMEOUT))
 		{
@@ -349,8 +349,8 @@ QString Registration::sendChangePasswordRequest(const Jid &AStreamJid, const Jid
 {
 	if (FStanzaProcessor && AStreamJid.isValid() && AServiceJid.isValid())
 	{
-		Stanza request("iq");
-		request.setTo(AServiceJid.full()).setType("set").setId(FStanzaProcessor->newId());
+		Stanza request(STANZA_KIND_IQ);
+		request.setType(STANZA_TYPE_SET).setTo(AServiceJid.full()).setUniqueId();
 		QDomElement elem = request.addElement("query",NS_JABBER_REGISTER);
 		elem.appendChild(request.createElement("username")).appendChild(request.createTextNode(AUserName));
 		elem.appendChild(request.createElement("password")).appendChild(request.createTextNode(APassword));
@@ -376,8 +376,8 @@ QString Registration::sendRequestSubmit(const Jid &AStreamJid, const IRegisterSu
 {
 	if (FStanzaProcessor && AStreamJid.isValid())
 	{
-		Stanza request("iq");
-		request.setTo(ASubmit.serviceJid.full()).setType("set").setId(FStanzaProcessor->newId());
+		Stanza request(STANZA_KIND_IQ);
+		request.setType(STANZA_TYPE_SET).setTo(ASubmit.serviceJid.full()).setUniqueId();
 
 		QDomElement queryElem = request.addElement("query",NS_JABBER_REGISTER);
 		writeSubmit(queryElem,ASubmit);

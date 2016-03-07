@@ -42,7 +42,6 @@ public:
 	virtual bool xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder);
 	virtual bool xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder);
 	//IStanzaProcessor
-	virtual QString newId() const;
 	virtual bool sendStanzaIn(const Jid &AStreamJid, Stanza &AStanza);
 	virtual bool sendStanzaOut(const Jid &AStreamJid, Stanza &AStanza);
 	virtual bool sendStanzaRequest(IStanzaRequestOwner *AIqOwner, const Jid &AStreamJid, Stanza &AStanza, int ATimeout);

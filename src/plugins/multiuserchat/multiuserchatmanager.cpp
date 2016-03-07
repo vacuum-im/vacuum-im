@@ -306,7 +306,7 @@ void MultiUserChatManager::stanzaRequestResult(const Jid &AStreamJid, const Stan
 		FDiscoNickRequests.removeAll(AStanza.id());
 		QDomElement queryElem = AStanza.firstElement("query",NS_DISCO_INFO);
 		QDomElement identityElem = AStanza.firstElement("query",NS_DISCO_INFO).firstChildElement("identity");
-		if (AStanza.type()=="result" && queryElem.attribute("node")==MUC_NODE_NICK)
+		if (AStanza.isResult() && queryElem.attribute("node")==MUC_NODE_NICK)
 		{
 			QString nick = queryElem.firstChildElement("identity").attribute("name");
 			LOG_STRM_INFO(AStreamJid,QString("Registered nick as discovery request received from=%1, nick=%2, id=%3").arg(AStanza.from(),nick,AStanza.id()));
@@ -316,8 +316,8 @@ void MultiUserChatManager::stanzaRequestResult(const Jid &AStreamJid, const Stan
 		{
 			LOG_STRM_WARNING(AStreamJid,QString("Failed to receive registered nick as discovery request from=%1, id=%2: %3").arg(AStanza.from(),AStanza.id(),XmppStanzaError(AStanza).errorMessage()));
 
-			Stanza stanza("iq");
-			stanza.setType("get").setId(FStanzaProcessor->newId()).setTo(Jid(AStanza.from()).domain());
+			Stanza stanza(STANZA_KIND_IQ);
+			stanza.setType(STANZA_TYPE_GET).setTo(Jid(AStanza.from()).domain()).setUniqueId();
 			stanza.addElement("query",NS_JABBER_REGISTER);
 			if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,10000))
 			{
@@ -334,7 +334,7 @@ void MultiUserChatManager::stanzaRequestResult(const Jid &AStreamJid, const Stan
 	else if (FRegisterNickRequests.contains(AStanza.id()))
 	{
 		QString reqId = FRegisterNickRequests.take(AStanza.id());
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			QDomElement queryElem = AStanza.firstElement("query",NS_JABBER_REGISTER);
 			QDomElement formElem = Stanza::findElement(queryElem,"x",NS_JABBER_DATA);
@@ -409,7 +409,7 @@ bool MultiUserChatManager::xmppUriOpen(const Jid &AStreamJid, const Jid &AContac
 
 bool MultiUserChatManager::execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo)
 {
-	if (AFeature==NS_MUC && ADiscoInfo.contactJid.resource().isEmpty())
+	if (AFeature==NS_MUC && !ADiscoInfo.contactJid.hasResource())
 	{
 		IMultiUserChatWindow *window = findMultiChatWindow(AStreamJid,ADiscoInfo.contactJid);
 		if (!window)
@@ -787,8 +787,8 @@ QString MultiUserChatManager::requestRegisteredNick(const Jid &AStreamJid, const
 {
 	if (FStanzaProcessor && AStreamJid.isValid() && ARoomJid.isValid())
 	{
-		Stanza stanza("iq");
-		stanza.setType("get").setId(FStanzaProcessor->newId()).setTo(ARoomJid.bare());
+		Stanza stanza(STANZA_KIND_IQ);
+		stanza.setType(STANZA_TYPE_GET).setTo(ARoomJid.bare()).setUniqueId();
 		stanza.addElement("query",NS_DISCO_INFO).setAttribute("node",MUC_NODE_NICK);
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,10000))
 		{
@@ -1655,7 +1655,7 @@ void MultiUserChatManager::onInviteDialogFinished(int AResult)
 		}
 		else
 		{
-			Stanza stanza("message");
+			Stanza stanza(STANZA_KIND_MESSAGE);
 			stanza.setTo(fields.roomJid.bare());
 
 			QDomElement declElem = stanza.addElement("x",NS_MUC_USER).appendChild(stanza.createElement("decline")).toElement();

@@ -43,28 +43,28 @@ XmppStream::~XmppStream()
 
 bool XmppStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
-	if (AXmppStream==this && AOrder==XSHO_XMPP_STREAM)
+	if (AXmppStream==this && AOrder==XSHO_XMPP_STREAM && AStanza.namespaceURI()==NS_JABBER_STREAMS)
 	{
-		if (FStreamState==SS_INITIALIZE && AStanza.element().nodeName()=="stream:stream")
+		if (FStreamState==SS_INITIALIZE && AStanza.kind()=="stream")
 		{
 			FStreamId = AStanza.id();
 			setStreamState(SS_FEATURES);
-			if (VersionParser(AStanza.element().attribute("version","0.0")) < VersionParser(1,0))
+			if (VersionParser(AStanza.attribute("version","0.0")) < VersionParser(1,0))
 			{
-				Stanza stanza("stream:features");
+				Stanza stanza("features",NS_JABBER_STREAMS);
 				stanza.addElement("auth",NS_FEATURE_IQAUTH);
 				xmppStanzaIn(AXmppStream, stanza, AOrder);
 			}
 			return true;
 		}
-		else if (FStreamState==SS_FEATURES && AStanza.element().nodeName()=="stream:features")
+		else if (FStreamState==SS_FEATURES && AStanza.kind()=="features")
 		{
 			FServerFeatures = AStanza.element().cloneNode(true).toElement();
 			FAvailFeatures = FXmppStreamManager->xmppFeatures();
 			processFeatures();
 			return true;
 		}
-		else if (AStanza.element().nodeName() == "stream:error")
+		else if (AStanza.kind() == "error")
 		{
 			abort(XmppStreamError(AStanza.element()));
 			return true;
@@ -177,7 +177,7 @@ void XmppStream::setStreamJid(const Jid &AStreamJid)
 {
 	if (FStreamJid!=AStreamJid && AStreamJid.isValid())
 	{
-		if (FStreamState==SS_OFFLINE || FStreamJid.node().isEmpty())
+		if (FStreamState==SS_OFFLINE || !FStreamJid.hasNode())
 		{
 			LOG_STRM_INFO(streamJid(),QString("Changing offline XMPP stream JID, from=%1, to=%2").arg(FOfflineJid.full(),AStreamJid.full()));
 
@@ -423,19 +423,16 @@ void XmppStream::startStream()
 	FParser.restart();
 	setKeepAliveTimerActive(true);
 
-	QDomDocument doc;
-	QDomElement root = doc.createElementNS(NS_JABBER_STREAMS,"stream:stream");
-	doc.appendChild(root);
-	root.setAttribute("xmlns",NS_JABBER_CLIENT);
-	root.setAttribute("to", FStreamJid.domain());
-	if (!FDefLang.isEmpty())
-		root.setAttribute("xml:lang",FDefLang);
+	Stanza stream("stream:stream",NS_JABBER_STREAMS);
+	stream.setAttribute("to", FStreamJid.domain());
+	stream.setAttribute("xmlns", NS_JABBER_CLIENT);
+	stream.setAttribute("xmlns:xml", NS_XML);
+	stream.setAttribute("xml:lang", !FDefLang.isEmpty() ? FDefLang : QLocale().name());
 
 	setStreamState(SS_INITIALIZE);
-	Stanza stanza(doc.documentElement());
-	if (!processStanzaHandlers(stanza,true))
+	if (!processStanzaHandlers(stream,true))
 	{
-		QByteArray data = QString("<?xml version=\"1.0\"?>").toUtf8()+stanza.toByteArray().trimmed();
+		QByteArray data = QString("<?xml version=\"1.0\"?>").toUtf8() + stream.toByteArray().trimmed();
 		data.remove(data.size()-2,1);
 		sendData(data);
 	}
@@ -670,10 +667,6 @@ void XmppStream::onFeatureFinished(bool ARestart)
 
 void XmppStream::onFeatureError(const XmppError &AError)
 {
-	//if (AError.isSaslError() && AError.toSaslError().conditionCode()==XmppSaslError::EC_NOT_AUTHORIZED)
-	//	FSessionPassword = QString::null;
-	//else if (AError.isStanzaError() && AError.toStanzaError().conditionCode()==XmppStanzaError::EC_NOT_AUTHORIZED)
-	//	FSessionPassword = QString::null;
 	abort(AError);
 }
 

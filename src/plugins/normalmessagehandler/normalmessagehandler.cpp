@@ -1053,7 +1053,7 @@ void NormalMessageHandler::onStatusIconsChanged()
 void NormalMessageHandler::onAvatarChanged(const Jid &AContactJid)
 {
 	foreach(IMessageNormalWindow *window, FWindows)
-		if (window->contactJid() && AContactJid)
+		if (window->contactJid().pBare() == AContactJid.pBare())
 			updateWindow(window);
 }
 

@@ -1038,7 +1038,7 @@ void ReceiversWidget::onRosterItemReceived(IRoster *ARoster, const IRosterItem &
 
 				int groupOrder;
 				QSet<QString> newGroups;
-				if (AItem.itemJid.node().isEmpty())
+				if (!AItem.itemJid.hasNode())
 				{
 					groupOrder = RIKO_GROUP_AGENTS;
 					newGroups << (FRostersModel!=NULL ? FRostersModel->singleGroupName(RIK_GROUP_AGENTS) : tr("Agents"));

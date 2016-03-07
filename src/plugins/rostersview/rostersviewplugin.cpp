@@ -265,7 +265,7 @@ QVariant RostersViewPlugin::rosterData(int AOrder, const IRosterIndex *AIndex, i
 			{
 				if (name.isEmpty())
 					name = indexJid.uBare();
-				if (FShowResource && !indexJid.node().isEmpty() && !indexJid.resource().isEmpty())
+				if (FShowResource && indexJid.hasNode() && indexJid.hasResource())
 					name += "/" + indexJid.resource();
 			}
 			else if (name.isEmpty())
@@ -617,7 +617,7 @@ void RostersViewPlugin::onRostersViewClipboardMenu(const QList<IRosterIndex *> &
 				IPresenceItem pitem =presence!=NULL ? presence->findItem(resource) : IPresenceItem();
 				if (!pitem.isNull())
 				{
-					if (!pitem.itemJid.resource().isEmpty())
+					if (pitem.itemJid.hasResource())
 					{
 						Action *fullJidAction = new Action(AMenu);
 						fullJidAction->setText(pitem.itemJid.uFull());
@@ -732,7 +732,7 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 				IPresenceItem pItem = presence!=NULL ? presence->findItem(resources.at(resIndex)) : IPresenceItem();
 				if (!pItem.isNull())
 				{
-					QString resource = !pItem.itemJid.resource().isEmpty() ? pItem.itemJid.resource() : pItem.itemJid.uBare();
+					QString resource = pItem.itemJid.hasResource() ? pItem.itemJid.resource() : pItem.itemJid.uBare();
 					QString statusIcon = FStatusIcons!=NULL ? FStatusIcons->iconFileName(streamJid,pItem.itemJid) : QString::null;
 					AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_NAME+orderShift,QString("<img src='%1'> %2 (%3)").arg(statusIcon).arg(Qt::escape(resource)).arg(pItem.priority));
 					
@@ -754,7 +754,7 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 			int priority = AIndex->data(RDR_PRIORITY).toInt();
 			QString subscription = AIndex->data(RDR_SUBSCRIBTION).toString();
 			bool subscription_ask = AIndex->data(RDR_SUBSCRIPTION_ASK).toString() == SUBSCRIPTION_SUBSCRIBE;
-			QString resource = !contactJid.resource().isEmpty() ? contactJid.resource() : contactJid.uBare();
+			QString resource = contactJid.hasResource() ? contactJid.resource() : contactJid.uBare();
 
 			QString statusIconSet = FStatusIcons!=NULL ? FStatusIcons->iconsetByJid(contactJid) : QString::null;
 			QString statusIconKey = FStatusIcons!=NULL ? FStatusIcons->iconKeyByStatus(show,subscription,subscription_ask) : QString::null;

@@ -309,10 +309,9 @@ void MultiUserChatWindow::setTabPageNotifier(IMessageTabPageNotifier *ANotifier)
 bool MultiUserChatWindow::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
 	Q_UNUSED(AAccept); Q_UNUSED(AStreamJid);
-	Jid fromJid = AStanza.from();
-	if (AHandlerId==FSHIAnyStanza && contactJid().pBare()==fromJid.pBare())
+	if (AHandlerId==FSHIAnyStanza && contactJid().pBare()==AStanza.fromJid().pBare())
 	{
-		if (AStanza.tagName() == "message")
+		if (AStanza.kind() == STANZA_KIND_MESSAGE)
 			FLastStanzaTime = QDateTime::currentDateTime().addSecs(1);
 		else
 			FLastStanzaTime = QDateTime::currentDateTime();
@@ -451,9 +450,9 @@ bool MultiUserChatWindow::messageCheck(int AOrder, const Message &AMessage, int 
 {
 	Q_UNUSED(AOrder);
 	if (ADirection == IMessageProcessor::DirectionIn)
-		return streamJid()==AMessage.to() && contactJid().pBare()==Jid(AMessage.from()).pBare();
+		return streamJid()==AMessage.to() && contactJid().pBare()==AMessage.fromJid().pBare();
 	else
-		return streamJid()==AMessage.from() && contactJid().pBare()==Jid(AMessage.to()).pBare();
+		return streamJid()==AMessage.from() && contactJid().pBare()==AMessage.toJid().pBare();
 }
 
 bool MultiUserChatWindow::messageDisplay(const Message &AMessage, int ADirection)
@@ -464,13 +463,13 @@ bool MultiUserChatWindow::messageDisplay(const Message &AMessage, int ADirection
 		displayed = true;
 		Jid userJid = AMessage.from();
 		XmppStanzaError err(AMessage.stanza());
-		QString text = !userJid.resource().isEmpty() ? QString("%1: %2").arg(userJid.resource()).arg(err.errorMessage()) : err.errorMessage();
+		QString text = userJid.hasResource() ? QString("%1: %2").arg(userJid.resource()).arg(err.errorMessage()) : err.errorMessage();
 		showMultiChatStatusMessage(text,IMessageStyleContentOptions::TypeNotification,IMessageStyleContentOptions::StatusError);
 	}
 	else if (ADirection == IMessageProcessor::DirectionIn)
 	{
 		Jid userJid = AMessage.from();
-		bool isServiceMessage = userJid.resource().isEmpty();
+		bool isServiceMessage = !userJid.hasResource();
 		bool isEmptyBody =  AMessage.body().isEmpty();
 		bool isEmptyMessage = FMessageProcessor!=NULL ? !FMessageProcessor->messageHasText(AMessage) : isEmptyBody;
 
@@ -570,7 +569,7 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 	if (ADirection==IMessageProcessor::DirectionIn && AMessage.type()!=Message::Error)
 	{
 		Jid userJid = AMessage.from();
-		bool isServiceMessage = userJid.resource().isEmpty();
+		bool isServiceMessage = !userJid.hasResource();
 		bool isSelfMessage = FMultiChat->nickname()==userJid.resource();
 		bool isEmptyMessage = FMessageProcessor!=NULL ? !FMessageProcessor->messageHasText(AMessage) : AMessage.body().isEmpty();
 		int messageId = AMessage.data(MDR_MESSAGE_ID).toInt();
@@ -1482,7 +1481,7 @@ QStringList MultiUserChatWindow::findContactsName(const QList<Jid> &AContacts) c
 		{
 			if (FMultiChatManager->findMultiChatWindow(stream, contact.bare()))
 			{
-				if (!contact.resource().isEmpty())
+				if (contact.hasResource())
 					name = contact.resource();
 				else
 					name = contact.uNode();
@@ -3103,7 +3102,7 @@ void MultiUserChatWindow::onArchiveMessagesLoaded(const QString &AId, const IArc
 				if (window)
 					showPrivateChatMessage(window,message);
 				else
-					showMultiChatUserMessage(message,Jid(message.from()).resource());
+					showMultiChatUserMessage(message,message.fromJid().resource());
 				messageIt--;
 			}
 			else if (noteIt != ABody.notes.constEnd())

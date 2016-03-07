@@ -5,6 +5,7 @@
 #include <QCryptographicHash>
 #include <definitions/namespaces.h>
 #include <definitions/dataformtypes.h>
+#include <definitions/stanzahandlerorders.h>
 #include <definitions/sessionnegotiatororders.h>
 #include <definitions/discofeaturehandlerorders.h>
 #include <definitions/notificationtypes.h>
@@ -15,6 +16,7 @@
 #include <definitions/soundfiles.h>
 #include <utils/widgetmanager.h>
 #include <utils/xmpperror.h>
+#include <utils/message.h>
 #include <utils/logger.h>
 
 #define SHC_STANZA_SESSION            "/message/feature[@xmlns='"NS_FEATURENEG"']"
@@ -169,8 +171,7 @@ bool SessionNegotiation::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, 
 			FSuspended.remove(sessionId);
 			closeAcceptDialog(session);
 
-			QString stanzaType = AStanza.type();
-			if (stanzaType.isEmpty() || stanzaType=="normal")
+			if (AStanza.type().isEmpty() || AStanza.type()==MESSAGE_TYPE_NORMAL)
 			{
 				IDataForm form = FDataForms->dataForm(formElem);
 				bool isAccept = FDataForms->fieldIndex(SESSION_FIELD_ACCEPT, form.fields) >= 0;
@@ -206,7 +207,7 @@ bool SessionNegotiation::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, 
 					removeSession(session);
 				}
 			}
-			else if (stanzaType=="error" && session.sessionId==sessionId)
+			else if (AStanza.isError() && session.sessionId==sessionId)
 			{
 				session.status = IStanzaSession::Error;
 				session.error = XmppStanzaError(AStanza);
@@ -587,8 +588,8 @@ bool SessionNegotiation::sendSessionData(const IStanzaSession &ASession, const I
 {
 	if (FStanzaProcessor && FDataForms && !AForm.fields.isEmpty())
 	{
-		Stanza data("message");
-		data.setType("normal").setTo(ASession.contactJid.full());
+		Stanza data(STANZA_KIND_MESSAGE);
+		data.setType(MESSAGE_TYPE_NORMAL).setTo(ASession.contactJid.full());
 		data.addElement("thread").appendChild(data.createTextNode(ASession.sessionId));
 		QDomElement featureElem = data.addElement("feature",NS_FEATURENEG);
 		IDataForm form = AForm;
@@ -615,7 +616,7 @@ bool SessionNegotiation::sendSessionError(const IStanzaSession &ASession, const 
 {
 	if (FStanzaProcessor && FDataForms && !ASession.error.isNull())
 	{
-		Stanza error("message");
+		Stanza error(STANZA_KIND_MESSAGE);
 		error.setFrom(ASession.contactJid.full());
 		error = FStanzaProcessor->makeReplyError(error,ASession.error);
 		error.addElement("thread").appendChild(error.createTextNode(ASession.sessionId));

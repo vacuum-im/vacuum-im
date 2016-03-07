@@ -303,7 +303,7 @@ void VCardManager::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 	{
 		Jid fromJid = FVCardRequestId.take(AStanza.id());
 		QDomElement elem = AStanza.firstElement(VCARD_TAGNAME,NS_VCARD_TEMP);
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			LOG_STRM_INFO(AStreamJid,QString("User vCard loaded, jid=%1, id=%2").arg(fromJid.full(),AStanza.id()));
 			saveVCardFile(fromJid,elem);
@@ -320,7 +320,7 @@ void VCardManager::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 	else if (FVCardPublishId.contains(AStanza.id()))
 	{
 		Stanza stanza = FVCardPublishId.take(AStanza.id());
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			LOG_STRM_INFO(AStreamJid,QString("Self vCard published, id=%1").arg(AStanza.id()));
 			saveVCardFile(AStreamJid.bare(),stanza.element().firstChildElement(VCARD_TAGNAME));
@@ -378,8 +378,8 @@ bool VCardManager::requestVCard(const Jid &AStreamJid, const Jid &AContactJid)
 	{
 		if (FVCardRequestId.key(AContactJid).isEmpty())
 		{
-			Stanza stanza("iq");
-			stanza.setTo(AContactJid.full()).setType("get").setId(FStanzaProcessor->newId());
+			Stanza stanza(STANZA_KIND_IQ);
+			stanza.setType(STANZA_TYPE_GET).setTo(AContactJid.full()).setUniqueId();
 			stanza.addElement(VCARD_TAGNAME,NS_VCARD_TEMP);
 			if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,VCARD_TIMEOUT))
 			{
@@ -408,8 +408,8 @@ bool VCardManager::publishVCard(const Jid &AStreamJid, IVCard *AVCard)
 	{
 		restrictVCardImagesSize(AVCard);
 
-		Stanza stanza("iq");
-		stanza.setTo(AStreamJid.bare()).setType("set").setId(FStanzaProcessor->newId());
+		Stanza stanza(STANZA_KIND_IQ);
+		stanza.setType(STANZA_TYPE_SET).setTo(AStreamJid.bare()).setUniqueId();
 		QDomElement elem = stanza.element().appendChild(AVCard->vcardElem().cloneNode(true)).toElement();
 		removeEmptyChildElements(elem);
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,VCARD_TIMEOUT))

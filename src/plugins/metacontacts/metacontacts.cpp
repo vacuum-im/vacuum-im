@@ -1263,7 +1263,7 @@ bool MetaContacts::updateMetaContact(const Jid &AStreamJid, const IMetaContact &
 		foreach(const Jid &itemJid, after.items)
 		{
 			IRosterItem rItem = roster->findItem(itemJid);
-			if (!rItem.isNull() && !itemJid.node().isEmpty())
+			if (!rItem.isNull() && itemJid.hasNode())
 			{
 				if (!before.items.contains(itemJid))
 				{
@@ -1362,7 +1362,7 @@ bool MetaContacts::isReadyStreams(const QStringList &AStreams) const
 
 bool MetaContacts::isValidItem(const Jid &AStreamJid, const Jid &AItemJid) const
 {
-	if (AItemJid.isValid() && !AItemJid.node().isEmpty())
+	if (AItemJid.isValid() && AItemJid.hasNode())
 	{
 		IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(AStreamJid) : NULL;
 		if (roster != NULL)

@@ -59,7 +59,7 @@ CreateMultiChatWizard::CreateMultiChatWizard(Mode AMode, const Jid &AStreamJid, 
 	{
 		if (AStreamJid.isValid())
 			setField(WF_MANUAL_ACCOUNT,AStreamJid.full());
-		if (!ARoomJid.node().isEmpty())
+		if (ARoomJid.hasNode())
 			setField(WF_ROOM_JID,ARoomJid.bare());
 		if (!ANick.isEmpty())
 			setField(WF_ROOM_NICK,ANick);
@@ -73,9 +73,9 @@ CreateMultiChatWizard::CreateMultiChatWizard(Mode AMode, const Jid &AStreamJid, 
 			setField(WF_ACCOUNT,AStreamJid.full());
 		if (AStreamJid.isValid())
 			setField(WF_SERVER,AStreamJid.domain());
-		if (!ARoomJid.domain().isEmpty())
+		if (ARoomJid.hasDomain())
 			setField(WF_SERVICE,ARoomJid.domain());
-		if (!ARoomJid.node().isEmpty())
+		if (ARoomJid.hasNode())
 			setField(WF_ROOM_JID,ARoomJid.bare());
 		if (!ANick.isEmpty())
 			setField(WF_ROOM_NICK,ANick);
@@ -86,7 +86,7 @@ CreateMultiChatWizard::CreateMultiChatWizard(Mode AMode, const Jid &AStreamJid, 
 			setStartId(PageService);
 		else if (!ARoomJid.isValid())
 			setStartId(PageService);
-		else if (ARoomJid.node().isEmpty())
+		else if (!ARoomJid.hasNode())
 			setStartId(PageRoom);
 		else if (AMode == ModeJoin)
 			setStartId(PageJoin);
@@ -1631,7 +1631,7 @@ void ManualPage::setStreamJid(const QString &AStreamJid)
 QString ManualPage::roomJid() const
 {
 	Jid room = Jid::fromUserInput(lneRoomJid->text());
-	return room.isValid() && !room.node().isEmpty() ? room.bare() : QString::null;
+	return room.isValid() && room.hasNode() ? room.bare() : QString::null;
 }
 
 void ManualPage::setRoomJid(const QString &ARoomJid)
@@ -1699,7 +1699,7 @@ void ManualPage::onRoomNickTextChanged()
 void ManualPage::onRoomInfoTimerTimeout()
 {
 	Jid room = roomJid();
-	if (room.isValid() && !room.node().isEmpty())
+	if (room.isValid() && room.hasNode())
 	{
 		IServiceDiscovery *discovery = PluginHelper::pluginInstance<IServiceDiscovery>();
 		if (discovery && discovery->requestDiscoInfo(streamJid(),room))

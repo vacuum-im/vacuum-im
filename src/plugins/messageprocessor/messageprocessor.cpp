@@ -6,6 +6,7 @@
 #include <definitions/messagedataroles.h>
 #include <definitions/messagewriterorders.h>
 #include <definitions/notificationdataroles.h>
+#include <definitions/stanzahandlerorders.h>
 #include <utils/logger.h>
 
 #define SHC_MESSAGE         "/message"

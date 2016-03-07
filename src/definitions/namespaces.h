@@ -1,6 +1,8 @@
 #ifndef DEF_NAMESPACES_H
 #define DEF_NAMESPACES_H
 
+#define NS_XML                                  "http://www.w3.org/XML/1998/namespace"
+
 #define NS_XMPP_DELAY                           "urn:xmpp:delay"
 #define NS_XMPP_TIME                            "urn:xmpp:time"
 #define NS_XMPP_PING                            "urn:xmpp:ping"

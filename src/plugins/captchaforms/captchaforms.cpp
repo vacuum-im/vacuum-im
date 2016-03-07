@@ -186,7 +186,7 @@ void CaptchaForms::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 	if (FChallengeRequest.contains(AStanza.id()))
 	{
 		QString cid = FChallengeRequest.take(AStanza.id());
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			LOG_STRM_INFO(AStreamJid,QString("Challenge submit accepted by=%1, id=%2").arg(AStanza.from(),cid));
 			emit challengeAccepted(cid);
@@ -227,10 +227,8 @@ bool CaptchaForms::submitChallenge(const QString &AChallengeId, const IDataForm 
 			FNotifications->removeNotification(FChallengeNotify.key(AChallengeId));
 		item.dialog->instance()->deleteLater();
 
-		Stanza accept("iq");
-		accept.setType("set");
-		accept.setId(FStanzaProcessor->newId());
-		accept.setTo(item.challenger.full());
+		Stanza accept(STANZA_KIND_IQ);
+		accept.setType(STANZA_TYPE_SET).setTo(item.challenger.full()).setUniqueId();
 
 		QDomElement captchaElem = accept.addElement("captcha",NS_CAPTCHA_FORMS);
 		FDataForms->xmlForm(ASubmit, captchaElem);
@@ -263,8 +261,8 @@ bool CaptchaForms::cancelChallenge(const QString &AChallengeId)
 			FNotifications->removeNotification(FChallengeNotify.key(AChallengeId));
 		item.dialog->instance()->deleteLater();
 
-		Stanza reject("message");
-		reject.setId(AChallengeId).setFrom(item.challenger.full());
+		Stanza reject(STANZA_KIND_MESSAGE);
+		reject.setFrom(item.challenger.full()).setId(AChallengeId);
 		reject = FStanzaProcessor->makeReplyError(reject,XmppStanzaError::EC_NOT_ACCEPTABLE);
 
 		if (FStanzaProcessor->sendStanzaOut(item.streamJid, reject))
@@ -287,7 +285,7 @@ bool CaptchaForms::cancelChallenge(const QString &AChallengeId)
 
 void CaptchaForms::appendTrigger(const Jid &AStreamJid, const Stanza &AStanza)
 {
-	if (AStanza.type()!="result" && AStanza.type()!="error")
+	if (!AStanza.isResult() && !AStanza.isError())
 	{
 		QDateTime curDateTime = QDateTime::currentDateTime();
 		

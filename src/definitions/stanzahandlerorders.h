@@ -27,4 +27,7 @@
 //Iq Message Presence Out
 #define SHO_IMPO_CAPTCHAFORMS         100
 
+//Default
+#define SHO_DEFAULT                   1000
+
 #endif // DEF_STANZAHANDLERORDERS_H

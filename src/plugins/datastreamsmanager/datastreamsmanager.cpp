@@ -8,6 +8,7 @@
 #include <definitions/menuicons.h>
 #include <definitions/xmpperrors.h>
 #include <definitions/internalerrors.h>
+#include <definitions/stanzahandlerorders.h>
 #include <utils/xmpperror.h>
 #include <utils/options.h>
 #include <utils/stanza.h>
@@ -241,7 +242,7 @@ void DataStreamsManger::stanzaRequestResult(const Jid &AStreamJid, const Stanza 
 		IDataStreamProfile *sprofile = FProfiles.value(stream.profileNS);
 		if (sprofile != NULL)
 		{
-			if (AStanza.type() == "result")
+			if (AStanza.isResult())
 			{
 				QDomElement fnegElem = AStanza.firstElement("si",NS_STREAM_INITIATION).firstChildElement("feature");
 				while (!fnegElem.isNull() && fnegElem.namespaceURI()!=NS_FEATURENEG)
@@ -398,8 +399,8 @@ bool DataStreamsManger::initStream(const QString &AStreamId, const Jid &AStreamJ
 		IDataStreamProfile *sprofile = FProfiles.value(AProfileNS);
 		if (sprofile)
 		{
-			Stanza request("iq");
-			request.setType("set").setTo(AContactJid.full()).setId(FStanzaProcessor->newId());
+			Stanza request(STANZA_KIND_IQ);
+			request.setType(STANZA_TYPE_SET).setTo(AContactJid.full()).setUniqueId();
 
 			QDomElement siElem = request.addElement("si",NS_STREAM_INITIATION);
 			siElem.setAttribute("id",AStreamId);
@@ -478,8 +479,8 @@ bool DataStreamsManger::acceptStream(const QString &AStreamId, const QString &AM
 		int methodField = FDataForms->fieldIndex(DFV_STREAM_METHOD,stream.features.fields);
 		if (sprofile!=NULL && methodField>=0 && FDataForms->isOptionValid(stream.features.fields.at(methodField).options,AMethodNS))
 		{
-			Stanza reply("iq");
-			reply.setType("result").setTo(stream.contactJid.full()).setId(stream.requestId);
+			Stanza reply(STANZA_KIND_IQ);
+			reply.setType(STANZA_TYPE_RESULT).setTo(stream.contactJid.full()).setId(stream.requestId);
 
 			QDomElement siElem = reply.addElement("si",NS_STREAM_INITIATION);
 			if (sprofile->dataStreamMakeResponse(AStreamId,reply))
@@ -527,8 +528,8 @@ void DataStreamsManger::rejectStream(const QString &AStreamId, const XmppStanzaE
 	{
 		IDataStream stream = FStreams.take(AStreamId);
 		
-		Stanza reply("iq");
-		reply.setId(stream.requestId).setFrom(stream.contactJid.full());
+		Stanza reply(STANZA_KIND_IQ);
+		reply.setFrom(stream.contactJid.full()).setId(stream.requestId);
 		reply = FStanzaProcessor->makeReplyError(reply,AError);
 
 		if (FStanzaProcessor->sendStanzaOut(stream.streamJid,reply))

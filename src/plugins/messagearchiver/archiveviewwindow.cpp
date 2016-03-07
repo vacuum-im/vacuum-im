@@ -288,7 +288,7 @@ void ArchiveViewWindow::reset()
 
 Jid ArchiveViewWindow::gatewayJid(const Jid &AContactJid) const
 {
-	if (FFileMessageArchive!=NULL && !AContactJid.node().isEmpty())
+	if (FFileMessageArchive!=NULL && AContactJid.hasNode())
 	{
 		QString gateType = FFileMessageArchive->contactGateType(AContactJid);
 		if (!gateType.isEmpty())
@@ -309,14 +309,14 @@ bool ArchiveViewWindow::isConferenceDomain(const Jid &AWith) const
 
 bool ArchiveViewWindow::isConferencePrivateChat(const Jid &AWith) const
 {
-	return !AWith.resource().isEmpty() && isConferenceDomain(AWith);
+	return AWith.hasResource() && isConferenceDomain(AWith);
 }
 
 bool ArchiveViewWindow::isJidMatched(const Jid &ARequestWith, const Jid &AHeaderWith) const
 {
 	if (ARequestWith.pBare() != AHeaderWith.pBare())
 		return false;
-	else if (!ARequestWith.resource().isEmpty() && ARequestWith.pResource()!=AHeaderWith.pResource())
+	else if (ARequestWith.hasResource() && ARequestWith.pResource()!=AHeaderWith.pResource())
 		return false;
 	return true;
 }
@@ -326,7 +326,7 @@ QString ArchiveViewWindow::contactName(const Jid &AStreamJid, const Jid &AContac
 	IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(AStreamJid) : NULL;
 	IRosterItem ritem = roster!=NULL ? roster->findItem(AContactJid) : IRosterItem();
 	QString name = !ritem.name.isEmpty() ? ritem.name : AContactJid.uBare();
-	if (AShowResource && !AContactJid.resource().isEmpty())
+	if (AShowResource && AContactJid.hasResource())
 		name = name + "/" +AContactJid.resource();
 	return name;
 }
@@ -853,7 +853,7 @@ void ArchiveViewWindow::showCollection(const ArchiveCollection &ACollection)
 
 			if (FViewOptions.isGroupChat)
 			{
-				if (!senderJid.resource().isEmpty())
+				if (senderJid.hasResource())
 				{
 					options.type |= IMessageStyleContentOptions::TypeGroupchat;
 					options.direction = IMessageStyleContentOptions::DirectionIn;
@@ -1248,7 +1248,7 @@ void ArchiveViewWindow::onRemoveCollectionsByAction()
 				request.with = headerWith.at(i).toString();
 				request.start = headerStart.at(i).toDateTime();
 				request.end = headerEnd.at(i).toDateTime();
-				request.exactmatch = !request.with.isEmpty() && request.with.node().isEmpty();
+				request.exactmatch = !request.with.isEmpty() && !request.with.hasNode();
 
 				QString reqId = FArchiver->removeCollections(headerStream.at(i).toString(),request);
 				if (!reqId.isEmpty())
@@ -1456,7 +1456,7 @@ void ArchiveViewWindow::onHeadersRequestTimerTimeout()
 		for(QMultiMap<Jid,Jid>::const_iterator it=FAddresses.constBegin(); it!=FAddresses.constEnd(); ++it)
 		{
 			request.with = it.value();
-			request.exactmatch = request.with.isValid() && request.with.node().isEmpty();
+			request.exactmatch = request.with.isValid() && !request.with.hasNode();
 
 			QString reqId = FArchiver->loadHeaders(it.key(),request);
 			if (!reqId.isEmpty())

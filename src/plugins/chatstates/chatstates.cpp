@@ -365,7 +365,7 @@ void ChatStates::sessionLocalize(const IStanzaSession &ASession, IDataForm &AFor
 
 bool ChatStates::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
-	if (FSHIChatMessagesIn.value(AStreamJid)==AHandlerId && isReady(AStreamJid) && AStanza.type()!="error")
+	if (FSHIChatMessagesIn.value(AStreamJid)==AHandlerId && isReady(AStreamJid) && !AStanza.isError())
 	{
 		Message message(AStanza);
 		bool hasBody = !message.body().isEmpty();
@@ -394,7 +394,7 @@ bool ChatStates::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &
 		}
 		return !hasBody;
 	}
-	else if (FSHIChatMessagesOut.value(AStreamJid)==AHandlerId && isReady(AStreamJid) && AStanza.type()!="error")
+	else if (FSHIChatMessagesOut.value(AStreamJid)==AHandlerId && isReady(AStreamJid) && !AStanza.isError())
 	{
 		Jid contactJid = AStanza.to();
 		IMessageChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,contactJid,true) : NULL;
@@ -408,7 +408,7 @@ bool ChatStates::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &
 			setChatSelfState(AStreamJid,contactJid,IChatStates::StateActive,false);
 		}
 	}
-	else if (FSHIRoomMessagesIn.value(AStreamJid)==AHandlerId && isReady(AStreamJid) && AStanza.type()!="error")
+	else if (FSHIRoomMessagesIn.value(AStreamJid)==AHandlerId && isReady(AStreamJid) && !AStanza.isError())
 	{
 		Message message(AStanza);
 		bool hasBody = !message.body().isEmpty();
@@ -425,7 +425,7 @@ bool ChatStates::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &
 		}
 		return !hasBody;
 	}
-	else if (FSHIRoomMessagesOut.value(AStreamJid)==AHandlerId && isReady(AStreamJid) && AStanza.type()!="error")
+	else if (FSHIRoomMessagesOut.value(AStreamJid)==AHandlerId && isReady(AStreamJid) && !AStanza.isError())
 	{
 		Jid roomJid = AStanza.to();
 		IMultiUserChatWindow *window = FMultiChatManager!=NULL ? FMultiChatManager->findMultiChatWindow(AStreamJid,roomJid) : NULL;
@@ -708,7 +708,7 @@ bool ChatStates::isRoomCanSend(const Jid &AStreamJid, const Jid &ARoomJid) const
 
 void ChatStates::setRoomUserState(const Jid &AStreamJid, const Jid &AUserJid, int AState)
 {
-	if (isReady(AStreamJid) && !AUserJid.resource().isEmpty())
+	if (isReady(AStreamJid) && AUserJid.hasResource())
 	{
 		RoomParams &roomParams = FRoomParams[AStreamJid][AUserJid.bare()];
 		UserParams &userParams = roomParams.user[AUserJid];
@@ -724,7 +724,7 @@ void ChatStates::setRoomUserState(const Jid &AStreamJid, const Jid &AUserJid, in
 
 void ChatStates::setRoomSelfState(const Jid &AStreamJid, const Jid &ARoomJid, int AState, bool ASend)
 {
-	if (isReady(AStreamJid) && ARoomJid.resource().isEmpty())
+	if (isReady(AStreamJid) && !ARoomJid.hasResource())
 	{
 		RoomParams &roomParams = FRoomParams[AStreamJid][ARoomJid];
 

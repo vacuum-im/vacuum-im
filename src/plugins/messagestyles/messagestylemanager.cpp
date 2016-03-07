@@ -205,7 +205,7 @@ QString MessageStyleManager::contactName(const Jid &AStreamJid, const Jid &ACont
 	}
 	else if (AStreamJid.pBare() == AContactJid.pBare())
 	{
-		name = !AContactJid.resource().isEmpty() ? AContactJid.resource() : AContactJid.uNode();
+		name = AContactJid.hasResource() ? AContactJid.resource() : AContactJid.uNode();
 	}
 	else
 	{
@@ -216,9 +216,9 @@ QString MessageStyleManager::contactName(const Jid &AStreamJid, const Jid &ACont
 	if (name.isEmpty())
 	{
 		if (AContactJid.isValid())
-			name = !AContactJid.node().isEmpty() ? AContactJid.uNode() : AContactJid.domain();
+			name = AContactJid.hasNode() ? AContactJid.uNode() : AContactJid.domain();
 		else
-			name = !AStreamJid.node().isEmpty() ? AStreamJid.uNode() : AStreamJid.domain();
+			name = AStreamJid.hasNode() ? AStreamJid.uNode() : AStreamJid.domain();
 	}
 
 	return name;
