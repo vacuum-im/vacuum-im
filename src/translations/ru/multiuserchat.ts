@@ -1465,6 +1465,18 @@
         <source>Exit from Conference</source>
         <translation>Выйти из конференции</translation>
     </message>
+    <message numerus="yes">
+        <source>Failed to invite %1 and %n other contact(s) to this conference: %2</source>
+        <translation>
+            <numerusform>Не удалось пригласить %1 и еще %n другой контакт в эту конференцию: %2</numerusform>
+            <numerusform>Не удалось пригласить %1 и еще %n других контакта в эту конференцию: %2</numerusform>
+            <numerusform>Не удалось пригласить %1 и еще %n других контактов в эту конференцию: %2</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Failed to invite %1 to this conference: %2</source>
+        <translation>Не удалось пригласить %1 в эту конференцию: %2</translation>
+    </message>
 </context>
 <context>
     <name>RoomPage</name>

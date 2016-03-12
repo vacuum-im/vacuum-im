@@ -100,8 +100,9 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatManager *AMultiChatManage
 	connect(FMultiChat->instance(),SIGNAL(requestFailed(const QString &, const XmppError &)),SLOT(onMultiChatRequestFailed(const QString &, const XmppError &)));
 	connect(FMultiChat->instance(),SIGNAL(presenceChanged(const IPresenceItem &)),SLOT(onMultiChatPresenceChanged(const IPresenceItem &)));
 	connect(FMultiChat->instance(),SIGNAL(nicknameChanged(const QString &, const XmppError &)),SLOT(onMultiChatNicknameChanged(const QString &, const XmppError &)));
-	connect(FMultiChat->instance(),SIGNAL(invitationSent(const QList<Jid> &, const QString &)),SLOT(onMultiChatInvitationSent(const QList<Jid> &, const QString &)));
+	connect(FMultiChat->instance(),SIGNAL(invitationSent(const QList<Jid> &, const QString &, const QString &)),SLOT(onMultiChatInvitationSent(const QList<Jid> &, const QString &, const QString &)));
 	connect(FMultiChat->instance(),SIGNAL(invitationDeclined(const Jid &, const QString &)),SLOT(onMultiChatInvitationDeclined(const Jid &, const QString &)));
+	connect(FMultiChat->instance(),SIGNAL(invitationFailed(const QList<Jid> &, const XmppError &)),SLOT(onMultiChatInvitationFailed(const QList<Jid> &, const XmppError &)));
 	connect(FMultiChat->instance(),SIGNAL(userChanged(IMultiUser *, int, const QVariant &)),SLOT(onMultiChatUserChanged(IMultiUser *, int, const QVariant &)));
 	connect(FMultiChat->instance(),SIGNAL(voiceRequestReceived(const Message &)),SLOT(onMultiChatVoiceRequestReceived(const Message &)));
 	connect(FMultiChat->instance(),SIGNAL(subjectChanged(const QString &, const QString &)),SLOT(onMultiChatSubjectChanged(const QString &, const QString &)));
@@ -2327,8 +2328,9 @@ void MultiUserChatWindow::onMultiChatNicknameChanged(const QString &ANick, const
 	}
 }
 
-void MultiUserChatWindow::onMultiChatInvitationSent(const QList<Jid> &AContacts, const QString &AReason)
+void MultiUserChatWindow::onMultiChatInvitationSent(const QList<Jid> &AContacts, const QString &AReason, const QString &AThread)
 {
+	Q_UNUSED(AThread);
 	QStringList sent = findContactsName(AContacts);
 	if (sent.count() > 3)
 	{
@@ -2346,6 +2348,21 @@ void MultiUserChatWindow::onMultiChatInvitationDeclined(const Jid &AContactJid, 
 {
 	QString name = findContactsName(QList<Jid>() << AContactJid).value(0);
 	showMultiChatStatusMessage(tr("User %1 has declined your invite to this conference. %2").arg(name).arg(AReason),IMessageStyleContentOptions::TypeNotification);
+}
+
+void MultiUserChatWindow::onMultiChatInvitationFailed(const QList<Jid> &AContacts, const XmppError &AError)
+{
+	QStringList sent = findContactsName(AContacts);
+	if (sent.count() > 3)
+	{
+		QString names = QStringList(sent.mid(0,2)).join(", ");
+		showMultiChatStatusMessage(tr("Failed to invite %1 and %n other contact(s) to this conference: %2","",sent.count()-2).arg(names,AError.errorMessage()),IMessageStyleContentOptions::TypeNotification);
+	}
+	else if (!sent.isEmpty())
+	{
+		QString names = sent.join(", ");
+		showMultiChatStatusMessage(tr("Failed to invite %1 to this conference: %2").arg(names,AError.errorMessage()),IMessageStyleContentOptions::TypeNotification);
+	}
 }
 
 void MultiUserChatWindow::onMultiChatUserChanged(IMultiUser *AUser, int AData, const QVariant &ABefore)

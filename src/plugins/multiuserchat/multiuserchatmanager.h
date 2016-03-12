@@ -26,10 +26,14 @@
 #include "multiuserchatwindow.h"
 #include "createmultichatwizard.h"
 
-struct InviteFields {
+struct ChatInvite {
+	QString id;
 	Jid streamJid;
 	Jid roomJid;
 	Jid fromJid;
+	QString reason;
+	QString thread;
+	bool isContinue;
 	QString password;
 };
 
@@ -195,8 +199,8 @@ private:
 	QMap<QString, QString> FRegisterNickRequests;
 private:
 	QMap<Jid, int> FSHIInvite;
-	QMap<int, Stanza> FInviteNotify;
-	QMap<QMessageBox *, InviteFields> FInviteDialogs;
+	QMap<int, ChatInvite> FInviteNotify;
+	QMap<QMessageBox *, ChatInvite> FInviteDialogs;
 };
 
 #endif // MULTIUSERCHATMANAGER_H

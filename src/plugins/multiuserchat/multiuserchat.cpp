@@ -558,7 +558,7 @@ bool MultiUserChat::sendMessage(const Message &AMessage, const QString &AToNick)
 	return false;
 }
 
-bool MultiUserChat::sendInvitation(const QList<Jid> &AContacts, const QString &AReason)
+bool MultiUserChat::sendInvitation(const QList<Jid> &AContacts, const QString &AReason, const QString &AThread)
 {
 	if (FStanzaProcessor && isOpen() && !AContacts.isEmpty())
 	{
@@ -571,28 +571,87 @@ bool MultiUserChat::sendInvitation(const QList<Jid> &AContacts, const QString &A
 		{
 			if (!invited.contains(contact) && !isUserPresent(contact))
 			{
-				QDomElement invElem = xElem.appendChild(invite.createElement("invite")).toElement();
+				QDomElement inviteElem = xElem.appendChild(invite.createElement("invite")).toElement();
+
 				if (!AReason.isEmpty())
-					invElem.appendChild(invite.createElement("reason")).appendChild(invite.createTextNode(AReason));
-				invElem.setAttribute("to",contact.full());
+					inviteElem.appendChild(invite.createElement("reason")).appendChild(invite.createTextNode(AReason));
+
+				if (!AThread.isEmpty())
+					inviteElem.appendChild(invite.createElement("continue")).toElement().setAttribute("thread",AThread);
+				else if (!AThread.isNull())
+					inviteElem.appendChild(invite.createElement("continue"));
+
+				inviteElem.setAttribute("to",contact.full());
 				invited.append(contact);
 			}
 		}
 
 		if (FStanzaProcessor->sendStanzaOut(FStreamJid, invite))
 		{
-			LOG_STRM_INFO(FStreamJid,QString("Conference invite sent, room=%1, contacts=%2").arg(FRoomJid.bare()).arg(AContacts.count()));
-			emit invitationSent(invited,AReason);
+			LOG_STRM_INFO(FStreamJid,QString("Conference invite sent to room=%1, contacts=%2").arg(FRoomJid.bare()).arg(invited.count()));
+			emit invitationSent(invited,AReason,AThread);
 			return true;
 		}
 		else
 		{
-			LOG_STRM_WARNING(FStreamJid,QString("Failed to send conference invite, room=%1, contact=%2").arg(FRoomJid.bare()).arg(AContacts.count()));
+			LOG_STRM_WARNING(FStreamJid,QString("Failed to send conference invite to room=%1, contact=%2").arg(FRoomJid.bare()).arg(invited.count()));
 		}
 	}
-	else if (!isOpen())
+	else if (FStanzaProcessor && !isOpen())
 	{
-		LOG_STRM_WARNING(FStreamJid,QString("Failed to send conference invite, room=%1, contact=%2: Conference is closed").arg(FRoomJid.bare()).arg(AContacts.count()));
+		LOG_STRM_WARNING(FStreamJid,QString("Failed to send conference invite to room=%1, contact=%2: Conference is closed").arg(FRoomJid.bare()).arg(AContacts.count()));
+	}
+	return false;
+}
+
+bool MultiUserChat::sendDirectInvitation(const QList<Jid> &AContacts, const QString &AReason, const QString &AThread)
+{
+	if (FStanzaProcessor && isOpen() && !AContacts.isEmpty())
+	{
+		Stanza invite(STANZA_KIND_MESSAGE);
+
+		QDomElement xElem = invite.addElement("x",NS_JABBER_X_CONFERENCE);
+		xElem.setAttribute("jid",FRoomJid.bare());
+
+		if (!AReason.isEmpty())
+			xElem.setAttribute("reason",AReason);
+
+		if (!FPassword.isEmpty())
+			xElem.setAttribute("password",FPassword);
+
+		if (!AThread.isEmpty())
+		{
+			xElem.setAttribute("continue",true);
+			xElem.setAttribute("thread",AThread);
+		}
+		else if (!AThread.isNull())
+		{
+			xElem.setAttribute("continue",true);
+		}
+
+		QList<Jid> invited;
+		foreach(const Jid &contactJid, AContacts)
+		{
+			if (!invited.contains(contactJid))
+			{
+				invite.setTo(contactJid.full());
+				if (FStanzaProcessor->sendStanzaOut(FStreamJid, invite))
+					invited.append(contactJid);
+				else
+					LOG_STRM_WARNING(FStreamJid,QString("Failed to send direct conference invite to=%1, room=%2").arg(contactJid.full(),FRoomJid.bare()));
+			}
+		}
+
+		if (!invited.isEmpty())
+		{
+			LOG_STRM_INFO(FStreamJid,QString("Direct conference invite sent to room=%1, contacts=%2").arg(FRoomJid.bare()).arg(invited.count()));
+			emit invitationSent(invited,AReason,AThread);
+			return true;
+		}
+	}
+	else if (FStanzaProcessor && !isOpen())
+	{
+		LOG_STRM_WARNING(FStreamJid,QString("Failed to send direct conference invite to room=%1, contact=%2: Conference is closed").arg(FRoomJid.bare()).arg(AContacts.count()));
 	}
 	return false;
 }
@@ -985,6 +1044,25 @@ bool MultiUserChat::processMessage(const Stanza &AStanza)
 				LOG_STRM_INFO(FStreamJid,QString("Conference voice request received, room=%1").arg(FRoomJid.bare()));
 				emit voiceRequestReceived(message);
 			}
+		}
+	}
+	else if (message.type()==Message::Error && fromNick.isEmpty())
+	{
+		if (!AStanza.firstElement("x",NS_MUC_USER).firstChildElement("invite").isNull())
+		{
+			hooked = true;
+			XmppStanzaError err(message.stanza());
+			
+			QList<Jid> contacts;
+			QDomElement inviteElem = AStanza.firstElement("x",NS_MUC_USER).firstChildElement("invite");
+			while (!inviteElem.isNull())
+			{
+				contacts.append(inviteElem.attribute("to"));
+				inviteElem = inviteElem.nextSiblingElement("invite");
+			}
+
+			LOG_STRM_WARNING(FStreamJid,QString("Failed to send conference invite to room=%1, contacts=%2: %3").arg(FRoomJid.bare()).arg(contacts.count()).arg(err.condition()));
+			emit invitationFailed(contacts,err);
 		}
 	}
 

@@ -260,37 +260,60 @@ QMultiMap<int, IOptionsDialogWidget *> MultiUserChatManager::optionsDialogWidget
 
 bool MultiUserChatManager::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
-	if (FSHIInvite.value(AStreamJid) == AHandleId)
+	if (FSHIInvite.value(AStreamJid)==AHandleId && AStanza.type()!=STANZA_TYPE_ERROR)
 	{
 		AAccept = true;
 
-		QDomElement inviteElem = AStanza.firstElement("x",NS_MUC_USER).firstChildElement("invite");
+		QDomElement mucInviteElem = AStanza.firstElement("x",NS_MUC_USER).firstChildElement("invite");
 		QDomElement directInviteElem = AStanza.firstElement("x",NS_JABBER_X_CONFERENCE);
 
-		Jid roomJid = inviteElem.isNull() ? directInviteElem.attribute("jid") : AStanza.from();
-		Jid contactJid = inviteElem.isNull() ? AStanza.from() : inviteElem.attribute("from");
-		LOG_STRM_DEBUG(AStreamJid,QString("Received invite to room=%1, from=%2").arg(roomJid.full(),contactJid.full()));
-
-		if (roomJid.isValid() && contactJid.isValid() && !findMultiChatWindow(AStreamJid,roomJid))
+		ChatInvite invite;
+		invite.id = AStanza.id();
+		invite.streamJid = AStreamJid;
+		if (!mucInviteElem.isNull())
 		{
+			invite.roomJid = AStanza.from();
+			invite.fromJid = mucInviteElem.attribute("from");
+			invite.reason = mucInviteElem.firstChildElement("reason").text();
+			invite.thread = mucInviteElem.firstChildElement("continue").attribute("thread");
+			invite.isContinue = !mucInviteElem.firstChildElement("continue").isNull();
+			invite.password = mucInviteElem.parentNode().toElement().firstChildElement("password").text();
+			LOG_STRM_INFO(AStreamJid,QString("Received mediated invite to room=%1, from=%2").arg(invite.roomJid.full(),invite.fromJid.full()));
+		}
+		else if (!directInviteElem.isNull())
+		{
+			invite.roomJid = directInviteElem.attribute("jid");
+			invite.fromJid = AStanza.from();
+			invite.reason = directInviteElem.attribute("reason");
+			invite.thread = directInviteElem.attribute("thread");
+			invite.isContinue = directInviteElem.hasAttribute("continue") ? QVariant(directInviteElem.attribute("continue")).toBool() : false;
+			invite.password = directInviteElem.attribute("password");
+			LOG_STRM_INFO(AStreamJid,QString("Received direct invite to room=%1, from=%2").arg(invite.roomJid.full(),invite.fromJid.full()));
+		}
+
+		if (invite.roomJid.isValid() && invite.fromJid.isValid() && !findMultiChatWindow(AStreamJid,invite.roomJid))
+		{
+			if (FDiscovery && !FDiscovery->hasDiscoInfo(AStreamJid,invite.roomJid))
+				FDiscovery->requestDiscoInfo(AStreamJid,invite.roomJid);
+
 			INotification notify;
-			notify.kinds = FNotifications->enabledTypeNotificationKinds(NNT_MUC_MESSAGE_INVITE);
+			notify.kinds = FNotifications!=NULL ? FNotifications->enabledTypeNotificationKinds(NNT_MUC_MESSAGE_INVITE) : 0;
 			if (notify.kinds > 0)
 			{
 				notify.typeId = NNT_MUC_MESSAGE_INVITE;
 				notify.data.insert(NDR_ICON,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MUC_INVITE));
-				notify.data.insert(NDR_TOOLTIP,tr("You are invited to the conference %1").arg(roomJid.uBare()));
+				notify.data.insert(NDR_TOOLTIP,tr("You are invited to the conference %1").arg(invite.roomJid.uBare()));
 				notify.data.insert(NDR_STREAM_JID,AStreamJid.full());
-				notify.data.insert(NDR_CONTACT_JID,contactJid.full());
+				notify.data.insert(NDR_CONTACT_JID,invite.fromJid.full());
 				notify.data.insert(NDR_ROSTER_ORDER,RNO_MUC_INVITE);
 				notify.data.insert(NDR_ROSTER_FLAGS,IRostersNotify::Blink|IRostersNotify::AllwaysVisible|IRostersNotify::HookClicks);
 				notify.data.insert(NDR_ROSTER_CREATE_INDEX,true);
 				notify.data.insert(NDR_POPUP_CAPTION,tr("Invitation received"));
-				notify.data.insert(NDR_POPUP_TITLE,FNotifications->contactName(AStreamJid,contactJid));
-				notify.data.insert(NDR_POPUP_IMAGE,FNotifications->contactAvatar(contactJid));
+				notify.data.insert(NDR_POPUP_TITLE,FNotifications->contactName(AStreamJid,invite.fromJid));
+				notify.data.insert(NDR_POPUP_IMAGE,FNotifications->contactAvatar(invite.fromJid));
 				notify.data.insert(NDR_POPUP_TEXT,notify.data.value(NDR_TOOLTIP).toString());
 				notify.data.insert(NDR_SOUND_FILE,SDF_MUC_INVITE_MESSAGE);
-				FInviteNotify.insert(FNotifications->appendNotification(notify), AStanza);
+				FInviteNotify.insert(FNotifications->appendNotification(notify), invite);
 			}
 		}
 
@@ -1377,7 +1400,7 @@ void MultiUserChatManager::onXmppStreamClosed(IXmppStream *AXmppStream)
 		FStanzaProcessor->removeStanzaHandle(FSHIInvite.take(AXmppStream->streamJid()));
 
 	foreach(int notifyId, FInviteNotify.keys())
-		if (AXmppStream->streamJid() == FInviteNotify.value(notifyId).to())
+		if (AXmppStream->streamJid() == FInviteNotify.value(notifyId).streamJid)
 			FNotifications->removeNotification(notifyId);
 
 	foreach(QMessageBox *inviteDialog, FInviteDialogs.keys())
@@ -1647,24 +1670,24 @@ void MultiUserChatManager::onInviteDialogFinished(int AResult)
 	QMessageBox *inviteDialog = qobject_cast<QMessageBox *>(sender());
 	if (inviteDialog)
 	{
-		InviteFields fields = FInviteDialogs.take(inviteDialog);
+		ChatInvite invite = FInviteDialogs.take(inviteDialog);
 		if (AResult == QMessageBox::Yes)
 		{
-			LOG_STRM_INFO(fields.streamJid,QString("Accepted invite request from=%1 to room=%2").arg(fields.fromJid.full(),fields.roomJid.bare()));
-			showJoinMultiChatWizard(fields.streamJid,fields.roomJid,QString::null,fields.password);
+			LOG_STRM_INFO(invite.streamJid,QString("Accepted invite request from=%1 to room=%2").arg(invite.fromJid.full(),invite.roomJid.bare()));
+			showJoinMultiChatWizard(invite.streamJid,invite.roomJid,QString::null,invite.password);
 		}
 		else
 		{
 			Stanza stanza(STANZA_KIND_MESSAGE);
-			stanza.setTo(fields.roomJid.bare());
+			stanza.setTo(invite.roomJid.bare()).setId(invite.id);
 
 			QDomElement declElem = stanza.addElement("x",NS_MUC_USER).appendChild(stanza.createElement("decline")).toElement();
-			declElem.setAttribute("to",fields.fromJid.full());
+			declElem.setAttribute("to",invite.fromJid.full());
 
-			if (FStanzaProcessor && FStanzaProcessor->sendStanzaOut(fields.streamJid,stanza))
-				LOG_STRM_INFO(fields.streamJid,QString("Rejected invite request from=%1 to room=%2").arg(fields.fromJid.full(),fields.roomJid.bare()));
+			if (FStanzaProcessor && FStanzaProcessor->sendStanzaOut(invite.streamJid,stanza))
+				LOG_STRM_INFO(invite.streamJid,QString("Rejected invite request from=%1 to room=%2").arg(invite.fromJid.full(),invite.roomJid.bare()));
 			else
-				LOG_STRM_WARNING(fields.streamJid,QString("Failed to send invite reject message to=%1").arg(fields.fromJid.full()));
+				LOG_STRM_WARNING(invite.streamJid,QString("Failed to send invite reject message to=%1").arg(invite.fromJid.full()));
 		}
 	}
 }
@@ -1673,23 +1696,17 @@ void MultiUserChatManager::onNotificationActivated(int ANotifyId)
 {
 	if (FInviteNotify.contains(ANotifyId))
 	{
-		Stanza stanza = FInviteNotify.take(ANotifyId);
+		ChatInvite invite = FInviteNotify.take(ANotifyId);
 
-		QDomElement xElem = stanza.firstElement("x",NS_MUC_USER);
-		QDomElement inviteElem = xElem.firstChildElement("invite");
+		QList<IDiscoIdentity> roomIdent = FDiscovery!=NULL ? FDiscovery->discoInfo(invite.streamJid,invite.roomJid).identity : QList<IDiscoIdentity>();
+		int identIndex = !roomIdent.isEmpty() ? FDiscovery->findIdentity(roomIdent,DIC_CONFERENCE,QString::null) : -1;
+		QString identName = identIndex>=0 ? roomIdent.value(identIndex).name : QString::null;
 
-		InviteFields fields;
-		fields.streamJid = stanza.to();
-		fields.roomJid = stanza.from();
-		fields.fromJid  = inviteElem.attribute("from");
-		fields.password = xElem.firstChildElement("password").text();
+		QString roomName = Qt::escape(!identName.isEmpty() ? QString("%1 <%2>").arg(identName,invite.roomJid.uBare()) : invite.roomJid.uBare());
+		QString userName = Qt::escape(FNotifications->contactName(invite.streamJid,invite.fromJid));
 
-		QString roomName = Qt::escape(fields.roomJid.uBare());
-		QString userName = Qt::escape(FNotifications->contactName(fields.streamJid,fields.fromJid));
-		QString reason = Qt::escape(inviteElem.firstChildElement("reason").text());
-
-		QString msg = tr("You are invited to the conference <b>%1</b> by user <b>%2</b>.").arg(roomName, userName);
-		msg += QString("<br>%3<br>").arg(reason);
+		QString msg = tr("You are invited to the conference <b>%1</b> by user <b>%2</b>.").arg(roomName,userName);
+		msg += QString("<br>%1<br>").arg(Qt::escape(invite.reason));
 		msg += tr("Do you want to join to the conference?");
 
 		QMessageBox *inviteDialog = new QMessageBox(QMessageBox::Question,tr("Invitation to Conference"),msg,QMessageBox::Yes|QMessageBox::No);
@@ -1698,7 +1715,7 @@ void MultiUserChatManager::onNotificationActivated(int ANotifyId)
 		inviteDialog->setModal(false);
 		connect(inviteDialog,SIGNAL(finished(int)),SLOT(onInviteDialogFinished(int)));
 
-		FInviteDialogs.insert(inviteDialog,fields);
+		FInviteDialogs.insert(inviteDialog,invite);
 		inviteDialog->show();
 
 		FNotifications->removeNotification(ANotifyId);

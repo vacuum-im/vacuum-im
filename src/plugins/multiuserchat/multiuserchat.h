@@ -58,8 +58,9 @@ public:
 	virtual void setHistoryScope(const IMultiUserChatHistory &AHistory);
 	virtual bool sendStreamPresence();
 	virtual bool sendPresence(int AShow, const QString &AStatus, int APriority);
-	virtual bool sendMessage(const Message &AMessage, const QString &AToNick = QString::null);
-	virtual bool sendInvitation(const QList<Jid> &AContacts, const QString &AReason = QString::null);
+	virtual bool sendMessage(const Message &AMessage, const QString &AToNick=QString::null);
+	virtual bool sendInvitation(const QList<Jid> &AContacts, const QString &AReason=QString::null, const QString &AThread=QString::null);
+	virtual bool sendDirectInvitation(const QList<Jid> &AContacts, const QString &AReason=QString::null, const QString &AThread=QString::null);
 	virtual bool sendVoiceRequest();
 	//Moderator
 	virtual QString subject() const;
@@ -68,8 +69,8 @@ public:
 	//Administrator
 	virtual QString loadAffiliationList(const QString &AAffiliation);
 	virtual QString updateAffiliationList(const QList<IMultiUserListItem> &AItems);
-	virtual QString setUserRole(const QString &ANick, const QString &ARole, const QString &AReason = QString::null);
-	virtual QString setUserAffiliation(const QString &ANick, const QString &AAffiliation, const QString &AReason = QString::null);
+	virtual QString setUserRole(const QString &ANick, const QString &ARole, const QString &AReason=QString::null);
+	virtual QString setUserAffiliation(const QString &ANick, const QString &AAffiliation, const QString &AReason=QString::null);
 	//Owner
 	virtual QString loadRoomConfig();
 	virtual QString updateRoomConfig(const IDataForm &AForm);
@@ -87,8 +88,9 @@ signals:
 	void passwordChanged(const QString &APassword);
 	void presenceChanged(const IPresenceItem &APresence);
 	void nicknameChanged(const QString &ANick, const XmppError &AError);
-	void invitationSent(const QList<Jid> &AContacts, const QString &AReason);
+	void invitationSent(const QList<Jid> &AContacts, const QString &AReason, const QString &AThread);
 	void invitationDeclined(const Jid &AContactJid, const QString &AReason);
+	void invitationFailed(const QList<Jid> &AContacts, const XmppError &AError);
 	void userChanged(IMultiUser *AUser, int AData, const QVariant &ABefore);
 	//Moderator
 	void voiceRequestReceived(const Message &AMessage);

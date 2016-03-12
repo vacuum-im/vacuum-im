@@ -175,8 +175,9 @@ protected slots:
 	//Occupant
 	void onMultiChatPresenceChanged(const IPresenceItem &APresence);
 	void onMultiChatNicknameChanged(const QString &ANick, const XmppError &AError);
-	void onMultiChatInvitationSent(const QList<Jid> &AContacts, const QString &AReason);
+	void onMultiChatInvitationSent(const QList<Jid> &AContacts, const QString &AReason, const QString &AThread);
 	void onMultiChatInvitationDeclined(const Jid &AContactJid, const QString &AReason);
+	void onMultiChatInvitationFailed(const QList<Jid> &AContacts, const XmppError &AError);
 	void onMultiChatUserChanged(IMultiUser *AUser, int AData, const QVariant &ABefore);
 	//Moderator
 	void onMultiChatVoiceRequestReceived(const Message &AMessage);
