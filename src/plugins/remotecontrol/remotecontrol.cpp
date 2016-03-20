@@ -679,10 +679,7 @@ bool RemoteControl::processForwardMessages(const ICommandRequest &ARequest)
 				{
 					foreach(Message message, notifiedMessages(ARequest.streamJid,senderJid))
 					{
-						message.detach();
-						message.setFrom(QString::null);
-						message.setTo(ARequest.contactJid.full());
-						message.setDateTime(message.dateTime(),true);
+						message.setTo(ARequest.contactJid.full()).setDelayed(message.dateTime(),message.from()).setFrom(QString::null);
 
 						QDomElement addresses = message.stanza().firstElement("addresses",NS_ADDRESS);
 						if (!addresses.isNull())

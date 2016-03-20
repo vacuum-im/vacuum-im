@@ -121,6 +121,21 @@ bool MultiUserChatManager::initConnections(IPluginManager *APluginManager, int &
 		connect(FNotifications->instance(),SIGNAL(notificationRemoved(int)),SLOT(onNotificationRemoved(int)));
 	}
 
+	if (FMessageWidgets)
+	{
+		connect(FMessageWidgets->instance(),SIGNAL(chatWindowCreated(IMessageChatWindow *)),SLOT(onMessageChatWindowCreated(IMessageChatWindow *)));
+	}
+
+	if (FMessageArchiver)
+	{
+		connect(FMessageArchiver->instance(),SIGNAL(requestFailed(const QString &, const XmppError &)),
+			SLOT(onMessageArchiverRequestFailed(const QString &, const XmppError &)));
+		connect(FMessageArchiver->instance(),SIGNAL(headersLoaded(const QString &, const QList<IArchiveHeader> &)),
+			SLOT(onMessageArchiverHeadersLoaded(const QString &, const QList<IArchiveHeader> &)));
+		connect(FMessageArchiver->instance(),SIGNAL(collectionLoaded(const QString &, const IArchiveCollection &)),
+			SLOT(onMessageArchiverCollectionLoaded(const QString &, const IArchiveCollection &)));
+	}
+
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
 
 	return FXmppStreamManager!=NULL;
@@ -142,8 +157,7 @@ bool MultiUserChatManager::initObjects()
 	if (FDiscovery)
 	{
 		registerDiscoFeatures();
-		if (FMessageWidgets)
-			FDiscovery->insertFeatureHandler(NS_MUC,this,DFO_DEFAULT);
+		FDiscovery->insertFeatureHandler(NS_MUC,this,DFO_DEFAULT);
 	}
 
 	if (FNotifications)
@@ -435,10 +449,10 @@ bool MultiUserChatManager::execDiscoFeature(const Jid &AStreamJid, const QString
 	if (AFeature==NS_MUC && !ADiscoInfo.contactJid.hasResource())
 	{
 		IMultiUserChatWindow *window = findMultiChatWindow(AStreamJid,ADiscoInfo.contactJid);
-		if (!window)
-			showJoinMultiChatWizard(AStreamJid,ADiscoInfo.contactJid,QString::null,QString::null);
-		else
+		if (window != NULL)
 			window->showTabPage();
+		else
+			showJoinMultiChatWizard(AStreamJid,ADiscoInfo.contactJid,QString::null,QString::null);
 		return true;
 	}
 	return false;
@@ -446,20 +460,19 @@ bool MultiUserChatManager::execDiscoFeature(const Jid &AStreamJid, const QString
 
 Action *MultiUserChatManager::createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent)
 {
-	if (AFeature == NS_MUC)
+	if (AFeature==NS_MUC && FDiscovery)
 	{
-		if (FDiscovery && FDiscovery->findIdentity(ADiscoInfo.identity,DIC_CONFERENCE,QString::null)>=0)
-		{
-			if (findMultiChatWindow(AStreamJid,ADiscoInfo.contactJid) == NULL)
-				return createJoinAction(AStreamJid,ADiscoInfo.contactJid,AParent);
-		}
-		else if (FDiscovery)
+		if (FDiscovery->findIdentity(ADiscoInfo.identity,DIC_CONFERENCE,QString::null) < 0)
 		{
 			Menu *inviteMenu = createInviteMenu(QStringList()<<ADiscoInfo.streamJid.full(), QStringList()<<ADiscoInfo.contactJid.full(), AParent);
 			if (!inviteMenu->isEmpty())
 				return inviteMenu->menuAction();
 			else
 				delete inviteMenu;
+		}
+		else if (findMultiChatWindow(AStreamJid,ADiscoInfo.contactJid) == NULL)
+		{
+			return createJoinAction(AStreamJid,ADiscoInfo.contactJid,AParent);
 		}
 	}
 	return NULL;
@@ -1123,7 +1136,7 @@ Menu *MultiUserChatManager::createInviteMenu(const QStringList &AStreams, const 
 				if (mchat->isUserPresent(contact))
 					continue;
 
-				if (FDiscovery!=NULL && !FDiscovery->checkDiscoFeature(stream,contact,QString::null,NS_MUC))
+				if (FDiscovery!=NULL && !FDiscovery->checkDiscoFeature(stream,contact,NS_MUC))
 					continue;
 
 				contacts.append(contact.pFull());
@@ -1727,4 +1740,193 @@ void MultiUserChatManager::onNotificationRemoved(int ANotifyId)
 	FInviteNotify.remove(ANotifyId);
 }
 
+void MultiUserChatManager::onMessageChatWindowCreated(IMessageChatWindow *AWindow)
+{
+	if (FDiscovery && AWindow->contactJid().hasNode())
+	{
+		Menu *inviteMenu = new InviteUsersMenu(AWindow,AWindow->instance());
+		inviteMenu->setTitle(tr("Invite to Conversation"));
+		inviteMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_INVITE);
+		connect(inviteMenu,SIGNAL(inviteAccepted(const QMultiMap<Jid, Jid> &)),SLOT(onConvertMessageChatWindowStart(const QMultiMap<Jid, Jid> &)));
+		AWindow->toolBarWidget()->toolBarChanger()->insertAction(inviteMenu->menuAction(),TBG_MWTBW_MULTIUSERCHAT_INVITE)->setPopupMode(QToolButton::InstantPopup);
+	}
+}
+
+void MultiUserChatManager::onConvertMessageChatWindowStart(const QMultiMap<Jid, Jid> &AAddresses)
+{
+	Menu *inviteMenu = qobject_cast<Menu *>(sender());
+	IMessageChatWindow *window = inviteMenu!=NULL ? qobject_cast<IMessageChatWindow *>(inviteMenu->parent()) : NULL;
+	if (window!=NULL && !AAddresses.isEmpty())
+	{
+		ChatConvert convert;
+		convert.streamJid = window->streamJid();
+		convert.contactJid = window->contactJid();
+		convert.members = AAddresses.values() << window->contactJid();
+		convert.threadId = QString("");
+
+		LOG_STRM_INFO(convert.streamJid,QString("Starting conversion chat with=%1 to conference").arg(convert.contactJid.full()));
+
+		QMultiMap<Jid, Jid> addresses = AAddresses;
+		addresses.insert(window->streamJid(),window->streamJid());
+		addresses.insert(window->streamJid(),window->contactJid());
+
+		QStringList names;
+		QSet<Jid> invited;
+		for (QMultiMap<Jid,Jid>::const_iterator it=addresses.constBegin(); it!=addresses.constEnd(); ++it)
+		{
+			if (!invited.contains(it.value().bare()))
+			{
+				if (FNotifications)
+					names.append(FNotifications->contactName(it.key(),it.value()));
+				else
+					names.append(it->uNode());
+				invited += it.value().bare();
+			}
+		}
+
+		QString roomName;
+		if (names.count() > 3)
+			roomName = tr("Conference with %1 and %n other contact(s)","",names.count()-2).arg(QStringList(names.mid(0,2)).join(", "));
+		else
+			roomName = tr("Conference with %1").arg(names.join(", "));
+
+		QMap<QString,QVariant> hints;
+		hints["muc#roomconfig_roomname"] = roomName;
+		hints["muc#roomconfig_publicroom"] = false;
+		hints["muc#roomconfig_persistentroom"] = true;
+		hints["muc#roomconfig_whois"] = "anyone";
+		hints["muc#roomconfig_changesubject"] = true;
+		hints["muc#roomconfig_allowinvites"] = true;
+
+		CreateMultiChatWizard *wizard = new CreateMultiChatWizard(CreateMultiChatWizard::ModeCreate,convert.streamJid,Jid::null,QString::null,QString::null);
+		connect(wizard,SIGNAL(wizardAccepted(IMultiUserChatWindow *)),SLOT(onConvertMessageChatWindowWizardAccetped(IMultiUserChatWindow *)));
+		connect(wizard,SIGNAL(rejected()),SLOT(onConvertMessageChatWindowWizardRejected()));
+		FWizardConvert.insert(wizard,convert);
+
+		wizard->setConfigHints(hints);
+		wizard->show();
+	}
+}
+
+void MultiUserChatManager::onConvertMessageChatWindowWizardAccetped(IMultiUserChatWindow *AWindow)
+{
+	CreateMultiChatWizard *wizard = qobject_cast<CreateMultiChatWizard *>(sender());
+	if (FWizardConvert.contains(wizard))
+	{
+		ChatConvert convert = FWizardConvert.take(wizard);
+		convert.streamJid = AWindow->multiUserChat()->streamJid();
+		convert.roomJid = AWindow->multiUserChat()->roomJid();
+
+		LOG_STRM_INFO(convert.streamJid,QString("Accepted conversion chat with=%1 to conference room=%2").arg(convert.contactJid.full(),convert.roomJid.bare()));
+
+		if (FMessageArchiver)
+		{
+			IArchiveRequest request;
+			request.with = convert.contactJid;
+			request.maxItems = 1;
+			request.openOnly = true;
+			request.exactmatch = true;
+			request.threadId = convert.threadId;
+
+			QString reqId = FMessageArchiver->loadHeaders(convert.streamJid,request);
+			if (!reqId.isEmpty())
+			{
+				LOG_STRM_INFO(convert.streamJid,QString("Loading history headers for conversion chat with=%1 to conference room=%2, id=%3").arg(convert.contactJid.full(),convert.roomJid.bare(),reqId));
+				FHistoryConvert.insert(reqId,convert);
+			}
+			else
+			{
+				LOG_STRM_WARNING(convert.streamJid,QString("Failed to load history headers for conversion chat with=%1 to conference room=%2: Request not sent").arg(convert.contactJid.full(),convert.roomJid.bare()));
+				onConvertMessageChatWindowFinish(convert);
+			}
+		}
+		else
+		{
+			onConvertMessageChatWindowFinish(convert);
+		}
+	}
+}
+
+void MultiUserChatManager::onConvertMessageChatWindowWizardRejected()
+{
+	CreateMultiChatWizard *wizard = qobject_cast<CreateMultiChatWizard *>(sender());
+	if (FWizardConvert.contains(wizard))
+	{
+		ChatConvert convert = FWizardConvert.take(wizard);
+		LOG_STRM_INFO(convert.streamJid,QString("User canceled conversion chat with=%1 to conference").arg(convert.contactJid.full()));
+	}
+}
+
+void MultiUserChatManager::onConvertMessageChatWindowFinish(const ChatConvert &AConvert)
+{
+	IMultiUserChatWindow *window = findMultiChatWindow(AConvert.streamJid,AConvert.roomJid);
+	if (window)
+	{
+		window->multiUserChat()->sendInvitation(AConvert.members,AConvert.reason,AConvert.threadId);
+		LOG_STRM_INFO(AConvert.streamJid,QString("Finished conversion chat with=%1 to conference room=%2").arg(AConvert.contactJid.full(),AConvert.roomJid.bare()));
+	}
+	else
+	{
+		REPORT_ERROR("Failed to finish conversion chat to conference: Conference window not found");
+	}
+}
+
+void MultiUserChatManager::onMessageArchiverRequestFailed(const QString &AId, const XmppError &AError)
+{
+	if (FHistoryConvert.contains(AId))
+	{
+		ChatConvert convert = FHistoryConvert.take(AId);
+		LOG_STRM_WARNING(convert.streamJid,QString("Failed to load history for conversion chat with=%1 to conference room=%2: %3").arg(convert.contactJid.full(),convert.roomJid.bare(),AError.condition()));
+		onConvertMessageChatWindowFinish(convert);
+	}
+}
+
+void MultiUserChatManager::onMessageArchiverHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders)
+{
+	if (FHistoryConvert.contains(AId))
+	{
+		ChatConvert convert = FHistoryConvert.take(AId);
+		if (!AHeaders.isEmpty())
+		{
+			QString reqId = FMessageArchiver->loadCollection(convert.streamJid,AHeaders.first());
+			if (!reqId.isEmpty())
+			{
+				LOG_STRM_INFO(convert.streamJid,QString("Loading history collection for conversion chat with=%1 to conference room=%2, id=%3").arg(convert.contactJid.full(),convert.roomJid.bare(),reqId));
+				FHistoryConvert.insert(reqId,convert);
+			}
+			else
+			{
+				LOG_STRM_WARNING(convert.streamJid,QString("Failed to load history collection for conversion chat with=%1 to conference room=%2: Request not sent").arg(convert.contactJid.full(),convert.roomJid.bare()));
+				onConvertMessageChatWindowFinish(convert);
+			}
+		}
+		else
+		{
+			LOG_STRM_INFO(convert.streamJid,QString("No current history for conversion chat with=%1 to conference room=%2").arg(convert.contactJid.full(),convert.roomJid.bare()));
+			onConvertMessageChatWindowFinish(convert);
+		}
+	}
+}
+
+void MultiUserChatManager::onMessageArchiverCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection)
+{
+	if (FHistoryConvert.contains(AId))
+	{
+		ChatConvert convert = FHistoryConvert.take(AId);
+		IMultiUserChatWindow *window = findMultiChatWindow(convert.streamJid,convert.roomJid);
+		if (window && window->multiUserChat()->isOpen())
+		{
+			LOG_STRM_INFO(convert.streamJid,QString("Uploading history for conversion chat with=%1 to conference room=%2, messages=%3").arg(convert.contactJid.full(),convert.roomJid.bare()).arg(ACollection.body.messages.count()));
+			foreach(Message message, ACollection.body.messages)
+			{
+				message.setDelayed(message.dateTime(),message.fromJid());
+				message.setTo(convert.roomJid.bare()).setType(Message::GroupChat);
+				window->multiUserChat()->sendMessage(message);
+			}
+		}
+		onConvertMessageChatWindowFinish(convert);
+	}
+}
+
 Q_EXPORT_PLUGIN2(plg_multiuserchat, MultiUserChatManager)
+

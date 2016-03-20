@@ -534,7 +534,32 @@ bool MultiUserChatWindow::messageDisplay(const Message &AMessage, int ADirection
 				updateRecentItemActiveTime(NULL);
 			if (FHistoryRequests.values().contains(NULL))
 				FPendingMessages[NULL].append(AMessage);
-			showMultiChatUserMessage(AMessage,userJid.resource());
+
+			if (AMessage.isDelayed() && AMessage.delayedFromJid()!=FMultiChat->roomJid() && AMessage.delayedFromJid().isValid())
+			{
+				IMultiUser *user = FMultiChat->findUser(userJid.resource());
+				if (user!=NULL && user->affiliation()==MUC_AFFIL_OWNER)
+				{
+					// Owner send history to conference converted from chat
+					Jid senderJid = AMessage.delayedFromJid();
+					IMultiUser *senderUser = FMultiChat->findUserByRealJid(senderJid);
+
+					QString senderNick = senderJid.uNode();
+					if (senderUser != NULL)
+						senderNick = senderUser->nick();
+					else if (FNotifications)
+						senderNick = FNotifications->contactName(streamJid(),senderJid);
+					showMultiChatUserMessage(AMessage,senderNick);
+				}
+				else
+				{
+					showMultiChatUserMessage(AMessage,userJid.resource());
+				}
+			}
+			else
+			{
+				showMultiChatUserMessage(AMessage,userJid.resource());
+			}
 		}
 	}
 	else if (ADirection == IMessageProcessor::DirectionOut)
@@ -1273,10 +1298,6 @@ void MultiUserChatWindow::updateStaticRoomActions()
 	FRequestVoice->setVisible(role == MUC_ROLE_VISITOR);
 	FChangeTopic->setVisible(affiliation==MUC_AFFIL_OWNER || affiliation==MUC_AFFIL_ADMIN || affiliation==MUC_AFFIL_MEMBER);
 	FChangePassword->setVisible(FMultiChat->roomError().toStanzaError().conditionCode() == XmppStanzaError::EC_NOT_AUTHORIZED);
-
-	QAction *inviteHandle = FToolBarWidget->toolBarChanger()->actionHandle(FInviteUsers->menuAction());
-	if (inviteHandle)
-		inviteHandle->setEnabled(FMultiChat->state() == IMultiUserChat::Opened);
 
 	FEnterRoom->setVisible(FMultiChatManager->isReady(streamJid()) && FMultiChat->state()==IMultiUserChat::Closed);
 }

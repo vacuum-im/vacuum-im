@@ -56,9 +56,13 @@ public:
 	Message &setFrom(const QString &AFrom);
 	QString defLang() const;
 	Message &setDefLang(const QString &ALang);
-	bool isDelayed() const;
 	QDateTime dateTime() const;
-	Message &setDateTime(const QDateTime &ADateTime, bool ADelayed = false);
+	Message &setDateTime(const QDateTime &ADateTime);
+	bool isDelayed() const;
+	Jid delayedFromJid() const;
+	QString delayedFrom() const;
+	QDateTime delayedStamp() const;
+	Message &setDelayed(const QDateTime &AStamp, const Jid &AFrom);
 	QStringList subjectLangs() const;
 	QString subject(const QString &ALang=QString::null) const;
 	Message &setSubject(const QString &ASubject, const QString &ALang=QString::null);

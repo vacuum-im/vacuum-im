@@ -10,10 +10,14 @@ class SupportedProxyModel :
 	public QSortFilterProxyModel
 {
 public:
-	SupportedProxyModel(IServiceDiscovery *ADiscovery, IMultiUserChat *AMultiChat, QObject *AParent) : QSortFilterProxyModel(AParent)
+	SupportedProxyModel(IServiceDiscovery *ADiscovery, IMessageWindow *AWindow, QObject *AParent) : QSortFilterProxyModel(AParent)
 	{
-		FMultiChat = AMultiChat;
+		FWindow = AWindow;
 		FDiscovery = ADiscovery;
+
+		IMultiUserChatWindow *mucWindow = FWindow!=NULL ? qobject_cast<IMultiUserChatWindow *>(AWindow->instance()) : NULL;
+		FMultiChat = mucWindow!=NULL ? mucWindow->multiUserChat() : NULL;
+
 		setDynamicSortFilter(true);
 	}
 protected:
@@ -25,10 +29,12 @@ protected:
 			Jid streamJid = index.data(RDR_STREAM_JID).toString();
 			foreach(const Jid &contactJid, index.data(RDR_RESOURCES).toStringList())
 			{
-				if (FDiscovery->checkDiscoFeature(streamJid,contactJid,QString::null,NS_MUC,false))
+				if (FDiscovery->checkDiscoFeature(streamJid,contactJid,NS_MUC))
 				{
-					if (FMultiChat==NULL || !FMultiChat->isUserPresent(contactJid))
-						return true;
+					if (FMultiChat != NULL)
+						return !FMultiChat->isUserPresent(contactJid);
+					else if (FWindow)
+						return FWindow->streamJid().pBare()!=contactJid.pBare() && FWindow->contactJid().pBare()!=contactJid.pBare();
 				}
 			}
 			return false;
@@ -36,6 +42,7 @@ protected:
 		return QSortFilterProxyModel::filterAcceptsRow(AModelRow,AModelParent);
 	}
 private:
+	IMessageWindow *FWindow;
 	IMultiUserChat *FMultiChat;
 	IServiceDiscovery *FDiscovery;
 };
@@ -45,7 +52,6 @@ InviteUsersWidget::InviteUsersWidget(IMessageWindow *AWindow, QWidget *AParent) 
 {
 	ui.setupUi(this);
 
-	FWindow = AWindow;
 	FReceiversWidget = NULL;
 
 	IMessageWidgets *messageWidgets = PluginHelper::pluginInstance<IMessageWidgets>();
@@ -56,10 +62,7 @@ InviteUsersWidget::InviteUsersWidget(IMessageWindow *AWindow, QWidget *AParent) 
 		IServiceDiscovery *discovery = PluginHelper::pluginInstance<IServiceDiscovery>();
 		if (discovery)
 		{
-			IMultiUserChatWindow *chatWindow = qobject_cast<IMultiUserChatWindow *>(AWindow->instance());
-			IMultiUserChat *multiChat = chatWindow!=NULL ? chatWindow->multiUserChat() : NULL;
-
-			SupportedProxyModel *proxy = new SupportedProxyModel(discovery, multiChat, this);
+			SupportedProxyModel *proxy = new SupportedProxyModel(discovery, AWindow, this);
 			FReceiversWidget->insertProxyModel(proxy);
 		}
 

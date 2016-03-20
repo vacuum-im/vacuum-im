@@ -246,6 +246,7 @@ private:
 	PluginPointer<IAvatars> FAvatars;
 	PluginPointer<IDataForms> FDataForms;
 	PluginPointer<IStatusIcons> FStatusIcons;
+	PluginPointer<INotifications> FNotifications;
 	PluginPointer<IStatusChanger> FStatusChanger;
 	PluginPointer<IRosterManager> FRosterManager;
 	PluginPointer<IMessageWidgets> FMessageWidgets;

@@ -4,6 +4,7 @@
 #include <QTimer>
 #include <QLabel>
 #include <QWizard>
+#include <QVariant>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QLineEdit>
@@ -24,23 +25,27 @@ class CreateMultiChatWizard :
 {
 	Q_OBJECT;
 public:
+	enum Mode {
+		ModeJoin,
+		ModeCreate,
+		ModeManual,
+	};
 	enum Pages {
 		PageMode,
 		PageService,
 		PageRoom,
 		PageConfig,
 		PageJoin,
-		PageManual
-	};
-	enum Mode {
-		ModeJoin,
-		ModeCreate,
-		ModeManual
+		PageManual,
 	};
 public:
 	CreateMultiChatWizard(QWidget *AParent = NULL);
-	CreateMultiChatWizard(Mode AMode, const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword, QWidget *AParent = NULL);
+	CreateMultiChatWizard(Mode AMode, const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword, QWidget *AParent=NULL);
+	void setConfigHints(const QMap<QString,QVariant> &AHints);
+public:
 	void accept();
+signals:
+	void wizardAccepted(IMultiUserChatWindow *AWindow);
 protected:
 	void initialize();
 };
@@ -158,6 +163,7 @@ class ConfigPage :
 	public QWizardPage
 {
 	Q_OBJECT;
+	Q_PROPERTY(QVariant configHints READ configHints WRITE setConfigHints);
 public:
 	ConfigPage(QWidget *AParent);
 	void cleanupPage();
@@ -168,6 +174,8 @@ public:
 public:
 	Jid streamJid() const;
 	Jid roomJid() const;
+	QVariant configHints() const;
+	void setConfigHints(const QVariant &AHints);
 protected:
 	void setError(const QString &AMessage);
 protected slots:
@@ -191,6 +199,7 @@ private:
 	QString FConfigLoadRequestId;
 	QString FConfigUpdateRequestId;
 	IDataFormWidget *FConfigFormWidget;
+	QMap<QString,QVariant> FConfigHints;
 };
 
 class JoinPage :

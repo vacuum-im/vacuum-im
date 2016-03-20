@@ -519,7 +519,7 @@ void ServiceDiscovery::showDiscoItems(const Jid &AStreamJid, const Jid &AContact
 	}
 }
 
-bool ServiceDiscovery::checkDiscoFeature(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, const QString &AFeature, bool ADefault)
+bool ServiceDiscovery::checkDiscoFeature(const Jid &AStreamJid, const Jid &AContactJid, const QString &AFeature, const QString &ANode, bool ADefault)
 {
 	IDiscoInfo dinfo = discoInfo(AStreamJid,AContactJid,ANode);
 	if (!dinfo.error.isNull())

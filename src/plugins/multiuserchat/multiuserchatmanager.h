@@ -6,6 +6,7 @@
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/imessageprocessor.h>
+#include <interfaces/imessagearchiver.h>
 #include <interfaces/ixmppstreammanager.h>
 #include <interfaces/ipresencemanager.h>
 #include <interfaces/iservicediscovery.h>
@@ -25,6 +26,7 @@
 #include "multiuserchat.h"
 #include "multiuserchatwindow.h"
 #include "createmultichatwizard.h"
+#include "inviteusersmenu.h"
 
 struct ChatInvite {
 	QString id;
@@ -35,6 +37,15 @@ struct ChatInvite {
 	QString thread;
 	bool isContinue;
 	QString password;
+};
+
+struct ChatConvert {
+	Jid streamJid;
+	Jid contactJid;
+	Jid roomJid;
+	QString reason;
+	QString threadId;
+	QList<Jid> members;
 };
 
 class MultiUserChatManager :
@@ -155,7 +166,6 @@ protected slots:
 	void onMultiChatWindowUserContextMenu(IMultiUser *AUser, Menu *AMenu);
 	void onMultiChatWindowUserToolTips(IMultiUser *AUser, QMap<int,QString> &AToolTips);
 	void onMultiChatWindowPrivateWindowChanged(IMessageChatWindow *AWindow);
-protected slots:
 	void onMultiChatWindowInfoContextMenu(Menu *AMenu);
 	void onMultiChatWindowInfoToolTips(QMap<int,QString> &AToolTips);
 protected slots:
@@ -175,6 +185,16 @@ protected slots:
 	void onInviteDialogFinished(int AResult);
 	void onNotificationActivated(int ANotifyId);
 	void onNotificationRemoved(int ANotifyId);
+protected slots:
+	void onMessageChatWindowCreated(IMessageChatWindow *AWindow);
+	void onConvertMessageChatWindowStart(const QMultiMap<Jid, Jid> &AAddresses);
+	void onConvertMessageChatWindowWizardAccetped(IMultiUserChatWindow *AWindow);
+	void onConvertMessageChatWindowWizardRejected();
+	void onConvertMessageChatWindowFinish(const ChatConvert &AConvert);
+protected slots:
+	void onMessageArchiverRequestFailed(const QString &AId, const XmppError &AError);
+	void onMessageArchiverHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders);
+	void onMessageArchiverCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection);
 private:
 	PluginPointer<IDataForms> FDataForms;
 	PluginPointer<IStatusIcons> FStatusIcons;
@@ -185,6 +205,7 @@ private:
 	PluginPointer<IOptionsManager> FOptionsManager;
 	PluginPointer<IRecentContacts> FRecentContacts;
 	PluginPointer<IMessageWidgets> FMessageWidgets;
+	PluginPointer<IMessageArchiver> FMessageArchiver;
 	PluginPointer<IStanzaProcessor> FStanzaProcessor;
 	PluginPointer<IMainWindowPlugin> FMainWindowPlugin;
 	PluginPointer<IMessageProcessor> FMessageProcessor;
@@ -201,6 +222,9 @@ private:
 	QMap<Jid, int> FSHIInvite;
 	QMap<int, ChatInvite> FInviteNotify;
 	QMap<QMessageBox *, ChatInvite> FInviteDialogs;
+private:
+	QMap<QString, ChatConvert> FHistoryConvert;
+	QMap<CreateMultiChatWizard *, ChatConvert> FWizardConvert;
 };
 
 #endif // MULTIUSERCHATMANAGER_H

@@ -337,16 +337,17 @@ IMultiUser *MultiUserChat::findUser(const QString &ANick) const
 	return FUsers.value(ANick);
 }
 
+IMultiUser *MultiUserChat::findUserByRealJid(const Jid &ARealJid) const
+{
+	foreach(MultiUser *user, FUsers)
+		if (ARealJid == user->realJid())
+			return user;
+	return NULL;
+}
+
 bool MultiUserChat::isUserPresent(const Jid &AContactJid) const
 {
-	if (AContactJid.pBare() != FRoomJid.pBare())
-	{
-		foreach(MultiUser *user, FUsers)
-			if (AContactJid == user->realJid())
-				return true;
-		return false;
-	}
-	return FUsers.contains(AContactJid.resource());
+	return AContactJid.pBare()!=FRoomJid.pBare() ? findUserByRealJid(AContactJid)!=NULL : FUsers.contains(AContactJid.resource());
 }
 
 void MultiUserChat::abortConnection(const QString &AStatus, bool AError)
@@ -562,39 +563,40 @@ bool MultiUserChat::sendInvitation(const QList<Jid> &AContacts, const QString &A
 {
 	if (FStanzaProcessor && isOpen() && !AContacts.isEmpty())
 	{
+		// NOTE: Sending each invite in separate message due to ejabberd is not supported multi invite
+
 		Stanza invite(STANZA_KIND_MESSAGE);
 		invite.setTo(FRoomJid.bare());
 
-		QList<Jid> invited;
 		QDomElement xElem = invite.addElement("x",NS_MUC_USER);
+		QDomElement inviteElem = xElem.appendChild(invite.createElement("invite")).toElement();
+		
+		if (!AReason.isEmpty())
+			inviteElem.appendChild(invite.createElement("reason")).appendChild(invite.createTextNode(AReason));
+	
+		if (!AThread.isEmpty())
+			inviteElem.appendChild(invite.createElement("continue")).toElement().setAttribute("thread",AThread);
+		else if (!AThread.isNull())
+			inviteElem.appendChild(invite.createElement("continue"));
+
+		QList<Jid> invited;
 		foreach(const Jid &contact, AContacts)
 		{
 			if (!invited.contains(contact) && !isUserPresent(contact))
 			{
-				QDomElement inviteElem = xElem.appendChild(invite.createElement("invite")).toElement();
-
-				if (!AReason.isEmpty())
-					inviteElem.appendChild(invite.createElement("reason")).appendChild(invite.createTextNode(AReason));
-
-				if (!AThread.isEmpty())
-					inviteElem.appendChild(invite.createElement("continue")).toElement().setAttribute("thread",AThread);
-				else if (!AThread.isNull())
-					inviteElem.appendChild(invite.createElement("continue"));
-
 				inviteElem.setAttribute("to",contact.full());
-				invited.append(contact);
+				if (FStanzaProcessor->sendStanzaOut(FStreamJid, invite))
+					invited.append(contact);
+				else
+					LOG_STRM_WARNING(FStreamJid,QString("Failed to send conference invite to=%1, room=%2").arg(contact.full(),FRoomJid.bare()));
 			}
 		}
 
-		if (FStanzaProcessor->sendStanzaOut(FStreamJid, invite))
+		if (!invited.isEmpty())
 		{
 			LOG_STRM_INFO(FStreamJid,QString("Conference invite sent to room=%1, contacts=%2").arg(FRoomJid.bare()).arg(invited.count()));
 			emit invitationSent(invited,AReason,AThread);
 			return true;
-		}
-		else
-		{
-			LOG_STRM_WARNING(FStreamJid,QString("Failed to send conference invite to room=%1, contact=%2").arg(FRoomJid.bare()).arg(invited.count()));
 		}
 	}
 	else if (FStanzaProcessor && !isOpen())

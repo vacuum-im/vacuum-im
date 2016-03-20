@@ -1719,7 +1719,7 @@ void MessageArchiver::savePendingMessages(const Jid &AStreamJid)
 		for (int i=0; i<messages.count(); i++)
 		{
 			QPair<Message,bool> &message = messages[i];
-			message.first.setDateTime(message.first.dateTime(),true);
+			message.first.setDelayed(message.first.dateTime(),message.first.from());
 			if (prepareMessage(AStreamJid,message.first,message.second))
 			{
 				QDomElement messageElem = doc.documentElement().appendChild(doc.importNode(message.first.stanza().element(),true)).toElement();

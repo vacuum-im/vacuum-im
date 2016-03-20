@@ -26,7 +26,6 @@ protected slots:
 private:
 	Ui::InviteUsersWidgetClass ui;
 private:
-	IMessageWindow *FWindow;
 	IMessageReceiversWidget *FReceiversWidget;
 };
 

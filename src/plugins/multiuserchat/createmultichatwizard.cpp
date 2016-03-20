@@ -18,6 +18,7 @@
 #include <utils/logger.h>
 
 #define WF_MODE                   "Mode"
+#define WF_CONFIG_HINTS           "ConfigHints"
 
 #define WF_ACCOUNT                "Account"
 #define WF_SERVER                 "Server"
@@ -54,7 +55,7 @@ CreateMultiChatWizard::CreateMultiChatWizard(Mode AMode, const Jid &AStreamJid, 
 {
 	initialize();
 
-	setField(WF_MODE, AMode);
+	setField(WF_MODE,AMode);
 	if (AMode == CreateMultiChatWizard::ModeManual)
 	{
 		if (AStreamJid.isValid())
@@ -93,6 +94,11 @@ CreateMultiChatWizard::CreateMultiChatWizard(Mode AMode, const Jid &AStreamJid, 
 		else if (AMode == ModeCreate)
 			setStartId(PageConfig);
 	}
+}
+
+void CreateMultiChatWizard::setConfigHints(const QMap<QString,QVariant> &AHints)
+{
+	setField(WF_CONFIG_HINTS,AHints);
 }
 
 void CreateMultiChatWizard::accept()
@@ -136,6 +142,7 @@ void CreateMultiChatWizard::accept()
 				Options::setFileValue(streamJid,OFV_LAST_ACCOUNT);
 				Options::setFileValue(roomNick,OFV_LAST_NICK);
 
+				emit wizardAccepted(window);
 				QDialog::accept();
 			}
 			else
@@ -914,6 +921,8 @@ ConfigPage::ConfigPage(QWidget *AParent) : QWizardPage(AParent)
 	layout->addWidget(lblInfo);
 	layout->addStretch();
 	layout->setMargin(0);
+
+	registerField(WF_CONFIG_HINTS,this,"configHints");
 }
 
 void ConfigPage::cleanupPage()
@@ -1012,6 +1021,16 @@ Jid ConfigPage::roomJid() const
 	return field(WF_ROOM_JID).toString();
 }
 
+QVariant ConfigPage::configHints() const
+{
+	return FConfigHints;
+}
+
+void ConfigPage::setConfigHints(const QVariant &AHints)
+{
+	FConfigHints = AHints.toMap();
+}
+
 void ConfigPage::setError(const QString &AMessage)
 {
 	prbProgress->setVisible(false);
@@ -1069,8 +1088,15 @@ void ConfigPage::onMultiChatConfigLoaded(const QString &AId, const IDataForm &AF
 
 			FConfigFormWidget = dataForms->formWidget(dataForms->localizeForm(AForm), wdtConfig);
 			FConfigFormWidget->instance()->layout()->setMargin(0);
-			connect(FConfigFormWidget->instance(),SIGNAL(fieldChanged(IDataFieldWidget *)),SLOT(onConfigFormFieldChanged()));
 			wdtConfig->layout()->addWidget(FConfigFormWidget->instance());
+
+			for (QMap<QString,QVariant>::const_iterator it=FConfigHints.constBegin(); it!=FConfigHints.constEnd(); ++it)
+			{
+				IDataFieldWidget *field = FConfigFormWidget->fieldWidget(it.key());
+				if (field != NULL)
+					field->setValue(it.value());
+			}
+			connect(FConfigFormWidget->instance(),SIGNAL(fieldChanged(IDataFieldWidget *)),SLOT(onConfigFormFieldChanged()));
 		}
 		else
 		{

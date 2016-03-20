@@ -894,6 +894,22 @@
         <comment>Show/Hide conference participants list</comment>
         <translation>Ctrl+U</translation>
     </message>
+    <message>
+        <source>Invite to Conversation</source>
+        <translation>Пригласить к разговору</translation>
+    </message>
+    <message numerus="yes">
+        <source>Conference with %1 and %n other contact(s)</source>
+        <translation>
+            <numerusform>Конференция с %1 и еще %n контактом</numerusform>
+            <numerusform>Конференция с %1 и еще %n контактами</numerusform>
+            <numerusform>Конференция с %1 и еще %n контактами</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Conference with %1</source>
+        <translation>Конференция с %1</translation>
+    </message>
 </context>
 <context>
     <name>MultiUserChatWindow</name>

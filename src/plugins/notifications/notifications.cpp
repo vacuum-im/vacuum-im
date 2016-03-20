@@ -626,7 +626,7 @@ QString Notifications::contactName(const Jid &AStreamJid, const Jid &AContactJid
 		name = roster!=NULL ? roster->findItem(AContactJid).name : AContactJid.uNode();
 	}
 
-	return name.isEmpty() ? AContactJid.uBare() : name;
+	return name.isEmpty() ? AContactJid.uNode() : name;
 }
 
 int Notifications::notifyIdByRosterId(int ARosterId) const

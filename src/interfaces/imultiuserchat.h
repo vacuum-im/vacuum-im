@@ -148,6 +148,7 @@ public:
 	virtual IMultiUser *mainUser() const =0;
 	virtual QList<IMultiUser *> allUsers() const =0;
 	virtual IMultiUser *findUser(const QString &ANick) const =0;
+	virtual IMultiUser *findUserByRealJid(const Jid &ARealJid) const =0;
 	virtual bool isUserPresent(const Jid &AContactJid) const =0;
 	virtual void abortConnection(const QString &AStatus, bool AError=true) =0;
 	// Occupant

@@ -153,30 +153,55 @@ Message &Message::setDefLang(const QString &ALang)
 	return *this;
 }
 
-bool Message::isDelayed() const
-{
-	return !d->FStanza.firstElement("delay",MESSAGE_NS_DELAY).isNull() || !d->FStanza.firstElement("x",MESSAGE_NS_X_DELAY).isNull();
-}
-
 QDateTime Message::dateTime() const
 {
 	return d->FDateTime;
 }
 
-Message &Message::setDateTime(const QDateTime &ADateTime, bool ADelayed)
+Message &Message::setDateTime(const QDateTime &ADateTime)
 {
 	d->FDateTime = ADateTime;
-	if (ADelayed)
-	{
-		d->FStanza.detach();
-		QDomElement elem = d->FStanza.firstElement("delay",MESSAGE_NS_DELAY);
-		if (elem.isNull())
-			elem = d->FStanza.firstElement("x",MESSAGE_NS_X_DELAY);
-		if (elem.isNull())
-			elem = d->FStanza.addElement("delay",MESSAGE_NS_DELAY);
-		elem.setAttribute("stamp",DateTime(ADateTime).toX85UTC());
-	}
 	return *this;
+}
+
+bool Message::isDelayed() const
+{
+	return !d->FStanza.firstElement("delay",MESSAGE_NS_DELAY).isNull() || !d->FStanza.firstElement("x",MESSAGE_NS_X_DELAY).isNull();
+}
+
+Jid Message::delayedFromJid() const
+{
+	return delayedFrom();
+}
+
+QString Message::delayedFrom() const
+{
+	QDomElement elem = d->FStanza.firstElement("delay",MESSAGE_NS_DELAY);
+	if (elem.isNull())
+		elem = d->FStanza.firstElement("x",MESSAGE_NS_X_DELAY);
+	return elem.attribute("from");
+}
+
+QDateTime Message::delayedStamp() const
+{
+	QDomElement elem = d->FStanza.firstElement("delay",MESSAGE_NS_DELAY);
+	if (elem.isNull())
+		elem = d->FStanza.firstElement("x",MESSAGE_NS_X_DELAY);
+	return DateTime(elem.attribute("stamp")).toLocal();
+}
+
+Message &Message::setDelayed(const QDateTime &AStamp, const Jid &AFrom)
+{
+	d->FStanza.detach();
+	QDomElement elem = d->FStanza.firstElement("delay",MESSAGE_NS_DELAY);
+	if (elem.isNull())
+		elem = d->FStanza.firstElement("x",MESSAGE_NS_X_DELAY);
+	if (elem.isNull())
+		elem = d->FStanza.addElement("delay",MESSAGE_NS_DELAY);
+	if (AFrom.isValid())
+		elem.setAttribute("from",AFrom.full());
+	elem.setAttribute("stamp",DateTime(AStamp).toX85UTC());
+	return setDateTime(AStamp);
 }
 
 QStringList Message::subjectLangs() const
