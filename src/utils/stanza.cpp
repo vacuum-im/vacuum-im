@@ -14,9 +14,10 @@ static inline bool IsValidXmlChar(quint32 ACode)
 		|| (ACode >= 0x10000 && ACode <= 0x10FFFF);
 }
 
-StanzaData::StanzaData(const QString &ATagName)
+
+StanzaData::StanzaData(const StanzaData &AOther) : QSharedData(AOther)
 {
-	FDoc.appendChild(FDoc.createElement(ATagName));
+	FDoc = AOther.FDoc.cloneNode(true).toDocument();
 }
 
 StanzaData::StanzaData(const QDomElement &AElem)
@@ -24,24 +25,20 @@ StanzaData::StanzaData(const QDomElement &AElem)
 	FDoc.appendChild(FDoc.importNode(AElem,true));
 }
 
-StanzaData::StanzaData(const StanzaData &AOther) : QSharedData(AOther)
+StanzaData::StanzaData(const QString &AKind, const QString &ANamespace)
 {
-	FDoc = AOther.FDoc.cloneNode(true).toDocument();
+	FDoc.appendChild(FDoc.createElementNS(ANamespace,AKind));
 }
 
-Stanza::Stanza(const QString &ATagName)
-{
-	d = new StanzaData(ATagName);
-}
 
 Stanza::Stanza(const QDomElement &AElem)
 {
 	d = new StanzaData(AElem);
 }
 
-Stanza::~Stanza()
+Stanza::Stanza(const QString &AKind, const QString &ANamespace)
 {
-
+	d = new StanzaData(AKind, ANamespace);
 }
 
 void Stanza::detach()
@@ -49,26 +46,24 @@ void Stanza::detach()
 	d.detach();
 }
 
-bool Stanza::isValid() const
+bool Stanza::isNull() const
 {
-	if (element().isNull())
-		return false;
+	return element().isNull();
+}
 
-	if (type()=="error" && firstElement("error").isNull())
-		return false;
+bool Stanza::isResult() const
+{
+	return type()==STANZA_TYPE_RESULT;
+}
 
-	return true;
+bool Stanza::isError() const
+{
+	return type()==STANZA_TYPE_ERROR;
 }
 
 bool Stanza::isFromServer() const
 {
-	if (!to().isEmpty())
-	{
-		Jid toJid = to();
-		Jid fromJid = from();
-		return fromJid.isEmpty() || fromJid==toJid || fromJid==toJid.bare() || fromJid==toJid.domain();
-	}
-	return false;
+	return !to().isEmpty() ? fromJid().isEmpty() || fromJid()==toJid() || fromJid()==toJid().bare() || fromJid()==toJid().domain() : false;
 }
 
 QDomDocument Stanza::document() const
@@ -81,28 +76,19 @@ QDomElement Stanza::element() const
 	return d->FDoc.documentElement();
 }
 
-QString Stanza::attribute(const QString &AName) const
+QString Stanza::namespaceURI() const
 {
-	return d->FDoc.documentElement().attribute(AName);
+	return d->FDoc.documentElement().namespaceURI();
 }
 
-Stanza &Stanza::setAttribute(const QString &AName, const QString &AValue)
-{
-	if (!AValue.isEmpty())
-		d->FDoc.documentElement().setAttribute(AName,AValue);
-	else
-		d->FDoc.documentElement().removeAttribute(AName);
-	return *this;
-}
-
-QString Stanza::tagName() const
+QString Stanza::kind() const
 {
 	return d->FDoc.documentElement().tagName();
 }
 
-Stanza &Stanza::setTagName(const QString &ATagName)
+Stanza &Stanza::setKind(const QString &AName)
 {
-	d->FDoc.documentElement().setTagName(ATagName);
+	d->FDoc.documentElement().setTagName(AName);
 	return *this;
 }
 
@@ -122,10 +108,22 @@ QString Stanza::id() const
 	return attribute("id");
 }
 
+Stanza &Stanza::setUniqueId()
+{
+	static quint64 sid = 1;
+	static const QString mask = "sid_%1";
+	return setId(mask.arg(sid++));
+}
+
 Stanza &Stanza::setId(const QString &AId)
 {
 	setAttribute("id",AId);
 	return *this;
+}
+
+Jid Stanza::toJid() const
+{
+	return to();
 }
 
 QString Stanza::to() const
@@ -137,6 +135,11 @@ Stanza &Stanza::setTo(const QString &ATo)
 {
 	setAttribute("to",ATo);
 	return *this;
+}
+
+Jid Stanza::fromJid() const
+{
+	return from();
 }
 
 QString Stanza::from() const
@@ -161,22 +164,38 @@ Stanza &Stanza::setLang(const QString &ALang)
 	return *this;
 }
 
+bool Stanza::hasAttribute(const QString &AName) const
+{
+	return d->FDoc.documentElement().hasAttribute(AName);
+}
+
+QString Stanza::attribute(const QString &AName, const QString &ADefault) const
+{
+	return d->FDoc.documentElement().attribute(AName,ADefault);
+}
+
+Stanza &Stanza::setAttribute(const QString &AName, const QString &AValue)
+{
+	if (!AValue.isEmpty())
+		d->FDoc.documentElement().setAttribute(AName,AValue);
+	else
+		d->FDoc.documentElement().removeAttribute(AName);
+	return *this;
+}
+
 QDomElement Stanza::firstElement(const QString &ATagName, const QString &ANamespace) const
 {
 	return findElement(d->FDoc.documentElement(),ATagName,ANamespace);
 }
 
-QDomElement Stanza::addElement(const QString &ATagName, const QString &ANamespace)
+QDomElement Stanza::addElement(const QString &AName, const QString &ANamespace)
 {
-	return d->FDoc.documentElement().appendChild(createElement(ATagName,ANamespace)).toElement();
+	return d->FDoc.documentElement().appendChild(createElement(AName,ANamespace)).toElement();
 }
 
-QDomElement Stanza::createElement(const QString &ATagName, const QString &ANamespace)
+QDomElement Stanza::createElement(const QString &AName, const QString &ANamespace)
 {
-	if (ANamespace.isEmpty())
-		return d->FDoc.createElement(ATagName);
-	else
-		return d->FDoc.createElementNS(ANamespace,ATagName);
+	return ANamespace.isEmpty() ? d->FDoc.createElement(AName) : d->FDoc.createElementNS(ANamespace,AName);
 }
 
 QDomText Stanza::createTextNode(const QString &AData)
@@ -194,7 +213,7 @@ QString Stanza::toString(int AIndent) const
 
 QByteArray Stanza::toByteArray() const
 {
-	return toString(0).toUtf8();
+	return toString(-1).toUtf8();
 }
 
 bool Stanza::isValidXmlChar(quint32 ACode)

@@ -203,20 +203,20 @@ bool RosterItemExchange::initSettings()
 
 bool RosterItemExchange::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
-	if (FSHIExchangeRequest==AHandleId && AStanza.type()!="error")
+	if (FSHIExchangeRequest==AHandleId && !AStanza.isError())
 	{
 		QDomElement xElem = AStanza.firstElement("x",NS_ROSTERX);
 		if (!xElem.isNull() && !xElem.firstChildElement("item").isNull())
 		{
 			AAccept = true;
 
-			LOG_STRM_INFO(AStreamJid,QString("Roster exchange request received, from=%1, type=%2, id=%3").arg(AStanza.from(),AStanza.tagName(),AStanza.id()));
+			LOG_STRM_INFO(AStreamJid,QString("Roster exchange request received, from=%1, kind=%2, id=%3").arg(AStanza.from(),AStanza.kind(),AStanza.id()));
 
 			IRosterExchangeRequest request;
 			request.streamJid = AStreamJid;
 			request.contactJid = AStanza.from();
-			request.id = AStanza.tagName()=="iq" ? AStanza.id() : QString::null;
-			request.message = AStanza.tagName()=="message" ? Message(AStanza).body() : QString::null;
+			request.id = AStanza.kind()==STANZA_KIND_IQ ? AStanza.id() : QString::null;
+			request.message = AStanza.kind()==STANZA_KIND_MESSAGE ? Message(AStanza).body() : QString::null;
 
 			QList<Jid> existItems;
 			QDomElement itemElem = xElem.firstChildElement("item");
@@ -268,7 +268,7 @@ void RosterItemExchange::stanzaRequestResult(const Jid &AStreamJid, const Stanza
 	if (FSentRequests.contains(AStanza.id()))
 	{
 		IRosterExchangeRequest request = FSentRequests.take(AStanza.id());
-		if (AStanza.type()=="result")
+		if (AStanza.isResult())
 		{
 			LOG_STRM_INFO(AStreamJid,QString("Roster exchange request accepted by=%1, id=%2").arg(AStanza.from(),AStanza.id()));
 			emit exchangeRequestApproved(request);
@@ -293,7 +293,7 @@ QMultiMap<int, IOptionsDialogWidget *> RosterItemExchange::optionsDialogWidgets(
 	return widgets;
 }
 
-bool RosterItemExchange::messagaeViewDragEnter(IMessageViewWidget *AWidget, const QDragEnterEvent *AEvent)
+bool RosterItemExchange::messageViewDragEnter(IMessageViewWidget *AWidget, const QDragEnterEvent *AEvent)
 {
 	return !dropDataContacts(AWidget->messageWindow()->streamJid(),AWidget->messageWindow()->contactJid(),AEvent->mimeData()).isEmpty();
 }
@@ -333,7 +333,7 @@ bool RosterItemExchange::rosterDragEnter(const QDragEnterEvent *AEvent)
 		if (DragRosterKinds.contains(indexData.value(RDR_KIND).toInt()))
 		{
 			Jid indexJid = indexData.value(RDR_PREP_BARE_JID).toString();
-			if (!indexJid.node().isEmpty())
+			if (indexJid.hasNode())
 			{
 				QList<Jid> services = FGateways!=NULL ? FGateways->streamServices(indexData.value(RDR_STREAM_JID).toString()) : QList<Jid>();
 				return !services.contains(indexJid.domain());
@@ -370,11 +370,11 @@ QString RosterItemExchange::sendExchangeRequest(const IRosterExchangeRequest &AR
 {
 	if (FStanzaProcessor && ARequest.streamJid.isValid() && ARequest.contactJid.isValid() && !ARequest.items.isEmpty())
 	{
-		Stanza request(AIqQuery ? "iq" : "message");
-		request.setId(FStanzaProcessor->newId()).setTo(ARequest.contactJid.full());
+		Stanza request(AIqQuery ? STANZA_KIND_IQ : STANZA_KIND_MESSAGE);
+		request.setTo(ARequest.contactJid.full()).setUniqueId();
 
 		if (AIqQuery)
-			request.setType("set");
+			request.setType(STANZA_TYPE_SET);
 		else if (!ARequest.message.isEmpty())
 			request.addElement("body").appendChild(request.createTextNode(ARequest.message));
 
@@ -473,7 +473,7 @@ QList<IRosterItem> RosterItemExchange::dragDataContacts(const QMimeData *AData) 
 				QList<Jid> services = FGateways!=NULL ? FGateways->streamServices(indexData.value(RDR_STREAM_JID).toString()) : QList<Jid>();
 				for (QList<IRosterItem>::iterator it=contactList.begin(); it!=contactList.end(); )
 				{
-					if (!it->itemJid.node().isEmpty() && services.contains(it->itemJid.domain()))
+					if (it->itemJid.hasNode() && services.contains(it->itemJid.domain()))
 						it = contactList.erase(it);
 					else
 						++it;
@@ -547,7 +547,7 @@ void RosterItemExchange::processRequest(const IRosterExchangeRequest &ARequest)
 	{
 		bool isGateway = false;
 		bool isDirectory = false;
-		if (ARequest.contactJid.node().isEmpty())
+		if (!ARequest.contactJid.hasNode())
 		{
 			if (!ARequest.contactJid.isEmpty() && ARequest.contactJid!=ARequest.streamJid.bare() && ARequest.contactJid!=ARequest.streamJid.domain())
 			{
@@ -736,8 +736,8 @@ void RosterItemExchange::replyRequestResult(const IRosterExchangeRequest &AReque
 	LOG_STRM_INFO(ARequest.streamJid,QString("Roster exchange request processed, from=%1, id=%2").arg(ARequest.contactJid.full(),ARequest.id));
 	if (FStanzaProcessor && !ARequest.id.isEmpty())
 	{
-		Stanza result("iq");
-		result.setType("result").setId(ARequest.id).setTo(ARequest.contactJid.full());
+		Stanza result(STANZA_KIND_IQ);
+		result.setType(STANZA_TYPE_RESULT).setTo(ARequest.contactJid.full()).setId(ARequest.id);
 		FStanzaProcessor->sendStanzaOut(ARequest.streamJid,result);
 	}
 	emit exchangeRequestApproved(ARequest);
@@ -748,8 +748,8 @@ void RosterItemExchange::replyRequestError(const IRosterExchangeRequest &AReques
 	LOG_STRM_WARNING(ARequest.streamJid,QString("Failed to process roster exchange request from=%1, id=%2: %3").arg(ARequest.contactJid.full(),ARequest.id,AError.errorMessage()));
 	if (FStanzaProcessor && !ARequest.id.isEmpty())
 	{
-		Stanza error("iq");
-		error.setId(ARequest.id).setTo(ARequest.streamJid.full()).setFrom(ARequest.contactJid.full());
+		Stanza error(STANZA_KIND_IQ);
+		error.setFrom(ARequest.contactJid.full()).setId(ARequest.id);
 		error = FStanzaProcessor->makeReplyError(error,AError);
 		FStanzaProcessor->sendStanzaOut(ARequest.streamJid,error);
 	}

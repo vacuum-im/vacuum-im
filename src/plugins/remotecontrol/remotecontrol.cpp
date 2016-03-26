@@ -154,7 +154,7 @@ bool RemoteControl::initObjects()
 
 	if (FDataForms)
 	{
-		FDataForms->insertLocalizer(this, DATA_FORM_REMOTECONTROL);
+		FDataForms->insertLocalizer(this, DFT_REMOTECONTROL);
 	}
 
 	if (FStanzaProcessor)
@@ -191,7 +191,7 @@ bool RemoteControl::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza
 	Q_UNUSED(AAccept);
 	if (AHandleId == FSHIMessageForward)
 	{
-		if (AStreamJid.pBare() == Jid(AStanza.from()).pBare())
+		if (AStreamJid.pBare() == AStanza.fromJid().pBare())
 		{
 			QDomElement addressElem = AStanza.firstElement("addresses",NS_ADDRESS).firstChildElement("address");
 			while(!addressElem.isNull() && addressElem.attribute("type")!="ofrom")
@@ -260,7 +260,7 @@ bool RemoteControl::receiveCommandRequest(const ICommandRequest &ARequest)
 IDataFormLocale RemoteControl::dataFormLocale(const QString &AFormType)
 {
 	IDataFormLocale locale;
-	if (AFormType == DATA_FORM_REMOTECONTROL)
+	if (AFormType == DFT_REMOTECONTROL)
 	{
 		locale.fields[FIELD_AUTO_AUTH].label = tr("Whether to automatically authorize subscription requests");
 		locale.fields[FIELD_AUTO_FILES].label = tr("Whether to automatically accept file transfers");
@@ -324,7 +324,7 @@ bool RemoteControl::processSetStatus(const ICommandRequest &ARequest)
 			IDataField field;
 			field.type = DATAFIELD_TYPE_HIDDEN;
 			field.var = "FORM_TYPE";
-			field.value = DATA_FORM_REMOTECONTROL;
+			field.value = DFT_REMOTECONTROL;
 			field.required = false;
 			result.form.fields.append(field);
 
@@ -399,7 +399,7 @@ bool RemoteControl::processLeaveMUC(const ICommandRequest &ARequest)
 			IDataField field;
 			field.type = DATAFIELD_TYPE_HIDDEN;
 			field.var = "FORM_TYPE";
-			field.value = DATA_FORM_REMOTECONTROL;
+			field.value = DFT_REMOTECONTROL;
 			field.required = false;
 			result.form.fields.append(field);
 
@@ -412,9 +412,9 @@ bool RemoteControl::processLeaveMUC(const ICommandRequest &ARequest)
 			IDataOption opt;
 			foreach(IMultiUserChat* muc, FMultiChatManager->multiUserChats())
 			{
-				if (muc->isConnected() && muc->streamJid()==ARequest.streamJid)
+				if (muc->isOpen() && muc->streamJid()==ARequest.streamJid)
 				{
-					opt.label = tr("%1 on %2").arg(muc->nickName()).arg(muc->roomJid().uBare());
+					opt.label = tr("%1 on %2").arg(muc->nickname()).arg(muc->roomJid().uBare());
 					opt.value = muc->roomJid().bare();
 					field.options.append(opt);
 				}
@@ -480,7 +480,7 @@ bool RemoteControl::processFileTransfers(const ICommandRequest &ARequest)
 			IDataField field;
 			field.type = DATAFIELD_TYPE_HIDDEN;
 			field.var = "FORM_TYPE";
-			field.value = DATA_FORM_REMOTECONTROL;
+			field.value = DFT_REMOTECONTROL;
 			field.required = false;
 			result.form.fields.append(field);
 
@@ -528,7 +528,7 @@ bool RemoteControl::processFileTransfers(const ICommandRequest &ARequest)
 			{
 				foreach(const QString &streamId, ARequest.form.fields.value(index).value.toStringList())
 				{
-					IFileStream *stream = FFileStreamManager->streamById(streamId);
+					IFileStream *stream = FFileStreamManager->findStream(streamId);
 					QString defaultMethod = Options::node(OPV_FILESTREAMS_DEFAULTMETHOD).value().toString();
 					if (stream->acceptableMethods().contains(defaultMethod))
 					{
@@ -571,7 +571,7 @@ bool RemoteControl::processSetOptions(const ICommandRequest &ARequest)
 			IDataField field;
 			field.type = DATAFIELD_TYPE_HIDDEN;
 			field.var = "FORM_TYPE";
-			field.value = DATA_FORM_REMOTECONTROL;
+			field.value = DFT_REMOTECONTROL;
 			field.required = false;
 			result.form.fields.append(field);
 
@@ -621,7 +621,7 @@ bool RemoteControl::processForwardMessages(const ICommandRequest &ARequest)
 			IDataField field;
 			field.type = DATAFIELD_TYPE_HIDDEN;
 			field.var = "FORM_TYPE";
-			field.value = DATA_FORM_REMOTECONTROL;
+			field.value = DFT_REMOTECONTROL;
 			field.required = false;
 			result.form.fields.append(field);
 
@@ -643,7 +643,7 @@ bool RemoteControl::processForwardMessages(const ICommandRequest &ARequest)
 				IDataOption opt;
 
 				QString name = FNotifications!=NULL ? FNotifications->contactName(ARequest.streamJid,it.key()) : it.key().uBare();
-				if (!it.key().resource().isEmpty())
+				if (it.key().hasResource())
 					name += "/" + it.key().resource();
 
 				opt.label = tr("%n message(s) from '%1'","",it.value()).arg(name);
@@ -679,10 +679,7 @@ bool RemoteControl::processForwardMessages(const ICommandRequest &ARequest)
 				{
 					foreach(Message message, notifiedMessages(ARequest.streamJid,senderJid))
 					{
-						message.detach();
-						message.setFrom(QString::null);
-						message.setTo(ARequest.contactJid.full());
-						message.setDateTime(message.dateTime(),true);
+						message.setTo(ARequest.contactJid.full()).setDelayed(message.dateTime(),message.from()).setFrom(QString::null);
 
 						QDomElement addresses = message.stanza().firstElement("addresses",NS_ADDRESS);
 						if (!addresses.isNull())
@@ -724,7 +721,7 @@ QList<Message> RemoteControl::notifiedMessages(const Jid &AStreamJid, const Jid 
 			{
 				if (message.type()!=Message::Error && !message.body().isEmpty())
 				{
-					if (FMultiChatManager==NULL || FMultiChatManager->findMultiUserChat(AStreamJid,Jid(message.from()).bare())==NULL)
+					if (FMultiChatManager==NULL || FMultiChatManager->findMultiUserChat(AStreamJid,message.from())==NULL)
 					{
 						if (AContactJid.isEmpty() || AContactJid==message.from())
 							messages.append(message);

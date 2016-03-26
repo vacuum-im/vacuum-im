@@ -12,8 +12,10 @@
 #define MSIV_DEFAULT_VARIANT                "DefaultVariant"
 #define MSIV_DEFAULT_FONT_FAMILY            "DefaultFontFamily"
 #define MSIV_DEFAULT_FONT_SIZE              "DefaultFontSize"
-#define MSIV_DISABLE_COMBINE_CONSECUTIVE    "DisableCombineConsecutive"
+#define MSIV_DEFAULT_SELF_COLOR             "DefaultSelfColor"
+#define MSIV_DEFAULT_CONTACT_COLOR          "DefaultContactColor"
 #define MSIV_DEFAULT_BACKGROUND_COLOR       "DefaultBackgroundColor"
+#define MSIV_DISABLE_COMBINE_CONSECUTIVE    "DisableCombineConsecutive"
 #define MSIV_DISABLE_CUSTOM_BACKGROUND      "DisableCustomBackground"
 
 //Message Status Message Classes
@@ -50,21 +52,10 @@
 #define MSO_VARIANT                         "variant"
 #define MSO_FONT_FAMILY                     "fontFamily"
 #define MSO_FONT_SIZE                       "fontSize"
+#define MSO_SELF_COLOR                      "selfColor"
+#define MSO_CONTACT_COLOR                   "contactColor"
 #define MSO_BG_COLOR                        "bgColor"
 #define MSO_BG_IMAGE_FILE                   "bgImageFile"
-
-struct ContentItem {
-	int size;
-};
-
-struct WidgetStatus {
-	int lastKind;
-	QString lastId;
-	QDateTime lastTime;
-	bool scrollStarted;
-	int contentStartPosition;
-	QList<ContentItem> content;
-};
 
 class SimpleMessageStyle :
 	public QObject,
@@ -72,6 +63,19 @@ class SimpleMessageStyle :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IMessageStyle);
+public:
+	struct ContentItem {
+		int size;
+	};
+	struct WidgetStatus {
+		int lastKind;
+		QString lastId;
+		QDateTime lastTime;
+		bool scrollStarted;
+		int contentStartPosition;
+		QList<ContentItem> content;
+		QMap<QString, QVariant> options;
+	};
 public:
 	SimpleMessageStyle(const QString &AStylePath, QNetworkAccessManager *ANetworkAccessManager, QObject *AParent);
 	~SimpleMessageStyle();
@@ -81,7 +85,7 @@ public:
 	virtual QString styleId() const;
 	virtual QList<QWidget *> styleWidgets() const;
 	virtual QWidget *createWidget(const IMessageStyleOptions &AOptions, QWidget *AParent);
-	virtual QString senderColor(const QString &ASenderId) const;
+	virtual QString senderColorById(const QString &ASenderId) const;
 	virtual QTextDocumentFragment selection(QWidget *AWidget) const;
 	virtual QTextCharFormat textFormatAt(QWidget *AWidget, const QPoint &APosition) const;
 	virtual QTextDocumentFragment textFragmentAt(QWidget *AWidget, const QPoint &APosition) const;
@@ -100,17 +104,19 @@ public:
 	static QList<QString> styleVariants(const QString &AStylePath);
 	static QMap<QString, QVariant> styleInfo(const QString &AStylePath);
 protected:
-	bool isSameSender(QWidget *AWidget, const IMessageStyleContentOptions &AOptions) const;
-	void setVariant(StyleViewer *AView, const QString  &AVariant);
-	QString makeStyleTemplate() const;
-	void fillStyleKeywords(QString &AHtml, const IMessageStyleOptions &AOptions) const;
-	QString makeContentTemplate(const IMessageStyleContentOptions &AOptions, bool ASameSender) const;
-	void fillContentKeywords(QString &AHtml, const IMessageStyleContentOptions &AOptions, bool ASameSender) const;
-	QString prepareMessage(const QString &AHtml, const IMessageStyleContentOptions &AOptions) const;
-	QString loadFileData(const QString &AFileName, const QString &DefValue) const;
+	void initStyleSettings();
 	void loadTemplates();
 	void loadSenderColors();
-	void initStyleSettings();
+	QString loadFileData(const QString &AFileName, const QString &DefValue) const;
+protected:
+	QString makeStyleTemplate() const;
+	void fillStyleKeywords(QString &AHtml, const IMessageStyleOptions &AOptions) const;
+	void setVariant(StyleViewer *AView, const QString  &AVariant);
+protected:
+	bool isConsecutive(const IMessageStyleContentOptions &AOptions, const WidgetStatus &AStatus) const;
+	QString makeContentTemplate(const IMessageStyleContentOptions &AOptions, const WidgetStatus &AStatus) const;
+	void fillContentKeywords(QString &AHtml, const IMessageStyleContentOptions &AOptions, const WidgetStatus &AStatus) const;
+	QString prepareMessage(const QString &AHtml, const IMessageStyleContentOptions &AOptions) const;
 protected:
 	bool eventFilter(QObject *AWatched, QEvent *AEvent);
 protected slots:

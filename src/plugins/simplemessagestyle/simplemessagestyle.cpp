@@ -15,6 +15,8 @@
 #include <utils/options.h>
 #include <utils/logger.h>
 
+#define CONSECUTIVE_TIMEOUT                 2*60
+
 #define SCROLL_TIMEOUT                      100
 #define SHARED_STYLE_PATH                   RESOURCES_DIR"/"RSR_STORAGE_SIMPLEMESSAGESTYLES"/"FILE_STORAGE_SHARED_DIR
 
@@ -46,17 +48,17 @@ SimpleMessageStyle::SimpleMessageStyle(const QString &AStylePath, QNetworkAccess
 	FStylePath = AStylePath;
 	FInfo = styleInfo(AStylePath);
 	FVariants = styleVariants(AStylePath);
-	FNetworkAccessManager=ANetworkAccessManager;
-
-	initStyleSettings();
-	loadTemplates();
-	loadSenderColors();
+	FNetworkAccessManager = ANetworkAccessManager;
 
 	FScrollTimer.setSingleShot(true);
 	FScrollTimer.setInterval(SCROLL_TIMEOUT);
 	connect(&FScrollTimer,SIGNAL(timeout()),SLOT(onScrollAfterResize()));
 
 	connect(AParent,SIGNAL(styleWidgetAdded(IMessageStyle *, QWidget *)),SLOT(onStyleWidgetAdded(IMessageStyle *, QWidget *)));
+
+	initStyleSettings();
+	loadTemplates();
+	loadSenderColors();
 }
 
 SimpleMessageStyle::~SimpleMessageStyle()
@@ -82,16 +84,18 @@ QList<QWidget *> SimpleMessageStyle::styleWidgets() const
 QWidget *SimpleMessageStyle::createWidget(const IMessageStyleOptions &AOptions, QWidget *AParent)
 {
 	StyleViewer *view = new StyleViewer(AParent);
-	view->setNetworkAccessManager(FNetworkAccessManager);
+	if (FNetworkAccessManager)
+		view->setNetworkAccessManager(FNetworkAccessManager);
 	changeOptions(view,AOptions,true);
 	return view;
 }
 
-QString SimpleMessageStyle::senderColor(const QString &ASenderId) const
+QString SimpleMessageStyle::senderColorById(const QString &ASenderId) const
 {
 	if (!FSenderColors.isEmpty())
 		return FSenderColors.at(qHash(ASenderId) % FSenderColors.count());
-	return QString(SenderColors[qHash(ASenderId) % SenderColorsCount]);
+	else
+		return QString(SenderColors[qHash(ASenderId) % SenderColorsCount]);
 }
 
 QTextDocumentFragment SimpleMessageStyle::selection(QWidget *AWidget) const
@@ -139,6 +143,7 @@ bool SimpleMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOpti
 			wstatus.lastTime = QDateTime();
 			wstatus.scrollStarted = false;
 			wstatus.content.clear();
+			wstatus.options = AOptions.extended;
 
 			if (isNewView)
 			{
@@ -163,10 +168,11 @@ bool SimpleMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOpti
 
 		setVariant(view, AOptions.extended.value(MSO_VARIANT).toString());
 
-		QFont font;
 		int fontSize = AOptions.extended.value(MSO_FONT_SIZE).toInt();
 		QString fontFamily = AOptions.extended.value(MSO_FONT_FAMILY).toString();
-		if (fontSize>0)
+
+		QFont font = view->document()->defaultFont();
+		if (fontSize > 0)
 			font.setPointSize(fontSize);
 		if (!fontFamily.isEmpty())
 			font.setFamily(fontFamily);
@@ -189,7 +195,7 @@ bool SimpleMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, c
 	{
 		WidgetStatus &wstatus = FWidgetStatus[AWidget];
 		bool scrollAtEnd = !AOptions.noScroll && view->verticalScrollBar()->sliderPosition()==view->verticalScrollBar()->maximum();
-		
+
 		QTextCursor cursor(view->document());
 		int maxMessages = Options::node(OPV_MESSAGES_MAXMESSAGESINWINDOW).value().toInt();
 		if (maxMessages>0 && wstatus.content.count()>maxMessages+10)
@@ -199,6 +205,7 @@ bool SimpleMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, c
 			int removeSize = 0;
 			while(wstatus.content.count() > maxMessages)
 				removeSize += wstatus.content.takeFirst().size;
+
 			cursor.setPosition(wstatus.contentStartPosition);
 			cursor.setPosition(wstatus.contentStartPosition+removeSize,QTextCursor::KeepAnchor);
 			cursor.removeSelectedText();
@@ -211,15 +218,14 @@ bool SimpleMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, c
 		}
 		cursor.movePosition(QTextCursor::End);
 
-		bool sameSender = isSameSender(AWidget,AOptions);
-		QString html = makeContentTemplate(AOptions,sameSender);
-		fillContentKeywords(html,AOptions,sameSender);
-		html.replace("%message%",prepareMessage(AHtml,AOptions));
+		QString content = makeContentTemplate(AOptions,wstatus);
+		fillContentKeywords(content,AOptions,wstatus);
+		content.replace("%message%",prepareMessage(AHtml,AOptions));
 
-		ContentItem content;
+		ContentItem item;
 		int startPos = cursor.position();
-		cursor.insertHtml(html);
-		content.size = cursor.position()-startPos;
+		cursor.insertHtml(content);
+		item.size = cursor.position()-startPos;
 
 		if (scrollAtEnd)
 			view->verticalScrollBar()->setSliderPosition(view->verticalScrollBar()->maximum());
@@ -227,7 +233,7 @@ bool SimpleMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, c
 		wstatus.lastKind = AOptions.kind;
 		wstatus.lastId = AOptions.senderId;
 		wstatus.lastTime = AOptions.time;
-		wstatus.content.append(content);
+		wstatus.content.append(item);
 
 		emit contentAppended(AWidget,AHtml,AOptions);
 		return true;
@@ -301,41 +307,56 @@ QMap<QString, QVariant> SimpleMessageStyle::styleInfo(const QString &AStylePath)
 			LOG_ERROR(QString("Failed to load simple style info from file content: %1").arg(xmlError));
 		}
 	}
-	else if (AStylePath.isEmpty())
+	else if (!AStylePath.isEmpty())
 	{
-		REPORT_ERROR("Failed to get simple style info: Style path is empty");
+		LOG_ERROR(QString("Failed to load simple style info from file: %1").arg(file.errorString()));
 	}
 	else
 	{
-		LOG_ERROR(QString("Failed to load simple style info from file: %1").arg(file.errorString()));
+		REPORT_ERROR("Failed to get simple style info: Style path is empty");
 	}
 	return info;
 }
 
-bool SimpleMessageStyle::isSameSender(QWidget *AWidget, const IMessageStyleContentOptions &AOptions) const
+void SimpleMessageStyle::initStyleSettings()
 {
-	if (!FCombineConsecutive)
-		return false;
-	if (AOptions.kind != IMessageStyleContentOptions::KindMessage)
-		return false;
-	if (AOptions.senderId.isEmpty())
-		return false;
-
-	const WidgetStatus &wstatus = FWidgetStatus.value(AWidget);
-	if (wstatus.lastKind != AOptions.kind)
-		return false;
-	if (wstatus.lastId != AOptions.senderId)
-		return false;
-	if (wstatus.lastTime.secsTo(AOptions.time)>2*60)
-		return false;
-
-	return true;
+	FCombineConsecutive = !FInfo.value(MSIV_DISABLE_COMBINE_CONSECUTIVE,false).toBool();
+	FAllowCustomBackground = !FInfo.value(MSIV_DISABLE_CUSTOM_BACKGROUND,false).toBool();
 }
 
-void SimpleMessageStyle::setVariant(StyleViewer *AView, const QString &AVariant)
+void SimpleMessageStyle::loadTemplates()
 {
-	QString variant = QString("Variants/%1.css").arg(!FVariants.contains(AVariant) ? FInfo.value(MSIV_DEFAULT_VARIANT,"main").toString() : AVariant);
-	AView->document()->setDefaultStyleSheet(loadFileData(FStylePath+"/"+variant,QString::null));
+	FIn_ContentHTML =      loadFileData(FStylePath+"/Incoming/Content.html",QString::null);
+	FIn_NextContentHTML =  loadFileData(FStylePath+"/Incoming/NextContent.html",FIn_ContentHTML);
+
+	FOut_ContentHTML =     loadFileData(FStylePath+"/Outgoing/Content.html",FIn_ContentHTML);
+	FOut_NextContentHTML = loadFileData(FStylePath+"/Outgoing/NextContent.html",FOut_ContentHTML);
+
+	FTopicHTML =           loadFileData(FStylePath+"/Topic.html",QString::null);
+	FStatusHTML =          loadFileData(FStylePath+"/Status.html",FIn_ContentHTML);
+	FMeCommandHTML =       loadFileData(FStylePath+"/MeCommand.html",QString::null);
+}
+
+void SimpleMessageStyle::loadSenderColors()
+{
+	QFile colors(FStylePath+"/Incoming/SenderColors.txt");
+	if (colors.open(QFile::ReadOnly))
+		FSenderColors = QString::fromUtf8(colors.readAll()).split(':',QString::SkipEmptyParts);
+}
+
+QString SimpleMessageStyle::loadFileData(const QString &AFileName, const QString &DefValue) const
+{
+	QFile file(AFileName);
+	if (file.open(QFile::ReadOnly))
+	{
+		QByteArray html = file.readAll();
+		return QString::fromUtf8(html.data(),html.size());
+	}
+	else if (file.exists())
+	{
+		LOG_ERROR(QString("Failed to load simple style data from file=%1: %2").arg(AFileName,file.errorString()));
+	}
+	return DefValue;
 }
 
 QString SimpleMessageStyle::makeStyleTemplate() const
@@ -364,7 +385,34 @@ void SimpleMessageStyle::fillStyleKeywords(QString &AHtml, const IMessageStyleOp
 	AHtml.replace("%bodyBackground%", background);
 }
 
-QString SimpleMessageStyle::makeContentTemplate(const IMessageStyleContentOptions &AOptions, bool ASameSender) const
+void SimpleMessageStyle::setVariant(StyleViewer *AView, const QString &AVariant)
+{
+	QString variantName = !FVariants.contains(AVariant) ? FInfo.value(MSIV_DEFAULT_VARIANT,"main").toString() : AVariant;
+	QString variantFile = QString("Variants/%1.css").arg(variantName);
+	AView->document()->setDefaultStyleSheet(loadFileData(FStylePath+"/"+variantFile,QString::null));
+}
+
+bool SimpleMessageStyle::isConsecutive(const IMessageStyleContentOptions &AOptions, const WidgetStatus &AStatus) const
+{
+	if (!FCombineConsecutive)
+		return false;
+
+	if (AOptions.kind != IMessageStyleContentOptions::KindMessage)
+		return false;
+	if (AOptions.senderId.isEmpty())
+		return false;
+
+	if (AStatus.lastKind != AOptions.kind)
+		return false;
+	if (AStatus.lastId != AOptions.senderId)
+		return false;
+	if (AStatus.lastTime.secsTo(AOptions.time) > CONSECUTIVE_TIMEOUT)
+		return false;
+
+	return true;
+}
+
+QString SimpleMessageStyle::makeContentTemplate(const IMessageStyleContentOptions &AOptions, const WidgetStatus &AStatus) const
 {
 	QString html;
 	if (AOptions.kind==IMessageStyleContentOptions::KindTopic && !FTopicHTML.isEmpty())
@@ -381,24 +429,21 @@ QString SimpleMessageStyle::makeContentTemplate(const IMessageStyleContentOption
 	}
 	else
 	{
+		bool consecutive = isConsecutive(AOptions,AStatus);
 		if (AOptions.direction == IMessageStyleContentOptions::DirectionIn)
-		{
-			html = ASameSender ? FIn_NextContentHTML : FIn_ContentHTML;
-		}
+			html = consecutive ? FIn_NextContentHTML : FIn_ContentHTML;
 		else
-		{
-			html = ASameSender ? FOut_NextContentHTML : FOut_ContentHTML;
-		}
+			html = consecutive ? FOut_NextContentHTML : FOut_ContentHTML;
 	}
 	return html;
 }
 
-void SimpleMessageStyle::fillContentKeywords(QString &AHtml, const IMessageStyleContentOptions &AOptions, bool ASameSender) const
+void SimpleMessageStyle::fillContentKeywords(QString &AHtml, const IMessageStyleContentOptions &AOptions, const WidgetStatus &AStatus) const
 {
 	bool isDirectionIn = AOptions.direction == IMessageStyleContentOptions::DirectionIn;
 
 	QStringList messageClasses;
-	if (FCombineConsecutive && ASameSender)
+	if (isConsecutive(AOptions,AStatus))
 		messageClasses << MSMC_CONSECUTIVE;
 
 	if (AOptions.kind==IMessageStyleContentOptions::KindMeCommand)
@@ -478,11 +523,18 @@ void SimpleMessageStyle::fillContentKeywords(QString &AHtml, const IMessageStyle
 	QString time = Qt::escape(AOptions.time.toString(timeFormat));
 	AHtml.replace("%time%", time);
 
-	QString sColor = !AOptions.senderColor.isEmpty() ? AOptions.senderColor : senderColor(AOptions.senderId);
-	AHtml.replace("%senderColor%",sColor);
+	QString senderColor = AOptions.senderColor;
+	if (senderColor.isEmpty())
+	{
+		if (isDirectionIn)
+			senderColor = AStatus.options.value(MSO_CONTACT_COLOR).toString();
+		else
+			senderColor = AStatus.options.value(MSO_SELF_COLOR).toString();
+	}
+	AHtml.replace("%senderColor%",senderColor);
 
 	AHtml.replace("%sender%",AOptions.senderName);
-	AHtml.replace("%senderScreenName%",AOptions.senderId);
+	AHtml.replace("%senderScreenName%", QString::null);
 	AHtml.replace("%textbackgroundcolor%",!AOptions.textBGColor.isEmpty() ? AOptions.textBGColor : "inherit");
 }
 
@@ -497,47 +549,6 @@ QString SimpleMessageStyle::prepareMessage(const QString &AHtml, const IMessageS
 		return TextManager::getDocumentBody(doc);
 	}
 	return AHtml;
-}
-
-QString SimpleMessageStyle::loadFileData(const QString &AFileName, const QString &DefValue) const
-{
-	QFile file(AFileName);
-	if (file.open(QFile::ReadOnly))
-	{
-		QByteArray html = file.readAll();
-		return QString::fromUtf8(html.data(),html.size());
-	}
-	else if (file.exists())
-	{
-		LOG_ERROR(QString("Failed to load simple style data from file=%1: %2").arg(AFileName,file.errorString()));
-	}
-	return DefValue;
-}
-
-void SimpleMessageStyle::loadTemplates()
-{
-	FIn_ContentHTML =      loadFileData(FStylePath+"/Incoming/Content.html",QString::null);
-	FIn_NextContentHTML =  loadFileData(FStylePath+"/Incoming/NextContent.html",FIn_ContentHTML);
-
-	FOut_ContentHTML =     loadFileData(FStylePath+"/Outgoing/Content.html",FIn_ContentHTML);
-	FOut_NextContentHTML = loadFileData(FStylePath+"/Outgoing/NextContent.html",FOut_ContentHTML);
-
-	FTopicHTML =           loadFileData(FStylePath+"/Topic.html",QString::null);
-	FStatusHTML =          loadFileData(FStylePath+"/Status.html",FIn_ContentHTML);
-	FMeCommandHTML =       loadFileData(FStylePath+"/MeCommand.html",QString::null);
-}
-
-void SimpleMessageStyle::loadSenderColors()
-{
-	QFile colors(FStylePath+"/Incoming/SenderColors.txt");
-	if (colors.open(QFile::ReadOnly))
-		FSenderColors = QString::fromUtf8(colors.readAll()).split(':',QString::SkipEmptyParts);
-}
-
-void SimpleMessageStyle::initStyleSettings()
-{
-	FCombineConsecutive = !FInfo.value(MSIV_DISABLE_COMBINE_CONSECUTIVE,false).toBool();
-	FAllowCustomBackground = !FInfo.value(MSIV_DISABLE_CUSTOM_BACKGROUND,false).toBool();
 }
 
 bool SimpleMessageStyle::eventFilter(QObject *AWatched, QEvent *AEvent)

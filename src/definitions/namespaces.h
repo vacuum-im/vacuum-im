@@ -1,6 +1,8 @@
 #ifndef DEF_NAMESPACES_H
 #define DEF_NAMESPACES_H
 
+#define NS_XML                                  "http://www.w3.org/XML/1998/namespace"
+
 #define NS_XMPP_DELAY                           "urn:xmpp:delay"
 #define NS_XMPP_TIME                            "urn:xmpp:time"
 #define NS_XMPP_PING                            "urn:xmpp:ping"
@@ -25,6 +27,7 @@
 #define NS_JABBER_PRIVACY                       "jabber:iq:privacy"
 #define NS_JABBER_X_AVATAR                      "jabber:x:avatar"
 #define NS_JABBER_IQ_AVATAR                     "jabber:iq:avatar"
+#define NS_JABBER_X_CONFERENCE                  "jabber:x:conference"
 
 #define NS_VCARD_TEMP                           "vcard-temp"
 #define NS_VCARD_UPDATE                         "vcard-temp:x:update"
@@ -47,7 +50,6 @@
 #define NS_MUC_USER                             "http://jabber.org/protocol/muc#user"
 #define NS_MUC_ADMIN                            "http://jabber.org/protocol/muc#admin"
 #define NS_MUC_OWNER                            "http://jabber.org/protocol/muc#owner"
-#define NS_MUC_UNIQUE                           "http://jabber.org/protocol/muc#unique"
 
 #define NS_DISCO                                "http://jabber.org/protocol/disco"
 #define NS_DISCO_INFO                           "http://jabber.org/protocol/disco#info"
@@ -75,6 +77,7 @@
 #define NS_CHATSTATES                           "http://jabber.org/protocol/chatstates"
 
 #define NS_STREAM_INITIATION                    "http://jabber.org/protocol/si"
+#define NS_STREAM_PUBLICATION                   "http://jabber.org/protocol/sipub"
 #define NS_SI_FILETRANSFER                      "http://jabber.org/protocol/si/profile/file-transfer"
 
 #define NS_INBAND_BYTESTREAMS                   "http://jabber.org/protocol/ibb"
@@ -94,4 +97,4 @@
 
 #define NS_VACUUM_PRIVATESTORAGE_UPDATE         "vacuum:privatestorage:update"
 
-#endif
+#endif // DEF_NAMESPACES_H

@@ -7,8 +7,6 @@
 #include <utils/imagemanager.h>
 #include <utils/pluginhelper.h>
 
-#define AVATAR_SIZE QSize(24,24)
-
 static bool StringSizeLessThan(const QString &AValue1, const QString &AValue2)
 {
 	return AValue1.size() < AValue2.size();
@@ -59,16 +57,14 @@ CombineContactsDialog::CombineContactsDialog(IMetaContacts *AMetaContacts, const
 		}
 		FMetaId = FMetaId.isNull() ? QUuid::createUuid() : FMetaId;
 
-		ui.lwtContacts->setIconSize(AVATAR_SIZE);
+		int iconSize = FAvatars!=NULL ? FAvatars->avatarSize(IAvatars::AvatarSmall) : 24;
+		ui.lwtContacts->setIconSize(QSize(iconSize,iconSize));
 		for (QMultiMap<Jid, Jid>::const_iterator it = FMetaItems.constBegin(); it!=FMetaItems.constEnd(); ++it)
 		{
 			IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(it.key()) : NULL;
 			IRosterItem ritem = roster!=NULL ? roster->findItem(it.value()) : IRosterItem();
 			QString name = !ritem.name.isEmpty() ? ritem.name : ritem.itemJid.uBare();
-
-			QImage avatar = FAvatars!=NULL ? FAvatars->loadAvatarImage(FAvatars->avatarHash(it.value()),AVATAR_SIZE) : QImage();
-			avatar = avatar.isNull() ? (FAvatars!=NULL ? FAvatars->emptyAvatarImage(AVATAR_SIZE) : QImage()) : avatar;
-			avatar = ImageManager::squared(avatar,AVATAR_SIZE.width());
+			QImage avatar = FAvatars!=NULL ? FAvatars->visibleAvatarImage(FAvatars->avatarHash(it.value()),iconSize) : QImage();
 
 			QListWidgetItem *item = new QListWidgetItem(QIcon(QPixmap::fromImage(avatar)),name,ui.lwtContacts);
 			item->setFlags(Qt::ItemIsEnabled);

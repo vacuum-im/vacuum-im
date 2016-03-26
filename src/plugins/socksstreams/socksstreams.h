@@ -36,7 +36,7 @@ public:
 	virtual QString methodNS() const;
 	virtual QString methodName() const;
 	virtual QString methodDescription() const;
-	virtual IDataStreamSocket *dataStreamSocket(const QString &ASocketId, const Jid &AStreamJid, const Jid &AContactJid, IDataStreamSocket::StreamKind AKind, QObject *AParent=NULL);
+	virtual IDataStreamSocket *dataStreamSocket(const QString &ASocketId, const Jid &AStreamJid, const Jid &AContactJid, IDataStream::Kind AKind, QObject *AParent=NULL);
 	virtual IOptionsDialogWidget *methodSettingsWidget(const OptionsNode &ANode, QWidget *AParent);
 	virtual void loadMethodSettings(IDataStreamSocket *ASocket, const OptionsNode &ANode);
 	//ISocksStreams

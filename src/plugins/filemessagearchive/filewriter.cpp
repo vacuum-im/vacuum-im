@@ -96,7 +96,7 @@ bool FileWriter::writeMessage(const Message &AMessage, const QString &ASaveMode,
 	{
 		Jid contactJid = AMessage.from();
 		FGroupchat |= AMessage.type()==Message::GroupChat;
-		if (!FGroupchat || !contactJid.resource().isEmpty())
+		if (!FGroupchat || contactJid.hasResource())
 		{
 			FMessagesCount++;
 			FXmlWriter->writeStartElement(ADirectionIn ? "from" : "to");
@@ -113,7 +113,7 @@ bool FileWriter::writeMessage(const Message &AMessage, const QString &ASaveMode,
 			if (ASaveMode == ARCHIVE_SAVE_BODY)
 				FXmlWriter->writeTextElement("body",AMessage.body());
 			else
-				writeElementChilds(AMessage.stanza().document().documentElement());
+				writeElementChilds(AMessage.stanza().element());
 
 			FXmlWriter->writeEndElement();
 			FXmlFile->flush();
@@ -179,9 +179,9 @@ void FileWriter::stopCollection()
 	}
 }
 
-void FileWriter::writeElementChilds(const QDomElement &AElem)
+void FileWriter::writeElementChilds(const QDomElement &AParent)
 {
-	QDomNode node = AElem.firstChild();
+	QDomNode node = AParent.firstChild();
 	while (!node.isNull())
 	{
 		if (node.isElement())
@@ -189,15 +189,17 @@ void FileWriter::writeElementChilds(const QDomElement &AElem)
 			QDomElement elem = node.toElement();
 			if (elem.tagName() != "thread")
 			{
-				FXmlWriter->writeStartElement(elem.nodeName());
-				if (!elem.namespaceURI().isEmpty())
+				FXmlWriter->writeStartElement(elem.tagName());
+
+				QString elemNs = elem.namespaceURI();
+				if (!elemNs.isEmpty() && elem.parentNode().namespaceURI()!=elemNs)
 					FXmlWriter->writeAttribute("xmlns",elem.namespaceURI());
 
 				QDomNamedNodeMap attrMap = elem.attributes();
-				for (uint i =0; i<attrMap.length(); i++)
+				for (uint i=0; i<attrMap.length(); i++)
 				{
 					QDomNode attrNode = attrMap.item(i);
-					FXmlWriter->writeAttribute(attrNode.nodeName(),attrNode.nodeValue());
+					FXmlWriter->writeAttribute(attrNode.nodeName(), attrNode.nodeValue());
 				}
 
 				writeElementChilds(elem);

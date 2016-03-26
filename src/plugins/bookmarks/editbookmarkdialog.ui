@@ -30,14 +30,18 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lneName"/>
+      <widget class="QLineEdit" name="lneName">
+       <property name="placeholderText">
+        <string>Bookmark name</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
    <item>
     <widget class="QGroupBox" name="grbConference">
      <property name="title">
-      <string>Conference bookmark</string>
+      <string>Bookmark to Conference</string>
      </property>
      <property name="checkable">
       <bool>true</bool>
@@ -46,7 +50,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="lblRoomJid">
         <property name="text">
-         <string>Room:</string>
+         <string>Conference:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::PlainText</enum>
@@ -54,12 +58,16 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLineEdit" name="lneRoom"/>
+       <widget class="QLineEdit" name="lneRoom">
+        <property name="placeholderText">
+         <string>Conference as 'name@service.server.com'</string>
+        </property>
+       </widget>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="lblNick">
         <property name="text">
-         <string>Nick:</string>
+         <string>Nickname:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::PlainText</enum>
@@ -67,7 +75,11 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLineEdit" name="lneNick"/>
+       <widget class="QLineEdit" name="lneNick">
+        <property name="placeholderText">
+         <string>Your nickname in conference</string>
+        </property>
+       </widget>
       </item>
       <item row="2" column="0">
        <widget class="QLabel" name="lblPassword">
@@ -84,6 +96,9 @@
         <property name="echoMode">
          <enum>QLineEdit::PasswordEchoOnEdit</enum>
         </property>
+        <property name="placeholderText">
+         <string>Conference password if required</string>
+        </property>
        </widget>
       </item>
       <item row="3" column="0" colspan="2">
@@ -99,7 +114,7 @@
    <item>
     <widget class="QGroupBox" name="grbURL">
      <property name="title">
-      <string>URL bookmark</string>
+      <string>Bookmark to Link</string>
      </property>
      <property name="checkable">
       <bool>true</bool>
@@ -111,7 +126,7 @@
       <item>
        <widget class="QLabel" name="lblUrl">
         <property name="text">
-         <string>URL:</string>
+         <string>Link:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::PlainText</enum>
@@ -119,7 +134,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="lneUrl"/>
+       <widget class="QLineEdit" name="lneUrl">
+        <property name="placeholderText">
+         <string>Any valid link</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

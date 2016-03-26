@@ -15,16 +15,29 @@
 #include <utils/xmpperror.h>
 #include <utils/logger.h>
 
+#define SHC_TRIGGER_IQ              "/iq"
+#define SHC_TRIGGER_MESSAGE         "/message"
+#define SHC_TRIGGER_PRESENCE        "/presence"
 #define SHC_MESSAGE_CAPTCHA         "/message/captcha[@xmlns='" NS_CAPTCHA_FORMS "']"
 
+#define TRIGGER_TIMEOUT             120000
 #define ACCEPT_CHALLENGE_TIMEOUT    30000
+
+static const QList<QString> CaptchaFieldTypes = QList<QString>()
+	<< DATAFIELD_TYPE_TEXTSINGLE << DATAFIELD_TYPE_TEXTMULTI;
+
+static const QList<QString> CaptchaFieldVars = QList<QString>()
+	<< "qa" << "ocr"
+	<< "audio_recog" << "speech_q" << "speech_recog"
+	<< "picture_q" << "picture_recog"
+	<< "video_q" << "video_recog";
 
 CaptchaForms::CaptchaForms()
 {
 	FDataForms = NULL;
-	FXmppStreamManager = NULL;
 	FNotifications = NULL;
 	FStanzaProcessor = NULL;
+	FXmppStreamManager = NULL;
 }
 
 CaptchaForms::~CaptchaForms()
@@ -88,7 +101,7 @@ bool CaptchaForms::initObjects()
 {
 	if (FDataForms)
 	{
-		FDataForms->insertLocalizer(this,DATA_FORM_CAPTCHAFORMS);
+		FDataForms->insertLocalizer(this,DFT_CAPTCHAFORMS);
 	}
 	if (FNotifications)
 	{
@@ -108,14 +121,20 @@ bool CaptchaForms::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 	if (FDataForms && FSHIChallenge.value(AStreamJid)==AHandleId)
 	{
 		AAccept = true;
-		IDataForm form;
-		if (!isValidChallenge(AStreamJid,AStanza,form))
+		IDataForm form = getChallengeForm(AStanza);
+		if (!isValidChallenge(AStanza,form))
 		{
 			LOG_STRM_WARNING(AStreamJid,QString("Received invalid challenge from=%1, id=%2").arg(AStanza.from(),AStanza.id()));
+		}
+		else if (!hasTrigger(AStreamJid,form))
+		{
+			LOG_STRM_WARNING(AStreamJid,QString("Received unexpected challenge from=%1, id=%2").arg(AStanza.from(),AStanza.id()));
 		}
 		else if (!isSupportedChallenge(form))
 		{
 			LOG_STRM_WARNING(AStreamJid,QString("Received unsupported challenge from=%1, id=%2").arg(AStanza.from(),AStanza.id()));
+			Stanza error = FStanzaProcessor->makeReplyError(AStanza,XmppStanzaError::EC_NOT_ACCEPTABLE);
+			FStanzaProcessor->sendStanzaOut(AStreamJid,error);
 		}
 		else
 		{
@@ -123,10 +142,12 @@ bool CaptchaForms::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 			if (cid.isEmpty())
 			{
 				LOG_STRM_INFO(AStreamJid,QString("Received new challenge from=%1, id=%2").arg(AStanza.from(),AStanza.id()));
+				
 				ChallengeItem &item = FChallenges[AStanza.id()];
 				item.streamJid = AStreamJid;
 				item.challenger = AStanza.from();
 				item.challengeId = AStanza.id();
+
 				item.dialog = FDataForms->dialogWidget(FDataForms->localizeForm(form), NULL);
 				item.dialog->setAllowInvalid(false);
 				item.dialog->instance()->installEventFilter(this);
@@ -134,23 +155,27 @@ bool CaptchaForms::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 				item.dialog->instance()->setWindowTitle(tr("CAPTCHA Challenge - %1").arg(AStanza.from()));
 				connect(item.dialog->instance(),SIGNAL(accepted()),SLOT(onChallengeDialogAccepted()));
 				connect(item.dialog->instance(),SIGNAL(rejected()),SLOT(onChallengeDialogRejected()));
+
 				notifyChallenge(item);
 			}
 			else
 			{
 				LOG_STRM_INFO(AStreamJid,QString("Received challenge update from=%1, id=%2").arg(AStanza.from(),cid));
+				
 				ChallengeItem &challenge = FChallenges[cid];
 				challenge.challenger = AStanza.from();
 				challenge.dialog->setForm(FDataForms->localizeForm(form));
-				setFocusToEditableWidget(challenge.dialog->instance());
+				
+				setFocusToEditableField(challenge.dialog);
 			}
+
 			emit challengeReceived(AStanza.id(), form);
 			return true;
 		}
 	}
-	else if (FDataForms)
+	else if (FSHITrigger.value(AStreamJid) == AHandleId)
 	{
-		REPORT_ERROR("Received unexpected stanza");
+		appendTrigger(AStreamJid,AStanza);
 	}
 	return false;
 }
@@ -161,15 +186,16 @@ void CaptchaForms::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 	if (FChallengeRequest.contains(AStanza.id()))
 	{
 		QString cid = FChallengeRequest.take(AStanza.id());
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			LOG_STRM_INFO(AStreamJid,QString("Challenge submit accepted by=%1, id=%2").arg(AStanza.from(),cid));
 			emit challengeAccepted(cid);
 		}
 		else
 		{
-			LOG_STRM_INFO(AStreamJid,QString("Challenge submit rejected by=%1, id=%2").arg(AStanza.from(),cid));
-			emit challengeRejected(cid, XmppStanzaError(AStanza));
+			XmppStanzaError err(AStanza);
+			LOG_STRM_INFO(AStreamJid,QString("Challenge submit rejected by=%1, id=%2: %3").arg(AStanza.from(),cid,err.errorMessage()));
+			emit challengeRejected(cid,err);
 		}
 	}
 }
@@ -177,7 +203,7 @@ void CaptchaForms::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 IDataFormLocale CaptchaForms::dataFormLocale(const QString &AFormType)
 {
 	IDataFormLocale locale;
-	if (AFormType == DATA_FORM_CAPTCHAFORMS)
+	if (AFormType == DFT_CAPTCHAFORMS)
 	{
 		locale.title = tr("CAPTCHA Challenge");
 		locale.fields["audio_recog"].label = tr("Describe the sound you hear");
@@ -201,12 +227,12 @@ bool CaptchaForms::submitChallenge(const QString &AChallengeId, const IDataForm 
 			FNotifications->removeNotification(FChallengeNotify.key(AChallengeId));
 		item.dialog->instance()->deleteLater();
 
-		Stanza accept("iq");
-		accept.setType("set");
-		accept.setId(FStanzaProcessor->newId());
-		accept.setTo(item.challenger.full());
+		Stanza accept(STANZA_KIND_IQ);
+		accept.setType(STANZA_TYPE_SET).setTo(item.challenger.full()).setUniqueId();
+
 		QDomElement captchaElem = accept.addElement("captcha",NS_CAPTCHA_FORMS);
 		FDataForms->xmlForm(ASubmit, captchaElem);
+		
 		if (FStanzaProcessor->sendStanzaRequest(this,item.streamJid,accept,ACCEPT_CHALLENGE_TIMEOUT))
 		{
 			LOG_STRM_INFO(item.streamJid,QString("Challenge submit request sent to=%1, id=%2").arg(item.challenger.full(),AChallengeId));
@@ -235,8 +261,8 @@ bool CaptchaForms::cancelChallenge(const QString &AChallengeId)
 			FNotifications->removeNotification(FChallengeNotify.key(AChallengeId));
 		item.dialog->instance()->deleteLater();
 
-		Stanza reject("message");
-		reject.setId(AChallengeId).setFrom(item.challenger.full());
+		Stanza reject(STANZA_KIND_MESSAGE);
+		reject.setFrom(item.challenger.full()).setId(AChallengeId);
 		reject = FStanzaProcessor->makeReplyError(reject,XmppStanzaError::EC_NOT_ACCEPTABLE);
 
 		if (FStanzaProcessor->sendStanzaOut(item.streamJid, reject))
@@ -257,60 +283,75 @@ bool CaptchaForms::cancelChallenge(const QString &AChallengeId)
 	return false;
 }
 
-bool CaptchaForms::isSupportedChallenge(IDataForm &AForm) const
+void CaptchaForms::appendTrigger(const Jid &AStreamJid, const Stanza &AStanza)
 {
-	static QStringList methods = QStringList() << "qa" << "ocr" << "picture_q" << "picture_recog";
+	if (!AStanza.isResult() && !AStanza.isError())
+	{
+		QDateTime curDateTime = QDateTime::currentDateTime();
+		
+		Jid receiver = !AStanza.to().isEmpty() ? AStanza.to() : AStreamJid.domain();
+		QList<TriggerItem> &triggers = FTriggers[AStreamJid][receiver];
+
+		TriggerItem item;
+		item.id = AStanza.id();
+		item.sent = curDateTime;
+
+		for(QList<TriggerItem>::iterator it=triggers.begin(); it!=triggers.end(); )
+		{
+			if (it->sent.msecsTo(curDateTime) > TRIGGER_TIMEOUT)
+				it = triggers.erase(it);
+			else if (it->id == item.id)
+				it = triggers.erase(it);
+			else
+				++it;
+		}
+
+		triggers.prepend(item);
+	}
+}
+
+bool CaptchaForms::hasTrigger(const Jid &AStreamJid, const IDataForm &AForm) const
+{
 	if (FDataForms)
 	{
-		int answers = 0;
-		for (int i=0; i<AForm.fields.count(); i++)
+		QString sid = FDataForms->fieldValue("sid",AForm.fields).toString();
+		Jid from = FDataForms->fieldValue("from",AForm.fields).toString();
+
+		QDateTime curDateTime = QDateTime::currentDateTime();
+		QList<TriggerItem> triggers = FTriggers.value(AStreamJid).value(from);
+		foreach(const TriggerItem &item, triggers)
 		{
-			IDataField &field = AForm.fields[i];
-			if (methods.contains(field.var))
-			{
-				bool accepted = field.media.uris.isEmpty();
-				for (int i=0; !accepted && i<field.media.uris.count(); i++)
-					accepted = FDataForms->isSupportedUri(field.media.uris.at(i));
-				if (accepted)
-					answers++;
-				else
-					field.type = DATAFIELD_TYPE_HIDDEN;
-			}
-			else if (!field.required || !field.value.isNull())
-			{
-				field.type = DATAFIELD_TYPE_HIDDEN;
-			}
-			else
-			{
-				return false;
-			}
+			if (item.id==sid && item.sent.msecsTo(curDateTime)<TRIGGER_TIMEOUT)
+				return true;
 		}
-		int minAnswers = FDataForms->fieldIndex("answers",AForm.fields)>=0 ? FDataForms->fieldValue("answers",AForm.fields).toInt() : 1;
-		return answers >= minAnswers;
 	}
 	return false;
 }
 
-bool CaptchaForms::isValidChallenge(const Jid &AStreamJid, const Stanza &AStanza, IDataForm &AForm) const
+IDataForm CaptchaForms::getChallengeForm(const Stanza &AStanza) const
 {
-	Q_UNUSED(AStreamJid);
+	QDomElement formElem = AStanza.firstElement("captcha",NS_CAPTCHA_FORMS).firstChildElement("x");
+	while (!formElem.isNull() && formElem.namespaceURI()!=NS_JABBER_DATA)
+		formElem = formElem.nextSiblingElement("x");
+	return FDataForms!=NULL ? FDataForms->dataForm(formElem) : IDataForm();
+}
+
+bool CaptchaForms::isValidChallenge(const Stanza &AStanza, const IDataForm &AForm) const
+{
 	if (FDataForms)
 	{
-		QDomElement formElem = AStanza.firstElement("captcha",NS_CAPTCHA_FORMS).firstChildElement("x");
-		while (!formElem.isNull() && formElem.namespaceURI()!=NS_JABBER_DATA)
-			formElem = formElem.nextSiblingElement("x");
-		AForm = FDataForms->dataForm(formElem);
-
 		if (AStanza.id().isEmpty())
 			return false;
+
 		if (FDataForms->fieldValue("FORM_TYPE",AForm.fields).toString() != NS_CAPTCHA_FORMS)
 			return false;
-		
-		/* This checks removed due to capability issues with entities that does not follow XEP
+
 		Jid fromAttr = AStanza.from();
 		Jid fromField = FDataForms->fieldValue("from",AForm.fields).toString();
 		if (fromAttr.pBare()!=fromField.pBare() && fromAttr.pBare()!=fromField.pDomain())
 			return false;
+
+		/* This checks removed due to capability issues with entities that does not follow XEP
 		if (AStanza.id()!=FDataForms->fieldValue("challenge",AForm.fields).toString())
 			return false;
 		*/
@@ -320,9 +361,34 @@ bool CaptchaForms::isValidChallenge(const Jid &AStreamJid, const Stanza &AStanza
 	return false;
 }
 
+bool CaptchaForms::isSupportedChallenge(IDataForm &AForm) const
+{
+	if (FDataForms)
+	{
+		int availAnswers = 0;
+		for (int i=0; i<AForm.fields.count(); i++)
+		{
+			IDataField &field = AForm.fields[i];
+			if (CaptchaFieldVars.contains(field.var))
+			{
+				if (field.media.uris.isEmpty() || FDataForms->isSupportedMedia(field.media))
+					availAnswers++;
+				else if (!field.required)
+					field.type = DATAFIELD_TYPE_HIDDEN;
+				else
+					return false;
+			}
+		}
+
+		int minAnswers = FDataForms->fieldIndex("answers",AForm.fields)>=0 ? FDataForms->fieldValue("answers",AForm.fields).toInt() : 1;
+		return availAnswers >= minAnswers;
+	}
+	return false;
+}
+
 void CaptchaForms::notifyChallenge(const ChallengeItem &AChallenge)
 {
-	if (FDataForms && FNotifications)
+	if (FNotifications)
 	{
 		INotification notify;
 		notify.kinds = FNotifications->enabledTypeNotificationKinds(NNT_CAPTCHA_REQUEST);
@@ -338,67 +404,68 @@ void CaptchaForms::notifyChallenge(const ChallengeItem &AChallenge)
 			notify.data.insert(NDR_ALERT_WIDGET,(qint64)AChallenge.dialog->instance());
 			notify.data.insert(NDR_SHOWMINIMIZED_WIDGET,(qint64)AChallenge.dialog->instance());
 			FChallengeNotify.insert(FNotifications->appendNotification(notify),AChallenge.challengeId);
-			return;
+		}
+		else
+		{
+			AChallenge.dialog->instance()->show();
 		}
 	}
-	AChallenge.dialog->instance()->show();
 }
 
 QString CaptchaForms::findChallenge(IDataDialogWidget *ADialog) const
 {
-	QMap<QString, ChallengeItem>::const_iterator it = FChallenges.constBegin();
-	while (it != FChallenges.constEnd())
+	for (QMap<QString, ChallengeItem>::const_iterator it=FChallenges.constBegin(); it!=FChallenges.constEnd(); ++it)
 	{
 		if (it->dialog == ADialog)
 			return it.key();
-		++it;
 	}
 	return QString::null;
 }
 
 QString CaptchaForms::findChallenge(const Jid &AStreamJid, const Jid &AContactJid) const
 {
-	if (FDataForms && AContactJid.isValid())
+	for (QMap<QString, ChallengeItem>::const_iterator it=FChallenges.constBegin(); it!=FChallenges.constEnd(); ++it)
 	{
-		QMap<QString, ChallengeItem>::const_iterator it = FChallenges.constBegin();
-		while (it != FChallenges.constEnd())
-		{
-			if (AStreamJid==it->streamJid && AContactJid==it->challenger)
-				return it.key();
-			++it;
-		}
-	}
-	else if (!AContactJid.isValid())
-	{
-		REPORT_ERROR("Failed to find challenge: Invalid contact");
+		if (AStreamJid==it->streamJid && AContactJid==it->challenger)
+			return it.key();
 	}
 	return QString::null;
 }
 
-bool CaptchaForms::setFocusToEditableWidget(QWidget *AWidget)
+bool CaptchaForms::setFocusToEditableField(IDataDialogWidget *ADialog)
 {
-	static const QList<const char *> editableWidgets = QList<const char *>() << "QLineEdit" << "QTextEdit";
-
-	QWidget *focus = AWidget->focusWidget();
-	foreach(const char *className, editableWidgets)
+	if (FDataForms)
 	{
-		if (focus && focus->inherits(className))
+		IDataFieldWidget *focusField = NULL;
+		foreach(const IDataField &field, ADialog->formWidget()->dataForm().fields)
 		{
+			if (CaptchaFieldTypes.contains(field.type) && CaptchaFieldVars.contains(field.var))
+			{
+				if (!FDataForms->isMediaValid(field.media) || FDataForms->isSupportedMedia(field.media))
+				{
+					if (field.required)
+					{
+						focusField = ADialog->formWidget()->fieldWidget(field.var);
+						break;
+					}
+					else if (focusField == NULL)
+					{
+						focusField = ADialog->formWidget()->fieldWidget(field.var);
+					}
+				}
+			}
+		}
+
+		if (focusField != NULL)
+		{
+			focusField->instance()->setFocus();
 			return true;
 		}
-		else if (AWidget->focusPolicy()!=Qt::NoFocus && AWidget->inherits(className))
+		else
 		{
-			AWidget->setFocus();
-			return true;
+			LOG_WARNING("Failed to set focus to editable field");
 		}
 	}
-
-	foreach(QObject *child, AWidget->children())
-		if (child->isWidgetType() && setFocusToEditableWidget(qobject_cast<QWidget *>(child)))
-			return true;
-
-	LOG_WARNING("Failed to set focus to editable widget");
-
 	return false;
 }
 
@@ -414,7 +481,7 @@ bool CaptchaForms::eventFilter(QObject *AObject, QEvent *AEvent)
 				QString cid = findChallenge(dialog);
 				FNotifications->removeNotification(FChallengeNotify.key(cid));
 			}
-			setFocusToEditableWidget(dialog->instance());
+			setFocusToEditableField(dialog);
 		}
 	}
 	return QObject::eventFilter(AObject,AEvent);
@@ -424,33 +491,43 @@ void CaptchaForms::onXmppStreamOpened(IXmppStream *AXmppStream)
 {
 	if (FStanzaProcessor)
 	{
-		IStanzaHandle handle;
-		handle.handler = this;
-		handle.order = SHO_MI_CAPTCHAFORMS;
-		handle.direction = IStanzaHandle::DirectionIn;
-		handle.streamJid = AXmppStream->streamJid();
-		handle.conditions.append(SHC_MESSAGE_CAPTCHA);
-		FSHIChallenge.insert(handle.streamJid, FStanzaProcessor->insertStanzaHandle(handle));
+		IStanzaHandle triggerHandle;
+		triggerHandle.handler = this;
+		triggerHandle.order = SHO_IMPO_CAPTCHAFORMS;
+		triggerHandle.direction = IStanzaHandle::DirectionOut;
+		triggerHandle.streamJid = AXmppStream->streamJid();
+		triggerHandle.conditions.append(SHC_TRIGGER_IQ);
+		triggerHandle.conditions.append(SHC_TRIGGER_MESSAGE);
+		triggerHandle.conditions.append(SHC_TRIGGER_PRESENCE);
+		FSHITrigger.insert(triggerHandle.streamJid, FStanzaProcessor->insertStanzaHandle(triggerHandle));
+
+		IStanzaHandle challengeHandle;
+		challengeHandle.handler = this;
+		challengeHandle.order = SHO_MI_CAPTCHAFORMS;
+		challengeHandle.direction = IStanzaHandle::DirectionIn;
+		challengeHandle.streamJid = AXmppStream->streamJid();
+		challengeHandle.conditions.append(SHC_MESSAGE_CAPTCHA);
+		FSHIChallenge.insert(challengeHandle.streamJid, FStanzaProcessor->insertStanzaHandle(challengeHandle));
 	}
 }
 
 void CaptchaForms::onXmppStreamClosed(IXmppStream *AXmppStream)
 {
 	QList<IDataDialogWidget *> dialogs;
-
-	QMap<QString, ChallengeItem>::const_iterator it = FChallenges.constBegin();
-	while (it != FChallenges.constEnd())
-	{
+	for (QMap<QString, ChallengeItem>::const_iterator it=FChallenges.constBegin(); it!=FChallenges.constEnd(); ++it)
 		if (it->streamJid == AXmppStream->streamJid())
 			dialogs.append(it->dialog);
-		++it;
-	}
 
 	foreach(IDataDialogWidget *dialog, dialogs)
 		dialog->instance()->reject();
 
 	if (FStanzaProcessor)
+	{
+		FStanzaProcessor->removeStanzaHandle(FSHITrigger.take(AXmppStream->streamJid()));
 		FStanzaProcessor->removeStanzaHandle(FSHIChallenge.take(AXmppStream->streamJid()));
+	}
+
+	FTriggers.remove(AXmppStream->streamJid());
 }
 
 void CaptchaForms::onChallengeDialogAccepted()
@@ -459,7 +536,7 @@ void CaptchaForms::onChallengeDialogAccepted()
 	if (!cid.isEmpty())
 	{
 		const ChallengeItem &item = FChallenges.value(cid);
-		submitChallenge(cid,FDataForms->dataSubmit(item.dialog->formWidget()->userDataForm()));
+		submitChallenge(cid,item.dialog->formWidget()->submitDataForm());
 	}
 	else
 	{

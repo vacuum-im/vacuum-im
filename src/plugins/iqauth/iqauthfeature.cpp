@@ -26,10 +26,10 @@ bool IqAuthFeature::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int 
 	{
 		if (AStanza.id() == "getIqAuth")
 		{
-			if (AStanza.type() == "result")
+			if (AStanza.isResult())
 			{
-				Stanza auth("iq");
-				auth.setType("set").setTo(FXmppStream->streamJid().domain()).setId("setIqAuth");
+				Stanza auth(STANZA_KIND_IQ);
+				auth.setType(STANZA_TYPE_SET).setTo(FXmppStream->streamJid().domain()).setId("setIqAuth");
 				QDomElement query = auth.addElement("query",NS_JABBER_IQ_AUTH);
 				query.appendChild(auth.createElement("username")).appendChild(auth.createTextNode(FXmppStream->streamJid().pNode()));
 				query.appendChild(auth.createElement("resource")).appendChild(auth.createTextNode(FXmppStream->streamJid().resource()));
@@ -69,7 +69,7 @@ bool IqAuthFeature::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int 
 		else if (AStanza.id() == "setIqAuth")
 		{
 			FXmppStream->removeXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
-			if (AStanza.type() == "result")
+			if (AStanza.isResult())
 			{
 				LOG_STRM_INFO(AXmppStream->streamJid(),"Username and password accepted");
 				deleteLater();
@@ -128,8 +128,8 @@ bool IqAuthFeature::start(const QDomElement &AElem)
 
 void IqAuthFeature::sendAuthRequest()
 {
-	Stanza request("iq");
-	request.setType("get").setId("getIqAuth");
+	Stanza request(STANZA_KIND_IQ);
+	request.setType(STANZA_TYPE_GET).setId("getIqAuth");
 	request.addElement("query",NS_JABBER_IQ_AUTH).appendChild(request.createElement("username")).appendChild(request.createTextNode(FXmppStream->streamJid().pNode()));
 
 	FXmppStream->insertXmppStanzaHandler(XSHO_XMPP_FEATURE,this);

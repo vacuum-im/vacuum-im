@@ -7,7 +7,7 @@
 #include <utils/xmpperror.h>
 #include <utils/logger.h>
 
-#define CHUNK 5120
+#define CHUNK_SIZE   4096
 
 CompressFeature::CompressFeature(IXmppStream *AXmppStream) : QObject(AXmppStream->instance())
 {
@@ -42,7 +42,7 @@ bool CompressFeature::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, in
 	if (AXmppStream==FXmppStream && AOrder==XSHO_XMPP_FEATURE)
 	{
 		FXmppStream->removeXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
-		if (AStanza.tagName() == "compressed")
+		if (AStanza.kind() == "compressed")
 		{
 			LOG_STRM_INFO(AXmppStream->streamJid(),"Stream compression started");
 			FXmppStream->insertXmppDataHandler(XDHO_FEATURE_COMPRESS,this);
@@ -50,7 +50,7 @@ bool CompressFeature::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, in
 		}
 		else
 		{
-			LOG_STRM_WARNING(AXmppStream->streamJid(),QString("Failed to start stream compression: %1").arg(AStanza.tagName()));
+			LOG_STRM_WARNING(AXmppStream->streamJid(),QString("Failed to start stream compression: Invalid stanza kind=%1").arg(AStanza.kind()));
 			deleteLater();
 			emit finished(false);
 		}
@@ -87,8 +87,7 @@ bool CompressFeature::start(const QDomElement &AElem)
 				if (startZlib())
 				{
 					LOG_STRM_INFO(FXmppStream->streamJid(),QString("Starting stream compression with ZLib=%1").arg(ZLIB_VERSION));
-					Stanza compress("compress");
-					compress.setAttribute("xmlns",NS_PROTOCOL_COMPRESS);
+					Stanza compress("compress",NS_PROTOCOL_COMPRESS);
 					compress.addElement("method").appendChild(compress.createTextNode("zlib"));
 					FXmppStream->insertXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 					FXmppStream->sendStanza(compress);
@@ -132,7 +131,7 @@ bool CompressFeature::startZlib()
 		if (retInf == Z_OK && retDef == Z_OK)
 		{
 			FZlibInited = true;
-			FOutBuffer.reserve(CHUNK);
+			FOutBuffer.reserve(CHUNK_SIZE);
 		}
 		else
 		{
@@ -186,7 +185,7 @@ void CompressFeature::processData(QByteArray &AData, bool ADataOut)
 			case Z_OK:
 				dataPosOut = FOutBuffer.capacity() - zstream->avail_out;
 				if (zstream->avail_out == 0)
-					FOutBuffer.reserve(FOutBuffer.capacity() + CHUNK);
+					FOutBuffer.reserve(FOutBuffer.capacity() + CHUNK_SIZE);
 				break;
 			case Z_STREAM_ERROR:
 				emit error(XmppError(IERR_COMPRESS_INVALID_COMPRESSION_LEVEL));

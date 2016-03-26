@@ -1263,7 +1263,7 @@ bool MetaContacts::updateMetaContact(const Jid &AStreamJid, const IMetaContact &
 		foreach(const Jid &itemJid, after.items)
 		{
 			IRosterItem rItem = roster->findItem(itemJid);
-			if (!rItem.isNull() && !itemJid.node().isEmpty())
+			if (!rItem.isNull() && itemJid.hasNode())
 			{
 				if (!before.items.contains(itemJid))
 				{
@@ -1362,7 +1362,7 @@ bool MetaContacts::isReadyStreams(const QStringList &AStreams) const
 
 bool MetaContacts::isValidItem(const Jid &AStreamJid, const Jid &AItemJid) const
 {
-	if (AItemJid.isValid() && !AItemJid.node().isEmpty())
+	if (AItemJid.isValid() && AItemJid.hasNode())
 	{
 		IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(AStreamJid) : NULL;
 		if (roster != NULL)
@@ -1936,7 +1936,7 @@ void MetaContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AI
 				combineAction->setData(ADR_METACONTACT_ID,rolesMap.value(RDR_METACONTACT_ID));
 				combineAction->setShortcutId(SCT_ROSTERVIEW_COMBINECONTACTS);
 				connect(combineAction,SIGNAL(triggered()),SLOT(onCombineMetaItemsByAction()));
-				AMenu->addAction(combineAction,AG_RVCM_METACONTACTS,true);
+				AMenu->addAction(combineAction,AG_RVCM_METACONTACTS_EDIT,true);
 			}
 
 			if (uniqueKinds.count()==1 && uniqueKinds.value(0).toInt()==RIK_METACONTACT_ITEM)
@@ -1948,7 +1948,7 @@ void MetaContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AI
 				detachAction->setData(ADR_CONTACT_JID,rolesMap.value(RDR_PREP_BARE_JID));
 				detachAction->setShortcutId(SCT_ROSTERVIEW_DETACHFROMMETACONTACT);
 				connect(detachAction,SIGNAL(triggered()),SLOT(onRemoveMetaItemsByAction()));
-				AMenu->addAction(detachAction,AG_RVCM_METACONTACTS,true);
+				AMenu->addAction(detachAction,AG_RVCM_METACONTACTS_EDIT,true);
 			}
 
 			if (uniqueKinds.count()==1 && uniqueKinds.value(0).toInt()==RIK_METACONTACT)
@@ -1960,7 +1960,7 @@ void MetaContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AI
 				destroyAction->setData(ADR_METACONTACT_ID,rolesMap.value(RDR_METACONTACT_ID));
 				destroyAction->setShortcutId(SCT_ROSTERVIEW_DESTROYMETACONTACT);
 				connect(destroyAction,SIGNAL(triggered()),SLOT(onDestroyMetaContactsByAction()));
-				AMenu->addAction(destroyAction,AG_RVCM_METACONTACTS,true);
+				AMenu->addAction(destroyAction,AG_RVCM_METACONTACTS_EDIT,true);
 			}
 			
 			if (!isMultiSelection && uniqueKinds.value(0).toInt()==RIK_METACONTACT)
@@ -1973,7 +1973,7 @@ void MetaContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AI
 				renameAction->setData(ADR_FROM_GROUP, AIndexes.value(0)->data(RDR_GROUP));
 				renameAction->setShortcutId(SCT_ROSTERVIEW_RENAME);
 				connect(renameAction,SIGNAL(triggered()),SLOT(onRenameMetaContactByAction()));
-				AMenu->addAction(renameAction,AG_RVCM_RCHANGER,true);
+				AMenu->addAction(renameAction,AG_RVCM_RCHANGER_EDIT,true);
 			}
 		}
 

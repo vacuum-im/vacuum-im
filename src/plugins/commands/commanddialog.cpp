@@ -169,8 +169,7 @@ QString CommandDialog::sendRequest(const QString &AAction)
 	request.node = FNode;
 	request.sessionId = FSessionId;
 	request.action = AAction;
-	if (FCurrentForm)
-		request.form = FDataForms->dataSubmit(FCurrentForm->userDataForm());
+	request.form = FCurrentForm!=NULL ? FCurrentForm->submitDataForm() : IDataForm();
 	return FCommands->sendCommandRequest(request);
 }
 

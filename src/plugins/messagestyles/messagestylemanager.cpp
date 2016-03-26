@@ -205,7 +205,7 @@ QString MessageStyleManager::contactName(const Jid &AStreamJid, const Jid &ACont
 	}
 	else if (AStreamJid.pBare() == AContactJid.pBare())
 	{
-		name = !AContactJid.resource().isEmpty() ? AContactJid.resource() : AContactJid.uNode();
+		name = AContactJid.hasResource() ? AContactJid.resource() : AContactJid.uNode();
 	}
 	else
 	{
@@ -216,9 +216,9 @@ QString MessageStyleManager::contactName(const Jid &AStreamJid, const Jid &ACont
 	if (name.isEmpty())
 	{
 		if (AContactJid.isValid())
-			name = !AContactJid.node().isEmpty() ? AContactJid.uNode() : AContactJid.domain();
+			name = AContactJid.hasNode() ? AContactJid.uNode() : AContactJid.domain();
 		else
-			name = !AStreamJid.node().isEmpty() ? AStreamJid.uNode() : AStreamJid.domain();
+			name = AStreamJid.hasNode() ? AStreamJid.uNode() : AStreamJid.domain();
 	}
 
 	return name;
@@ -303,18 +303,17 @@ void MessageStyleManager::onVCardChanged(const Jid &AContactJid)
 
 void MessageStyleManager::onOptionsChanged(const OptionsNode &ANode)
 {
-	QString cleanPath = Options::cleanNSpaces(ANode.path());
-	if (cleanPath == OPV_MESSAGESTYLE_CONTEXT_ENGINEID)
+	if (ANode.cleanPath() == OPV_MESSAGESTYLE_CONTEXT_ENGINEID)
 	{
 		QList<QString> nspaces = ANode.parentNSpaces();
 		appendPendingChanges(nspaces.value(1).toInt(),nspaces.value(2));
 	}
-	else if (cleanPath == OPV_MESSAGESTYLE_ENGINE_STYLEID)
+	else if (ANode.cleanPath() == OPV_MESSAGESTYLE_ENGINE_STYLEID)
 	{
 		QList<QString> nspaces = ANode.parentNSpaces();
 		appendPendingChanges(nspaces.value(1).toInt(),nspaces.value(2));
 	}
-	else if (cleanPath.startsWith(OPV_MESSAGESTYLE_STYLE_ITEM"."))
+	else if (ANode.cleanPath().startsWith(OPV_MESSAGESTYLE_STYLE_ITEM"."))
 	{
 		QList<QString> nspaces = ANode.parentNSpaces();
 		QString mtype = nspaces.value(1);

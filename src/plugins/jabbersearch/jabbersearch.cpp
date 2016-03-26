@@ -78,7 +78,7 @@ bool JabberSearch::initObjects()
 	}
 	if (FDataForms)
 	{
-		FDataForms->insertLocalizer(this,DATA_FORM_SEARCH);
+		FDataForms->insertLocalizer(this,DFT_JABBERSEARCH);
 	}
 	return true;
 }
@@ -88,7 +88,7 @@ void JabberSearch::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 	Q_UNUSED(AStreamJid);
 	if (FRequests.contains(AStanza.id()))
 	{
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			LOG_STRM_INFO(AStreamJid,QString("Search request result received, id=%1").arg(AStanza.id()));
 			QDomElement query = AStanza.firstElement("query",NS_JABBER_SEARCH);
@@ -139,7 +139,7 @@ void JabberSearch::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 	}
 	else if (FSubmits.contains(AStanza.id()))
 	{
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			LOG_STRM_INFO(AStreamJid,QString("Search submit result received, id=%1").arg(AStanza.id()));
 			QDomElement query = AStanza.firstElement("query",NS_JABBER_SEARCH);
@@ -209,7 +209,7 @@ Action *JabberSearch::createDiscoFeatureAction(const Jid &AStreamJid, const QStr
 IDataFormLocale JabberSearch::dataFormLocale(const QString &AFormType)
 {
 	IDataFormLocale locale;
-	if (AFormType == DATA_FORM_SEARCH)
+	if (AFormType == DFT_JABBERSEARCH)
 	{
 		locale.title = tr("Jabber Search");
 		locale.fields["first"].label = tr("First Name");
@@ -224,8 +224,8 @@ QString JabberSearch::sendRequest(const Jid &AStreamJid, const Jid &AServiceJid)
 {
 	if (FStanzaProcessor)
 	{
-		Stanza request("iq");
-		request.setTo(AServiceJid.full()).setType("get").setId(FStanzaProcessor->newId());
+		Stanza request(STANZA_KIND_IQ);
+		request.setType(STANZA_TYPE_GET).setTo(AServiceJid.full()).setUniqueId();
 		request.addElement("query",NS_JABBER_SEARCH);
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,SEARCH_TIMEOUT))
 		{
@@ -245,8 +245,8 @@ QString JabberSearch::sendSubmit(const Jid &AStreamJid, const ISearchSubmit &ASu
 {
 	if (FStanzaProcessor)
 	{
-		Stanza submit("iq");
-		submit.setTo(ASubmit.serviceJid.full()).setType("set").setId(FStanzaProcessor->newId());
+		Stanza submit(STANZA_KIND_IQ);
+		submit.setType(STANZA_TYPE_SET).setTo(ASubmit.serviceJid.full()).setUniqueId();
 
 		QDomElement query = submit.addElement("query",NS_JABBER_SEARCH);
 		if (FDataForms && !ASubmit.form.type.isEmpty())

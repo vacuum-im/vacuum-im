@@ -50,7 +50,7 @@ public:
 	virtual QDialog *showVCardDialog(const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent = NULL) =0;
 protected:
 	virtual void vcardReceived(const Jid &AContactJid) =0;
-	virtual void vcardPublished(const Jid &AContactJid) =0;
+	virtual void vcardPublished(const Jid &AStreamJid) =0;
 	virtual void vcardError(const Jid &AContactJid, const XmppError &AError) =0;
 };
 

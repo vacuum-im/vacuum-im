@@ -16,7 +16,9 @@
 
 #define RIDR_ITEM_COLLAPSED        RDR_USER_ROLE+111
 
-ReceiversSortSearchProxyModel::ReceiversSortSearchProxyModel(QObject *AParent) : QSortFilterProxyModel(AParent)
+static const QList<int> GroupKinds = QList<int>() << RIK_STREAM_ROOT << RIK_GROUP;
+
+ReceiversProxyModel::ReceiversProxyModel(QObject *AParent) : QSortFilterProxyModel(AParent)
 {
 	FOfflineVisible = true;
 	setSortLocaleAware(true);
@@ -25,49 +27,57 @@ ReceiversSortSearchProxyModel::ReceiversSortSearchProxyModel(QObject *AParent) :
 	setFilterCaseSensitivity(Qt::CaseInsensitive);
 }
 
-bool ReceiversSortSearchProxyModel::isOfflineContactsVisible() const
+bool ReceiversProxyModel::isOfflineContactsVisible() const
 {
 	return FOfflineVisible;
 }
 
-void ReceiversSortSearchProxyModel::setOfflineContactsVisible(bool AVisible)
+void ReceiversProxyModel::setOfflineContactsVisible(bool AVisible)
 {
 	if (FOfflineVisible != AVisible)
 	{
 		FOfflineVisible = AVisible;
-		invalidate();
+		invalidateFilter();
 	}
 }
 
-bool ReceiversSortSearchProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex &ARight) const
+bool ReceiversProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex &ARight) const
 {
 	int leftTypeOrder = ALeft.data(RDR_KIND_ORDER).toInt();
 	int rightTypeOrder = ARight.data(RDR_KIND_ORDER).toInt();
 	if (leftTypeOrder == rightTypeOrder)
 	{
-		if (leftTypeOrder != RIKO_STREAM_ROOT)
+		int leftSortOrder = ALeft.data(RDR_SORT_ORDER).toInt();
+		int rightSortOrder = ARight.data(RDR_SORT_ORDER).toInt();
+		if (leftSortOrder == rightSortOrder)
 		{
-			int leftShow = ALeft.data(RDR_SHOW).toInt();
-			int rightShow = ARight.data(RDR_SHOW).toInt();
-			if (leftShow != rightShow)
+			if (leftTypeOrder != RIKO_STREAM_ROOT)
 			{
-				static const int showOrders[] = {6,2,1,3,4,5,7,8};
-				static const int showOrdersCount = sizeof(showOrders)/sizeof(showOrders[0]);
-				if (leftShow<showOrdersCount && rightShow<showOrdersCount)
-					return showOrders[leftShow] < showOrders[rightShow];
+				int leftShow = ALeft.data(RDR_SHOW).toInt();
+				int rightShow = ARight.data(RDR_SHOW).toInt();
+				if (leftShow != rightShow)
+				{
+					static const int showOrders[] = {6,2,1,3,4,5,7,8};
+					static const int showOrdersCount = sizeof(showOrders)/sizeof(showOrders[0]);
+					if (leftShow<showOrdersCount && rightShow<showOrdersCount)
+						return showOrders[leftShow] < showOrders[rightShow];
+				}
 			}
+			return QSortFilterProxyModel::lessThan(ALeft,ARight);
 		}
-		return QSortFilterProxyModel::lessThan(ALeft,ARight);
+		return leftSortOrder < rightSortOrder;
 	}
 	return leftTypeOrder < rightTypeOrder;
 }
 
-bool ReceiversSortSearchProxyModel::filterAcceptsRow(int AModelRow, const QModelIndex &AModelParent) const
+bool ReceiversProxyModel::filterAcceptsRow(int AModelRow, const QModelIndex &AModelParent) const
 {
-	QModelIndex index = sourceModel()->index(AModelRow,0,AModelParent);
-	if (sourceModel()->hasChildren(index))
+	QAbstractItemModel *source = sourceModel();
+
+	QModelIndex index = source->index(AModelRow,0,AModelParent);
+	if (GroupKinds.contains(index.data(RDR_KIND).toInt()))
 	{
-		for (int childRow = 0; index.child(childRow,0).isValid(); childRow++)
+		for (int childRow=0; index.child(childRow,0).isValid(); childRow++)
 			if (filterAcceptsRow(childRow,index))
 				return true;
 		return false;
@@ -78,6 +88,7 @@ bool ReceiversSortSearchProxyModel::filterAcceptsRow(int AModelRow, const QModel
 		if (show==IPresence::Offline || show==IPresence::Error)
 			return false;
 	}
+	
 	return QSortFilterProxyModel::filterAcceptsRow(AModelRow,AModelParent);
 }
 
@@ -85,6 +96,8 @@ ReceiversWidget::ReceiversWidget(IMessageWidgets *AMessageWidgets, IMessageWindo
 {
 	ui.setupUi(this);
 	setWindowIconText(tr("Receivers"));
+	
+	qRegisterMetaType< QList<QStandardItem *> >("QList<QStandardItem *>");
 
 	FWindow = AWindow;
 	FMessageWidgets = AMessageWidgets;
@@ -121,21 +134,18 @@ ReceiversWidget::ReceiversWidget(IMessageWidgets *AMessageWidgets, IMessageWindo
 	ui.trvReceivers->setItemDelegate(itemDelegate);
 
 	FModel = new AdvancedItemModel(this);
+	FModel->setDelayedDataChangedSignals(true);
 	FModel->setRecursiveParentDataChangedSignals(true);
 	connect(FModel,SIGNAL(itemInserted(QStandardItem *)),SLOT(onModelItemInserted(QStandardItem *)));
 	connect(FModel,SIGNAL(itemRemoving(QStandardItem *)),SLOT(onModelItemRemoving(QStandardItem *)));
 	connect(FModel,SIGNAL(itemDataChanged(QStandardItem *,int)),SLOT(onModelItemDataChanged(QStandardItem *,int)));
 
-	FProxyModel = new ReceiversSortSearchProxyModel(this);
-	FProxyModel->setSourceModel(FModel);
+	FProxyModel = new ReceiversProxyModel(this);
 	FProxyModel->sort(0,Qt::AscendingOrder);
-	ui.trvReceivers->setModel(FProxyModel);
 
 	FSelectionSignalTimer.setSingleShot(true);
 	FSelectionSignalTimer.setInterval(0);
 	connect(&FSelectionSignalTimer,SIGNAL(timeout()),SIGNAL(addressSelectionChanged()));
-
-	qRegisterMetaType< QList<QStandardItem *> >("QList<QStandardItem *>");
 
 	foreach(const Jid &streamJid, FMessageProcessor!=NULL ? FMessageProcessor->activeStreams() : QList<Jid>())
 		onActiveStreamAppended(streamJid);
@@ -144,7 +154,8 @@ ReceiversWidget::ReceiversWidget(IMessageWidgets *AMessageWidgets, IMessageWindo
 	connect(ui.trvReceivers,SIGNAL(collapsed(const QModelIndex &)),SLOT(onViewIndexCollapsed(const QModelIndex &)));
 	connect(ui.trvReceivers,SIGNAL(expanded(const QModelIndex &)),SLOT(onViewIndexExpanded(const QModelIndex &)));
 	connect(ui.trvReceivers,SIGNAL(customContextMenuRequested(const QPoint &)),SLOT(onViewContextMenuRequested(const QPoint &)));
-	connect(ui.trvReceivers->model(),SIGNAL(rowsInserted(const QModelIndex &, int , int )),SLOT(onViewModelRowsInserted(const QModelIndex &, int , int )));
+
+	insertProxyModel(FProxyModel);
 }
 
 ReceiversWidget::~ReceiversWidget()
@@ -154,7 +165,7 @@ ReceiversWidget::~ReceiversWidget()
 
 bool ReceiversWidget::isVisibleOnWindow() const
 {
-	return isVisibleTo(FWindow->instance());
+	return FWindow!=NULL ? isVisibleTo(FWindow->instance()) : false;
 }
 
 IMessageWindow *ReceiversWidget::messageWindow() const
@@ -177,33 +188,113 @@ AdvancedItemModel *ReceiversWidget::receiversModel() const
 	return FModel;
 }
 
+QList<QAbstractProxyModel *> ReceiversWidget::proxyModels() const
+{
+	return FProxyModels;
+}
+
+void ReceiversWidget::insertProxyModel(QAbstractProxyModel *AProxy)
+{
+	if (AProxy!=NULL && !FProxyModels.contains(AProxy))
+	{
+		emit proxyModelsAboutToBeChanged();
+
+		if (ui.trvReceivers->model())
+			disconnect(ui.trvReceivers->model(),SIGNAL(rowsInserted(const QModelIndex &, int , int )),this,SLOT(onViewModelRowsInserted(const QModelIndex &, int , int )));
+
+		AProxy->setSourceModel(FModel);
+
+		bool viewModelChanged = false;
+		QAbstractProxyModel *firstProxy = FProxyModels.value(0);
+		if (firstProxy != NULL)
+		{
+			firstProxy->setSourceModel(NULL); // fix bug in QSortFilterProxyModel
+			firstProxy->setSourceModel(AProxy);
+		}
+		else
+		{
+			viewModelChanged = true;
+			ui.trvReceivers->setModel(AProxy);
+		}
+
+		FProxyModels.prepend(AProxy);
+
+		if (ui.trvReceivers->model())
+			connect(ui.trvReceivers->model(),SIGNAL(rowsInserted(const QModelIndex &, int , int )),this,SLOT(onViewModelRowsInserted(const QModelIndex &, int , int )));
+
+		restoreExpandState(FModel->invisibleRootItem());
+		emit proxyModelsChanged(viewModelChanged);
+	}
+}
+
+void ReceiversWidget::removeProxyModel(QAbstractProxyModel *AProxy)
+{
+	int index = FProxyModels.indexOf(AProxy);
+	if (index >= 0)
+	{
+		emit proxyModelsAboutToBeChanged();
+
+		if (ui.trvReceivers->model())
+			disconnect(ui.trvReceivers->model(),SIGNAL(rowsInserted(const QModelIndex &, int , int )),this,SLOT(onViewModelRowsInserted(const QModelIndex &, int , int )));
+
+		FProxyModels.removeAt(index);
+
+		bool viewModelChanged = false;
+		if (FProxyModels.isEmpty())
+		{
+			// No more proxy models
+			ui.trvReceivers->setModel(FModel);
+			viewModelChanged = true;
+		}
+		else if (index == FProxyModels.count())
+		{
+			// Last proxy model was removed
+			ui.trvReceivers->setModel(FProxyModels.last());
+			viewModelChanged = true;
+		}
+		else if (index == 0)
+		{
+			// First proxy model was removed
+			FProxyModels[0]->setSourceModel(FModel);
+		}
+		else
+		{
+			// Middle proxy model was removed
+			FProxyModels[index]->setSourceModel(FProxyModels[index-1]);
+		}
+
+		if (ui.trvReceivers->model())
+			connect(ui.trvReceivers->model(),SIGNAL(rowsInserted(const QModelIndex &, int , int )),this,SLOT(onViewModelRowsInserted(const QModelIndex &, int , int )));
+
+		restoreExpandState(FModel->invisibleRootItem());
+		emit proxyModelsChanged(viewModelChanged);
+	}
+}
+
 QModelIndex ReceiversWidget::mapModelToView(QStandardItem *AItem)
 {
 	QModelIndex index = FModel->indexFromItem(AItem);
-	if (ui.trvReceivers->model() != FModel)
-	{
-		QAbstractProxyModel *proxy = qobject_cast<QAbstractProxyModel *>(ui.trvReceivers->model());
-		return proxy!=NULL ? proxy->mapFromSource(index) : QModelIndex();
-	}
+	for (int i=0; i<FProxyModels.count(); i++)
+		index = FProxyModels.at(i)->mapFromSource(index);
 	return index;
 }
 
 QStandardItem *ReceiversWidget::mapViewToModel(const QModelIndex &AIndex)
 {
-	if (ui.trvReceivers->model() != FModel)
-	{
-		QAbstractProxyModel *proxy = qobject_cast<QAbstractProxyModel *>(ui.trvReceivers->model());
-		return proxy!=NULL ? FModel->itemFromIndex(proxy->mapToSource(AIndex)) : NULL;
-	}
-	return FModel->itemFromIndex(AIndex);
+	QModelIndex index = AIndex;
+	for (int i=FProxyModels.count()-1; i>=0; i--)
+		index = FProxyModels.at(i)->mapToSource(index);
+	return FModel->itemFromIndex(index);
 }
 
 void ReceiversWidget::contextMenuForItems(QList<QStandardItem *> AItems, Menu *AMenu)
 {
 	bool allHasChildren = true;
 	foreach(QStandardItem *item, AItems)
+	{
 		if (!item->hasChildren())
 			allHasChildren = false;
+	}
 
 	if (allHasChildren)
 	{
@@ -267,13 +358,27 @@ void ReceiversWidget::contextMenuForItems(QList<QStandardItem *> AItems, Menu *A
 			Action *hideOffline = new Action(AMenu);
 			hideOffline->setText(tr("Hide Offline Contacts"));
 			hideOffline->setCheckable(true);
-			hideOffline->setChecked(!FProxyModel->isOfflineContactsVisible());
+			hideOffline->setChecked(!isOfflineContactsVisible());
 			connect(hideOffline,SIGNAL(triggered()),SLOT(onHideOfflineContacts()));
 			AMenu->addAction(hideOffline,AG_MWRWCM_MWIDGETS_HIDE_OFFLINE);
 		}
 	}
 
 	emit contextMenuForItemsRequested(AItems,AMenu);
+}
+
+bool ReceiversWidget::isOfflineContactsVisible() const
+{
+	return FProxyModel->isOfflineContactsVisible();
+}
+
+void ReceiversWidget::setOfflineContactsVisible(bool AVisible)
+{
+	if (FProxyModel->isOfflineContactsVisible() != AVisible)
+	{
+		FProxyModel->setOfflineContactsVisible(AVisible);
+		restoreExpandState(FModel->invisibleRootItem());
+	}
 }
 
 QMultiMap<Jid, Jid> ReceiversWidget::selectedAddresses() const
@@ -361,11 +466,16 @@ QStandardItem *ReceiversWidget::getStreamItem(const Jid &AStreamJid)
 	QStandardItem *streamItem = FStreamItems.value(AStreamJid);
 	if (streamItem == NULL)
 	{
+		IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(AStreamJid) : NULL;
+		int streamOrder =  account!=NULL ? account->accountOrder() : 0;
+
 		streamItem = new AdvancedItem();
 		streamItem->setCheckable(true);
 		streamItem->setData(RIK_STREAM_ROOT,RDR_KIND);
 		streamItem->setData(RIKO_STREAM_ROOT,RDR_KIND_ORDER);
+		streamItem->setData(streamOrder,RDR_SORT_ORDER);
 		streamItem->setData(AStreamJid.pFull(),RDR_STREAM_JID);
+		streamItem->setText(account!=NULL ? account->name() : AStreamJid.uBare());
 
 		QFont streamFont = streamItem->font();
 		streamFont.setBold(true);
@@ -373,9 +483,6 @@ QStandardItem *ReceiversWidget::getStreamItem(const Jid &AStreamJid)
 
 		streamItem->setBackground(ui.trvReceivers->palette().color(QPalette::Active, QPalette::Dark));
 		streamItem->setForeground(ui.trvReceivers->palette().color(QPalette::Active, QPalette::BrightText));
-
-		IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(AStreamJid) : NULL;
-		streamItem->setText(account!=NULL ? account->name() : AStreamJid.uBare());
 
 		FModel->invisibleRootItem()->appendRow(streamItem);
 		ui.trvReceivers->expand(mapModelToView(streamItem));
@@ -436,6 +543,8 @@ QStandardItem *ReceiversWidget::getContactItem(const Jid &AStreamJid, const Jid 
 		contactItem->setData(RIK_CONTACT,RDR_KIND);
 		contactItem->setData(RIKO_DEFAULT,RDR_KIND_ORDER);
 		contactItem->setData(AStreamJid.pFull(),RDR_STREAM_JID);
+		contactItem->setData(AContactJid.full(),RDR_FULL_JID);
+		contactItem->setData(AContactJid.pFull(),RDR_PREP_FULL_JID);
 		contactItem->setData(AContactJid.pBare(),RDR_PREP_BARE_JID);
 		contactItem->setData(AGroup,RDR_GROUP);
 
@@ -468,8 +577,12 @@ void ReceiversWidget::updateCheckState(QStandardItem *AItem)
 			QStandardItem *childItem = AItem->child(row);
 			if (!FModel->isRemovedItem(childItem))
 			{
-				allChecked = allChecked && (childItem->checkState()==Qt::Checked);
-				allUnchecked = allUnchecked && (childItem->checkState()==Qt::Unchecked);
+				QModelIndex index = mapModelToView(childItem);
+				if (index.isValid())
+				{
+					allChecked = allChecked && (childItem->checkState()==Qt::Checked);
+					allUnchecked = allUnchecked && (childItem->checkState()==Qt::Unchecked);
+				}
 			}
 		}
 
@@ -485,10 +598,22 @@ void ReceiversWidget::updateCheckState(QStandardItem *AItem)
 void ReceiversWidget::updateContactItemsPresence(const Jid &AStreamJid, const Jid &AContactJid)
 {
 	IPresence *presence = FPresenceManager!=NULL ? FPresenceManager->findPresence(AStreamJid) : NULL;
-	IPresenceItem pitem = presence!=NULL ? FPresenceManager->sortPresenceItems(presence->findItems(AContactJid)).value(0) : IPresenceItem();
+	QList<IPresenceItem> pitemList = presence!=NULL ? FPresenceManager->sortPresenceItems(presence->findItems(AContactJid)) : QList<IPresenceItem>();
+
+	QStringList resources;
+	foreach(const IPresenceItem &pitem, pitemList)
+	{
+		if (pitem.show!=IPresence::Offline && pitem.show!=IPresence::Error)
+			resources.append(pitem.itemJid.pFull());
+	}
+
+	IPresenceItem pitem = pitemList.value(0);
 	foreach(QStandardItem *contactItem, findContactItems(AStreamJid,AContactJid))
 	{
 		contactItem->setData(pitem.show,RDR_SHOW);
+		contactItem->setData(pitem.status,RDR_STATUS);
+		contactItem->setData(pitem.priority,RDR_PRIORITY);
+		contactItem->setData(resources,RDR_RESOURCES);
 		contactItem->setIcon(FStatusIcons!=NULL ? FStatusIcons->iconByJidStatus(pitem.itemJid,pitem.show,SUBSCRIPTION_BOTH,false) : QIcon());
 	}
 }
@@ -706,25 +831,22 @@ void ReceiversWidget::collapseAllChilds(QList<QStandardItem *> AParents)
 	}
 }
 
-void ReceiversWidget::restoreExpandState(QList<QStandardItem *> AParents)
+void ReceiversWidget::restoreExpandState(QStandardItem * AParent)
 {
-	foreach(QStandardItem *parentItem, AParents)
+	QModelIndex index = mapModelToView(AParent);
+	if (index.isValid())
 	{
-		QModelIndex index = mapModelToView(parentItem);
-		if (index.isValid())
-		{
-			if (index.data(RIDR_ITEM_COLLAPSED).toBool())
-				ui.trvReceivers->collapse(index);
-			else
-				ui.trvReceivers->expand(index);
-		}
+		if (index.data(RIDR_ITEM_COLLAPSED).toBool())
+			ui.trvReceivers->collapse(index);
+		else
+			ui.trvReceivers->expand(index);
+	}
 
-		for (int row=0; row<parentItem->rowCount(); row++)
-		{
-			QStandardItem *item = parentItem->child(row);
-			if (item->hasChildren())
-				restoreExpandState(QList<QStandardItem *>() << item);
-		}
+	for (int row=0; row<AParent->rowCount(); row++)
+	{
+		QStandardItem *item = AParent->child(row);
+		if (item->hasChildren())
+			restoreExpandState(item);
 	}
 }
 
@@ -815,14 +937,14 @@ void ReceiversWidget::onModelItemDataChanged(QStandardItem *AItem, int ARole)
 void ReceiversWidget::onViewIndexExpanded(const QModelIndex &AIndex)
 {
 	QStandardItem *item = mapViewToModel(AIndex);
-	if (item && FProxyModel->filterRegExp().isEmpty())
+	if (item!=NULL && FProxyModel->filterRegExp().isEmpty())
 		item->setData(false,RIDR_ITEM_COLLAPSED);
 }
 
-void ReceiversWidget::onViewIndexCollapsed( const QModelIndex &AIndex )
+void ReceiversWidget::onViewIndexCollapsed(const QModelIndex &AIndex)
 {
 	QStandardItem *item = mapViewToModel(AIndex);
-	if (item && FProxyModel->filterRegExp().isEmpty())
+	if (item!=NULL && FProxyModel->filterRegExp().isEmpty())
 		item->setData(true,RIDR_ITEM_COLLAPSED);
 }
 
@@ -848,7 +970,7 @@ void ReceiversWidget::onViewContextMenuRequested(const QPoint &APos)
 void ReceiversWidget::onViewModelRowsInserted(const QModelIndex &AParent, int AStart, int AEnd)
 {
 	Q_UNUSED(AStart); Q_UNUSED(AEnd);
-	restoreExpandState(QList<QStandardItem *>() << (AParent.isValid() ? mapViewToModel(AParent) : FModel->invisibleRootItem()));
+	restoreExpandState(AParent.isValid() ? mapViewToModel(AParent) : FModel->invisibleRootItem());
 }
 
 void ReceiversWidget::onActiveStreamAppended(const Jid &AStreamJid)
@@ -916,7 +1038,7 @@ void ReceiversWidget::onRosterItemReceived(IRoster *ARoster, const IRosterItem &
 
 				int groupOrder;
 				QSet<QString> newGroups;
-				if (AItem.itemJid.node().isEmpty())
+				if (!AItem.itemJid.hasNode())
 				{
 					groupOrder = RIKO_GROUP_AGENTS;
 					newGroups << (FRostersModel!=NULL ? FRostersModel->singleGroupName(RIK_GROUP_AGENTS) : tr("Agents"));
@@ -949,10 +1071,12 @@ void ReceiversWidget::onRosterItemReceived(IRoster *ARoster, const IRosterItem &
 				}
 			}
 
-			if (AItem.name != ABefore.name)
+			foreach(QStandardItem *contactItem, contactItems)
 			{
-				foreach(QStandardItem *contactItem, contactItems)
-					contactItem->setText(name);
+				contactItem->setText(name);
+				contactItem->setData(name,RDR_NAME);
+				contactItem->setData(AItem.subscription,RDR_SUBSCRIBTION);
+				contactItem->setData(AItem.subscriptionAsk,RDR_SUBSCRIPTION_ASK);
 			}
 
 			if (updatePresence)
@@ -1022,10 +1146,7 @@ void ReceiversWidget::onHideOfflineContacts()
 {
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
-	{
-		FProxyModel->setOfflineContactsVisible(!action->isChecked());
-		restoreExpandState(QList<QStandardItem *>() << FModel->invisibleRootItem());
-	}
+		setOfflineContactsVisible(!action->isChecked());
 }
 
 void ReceiversWidget::onDeleteDelayedItems()
@@ -1044,7 +1165,7 @@ void ReceiversWidget::onStartSearchContacts()
 	if (!FProxyModel->filterRegExp().isEmpty())
 		ui.trvReceivers->expandAll();
 	else
-		restoreExpandState(QList<QStandardItem *>() << FModel->invisibleRootItem());
+		restoreExpandState(FModel->invisibleRootItem());
 }
 
 Q_DECLARE_METATYPE(QList<QStandardItem *>);

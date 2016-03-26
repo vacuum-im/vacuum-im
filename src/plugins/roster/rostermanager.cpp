@@ -163,7 +163,7 @@ void RosterManager::onRosterStreamJidAboutToBeChanged(const Jid &AAfter)
 	Roster *roster = qobject_cast<Roster *>(sender());
 	if (roster)
 	{
-		if (!(roster->streamJid() && AAfter))
+		if (roster->streamJid().pBare() != AAfter.pBare())
 			roster->saveRosterItems(rosterFileName(roster->streamJid()));
 		emit rosterStreamJidAboutToBeChanged(roster,AAfter);
 	}
@@ -175,7 +175,7 @@ void RosterManager::onRosterStreamJidChanged(const Jid &ABefore)
 	if (roster)
 	{
 		emit rosterStreamJidChanged(roster,ABefore);
-		if (!(roster->streamJid() && ABefore))
+		if (roster->streamJid().pBare() != ABefore.pBare())
 			roster->loadRosterItems(rosterFileName(roster->streamJid()));
 	}
 }

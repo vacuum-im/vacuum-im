@@ -55,10 +55,6 @@
 <context>
     <name>EditBookmarkDialog</name>
     <message>
-        <source>Bookmark is not valid</source>
-        <translation>Ошибка в закладке</translation>
-    </message>
-    <message>
         <source>Field &apos;Name&apos; should not be empty</source>
         <translation>Поле &apos;Имя&apos; не может быть пустым</translation>
     </message>
@@ -70,28 +66,16 @@
         <source>In conference bookmark field &apos;Room&apos; should not be empty</source>
         <translation>В закладке на конференцию поле &apos;Комната&apos; не может быть пустым</translation>
     </message>
+    <message>
+        <source>Error</source>
+        <translation>Ошибка</translation>
+    </message>
 </context>
 <context>
     <name>EditBookmarkDialogClass</name>
     <message>
         <source>Edit bookmark</source>
         <translation>Редактировать закладку</translation>
-    </message>
-    <message>
-        <source>Name:</source>
-        <translation>Имя:</translation>
-    </message>
-    <message>
-        <source>Conference bookmark</source>
-        <translation>Закладка с конференцией</translation>
-    </message>
-    <message>
-        <source>Room:</source>
-        <translation>Комната:</translation>
-    </message>
-    <message>
-        <source>Nick:</source>
-        <translation>Ник:</translation>
     </message>
     <message>
         <source>Password:</source>
@@ -102,20 +86,52 @@
         <translation>Автоматически присоединяться</translation>
     </message>
     <message>
-        <source>URL bookmark</source>
+        <source>Conference:</source>
+        <translation>Конференция:</translation>
+    </message>
+    <message>
+        <source>Conference as &apos;name@service.server.com&apos;</source>
+        <translation>Конференция в виде  &apos;name@service.server.com&apos;</translation>
+    </message>
+    <message>
+        <source>Nickname:</source>
+        <translation>Ник:</translation>
+    </message>
+    <message>
+        <source>Your nickname in conference</source>
+        <translation>Ваш ник в конференции</translation>
+    </message>
+    <message>
+        <source>Conference password if required</source>
+        <translation>Пароль конференции если требуется</translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation>Имя:</translation>
+    </message>
+    <message>
+        <source>Bookmark to Conference</source>
+        <translation>Закладка на конференцию</translation>
+    </message>
+    <message>
+        <source>Bookmark to Link</source>
         <translation>Закладка на ссылку</translation>
     </message>
     <message>
-        <source>URL:</source>
+        <source>Link:</source>
         <translation>Ссылка:</translation>
+    </message>
+    <message>
+        <source>Any valid link</source>
+        <translation>Любая корректная ссылка</translation>
+    </message>
+    <message>
+        <source>Bookmark name</source>
+        <translation>Имя закладки</translation>
     </message>
 </context>
 <context>
     <name>EditBookmarksDialog</name>
-    <message>
-        <source>Bookmarks not saved</source>
-        <translation>Закладки не сохранены</translation>
-    </message>
     <message>
         <source>Cant save bookmarks to server</source>
         <translation>Не удалось сохранить закладки на сервере</translation>
@@ -123,6 +139,10 @@
     <message>
         <source>Edit bookmarks - %1</source>
         <translation>Редактировать закладки - %1</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Ошибка</translation>
     </message>
 </context>
 <context>

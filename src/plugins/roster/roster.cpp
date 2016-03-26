@@ -5,6 +5,7 @@
 #include <definitions/namespaces.h>
 #include <definitions/optionvalues.h>
 #include <definitions/internalerrors.h>
+#include <definitions/stanzahandlerorders.h>
 #include <definitions/xmppstanzahandlerorders.h>
 #include <utils/xmpperror.h>
 #include <utils/options.h>
@@ -117,7 +118,7 @@ void Roster::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 	{
 		FDelimRequestId.clear();
 		QString groupDelim = ROSTER_GROUP_DELIMITER;
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			groupDelim = AStanza.firstElement("query",NS_JABBER_PRIVATE).firstChildElement("roster").text();
 			if (groupDelim.isEmpty())
@@ -125,8 +126,8 @@ void Roster::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 				groupDelim = ROSTER_GROUP_DELIMITER;
 				LOG_STRM_INFO(streamJid(),QString("Saving default roster group delimiter on server, delimiter='%1'").arg(groupDelim));
 
-				Stanza delim("iq");
-				delim.setType("set").setId(FStanzaProcessor->newId());
+				Stanza delim(STANZA_KIND_IQ);
+				delim.setType(STANZA_TYPE_SET).setUniqueId();
 				QDomElement elem = delim.addElement("query",NS_JABBER_PRIVATE);
 				elem.appendChild(delim.createElement("roster",NS_STORAGE_GROUP_DELIMITER)).appendChild(delim.createTextNode(groupDelim));
 				FStanzaProcessor->sendStanzaOut(AStreamJid,delim);
@@ -146,7 +147,7 @@ void Roster::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 	else if (AStanza.id() == FOpenRequestId)
 	{
 		FOpenRequestId.clear();
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			LOG_STRM_INFO(streamJid(),"Roster items loaded");
 			processItemsElement(AStanza.firstElement("query",NS_JABBER_ROSTER),true);
@@ -165,7 +166,7 @@ bool Roster::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
 	if (!FVerSupported && !isOpen() && FXmppStream==AXmppStream && AOrder==XSHO_XMPP_FEATURE)
 	{
-		if (AStanza.element().nodeName()=="stream:features" && !AStanza.firstElement("ver",NS_FEATURE_ROSTER_VER).isNull())
+		if (AStanza.namespaceURI()==NS_JABBER_STREAMS && AStanza.kind()=="features" && !AStanza.firstElement("ver",NS_FEATURE_ROSTER_VER).isNull())
 		{
 			FVerSupported = true;
 			LOG_STRM_INFO(streamJid(),"Roster versioning is supported by server");
@@ -272,8 +273,8 @@ void Roster::setItem(const Jid &AItemJid, const QString &AName, const QSet<QStri
 {
 	if (isOpen())
 	{
-		Stanza request("iq");
-		request.setType("set").setId(FStanzaProcessor->newId());
+		Stanza request(STANZA_KIND_IQ);
+		request.setType(STANZA_TYPE_SET).setUniqueId();
 
 		QDomElement itemElem = request.addElement("query",NS_JABBER_ROSTER).appendChild(request.createElement("item")).toElement();
 		if (!AName.isEmpty())
@@ -302,8 +303,8 @@ void Roster::setItems(const QList<IRosterItem> &AItems)
 {
 	if (isOpen() && !AItems.isEmpty())
 	{
-		Stanza request("iq");
-		request.setType("set").setId(FStanzaProcessor->newId());
+		Stanza request(STANZA_KIND_IQ);
+		request.setType(STANZA_TYPE_SET).setUniqueId();
 		
 		QDomElement elem = request.addElement("query",NS_JABBER_ROSTER);
 		foreach(const IRosterItem &ritem, AItems)
@@ -353,7 +354,7 @@ void Roster::sendSubscription(const Jid &AItemJid, int ASubsType, const QString 
 
 		if (!type.isEmpty())
 		{
-			Stanza request("presence");
+			Stanza request(STANZA_KIND_PRESENCE);
 			request.setTo(AItemJid.bare()).setType(type);
 			if (!AText.isEmpty())
 				request.addElement("status").appendChild(request.createTextNode(AText));
@@ -384,8 +385,8 @@ void Roster::removeItem(const Jid &AItemJid)
 {
 	if (isOpen())
 	{
-		Stanza query("iq");
-		query.setType("set").setId(FStanzaProcessor->newId());
+		Stanza query(STANZA_KIND_IQ);
+		query.setType(STANZA_TYPE_SET).setUniqueId();
 		QDomElement itemElem = query.addElement("query",NS_JABBER_ROSTER).appendChild(query.createElement("item")).toElement();
 		itemElem.setAttribute("jid", AItemJid.bare());
 		itemElem.setAttribute("subscription",SUBSCRIPTION_REMOVE);
@@ -404,8 +405,8 @@ void Roster::removeItems(const QList<IRosterItem> &AItems)
 {
 	if (isOpen() && !AItems.isEmpty())
 	{
-		Stanza query("iq");
-		query.setType("set").setId(FStanzaProcessor->newId());
+		Stanza query(STANZA_KIND_IQ);
+		query.setType(STANZA_TYPE_SET).setUniqueId();
 		QDomElement elem = query.addElement("query",NS_JABBER_ROSTER);
 		foreach(const IRosterItem &ritem, AItems)
 		{
@@ -658,8 +659,8 @@ void Roster::clearRosterItems()
 
 void Roster::requestRosterItems()
 {
-	Stanza query("iq");
-	query.setType("get").setId(FStanzaProcessor->newId());
+	Stanza query(STANZA_KIND_IQ);
+	query.setType(STANZA_TYPE_GET).setUniqueId();
 
 	if (!FVerSupported)
 		query.addElement("query",NS_JABBER_ROSTER);
@@ -679,8 +680,8 @@ void Roster::requestRosterItems()
 
 void Roster::requestGroupDelimiter()
 {
-	Stanza query("iq");
-	query.setType("get").setId(FStanzaProcessor->newId());
+	Stanza query(STANZA_KIND_IQ);
+	query.setType(STANZA_TYPE_GET).setUniqueId();
 	query.addElement("query",NS_JABBER_PRIVATE).appendChild(query.createElement("roster",NS_STORAGE_GROUP_DELIMITER));
 	if (FStanzaProcessor->sendStanzaRequest(this,FXmppStream->streamJid(),query,Options::node(OPV_XMPPSTREAMS_TIMEOUT_ROSTERREQUEST).value().toInt()))
 	{
@@ -713,7 +714,7 @@ void Roster::processItemsElement(const QDomElement &AItemsElem, bool ACompleteRo
 		while (!itemElem.isNull())
 		{
 			Jid itemJid = itemElem.attribute("jid");
-			if (itemJid.isValid() && itemJid.resource().isEmpty())
+			if (itemJid.isValid() && !itemJid.hasResource())
 			{
 				QString subs = itemElem.attribute("subscription");
 				if (subs==SUBSCRIPTION_BOTH || subs==SUBSCRIPTION_TO || subs==SUBSCRIPTION_FROM || subs==SUBSCRIPTION_NONE)
@@ -811,7 +812,7 @@ void Roster::onXmppStreamClosed()
 void Roster::onXmppStreamJidAboutToBeChanged(const Jid &AAfter)
 {
 	emit streamJidAboutToBeChanged(AAfter);
-	if (!(FXmppStream->streamJid() && AAfter))
+	if (FXmppStream->streamJid().pBare() != AAfter.pBare())
 		clearRosterItems();
 }
 

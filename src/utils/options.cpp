@@ -181,6 +181,7 @@ struct OptionsNode::OptionsNodeData
 {
 	int refCount;
 	QString path;
+	QString cleanPath;
 	QDomElement node;
 };
 
@@ -216,7 +217,7 @@ bool OptionsNode::isNull() const
 
 QString OptionsNode::path() const
 {
-	if (d->path.isEmpty())
+	if (d->path.isNull())
 	{
 		QDomElement rootElem = d->node;
 		while (!rootElem.parentNode().toElement().isNull())
@@ -234,6 +235,13 @@ QString OptionsNode::name() const
 QString OptionsNode::nspace() const
 {
 	return d->node.attribute("ns");
+}
+
+QString OptionsNode::cleanPath() const
+{
+	if (d->cleanPath.isNull())
+		d->cleanPath = Options::cleanNSpaces(path());
+	return d->cleanPath;
 }
 
 OptionsNode OptionsNode::parent() const

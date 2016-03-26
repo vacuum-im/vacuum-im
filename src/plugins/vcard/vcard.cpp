@@ -162,15 +162,21 @@ void VCard::clear()
 
 bool VCard::update(const Jid &AStreamJid)
 {
-	if (FContactJid.isValid())
+	if (FContactJid.isValid() && AStreamJid.isValid())
+	{
+		FStreamJid = AStreamJid;
 		return FVCardPlugin->requestVCard(AStreamJid,FContactJid);
+	}
 	return false;
 }
 
 bool VCard::publish(const Jid &AStreamJid)
 {
 	if (isValid() && AStreamJid.isValid())
+	{
+		FStreamJid = AStreamJid;
 		return FVCardPlugin->publishVCard(AStreamJid,this);
+	}
 	return false;
 }
 
@@ -287,17 +293,31 @@ QDomElement VCard::setTextToElem(QDomElement &AElem, const QString &AText) const
 void VCard::onVCardReceived(const Jid &AContactJid)
 {
 	if (FContactJid == AContactJid)
+	{
+		FStreamJid = Jid::null;
 		loadVCardFile();
+	}
 }
 
-void VCard::onVCardPublished(const Jid &AContactJid)
+void VCard::onVCardPublished(const Jid &AStreamJid)
 {
-	if (FContactJid == AContactJid)
+	if (FStreamJid == AStreamJid)
+	{
+		FStreamJid = Jid::null;
 		emit vcardPublished();
+	}
 }
 
 void VCard::onVCardError(const Jid &AContactJid, const XmppError &AError)
 {
 	if (FContactJid == AContactJid)
+	{
+		FStreamJid = Jid::null;
 		emit vcardError(AError);
+	}
+	else if (FStreamJid == AContactJid)
+	{
+		FStreamJid = Jid::null;
+		emit vcardError(AError);
+	}
 }

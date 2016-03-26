@@ -8,6 +8,7 @@
 #define OPN_ACCOUNTS_ADDITIONAL          OPN_ACCOUNTS".[id].Additional"
 #define OPN_ROSTERVIEW                   "RosterView"
 #define OPN_MESSAGES                     "Messages"
+#define OPN_CONFERENCES                  "Conferences"
 #define OPN_HISTORY                      "History"
 #define OPN_STATUSITEMS                  "StatusItems"
 #define OPN_NOTIFICATIONS                "Notifications"

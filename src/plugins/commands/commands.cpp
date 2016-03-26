@@ -6,6 +6,7 @@
 #include <definitions/menuicons.h>
 #include <definitions/xmpperrors.h>
 #include <definitions/xmppurihandlerorders.h>
+#include <definitions/stanzahandlerorders.h>
 #include <utils/logger.h>
 #include <utils/menu.h>
 
@@ -125,7 +126,7 @@ bool Commands::initObjects()
 	}
 	if (FXmppUriQueries)
 	{
-		FXmppUriQueries->insertUriHandler(this,XUHO_DEFAULT);
+		FXmppUriQueries->insertUriHandler(XUHO_DEFAULT,this);
 	}
 	return true;
 }
@@ -187,7 +188,7 @@ void Commands::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 	if (FRequests.contains(AStanza.id()))
 	{
 		FRequests.removeAt(FRequests.indexOf(AStanza.id()));
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			ICommandResult result;
 			result.streamJid = AStreamJid;
@@ -435,8 +436,8 @@ QString Commands::sendCommandRequest(const ICommandRequest &ARequest)
 {
 	if (FStanzaProcessor)
 	{
-		Stanza request("iq");
-		request.setTo(ARequest.contactJid.full()).setType("set").setId(FStanzaProcessor->newId());
+		Stanza request(STANZA_KIND_IQ);
+		request.setType(STANZA_TYPE_SET).setTo(ARequest.contactJid.full()).setUniqueId();
 		QDomElement cmdElem = request.addElement(COMMAND_TAG_NAME,NS_COMMANDS);
 		cmdElem.setAttribute("node",ARequest.node);
 		if (!ARequest.sessionId.isEmpty())
@@ -463,8 +464,8 @@ bool Commands::sendCommandResult(const ICommandResult &AResult)
 {
 	if (FStanzaProcessor)
 	{
-		Stanza result("iq");
-		result.setType("result").setId(AResult.stanzaId).setTo(AResult.contactJid.full());
+		Stanza result(STANZA_KIND_IQ);
+		result.setType(STANZA_TYPE_RESULT).setTo(AResult.contactJid.full()).setId(AResult.stanzaId);
 
 		QDomElement cmdElem = result.addElement(COMMAND_TAG_NAME,NS_COMMANDS);
 		cmdElem.setAttribute("node",AResult.node);
@@ -603,7 +604,7 @@ void Commands::onDiscoItemsReceived(const IDiscoItems &AItems)
 void Commands::onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore)
 {
 	Q_UNUSED(ABefore);
-	if (FDiscovery && APresence->isOpen() && AItem.itemJid.node().isEmpty())
+	if (FDiscovery && APresence->isOpen() && !AItem.itemJid.hasNode())
 	{
 		if (FDiscovery->discoInfo(APresence->streamJid(),AItem.itemJid).features.contains(NS_COMMANDS))
 		{

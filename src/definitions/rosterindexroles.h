@@ -27,7 +27,6 @@ enum RosterIndexDataRoles {
 	RDR_STATES_FORCE_ON,
 	RDR_STATES_FORCE_OFF,
 	//Avatars
-	RDR_AVATAR_HASH,
 	RDR_AVATAR_IMAGE,
 	//Annotations
 	RDR_ANNOTATIONS,

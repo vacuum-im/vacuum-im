@@ -107,7 +107,7 @@ void PrivateStorage::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AS
 	if (FSaveRequests.contains(AStanza.id()))
 	{
 		QDomElement dataElem = FSaveRequests.take(AStanza.id());
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			LOG_STRM_INFO(AStreamJid,QString("Private data saved on server, ns=%1, id=%2").arg(dataElem.namespaceURI(),AStanza.id()));
 			notifyDataChanged(AStreamJid,dataElem.tagName(),dataElem.namespaceURI());
@@ -123,7 +123,7 @@ void PrivateStorage::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AS
 	{
 		QDomElement dataElem; 
 		QDomElement loadElem = FLoadRequests.take(AStanza.id());
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			dataElem = AStanza.firstElement("query",NS_JABBER_PRIVATE).firstChildElement(loadElem.tagName());
 			LOG_STRM_INFO(AStreamJid,QString("Private data loaded from server, ns=%1, id=%2").arg(loadElem.namespaceURI(),AStanza.id()));
@@ -139,7 +139,7 @@ void PrivateStorage::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AS
 	else if (FRemoveRequests.contains(AStanza.id()))
 	{
 		QDomElement dataElem = FRemoveRequests.take(AStanza.id());
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			LOG_STRM_INFO(AStreamJid,QString("Private data removed from server, ns=%1, id=%2").arg(dataElem.namespaceURI(),AStanza.id()));
 			notifyDataChanged(AStreamJid,dataElem.tagName(),dataElem.namespaceURI());
@@ -176,8 +176,8 @@ QString PrivateStorage::saveData(const Jid &AStreamJid, const QDomElement &AElem
 {
 	if (FStanzaProcessor && isOpen(AStreamJid) && !AElement.tagName().isEmpty() && !AElement.namespaceURI().isEmpty())
 	{
-		Stanza request("iq");
-		request.setType("set").setId(FStanzaProcessor->newId());
+		Stanza request(STANZA_KIND_IQ);
+		request.setType(STANZA_TYPE_SET).setUniqueId();
 		QDomElement elem = request.addElement("query",NS_JABBER_PRIVATE);
 		elem.appendChild(AElement.cloneNode(true));
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,PRIVATE_STORAGE_TIMEOUT))
@@ -208,8 +208,8 @@ QString PrivateStorage::loadData(const Jid &AStreamJid, const QString &ATagName,
 {
 	if (FStanzaProcessor && isOpen(AStreamJid) && !ATagName.isEmpty() && !ANamespace.isEmpty())
 	{
-		Stanza request("iq");
-		request.setType("get").setId(FStanzaProcessor->newId());
+		Stanza request(STANZA_KIND_IQ);
+		request.setType(STANZA_TYPE_GET).setUniqueId();
 		QDomElement elem = request.addElement("query",NS_JABBER_PRIVATE);
 		QDomElement dataElem = elem.appendChild(request.createElement(ATagName,ANamespace)).toElement();
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,PRIVATE_STORAGE_TIMEOUT))
@@ -238,8 +238,8 @@ QString PrivateStorage::removeData(const Jid &AStreamJid, const QString &ATagNam
 {
 	if (FStanzaProcessor && isOpen(AStreamJid) && !ATagName.isEmpty() && !ANamespace.isEmpty())
 	{
-		Stanza request("iq");
-		request.setType("set").setId(FStanzaProcessor->newId());
+		Stanza request(STANZA_KIND_IQ);
+		request.setType(STANZA_TYPE_SET).setUniqueId();
 		QDomElement elem = request.addElement("query",NS_JABBER_PRIVATE);
 		elem = elem.appendChild(request.createElement(ATagName,ANamespace)).toElement();
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,PRIVATE_STORAGE_TIMEOUT))
@@ -278,7 +278,7 @@ void PrivateStorage::notifyDataChanged(const Jid &AStreamJid, const QString &ATa
 		{
 			if (item.itemJid != AStreamJid)
 			{
-				Stanza notify("message");
+				Stanza notify(STANZA_KIND_MESSAGE);
 				notify.setTo(item.itemJid.full());
 				QDomElement xElem = notify.addElement("x",NS_VACUUM_PRIVATESTORAGE_UPDATE);
 				xElem.appendChild(notify.createElement(ATagName,ANamespace));

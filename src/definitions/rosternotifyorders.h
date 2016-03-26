@@ -7,5 +7,6 @@
 #define RNO_ROSTEREXCHANGE_REQUEST     300
 #define RNO_MUC_INVITE                 500
 #define RNO_SUBSCRIPTION               700
+#define RNO_CHATSTATE_TYPING           900
 
 #endif // DEF_ROSTERNOTIFYORDERS_H

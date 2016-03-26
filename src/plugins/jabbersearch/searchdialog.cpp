@@ -153,7 +153,7 @@ void SearchDialog::requestResult()
 		}
 		else
 		{
-			submit.form = FDataForms->dataSubmit(FCurrentForm->userDataForm());
+			submit.form = FCurrentForm->submitDataForm();
 		}
 
 		FRequestId = FSearch->sendSubmit(FStreamJid,submit);

@@ -19,6 +19,7 @@ public:
 	QString path() const;
 	QString name() const;
 	QString nspace() const;
+	QString cleanPath() const;
 	OptionsNode parent() const;
 	QList<QString> parentNSpaces() const;
 	QList<QString> childNames() const;

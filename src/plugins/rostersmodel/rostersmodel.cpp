@@ -467,7 +467,7 @@ QList<IRosterIndex *> RostersModel::findContactIndexes(const Jid &AStreamJid, co
 	QList<IRosterIndex *> indexes = FContactsCache.value(streamIndex(AStreamJid)).values(AContactJid.bare());
 
 	bool checkParent = AParent!=NULL;
-	bool checkResource = AStreamJid.pBare()==AContactJid.pBare() && !AContactJid.resource().isEmpty();
+	bool checkResource = AContactJid.hasResource() && AStreamJid.pBare()==AContactJid.pBare();
 	if (checkParent || checkResource)
 	{
 		for(QList<IRosterIndex *>::iterator it=indexes.begin(); it!=indexes.end(); )
@@ -493,9 +493,9 @@ QList<IRosterIndex *> RostersModel::getContactIndexes(const Jid &AStreamJid, con
 		if (sroot)
 		{
 			int type = RIK_CONTACT;
-			if (AContactJid.node().isEmpty())
+			if (!AContactJid.hasNode())
 				type = RIK_AGENT;
-			else if (AContactJid && AStreamJid)
+			else if (AContactJid.pBare() == AStreamJid.pBare())
 				type = RIK_MY_RESOURCE;
 
 			IRosterIndex *groupIndex;
@@ -723,7 +723,7 @@ void RostersModel::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AIt
 		
 		int groupKind;
 		QSet<QString> itemGroups;
-		int itemKind = !AItem.itemJid.node().isEmpty() ? RIK_CONTACT : RIK_AGENT;
+		int itemKind = AItem.itemJid.hasNode() ? RIK_CONTACT : RIK_AGENT;
 		if (itemKind == RIK_AGENT)
 		{
 			groupKind = RIK_GROUP_AGENTS;
@@ -882,9 +882,9 @@ void RostersModel::onPresenceItemReceived(IPresence *APresence, const IPresenceI
 	if (sroot)
 	{
 		int itemKind = RIK_CONTACT;
-		if (AItem.itemJid.node().isEmpty())
+		if (!AItem.itemJid.hasNode())
 			itemKind = RIK_AGENT;
-		else if (AItem.itemJid && APresence->streamJid())
+		else if (AItem.itemJid.pBare() == APresence->streamJid().pBare())
 			itemKind = RIK_MY_RESOURCE;
 
 		QList<IRosterIndex *> itemList = findContactIndexes(APresence->streamJid(),AItem.itemJid);

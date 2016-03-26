@@ -27,6 +27,8 @@
 #define SCROLL_TIMEOUT                      100
 #define CONTENT_TIMEOUT                     10
 
+#define CONSECUTIVE_TIMEOUT                 2*60
+
 #define SHARED_STYLE_PATH                   RESOURCES_DIR"/"RSR_STORAGE_ADIUMMESSAGESTYLES"/"FILE_STORAGE_SHARED_DIR
 #define STYLE_CONTENTS_PATH                 "Contents"
 #define STYLE_RESOURCES_PATH                STYLE_CONTENTS_PATH"/Resources"
@@ -72,10 +74,6 @@ AdiumMessageStyle::AdiumMessageStyle(const QString &AStylePath, QNetworkAccessMa
 	FResourcePath = AStylePath+"/"STYLE_RESOURCES_PATH;
 	FNetworkAccessManager = ANetworkAccessManager;
 
-	initStyleSettings();
-	loadTemplates();
-	loadSenderColors();
-
 	FScrollTimer.setSingleShot(true);
 	connect(&FScrollTimer,SIGNAL(timeout()),SLOT(onScrollTimerTimeout()));
 
@@ -83,6 +81,10 @@ AdiumMessageStyle::AdiumMessageStyle(const QString &AStylePath, QNetworkAccessMa
 	connect(&FContentTimer,SIGNAL(timeout()),SLOT(onContentTimerTimeout()));
 
 	connect(AParent,SIGNAL(styleWidgetAdded(IMessageStyle *, QWidget *)),SLOT(onStyleWidgetAdded(IMessageStyle *, QWidget *)));
+
+	initStyleSettings();
+	loadTemplates();
+	loadSenderColors();
 }
 
 AdiumMessageStyle::~AdiumMessageStyle()
@@ -114,11 +116,12 @@ QWidget *AdiumMessageStyle::createWidget(const IMessageStyleOptions &AOptions, Q
 	return view;
 }
 
-QString AdiumMessageStyle::senderColor(const QString &ASenderId) const
+QString AdiumMessageStyle::senderColorById(const QString &ASenderId) const
 {
 	if (!FSenderColors.isEmpty())
 		return FSenderColors.at(qHash(ASenderId) % FSenderColors.count());
-	return QString(SenderColors[qHash(ASenderId) % SenderColorsCount]);
+	else
+		return QString(SenderColors[qHash(ASenderId) % SenderColorsCount]);
 }
 
 QTextDocumentFragment AdiumMessageStyle::selection(QWidget *AWidget) const
@@ -183,6 +186,7 @@ bool AdiumMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptio
 			wstatus.lastTime = QDateTime();
 			wstatus.scrollStarted = false;
 			wstatus.pending.clear();
+			wstatus.options = AOptions.extended;
 
 			if (isNewView)
 			{
@@ -228,24 +232,24 @@ bool AdiumMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, co
 		WidgetStatus &wstatus = FWidgetStatus[view];
 		if (!wstatus.failed)
 		{
-			bool sameSender = isSameSender(view,AOptions);
-			QString html = makeContentTemplate(AOptions,sameSender);
-			fillContentKeywords(html,AOptions,sameSender);
-			html.replace("%message%",prepareMessage(AHtml,AOptions));
+			QString content = makeContentTemplate(AOptions,wstatus);
+			fillContentKeywords(content,AOptions,wstatus);
+
+			content.replace("%message%",prepareMessage(AHtml,AOptions));
 			if (AOptions.kind == IMessageStyleContentOptions::KindTopic)
-				html.replace("%topic%",QString(TOPIC_INDIVIDUAL_WRAPPER).arg(AHtml));
+				content.replace("%topic%",QString(TOPIC_INDIVIDUAL_WRAPPER).arg(AHtml));
+
+			escapeStringForScript(content);
+			QString script = scriptForAppendContent(AOptions,wstatus).arg(content);
 
 			wstatus.lastKind = AOptions.kind;
 			wstatus.lastId = AOptions.senderId;
 			wstatus.lastTime = AOptions.time;
-
-			escapeStringForScript(html);
-			QString script = scriptForAppendContent(sameSender,AOptions.noScroll).arg(html);
-
 			wstatus.pending.append(script);
-			FContentTimer.start(CONTENT_TIMEOUT);
 
+			FContentTimer.start(CONTENT_TIMEOUT);
 			emit contentAppended(view,AHtml,AOptions);
+
 			return true;
 		}
 	}
@@ -322,50 +326,70 @@ QMap<QString, QVariant> AdiumMessageStyle::styleInfo(const QString &AStylePath)
 			LOG_ERROR(QString("Failed to load adium style info from file content: %1").arg(xmlError));
 		}
 	}
-	else if (AStylePath.isEmpty())
+	else if (!AStylePath.isEmpty())
 	{
-		REPORT_ERROR("Failed to get adium style info: Style path is empty");
+		LOG_ERROR(QString("Failed to load adium style info from file: %1").arg(file.errorString()));
 	}
 	else
 	{
-		LOG_ERROR(QString("Failed to load adium style info from file: %1").arg(file.errorString()));
+		REPORT_ERROR("Failed to get adium style info: Style path is empty");
 	}
 	return info;
 }
 
-QWebHitTestResult AdiumMessageStyle::hitTest(QWidget *AWidget, const QPoint &APosition) const
+void AdiumMessageStyle::initStyleSettings()
 {
-	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
-	QWebFrame *frame = view!=NULL ? view->page()->frameAt(APosition) : NULL;
-	return frame!=NULL ? frame->hitTestContent(APosition) : QWebHitTestResult();
+	FCombineConsecutive = !FInfo.value(MSIV_DISABLE_COMBINE_CONSECUTIVE,false).toBool();
+	FAllowCustomBackground = !FInfo.value(MSIV_DISABLE_CUSTOM_BACKGROUND,false).toBool();
 }
 
-bool AdiumMessageStyle::isSameSender(QWidget *AWidget, const IMessageStyleContentOptions &AOptions) const
+void AdiumMessageStyle::loadTemplates()
 {
-	if (!FCombineConsecutive)
-		return false;
-	if (AOptions.kind != IMessageStyleContentOptions::KindMessage)
-		return false;
-	if (AOptions.senderId.isEmpty())
-		return false;
+	FIn_ContentHTML =      loadFileData(FResourcePath+"/Content.html",QString::null);
 
-	const WidgetStatus &wstatus = FWidgetStatus.value(AWidget);
-	if (wstatus.lastKind != AOptions.kind)
-		return false;
-	if (wstatus.lastId != AOptions.senderId)
-		return false;
-	if (wstatus.lastTime.secsTo(AOptions.time)>2*60)
-		return false;
+	FIn_ContentHTML =      loadFileData(FResourcePath+"/Incoming/Content.html",FIn_ContentHTML);
+	FIn_NextContentHTML =  loadFileData(FResourcePath+"/Incoming/NextContent.html",FIn_ContentHTML);
+	FIn_ContextHTML =      loadFileData(FResourcePath+"/Incoming/Context.html",FIn_ContentHTML);
+	FIn_NextContextHTML =  loadFileData(FResourcePath+"/Incoming/NextContext.html",FIn_NextContentHTML);
 
-	return true;
+	FOut_ContentHTML =     loadFileData(FResourcePath+"/Outgoing/Content.html",FIn_ContentHTML);
+	FOut_NextContentHTML = loadFileData(FResourcePath+"/Outgoing/NextContent.html",FOut_ContentHTML);
+	FOut_ContextHTML =     loadFileData(FResourcePath+"/Outgoing/Context.html",FOut_ContentHTML);
+	FOut_NextContextHTML = loadFileData(FResourcePath+"/Outgoing/NextContext.html",FOut_NextContentHTML);
+
+	FTopicHTML =           loadFileData(FResourcePath+"/Topic.html",QString::null);
+	FStatusHTML =          loadFileData(FResourcePath+"/Status.html",FIn_ContentHTML);
+	FMeCommandHTML =       loadFileData(FResourcePath+"/MeCommand.html",QString::null);
 }
 
-void AdiumMessageStyle::setVariant(StyleViewer *AView, const QString &AVariant)
+void AdiumMessageStyle::loadSenderColors()
 {
-	QString variant = QDir::cleanPath(QString("Variants/%1.css").arg(!FVariants.contains(AVariant) ? FInfo.value(MSIV_DEFAULT_VARIANT,"../main").toString() : AVariant));
-	escapeStringForScript(variant);
-	QString script = QString("setStylesheet(\"%1\",\"%2\");").arg("mainStyle").arg(variant);
-	AView->page()->mainFrame()->evaluateJavaScript(script);
+	QFile colors(FResourcePath + "/Incoming/SenderColors.txt");
+	if (colors.open(QFile::ReadOnly))
+		FSenderColors = QString::fromUtf8(colors.readAll()).split(':',QString::SkipEmptyParts);
+}
+
+QString AdiumMessageStyle::loadFileData(const QString &AFileName, const QString &DefValue) const
+{
+	QFile file(AFileName);
+	if (file.open(QFile::ReadOnly))
+	{
+		QByteArray html = file.readAll();
+		return QString::fromUtf8(html.data(),html.size());
+	}
+	else if (file.exists())
+	{
+		LOG_ERROR(QString("Failed to load adium style data from file=%1: %2").arg(AFileName,file.errorString()));
+	}
+	return DefValue;
+}
+
+void AdiumMessageStyle::escapeStringForScript(QString &AText) const
+{
+	AText.replace("\\","\\\\");
+	AText.replace("\"","\\\"");
+	AText.replace("\n","");
+	AText.replace("\r","<br>");
 }
 
 QString AdiumMessageStyle::makeStyleTemplate(const IMessageStyleOptions &AOptions)
@@ -456,7 +480,45 @@ void AdiumMessageStyle::fillStyleKeywords(QString &AHtml, const IMessageStyleOpt
 	AHtml.replace("==bodyBackground==", background);
 }
 
-QString AdiumMessageStyle::makeContentTemplate(const IMessageStyleContentOptions &AOptions, bool ASameSender) const
+void AdiumMessageStyle::setVariant(StyleViewer *AView, const QString &AVariant)
+{
+	QString variantName = !FVariants.contains(AVariant) ? FInfo.value(MSIV_DEFAULT_VARIANT,QString("../main")).toString() : AVariant;
+	QString variantFile = QDir::cleanPath(QString("Variants/%1.css").arg(variantName));
+
+	escapeStringForScript(variantFile);
+	QString script = QString("setStylesheet(\"%1\",\"%2\");").arg("mainStyle").arg(variantFile);
+
+	AView->page()->mainFrame()->evaluateJavaScript(script);
+}
+
+QWebHitTestResult AdiumMessageStyle::hitTest(QWidget *AWidget, const QPoint &APosition) const
+{
+	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
+	QWebFrame *frame = view!=NULL ? view->page()->frameAt(APosition) : NULL;
+	return frame!=NULL ? frame->hitTestContent(APosition) : QWebHitTestResult();
+}
+
+bool AdiumMessageStyle::isConsecutive(const IMessageStyleContentOptions &AOptions, const WidgetStatus &AStatus) const
+{
+	if (!FCombineConsecutive)
+		return false;
+
+	if (AOptions.kind != IMessageStyleContentOptions::KindMessage)
+		return false;
+	if (AOptions.senderId.isEmpty())
+		return false;
+
+	if (AStatus.lastKind != AOptions.kind)
+		return false;
+	if (AStatus.lastId != AOptions.senderId)
+		return false;
+	if (AStatus.lastTime.secsTo(AOptions.time) > CONSECUTIVE_TIMEOUT)
+		return false;
+
+	return true;
+}
+
+QString AdiumMessageStyle::makeContentTemplate(const IMessageStyleContentOptions &AOptions, const WidgetStatus &AStatus) const
 {
 	QString html;
 	if (false && AOptions.kind == IMessageStyleContentOptions::KindTopic && !FTopicHTML.isEmpty())
@@ -473,31 +535,32 @@ QString AdiumMessageStyle::makeContentTemplate(const IMessageStyleContentOptions
 	}
 	else
 	{
+		bool consecutive = isConsecutive(AOptions,AStatus);
 		if (AOptions.type & IMessageStyleContentOptions::TypeHistory)
 		{
 			if (AOptions.direction == IMessageStyleContentOptions::DirectionIn)
-				html = ASameSender ? FIn_NextContextHTML : FIn_ContextHTML;
+				html = consecutive ? FIn_NextContextHTML : FIn_ContextHTML;
 			else
-				html = ASameSender ? FOut_NextContextHTML : FOut_ContextHTML;
+				html = consecutive ? FOut_NextContextHTML : FOut_ContextHTML;
 		}
 		else if (AOptions.direction == IMessageStyleContentOptions::DirectionIn)
 		{
-			html = ASameSender ? FIn_NextContentHTML : FIn_ContentHTML;
+			html = consecutive ? FIn_NextContentHTML : FIn_ContentHTML;
 		}
 		else
 		{
-			html = ASameSender ? FOut_NextContentHTML : FOut_ContentHTML;
+			html = consecutive ? FOut_NextContentHTML : FOut_ContentHTML;
 		}
 	}
 	return html;
 }
 
-void AdiumMessageStyle::fillContentKeywords(QString &AHtml, const IMessageStyleContentOptions &AOptions, bool ASameSender) const
+void AdiumMessageStyle::fillContentKeywords(QString &AHtml, const IMessageStyleContentOptions &AOptions, const WidgetStatus &AStatus) const
 {
 	bool isDirectionIn = AOptions.direction==IMessageStyleContentOptions::DirectionIn;
 
 	QStringList messageClasses;
-	if (FCombineConsecutive && ASameSender)
+	if (isConsecutive(AOptions,AStatus))
 		messageClasses << MSMC_CONSECUTIVE;
 	
 	if (AOptions.kind==IMessageStyleContentOptions::KindMeCommand)
@@ -582,13 +645,20 @@ void AdiumMessageStyle::fillContentKeywords(QString &AHtml, const IMessageStyleC
 		if (!timeRegExp.cap(0).isEmpty())
 			AHtml.replace(pos, timeRegExp.cap(0).length(), time);
 
-	QString sColor = !AOptions.senderColor.isEmpty() ? AOptions.senderColor : senderColor(AOptions.senderId);
-	AHtml.replace("%senderColor%",sColor);
+	QString senderColor = AOptions.senderColor;
+	if (senderColor.isEmpty())
+	{
+		if (isDirectionIn)
+			senderColor = AStatus.options.value(MSO_CONTACT_COLOR).toString();
+		else
+			senderColor = AStatus.options.value(MSO_SELF_COLOR).toString();
+	}
+	AHtml.replace("%senderColor%",senderColor);
 
 	QRegExp scolorRegExp("%senderColor\\{([^}]*)\\}%");
 	for (int pos=0; pos!=-1; pos = scolorRegExp.indexIn(AHtml, pos))
 		if (!scolorRegExp.cap(0).isEmpty())
-			AHtml.replace(pos, scolorRegExp.cap(0).length(), sColor);
+			AHtml.replace(pos, scolorRegExp.cap(0).length(), senderColor);
 
 	if (AOptions.kind == IMessageStyleContentOptions::KindStatus)
 	{
@@ -597,8 +667,8 @@ void AdiumMessageStyle::fillContentKeywords(QString &AHtml, const IMessageStyleC
 	}
 	else
 	{
-		AHtml.replace("%senderScreenName%",AOptions.senderId);
 		AHtml.replace("%sender%",AOptions.senderName);
+		AHtml.replace("%senderScreenName%", QString::null);
 		AHtml.replace("%senderDisplayName%",AOptions.senderName);
 		AHtml.replace("%senderPrefix%",QString::null);
 
@@ -628,41 +698,34 @@ void AdiumMessageStyle::fillContentKeywords(QString &AHtml, const IMessageStyleC
 	}
 }
 
-void AdiumMessageStyle::escapeStringForScript(QString &AText) const
-{
-	AText.replace("\\","\\\\");
-	AText.replace("\"","\\\"");
-	AText.replace("\n","");
-	AText.replace("\r","<br>");
-}
-
-QString AdiumMessageStyle::scriptForAppendContent(bool ASameSender, bool ANoScroll) const
+QString AdiumMessageStyle::scriptForAppendContent(const IMessageStyleContentOptions &AOptions, const WidgetStatus &AStatus) const
 {
 	QString script;
+	bool consecutive = isConsecutive(AOptions,AStatus);
 	if (!FUsingCustomTemplate && version() >= 4)
 	{
-		if (ANoScroll)
-			script = (FCombineConsecutive && ASameSender ? APPEND_NEXT_MESSAGE_NO_SCROLL : APPEND_MESSAGE_NO_SCROLL);
+		if (AOptions.noScroll)
+			script = consecutive ? APPEND_NEXT_MESSAGE_NO_SCROLL : APPEND_MESSAGE_NO_SCROLL;
 		else
-			script = (FCombineConsecutive && ASameSender ? APPEND_NEXT_MESSAGE : APPEND_MESSAGE);
+			script = consecutive ? APPEND_NEXT_MESSAGE : APPEND_MESSAGE;
 	}
 	else if (version() >= 3)
 	{
-		if (ANoScroll)
-			script = (FCombineConsecutive && ASameSender ? APPEND_NEXT_MESSAGE_NO_SCROLL : APPEND_MESSAGE_NO_SCROLL);
+		if (AOptions.noScroll)
+			script = consecutive ? APPEND_NEXT_MESSAGE_NO_SCROLL : APPEND_MESSAGE_NO_SCROLL;
 		else
-			script = (FCombineConsecutive && ASameSender ? APPEND_NEXT_MESSAGE : APPEND_MESSAGE);
+			script = consecutive ? APPEND_NEXT_MESSAGE : APPEND_MESSAGE;
 	}
 	else if (version() >= 1)
 	{
-		script = (ASameSender ? APPEND_NEXT_MESSAGE : APPEND_MESSAGE);
+		script = consecutive ? APPEND_NEXT_MESSAGE : APPEND_MESSAGE;
 	}
 	else
 	{
 		if (FUsingCustomTemplate)
-			script = (ASameSender ? APPEND_NEXT_MESSAGE_WITH_SCROLL : APPEND_MESSAGE_WITH_SCROLL);
+			script = consecutive ? APPEND_NEXT_MESSAGE_WITH_SCROLL : APPEND_MESSAGE_WITH_SCROLL;
 		else
-			script = (ASameSender ? APPEND_NEXT_MESSAGE : APPEND_MESSAGE);
+			script = consecutive ? APPEND_NEXT_MESSAGE : APPEND_MESSAGE;
 	}
 	return script;
 }
@@ -678,53 +741,6 @@ QString AdiumMessageStyle::prepareMessage(const QString &AHtml, const IMessageSt
 		return TextManager::getDocumentBody(doc);
 	}
 	return AHtml;
-}
-
-QString AdiumMessageStyle::loadFileData(const QString &AFileName, const QString &DefValue) const
-{
-	QFile file(AFileName);
-	if (file.open(QFile::ReadOnly))
-	{
-		QByteArray html = file.readAll();
-		return QString::fromUtf8(html.data(),html.size());
-	}
-	else if (file.exists())
-	{
-		LOG_ERROR(QString("Failed to load adium style data from file=%1: %2").arg(AFileName,file.errorString()));
-	}
-	return DefValue;
-}
-
-void AdiumMessageStyle::loadTemplates()
-{
-	FIn_ContentHTML =      loadFileData(FResourcePath+"/Content.html",QString::null);
-
-	FIn_ContentHTML =      loadFileData(FResourcePath+"/Incoming/Content.html",FIn_ContentHTML);
-	FIn_NextContentHTML =  loadFileData(FResourcePath+"/Incoming/NextContent.html",FIn_ContentHTML);
-	FIn_ContextHTML =      loadFileData(FResourcePath+"/Incoming/Context.html",FIn_ContentHTML);
-	FIn_NextContextHTML =  loadFileData(FResourcePath+"/Incoming/NextContext.html",FIn_NextContentHTML);
-
-	FOut_ContentHTML =     loadFileData(FResourcePath+"/Outgoing/Content.html",FIn_ContentHTML);
-	FOut_NextContentHTML = loadFileData(FResourcePath+"/Outgoing/NextContent.html",FOut_ContentHTML);
-	FOut_ContextHTML =     loadFileData(FResourcePath+"/Outgoing/Context.html",FOut_ContentHTML);
-	FOut_NextContextHTML = loadFileData(FResourcePath+"/Outgoing/NextContext.html",FOut_NextContentHTML);
-
-	FTopicHTML =           loadFileData(FResourcePath+"/Topic.html",QString::null);
-	FStatusHTML =          loadFileData(FResourcePath+"/Status.html",FIn_ContentHTML);
-	FMeCommandHTML =       loadFileData(FResourcePath+"/MeCommand.html",QString::null);
-}
-
-void AdiumMessageStyle::loadSenderColors()
-{
-	QFile colors(FResourcePath + "/Incoming/SenderColors.txt");
-	if (colors.open(QFile::ReadOnly))
-		FSenderColors = QString::fromUtf8(colors.readAll()).split(':',QString::SkipEmptyParts);
-}
-
-void AdiumMessageStyle::initStyleSettings()
-{
-	FCombineConsecutive = !FInfo.value(MSIV_DISABLE_COMBINE_CONSECUTIVE,false).toBool();
-	FAllowCustomBackground = !FInfo.value(MSIV_DISABLE_CUSTOM_BACKGROUND,false).toBool();
 }
 
 bool AdiumMessageStyle::eventFilter(QObject *AWatched, QEvent *AEvent)

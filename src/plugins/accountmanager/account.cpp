@@ -23,6 +23,11 @@ QUuid Account::accountId() const
 	return FOptionsNode.nspace();
 }
 
+int Account::accountOrder() const
+{
+	return FOptionsNode.value("order").toInt();
+}
+
 Jid Account::accountJid() const
 {
 	Jid jid = FOptionsNode.value("streamJid").toString();

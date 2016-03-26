@@ -16,6 +16,7 @@
 #include <definitions/optionvalues.h>
 #include <definitions/optionnodes.h>
 #include <definitions/optionwidgetorders.h>
+#include <definitions/stanzahandlerorders.h>
 #include <utils/widgetmanager.h>
 #include <utils/systemmanager.h>
 #include <utils/xmpperror.h>
@@ -188,7 +189,7 @@ bool ClientInfo::initObjects()
 
 	if (FDataForms)
 	{
-		FDataForms->insertLocalizer(this,DATA_FORM_SOFTWAREINFO);
+		FDataForms->insertLocalizer(this,DFT_SOFTWAREINFO);
 	}
 
 	return true;
@@ -291,7 +292,7 @@ void ClientInfo::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanz
 	{
 		Jid contactJid = FSoftwareId.take(AStanza.id());
 		SoftwareItem &software = FSoftwareItems[contactJid];
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			QDomElement query = AStanza.firstElement("query");
 			software.name = query.firstChildElement("name").text();
@@ -300,7 +301,7 @@ void ClientInfo::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanz
 			software.status = SoftwareLoaded;
 			LOG_STRM_INFO(AStreamJid,QString("Received software version from=%1").arg(AStanza.from()));
 		}
-		else if (AStanza.type() == "error")
+		else
 		{
 			software.name = XmppStanzaError(AStanza).errorMessage();
 			software.version.clear();
@@ -314,14 +315,14 @@ void ClientInfo::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanz
 	{
 		Jid contactJid = FActivityId.take(AStanza.id());
 		ActivityItem &activity = FActivityItems[contactJid];
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			QDomElement query = AStanza.firstElement("query");
 			activity.dateTime = QDateTime::currentDateTime().addSecs(0-query.attribute("seconds","0").toInt());
 			activity.text = query.text();
 			LOG_STRM_INFO(AStreamJid,QString("Received last activity from=%1").arg(AStanza.from()));
 		}
-		else if (AStanza.type() == "error")
+		else
 		{
 			activity.dateTime = QDateTime();
 			activity.text = XmppStanzaError(AStanza).errorMessage();
@@ -335,7 +336,7 @@ void ClientInfo::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanz
 		QDomElement time = AStanza.firstElement("time");
 		QString tzo = time.firstChildElement("tzo").text();
 		QString utc = time.firstChildElement("utc").text();
-		if (AStanza.type() == "result" && !tzo.isEmpty() && !utc.isEmpty())
+		if (AStanza.isResult() && !tzo.isEmpty() && !utc.isEmpty())
 		{
 			TimeItem &tItem = FTimeItems[contactJid];
 			tItem.zone = DateTime::tzdFromX85(tzo);
@@ -355,7 +356,7 @@ void ClientInfo::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanz
 IDataFormLocale ClientInfo::dataFormLocale(const QString &AFormType)
 {
 	IDataFormLocale locale;
-	if (AFormType == DATA_FORM_SOFTWAREINFO)
+	if (AFormType == DFT_SOFTWAREINFO)
 	{
 		locale.title = tr("Software information");
 		locale.fields[FORM_FIELD_SOFTWARE].label = tr("Software");
@@ -462,9 +463,9 @@ bool ClientInfo::requestSoftwareInfo(const Jid &AStreamJid, const Jid &AContactJ
 	bool sent = FSoftwareId.values().contains(AContactJid);
 	if (!sent && AStreamJid.isValid() && AContactJid.isValid())
 	{
-		Stanza iq("iq");
+		Stanza iq(STANZA_KIND_IQ);
+		iq.setType(STANZA_TYPE_GET).setTo(AContactJid.full()).setUniqueId();
 		iq.addElement("query",NS_JABBER_VERSION);
-		iq.setTo(AContactJid.full()).setId(FStanzaProcessor->newId()).setType("get");
 		sent = FStanzaProcessor->sendStanzaRequest(this,AStreamJid,iq,SOFTWARE_INFO_TIMEOUT);
 		if (sent)
 		{
@@ -510,9 +511,9 @@ bool ClientInfo::requestLastActivity(const Jid &AStreamJid, const Jid &AContactJ
 	bool sent = FActivityId.values().contains(AContactJid);
 	if (!sent && AStreamJid.isValid() && AContactJid.isValid())
 	{
-		Stanza iq("iq");
+		Stanza iq(STANZA_KIND_IQ);
+		iq.setType(STANZA_TYPE_GET).setTo(AContactJid.full()).setUniqueId();
 		iq.addElement("query",NS_JABBER_LAST);
-		iq.setTo(AContactJid.full()).setId(FStanzaProcessor->newId()).setType("get");
 		sent = FStanzaProcessor->sendStanzaRequest(this,AStreamJid,iq,LAST_ACTIVITY_TIMEOUT);
 		if (sent)
 		{
@@ -547,9 +548,9 @@ bool ClientInfo::requestEntityTime(const Jid &AStreamJid, const Jid &AContactJid
 	bool sent = FTimeId.values().contains(AContactJid);
 	if (!sent && AStreamJid.isValid() && AContactJid.isValid())
 	{
-		Stanza iq("iq");
+		Stanza iq(STANZA_KIND_IQ);
+		iq.setType(STANZA_TYPE_GET).setTo(AContactJid.full()).setUniqueId();
 		iq.addElement("time",NS_XMPP_TIME);
-		iq.setTo(AContactJid.full()).setType("get").setId(FStanzaProcessor->newId());
 		sent = FStanzaProcessor->sendStanzaRequest(this,AStreamJid,iq,ENTITY_TIME_TIMEOUT);
 		if (sent)
 		{
@@ -608,9 +609,9 @@ Action *ClientInfo::createInfoAction(const Jid &AStreamJid, const Jid &AContactJ
 	{
 		Action *action = new Action(AParent);
 
-		if (AContactJid.node().isEmpty())
+		if (!AContactJid.hasNode())
 			action->setText(tr("Service Uptime"));
-		else if (AContactJid.resource().isEmpty())
+		else if (!AContactJid.hasResource())
 			action->setText(tr("Last Activity"));
 		else
 			action->setText(tr("Idle Time"));
@@ -726,7 +727,7 @@ void ClientInfo::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AInd
 				if (show==IPresence::Offline || show==IPresence::Error)
 				{
 					Action *action = createInfoAction(streamJid,contactJid,NS_JABBER_LAST,AMenu);
-					AMenu->addAction(action,AG_RVCM_CLIENTINFO,true);
+					AMenu->addAction(action,AG_RVCM_CLIENTINFO_SHOW,true);
 				}
 			}
 		}
@@ -762,7 +763,7 @@ void ClientInfo::onDiscoInfoReceived(const IDiscoInfo &AInfo)
 	{
 		foreach(const IDataForm &form, AInfo.extensions)
 		{
-			if (FDataForms->fieldValue("FORM_TYPE",form.fields).toString() == DATA_FORM_SOFTWAREINFO)
+			if (FDataForms->fieldValue("FORM_TYPE",form.fields).toString() == DFT_SOFTWAREINFO)
 			{
 				SoftwareItem &software = FSoftwareItems[AInfo.contactJid];
 				software.name = FDataForms->fieldValue(FORM_FIELD_SOFTWARE,form.fields).toString();

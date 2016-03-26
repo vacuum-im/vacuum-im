@@ -5,6 +5,7 @@
 #include <QCryptographicHash>
 #include <definitions/namespaces.h>
 #include <definitions/dataformtypes.h>
+#include <definitions/stanzahandlerorders.h>
 #include <definitions/sessionnegotiatororders.h>
 #include <definitions/discofeaturehandlerorders.h>
 #include <definitions/notificationtypes.h>
@@ -15,6 +16,7 @@
 #include <definitions/soundfiles.h>
 #include <utils/widgetmanager.h>
 #include <utils/xmpperror.h>
+#include <utils/message.h>
 #include <utils/logger.h>
 
 #define SHC_STANZA_SESSION            "/message/feature[@xmlns='"NS_FEATURENEG"']"
@@ -135,7 +137,7 @@ bool SessionNegotiation::initObjects()
 	}
 	if (FDataForms)
 	{
-		FDataForms->insertLocalizer(this,DATA_FORM_SESSION_NEGOTIATION);
+		FDataForms->insertLocalizer(this,DFT_SESSIONNEGOTIATION);
 	}
 	insertNegotiator(this,SNO_DEFAULT);
 	return true;
@@ -169,8 +171,7 @@ bool SessionNegotiation::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, 
 			FSuspended.remove(sessionId);
 			closeAcceptDialog(session);
 
-			QString stanzaType = AStanza.type();
-			if (stanzaType.isEmpty() || stanzaType=="normal")
+			if (AStanza.type().isEmpty() || AStanza.type()==MESSAGE_TYPE_NORMAL)
 			{
 				IDataForm form = FDataForms->dataForm(formElem);
 				bool isAccept = FDataForms->fieldIndex(SESSION_FIELD_ACCEPT, form.fields) >= 0;
@@ -206,7 +207,7 @@ bool SessionNegotiation::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, 
 					removeSession(session);
 				}
 			}
-			else if (stanzaType=="error" && session.sessionId==sessionId)
+			else if (AStanza.isError() && session.sessionId==sessionId)
 			{
 				session.status = IStanzaSession::Error;
 				session.error = XmppStanzaError(AStanza);
@@ -278,7 +279,7 @@ Action *SessionNegotiation::createDiscoFeatureAction(const Jid &AStreamJid, cons
 IDataFormLocale SessionNegotiation::dataFormLocale(const QString &AFormType)
 {
 	IDataFormLocale locale;
-	if (AFormType == DATA_FORM_SESSION_NEGOTIATION)
+	if (AFormType == DFT_SESSIONNEGOTIATION)
 	{
 		locale.title = tr("Session Negotiation");
 		locale.fields["accept"].label = tr("Accept the Invitation?");
@@ -587,8 +588,8 @@ bool SessionNegotiation::sendSessionData(const IStanzaSession &ASession, const I
 {
 	if (FStanzaProcessor && FDataForms && !AForm.fields.isEmpty())
 	{
-		Stanza data("message");
-		data.setType("normal").setTo(ASession.contactJid.full());
+		Stanza data(STANZA_KIND_MESSAGE);
+		data.setType(MESSAGE_TYPE_NORMAL).setTo(ASession.contactJid.full());
 		data.addElement("thread").appendChild(data.createTextNode(ASession.sessionId));
 		QDomElement featureElem = data.addElement("feature",NS_FEATURENEG);
 		IDataForm form = AForm;
@@ -615,7 +616,7 @@ bool SessionNegotiation::sendSessionError(const IStanzaSession &ASession, const 
 {
 	if (FStanzaProcessor && FDataForms && !ASession.error.isNull())
 	{
-		Stanza error("message");
+		Stanza error(STANZA_KIND_MESSAGE);
 		error.setFrom(ASession.contactJid.full());
 		error = FStanzaProcessor->makeReplyError(error,ASession.error);
 		error.addElement("thread").appendChild(error.createTextNode(ASession.sessionId));
@@ -1141,7 +1142,7 @@ IDataForm SessionNegotiation::defaultForm(const QString &AActionVar, const QVari
 	IDataField form_type;
 	form_type.var = "FORM_TYPE";
 	form_type.type = DATAFIELD_TYPE_HIDDEN;
-	form_type.value = DATA_FORM_SESSION_NEGOTIATION;
+	form_type.value = DFT_SESSIONNEGOTIATION;
 	form_type.required = false;
 
 	IDataField actionField;
@@ -1293,7 +1294,7 @@ void SessionNegotiation::onAcceptDialogAccepted()
 			LOG_STRM_INFO(session.streamJid,QString("Stanza session accept approved by user, with=%1, sid=%2").arg(session.contactJid.full(),session.sessionId));
 			if (dialog->formWidget()->dataForm().type == DATAFORM_TYPE_FORM)
 			{
-				IDataForm submit = FDataForms->dataSubmit(dialog->formWidget()->userDataForm());
+				IDataForm submit = dialog->formWidget()->submitDataForm();
 				updateFields(submit,session.form,false,false);
 				processApply(session,submit);
 			}
@@ -1317,7 +1318,7 @@ void SessionNegotiation::onAcceptDialogAccepted()
 			}
 			else if (request.type == DATAFORM_TYPE_FORM)
 			{
-				IDataForm submit = FDataForms->dataSubmit(dialog->formWidget()->userDataForm());
+				IDataForm submit = dialog->formWidget()->submitDataForm();
 				updateFields(submit,session.form,false,false);
 				processApply(session,submit);
 			}

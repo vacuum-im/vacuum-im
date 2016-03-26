@@ -1,72 +1,111 @@
 #include "multiuser.h"
-#include <definitions/multiuserdataroles.h>
 
-MultiUser::MultiUser(const Jid &ARoomJid, const QString &ANickName, QObject *AParent) : QObject(AParent)
+#include <definitions/multiuserdataroles.h>
+#include <utils/logger.h>
+
+MultiUser::MultiUser(const Jid &AStreamJid, const Jid &AUserJid, const Jid &ARealJid, QObject *AParent) : QObject(AParent)
 {
-	FRoomJid = ARoomJid;
-	FContactJid = ARoomJid;
-	FContactJid.setResource(ANickName);
-	FNickName = ANickName;
-	setData(MUDR_ROOM_JID,FRoomJid.bare());
-	setData(MUDR_NICK_NAME,FNickName);
-	setData(MUDR_CONTACT_JID,FContactJid.full());
-	setData(MUDR_SHOW,IPresence::Offline);
-	setData(MUDR_ROLE,MUC_ROLE_NONE);
-	setData(MUDR_AFFILIATION,MUC_AFFIL_NONE);
+	FStreamJid = AStreamJid;
+	FUserJid = AUserJid;
+	FRealJid = ARealJid;
+	FRole = MUC_ROLE_NONE;
+	FAffiliation = MUC_AFFIL_NONE;
+
+	LOG_STRM_DEBUG(FStreamJid,QString("User created, user=%1").arg(FUserJid.full()));
 }
 
 MultiUser::~MultiUser()
 {
+	LOG_STRM_DEBUG(FStreamJid,QString("User destroyed, user=%1").arg(FUserJid.full()));
+}
 
+Jid MultiUser::streamJid() const
+{
+	return FStreamJid;
 }
 
 Jid MultiUser::roomJid() const
 {
-	return FRoomJid;
+	return FUserJid.bare();
 }
 
-Jid MultiUser::contactJid() const
+Jid MultiUser::userJid() const
 {
-	return FContactJid;
+	return FUserJid;
 }
 
-QString MultiUser::nickName() const
+Jid MultiUser::realJid() const
 {
-	return FNickName;
+	return FRealJid;
+}
+
+QString MultiUser::nick() const
+{
+	return FUserJid.resource();
 }
 
 QString MultiUser::role() const
 {
-	return data(MUDR_ROLE).toString();
+	return FRole;
 }
 
 QString MultiUser::affiliation() const
 {
-	return data(MUDR_AFFILIATION).toString();
+	return FAffiliation;
 }
 
-QVariant MultiUser::data(int ARole) const
+IPresenceItem MultiUser::presence() const
 {
-	return FData.value(ARole);
+	return FPresence;
 }
 
-void MultiUser::setData(int ARole, const QVariant &AValue)
+void MultiUser::setNick(const QString &ANick)
 {
-	QVariant before = data(ARole);
-	if (before != AValue)
+	if (FUserJid.resource() != ANick)
 	{
-		if (AValue.isValid())
-			FData.insert(ARole,AValue);
-		else
-			FData.remove(ARole);
-		emit dataChanged(ARole,before,AValue);
+		LOG_STRM_DEBUG(FStreamJid,QString("User nick changed to=%1, user=%2").arg(ANick,FUserJid.full()));
+
+		QVariant before = FUserJid.resource();
+		FUserJid.setResource(ANick);
+
+		emit changed(MUDR_NICK,before);
 	}
 }
 
-void MultiUser::setNickName(const QString &ANickName)
+void MultiUser::setRole(const QString &ARole)
 {
-	FNickName = ANickName;
-	FContactJid.setResource(ANickName);
-	setData(MUDR_NICK_NAME,ANickName);
-	setData(MUDR_CONTACT_JID,FContactJid.full());
+	if (FRole != ARole)
+	{
+		LOG_STRM_DEBUG(FStreamJid,QString("User role changed from=%1 to=%2, user=%3").arg(FRole,ARole,FUserJid.full()));
+
+		QVariant before = FRole;
+		FRole = ARole;
+
+		emit changed(MUDR_ROLE,before);
+	}
+}
+
+void MultiUser::setAffiliation(const QString &AAffiliation)
+{
+	if (FAffiliation != AAffiliation)
+	{
+		LOG_STRM_DEBUG(FStreamJid,QString("User affiliation changed from=%1 to=%2, user=%3").arg(FAffiliation,AAffiliation,FUserJid.full()));
+
+		QVariant before = FAffiliation;
+		FAffiliation = AAffiliation;
+		
+		emit changed(MUDR_AFFILIATION,before);
+	}
+}
+
+void MultiUser::setPresence(const IPresenceItem &APresence)
+{
+	if (FPresence != APresence)
+	{
+		LOG_STRM_DEBUG(FStreamJid,QString("User presence changed from=%1 to=%2, user=%3").arg(FPresence.show).arg(APresence.show).arg(FUserJid.full()));
+
+		FPresence = APresence;
+
+		emit changed(MUDR_PRESENCE,QVariant());
+	}
 }

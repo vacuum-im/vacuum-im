@@ -100,9 +100,9 @@ bool SASLAuthFeature::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, in
 {
 	if (AXmppStream==FXmppStream && AOrder==XSHO_XMPP_FEATURE)
 	{
-		if (AStanza.tagName() == "challenge")
+		if (AStanza.kind() == "challenge")
 		{
-			QByteArray challengeData = QByteArray::fromBase64(AStanza.element().text().toAscii());
+			QByteArray challengeData = QByteArray::fromBase64(AStanza.element().text().toLatin1());
 			LOG_STRM_DEBUG(FXmppStream->streamJid(),QString("SASL auth challenge received: %1").arg(QString::fromUtf8(challengeData)));
 			
 			QMap<QByteArray, QByteArray> responseMap;
@@ -128,8 +128,7 @@ bool SASLAuthFeature::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, in
 			}
 			QByteArray responseData = serializeResponse(responseMap);
 
-			Stanza response("response");
-			response.setAttribute("xmlns",NS_FEATURE_SASL);
+			Stanza response("response",NS_FEATURE_SASL);
 			response.element().appendChild(response.createTextNode(responseData.toBase64()));
 			FXmppStream->sendStanza(response);
 
@@ -138,13 +137,13 @@ bool SASLAuthFeature::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, in
 		else
 		{
 			FXmppStream->removeXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
-			if (AStanza.tagName() == "success")
+			if (AStanza.kind() == "success")
 			{
 				LOG_STRM_INFO(FXmppStream->streamJid(),"Authorization successes");
 				deleteLater();
 				emit finished(true);
 			}
-			else if (AStanza.tagName() == "failure")
+			else if (AStanza.kind() == "failure")
 			{
 				XmppSaslError err(AStanza.element());
 				LOG_STRM_WARNING(FXmppStream->streamJid(),QString("Authorization failed: %1").arg(err.condition()));
@@ -153,7 +152,7 @@ bool SASLAuthFeature::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, in
 			else
 			{
 				XmppError err(IERR_SASL_AUTH_INVALID_RESPONSE);
-				LOG_STRM_WARNING(FXmppStream->streamJid(),QString("Authorization error: Invalid response=%1").arg(AStanza.tagName()));
+				LOG_STRM_WARNING(FXmppStream->streamJid(),QString("Authorization error: Invalid stanza kind=%1").arg(AStanza.kind()));
 				emit error(err);
 			}
 		}
@@ -224,8 +223,7 @@ bool SASLAuthFeature::start(const QDomElement &AElem)
 
 void SASLAuthFeature::sendAuthRequest(const QStringList &AMechanisms)
 {
-	Stanza auth("auth");
-	auth.setAttribute("xmlns",NS_FEATURE_SASL);
+	Stanza auth("auth",NS_FEATURE_SASL);
 	if (AMechanisms.contains(AUTH_DIGEST_MD5))
 	{
 		auth.setAttribute("mechanism",AUTH_DIGEST_MD5);

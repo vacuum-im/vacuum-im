@@ -191,12 +191,14 @@ class IDataFormWidget
 {
 public:
 	virtual QWidget *instance() =0;
+	virtual bool isSubmitValid() const =0;
 	virtual bool checkForm(bool AAllowInvalid) const =0;
 	virtual IDataTableWidget *tableWidget() const =0;
 	virtual IDataFieldWidget *fieldWidget(int AIndex) const =0;
 	virtual IDataFieldWidget *fieldWidget(const QString &AVar) const =0;
-	virtual IDataForm userDataForm() const =0;
 	virtual const IDataForm &dataForm() const =0;
+	virtual IDataForm userDataForm() const =0;
+	virtual IDataForm submitDataForm() const =0;
 protected:
 	virtual void cellActivated(int ARow, int AColumn) =0;
 	virtual void cellChanged(int ARow, int AColumn, int APrevRow, int APrevColumn) =0;
@@ -256,7 +258,8 @@ public:
 	virtual bool isFieldValid(const IDataField &AField, const QString &AFormType) const =0;
 	virtual bool isFormValid(const IDataForm &AForm) const =0;
 	virtual bool isSubmitValid(const IDataForm &AForm, const IDataForm &ASubmit) const =0;
-	virtual bool isSupportedUri(const IDataMediaURI &AUri) const =0;
+	virtual bool isSupportedMedia(const IDataMedia &AMedia) const =0;
+	virtual bool isSupportedMediaUri(const IDataMediaURI &AUri) const =0;
 	//Localization
 	virtual IDataForm localizeForm(const IDataForm &AForm) const =0;
 	virtual IDataLocalizer *dataLocalizer(const QString &AFormType) const =0;
@@ -288,9 +291,9 @@ protected:
 Q_DECLARE_INTERFACE(IDataTableWidget,"Vacuum.Plugin.IDataTableWidget/1.1")
 Q_DECLARE_INTERFACE(IDataMediaWidget,"Vacuum.Plugin.IDataMediaWidget/1.1")
 Q_DECLARE_INTERFACE(IDataFieldWidget,"Vacuum.Plugin.IDataFieldWidget/1.1")
-Q_DECLARE_INTERFACE(IDataFormWidget,"Vacuum.Plugin.IDataFormWidget/1.1")
+Q_DECLARE_INTERFACE(IDataFormWidget,"Vacuum.Plugin.IDataFormWidget/1.2")
 Q_DECLARE_INTERFACE(IDataDialogWidget,"Vacuum.Plugin.IDataDialogWidget/1.0")
 Q_DECLARE_INTERFACE(IDataLocalizer,"Vacuum.Plugin.IDataLocalizer/1.0")
-Q_DECLARE_INTERFACE(IDataForms,"Vacuum.Plugin.IDataForms/1.3")
+Q_DECLARE_INTERFACE(IDataForms,"Vacuum.Plugin.IDataForms/1.4")
 
-#endif
+#endif //IDATAFORMS_H

@@ -150,7 +150,7 @@ bool BitsOfBinary::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int A
 	Q_UNUSED(AXmppStream);
 	if (AOrder == XSHO_BITSOFBINARY)
 	{
-		QDomElement dataElem = AStanza.tagName()=="iq" ? AStanza.firstElement().firstChildElement("data") : AStanza.firstElement("data");
+		QDomElement dataElem = AStanza.kind()==STANZA_KIND_IQ ? AStanza.firstElement().firstChildElement("data") : AStanza.firstElement("data");
 		while (!dataElem.isNull())
 		{
 			if (dataElem.namespaceURI() == NS_BITS_OF_BINARY)
@@ -211,7 +211,7 @@ void BitsOfBinary::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 	if (FLoadRequests.contains(AStanza.id()))
 	{
 		QString cid = FLoadRequests.take(AStanza.id());
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			QDomElement dataElem = AStanza.firstElement("data",NS_BITS_OF_BINARY);
 			QString type = dataElem.attribute("type");
@@ -264,8 +264,8 @@ bool BitsOfBinary::loadBinary(const QString &AContentId, const Jid &AStreamJid, 
 		{
 			if (!FLoadRequests.values().contains(AContentId))
 			{
-				Stanza stanza("iq");
-				stanza.setTo(AContactJid.full()).setId(FStanzaProcessor->newId()).setType("get");
+				Stanza stanza(STANZA_KIND_IQ);
+				stanza.setType(STANZA_TYPE_GET).setTo(AContactJid.full()).setUniqueId();
 				QDomElement dataElem = stanza.addElement("data",NS_BITS_OF_BINARY);
 				dataElem.setAttribute("cid",AContentId);
 				if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,LOAD_TIMEOUT))

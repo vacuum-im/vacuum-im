@@ -8,6 +8,7 @@
 #include <definitions/rostertooltiporders.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
+#include <definitions/stanzahandlerorders.h>
 #include <utils/logger.h>
 
 #define SHC_PRIVACY         "/iq[@type='set']/query[@xmlns='"NS_JABBER_PRIVACY"']"
@@ -224,12 +225,12 @@ bool PrivacyLists::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza
 
 void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 {
-	XmppStanzaError err = AStanza.type()!="result" ? XmppStanzaError(AStanza) : XmppStanzaError::null;
+	XmppStanzaError err = !AStanza.isResult() ? XmppStanzaError(AStanza) : XmppStanzaError::null;
 
 	if (FLoadRequests.contains(AStanza.id()))
 	{
 		QString loadListName = FLoadRequests.take(AStanza.id());
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			bool opened = isReady(AStreamJid);
 			QMap<QString,IPrivacyList> &lists = FPrivacyLists[AStreamJid];
@@ -336,7 +337,7 @@ void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 	else if (FSaveRequests.contains(AStanza.id()))
 	{
 		IPrivacyList list = FSaveRequests.take(AStanza.id());
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			LOG_STRM_INFO(AStreamJid,QString("Privacy list saved, list=%1, id=%2").arg(list.name,AStanza.id()));
 			FPrivacyLists[AStreamJid].insert(list.name,list);
@@ -350,7 +351,7 @@ void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 	else if (FActiveRequests.contains(AStanza.id()))
 	{
 		QString activeListName = FActiveRequests.take(AStanza.id());
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			LOG_STRM_INFO(AStreamJid,QString("Active privacy list changed to=%1, id=%2").arg(activeListName,AStanza.id()));
 			FActiveLists.insert(AStreamJid,activeListName);
@@ -364,7 +365,7 @@ void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 	else if (FDefaultRequests.contains(AStanza.id()))
 	{
 		QString defaultListName = FDefaultRequests.take(AStanza.id());
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			LOG_STRM_INFO(AStreamJid,QString("Default privacy list changed to=%1, id=%2").arg(defaultListName,AStanza.id()));
 			FDefaultLists.insert(AStreamJid,defaultListName);
@@ -378,7 +379,7 @@ void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 	else if (FRemoveRequests.contains(AStanza.id()))
 	{
 		QString listName = FRemoveRequests.take(AStanza.id());
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			LOG_STRM_INFO(AStreamJid,QString("Privacy list removed, list=%1, id=%2").arg(listName,AStanza.id()));
 			FPrivacyLists[AStreamJid].remove(listName);
@@ -391,7 +392,7 @@ void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 	}
 	FStreamRequests[AStreamJid].removeAll(AStanza.id());
 
-	if (AStanza.type() == "result")
+	if (AStanza.isResult())
 		emit requestCompleted(AStanza.id());
 	else
 		emit requestFailed(AStanza.id(),err);
@@ -688,8 +689,8 @@ QString PrivacyLists::setActiveList(const Jid &AStreamJid, const QString &AList)
 {
 	if (isReady(AStreamJid) && AList!=activeList(AStreamJid))
 	{
-		Stanza request("iq");
-		request.setType("set").setId(FStanzaProcessor->newId());
+		Stanza request(STANZA_KIND_IQ);
+		request.setType(STANZA_TYPE_SET).setUniqueId();
 		QDomElement queryElem = request.addElement("query",NS_JABBER_PRIVACY);
 		QDomElement activeElem = queryElem.appendChild(request.createElement("active")).toElement();
 		if (!AList.isEmpty())
@@ -728,8 +729,8 @@ QString PrivacyLists::setDefaultList(const Jid &AStreamJid, const QString &AList
 {
 	if (isReady(AStreamJid) && AList!=defaultList(AStreamJid))
 	{
-		Stanza request("iq");
-		request.setType("set").setId(FStanzaProcessor->newId());
+		Stanza request(STANZA_KIND_IQ);
+		request.setType(STANZA_TYPE_SET).setUniqueId();
 		QDomElement queryElem = request.addElement("query",NS_JABBER_PRIVACY);
 		QDomElement defaultElem = queryElem.appendChild(request.createElement("default")).toElement();
 		if (!AList.isEmpty())
@@ -789,8 +790,8 @@ QString PrivacyLists::loadPrivacyList(const Jid &AStreamJid, const QString &ALis
 {
 	if (isReady(AStreamJid) && !AList.isEmpty())
 	{
-		Stanza request("iq");
-		request.setType("get").setId(FStanzaProcessor->newId());
+		Stanza request(STANZA_KIND_IQ);
+		request.setType(STANZA_TYPE_GET).setUniqueId();
 		QDomElement elem = request.addElement("query",NS_JABBER_PRIVACY);
 		elem.appendChild(request.createElement("list")).toElement().setAttribute("name",AList);
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,PRIVACY_TIMEOUT))
@@ -814,8 +815,8 @@ QString PrivacyLists::savePrivacyList(const Jid &AStreamJid, const IPrivacyList 
 	{
 		if (privacyList(AStreamJid,AList.name,true) != AList)
 		{
-			Stanza request("iq");
-			request.setType("set").setId(FStanzaProcessor->newId());
+			Stanza request(STANZA_KIND_IQ);
+			request.setType(STANZA_TYPE_SET).setUniqueId();
 			QDomElement queryElem = request.addElement("query",NS_JABBER_PRIVACY);
 			QDomElement listElem =  queryElem.appendChild(request.createElement("list")).toElement();
 			listElem.setAttribute("name",AList.name);
@@ -867,8 +868,8 @@ QString PrivacyLists::removePrivacyList(const Jid &AStreamJid, const QString &AL
 {
 	if (isReady(AStreamJid) && !AList.isEmpty())
 	{
-		Stanza remove("iq");
-		remove.setType("set").setId(FStanzaProcessor->newId());
+		Stanza remove(STANZA_KIND_IQ);
+		remove.setType(STANZA_TYPE_SET).setUniqueId();
 		QDomElement queryElem = remove.addElement("query",NS_JABBER_PRIVACY);
 		queryElem.appendChild(remove.createElement("list")).toElement().setAttribute("name",AList);
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,remove,PRIVACY_TIMEOUT))
@@ -906,8 +907,8 @@ QString PrivacyLists::loadPrivacyLists(const Jid &AStreamJid)
 {
 	if (FStanzaProcessor)
 	{
-		Stanza request("iq");
-		request.setType("get").setId(FStanzaProcessor->newId());
+		Stanza request(STANZA_KIND_IQ);
+		request.setType(STANZA_TYPE_GET).setUniqueId();
 		request.addElement("query",NS_JABBER_PRIVACY);
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,PRIVACY_TIMEOUT))
 		{
@@ -928,7 +929,7 @@ Menu *PrivacyLists::createPrivacyMenu(Menu *AMenu) const
 	Menu *pmenu = new Menu(AMenu);
 	pmenu->setTitle(tr("Privacy"));
 	pmenu->setIcon(RSR_STORAGE_MENUICONS,MNI_PRIVACYLISTS);
-	AMenu->addAction(pmenu->menuAction(),AG_RVCM_PRIVACYLISTS,true);
+	AMenu->addAction(pmenu->menuAction(),AG_RVCM_PRIVACYLISTS_OPTIONS,true);
 	return pmenu;
 }
 
@@ -1192,8 +1193,8 @@ Menu *PrivacyLists::createSetDefaultMenu(const Jid &AStreamJid, const QList<IPri
 bool PrivacyLists::isMatchedJid(const Jid &AMask, const Jid &AJid) const
 {
 	return  ( (AMask.pDomain() == AJid.pDomain()) &&
-	          (AMask.node().isEmpty() || AMask.pNode()==AJid.pNode()) &&
-	          (AMask.resource().isEmpty() || AMask.pResource()==AJid.pResource()) );
+	          (!AMask.hasNode() || AMask.pNode()==AJid.pNode()) &&
+	          (!AMask.hasResource() || AMask.pResource()==AJid.pResource()) );
 }
 
 void PrivacyLists::sendOnlinePresences(const Jid &AStreamJid, const IPrivacyList &AAutoList)

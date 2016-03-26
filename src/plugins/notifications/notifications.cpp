@@ -604,7 +604,7 @@ void Notifications::removeNotificationHandler(int AOrder, INotificationHandler *
 
 QImage Notifications::contactAvatar(const Jid &AContactJid) const
 {
-	return FAvatars!=NULL ? FAvatars->loadAvatarImage(FAvatars->avatarHash(AContactJid), QSize(32,32)) : QImage();
+	return FAvatars!=NULL ? FAvatars->visibleAvatarImage(FAvatars->avatarHash(AContactJid),FAvatars->avatarSize(IAvatars::AvatarNormal)) : QImage();
 }
 
 QIcon Notifications::contactIcon(const Jid &AStreamJid, const Jid &AContactJid) const
@@ -626,7 +626,7 @@ QString Notifications::contactName(const Jid &AStreamJid, const Jid &AContactJid
 		name = roster!=NULL ? roster->findItem(AContactJid).name : AContactJid.uNode();
 	}
 
-	return name.isEmpty() ? AContactJid.uBare() : name;
+	return name.isEmpty() ? AContactJid.uNode() : name;
 }
 
 int Notifications::notifyIdByRosterId(int ARosterId) const
@@ -807,7 +807,7 @@ void Notifications::onOptionsOpened()
 
 void Notifications::onOptionsChanged(const OptionsNode &ANode)
 {
-	if (Options::cleanNSpaces(ANode.path()) == OPV_NOTIFICATIONS_KINDENABLED_ITEM)
+	if (ANode.cleanPath() == OPV_NOTIFICATIONS_KINDENABLED_ITEM)
 	{
 		if (ANode.nspace().toInt() == INotification::SoundPlay)
 		{

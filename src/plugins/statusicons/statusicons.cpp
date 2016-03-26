@@ -354,7 +354,7 @@ QString StatusIcons::iconKeyByJid(const Jid &AStreamJid, const Jid &AContactJid)
 		subscription = SUBSCRIPTION_BOTH;
 		show = presence!=NULL ? presence->show() : show;
 	}
-	else if (AStreamJid && AContactJid)
+	else if (AStreamJid.pBare() == AContactJid.pBare())
 	{
 		subscription = SUBSCRIPTION_BOTH;
 		show = presence!=NULL ? presence->findItem(AContactJid).show : show;
@@ -540,17 +540,17 @@ void StatusIcons::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIn
 		else if (AIndexes.count() == 1)
 			FCustomIconMenu->setIcon(iconByJidStatus(AIndexes.first()->data(RDR_FULL_JID).toString(),IPresence::Online,SUBSCRIPTION_BOTH,false));
 
-		AMenu->addAction(FCustomIconMenu->menuAction(),AG_RVCM_STATUSICONS,true);
+		AMenu->addAction(FCustomIconMenu->menuAction(),AG_RVCM_STATUSICONS_CUSTOM,true);
 	}
 }
 
 void StatusIcons::onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu)
 {
 	Q_UNUSED(AWindow);
-	QString pattern = QString(".*@%1/%2").arg(QRegExp::escape(AUser->contactJid().pDomain())).arg(QRegExp::escape(AUser->nickName()));
+	QString pattern = QString(".*@%1/%2").arg(QRegExp::escape(AUser->userJid().pDomain())).arg(QRegExp::escape(AUser->nick()));
 	updateCustomIconMenu(QStringList() << pattern);
-	FCustomIconMenu->setIcon(iconByJidStatus(AUser->contactJid(),IPresence::Online,SUBSCRIPTION_BOTH,false));
-	AMenu->addAction(FCustomIconMenu->menuAction(),AG_MUCM_STATUSICONS,true);
+	FCustomIconMenu->setIcon(iconByJidStatus(AUser->userJid(),IPresence::Online,SUBSCRIPTION_BOTH,false));
+	AMenu->addAction(FCustomIconMenu->menuAction(),AG_MUCM_STATUSICONS_CUSTOM,true);
 }
 
 void StatusIcons::onOptionsOpened()

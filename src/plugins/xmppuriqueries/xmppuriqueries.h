@@ -28,11 +28,13 @@ public:
 	virtual bool messageViewUrlOpen(int AOrder, IMessageViewWidget *AWidget, const QUrl &AUrl);
 	//IXmppUriQueries
 	virtual bool openXmppUri(const Jid &AStreamJid, const QUrl &AUrl) const;
-	virtual void insertUriHandler(IXmppUriHandler *AHandler, int AOrder);
-	virtual void removeUriHandler(IXmppUriHandler *AHandler, int AOrder);
+	virtual bool parseXmppUri(const QUrl &AUrl, Jid &AContactJid, QString &AAction, QMultiMap<QString, QString> &AParams) const;
+	virtual QString makeXmppUri(const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams) const;
+	virtual void insertUriHandler(int AOrder, IXmppUriHandler *AHandler);
+	virtual void removeUriHandler(int AOrder, IXmppUriHandler *AHandler);
 signals:
-	void uriHandlerInserted(IXmppUriHandler *AHandler, int AOrder);
-	void uriHandlerRemoved(IXmppUriHandler *AHandler, int AOrder);
+	void uriHandlerInserted(int AOrder, IXmppUriHandler *AHandler);
+	void uriHandlerRemoved(int AOrder, IXmppUriHandler *AHandler);
 private:
 	IMessageWidgets *FMessageWidgets;
 private:

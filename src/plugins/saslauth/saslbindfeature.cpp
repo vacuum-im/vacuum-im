@@ -24,20 +24,20 @@ bool SASLBindFeature::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, in
 	if (AXmppStream==FXmppStream && AOrder==XSHO_XMPP_FEATURE && AStanza.id()=="bind")
 	{
 		FXmppStream->removeXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			Jid bindJid = AStanza.firstElement().firstChild().toElement().text();
-			if (!bindJid.isValid() || bindJid.node().isEmpty())
-			{
-				LOG_STRM_WARNING(FXmppStream->streamJid(),QString("Failed to bind resource, jid=%1: Invalid JID").arg(bindJid.full()));
-				emit error(XmppError(IERR_SASL_BIND_INVALID_STREAM_JID));
-			}
-			else
+			if (bindJid.isValid() && bindJid.hasNode())
 			{
 				LOG_STRM_INFO(FXmppStream->streamJid(),QString("Resource binding finished, jid=%1").arg(bindJid.full()));
 				FXmppStream->setStreamJid(bindJid);
 				deleteLater();
 				emit finished(false);
+			}
+			else
+			{
+				LOG_STRM_WARNING(FXmppStream->streamJid(),QString("Failed to bind resource, jid=%1: Invalid JID").arg(bindJid.full()));
+				emit error(XmppError(IERR_SASL_BIND_INVALID_STREAM_JID));
 			}
 		}
 		else
@@ -71,8 +71,8 @@ bool SASLBindFeature::start(const QDomElement &AElem)
 {
 	if (AElem.tagName() == "bind")
 	{
-		Stanza bind("iq");
-		bind.setType("set").setId("bind");
+		Stanza bind(STANZA_KIND_IQ);
+		bind.setType(STANZA_TYPE_SET).setId("bind");
 		bind.addElement("bind",NS_FEATURE_BIND);
 
 		QString resource = FXmppStream->streamJid().resource();

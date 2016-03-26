@@ -9,6 +9,7 @@
 #include <definitions/namespaces.h>
 #include <definitions/internalerrors.h>
 #include <definitions/statisticsparams.h>
+#include <definitions/stanzahandlerorders.h>
 #include <utils/stanza.h>
 #include <utils/logger.h>
 
@@ -140,7 +141,7 @@ void SocksStream::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStan
 	Q_UNUSED(AStreamJid);
 	if (FProxyRequests.contains(AStanza.id()))
 	{
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			QDomElement hostElem = AStanza.firstElement("query",NS_SOCKS5_BYTESTREAMS).firstChildElement("streamhost");
 			if (!hostElem.isNull())
@@ -166,7 +167,7 @@ void SocksStream::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStan
 	}
 	else if (AStanza.id() == FHostRequest)
 	{
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			QDomElement hostElem = AStanza.firstElement("query",NS_SOCKS5_BYTESTREAMS).firstChildElement("streamhost-used");
 			Jid hostJid = hostElem.attribute("jid");
@@ -188,7 +189,7 @@ void SocksStream::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStan
 	}
 	else if (AStanza.id() == FActivateRequest)
 	{
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			LOG_STRM_DEBUG(FStreamJid,QString("Socks stream activated, sid=%1").arg(FStreamId));
 			negotiateConnection(NCMD_START_STREAM);
@@ -627,7 +628,7 @@ bool SocksStream::negotiateConnection(int ACommand)
 	{
 		FHosts.clear();
 		FHostIndex = INT_MAX;
-		if (streamKind() == IDataStreamSocket::Initiator)
+		if (streamKind() == IDataStream::Initiator)
 		{
 			FConnectKey = FSocksStreams->connectionKey(FStreamId, FStreamJid, FContactJid);
 			if (requestProxyAddress() || sendAvailHosts())
@@ -686,7 +687,7 @@ bool SocksStream::negotiateConnection(int ACommand)
 		}
 		else if (ACommand == NCMD_ACTIVATE_STREAM)
 		{
-			if (streamKind() == IDataStreamSocket::Initiator)
+			if (streamKind() == IDataStream::Initiator)
 			{
 				if (activateStream())
 					return true;
@@ -716,8 +717,8 @@ bool SocksStream::requestProxyAddress()
 	bool requested = false;
 	foreach(const Jid &proxy, FProxyList)
 	{
-		Stanza stanza("iq");
-		stanza.setType("get").setTo(proxy.full()).setId(FStanzaProcessor->newId());
+		Stanza stanza(STANZA_KIND_IQ);
+		stanza.setType(STANZA_TYPE_GET).setTo(proxy.full()).setUniqueId();
 		stanza.addElement("query",NS_SOCKS5_BYTESTREAMS);
 		if (FStanzaProcessor->sendStanzaRequest(this,FStreamJid,stanza,PROXY_REQUEST_TIMEOUT))
 		{
@@ -735,8 +736,8 @@ bool SocksStream::requestProxyAddress()
 
 bool SocksStream::sendAvailHosts()
 {
-	Stanza stanza("iq");
-	stanza.setType("set").setTo(FContactJid.full()).setId(FStanzaProcessor->newId());
+	Stanza stanza(STANZA_KIND_IQ);
+	stanza.setType(STANZA_TYPE_SET).setTo(FContactJid.full()).setUniqueId();
 
 	QDomElement queryElem = stanza.addElement("query",NS_SOCKS5_BYTESTREAMS);
 	queryElem.setAttribute("sid",FStreamId);
@@ -818,8 +819,8 @@ bool SocksStream::sendUsedHost()
 {
 	if (FHostIndex < FHosts.count())
 	{
-		Stanza stanza("iq");
-		stanza.setType("result").setId(FHostRequest).setTo(FContactJid.full());
+		Stanza stanza(STANZA_KIND_IQ);
+		stanza.setType(STANZA_TYPE_RESULT).setTo(FContactJid.full()).setId(FHostRequest);
 
 		const HostInfo &info = FHosts.at(FHostIndex);
 		QDomElement query =  stanza.addElement("query",NS_SOCKS5_BYTESTREAMS);
@@ -843,8 +844,8 @@ bool SocksStream::sendUsedHost()
 
 bool SocksStream::sendFailedHosts()
 {
-	Stanza stanza("iq");
-	stanza.setType("error").setTo(FContactJid.full()).setId(FHostRequest);
+	Stanza stanza(STANZA_KIND_IQ);
+	stanza.setType(STANZA_TYPE_ERROR).setTo(FContactJid.full()).setId(FHostRequest);
 
 	QDomElement errElem = stanza.addElement("error");
 	errElem.setAttribute("code", 404);
@@ -868,8 +869,8 @@ bool SocksStream::activateStream()
 {
 	if (FHostIndex < FHosts.count())
 	{
-		Stanza stanza("iq");
-		stanza.setType("set").setTo(FHosts.at(FHostIndex).jid.full()).setId(FStanzaProcessor->newId());
+		Stanza stanza(STANZA_KIND_IQ);
+		stanza.setType(STANZA_TYPE_SET).setTo(FHosts.at(FHostIndex).jid.full()).setUniqueId();
 		QDomElement queryElem = stanza.addElement("query",NS_SOCKS5_BYTESTREAMS);
 		queryElem.setAttribute("sid",FStreamId);
 		queryElem.appendChild(stanza.createElement("activate")).appendChild(stanza.createTextNode(FContactJid.full()));
@@ -956,7 +957,7 @@ void SocksStream::onHostSocketDisconnected()
 	LOG_STRM_DEBUG(FStreamJid,QString("Socks stream disconnected from host, address=%1, sid=%2").arg(FTcpSocket->peerAddress().toString(),FStreamId));
 
 	FHostIndex++;
-	if (streamKind() == IDataStreamSocket::Initiator)
+	if (streamKind() == IDataStream::Initiator)
 		abort(XmppError(IERR_SOCKS5_STREAM_HOST_NOT_CONNECTED));
 	else
 		negotiateConnection(NCMD_CHECK_NEXT_HOST);

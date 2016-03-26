@@ -203,7 +203,7 @@ bool StatusChanger::initObjects()
 
 	if (FTrayManager)
 	{
-		FTrayManager->contextMenu()->addAction(FMainMenu->menuAction(),AG_TMTM_STATUSCHANGER,true);
+		FTrayManager->contextMenu()->addAction(FMainMenu->menuAction(),AG_TMTM_STATUSCHANGER_STATUS,true);
 	}
 
 	if (FNotifications)
@@ -1156,7 +1156,7 @@ void StatusChanger::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &A
 				action->setMenu(menu);
 				action->setText(tr("Status"));
 				action->setIcon(menu->menuAction()->icon());
-				AMenu->addAction(action,AG_RVCM_STATUSCHANGER,true);
+				AMenu->addAction(action,AG_RVCM_STATUSCHANGER_STATUS,true);
 			}
 		}
 		else if (index->kind() == RIK_CONTACTS_ROOT)
@@ -1170,7 +1170,7 @@ void StatusChanger::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &A
 					menu->addAction(action,AG_SCSM_STATUSCHANGER_CUSTOM_STATUS,true);
 				foreach(Action *action, FMainMenu->actions(AG_SCSM_STATUSCHANGER_DEFAULT_STATUS))
 					menu->addAction(action,AG_SCSM_STATUSCHANGER_DEFAULT_STATUS,true);
-				AMenu->addAction(menu->menuAction(),AG_RVCM_STATUSCHANGER,true);
+				AMenu->addAction(menu->menuAction(),AG_RVCM_STATUSCHANGER_STATUS,true);
 			}
 		}
 	}

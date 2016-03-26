@@ -117,7 +117,7 @@ IMessageStyle *AdiumMessageStyleEngine::styleForOptions(const IMessageStyleOptio
 
 IMessageStyleOptions AdiumMessageStyleEngine::styleOptions(const OptionsNode &AEngineNode, const QString &AStyleId) const
 {
-	IMessageStyleOptions soptions;
+	IMessageStyleOptions options;
 	if (AStyleId.isEmpty() || FStylePaths.contains(AStyleId))
 	{
 		QString styleId = AStyleId.isEmpty() ? AEngineNode.value("style-id").toString() : AStyleId;
@@ -141,39 +141,46 @@ IMessageStyleOptions AdiumMessageStyleEngine::styleOptions(const OptionsNode &AE
 
 		if (FStylePaths.contains(styleId))
 		{
-			soptions.engineId = engineId();
-			soptions.styleId = styleId;
+			options.engineId = engineId();
+			options.styleId = styleId;
 
 			OptionsNode styleNode = AEngineNode.node("style",styleId);
-			soptions.extended.insert(MSO_HEADER_TYPE,AdiumMessageStyle::HeaderNone);
-			soptions.extended.insert(MSO_VARIANT,styleNode.value("variant"));
-			soptions.extended.insert(MSO_FONT_FAMILY,styleNode.value("font-family"));
-			soptions.extended.insert(MSO_FONT_SIZE,styleNode.value("font-size"));
-			soptions.extended.insert(MSO_BG_COLOR,styleNode.value("bg-color"));
-			soptions.extended.insert(MSO_BG_IMAGE_FILE,styleNode.value("bg-image-file"));
-			soptions.extended.insert(MSO_BG_IMAGE_LAYOUT,styleNode.value("bg-image-layout"));
+			options.extended.insert(MSO_HEADER_TYPE,AdiumMessageStyle::HeaderNone);
+			options.extended.insert(MSO_VARIANT,styleNode.value("variant"));
+			options.extended.insert(MSO_FONT_FAMILY,styleNode.value("font-family"));
+			options.extended.insert(MSO_FONT_SIZE,styleNode.value("font-size"));
+			options.extended.insert(MSO_SELF_COLOR,styleNode.value("self-color"));
+			options.extended.insert(MSO_CONTACT_COLOR,styleNode.value("contact-color"));
+			options.extended.insert(MSO_BG_COLOR,styleNode.value("bg-color"));
+			options.extended.insert(MSO_BG_IMAGE_FILE,styleNode.value("bg-image-file"));
+			options.extended.insert(MSO_BG_IMAGE_LAYOUT,styleNode.value("bg-image-layout"));
 
 			QList<QString> variants = styleVariants(styleId);
 			QMap<QString,QVariant> info = styleInfo(styleId);
 
-			if (!variants.contains(soptions.extended.value(MSO_VARIANT).toString()))
-				soptions.extended.insert(MSO_VARIANT,info.value(MSIV_DEFAULT_VARIANT, variants.value(0)));
+			if (!variants.contains(options.extended.value(MSO_VARIANT).toString()))
+				options.extended.insert(MSO_VARIANT,info.value(MSIV_DEFAULT_VARIANT, variants.value(0)));
 
 			if (info.value(MSIV_DISABLE_CUSTOM_BACKGROUND,false).toBool())
 			{
-				soptions.extended.remove(MSO_BG_IMAGE_FILE);
-				soptions.extended.remove(MSO_BG_IMAGE_LAYOUT);
-				soptions.extended.insert(MSO_BG_COLOR,info.value(MSIV_DEFAULT_BACKGROUND_COLOR));
+				options.extended.remove(MSO_BG_IMAGE_FILE);
+				options.extended.remove(MSO_BG_IMAGE_LAYOUT);
+				options.extended.insert(MSO_BG_COLOR,info.value(MSIV_DEFAULT_BACKGROUND_COLOR));
 			}
-			else if (soptions.extended.value(MSO_BG_COLOR).toString().isEmpty())
+			else if (options.extended.value(MSO_BG_COLOR).toString().isEmpty())
 			{
-				soptions.extended.insert(MSO_BG_COLOR,info.value(MSIV_DEFAULT_BACKGROUND_COLOR));
+				options.extended.insert(MSO_BG_COLOR,info.value(MSIV_DEFAULT_BACKGROUND_COLOR));
 			}
 
-			if (soptions.extended.value(MSO_FONT_FAMILY).toString().isEmpty())
-				soptions.extended.insert(MSO_FONT_FAMILY,info.value(MSIV_DEFAULT_FONT_FAMILY));
-			if (soptions.extended.value(MSO_FONT_SIZE).toInt() == 0)
-				soptions.extended.insert(MSO_FONT_SIZE,info.value(MSIV_DEFAULT_FONT_SIZE));
+			if (options.extended.value(MSO_FONT_FAMILY).toString().isEmpty())
+				options.extended.insert(MSO_FONT_FAMILY,info.value(MSIV_DEFAULT_FONT_FAMILY));
+			if (options.extended.value(MSO_FONT_SIZE).toInt() == 0)
+				options.extended.insert(MSO_FONT_SIZE,info.value(MSIV_DEFAULT_FONT_SIZE));
+
+			if (options.extended.value(MSO_SELF_COLOR).toString().isEmpty())
+				options.extended.insert(MSO_SELF_COLOR,info.value(MSIV_DEFAULT_SELF_COLOR,QColor(Qt::red).name()));
+			if (options.extended.value(MSO_CONTACT_COLOR).toString().isEmpty())
+				options.extended.insert(MSO_CONTACT_COLOR,info.value(MSIV_DEFAULT_CONTACT_COLOR,QColor(Qt::blue).name()));
 		}
 		else
 		{
@@ -185,7 +192,7 @@ IMessageStyleOptions AdiumMessageStyleEngine::styleOptions(const OptionsNode &AE
 		REPORT_ERROR(QString("Failed to get adium style options for style=%1: Style not found").arg(AStyleId));
 	}
 
-	return soptions;
+	return options;
 }
 
 IOptionsDialogWidget *AdiumMessageStyleEngine::styleSettingsWidget(const OptionsNode &AStyleNode, QWidget *AParent)

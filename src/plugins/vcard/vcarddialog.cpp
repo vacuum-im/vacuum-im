@@ -28,7 +28,7 @@ VCardDialog::VCardDialog(IVCardManager *AVCardPlugin, const Jid &AStreamJid, con
 	ui.cmbGender->addItem(tr("Male"),QString(VCARD_GENDER_MALE));
 	ui.cmbGender->addItem(tr("Female"),QString(VCARD_GENDER_FEMALE));
 
-	if (FStreamJid && FContactJid)
+	if (FStreamJid.pBare() == FContactJid.pBare())
 		ui.btbButtons->setStandardButtons(QDialogButtonBox::Save|QDialogButtonBox::Close);
 	else
 		ui.btbButtons->setStandardButtons(QDialogButtonBox::Close);
@@ -87,7 +87,7 @@ Jid VCardDialog::contactJid() const
 
 void VCardDialog::updateDialog()
 {
-	bool readOnly = !(FContactJid && FStreamJid);
+	bool readOnly = FContactJid.pBare()!=FStreamJid.pBare();
 
 	ui.lneFullName->setText(FVCard->value(VVN_FULL_NAME));
 	ui.lneFullName->setReadOnly(readOnly);
@@ -422,7 +422,7 @@ void VCardDialog::onEmailDeleteClicked()
 
 void VCardDialog::onEmailItemDoubleClicked(QListWidgetItem *AItem)
 {
-	if (FStreamJid && FContactJid)
+	if (FStreamJid.pBare() == FContactJid.pBare())
 	{
 		static QStringList emailTagList = QStringList() << "HOME" << "WORK" << "INTERNET" << "X400";
 		EditItemDialog dialog(AItem->text(),AItem->data(Qt::UserRole).toStringList(),emailTagList,this);
@@ -456,7 +456,7 @@ void VCardDialog::onPhoneDeleteClicked()
 
 void VCardDialog::onPhoneItemDoubleClicked(QListWidgetItem *AItem)
 {
-	if (FStreamJid && FContactJid)
+	if (FStreamJid.pBare() == FContactJid.pBare())
 	{
 		static QStringList phoneTagList = QStringList() << "HOME" << "WORK" << "CELL" << "MODEM";
 		EditItemDialog dialog(AItem->text(),AItem->data(Qt::UserRole).toStringList(),phoneTagList,this);
