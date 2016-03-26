@@ -35,6 +35,7 @@
 #include <definitions/xmppurihandlerorders.h>
 #include <definitions/multiuserdataroles.h>
 #include <definitions/multiusertooltiporders.h>
+#include <definitions/statisticsparams.h>
 #include <utils/widgetmanager.h>
 #include <utils/textmanager.h>
 #include <utils/shortcuts.h>
@@ -1864,6 +1865,7 @@ void MultiUserChatManager::onConvertMessageChatWindowFinish(const ChatConvert &A
 	{
 		window->multiUserChat()->sendInvitation(AConvert.members,AConvert.reason,AConvert.threadId);
 		LOG_STRM_INFO(AConvert.streamJid,QString("Finished conversion chat with=%1 to conference room=%2").arg(AConvert.contactJid.full(),AConvert.roomJid.bare()));
+		REPORT_EVENT(SEVP_MUC_CHAT_CONVERT,1);
 	}
 	else
 	{

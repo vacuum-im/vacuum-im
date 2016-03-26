@@ -1254,10 +1254,6 @@
    <translation>Conference configuration accepted</translation>
   </message>
   <message>
-   <source>This conference was destroyed by owner. %1</source>
-   <translation>This conference was destroyed by owner. %1</translation>
-  </message>
-  <message>
    <source>Enter new topic:</source>
    <translation>Enter new topic:</translation>
   </message>
@@ -1492,6 +1488,10 @@
   <message>
    <source>Failed to invite %1 to this conference: %2</source>
    <translation>Failed to invite %1 to this conference: %2</translation>
+  </message>
+  <message>
+   <source>This conference was destroyed by owner %1 %2</source>
+   <translation>This conference was destroyed by owner %1 %2</translation>
   </message>
  </context>
  <context>

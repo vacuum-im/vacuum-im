@@ -35,6 +35,7 @@
 #define SEVP_MUC_WIZARD_JOIN                                 "muc|wizard-join|MUC Wizard Join"
 #define SEVP_MUC_WIZARD_CREATE                               "muc|wizard-create|MUC Wizard Create"
 #define SEVP_MUC_WIZARD_MANUAL                               "muc|wizard-manual|MUC Wizard Manual"
+#define SEVP_MUC_CHAT_CONVERT                                "muc|chat-convert|MUC Chat Convert"
 
 // Hit-Timing
 #define STMP_APPLICATION_START                               "application|start|Application Start"

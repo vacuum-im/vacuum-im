@@ -86,7 +86,9 @@ protected slots:
 protected slots:
 	void onMultiChatPropertiesChanged();
 	void onMultiChatWindowToolsMenuAboutToShow();
-	void onMultiChatWindowBookmarkActionTriggered(bool);
+	void onMultiChatWindowAddBookmarkActionTriggered(bool);
+	void onMultiChatWindowEditBookmarkActionTriggered(bool);
+	void onMultiChatWindowRemoveBookmarkActionTriggered(bool);
 	void onMultiChatWindowCreated(IMultiUserChatWindow *AWindow);
 protected slots:
 	void onDiscoWindowAddBookmarkActionTriggered(bool);

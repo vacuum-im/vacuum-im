@@ -310,7 +310,7 @@ void MultiUserChatWindow::setTabPageNotifier(IMessageTabPageNotifier *ANotifier)
 bool MultiUserChatWindow::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
 	Q_UNUSED(AAccept); Q_UNUSED(AStreamJid);
-	if (AHandlerId==FSHIAnyStanza && contactJid().pBare()==AStanza.fromJid().pBare())
+	if (AHandlerId==FSHIAnyStanza && FMultiChat->roomJid().pBare()==AStanza.fromJid().pBare())
 	{
 		if (AStanza.kind() == STANZA_KIND_MESSAGE)
 			FLastStanzaTime = QDateTime::currentDateTime().addSecs(1);
@@ -385,7 +385,7 @@ bool MultiUserChatWindow::messageViewUrlOpen(int AOrder, IMessageViewWidget *AWi
 			}
 
 			Message message;
-			message.setTo(contactJid().bare()).setId(AUrl.queryItemValue("id"));
+			message.setTo(FMultiChat->roomJid().bare()).setId(AUrl.queryItemValue("id"));
 			
 			QDomElement formElem = message.stanza().element();
 			FDataForms->xmlForm(form,formElem);
@@ -451,9 +451,9 @@ bool MultiUserChatWindow::messageCheck(int AOrder, const Message &AMessage, int 
 {
 	Q_UNUSED(AOrder);
 	if (ADirection == IMessageProcessor::DirectionIn)
-		return streamJid()==AMessage.to() && contactJid().pBare()==AMessage.fromJid().pBare();
+		return streamJid()==AMessage.to() && FMultiChat->roomJid().pBare()==AMessage.fromJid().pBare();
 	else
-		return streamJid()==AMessage.from() && contactJid().pBare()==AMessage.toJid().pBare();
+		return streamJid()==AMessage.from() && FMultiChat->roomJid().pBare()==AMessage.toJid().pBare();
 }
 
 bool MultiUserChatWindow::messageDisplay(const Message &AMessage, int ADirection)
@@ -792,7 +792,7 @@ IMessageWindow *MultiUserChatWindow::messageShowNotified(int AMessageId)
 
 IMessageWindow *MultiUserChatWindow::messageGetWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType)
 {
-	if (streamJid()==AStreamJid && contactJid().pBare()==AContactJid.pBare())
+	if (streamJid()==AStreamJid && FMultiChat->roomJid().pBare()==AContactJid.pBare())
 	{
 		if (AType == Message::GroupChat)
 			return this;
@@ -1202,7 +1202,7 @@ void MultiUserChatWindow::createStaticRoomActions()
 	FToggleSilence->setCheckable(true);
 	FToggleSilence->setText(tr("Disable Notifications"));
 	FToggleSilence->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_NOTIFY_SILENCE);
-	FToggleSilence->setChecked(Options::node(OPV_MUC_GROUPCHAT_ITEM,contactJid().pBare()).node("notify-silence").value().toBool());
+	FToggleSilence->setChecked(Options::node(OPV_MUC_GROUPCHAT_ITEM,FMultiChat->roomJid().pBare()).node("notify-silence").value().toBool());
 	connect(FToggleSilence,SIGNAL(triggered(bool)),SLOT(onRoomActionTriggered(bool)));
 	FToolsMenu->addAction(FToggleSilence,AG_MUTM_MULTIUSERCHAT_NOTIFYSILENCE);
 
@@ -1463,7 +1463,7 @@ void MultiUserChatWindow::updateRecentItemActiveTime(IMessageChatWindow *AWindow
 		if (AWindow == NULL)
 		{
 			recentItem.type = REIT_CONFERENCE;
-			recentItem.reference = contactJid().pBare();
+			recentItem.reference = FMultiChat->roomJid().pBare();
 		}
 		else
 		{
@@ -1801,7 +1801,7 @@ void MultiUserChatWindow::updateMultiChatWindow()
 {
 	FInfoWidget->setFieldValue(IMessageInfoWidget::Caption,FMultiChat->roomTitle());
 
-	QIcon statusIcon = FStatusIcons!=NULL ? FStatusIcons->iconByJidStatus(contactJid(),FMultiChat->roomPresence().show,SUBSCRIPTION_BOTH,false) : QIcon();
+	QIcon statusIcon = FStatusIcons!=NULL ? FStatusIcons->iconByJidStatus(FMultiChat->roomJid(),FMultiChat->roomPresence().show,SUBSCRIPTION_BOTH,false) : QIcon();
 	FInfoWidget->setFieldValue(IMessageInfoWidget::StatusIcon,statusIcon);
 	FInfoWidget->setFieldValue(IMessageInfoWidget::StatusText,FMultiChat->subject());
 
@@ -2182,8 +2182,6 @@ void MultiUserChatWindow::onMultiChatStateChanged(int AState)
 			FInitializeConfig = true;
 			FConfigLoadRequestId = FMultiChat->loadRoomConfig();
 		}
-
-		updateRecentItemActiveTime(NULL);
 	}
 	else if (AState == IMultiUserChat::Closed)
 	{
@@ -2586,7 +2584,18 @@ void MultiUserChatWindow::onMultiChatRoomConfigUpdated(const QString &AId, const
 void MultiUserChatWindow::onMultiChatRoomDestroyed(const QString &AId, const QString &AReason)
 {
 	if (AId == FDestroyRequestId)
-		showMultiChatStatusMessage(tr("This conference was destroyed by owner. %1").arg(AReason),IMessageStyleContentOptions::TypeNotification);
+	{
+		QUrl exitUrl;
+		exitUrl.setScheme(MUC_URL_SCHEME);
+		exitUrl.setPath(FMultiChat->roomJid().full());
+		exitUrl.setFragment(MUC_URL_EXIT_ROOM);
+
+		QString html = tr("This conference was destroyed by owner %1 %2")
+			.arg(!AReason.isEmpty() ? Qt::escape("("+AReason+")") : QString::null)
+			.arg(QString("<a href='%1'>%2</a>").arg(exitUrl.toString(),tr("exit")));
+
+		showHTMLStatusMessage(FViewWidget,html,IMessageStyleContentOptions::TypeNotification);
+	}
 }
 
 void MultiUserChatWindow::onMultiChatWindowActivated()
@@ -2962,7 +2971,7 @@ void MultiUserChatWindow::onRoomActionTriggered(bool)
 	}
 	else if (action == FToggleSilence)
 	{
-		Options::node(OPV_MUC_GROUPCHAT_ITEM,contactJid().pBare()).node("notify-silence").setValue(FToggleSilence->isChecked());
+		Options::node(OPV_MUC_GROUPCHAT_ITEM,FMultiChat->roomJid().pBare()).node("notify-silence").setValue(FToggleSilence->isChecked());
 	}
 }
 

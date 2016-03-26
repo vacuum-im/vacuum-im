@@ -449,8 +449,8 @@ void Bookmarks::updateMultiChatWindows(const Jid &AStreamJid)
 void Bookmarks::updateMultiChatWindow(IMultiUserChatWindow *AWindow)
 {
 	ToolBarChanger *tbc = AWindow->infoWidget()->infoToolBarChanger();
-	Action *action =  tbc->handleAction(tbc->groupItems(TBG_MWIWTB_BOOKMARKS).value(0));
-	if (action)
+	Action *bookmarkAction = tbc->handleAction(tbc->groupItems(TBG_MWIWTB_BOOKMARKS).value(0));
+	if (bookmarkAction)
 	{
 		if (isReady(AWindow->streamJid()))
 		{
@@ -460,21 +460,55 @@ void Bookmarks::updateMultiChatWindow(IMultiUserChatWindow *AWindow)
 
 			if (!FBookmarks.value(AWindow->streamJid()).contains(ref))
 			{
-				action->setText(tr("Add to Bookmarks"));
-				action->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_EMPTY);
+				if (bookmarkAction->menu() != NULL)
+				{
+					bookmarkAction->menu()->deleteLater();
+					bookmarkAction->setMenu(NULL);
+				}
+
+				bookmarkAction->setText(tr("Add to Bookmarks"));
+				bookmarkAction->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_EMPTY);
 			}
 			else
 			{
-				action->setText(tr("Remove from Bookmarks"));
-				action->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS);
+				if (bookmarkAction->menu() == NULL)
+				{
+					Menu *menu = new Menu(tbc->toolBar());
+
+					Action *editAction = new Action(menu);
+					editAction->setText(tr("Edit Bookmark"));
+					connect(editAction,SIGNAL(triggered(bool)),SLOT(onMultiChatWindowEditBookmarkActionTriggered(bool)));
+					menu->addAction(editAction);
+
+					Action *removeAction = new Action(menu);
+					removeAction->setText(tr("Remove from Bookmarks"));
+					connect(removeAction,SIGNAL(triggered(bool)),SLOT(onMultiChatWindowRemoveBookmarkActionTriggered(bool)));
+					menu->addAction(removeAction);
+
+					bookmarkAction->setMenu(menu);
+				}
+
+				bookmarkAction->setText(tr("Edit Bookmark"));
+				bookmarkAction->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS);
 			}
 
-			action->setEnabled(true);
+			bookmarkAction->setEnabled(true);
 		}
 		else
 		{
-			action->setEnabled(false);
+			bookmarkAction->setEnabled(false);
 		}
+
+		if (bookmarkAction->menu() != NULL)
+		{
+			foreach(Action *action, bookmarkAction->menu()->actions())
+			{
+				action->setData(ADR_STREAM_JID, AWindow->streamJid().full());
+				action->setData(ADR_BOOKMARK_ROOM_JID, AWindow->contactJid().bare());
+			}
+		}
+		bookmarkAction->setData(ADR_STREAM_JID, AWindow->streamJid().full());
+		bookmarkAction->setData(ADR_BOOKMARK_ROOM_JID, AWindow->contactJid().bare());
 	}
 }
 
@@ -892,48 +926,107 @@ void Bookmarks::onMultiChatWindowToolsMenuAboutToShow()
 	}
 }
 
-void Bookmarks::onMultiChatWindowBookmarkActionTriggered(bool)
+void Bookmarks::onMultiChatWindowAddBookmarkActionTriggered(bool)
 {
-	Action *action = qobject_cast<Action *>(sender());
-	IMultiUserChatWindow *window = action!=NULL ? qobject_cast<IMultiUserChatWindow *>(action->parent()) : NULL;
-	if (window && isReady(window->streamJid()))
+	Action *addAction = qobject_cast<Action *>(sender());
+	if (addAction)
 	{
-		QList<IBookmark> bookmarkList = FBookmarks.value(window->streamJid());
-
-		IBookmark ref;
-		ref.type = IBookmark::TypeRoom;
-		ref.room.roomJid = window->contactJid();
-
-		int index = bookmarkList.indexOf(ref);
-		if (index < 0)
+		Jid streamJid = addAction->data(ADR_STREAM_JID).toString();
+		Jid roomJid = addAction->data(ADR_BOOKMARK_ROOM_JID).toString();
+		IMultiUserChatWindow *window = FMultiChatManager!=NULL ? FMultiChatManager->findMultiChatWindow(streamJid,roomJid) : NULL;
+		if (window!=NULL && isReady(window->streamJid()))
 		{
-			LOG_STRM_INFO(window->streamJid(),QString("Adding bookmark from conference window, room=%1").arg(window->contactJid().bare()));
+			QList<IBookmark> bookmarkList = FBookmarks.value(streamJid);
 
-			IBookmark bookmark = ref;
-			bookmark.name = window->multiUserChat()->roomTitle();
-			bookmark.room.nick = window->multiUserChat()->nickname();
-			bookmark.room.password = window->multiUserChat()->password();
-			bookmark.room.autojoin = true;
-			bookmarkList.append(bookmark);
-			setBookmarks(window->streamJid(),bookmarkList);
+			IBookmark ref;
+			ref.type = IBookmark::TypeRoom;
+			ref.room.roomJid = roomJid;
+
+			int index = bookmarkList.indexOf(ref);
+			if (index < 0)
+			{
+				LOG_STRM_INFO(streamJid,QString("Adding bookmark from conference window, room=%1").arg(roomJid.bare()));
+
+				IBookmark bookmark = ref;
+				bookmark.name = window->multiUserChat()->roomTitle();
+				bookmark.room.nick = window->multiUserChat()->nickname();
+				bookmark.room.password = window->multiUserChat()->password();
+				bookmark.room.autojoin = true;
+
+				if (showEditBookmarkDialog(&bookmark,window->instance())->exec() == QDialog::Accepted)
+				{
+					bookmarkList.append(bookmark);
+					setBookmarks(window->streamJid(),bookmarkList);
+				}
+			}
 		}
-		else
-		{
-			LOG_STRM_INFO(window->streamJid(),QString("Removing bookmark from conference window, room=%1").arg(window->contactJid().bare()));
+	}
+}
 
-			bookmarkList.removeAt(index);
-			setBookmarks(window->streamJid(),bookmarkList);
+void Bookmarks::onMultiChatWindowEditBookmarkActionTriggered(bool)
+{
+	Action *editAction = qobject_cast<Action *>(sender());
+	if (editAction)
+	{
+		Jid streamJid = editAction->data(ADR_STREAM_JID).toString();
+		Jid roomJid = editAction->data(ADR_BOOKMARK_ROOM_JID).toString();
+		IMultiUserChatWindow *window = FMultiChatManager!=NULL ? FMultiChatManager->findMultiChatWindow(streamJid,roomJid) : NULL;
+		if (window!=NULL && isReady(window->streamJid()))
+		{
+			QList<IBookmark> bookmarkList = FBookmarks.value(streamJid);
+
+			IBookmark ref;
+			ref.type = IBookmark::TypeRoom;
+			ref.room.roomJid = roomJid;
+
+			int index = bookmarkList.indexOf(ref);
+			if (index >= 0)
+			{
+				LOG_STRM_INFO(streamJid,QString("Editing bookmark from conference window, room=%1").arg(roomJid.bare()));
+
+				IBookmark &bookmark = bookmarkList[index];
+				if (showEditBookmarkDialog(&bookmark,window->instance())->exec() == QDialog::Accepted)
+					setBookmarks(window->streamJid(),bookmarkList);
+			}
+		}
+	}
+}
+
+void Bookmarks::onMultiChatWindowRemoveBookmarkActionTriggered(bool)
+{
+	Action *removeAction = qobject_cast<Action *>(sender());
+	if (removeAction)
+	{
+		Jid streamJid = removeAction->data(ADR_STREAM_JID).toString();
+		Jid roomJid = removeAction->data(ADR_BOOKMARK_ROOM_JID).toString();
+		IMultiUserChatWindow *window = FMultiChatManager!=NULL ? FMultiChatManager->findMultiChatWindow(streamJid,roomJid) : NULL;
+		if (window!=NULL && isReady(window->streamJid()))
+		{
+			QList<IBookmark> bookmarkList = FBookmarks.value(streamJid);
+
+			IBookmark ref;
+			ref.type = IBookmark::TypeRoom;
+			ref.room.roomJid = roomJid;
+
+			int index = bookmarkList.indexOf(ref);
+			if (index >= 0)
+			{
+				LOG_STRM_INFO(streamJid,QString("Removing bookmark from conference window, room=%1").arg(roomJid.bare()));
+
+				bookmarkList.removeAt(index);
+				setBookmarks(window->streamJid(),bookmarkList);
+			}
 		}
 	}
 }
 
 void Bookmarks::onMultiChatWindowCreated(IMultiUserChatWindow *AWindow)
 {
-	Action *action = new Action(AWindow->instance());
-	action->setText(tr("Add to Bookmarks"));
-	action->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_ADD);
-	connect(action,SIGNAL(triggered(bool)),SLOT(onMultiChatWindowBookmarkActionTriggered(bool)));
-	AWindow->infoWidget()->infoToolBarChanger()->insertAction(action,TBG_MWIWTB_BOOKMARKS);
+	Action *bookmarkAction = new Action(AWindow->instance());
+	bookmarkAction->setText(tr("Add to Bookmarks"));
+	bookmarkAction->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_EMPTY);
+	connect(bookmarkAction,SIGNAL(triggered(bool)),SLOT(onMultiChatWindowAddBookmarkActionTriggered(bool)));
+	AWindow->infoWidget()->infoToolBarChanger()->insertAction(bookmarkAction,TBG_MWIWTB_BOOKMARKS)->setPopupMode(QToolButton::InstantPopup);
 
 	connect(AWindow->instance(),SIGNAL(roomToolsMenuAboutToShow()),SLOT(onMultiChatWindowToolsMenuAboutToShow()));
 
