@@ -7,27 +7,54 @@
 #include <QKeySequence>
 #include <QCryptographicHash>
 
+static const QChar DelimChar   = '.';
+static const QChar NsOpenChar  = '[';
+static const QChar NsCloseChar = ']';
+
 const OptionsNode OptionsNode::null = OptionsNode(QDomElement());
 
-QDomElement findChildElement(const QDomElement &AParent, const QString &APath, const QString &ANSpace, QString &ChildName, QString &SubPath, QString &NSpace)
+static void splitOptionsPath(const QString &APath, const QString &ANSpace, QString &ANodeName, QString &ANodeNS, QString &ASubPath)
 {
-	int dotIndex = APath.indexOf('.');
-	ChildName = dotIndex>0 ? APath.left(dotIndex) : APath;
-	SubPath = dotIndex>0 ? APath.mid(dotIndex+1) : QString::null;
+	int nsStartAt=-1, nsStopAt=-1, subStartAt=-1;
+	for (int index=0; subStartAt<0 && index<APath.length(); index++)
+	{
+		if (APath.at(index)==DelimChar && (nsStartAt<0 || nsStopAt>0))
+			subStartAt = index;
+		else if (APath.at(index)==NsOpenChar && nsStartAt<0)
+			nsStartAt = index;
+		else if (APath.at(index)==NsCloseChar && nsStartAt>0)
+			nsStopAt = index;
+	}
 
-	int nsStart = ChildName.indexOf('[');
-	NSpace = nsStart>0 ? ChildName.mid(nsStart+1, ChildName.lastIndexOf(']')-nsStart-1) : QString::null;
-	NSpace = dotIndex>0 ? NSpace : (ANSpace.isNull() ? NSpace : ANSpace);
-	ChildName = nsStart>0 ? ChildName.left(nsStart) : ChildName;
+	if (nsStartAt > 0)
+		ANodeName = APath.left(nsStartAt);
+	else if (subStartAt > 0)
+		ANodeName = APath.left(subStartAt);
+	else
+		ANodeName = APath;
 
-	QDomElement childElem = AParent.firstChildElement(ChildName);
-	while (!childElem.isNull() && childElem.attribute("ns")!=NSpace)
-		childElem = childElem.nextSiblingElement(ChildName);
+	if (subStartAt > 0)
+		ASubPath = APath.mid(subStartAt+1);
+	else
+		ASubPath = QString::null;
 
+	if (nsStopAt > nsStartAt)
+		ANodeNS = APath.mid(nsStartAt+1,nsStopAt-nsStartAt-1);
+	else if (subStartAt > 0)
+		ANodeNS = QString::null;
+	else
+		ANodeNS = ANSpace;
+}
+
+static QDomElement findChildElement(const QDomElement &AParent, const QString &ANodeName, const QString &ANodeNS)
+{
+	QDomElement childElem = AParent.firstChildElement(ANodeName);
+	while (!childElem.isNull() && childElem.attribute("ns")!=ANodeNS)
+		childElem = childElem.nextSiblingElement(ANodeName);
 	return childElem;
 }
 
-QDomText findChildText(const QDomElement &AParent)
+static QDomText findChildText(const QDomElement &AParent)
 {
 	for (QDomNode node = AParent.firstChild(); !node.isNull(); node=node.nextSibling())
 		if (node.isText())
@@ -35,23 +62,13 @@ QDomText findChildText(const QDomElement &AParent)
 	return QDomText();
 }
 
-QString fullOptionsPath(const QString &APath, const QString &ASubPath)
+static QString fullFileName(const QString &APath, const QString &ANSpace)
 {
-	if (ASubPath.isEmpty())
-		return APath;
-	else if (APath.isEmpty())
-		return ASubPath;
-	else
-		return APath+ "." +ASubPath;
-}
-
-QString fullFileName(const QString &APath, const QString &ANSpace)
-{
-	QString fileKey = APath + (!ANSpace.isEmpty() ? "["+ANSpace+"]" : QString::null);
+	QString fileKey = APath + (!ANSpace.isEmpty() ? NsOpenChar+ANSpace+NsCloseChar : QString::null);
 	return Options::filesPath() + "/" + QCryptographicHash::hash(fileKey.toUtf8(), QCryptographicHash::Sha1).toHex();
 }
 
-void exportOptionNode(const OptionsNode &ANode, QDomElement &AToElem)
+static void exportOptionNode(const OptionsNode &ANode, QDomElement &AToElem)
 {
 	QVariant value = ANode.value();
 	if (!value.isNull())
@@ -69,24 +86,23 @@ void exportOptionNode(const OptionsNode &ANode, QDomElement &AToElem)
 		AToElem.removeChild(findChildText(AToElem));
 	}
 
-	QString cname, spath, nspace;
-	foreach(const QString &childName, ANode.childNames())
+	foreach(const QString &nodeName, ANode.childNames())
 	{
-		foreach (const QString &childNSpace, ANode.childNSpaces(childName))
+		foreach (const QString &nodeNS, ANode.childNSpaces(nodeName))
 		{
-			QDomElement childElem = findChildElement(AToElem,childName,childNSpace,cname,spath,nspace);
-			if (childElem.isNull())
+			QDomElement nodeElem = findChildElement(AToElem,nodeName,nodeNS);
+			if (nodeElem.isNull())
 			{
-				childElem = AToElem.appendChild(AToElem.ownerDocument().createElement(cname)).toElement();
-				if (!nspace.isEmpty())
-					childElem.setAttribute("ns",nspace);
+				nodeElem = AToElem.appendChild(AToElem.ownerDocument().createElement(nodeName)).toElement();
+				if (!nodeNS.isEmpty())
+					nodeElem.setAttribute("ns",nodeNS);
 			}
-			exportOptionNode(ANode.node(childName,childNSpace),childElem);
+			exportOptionNode(ANode.node(nodeName,nodeNS),nodeElem);
 		}
 	}
 }
 
-void importOptionNode(OptionsNode &ANode, const QDomElement &AFromElem)
+static void importOptionNode(OptionsNode &ANode, const QDomElement &AFromElem)
 {
 	if (AFromElem.hasAttribute("type"))
 	{
@@ -101,15 +117,16 @@ void importOptionNode(OptionsNode &ANode, const QDomElement &AFromElem)
 	QDomElement childElem = AFromElem.firstChildElement();
 	while (!childElem.isNull())
 	{
-		OptionsNode node = ANode.node(childElem.tagName(), childElem.attribute("ns"));
+		OptionsNode node = ANode.node(childElem.tagName(),childElem.attribute("ns"));
 		importOptionNode(node,childElem);
+
 		childElem = childElem.nextSiblingElement();
 	}
 }
 
 #define XTEA_ITERATIONS 64
 #define rol(N, R) (((N) << (R)) | ((N) >> (32 - (R))))
-void xtea2_encipher(unsigned int num_rounds, quint32 *v, quint32 const *k)
+static void xtea2_encipher(unsigned int num_rounds, quint32 *v, quint32 const *k)
 {
 	quint32 i;
 	quint32 a, b, c, d, sum=0, t,delta=0x9E3779B9;
@@ -134,7 +151,7 @@ void xtea2_encipher(unsigned int num_rounds, quint32 *v, quint32 const *k)
 	v[3] = d;
 }
 
-void xtea2_decipher(unsigned int num_rounds, quint32 *v, quint32 const *k)
+static void xtea2_decipher(unsigned int num_rounds, quint32 *v, quint32 const *k)
 {
 	quint32 i;
 	quint32 a, b, c, d, t, delta=0x9E3779B9, sum=delta*num_rounds;
@@ -283,18 +300,18 @@ bool OptionsNode::isChildNode(const OptionsNode &ANode) const
 
 QString OptionsNode::childPath(const OptionsNode &ANode) const
 {
-	QString result;
+	QString path;
 	QDomElement childElem = ANode.d->node;
 	while (!childElem.isNull() && childElem!=d->node)
 	{
-		QString pathItem = !childElem.hasAttribute("ns") ? childElem.tagName() : childElem.tagName()+"["+childElem.attribute("ns")+"]";
-		if (result.isEmpty())
-			result = pathItem;
+		QString pathItem = childElem.hasAttribute("ns") ? childElem.tagName() + NsOpenChar + childElem.attribute("ns") + NsCloseChar : childElem.tagName();
+		if (path.isEmpty())
+			path = pathItem;
 		else
-			result.prepend(pathItem + ".");
+			path.prepend(pathItem + DelimChar);
 		childElem = childElem.parentNode().toElement();
 	}
-	return childElem==d->node ? result : QString::null;
+	return childElem==d->node ? path : QString::null;
 }
 
 void OptionsNode::removeChilds(const QString &AName, const QString &ANSpace)
@@ -305,8 +322,10 @@ void OptionsNode::removeChilds(const QString &AName, const QString &ANSpace)
 		QDomElement nextChild = childElem.nextSiblingElement();
 		if ((AName.isNull() || childElem.tagName()==AName) && (ANSpace.isNull() || childElem.attribute("ns")==ANSpace))
 		{
-			OptionsNode(childElem).removeChilds();
-			emit Options::instance()->optionsRemoved(OptionsNode(childElem));
+			OptionsNode childNode(childElem);
+			childNode.removeChilds();
+			
+			emit Options::instance()->optionsRemoved(childNode);
 			d->node.removeChild(childElem);
 		}
 		childElem = nextChild;
@@ -317,41 +336,52 @@ bool OptionsNode::hasNode(const QString &APath, const QString &ANSpace) const
 {
 	if (!APath.isEmpty())
 	{
-		QString cname, spath, nspace;
-		QDomElement childElem = findChildElement(d->node,APath,ANSpace,cname,spath,nspace);
-		return spath.isEmpty() || childElem.isNull() ? !childElem.isNull() : OptionsNode(childElem).hasNode(spath,ANSpace);
+		QString nodeName, nodeNS, subPath;
+		splitOptionsPath(APath,ANSpace,nodeName,nodeNS,subPath);
+		QDomElement childElem = findChildElement(d->node,nodeName,nodeNS);
+		return !childElem.isNull() ? (!subPath.isEmpty() ? OptionsNode(childElem).hasNode(subPath,ANSpace) :true) : false;
 	}
-	return !isNull();
+	return !isNull() && nspace()==ANSpace;
 }
 
 OptionsNode OptionsNode::node(const QString &APath, const QString &ANSpace) const
 {
-	QString cname, spath, nspace;
-	QDomElement childElem = findChildElement(d->node,APath,ANSpace,cname,spath,nspace);
-	if (!isNull() && childElem.isNull())
+	if (!isNull())
 	{
-		childElem = d->node.appendChild(d->node.ownerDocument().createElement(cname)).toElement();
-		if (!nspace.isEmpty())
-			childElem.setAttribute("ns",nspace);
-		emit Options::instance()->optionsCreated(OptionsNode(childElem));
+		QString nodeName, nodeNS, subPath;
+		splitOptionsPath(APath,ANSpace,nodeName,nodeNS,subPath);
+
+		QDomElement childElem = findChildElement(d->node,nodeName,nodeNS);
+		if (childElem.isNull())
+		{
+			childElem = d->node.appendChild(d->node.ownerDocument().createElement(nodeName)).toElement();
+			if (!nodeNS.isEmpty())
+				childElem.setAttribute("ns",nodeNS);
+			emit Options::instance()->optionsCreated(OptionsNode(childElem));
+		}
+		return !subPath.isEmpty() ?  OptionsNode(childElem).node(subPath,ANSpace) : OptionsNode(childElem);
 	}
-	return spath.isEmpty() || childElem.isNull() ? OptionsNode(childElem) : OptionsNode(childElem).node(spath, ANSpace);
+	return OptionsNode::null;
 }
 
 void OptionsNode::removeNode(const QString &APath, const QString &ANSpace)
 {
-	QString cname, spath, nspace;
-	QDomElement childElem = findChildElement(d->node,APath,ANSpace,cname,spath,nspace);
-	if (!isNull() && !childElem.isNull())
+	if (!isNull())
 	{
-		if (!spath.isEmpty())
+		QString nodeName, nodeNS, subPath;
+		splitOptionsPath(APath,ANSpace,nodeName,nodeNS,subPath);
+
+		QDomElement childElem = findChildElement(d->node,nodeName,nodeNS);
+		if (!childElem.isNull())
 		{
-			OptionsNode(childElem).removeNode(spath,ANSpace);
-		}
-		if (spath.isEmpty() || (!childElem.hasAttribute("type") && !childElem.hasChildNodes()))
-		{
-			emit Options::instance()->optionsRemoved(OptionsNode(childElem));
-			d->node.removeChild(childElem);
+			if (!subPath.isEmpty())
+				OptionsNode(childElem).removeNode(subPath,ANSpace);
+
+			if (subPath.isEmpty() || (!childElem.hasAttribute("type") && !childElem.hasChildNodes()))
+			{
+				emit Options::instance()->optionsRemoved(OptionsNode(childElem));
+				d->node.removeChild(childElem);
+			}
 		}
 	}
 }
@@ -442,6 +472,7 @@ struct Options::OptionsData
 	QByteArray cryptKey;
 	QDomDocument options;
 	QHash<QString, OptionItem> items;
+	QHash<QString, QString> cleanPathCache;
 };
 
 Options::Options()
@@ -477,10 +508,28 @@ QByteArray Options::cryptKey()
 
 QString Options::cleanNSpaces(const QString &APath)
 {
-	QString cleanPath = APath;
-	for (int nsStart = cleanPath.indexOf('['); nsStart>=0; nsStart = cleanPath.indexOf('['))
-		cleanPath.remove(nsStart,cleanPath.indexOf(']',nsStart)-nsStart+1);
-	return cleanPath;
+	if (!APath.isEmpty())
+	{
+		QString &cleanPath = instance()->d->cleanPathCache[APath];
+		if (cleanPath.isEmpty())
+		{
+			QString nodePath = APath;
+			while(!nodePath.isEmpty())
+			{
+				QString nodeName, nodeNS, subPath;
+				splitOptionsPath(nodePath,QString::null,nodeName,nodeNS,subPath);
+
+				if (cleanPath.isEmpty())
+					cleanPath = nodeName;
+				else
+					cleanPath += DelimChar + nodeName;
+
+				nodePath = subPath;
+			}
+		}
+		return cleanPath;
+	}
+	return QString::null;
 }
 
 bool Options::hasNode(const QString &APath, const QString &ANSpace)
@@ -691,35 +740,39 @@ void Options::exportNode(const QString &APath, QDomElement &AToElem)
 {
 	if (hasNode(APath))
 	{
-		QString path = APath;
-		QString cname, spath, nspace;
+		QString nodePath = APath;
 		QDomElement nodeElem = AToElem;
-		while (!path.isEmpty())
+		while (!nodePath.isEmpty())
 		{
-			QDomElement childElem = findChildElement(nodeElem,path,QString::null,cname,spath,nspace);
+			QString nodeName, nodeNS, subPath;
+			splitOptionsPath(nodePath,QString::null,nodeName,nodeNS,subPath);
+
+			QDomElement childElem = findChildElement(nodeElem,nodeName,nodeNS);
 			if (childElem.isNull())
 			{
-				childElem = nodeElem.appendChild(nodeElem.ownerDocument().createElement(cname)).toElement();
-				if (!nspace.isEmpty())
-					childElem.setAttribute("ns",nspace);
+				childElem = nodeElem.appendChild(nodeElem.ownerDocument().createElement(nodeName)).toElement();
+				if (!nodeNS.isEmpty())
+					childElem.setAttribute("ns",nodeNS);
 			}
-			path = spath;
+
 			nodeElem = childElem;
+			nodePath = subPath;
 		}
-		exportOptionNode(Options::node(APath), nodeElem);
+		exportOptionNode(Options::node(APath),nodeElem);
 	}
 }
 
 void Options::importNode(const QString &APath, const QDomElement &AFromElem)
 {
-	QString path = APath;
-	QString cname, spath, nspace;
+	QString nodePath = APath;
 	QDomElement nodeElem = AFromElem;
-	while (!nodeElem.isNull() && !path.isEmpty())
+	while (!nodeElem.isNull() && !nodePath.isEmpty())
 	{
-		QDomElement childElem = findChildElement(nodeElem,path,QString::null,cname,spath,nspace);
-		path = spath;
-		nodeElem = childElem;
+		QString nodeName, nodeNS, subPath;
+		splitOptionsPath(nodePath,QString::null,nodeName,nodeNS,subPath);
+
+		nodeElem = findChildElement(nodeElem,nodeName,nodeNS);
+		nodePath = subPath;
 	}
 
 	if (!nodeElem.isNull())
