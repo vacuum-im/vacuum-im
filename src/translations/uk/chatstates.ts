@@ -41,10 +41,6 @@
         <translation>За замовчуванням</translation>
     </message>
     <message>
-        <source>Unknown</source>
-        <translation>Невідомо</translation>
-    </message>
-    <message>
         <source>Active</source>
         <translation>Активний</translation>
     </message>
@@ -57,24 +53,32 @@
         <translation>Відволікся</translation>
     </message>
     <message>
-        <source>User chat status</source>
-        <translation>Активність співбесідника у чаті</translation>
-    </message>
-    <message>
-        <source>Always send</source>
-        <translation>Завжди відправляти</translation>
-    </message>
-    <message>
-        <source>Never send</source>
-        <translation>Ніколи не відправляти</translation>
-    </message>
-    <message>
         <source>Inactive %1</source>
         <translation>Неактивний %1</translation>
     </message>
     <message>
         <source>Gone %1</source>
         <translation>Відійшов %1</translation>
+    </message>
+    <message>
+        <source>User activity in chat</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>and %1 other</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Always send my chat activity</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Never send my chat activity</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Participants activity in conference</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>

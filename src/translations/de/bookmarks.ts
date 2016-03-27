@@ -53,10 +53,6 @@
 <context>
     <name>EditBookmarkDialog</name>
     <message>
-        <source>Bookmark is not valid</source>
-        <translation>Lesezeichen ist ungültig</translation>
-    </message>
-    <message>
         <source>Field &apos;Name&apos; should not be empty</source>
         <translation>Feld &apos;Name&apos; darf nicht leer sein</translation>
     </message>
@@ -68,28 +64,16 @@
         <source>In conference bookmark field &apos;Room&apos; should not be empty</source>
         <translation>Das Konferenz-Lesezeichen Feld &apos;Raum&apos; darf nicht leer sein</translation>
     </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>EditBookmarkDialogClass</name>
     <message>
         <source>Edit bookmark</source>
         <translation>Lesezeichen bearbeiten</translation>
-    </message>
-    <message>
-        <source>Name:</source>
-        <translation>Name:</translation>
-    </message>
-    <message>
-        <source>Conference bookmark</source>
-        <translation>Konferenz Lesezeichen</translation>
-    </message>
-    <message>
-        <source>Room:</source>
-        <translation>Raum:</translation>
-    </message>
-    <message>
-        <source>Nick:</source>
-        <translation>Spitzname:</translation>
     </message>
     <message>
         <source>Password:</source>
@@ -100,20 +84,52 @@
         <translation>Automatisch beitreten</translation>
     </message>
     <message>
-        <source>URL bookmark</source>
-        <translation>URL Lesezeichen</translation>
+        <source>Conference:</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>URL:</source>
-        <translation>URL:</translation>
+        <source>Conference as &apos;name@service.server.com&apos;</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Nickname:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Your nickname in conference</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Conference password if required</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation>Name:</translation>
+    </message>
+    <message>
+        <source>Bookmark to Conference</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Bookmark to Link</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Link:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Any valid link</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Bookmark name</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>EditBookmarksDialog</name>
-    <message>
-        <source>Bookmarks not saved</source>
-        <translation>Lesezeichen nicht gespeichert</translation>
-    </message>
     <message>
         <source>Cant save bookmarks to server</source>
         <translation>Kann Lesezeichen nicht auf Server speichern</translation>
@@ -121,6 +137,10 @@
     <message>
         <source>Edit bookmarks - %1</source>
         <translation>Lesezeichen bearbeiten - %1</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>

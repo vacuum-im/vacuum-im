@@ -38,10 +38,6 @@
         <translation>Activar notificación</translation>
     </message>
     <message>
-        <source>Use native popup notifications if available</source>
-        <translation>Notificación de ventanas emergentes cuando esté disponible</translation>
-    </message>
-    <message>
         <source>Disable sounds and popup windows if status is &apos;Away&apos;</source>
         <translation type="unfinished"/>
     </message>
@@ -75,6 +71,10 @@
     </message>
     <message>
         <source>Highlight the corresponding window in the taskbar</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Use native popup notifications</source>
         <translation type="unfinished"/>
     </message>
 </context>

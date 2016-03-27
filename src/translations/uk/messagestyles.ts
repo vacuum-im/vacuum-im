@@ -129,14 +129,6 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Receiver</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <source>Sender</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
         <source>The message with a error code %1 is received</source>
         <translation type="unfinished"/>
     </message>
@@ -202,6 +194,14 @@
     </message>
     <message>
         <source>Outgoing consecutive message</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Contact</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>You</source>
         <translation type="unfinished"/>
     </message>
     <message>

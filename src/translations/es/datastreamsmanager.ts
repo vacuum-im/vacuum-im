@@ -14,10 +14,6 @@
         <translation>El perfil es desconocido o está dañado</translation>
     </message>
     <message>
-        <source>Invalid profile settings</source>
-        <translation>Ajustes de perfil inválidos</translation>
-    </message>
-    <message>
         <source>Data Streams Initiation</source>
         <translation>Iniciación de los flujos de dato</translation>
     </message>
@@ -48,6 +44,10 @@
     <message>
         <source>Transfer method %1</source>
         <translation>Método de trasmisión: %1</translation>
+    </message>
+    <message>
+        <source>Unsupported stream initiation request</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>
