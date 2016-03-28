@@ -88,9 +88,9 @@ void ClientInfoDialog::updateText()
 	//Last Activity
 	if ((FInfoTypes & IClientInfo::LastActivity)>0)
 	{
-		if (FContactJid.node().isEmpty())
+		if (!FContactJid.hasNode())
 			html += "<b>" + tr("Service Uptime") + "</b>";
-		else if (FContactJid.resource().isEmpty())
+		else if (!FContactJid.hasResource())
 			html += "<b>" + tr("Last Activity") + "</b>";
 		else
 			html += "<b>" + tr("Idle Time") + "</b>";
@@ -98,11 +98,11 @@ void ClientInfoDialog::updateText()
 
 		if (FClientInfo->hasLastActivity(FContactJid))
 		{
-			if (FContactJid.node().isEmpty())
+			if (!FContactJid.hasNode())
 			{
 				html += itemMask.arg(tr("Uptime:")).arg(secsToString(FClientInfo->lastActivityTime(FContactJid).secsTo(QDateTime::currentDateTime())));
 			}
-			else if (FContactJid.resource().isEmpty())
+			else if (!FContactJid.hasResource())
 			{
 				html += itemMask.arg(tr("Inactive:")).arg(secsToString(FClientInfo->lastActivityTime(FContactJid).secsTo(QDateTime::currentDateTime())));
 				if (!FClientInfo->lastActivityText(FContactJid).isEmpty())

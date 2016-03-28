@@ -1,6 +1,7 @@
 #include "presence.h"
 
 #include <definitions/namespaces.h>
+#include <definitions/stanzahandlerorders.h>
 #include <utils/datetime.h>
 #include <utils/logger.h>
 
@@ -40,18 +41,18 @@ bool Presence::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AS
 		int show;
 		int priority;
 		QString status;
-		if (AStanza.type().isEmpty())
+		if (AStanza.type() == PRESENCE_TYPE_AVAILABLE)
 		{
 			QString showText = AStanza.firstElement("show").text();
-			if (showText.isEmpty())
+			if (showText == PRESENCE_SHOW_ONLINE)
 				show = IPresence::Online;
-			else if (showText == "chat")
+			else if (showText == PRESENCE_SHOW_CHAT)
 				show = IPresence::Chat;
-			else if (showText == "away")
+			else if (showText == PRESENCE_SHOW_AWAY)
 				show = IPresence::Away;
-			else if (showText == "dnd")
+			else if (showText == PRESENCE_SHOW_DND)
 				show = IPresence::DoNotDisturb;
-			else if (showText == "xa")
+			else if (showText == PRESENCE_SHOW_XA)
 				show = IPresence::ExtendedAway;
 			else
 				show = IPresence::Online;
@@ -59,13 +60,13 @@ bool Presence::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AS
 			status = AStanza.firstElement("status").text();
 			priority = AStanza.firstElement("priority").text().toInt();
 		}
-		else if (AStanza.type() == "unavailable")
+		else if (AStanza.type() == PRESENCE_TYPE_UNAVAILABLE)
 		{
 			show = IPresence::Offline;
 			status = AStanza.firstElement("status").text();
 			priority = 0;
 		}
-		else if (AStanza.type() == "error")
+		else if (AStanza.isError())
 		{
 			XmppStanzaError err(AStanza);
 			show = IPresence::Error;
@@ -184,47 +185,48 @@ bool Presence::setPresence(int AShow, const QString &AStatus, int APriority)
 {
 	if (FXmppStream->isOpen() && AShow!=IPresence::Error)
 	{
-		QString show;
+		QString showText;
 		switch (AShow)
 		{
 		case IPresence::Online:
-			show = QString::null;
+			showText = PRESENCE_SHOW_ONLINE;
 			break;
 		case IPresence::Chat:
-			show = "chat";
+			showText = PRESENCE_SHOW_CHAT;
 			break;
 		case IPresence::Away:
-			show = "away";
+			showText = PRESENCE_SHOW_AWAY;
 			break;
 		case IPresence::DoNotDisturb:
-			show = "dnd";
+			showText = PRESENCE_SHOW_DND;
 			break;
 		case IPresence::ExtendedAway:
-			show = "xa";
+			showText = PRESENCE_SHOW_XA;
 			break;
 		case IPresence::Invisible:
-			show = QString::null;
+			showText = QString::null;
 			break;
 		case IPresence::Offline:
-			show = QString::null;
+			showText = QString::null;
 			break;
 		default:
+			REPORT_ERROR(QString("Failed to set presence: Invalid show=%1").arg(AShow));
 			return false;
 		}
 
-		Stanza stanza("presence");
+		Stanza stanza(STANZA_KIND_PRESENCE);
 		if (AShow == IPresence::Invisible)
 		{
-			stanza.setType("invisible");
+			stanza.setType(PRESENCE_TYPE_INVISIBLE);
 		}
 		else if (AShow == IPresence::Offline)
 		{
-			stanza.setType("unavailable");
+			stanza.setType(PRESENCE_TYPE_UNAVAILABLE);
 		}
 		else
 		{
-			if (!show.isEmpty())
-				stanza.addElement("show").appendChild(stanza.createTextNode(show));
+			if (!showText.isEmpty())
+				stanza.addElement("show").appendChild(stanza.createTextNode(showText));
 			stanza.addElement("priority").appendChild(stanza.createTextNode(QString::number(APriority)));
 		}
 
@@ -289,55 +291,56 @@ bool Presence::sendPresence(const Jid &AContactJid, int AShow, const QString &AS
 {
 	if (FXmppStream->isOpen() && AContactJid.isValid() && AContactJid!=FXmppStream->streamJid().domain())
 	{
-		QString show;
+		QString showText;
 		switch (AShow)
 		{
 		case IPresence::Online:
-			show = QString::null;
+			showText = PRESENCE_SHOW_ONLINE;
 			break;
 		case IPresence::Chat:
-			show = "chat";
+			showText = PRESENCE_SHOW_CHAT;
 			break;
 		case IPresence::Away:
-			show = "away";
+			showText = PRESENCE_SHOW_AWAY;
 			break;
 		case IPresence::DoNotDisturb:
-			show = "dnd";
+			showText = PRESENCE_SHOW_DND;
 			break;
 		case IPresence::ExtendedAway:
-			show = "xa";
+			showText = PRESENCE_SHOW_XA;
 			break;
 		case IPresence::Invisible:
-			show = QString::null;
+			showText = QString::null;
 			break;
 		case IPresence::Offline:
-			show = QString::null;
+			showText = QString::null;
 			break;
 		default:
+			REPORT_ERROR(QString("Failed to send presence: Invalid show=%1").arg(AShow));
 			return false;
 		}
 
-		Stanza pres("presence");
-		pres.setTo(AContactJid.full());
+		Stanza stanza(STANZA_KIND_PRESENCE);
+		stanza.setTo(AContactJid.full());
 		if (AShow == IPresence::Invisible)
 		{
-			pres.setType("invisible");
+			stanza.setType(PRESENCE_TYPE_INVISIBLE);
 		}
 		else if (AShow == IPresence::Offline)
 		{
-			pres.setType("unavailable");
+			stanza.setType(PRESENCE_TYPE_UNAVAILABLE);
 		}
 		else
 		{
-			if (!show.isEmpty())
-				pres.addElement("show").appendChild(pres.createTextNode(show));
-			pres.addElement("priority").appendChild(pres.createTextNode(QString::number(APriority)));
+			if (!showText.isEmpty())
+				stanza.addElement("show").appendChild(stanza.createTextNode(showText));
+			stanza.addElement("priority").appendChild(stanza.createTextNode(QString::number(APriority)));
 		}
 
 		if (!AStatus.isEmpty())
-			pres.addElement("status").appendChild(pres.createTextNode(AStatus));
+			stanza.addElement("status").appendChild(stanza.createTextNode(AStatus));
 
-		if (FStanzaProcessor->sendStanzaOut(FXmppStream->streamJid(), pres))
+		if (FStanzaProcessor->sendStanzaOut(FXmppStream->streamJid(), stanza))
 		{
 			LOG_STRM_INFO(streamJid(),QString("Direct presence sent, to=%1, show=%2, status=%3, priority=%4").arg(AContactJid.full()).arg(AShow).arg(AStatus).arg(APriority));
 			emit directSent(AContactJid,AShow,AStatus,APriority);

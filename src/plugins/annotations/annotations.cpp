@@ -389,7 +389,7 @@ void Annotations::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIn
 			action->setData(ADR_STREAMJID,streamJid.full());
 			action->setData(ADR_CONTACTJID,index->data(RDR_PREP_BARE_JID));
 			connect(action,SIGNAL(triggered(bool)),SLOT(onEditNoteActionTriggered(bool)));
-			AMenu->addAction(action,AG_RVCM_ANNOTATIONS,true);
+			AMenu->addAction(action,AG_RVCM_ANNOTATIONS_SHOW,true);
 		}
 	}
 }

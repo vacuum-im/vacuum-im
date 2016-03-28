@@ -131,14 +131,6 @@
    <translation>Message Style - %1 - %2</translation>
   </message>
   <message>
-   <source>Receiver</source>
-   <translation>Receiver</translation>
-  </message>
-  <message>
-   <source>Sender</source>
-   <translation>Sender</translation>
-  </message>
-  <message>
    <source>The message with a error code %1 is received</source>
    <translation>The message with a error code %1 is received</translation>
   </message>
@@ -205,6 +197,18 @@
   <message>
    <source>Outgoing consecutive message</source>
    <translation>Outgoing consecutive message</translation>
+  </message>
+  <message>
+   <source>Contact</source>
+   <translation>Contact</translation>
+  </message>
+  <message>
+   <source>You</source>
+   <translation>You</translation>
+  </message>
+  <message>
+   <source>speaks of himself in the third person</source>
+   <translation>speaks of himself in the third person</translation>
   </message>
  </context>
  <context>

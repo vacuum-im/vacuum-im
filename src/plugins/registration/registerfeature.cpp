@@ -32,7 +32,7 @@ bool RegisterFeature::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, in
 	{
 		if (AStanza.id() == FIELDS_STANZA_ID)
 		{
-			if (AStanza.type() == "result")
+			if (AStanza.isResult())
 			{
 				QDomElement queryElem = AStanza.firstElement("query",NS_JABBER_REGISTER);
 				IRegisterFields fields = FRegistration!=NULL ? FRegistration->readFields(FXmppStream->streamJid().domain(),queryElem) : IRegisterFields();
@@ -59,7 +59,7 @@ bool RegisterFeature::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, in
 		}
 		else if (AStanza.id() == SUBMIT_STANZA_ID)
 		{
-			if (AStanza.type() == "result")
+			if (AStanza.isResult())
 			{
 				LOG_INFO(QString("XMPP account registration submit accepted, server=%1").arg(FXmppStream->streamJid().pDomain()));
 
@@ -102,8 +102,8 @@ bool RegisterFeature::start(const QDomElement &AElem)
 	{
 		if (!xmppStream()->isEncryptionRequired() || xmppStream()->connection()->isEncrypted())
 		{
-			Stanza request("iq");
-			request.setType("get").setId(FIELDS_STANZA_ID);
+			Stanza request(STANZA_KIND_IQ);
+			request.setType(STANZA_TYPE_GET).setId(FIELDS_STANZA_ID);
 			request.addElement("query",NS_JABBER_REGISTER);
 
 			FXmppStream->insertXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
@@ -136,8 +136,8 @@ bool RegisterFeature::sendSubmit(const IRegisterSubmit &ASubmit)
 {
 	if (FXmppStream->isConnected())
 	{
-		Stanza request("iq");
-		request.setTo(ASubmit.serviceJid.full()).setType("set").setId(SUBMIT_STANZA_ID);
+		Stanza request(STANZA_KIND_IQ);
+		request.setType(STANZA_TYPE_SET).setTo(ASubmit.serviceJid.full()).setId(SUBMIT_STANZA_ID);
 
 		QDomElement queryElem = request.addElement("query",NS_JABBER_REGISTER);
 		FRegistration->writeSubmit(queryElem,ASubmit);

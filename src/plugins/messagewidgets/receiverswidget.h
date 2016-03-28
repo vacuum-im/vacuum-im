@@ -13,11 +13,11 @@
 #include <interfaces/imessageprocessor.h>
 #include "ui_receiverswidget.h"
 
-class ReceiversSortSearchProxyModel : 
+class ReceiversProxyModel: 
 	public QSortFilterProxyModel
 {
 public:
-	ReceiversSortSearchProxyModel(QObject *AParent);
+	ReceiversProxyModel(QObject *AParent);
 	bool isOfflineContactsVisible() const;
 	void setOfflineContactsVisible(bool AVisible);
 protected:
@@ -45,9 +45,14 @@ public:
 	virtual QList<Jid> availStreams() const;
 	virtual QTreeView *receiversView() const;
 	virtual AdvancedItemModel *receiversModel() const;
+	virtual QList<QAbstractProxyModel *> proxyModels() const;
+	virtual void insertProxyModel(QAbstractProxyModel *AProxy);
+	virtual void removeProxyModel(QAbstractProxyModel *AProxy);
 	virtual QModelIndex mapModelToView(QStandardItem *AItem);
 	virtual QStandardItem *mapViewToModel(const QModelIndex &AIndex);
 	virtual void contextMenuForItems(QList<QStandardItem *> AItems, Menu *AMenu);
+	virtual bool isOfflineContactsVisible() const;
+	virtual void setOfflineContactsVisible(bool AVisible);
 	virtual QMultiMap<Jid, Jid> selectedAddresses() const;
 	virtual void setGroupSelection(const Jid &AStreamJid, const QString &AGroup, bool ASelected);
 	virtual void setAddressSelection(const Jid &AStreamJid, const Jid &AContactJid, bool ASelected);
@@ -55,6 +60,8 @@ public:
 signals:
 	void availStreamsChanged();
 	void addressSelectionChanged();
+	void proxyModelsAboutToBeChanged();
+	void proxyModelsChanged(bool AViewModelChanged);
 	void contextMenuForItemsRequested(QList<QStandardItem *> AItems, Menu *AMenu);
 protected:
 	void initialize();
@@ -79,7 +86,7 @@ protected:
 	void selectNoneContacts(QList<QStandardItem *> AParents);
 	void expandAllChilds(QList<QStandardItem *> AParents);
 	void collapseAllChilds(QList<QStandardItem *> AParents);
-	void restoreExpandState(QList<QStandardItem *> AParents);
+	void restoreExpandState(QStandardItem *AParent);
 protected slots:
 	void onModelItemInserted(QStandardItem *AItem);
 	void onModelItemRemoving(QStandardItem *AItem);
@@ -124,7 +131,8 @@ private:
 	QList<Jid> FReceivers;
 	IMessageWindow *FWindow;
 	AdvancedItemModel *FModel;
-	ReceiversSortSearchProxyModel *FProxyModel;
+	ReceiversProxyModel *FProxyModel;
+	QList<QAbstractProxyModel *> FProxyModels;
 private:
 	QTimer FSelectionSignalTimer;
 	QList<QStandardItem *> FDeleteDelayed;

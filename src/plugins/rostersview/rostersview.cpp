@@ -181,18 +181,21 @@ AdvancedDelegateItem RostersView::rosterLabel(int AOrder, quint32 ALabelId, cons
 	IRosterIndex *index = const_cast<IRosterIndex *>(AIndex);
 	if (AOrder==RLHO_ROSTERSVIEW_NOTIFY && ALabelId==AdvancedDelegateItem::DecorationId)
 	{
+		const IRostersNotify &notify = FNotifyItems.value(FActiveNotifies.value(index));
 		label.d->id = AdvancedDelegateItem::DecorationId;
 		label.d->kind = AdvancedDelegateItem::Decoration;
-		label.d->flags = AdvancedDelegateItem::Blink;
+		if (notify.flags & IRostersNotify::Blink)
+			label.d->flags |= AdvancedDelegateItem::Blink;
 		label.d->data = FNotifyItems.value(FActiveNotifies.value(index)).icon;
 	}
 	else if (AOrder==RLHO_ROSTERSVIEW_NOTIFY && ALabelId==RLID_ROSTERSVIEW_STATUS)
 	{
+		const IRostersNotify &notify = FNotifyItems.value(FActiveNotifies.value(index));
 		label.d->id = RLID_ROSTERSVIEW_STATUS;
 		label.d->kind = AdvancedDelegateItem::CustomData;
 		label.d->hints.insert(AdvancedDelegateItem::FontSizeDelta,-1);
-		label.d->hints.insert(AdvancedDelegateItem::FontStyle,QFont::StyleItalic);
-		label.d->data = FNotifyItems.value(FActiveNotifies.value(index)).footer;
+		label.d->hints.insert(AdvancedDelegateItem::FontItalic,true);
+		label.d->data = notify.footer;
 	}
 	return label;
 }
@@ -556,6 +559,11 @@ QMap<int, QStringList> RostersView::indexesRolesMap(const QList<IRosterIndex *> 
 	return map;
 }
 
+QList<QAbstractProxyModel *> RostersView::proxyModels() const
+{
+	return FProxyModels.values();
+}
+
 void RostersView::insertProxyModel(QAbstractProxyModel *AProxyModel, int AOrder)
 {
 	if (AProxyModel && !FProxyModels.values().contains(AProxyModel))
@@ -604,11 +612,6 @@ void RostersView::insertProxyModel(QAbstractProxyModel *AProxyModel, int AOrder)
 
 		emit proxyModelInserted(AProxyModel);
 	}
-}
-
-QList<QAbstractProxyModel *> RostersView::proxyModels() const
-{
-	return FProxyModels.values();
 }
 
 void RostersView::removeProxyModel(QAbstractProxyModel *AProxyModel)
@@ -1167,15 +1170,16 @@ void RostersView::mouseDoubleClickEvent(QMouseEvent *AEvent)
 			IRosterIndex *index = FRostersModel->rosterIndexFromModelIndex(mapToModel(viewIndex));
 			if (index != NULL)
 			{
-				int notifyId = FActiveNotifies.value(index,-1);
-				if (notifyId<0 || (FNotifyItems.value(notifyId).flags & IRostersNotify::HookClicks)==0)
-				{
-					hooked = doubleClickOnIndex(index,AEvent);
-				}
-				else
+				int notifyId = FActiveNotifies.value(index);
+				bool activate = notifyId>0 ? (FNotifyItems.value(notifyId).flags & IRostersNotify::HookClicks)>0 : false;
+				if (activate)
 				{
 					hooked = true;
 					emit notifyActivated(notifyId);
+				}
+				else
+				{
+					hooked = doubleClickOnIndex(index,AEvent);
 				}
 			}
 		}

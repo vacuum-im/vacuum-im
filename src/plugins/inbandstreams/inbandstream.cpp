@@ -7,6 +7,7 @@
 #include <QCoreApplication>
 #include <definitions/namespaces.h>
 #include <definitions/internalerrors.h>
+#include <definitions/stanzahandlerorders.h>
 #include <utils/xmpperror.h>
 #include <utils/logger.h>
 #include <utils/jid.h>
@@ -80,10 +81,10 @@ bool InBandStream::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 		AAccept = true;
 		if (AStanza.firstElement("error").isNull())
 		{
-			QByteArray data =  QByteArray::fromBase64(elem.text().toUtf8());
+			QByteArray data =  QByteArray::fromBase64(elem.text().toLatin1());
 			if (FSeqIn==elem.attribute("seq").toInt() && data.size()>0 && data.size()<=FBlockSize)
 			{
-				if (AStanza.tagName() == "iq")
+				if (AStanza.kind() == STANZA_KIND_IQ)
 				{
 					Stanza result = FStanzaProcessor->makeReplyResult(AStanza);
 					FStanzaProcessor->sendStanzaOut(AStreamJid,result);
@@ -117,7 +118,7 @@ bool InBandStream::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 			FBlockSize = openElem.attribute("block-size").toInt();
 			if (FBlockSize>MINIMUM_BLOCK_SIZE && FBlockSize<=FMaxBlockSize)
 			{
-				FStanzaType = openElem.attribute("stanza") == "message" ? StanzaMessage : StanzaIq;
+				FStanzaType = openElem.attribute("stanza")==STANZA_KIND_MESSAGE ? StanzaMessage : StanzaIq;
 				FSHIData = insertStanzaHandle(FStanzaType==StanzaMessage ? SHC_INBAND_DATA_MESSAGE : SHC_INBAND_DATA_IQ);
 				FSHIClose = insertStanzaHandle(SHC_INBAND_CLOSE);
 				if (FSHIData>0 && FSHIClose>0)
@@ -164,7 +165,7 @@ void InBandStream::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 	Q_UNUSED(AStreamJid);
 	if (AStanza.id() == FDataIqRequestId)
 	{
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			FDataIqRequestId.clear();
 			sendNextPaket();
@@ -176,7 +177,7 @@ void InBandStream::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 	}
 	else if (AStanza.id() == FOpenRequestId)
 	{
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			FSHIData = insertStanzaHandle(FStanzaType==StanzaMessage ? SHC_INBAND_DATA_MESSAGE : SHC_INBAND_DATA_IQ);
 			FSHIClose = insertStanzaHandle(SHC_INBAND_CLOSE);
@@ -284,14 +285,14 @@ bool InBandStream::open(QIODevice::OpenMode AMode)
 	if (FStanzaProcessor && streamState()==IDataStreamSocket::Closed)
 	{
 		setStreamError(XmppError::null);
-		if (streamKind() == IDataStreamSocket::Initiator)
+		if (streamKind() == IDataStream::Initiator)
 		{
-			Stanza openRequest("iq");
-			openRequest.setType("set").setId(FStanzaProcessor->newId()).setTo(FContactJid.full());
+			Stanza openRequest(STANZA_KIND_IQ);
+			openRequest.setType(STANZA_TYPE_SET).setTo(FContactJid.full()).setUniqueId();
 			QDomElement elem = openRequest.addElement("open",NS_INBAND_BYTESTREAMS);
 			elem.setAttribute("sid",FStreamId);
 			elem.setAttribute("block-size",FBlockSize);
-			elem.setAttribute("stanza",FStanzaType==StanzaMessage ? "message" : "iq");
+			elem.setAttribute("stanza",FStanzaType==StanzaMessage ? STANZA_KIND_MESSAGE : STANZA_KIND_IQ);
 			if (FStanzaProcessor->sendStanzaRequest(this,FStreamJid,openRequest,OPEN_TIMEOUT))
 			{
 				LOG_STRM_INFO(FStreamJid,QString("Open stream request sent, sid=%1").arg(FStreamId));
@@ -343,8 +344,8 @@ void InBandStream::close()
 		emit aboutToClose();
 		if (FStanzaProcessor)
 		{
-			Stanza closeRequest("iq");
-			closeRequest.setType("set").setId(FStanzaProcessor->newId()).setTo(FContactJid.full());
+			Stanza closeRequest(STANZA_KIND_IQ);
+			closeRequest.setType(STANZA_TYPE_SET).setTo(FContactJid.full()).setUniqueId();
 			closeRequest.addElement("close",NS_INBAND_BYTESTREAMS).setAttribute("sid",FStreamId);
 			if (FStanzaProcessor->sendStanzaRequest(this,FStreamJid,closeRequest,CLOSE_TIMEOUT))
 			{
@@ -462,8 +463,9 @@ bool InBandStream::sendNextPaket(bool AFlush)
 		{
 			if (FStanzaProcessor)
 			{
-				Stanza paket(FStanzaType==StanzaMessage ? "message" : "iq");
-				paket.setTo(FContactJid.full()).setId(FStanzaProcessor->newId());
+				Stanza paket(FStanzaType==StanzaMessage ? STANZA_KIND_MESSAGE : STANZA_KIND_IQ);
+				paket.setTo(FContactJid.full()).setUniqueId();
+
 				QDomElement dataElem = paket.addElement("data",NS_INBAND_BYTESTREAMS);
 				dataElem.setAttribute("sid",FStreamId);
 				dataElem.setAttribute("seq",FSeqOut);
@@ -488,7 +490,7 @@ bool InBandStream::sendNextPaket(bool AFlush)
 				}
 				else
 				{
-					paket.setType("set");
+					paket.setType(STANZA_TYPE_SET);
 					FDataIqRequestId = paket.id();
 					sent = FStanzaProcessor->sendStanzaRequest(this,FStreamJid,paket,DATA_TIMEOUT);
 				}

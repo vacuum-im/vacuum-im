@@ -1,27 +1,31 @@
+#Get coreect path to lrelease binary
+LRELEASE = $$[QT_INSTALL_BINS]/lrelease
+win32: LRELEASE = $$replace(LRELEASE, \\\\, \\\\)
+win32: LRELEASE = $$replace(LRELEASE, /, \\\\)
+  
+
 #Building Translations
 qm_build_all.target = build_qm
 for(LANG, TRANS_LANGS) {
   TS_FILE = $${_PRO_FILE_PWD_}/$${TRANS_SOURCE_ROOT}/translations/$${LANG}/$${TRANS_TARGET}.ts
-  QM_FILE = $${TRANS_BUILD_ROOT}/src/translations/$${LANG}/$${TRANS_TARGET}.qm
-  QM_DIR = $${TRANS_BUILD_ROOT}/src/translations/$${LANG}
-  win32: QM_DIR = $$replace(QM_DIR, /, \\\\)
+  exists($${TS_FILE}) {
+    QM_FILE = $${TRANS_BUILD_ROOT}/src/translations/$${LANG}/$${TRANS_TARGET}.qm
+    QM_DIR = $${TRANS_BUILD_ROOT}/src/translations/$${LANG}
+    win32: QM_DIR = $$replace(QM_DIR, /, \\\\)
 
-  LRELEASE = $$[QT_INSTALL_BINS]/lrelease
-  win32: LRELEASE = $$replace(LRELEASE, \\\\, \\\\)
-  win32: LRELEASE = $$replace(LRELEASE, /, \\\\)
-  
-  QM_COMMAND = $(MKDIR) $${QM_DIR} && $${LRELEASE} -compress $${TS_FILE} -qm $${QM_FILE}
-  win32: QM_COMMAND = ( if not exist $${QM_DIR} ( $(MKDIR) $${QM_DIR} ) ) & $${LRELEASE} $${TS_FILE} -qm $${QM_FILE}
+    QM_COMMAND = $(MKDIR) $${QM_DIR} && $${LRELEASE} -compress $${TS_FILE} -qm $${QM_FILE}
+    win32: QM_COMMAND = ( if not exist $${QM_DIR} ( $(MKDIR) $${QM_DIR} ) ) & $${LRELEASE} $${TS_FILE} -qm $${QM_FILE}
 
-  eval(qm_$${TRANS_TARGET}_build_$${LANG}.target   = $${QM_FILE})
-  eval(qm_$${TRANS_TARGET}_build_$${LANG}.depends  = $${TS_FILE})
-  eval(qm_$${TRANS_TARGET}_build_$${LANG}.commands = $${QM_COMMAND})
+    eval(qm_$${TRANS_TARGET}_build_$${LANG}.target   = $${QM_FILE})
+    eval(qm_$${TRANS_TARGET}_build_$${LANG}.depends  = $${TS_FILE})
+    eval(qm_$${TRANS_TARGET}_build_$${LANG}.commands = $${QM_COMMAND})
 
-  qm_build_all.depends += qm_$${TRANS_TARGET}_build_$${LANG}
-  QMAKE_EXTRA_TARGETS  += qm_$${TRANS_TARGET}_build_$${LANG}
+    qm_build_all.depends += qm_$${TRANS_TARGET}_build_$${LANG}
+    QMAKE_EXTRA_TARGETS  += qm_$${TRANS_TARGET}_build_$${LANG}
 
-  win32: QM_FILE = $$replace(QM_FILE, /, \\\\)
-  QMAKE_DISTCLEAN += $${QM_FILE}
+    win32: QM_FILE = $$replace(QM_FILE, /, \\\\)
+    QMAKE_DISTCLEAN += $${QM_FILE}
+  }
 }
 QMAKE_EXTRA_TARGETS  += qm_build_all
 POST_TARGETDEPS += $${qm_build_all.target}

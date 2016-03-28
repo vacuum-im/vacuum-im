@@ -26,6 +26,7 @@ public:
 	virtual IMessageToolBarWidget *toolBarWidget() const;
 	virtual IMessageStatusBarWidget *statusBarWidget() const;
 	virtual IMessageReceiversWidget *receiversWidget() const;
+	virtual SplitterWidget *messageWidgetsBox() const;
 	// IMessageTabPage
 	virtual QString tabPageId() const;
 	virtual bool isVisibleTabPage() const;
@@ -40,7 +41,6 @@ public:
 	virtual IMessageTabPageNotifier *tabPageNotifier() const;
 	virtual void setTabPageNotifier(IMessageTabPageNotifier *ANotifier);
 	// IMessageChatWindow
-	virtual SplitterWidget *messageWidgetsBox() const;
 	virtual void updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip);
 signals:
 	// IMessageWindow

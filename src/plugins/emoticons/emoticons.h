@@ -38,8 +38,9 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IMessageWriter
-	virtual void writeTextToMessage(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang);
-	virtual void writeMessageToText(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang);
+	virtual bool writeMessageHasText(int AOrder, Message &AMessage, const QString &ALang);
+	virtual bool writeMessageToText(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang);
+	virtual bool writeTextToMessage(int AOrder, QTextDocument *ADocument, Message &AMessage, const QString &ALang);
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IMessageEditContentsHandler
@@ -58,8 +59,8 @@ protected:
 	void createTreeItem(const QString &AKey, const QUrl &AUrl);
 	void clearTreeItem(EmoticonTreeItem *AItem) const;
 	bool isWordBoundary(const QString &AText) const;
-	int replaceTextToImage(QTextDocument *ADocument, int AStartPos=0, int ALength=-1) const;
-	int replaceImageToText(QTextDocument *ADocument, int AStartPos=0, int ALength=-1) const;
+	bool replaceTextToImage(QTextDocument *ADocument, int AStartPos=0, int ALength=-1) const;
+	bool replaceImageToText(QTextDocument *ADocument, int AStartPos=0, int ALength=-1) const;
 	SelectIconMenu *createSelectIconMenu(const QString &ASubStorage, QWidget *AParent);
 	void insertSelectIconMenu(const QString &ASubStorage);
 	void removeSelectIconMenu(const QString &ASubStorage);

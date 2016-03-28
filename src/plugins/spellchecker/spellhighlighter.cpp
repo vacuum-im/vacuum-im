@@ -43,5 +43,5 @@ void SpellHighlighter::highlightBlock(const QString &AText)
 
 bool SpellHighlighter::isUserNickName(const QString &AText)
 {
-	return FMultiUserChat!=NULL && FMultiUserChat->userByNick(AText)!=NULL;
+	return FMultiUserChat!=NULL && FMultiUserChat->findUser(AText)!=NULL;
 }

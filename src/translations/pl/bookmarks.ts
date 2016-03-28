@@ -53,10 +53,6 @@
 <context>
     <name>EditBookmarkDialog</name>
     <message>
-        <source>Bookmark is not valid</source>
-        <translation>Nieprawidłowa zakładka</translation>
-    </message>
-    <message>
         <source>Field &apos;Name&apos; should not be empty</source>
         <translation>Pole &apos;Nazwa&apos; nie może pozostać puste</translation>
     </message>
@@ -68,28 +64,16 @@
         <source>In conference bookmark field &apos;Room&apos; should not be empty</source>
         <translation>W zakładce konferencji pole &apos;Pokój&apos; nie może pozostać puste</translation>
     </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>EditBookmarkDialogClass</name>
     <message>
         <source>Edit bookmark</source>
         <translation>Edytuj zakładkę</translation>
-    </message>
-    <message>
-        <source>Name:</source>
-        <translation>Nazwa:</translation>
-    </message>
-    <message>
-        <source>Conference bookmark</source>
-        <translation>Zakładka konferencji</translation>
-    </message>
-    <message>
-        <source>Room:</source>
-        <translation>Pokój:</translation>
-    </message>
-    <message>
-        <source>Nick:</source>
-        <translation>Nick:</translation>
     </message>
     <message>
         <source>Password:</source>
@@ -100,20 +84,52 @@
         <translation>Automatyczne dołączanie</translation>
     </message>
     <message>
-        <source>URL bookmark</source>
-        <translation>Zakładka strony internetowej</translation>
+        <source>Conference:</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <source>URL:</source>
-        <translation>Adres:</translation>
+        <source>Conference as &apos;name@service.server.com&apos;</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Nickname:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Your nickname in conference</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Conference password if required</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation>Nazwa:</translation>
+    </message>
+    <message>
+        <source>Bookmark to Conference</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Bookmark to Link</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Link:</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Any valid link</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Bookmark name</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>EditBookmarksDialog</name>
-    <message>
-        <source>Bookmarks not saved</source>
-        <translation>Nie zapisano zakładek</translation>
-    </message>
     <message>
         <source>Cant save bookmarks to server</source>
         <translation>Nie można zapisać zakładek na serwerze</translation>
@@ -121,6 +137,10 @@
     <message>
         <source>Edit bookmarks - %1</source>
         <translation>Edytuj zakładki - %1</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>

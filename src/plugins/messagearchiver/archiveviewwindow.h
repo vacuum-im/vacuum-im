@@ -79,6 +79,7 @@ public:
 protected:
 	void reset();
 	Jid gatewayJid(const Jid &AContactJid) const;
+	bool isConferenceDomain(const Jid &AWith) const;
 	bool isConferencePrivateChat(const Jid &AWith) const;
 	bool isJidMatched(const Jid &ARequestWith, const Jid &AHeaderWith) const;
 	QString contactName(const Jid &AStreamJid, const Jid &AContactJid, bool AShowResource = false) const;

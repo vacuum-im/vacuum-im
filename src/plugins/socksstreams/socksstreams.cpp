@@ -140,7 +140,7 @@ QString SocksStreams::methodDescription() const
 	return tr("Data is transferred out-band over TCP or UDP connection");
 }
 
-IDataStreamSocket *SocksStreams::dataStreamSocket(const QString &ASocketId, const Jid &AStreamJid, const Jid &AContactJid, IDataStreamSocket::StreamKind AKind, QObject *AParent)
+IDataStreamSocket *SocksStreams::dataStreamSocket(const QString &ASocketId, const Jid &AStreamJid, const Jid &AContactJid, IDataStream::Kind AKind, QObject *AParent)
 {
 	if (FStanzaProcessor)
 	{

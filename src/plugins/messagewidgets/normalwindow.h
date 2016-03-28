@@ -29,6 +29,7 @@ public:
 	virtual IMessageToolBarWidget *toolBarWidget() const;
 	virtual IMessageStatusBarWidget *statusBarWidget() const;
 	virtual IMessageReceiversWidget *receiversWidget() const;
+	virtual SplitterWidget *messageWidgetsBox() const;
 	// ITabWindowPage
 	virtual QString tabPageId() const;
 	virtual bool isVisibleTabPage() const;
@@ -49,7 +50,6 @@ public:
 	virtual void setSubject(const QString &ASubject);
 	virtual QString threadId() const;
 	virtual void setThreadId(const QString &AThreadId);
-	virtual SplitterWidget *messageWidgetsBox() const;
 	virtual void updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip);
 signals:
 	// IMessageNormalWindow

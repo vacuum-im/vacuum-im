@@ -43,10 +43,6 @@
         <translation>По умолчанию</translation>
     </message>
     <message>
-        <source>Unknown</source>
-        <translation>Нет данных</translation>
-    </message>
-    <message>
         <source>Active</source>
         <translation>Активен</translation>
     </message>
@@ -59,24 +55,32 @@
         <translation>Отвлёкся</translation>
     </message>
     <message>
-        <source>User chat status</source>
-        <translation>Активность собеседника в чате</translation>
-    </message>
-    <message>
-        <source>Always send</source>
-        <translation>Всегда отправлять</translation>
-    </message>
-    <message>
-        <source>Never send</source>
-        <translation>Никогда не отправлять</translation>
-    </message>
-    <message>
         <source>Inactive %1</source>
         <translation>Неактивен %1</translation>
     </message>
     <message>
         <source>Gone %1</source>
         <translation>Ушёл %1</translation>
+    </message>
+    <message>
+        <source>User activity in chat</source>
+        <translation>Активность собеседника в чате</translation>
+    </message>
+    <message>
+        <source>and %1 other</source>
+        <translation>и еще %1</translation>
+    </message>
+    <message>
+        <source>Always send my chat activity</source>
+        <translation>Всегда отправлять мою активность в чате</translation>
+    </message>
+    <message>
+        <source>Never send my chat activity</source>
+        <translation>Никогда не отправлять мою активность в чате</translation>
+    </message>
+    <message>
+        <source>Participants activity in conference</source>
+        <translation>Активность участников в конференции</translation>
     </message>
 </context>
 </TS>

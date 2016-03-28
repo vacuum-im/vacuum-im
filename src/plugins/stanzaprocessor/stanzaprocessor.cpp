@@ -4,6 +4,9 @@
 #include <definitions/xmppstanzahandlerorders.h>
 #include <utils/logger.h>
 
+static const QStringList IqRequestTypes = QStringList() << STANZA_TYPE_SET << STANZA_TYPE_GET;
+static const QStringList IqReplyTypes = QStringList() << STANZA_TYPE_RESULT << STANZA_TYPE_ERROR;
+
 StanzaProcessor::StanzaProcessor()
 {
 	FXmppStreamManager = NULL;
@@ -49,8 +52,8 @@ bool StanzaProcessor::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, in
 	{
 		if (!sendStanzaIn(AXmppStream->streamJid(),AStanza))
 		{
-			LOG_STRM_DEBUG(AXmppStream->streamJid(),QString("Incoming stanza not accepted, from=%1, tag=%2, ns=%3").arg(AStanza.from(),AStanza.tagName(),AStanza.firstElement().namespaceURI()));
-			if (AStanza.tagName()=="iq" && (AStanza.type()=="set" || AStanza.type()=="get"))
+			LOG_STRM_DEBUG(AXmppStream->streamJid(),QString("Incoming stanza not accepted, from=%1, kind=%2, ns=%3").arg(AStanza.from(),AStanza.kind(),AStanza.firstElement().namespaceURI()));
+			if (AStanza.kind()==STANZA_KIND_IQ && IqRequestTypes.contains(AStanza.type()))
 			{
 				Stanza error = makeReplyError(AStanza,XmppStanzaError::EC_SERVICE_UNAVAILABLE);
 				sendStanzaOut(AXmppStream->streamJid(), error);
@@ -67,13 +70,6 @@ bool StanzaProcessor::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, i
 }
 
 //IStanzaProcessor
-QString StanzaProcessor::newId() const
-{
-	static unsigned long id = 1;
-	static const QString mask = "sid_%1";
-	return mask.arg(id++);
-}
-
 bool StanzaProcessor::sendStanzaIn(const Jid &AStreamJid, Stanza &AStanza)
 {
 	emit stanzaReceived(AStreamJid, AStanza);
@@ -88,7 +84,7 @@ bool StanzaProcessor::sendStanzaOut(const Jid &AStreamJid, Stanza &AStanza)
 	if (!processStanza(AStreamJid,AStanza,IStanzaHandle::DirectionOut))
 	{
 		IXmppStream *stream = FXmppStreamManager->findXmppStream(AStreamJid);
-		if (stream && stream->sendStanza(AStanza)>=0)
+		if (stream!=NULL && stream->sendStanza(AStanza)>=0)
 		{
 			emit stanzaSent(AStreamJid, AStanza);
 			return true;
@@ -100,9 +96,9 @@ bool StanzaProcessor::sendStanzaOut(const Jid &AStreamJid, Stanza &AStanza)
 
 bool StanzaProcessor::sendStanzaRequest(IStanzaRequestOwner *AIqOwner, const Jid &AStreamJid, Stanza &AStanza, int ATimeout)
 {
-	if (AIqOwner && AStanza.tagName()=="iq" && !AStanza.id().isEmpty() && !FRequests.contains(AStanza.id()))
+	if (AIqOwner!=NULL && !AStanza.id().isEmpty() && AStanza.kind()==STANZA_KIND_IQ && IqRequestTypes.contains(AStanza.type()) && !FRequests.contains(AStanza.id()))
 	{
-		if ((AStanza.type()=="set" || AStanza.type()=="get") && sendStanzaOut(AStreamJid,AStanza))
+		if (sendStanzaOut(AStreamJid,AStanza))
 		{
 			StanzaRequest request;
 			request.owner = AIqOwner;
@@ -120,20 +116,24 @@ bool StanzaProcessor::sendStanzaRequest(IStanzaRequestOwner *AIqOwner, const Jid
 			return true;
 		}
 	}
+	else
+	{
+		REPORT_ERROR("Failed to send iq stanza request: Invalid parameters");
+	}
 	return false;
 }
 
 Stanza StanzaProcessor::makeReplyResult(const Stanza &AStanza) const
 {
-	Stanza result(AStanza.tagName());
-	result.setType("result").setId(AStanza.id()).setTo(AStanza.from());
+	Stanza result(AStanza.kind());
+	result.setType(STANZA_TYPE_RESULT).setTo(AStanza.from()).setId(AStanza.id());
 	return result;
 }
 
 Stanza StanzaProcessor::makeReplyError(const Stanza &AStanza, const XmppStanzaError &AError) const
 {
 	Stanza error(AStanza);
-	error.setType("error").setId(AStanza.id()).setTo(AStanza.from()).setFrom(QString::null);
+	error.setType(STANZA_TYPE_ERROR).setTo(AStanza.from()).setFrom(QString::null).setId(AStanza.id());
 	insertErrorElement(error,AError);
 	return error;
 }
@@ -155,11 +155,10 @@ IStanzaHandle StanzaProcessor::stanzaHandle(int AHandleId) const
 
 int StanzaProcessor::insertStanzaHandle(const IStanzaHandle &AHandle)
 {
-	if (AHandle.handler!=NULL && !AHandle.conditions.isEmpty())
+	if (AHandle.order!=0 && AHandle.handler!=NULL && !AHandle.conditions.isEmpty())
 	{
 		static int handleId = 0;
-		handleId++;
-		while(handleId <= 0 || FHandles.contains(handleId))
+		while(handleId<=0 || FHandles.contains(handleId))
 			handleId = (handleId > 0) ? handleId+1 : 1;
 
 		FHandles.insert(handleId,AHandle);
@@ -168,7 +167,12 @@ int StanzaProcessor::insertStanzaHandle(const IStanzaHandle &AHandle)
 
 		LOG_DEBUG(QString("Stanza handle inserted, id=%1, handler=%2, order=%3, direction=%4, stream=%5, conditions=%6").arg(handleId).arg(AHandle.handler->instance()->metaObject()->className()).arg(AHandle.order).arg(AHandle.direction).arg(AHandle.streamJid.full()).arg(QStringList(AHandle.conditions).join("; ")));
 		emit stanzaHandleInserted(handleId,AHandle);
+		
 		return handleId;
+	}
+	else
+	{
+		REPORT_ERROR("Failed to insert stanza handle: Invalid handle");
 	}
 	return -1;
 }
@@ -180,7 +184,7 @@ void StanzaProcessor::removeStanzaHandle(int AHandleId)
 		LOG_DEBUG(QString("Stanza handle removed, id=%1").arg(AHandleId));
 		IStanzaHandle shandle = FHandles.take(AHandleId);
 		FHandleIdByOrder.remove(shandle.order,AHandleId);
-		emit stanzaHandleRemoved(AHandleId, shandle);
+		emit stanzaHandleRemoved(AHandleId,shandle);
 	}
 }
 
@@ -327,7 +331,7 @@ bool StanzaProcessor::processStanza(const Jid &AStreamJid, Stanza &AStanza, int 
 
 bool StanzaProcessor::processStanzaRequest(const Jid &AStreamJid, const Stanza &AStanza)
 {
-	if (AStanza.tagName()=="iq" && FRequests.contains(AStanza.id()) && (AStanza.type()=="result" || AStanza.type()=="error"))
+	if (AStanza.kind()==STANZA_KIND_IQ && FRequests.contains(AStanza.id()) && IqReplyTypes.contains(AStanza.type()))
 	{
 		const StanzaRequest &request = FRequests.value(AStanza.id());
 		request.owner->stanzaRequestResult(AStreamJid,AStanza);
@@ -343,8 +347,8 @@ void StanzaProcessor::processRequestTimeout(const QString &AStanzaId) const
 	{
 		const StanzaRequest &request = FRequests.value(AStanzaId);
 
-		Stanza timeout("iq");
-		timeout.setType("error").setId(AStanzaId).setFrom(request.contactJid.full()).setTo(request.streamJid.full());
+		Stanza timeout(STANZA_KIND_IQ);
+		timeout.setType(STANZA_TYPE_ERROR).setFrom(request.contactJid.full()).setTo(request.streamJid.full()).setId(AStanzaId);
 		insertErrorElement(timeout,XmppStanzaError(XmppStanzaError::EC_REMOTE_SERVER_TIMEOUT));
 
 		request.owner->stanzaRequestResult(request.streamJid, timeout);
@@ -353,23 +357,26 @@ void StanzaProcessor::processRequestTimeout(const QString &AStanzaId) const
 
 void StanzaProcessor::removeStanzaRequest(const QString &AStanzaId)
 {
-	StanzaRequest request = FRequests.take(AStanzaId);
-	delete request.timer;
+	delete FRequests.take(AStanzaId).timer;
 }
 
 void StanzaProcessor::insertErrorElement(Stanza &AStanza, const XmppStanzaError &AError) const
 {
 	QDomElement errElem = AStanza.addElement("error");
+	
 	if (AError.errorTypeCode() != XmppStanzaError::ET_UNKNOWN)
 		errElem.setAttribute("type",AError.errorType());
+	
 	if (!AError.condition().isEmpty())
 	{
 		QDomNode condElem = errElem.appendChild(AStanza.createElement(AError.condition(),NS_XMPP_STANZA_ERROR));
 		if (!AError.conditionText().isEmpty())
 			condElem.appendChild(AStanza.createTextNode(AError.conditionText()));
 	}
+	
 	if (!AError.errorText().isEmpty())
 		errElem.appendChild(AStanza.createElement("text",NS_XMPP_STANZA_ERROR)).appendChild(AStanza.createTextNode(AError.errorText()));
+	
 	foreach(const QString &appCondNs, AError.appConditionNsList())
 		errElem.appendChild(AStanza.createElement(AError.appCondition(appCondNs),appCondNs));
 }

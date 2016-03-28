@@ -124,9 +124,10 @@ void RegisterDialog::onRegisterFields(const QString &AId, const IRegisterFields 
 		{
 			FSubmit.fieldMask = IRegisterFields::Form;
 
-			FCurrentForm = FDataForms->formWidget(AFields.form,ui.spgDataForm);
-			if (!AFields.form.title.isEmpty())
-				setWindowTitle(AFields.form.title);
+			IDataForm form = FDataForms->localizeForm(AFields.form);
+			FCurrentForm = FDataForms->formWidget(form,ui.spgDataForm);
+			if (!form.title.isEmpty())
+				setWindowTitle(form.title);
 			ui.spgDataForm->layout()->addWidget(FCurrentForm->instance());
 			ui.stwForm->setCurrentWidget(ui.spgDataForm);
 		}
@@ -193,7 +194,7 @@ void RegisterDialog::onDialogButtonsClicked(QAbstractButton *AButton)
 				FSubmit.username = ui.lneUserName->text();
 				FSubmit.password = ui.lnePassword->text();
 				FSubmit.email = ui.lneEMail->text();
-				FSubmit.form = FCurrentForm!=NULL ? FDataForms->dataSubmit(FCurrentForm->userDataForm()) : IDataForm();
+				FSubmit.form = FCurrentForm!=NULL ?FCurrentForm->submitDataForm() : IDataForm();
 				FRequestId = FRegistration->sendRequestSubmit(FStreamJid,FSubmit);
 			}
 		}

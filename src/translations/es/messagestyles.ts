@@ -126,15 +126,7 @@
     </message>
     <message>
         <source>Message Style - %1 - %2</source>
-        <translation>Estilo de mensaje - %1 - %2</translation>
-    </message>
-    <message>
-        <source>Receiver</source>
-        <translation>Destinatario</translation>
-    </message>
-    <message>
-        <source>Sender</source>
-        <translation>Remitente</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <source>The message with a error code %1 is received</source>
@@ -203,6 +195,18 @@
     <message>
         <source>Outgoing consecutive message</source>
         <translation>Mensaje consecutivo de salida</translation>
+    </message>
+    <message>
+        <source>Contact</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>You</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>speaks of himself in the third person</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>

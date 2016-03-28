@@ -2,9 +2,13 @@
 #define IMULTIUSERCHAT_H
 
 #include <QMenuBar>
+#include <QTreeView>
 #include <interfaces/idataforms.h>
 #include <interfaces/irostersmodel.h>
 #include <interfaces/imessagewidgets.h>
+#include <interfaces/ipresencemanager.h>
+#include <utils/advanceditemdelegate.h>
+#include <utils/advanceditemmodel.h>
 #include <utils/menubarchanger.h>
 #include <utils/xmpperror.h>
 #include <utils/message.h>
@@ -43,36 +47,30 @@
 #define MUC_SC_MEMBERS_ONLY             322
 #define MUC_SC_SYSTEM_SHUTDOWN          332
 
-#define MUC_FT_REQUEST                  "http://jabber.org/protocol/muc#request"
-#define MUC_FT_ROOM_GONFIG              "http://jabber.org/protocol/muc#roomconfig"
-#define MUC_FT_ROOM_INFO                "http://jabber.org/protocol/muc#roominfo"
-#define MUC_FV_ROLE                     "muc#role"
-
-#define MUC_NODE_ROOM_NICK              "x-roomuser-item"
+#define MUC_NODE_NICK                   "x-roomuser-item"
 #define MUC_NODE_ROOMS                  "http://jabber.org/protocol/muc#rooms"
 #define MUC_NODE_TRAFFIC                "http://jabber.org/protocol/muc#traffic"
 
-#define MUC_HIDDEN                      "muc_hidden"
-#define MUC_MEMBERSONLY                 "muc_membersonly"
-#define MUC_MODERATED                   "muc_moderated"
-#define MUC_NONANONYMOUS                "muc_nonanonymous"
-#define MUC_OPEN                        "muc_open"
-#define MUC_PASSWORD                    "muc_password"
-#define MUC_PASSWORDPROTECTED           "muc_passwordprotected"
-#define MUC_PERSISTENT                  "muc_persistent"
-#define MUC_PUBLIC                      "muc_public"
-#define MUC_ROOMS                       "muc_rooms"
-#define MUC_SEMIANONYMOUS               "muc_semianonymous"
-#define MUC_TEMPORARY                   "muc_temporary"
-#define MUC_UNMODERATED                 "muc_unmoderated"
-#define MUC_UNSECURED                   "muc_unsecured"
+#define MUC_FEATURE_PUBLIC              "muc_public"
+#define MUC_FEATURE_HIDDEN              "muc_hidden"
+#define MUC_FEATURE_OPEN                "muc_open"
+#define MUC_FEATURE_MEMBERSONLY         "muc_membersonly"
+#define MUC_FEATURE_UNMODERATED         "muc_unmoderated"
+#define MUC_FEATURE_MODERATED           "muc_moderated"
+#define MUC_FEATURE_NONANONYMOUS        "muc_nonanonymous"
+#define MUC_FEATURE_SEMIANONYMOUS       "muc_semianonymous"
+#define MUC_FEATURE_UNSECURED           "muc_unsecured"
+#define MUC_FEATURE_PASSWORD            "muc_password"
+#define MUC_FEATURE_PASSWORDPROTECTED   "muc_passwordprotected"
+#define MUC_FEATURE_TEMPORARY           "muc_temporary"
+#define MUC_FEATURE_PERSISTENT          "muc_persistent"
+#define MUC_FEATURE_ROOMS               "muc_rooms"
 
-struct IMultiUserListItem 
+struct IMultiUserListItem
 {
-	QString jid;
-	QString role;
+	Jid realJid;
+	QString reason;
 	QString affiliation;
-	QString notes;
 };
 
 struct IMultiUserChatHistory
@@ -90,99 +88,174 @@ struct IMultiUserChatHistory
 	QDateTime since;
 };
 
-class IMultiUser
+struct IMultiUserViewNotify
 {
-public:
-	virtual QObject *instance() = 0;
-	virtual Jid roomJid() const =0;
-	virtual Jid contactJid() const =0;
-	virtual QString nickName() const =0;
-	virtual QString role() const =0;
-	virtual QString affiliation() const =0;
-	virtual QVariant data(int ARole) const =0;
-	virtual void setData(int ARole, const QVariant &AValue) =0;
-protected:
-	virtual void dataChanged(int ARole, const QVariant &ABefore, const QVariant &AAfter) =0;
+	enum Flags {
+		Blink          = 0x01,
+		HookClicks     = 0x02,
+	};
+	IMultiUserViewNotify() {
+		order = -1;
+		flags = 0;
+	}
+	int order;
+	int flags;
+	QIcon icon;
+	QString footer;
 };
 
-class IMultiUserChat
+
+class IMultiUser
 {
 public:
 	virtual QObject *instance() = 0;
 	virtual Jid streamJid() const =0;
 	virtual Jid roomJid() const =0;
+	virtual Jid userJid() const =0;
+	virtual Jid realJid() const =0;
+	virtual QString nick() const =0;
+	virtual QString role() const =0;
+	virtual QString affiliation() const =0;
+	virtual IPresenceItem presence() const =0;
+protected:
+	virtual void changed(int AData, const QVariant &ABefore) =0;
+};
+
+class IMultiUserChat
+{
+public:
+	enum ChatState {
+		Closed,
+		Opening,
+		Opened,
+		Closing
+	};
+public:
+	virtual QObject *instance() = 0;
+	virtual Jid streamJid() const =0;
+	virtual Jid roomJid() const =0;
 	virtual QString roomName() const =0;
+	virtual QString roomTitle() const =0;
+	virtual int state() const =0;
 	virtual bool isOpen() const =0;
-	virtual bool isConnected() const =0;
+	virtual bool isIsolated() const =0;
 	virtual bool autoPresence() const =0;
 	virtual void setAutoPresence(bool AAuto) =0;
 	virtual QList<int> statusCodes() const =0;
-	virtual bool isUserPresent(const Jid &AContactJid) const =0;
+	virtual QList<int> statusCodes(const Stanza &AStanza) const =0;
+	virtual XmppError roomError() const =0;
+	virtual IPresenceItem roomPresence() const =0;
 	virtual IMultiUser *mainUser() const =0;
 	virtual QList<IMultiUser *> allUsers() const =0;
-	virtual IMultiUser *userByNick(const QString &ANick) const =0;
-	//Occupant
-	virtual QString nickName() const =0;
-	virtual bool setNickName(const QString &ANick) =0;
+	virtual IMultiUser *findUser(const QString &ANick) const =0;
+	virtual IMultiUser *findUserByRealJid(const Jid &ARealJid) const =0;
+	virtual bool isUserPresent(const Jid &AContactJid) const =0;
+	virtual void abortConnection(const QString &AStatus, bool AError=true) =0;
+	// Occupant
+	virtual QString nickname() const =0;
+	virtual bool setNickname(const QString &ANick) =0;
 	virtual QString password() const =0;
 	virtual void setPassword(const QString &APassword) =0;
-	virtual IMultiUserChatHistory history() const =0;
-	virtual void setHistory(const IMultiUserChatHistory &AHistory) =0;
-	virtual int show() const =0;
-	virtual QString status() const =0;
-	virtual XmppError roomError() const =0;
+	virtual IMultiUserChatHistory historyScope() const =0;
+	virtual void setHistoryScope(const IMultiUserChatHistory &AHistory) =0;
 	virtual bool sendStreamPresence() =0;
-	virtual bool sendPresence(int AShow, const QString &AStatus) =0;
-	virtual bool sendMessage(const Message &AMessage, const QString &AToNick = QString::null) =0;
-	virtual bool requestVoice() =0;
-	virtual bool inviteContact(const Jid &AContactJid, const QString &AReason) =0;
-	//Moderator
+	virtual bool sendPresence(int AShow, const QString &AStatus, int APriority) =0;
+	virtual bool sendMessage(const Message &AMessage, const QString &AToNick=QString::null) =0;
+	virtual bool sendInvitation(const QList<Jid> &AContacts, const QString &AReason=QString::null, const QString &AThread=QString::null) =0;
+	virtual bool sendDirectInvitation(const QList<Jid> &AContacts, const QString &AReason=QString::null, const QString &AThread=QString::null) =0;
+	virtual bool sendVoiceRequest() =0;
+	// Moderator
 	virtual QString subject() const =0;
 	virtual bool sendSubject(const QString &ASubject) =0;
-	virtual bool sendDataFormMessage(const IDataForm &AForm) =0;
-	//Administrator
-	virtual bool setRole(const QString &ANick, const QString &ARole, const QString &AReason = QString::null) =0;
-	virtual bool setAffiliation(const QString &ANick, const QString &AAffiliation, const QString &AReason = QString::null) =0;
-	virtual bool requestAffiliationList(const QString &AAffiliation) =0;
-	virtual bool changeAffiliationList(const QList<IMultiUserListItem> &ADeltaList) =0;
-	//Owner
-	virtual bool requestConfigForm() =0;
-	virtual bool sendConfigForm(const IDataForm &AForm) =0;
-	virtual bool destroyRoom(const QString &AReason) =0;
+	virtual bool sendVoiceApproval(const Message &AMessage) =0;
+	// Administrator
+	virtual QString loadAffiliationList(const QString &AAffiliation) =0;
+	virtual QString updateAffiliationList(const QList<IMultiUserListItem> &AItems) =0;
+	virtual QString setUserRole(const QString &ANick, const QString &ARole, const QString &AReason=QString::null) =0;
+	virtual QString setUserAffiliation(const QString &ANick, const QString &AAffiliation, const QString &AReason=QString::null) =0;
+	// Owner
+	virtual QString loadRoomConfig() =0;
+	virtual QString updateRoomConfig(const IDataForm &AForm) =0;
+	virtual QString destroyRoom(const QString &AReason) =0;
 protected:
-	virtual void chatAboutToConnect() =0;
-	virtual void chatOpened() =0;
-	virtual void chatNotify(const QString &ANotify) =0;
-	virtual void chatError(const QString &AMessage) =0;
-	virtual void chatAboutToDisconnect() =0;
-	virtual void chatClosed() =0;
+	virtual void stateChanged(int AState) =0;
 	virtual void chatDestroyed() =0;
-	virtual void roomNameChanged(const QString &AName) =0;
+	// Common
+	virtual void roomTitleChanged(const QString &ATitle) =0;
 	virtual void streamJidChanged(const Jid &ABefore, const Jid &AAfter) =0;
-	//Occupant
-	virtual void userPresence(IMultiUser *AUser, int AShow, const QString &AStatus) =0;
-	virtual void userDataChanged(IMultiUser *AUser, int ARole, const QVariant &ABefore, const QVariant &AAfter) =0;
-	virtual void userNickChanged(IMultiUser *AUser, const QString &AOldNick, const QString &ANewNick) =0;
-	virtual void presenceChanged(int AShow, const QString &AStatus) =0;
-	virtual void serviceMessageReceived(const Message &AMessage) =0;
+	virtual void requestFailed(const QString &AId, const XmppError &AError) =0;
+	// Occupant
 	virtual void messageSent(const Message &AMessage) =0;
-	virtual void messageReceived(const QString &ANick, const Message &AMessage) =0;
-	virtual void inviteDeclined(const Jid &AContactJid, const QString &AReason) =0;
-	//Moderator
+	virtual void messageReceived(const Message &AMessage) =0;
+	virtual void passwordChanged(const QString &APassword) =0;
+	virtual void presenceChanged(const IPresenceItem &APresence) =0;
+	virtual void nicknameChanged(const QString &ANick, const XmppError &AError) =0;
+	virtual void invitationSent(const QList<Jid> &AContacts, const QString &AReason, const QString &AThread) =0;
+	virtual void invitationDeclined(const Jid &AContactJid, const QString &AReason) =0;
+	virtual void invitationFailed(const QList<Jid> &AContacts, const XmppError &AError) =0;
+	virtual void userChanged(IMultiUser *AUser, int AData, const QVariant &ABefore) =0;
+	// Moderator
+	virtual void voiceRequestReceived(const Message &AMessage) =0;
 	virtual void subjectChanged(const QString &ANick, const QString &ASubject) =0;
 	virtual void userKicked(const QString &ANick, const QString &AReason, const QString &AByUser) =0;
-	virtual void dataFormMessageReceived(const Message &AMessage) =0;
-	virtual void dataFormMessageSent(const IDataForm &AForm) =0;
-	//Administrator
 	virtual void userBanned(const QString &ANick, const QString &AReason, const QString &AByUser) =0;
-	virtual void affiliationListReceived(const QString &AAffiliation, const QList<IMultiUserListItem> &AList) =0;
-	virtual void affiliationListChanged(const QList<IMultiUserListItem> &ADeltaList) =0;
-	//Owner
-	virtual void configFormReceived(const IDataForm &AForm) =0;
-	virtual void configFormSent(const IDataForm &AForm) =0;
-	virtual void configFormAccepted() =0;
-	virtual void configFormRejected(const XmppError &AError) =0;
-	virtual void roomDestroyed(const QString &AReason) =0;
+	// Administrator
+	virtual void userRoleUpdated(const QString &AId, const QString &ANick) =0;
+	virtual void userAffiliationUpdated(const QString &AId, const QString &ANick) =0;
+	virtual void affiliationListLoaded(const QString &AId, const QList<IMultiUserListItem> &AItems) =0;
+	virtual void affiliationListUpdated(const QString &AId, const QList<IMultiUserListItem> &AItems) =0;
+	// Owner
+	virtual void roomConfigLoaded(const QString &AId, const IDataForm &AForm) =0;
+	virtual void roomConfigUpdated(const QString &AId, const IDataForm &AForm) =0;
+	virtual void roomDestroyed(const QString &AId, const QString &AReason) =0;
+};
+
+class IMultiUserView
+{
+public:
+	enum ViewMode {
+		ViewFull,
+		ViewSimple,
+		ViewCompact
+	};
+public:
+	virtual QTreeView *instance() =0;
+	virtual int viewMode() const =0;
+	virtual void setViewMode(int AMode) =0;
+	// Items
+	virtual AdvancedItemModel *model() const =0;
+	virtual AdvancedItemDelegate *itemDelegate() const =0;
+	virtual IMultiUser *findItemUser(const QStandardItem *AItem) const =0;
+	virtual QStandardItem *findUserItem(const IMultiUser *AUser) const =0;
+	virtual QModelIndex indexFromItem(const QStandardItem *AItem) const =0;
+	virtual QStandardItem *itemFromIndex(const QModelIndex &AIndex) const =0;
+	// Labels
+	virtual AdvancedDelegateItem generalLabel(quint32 ALabelId) const =0;
+	virtual void insertGeneralLabel(const AdvancedDelegateItem &ALabel) =0;
+	virtual void removeGeneralLabel(quint32 ALabelId) =0;
+	virtual void insertItemLabel(const AdvancedDelegateItem &ALabel, QStandardItem *AItem) =0;
+	virtual void removeItemLabel(quint32 ALabelId, QStandardItem *AItem = NULL) =0;
+	virtual QRect labelRect(quint32 ALabeld, const QModelIndex &AIndex) const =0;
+	virtual quint32 labelAt(const QPoint &APoint, const QModelIndex &AIndex) const =0;
+	// Notify
+	virtual QStandardItem *notifyItem(int ANotifyId) const =0;
+	virtual QList<int> itemNotifies(QStandardItem *AItem) const =0;
+	virtual IMultiUserViewNotify itemNotify(int ANotifyId) const =0;
+	virtual int insertItemNotify(const IMultiUserViewNotify &ANotify, QStandardItem *AItem) =0;
+	virtual void activateItemNotify(int ANotifyId) =0;
+	virtual void removeItemNotify(int ANotifyId) =0;
+	// Context
+	virtual void contextMenuForItem(QStandardItem *AItem, Menu *AMenu) =0;
+	virtual void toolTipsForItem(QStandardItem *AItem, QMap<int,QString> &AToolTips) =0;
+protected:
+	virtual void viewModeChanged(int AMode) =0;
+	// Notify
+	virtual void itemNotifyInserted(int ANotifyId) =0;
+	virtual void itemNotifyActivated(int ANotifyId) =0;
+	virtual void itemNotifyRemoved(int ANotfyId) =0;
+	// Context
+	virtual void itemContextMenu(QStandardItem *AItem, Menu *AMenu) =0;
+	virtual void itemToolTips(QStandardItem *AItem, QMap<int,QString> &AToolTips) =0;
 };
 
 class IMultiUserChatWindow :
@@ -191,13 +264,19 @@ class IMultiUserChatWindow :
 public:
 	virtual QMainWindow *instance() =0;
 	virtual IMultiUserChat *multiUserChat() const =0;
-	virtual IMessageChatWindow *openChatWindow(const Jid &AContactJid) =0;
-	virtual IMessageChatWindow *findChatWindow(const Jid &AContactJid) const =0;
+	virtual IMultiUserView *multiUserView() const =0;
+	virtual SplitterWidget *viewWidgetsBox() const =0;
+	virtual SplitterWidget *usersWidgetsBox() const =0;
+	virtual SplitterWidget *centralWidgetsBox() const =0;
+	virtual IMessageChatWindow *openPrivateChatWindow(const Jid &AContactJid) =0;
+	virtual IMessageChatWindow *findPrivateChatWindow(const Jid &AContactJid) const =0;
+	virtual Menu *roomToolsMenu() const =0;
 	virtual void contextMenuForRoom(Menu *AMenu) =0;
 	virtual void contextMenuForUser(IMultiUser *AUser, Menu *AMenu) =0;
 	virtual void toolTipsForUser(IMultiUser *AUser, QMap<int,QString> &AToolTips) =0;
-	virtual void exitAndDestroy(const QString &AStatus, int AWaitClose = 15000) =0;
+	virtual void exitAndDestroy(const QString &AStatus, int AWaitClose = 5000) =0;
 protected:
+	virtual void roomToolsMenuAboutToShow() =0;
 	virtual void multiChatContextMenu(Menu *AMenu) =0;
 	virtual void multiUserContextMenu(IMultiUser *AUser, Menu *AMenu) =0;
 	virtual void multiUserToolTips(IMultiUser *AUser, QMap<int,QString> &AToolTips) =0;
@@ -209,17 +288,21 @@ class IMultiUserChatManager
 {
 public:
 	virtual QObject *instance() = 0;
-	virtual bool requestRoomNick(const Jid &AStreamJid, const Jid &ARoomJid) =0;
+	virtual bool isReady(const Jid &AStreamJid) const =0;
 	virtual QList<IMultiUserChat *> multiUserChats() const =0;
 	virtual IMultiUserChat *findMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid) const =0;
-	virtual IMultiUserChat *getMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword) =0;
+	virtual IMultiUserChat *getMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword, bool AIsolated) =0;
 	virtual QList<IMultiUserChatWindow *> multiChatWindows() const =0;
 	virtual IMultiUserChatWindow *findMultiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid) const =0;
 	virtual IMultiUserChatWindow *getMultiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword) =0;
 	virtual QList<IRosterIndex *> multiChatRosterIndexes() const =0;
 	virtual IRosterIndex *findMultiChatRosterIndex(const Jid &AStreamJid, const Jid &ARoomJid) const =0;
 	virtual IRosterIndex *getMultiChatRosterIndex(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword) =0;
-	virtual void showJoinMultiChatDialog(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword) =0;
+	virtual QDialog *showMultiChatWizard(QWidget *AParent = NULL) =0;
+	virtual QDialog *showJoinMultiChatWizard(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword, QWidget *AParent = NULL) =0;
+	virtual QDialog *showCreateMultiChatWizard(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword, QWidget *AParent = NULL) =0;
+	virtual QDialog *showManualMultiChatWizard(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword, QWidget *AParent = NULL) =0;
+	virtual QString requestRegisteredNick(const Jid &AStreamJid, const Jid &ARoomJid) =0;
 protected:
 	virtual void multiUserChatCreated(IMultiUserChat *AMultiChat) =0;
 	virtual void multiUserChatDestroyed(IMultiUserChat *AMultiChat) =0;
@@ -230,12 +313,13 @@ protected:
 	virtual void multiChatContextMenu(IMultiUserChatWindow *AWindow, Menu *AMenu) =0;
 	virtual void multiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu) =0;
 	virtual void multiUserToolTips(IMultiUserChatWindow *AWindow, IMultiUser *AUser, QMap<int,QString> &AToolTips) =0;
-	virtual void roomNickReceived(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick) =0;
+	virtual void registeredNickReceived(const QString &AId, const QString &ANick) =0;
 };
 
-Q_DECLARE_INTERFACE(IMultiUser,"Vacuum.Plugin.IMultiUser/1.0")
-Q_DECLARE_INTERFACE(IMultiUserChat,"Vacuum.Plugin.IMultiUserChat/1.6")
-Q_DECLARE_INTERFACE(IMultiUserChatWindow,"Vacuum.Plugin.IMultiUserChatWindow/1.3")
-Q_DECLARE_INTERFACE(IMultiUserChatManager,"Vacuum.Plugin.IMultiUserChatManager/1.8")
+Q_DECLARE_INTERFACE(IMultiUser,"Vacuum.Plugin.IMultiUser/1.1")
+Q_DECLARE_INTERFACE(IMultiUserChat,"Vacuum.Plugin.IMultiUserChat/1.7")
+Q_DECLARE_INTERFACE(IMultiUserView,"Vacuum.Plugin.IMultiUserView/1.0")
+Q_DECLARE_INTERFACE(IMultiUserChatWindow,"Vacuum.Plugin.IMultiUserChatWindow/1.4")
+Q_DECLARE_INTERFACE(IMultiUserChatManager,"Vacuum.Plugin.IMultiUserChatManager/1.9")
 
 #endif //IMULTIUSERCHAT_H

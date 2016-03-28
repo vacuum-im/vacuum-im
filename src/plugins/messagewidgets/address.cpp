@@ -87,7 +87,7 @@ void Address::appendAddress(const Jid &AStreamJid, const Jid &AContactJid)
 {
 	if (!FAddresses.value(AStreamJid).contains(AContactJid.bare(),AContactJid))
 	{
-		if (!AContactJid.resource().isEmpty() || !FAddresses.value(AStreamJid).contains(AContactJid))
+		if (AContactJid.hasResource() || !FAddresses.value(AStreamJid).contains(AContactJid))
 		{
 			FAddresses[AStreamJid].insertMulti(AContactJid.bare(),AContactJid);
 			updateAutoAddresses(false);
@@ -106,7 +106,7 @@ void Address::removeAddress(const Jid &AStreamJid, const Jid &AContactJid)
 			emit availAddressesChanged();
 		}
 	}
-	else if (AContactJid.resource().isEmpty())
+	else if (!AContactJid.hasResource())
 	{
 		if (FAddresses.value(AStreamJid).contains(AContactJid))
 		{
@@ -203,7 +203,7 @@ void Address::onPresenceItemReceived(IPresence *APresence, const IPresenceItem &
 			Jid bareJid = AItem.itemJid.bare();
 			if (AItem.show==IPresence::Offline || AItem.show==IPresence::Error)
 			{
-				if (!AItem.itemJid.resource().isEmpty() && contacts.contains(AItem.itemJid))
+				if (AItem.itemJid.hasResource() && contacts.contains(AItem.itemJid))
 				{
 					if (contacts.count() == 1)
 						FAddresses[APresence->streamJid()].insertMulti(bareJid,bareJid);

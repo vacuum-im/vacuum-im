@@ -23,7 +23,7 @@
     </message>
     <message>
         <source>When reminding of upcoming birthdays</source>
-        <translation type="unfinished"/>
+        <translation>Al recordar próximos cumpleaños</translation>
     </message>
     <message numerus="yes">
         <source>Birthday in %n day(s),

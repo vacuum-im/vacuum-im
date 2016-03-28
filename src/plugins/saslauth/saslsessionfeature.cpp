@@ -21,7 +21,7 @@ bool SASLSessionFeature::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza,
 {
 	if (AXmppStream==FXmppStream && AOrder==XSHO_XMPP_FEATURE && AStanza.id()=="session")
 	{
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			LOG_STRM_INFO(FXmppStream->streamJid(),"Session started");
 			deleteLater();
@@ -58,8 +58,8 @@ bool SASLSessionFeature::start(const QDomElement &AElem)
 {
 	if (AElem.tagName() == "session")
 	{
-		Stanza session("iq");
-		session.setType("set").setId("session");
+		Stanza session(STANZA_KIND_IQ);
+		session.setType(STANZA_TYPE_SET).setId("session");
 		session.addElement("session",NS_FEATURE_SESSION);
 		FXmppStream->insertXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 		FXmppStream->sendStanza(session);

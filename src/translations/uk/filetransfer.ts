@@ -14,56 +14,12 @@
         <translation>Передача файлу завершена</translation>
     </message>
     <message>
-        <source>Requested file transfer: %1</source>
-        <translation>Запит на передачу файлу: %1</translation>
-    </message>
-    <message>
-        <source>You received a request to transfer the file</source>
-        <translation>Ви отримали запит на передачу файлу</translation>
-    </message>
-    <message>
-        <source>Completed transferring file: %1</source>
-        <translation>Передачу файлу: %1 завершено</translation>
-    </message>
-    <message>
-        <source>Canceled transferring file: %1</source>
-        <translation>Передачу файлу: %1 відмінено</translation>
-    </message>
-    <message>
-        <source>File transfer canceled: %1</source>
-        <translation>Передача файлу відмінена: %1</translation>
-    </message>
-    <message>
-        <source>Auto sending file: %1</source>
-        <translation>Автоматичне надсилання файлу: %1</translation>
-    </message>
-    <message>
-        <source>File sending is started automatically</source>
-        <translation>Надсилання файлу запущено автоматично</translation>
-    </message>
-    <message>
-        <source>Auto receiving file: %1</source>
-        <translation>Автоматичне отримання файлу: %1</translation>
-    </message>
-    <message>
-        <source>File receiving is started automatically</source>
-        <translation>Отримання файлу запущено автоматично</translation>
-    </message>
-    <message>
         <source>Allows to send a file to another contact</source>
         <translation>Дозволяє передати файл іншому контакту</translation>
     </message>
     <message>
         <source>Supports the sending of the file to another contact</source>
         <translation>Підтримує передачу файлу іншому контакту</translation>
-    </message>
-    <message>
-        <source>File &apos;%1&apos; successfully sent.</source>
-        <translation>Файл &apos;%1&apos; успішно надісланий.</translation>
-    </message>
-    <message>
-        <source>File &apos;%1&apos; successfully received.</source>
-        <translation>Файл &apos;%1&apos; успішно отриманий.</translation>
     </message>
     <message>
         <source>Failed to start file transfer</source>
@@ -92,6 +48,66 @@
     </message>
     <message>
         <source>Hide file transfer dialog after transfer started</source>
+        <translation type="unfinished"/>
+    </message>
+    <message numerus="yes">
+        <source>/me share %n file(s): %1</source>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+    </message>
+    <message>
+        <source>Select Files</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Failed to send request for file &apos;%1&apos;</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>File transfer</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>File transfer request from %1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>%1 wants to send you a file &apos;%2&apos;</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Sending file &apos;%1&apos; to %2 started automatically</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Receiving file &apos;%1&apos; from %2 started automatically</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>File &apos;%1&apos; successfully sent to %2</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>File &apos;%1&apos; successfully received from %2</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>File transfer failed</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Failed to send file &apos;%1&apos; to %2: %3</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Failed to receive file &apos;%1&apos; from %2: %3</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Select File</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>File request rejected: %1</source>
         <translation type="unfinished"/>
     </message>
 </context>

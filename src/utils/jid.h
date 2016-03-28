@@ -29,18 +29,21 @@ class UTILS_EXPORT Jid
 {
 public:
 	Jid(const char *AJidStr);
-	Jid(const QString &AJidStr = QString::null);
-	Jid(const QString &ANode, const QString &ADomane, const QString &AResource);
+	Jid(const QString &AJidStr=QString::null);
+	Jid(const QString &ANode, const QString &ADomain, const QString &AResource);
 	~Jid();
 	bool isValid() const;
 	bool isEmpty() const;
+	bool hasNode() const;
 	QString node() const;
 	QString pNode() const;
 	QString uNode() const;
 	void setNode(const QString &ANode);
+	bool hasDomain() const;
 	QString domain() const;
 	QString pDomain() const;
 	void setDomain(const QString &ADomain);
+	bool hasResource() const;
 	QString resource() const;
 	QString pResource() const;
 	void setResource(const QString &AResource);
@@ -50,13 +53,12 @@ public:
 	QString full() const;
 	QString pFull() const;
 	QString uFull() const;
+	bool isBareEqual(const Jid &AJid) const;
 	Jid& operator =(const QString &AJidStr);
 	bool operator ==(const Jid &AJid) const;
 	bool operator ==(const QString &AJidStr) const;
 	bool operator !=(const Jid &AJid) const;
 	bool operator !=(const QString &AJidStr) const;
-	bool operator &&(const Jid &AJid) const;
-	bool operator &&(const QString &AJidStr) const;
 	bool operator <(const Jid &AJid) const;
 	bool operator >(const Jid &AJid) const;
 public:

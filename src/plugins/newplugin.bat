@@ -1,5 +1,6 @@
 mkdir %1
 echo SUBDIRS += %1 >> plugins.pro
+echo add_subdirectory(%1)  >> plugin_list.cmake
 cd %1
 
 echo TARGET = %1 >> %1.pro
@@ -13,3 +14,5 @@ lupdate %1.pro
 
 cd ..
 make_vcproj.bat %1
+
+pause

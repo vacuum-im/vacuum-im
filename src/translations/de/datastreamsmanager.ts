@@ -14,10 +14,6 @@
         <translation>Das Profil wurde nicht verstanden oder ist ungültig</translation>
     </message>
     <message>
-        <source>Invalid profile settings</source>
-        <translation>Ungültige Profileinstellungen</translation>
-    </message>
-    <message>
         <source>Data Streams Initiation</source>
         <translation>Datenstrom Initiation</translation>
     </message>
@@ -47,6 +43,10 @@
     </message>
     <message>
         <source>Transfer method %1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Unsupported stream initiation request</source>
         <translation type="unfinished"/>
     </message>
 </context>

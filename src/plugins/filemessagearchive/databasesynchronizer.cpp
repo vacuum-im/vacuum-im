@@ -180,7 +180,7 @@ void DatabaseSynchronizer::run()
 
 				if (!syncFailed && !newHeaders.isEmpty())
 				{
-					QString gateType = !with.node().isEmpty() ? FFileArchive->contactGateType(with) : QString::null;
+					QString gateType = with.hasNode() ? FFileArchive->contactGateType(with) : QString::null;
 					DatabaseTaskInsertHeaders *insertTask = new DatabaseTaskInsertHeaders(streamJid,newHeaders,gateType);
 					if (!FDatabaseWorker->execTask(insertTask))
 					{

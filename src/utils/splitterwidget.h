@@ -62,6 +62,7 @@ protected slots:
 	void onBoxWidgetInserted(int AOrderId, QWidget *AWidget);
 	void onBoxWidgetRemoved(QWidget *AWidget);
 private:
+	QSize FLastSize;
 	bool FMovingWidgets;
 	QSplitter *FSplitter;
 	QMap<int, int> FHandleSizes;

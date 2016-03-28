@@ -16,10 +16,6 @@
         <translation>Профиль не распознан или повреждён</translation>
     </message>
     <message>
-        <source>Invalid profile settings</source>
-        <translation>Неверные параметры профиля</translation>
-    </message>
-    <message>
         <source>Data Streams Initiation</source>
         <translation>Инициализация потоков данных</translation>
     </message>
@@ -50,6 +46,10 @@
     <message>
         <source>Transfer method %1</source>
         <translation>Метод передачи %1</translation>
+    </message>
+    <message>
+        <source>Unsupported stream initiation request</source>
+        <translation>Не поддерживаемый запрос инициализации потока</translation>
     </message>
 </context>
 </TS>

@@ -6,6 +6,7 @@
 #include <QTreeView>
 #include <QTextBrowser>
 #include <QTextDocument>
+#include <QAbstractProxyModel>
 #include <interfaces/imainwindow.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagestylemanager.h>
@@ -20,6 +21,8 @@
 #include <utils/advanceditemmodel.h>
 
 #define MESSAGEWIDGETS_UUID "{89de35ee-bd44-49fc-8495-edd2cfebb685}"
+
+class IMessageWindow;
 
 class IMessageAddress
 {
@@ -40,7 +43,6 @@ protected:
 	virtual void streamJidChanged(const Jid &ABefore, const Jid &AAfter) =0;
 };
 
-class IMessageWindow;
 class IMessageWidget
 {
 public:
@@ -55,7 +57,7 @@ class IMessageInfoWidget :
 public:
 	enum Field {
 		Avatar,
-		Name,
+		Caption,
 		StatusIcon,
 		StatusText,
 		UserField = 16
@@ -65,10 +67,13 @@ public:
 	virtual Menu *addressMenu() const =0;
 	virtual bool isAddressMenuVisible() const =0;
 	virtual void setAddressMenuVisible(bool AVisible) =0;
+	virtual bool isCaptionClickable() const =0;
+	virtual void setCaptionClickable(bool AEnabled) =0;
 	virtual QVariant fieldValue(int AField) const =0;
 	virtual void setFieldValue(int AField, const QVariant &AValue) =0;
 	virtual ToolBarChanger *infoToolBarChanger() const =0;
 protected:
+	virtual void captionFieldClicked() =0;
 	virtual void fieldValueChanged(int AField) =0;
 	virtual void addressMenuVisibleChanged(bool AVisible) =0;
 	virtual void addressMenuRequested(Menu *AMenu) =0;
@@ -85,9 +90,9 @@ public:
 	virtual QWidget *styleWidget() const =0;
 	virtual IMessageStyle *messageStyle() const =0;
 	virtual void setMessageStyle(IMessageStyle *AStyle, const IMessageStyleOptions &AOptions) =0;
-	virtual void appendHtml(const QString &AHtml, const IMessageStyleContentOptions &AOptions) =0;
-	virtual void appendText(const QString &AText, const IMessageStyleContentOptions &AOptions) =0;
-	virtual void appendMessage(const Message &AMessage, const IMessageStyleContentOptions &AOptions) =0;
+	virtual bool appendHtml(const QString &AHtml, const IMessageStyleContentOptions &AOptions) =0;
+	virtual bool appendText(const QString &AText, const IMessageStyleContentOptions &AOptions) =0;
+	virtual bool appendMessage(const Message &AMessage, const IMessageStyleContentOptions &AOptions) =0;
 	virtual void contextMenuForView(const QPoint &APosition, Menu *AMenu) =0;
 	virtual QTextDocumentFragment selection() const =0;
 	virtual QTextCharFormat textFormatAt(const QPoint &APosition) const =0;
@@ -145,9 +150,14 @@ public:
 	virtual QList<Jid> availStreams() const =0;
 	virtual QTreeView *receiversView() const =0;
 	virtual AdvancedItemModel *receiversModel() const =0;
+	virtual QList<QAbstractProxyModel *> proxyModels() const =0;
+	virtual void insertProxyModel(QAbstractProxyModel *AProxy) =0;
+	virtual void removeProxyModel(QAbstractProxyModel *AProxy) =0;
 	virtual QModelIndex mapModelToView(QStandardItem *AItem) =0;
 	virtual QStandardItem *mapViewToModel(const QModelIndex &AIndex) =0;
 	virtual void contextMenuForItems(QList<QStandardItem *> AItems, Menu *AMenu) =0;
+	virtual bool isOfflineContactsVisible() const =0;
+	virtual void setOfflineContactsVisible(bool AVisible) =0;
 	virtual QMultiMap<Jid, Jid> selectedAddresses() const =0;
 	virtual void setGroupSelection(const Jid &AStreamJid, const QString &AGroup, bool ASelected) =0;
 	virtual void setAddressSelection(const Jid &AStreamJid, const Jid &AContactJid, bool ASelected) =0;
@@ -155,6 +165,8 @@ public:
 protected:
 	virtual void availStreamsChanged() =0;
 	virtual void addressSelectionChanged() =0;
+	virtual void proxyModelsAboutToBeChanged() =0;
+	virtual void proxyModelsChanged(bool AViewModelChanged) =0;
 	virtual void contextMenuForItemsRequested(QList<QStandardItem *> AItems, Menu *AMenu) =0;
 };
 
@@ -288,6 +300,7 @@ public:
 	virtual IMessageToolBarWidget *toolBarWidget() const =0;
 	virtual IMessageStatusBarWidget *statusBarWidget() const =0;
 	virtual IMessageReceiversWidget *receiversWidget() const =0;
+	virtual SplitterWidget *messageWidgetsBox() const =0;
 protected:
 	virtual void widgetLayoutChanged() =0;
 };
@@ -308,7 +321,6 @@ public:
 	virtual void setSubject(const QString &ASubject) =0;
 	virtual QString threadId() const =0;
 	virtual void setThreadId(const QString &AThreadId) =0;
-	virtual SplitterWidget *messageWidgetsBox() const =0;
 	virtual void updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip) =0;
 protected:
 	virtual void modeChanged(int AMode) =0;
@@ -319,14 +331,13 @@ class IMessageChatWindow :
 {
 public:
 	virtual QMainWindow *instance() =0;
-	virtual SplitterWidget *messageWidgetsBox() const =0;
 	virtual void updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip) =0;
 };
 
 class IMessageViewDropHandler
 {
 public:
-	virtual bool messagaeViewDragEnter(IMessageViewWidget *AWidget, const QDragEnterEvent *AEvent) =0;
+	virtual bool messageViewDragEnter(IMessageViewWidget *AWidget, const QDragEnterEvent *AEvent) =0;
 	virtual bool messageViewDragMove(IMessageViewWidget *AWidget, const QDragMoveEvent *AEvent) =0;
 	virtual void messageViewDragLeave(IMessageViewWidget *AWidget, const QDragLeaveEvent *AEvent) =0;
 	virtual bool messageViewDropAction(IMessageViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu) =0;
@@ -417,23 +428,23 @@ protected:
 
 Q_DECLARE_INTERFACE(IMessageAddress,"Vacuum.Plugin.IMessageAddress/1.0")
 Q_DECLARE_INTERFACE(IMessageWidget,"Vacuum.Plugin.IMessageWidget/1.0")
-Q_DECLARE_INTERFACE(IMessageInfoWidget,"Vacuum.Plugin.IMessageInfoWidget/1.2")
-Q_DECLARE_INTERFACE(IMessageViewWidget,"Vacuum.Plugin.IMessageViewWidget/1.5")
+Q_DECLARE_INTERFACE(IMessageInfoWidget,"Vacuum.Plugin.IMessageInfoWidget/1.3")
+Q_DECLARE_INTERFACE(IMessageViewWidget,"Vacuum.Plugin.IMessageViewWidget/1.6")
 Q_DECLARE_INTERFACE(IMessageEditWidget,"Vacuum.Plugin.IMessageEditWidget/1.4")
-Q_DECLARE_INTERFACE(IMessageReceiversWidget,"Vacuum.Plugin.IMessageReceiversWidget/1.3")
+Q_DECLARE_INTERFACE(IMessageReceiversWidget,"Vacuum.Plugin.IMessageReceiversWidget/1.4")
 Q_DECLARE_INTERFACE(IMessageMenuBarWidget,"Vacuum.Plugin.IMessageMenuBarWidget/1.1")
 Q_DECLARE_INTERFACE(IMessageToolBarWidget,"Vacuum.Plugin.IMessageToolBarWidget/1.1")
 Q_DECLARE_INTERFACE(IMessageStatusBarWidget,"Vacuum.Plugin.IMessageStatusBarWidget/1.1")
 Q_DECLARE_INTERFACE(IMessageTabPageNotifier,"Vacuum.Plugin.IMessageTabPageNotifier/1.1")
 Q_DECLARE_INTERFACE(IMessageTabPage,"Vacuum.Plugin.IMessageTabPage/1.4")
 Q_DECLARE_INTERFACE(IMessageTabWindow,"Vacuum.Plugin.IMessageTabWindow/1.5")
-Q_DECLARE_INTERFACE(IMessageWindow,"Vacuum.Plugin.IMessageWindow/1.3")
+Q_DECLARE_INTERFACE(IMessageWindow,"Vacuum.Plugin.IMessageWindow/1.4")
 Q_DECLARE_INTERFACE(IMessageNormalWindow,"Vacuum.Plugin.IMessageNormalWindow/1.6")
 Q_DECLARE_INTERFACE(IMessageChatWindow,"Vacuum.Plugin.IMessageChatWindow/1.6")
-Q_DECLARE_INTERFACE(IMessageViewDropHandler,"Vacuum.Plugin.IMessageViewDropHandler/1.2")
+Q_DECLARE_INTERFACE(IMessageViewDropHandler,"Vacuum.Plugin.IMessageViewDropHandler/1.3")
 Q_DECLARE_INTERFACE(IMessageViewUrlHandler,"Vacuum.Plugin.IMessageViewUrlHandler/1.2")
 Q_DECLARE_INTERFACE(IMessageEditSendHandler,"QIP.Plugin.IMessageEditSendHandler/1.0")
 Q_DECLARE_INTERFACE(IMessageEditContentsHandler,"Vacuum.Plugin.IMessageEditContentsHandler/1.3")
-Q_DECLARE_INTERFACE(IMessageWidgets,"Vacuum.Plugin.IMessageWidgets/1.12")
+Q_DECLARE_INTERFACE(IMessageWidgets,"Vacuum.Plugin.IMessageWidgets/1.13")
 
 #endif // IMESSAGEWIDGETS_H

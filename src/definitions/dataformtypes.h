@@ -2,27 +2,27 @@
 #define DEF_DATAFORMTYPES_H
 
 //CaptchaForms
-#define DATA_FORM_CAPTCHAFORMS                "urn:xmpp:captcha"
+#define DFT_CAPTCHAFORMS                "urn:xmpp:captcha"
 
 //ClientInfo
-#define DATA_FORM_SOFTWAREINFO                "urn:xmpp:dataforms:softwareinfo"
+#define DFT_SOFTWAREINFO                "urn:xmpp:dataforms:softwareinfo"
 
 //Registration
-#define DATA_FORM_REGISTER                    "jabber:iq:register"
+#define DFT_REGISTER                    "jabber:iq:register"
 
 //MultiUserChat
-#define DATA_FORM_MUC_REGISTER                "http://jabber.org/protocol/muc#register"
-#define DATA_FORM_MUC_ROOMCONFIG              "http://jabber.org/protocol/muc#roomconfig"
-#define DATA_FORM_MUC_REQUEST                 "http://jabber.org/protocol/muc#request"
-#define DATA_FORM_MUC_ROOM_INFO               "http://jabber.org/protocol/muc#roominfo"
+#define DFT_MUC_REQUEST                 "http://jabber.org/protocol/muc#request"
+#define DFT_MUC_REGISTER                "http://jabber.org/protocol/muc#register"
+#define DFT_MUC_ROOM_INFO               "http://jabber.org/protocol/muc#roominfo"
+#define DFT_MUC_ROOMCONFIG              "http://jabber.org/protocol/muc#roomconfig"
 
 //JabberSearch
-#define DATA_FORM_SEARCH                      "jabber:iq:search"
+#define DFT_JABBERSEARCH                "jabber:iq:search"
 
 //SessionNegotiation
-#define DATA_FORM_SESSION_NEGOTIATION         "urn:xmpp:ssn"
+#define DFT_SESSIONNEGOTIATION          "urn:xmpp:ssn"
 
 //RemoteControl
-#define DATA_FORM_REMOTECONTROL               "http://jabber.org/protocol/rc"
+#define DFT_REMOTECONTROL               "http://jabber.org/protocol/rc"
 
-#endif
+#endif // DEF_DATAFORMTYPES_H

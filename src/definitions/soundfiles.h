@@ -21,7 +21,6 @@
 //MultiUserChat
 #define SDF_MUC_MESSAGE                   "mucMessage"
 #define SDF_MUC_PRIVATE_MESSAGE           "mucPrivateMessage"
-#define SDF_MUC_DATA_MESSAGE              "mucDataMessage"
 #define SDF_MUC_INVITE_MESSAGE            "mucInviteMessage"
 
 //RosterChanger

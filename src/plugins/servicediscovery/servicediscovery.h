@@ -85,7 +85,7 @@ public:
 	virtual IDiscoInfo selfDiscoInfo(const Jid &AStreamJid, const QString &ANode = QString::null) const;
 	virtual void showDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent = NULL);
 	virtual void showDiscoItems(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent = NULL);
-	virtual bool checkDiscoFeature(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, const QString &AFeature, bool ADefault = true);
+	virtual bool checkDiscoFeature(const Jid &AStreamJid, const Jid &AContactJid, const QString &AFeature, const QString &ANode=QString::null, bool ADefault=false);
 	virtual QList<IDiscoInfo> findDiscoInfo(const Jid &AStreamJid, const IDiscoIdentity &AIdentity, const QStringList &AFeatures, const IDiscoItem &AParent) const;
 	virtual QIcon identityIcon(const QList<IDiscoIdentity> &AIdentity) const;
 	virtual QIcon serviceIcon(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANode) const;
@@ -151,8 +151,8 @@ protected slots:
 	void onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore);
 	void onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore);
 	void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
-	void onMultiUserPresence(IMultiUser *AUser, int AShow, const QString &AStatus);
 	void onMultiUserChatCreated(IMultiUserChat *AMultiChat);
+	void onMultiUserChanged(IMultiUser *AUser, int AData, const QVariant &ABefore);
 	void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
 	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onShowDiscoInfoByAction(bool);

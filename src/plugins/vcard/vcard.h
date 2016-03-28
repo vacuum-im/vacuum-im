@@ -42,11 +42,12 @@ protected:
 	QDomElement setTextToElem(QDomElement &AElem, const QString &AText) const;
 protected slots:
 	void onVCardReceived(const Jid &AContactJid);
-	void onVCardPublished(const Jid &AContactJid);
+	void onVCardPublished(const Jid &AStreamJid);
 	void onVCardError(const Jid &AContactJid, const XmppError &AError);
 private:
 	VCardManager *FVCardPlugin;
 private:
+	Jid FStreamJid;
 	Jid FContactJid;
 	QDomDocument FDoc;
 private:

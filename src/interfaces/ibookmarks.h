@@ -2,6 +2,7 @@
 #define IBOOKMARKS_H
 
 #include <QUrl>
+#include <QDialog>
 #include <QDomElement>
 #include <utils/jid.h>
 
@@ -10,43 +11,53 @@
 struct IBookmark
 {
 	enum Type {
-		None,
-		Url,
-		Conference
+		TypeNone,
+		TypeUrl,
+		TypeRoom
 	};
 
 	int type;
 	QString name;
 	struct {
-		Jid roomJid;
-		bool autojoin;
-		QString nick;
-		QString password;
-	} conference;
-	struct {
 		QUrl url;
 	} url;
+	struct {
+		Jid roomJid;
+		QString nick;
+		QString password;
+		bool autojoin;
+	} room;
 
 	IBookmark() {
-		type = None;
-		conference.autojoin = false;
+		type = TypeNone;
+		room.autojoin = false;
 	}
-	bool operator<(const IBookmark &AOther) const {
+	inline bool isNull() const {
+		return type==TypeNone;
+	}
+	inline bool isValid() const {
+		if (type == TypeUrl)
+			return url.url.isValid();
+		if (type == TypeRoom)
+			return room.roomJid.isValid();
+		return false;
+	}
+	inline bool operator<(const IBookmark &AOther) const {
 		if (type != AOther.type)
 			return type < AOther.type;
-		if (type == Url)
+		if (type == TypeUrl)
 			return url.url < AOther.url.url;
-		if (type == Conference)
-			return conference.roomJid < AOther.conference.roomJid;
+		if (type == TypeRoom)
+			return room.roomJid < AOther.room.roomJid;
 		return false;
 	};
-	bool operator==(const IBookmark &AOther) const {
+	inline bool operator==(const IBookmark &AOther) const {
 		if (type != AOther.type)
 			return false;
-		if (type == Url)
+		if (type == TypeUrl)
 			return url.url == AOther.url.url;
-		if (type == Conference)
-			return conference.roomJid == AOther.conference.roomJid;
+		if (type == TypeRoom)
+			return room.roomJid == AOther.room.roomJid;
 		return true;
 	}
 };
@@ -56,18 +67,17 @@ class IBookmarks
 public:
 	virtual QObject *instance() =0;
 	virtual bool isReady(const Jid &AStreamJid) const =0;
-	virtual bool isValidBookmark(const IBookmark &ABookmark) const =0;
 	virtual QList<IBookmark> bookmarks(const Jid &AStreamJid) const =0;
 	virtual bool addBookmark(const Jid &AStreamJid, const IBookmark &ABookmark) =0;
 	virtual bool setBookmarks(const Jid &AStreamJid, const QList<IBookmark> &ABookmarks) =0;
-	virtual int execEditBookmarkDialog(IBookmark *ABookmark, QWidget *AParent) const =0;
-	virtual void showEditBookmarksDialog(const Jid &AStreamJid) =0;
+	virtual QDialog *showEditBookmarkDialog(IBookmark *ABookmark, QWidget *AParent = NULL) =0;
+	virtual QDialog *showEditBookmarksDialog(const Jid &AStreamJid, QWidget *AParent = NULL) =0;
 protected:
 	virtual void bookmarksOpened(const Jid &AStreamJid) =0;
 	virtual void bookmarksClosed(const Jid &AStreamJid) =0;
 	virtual void bookmarksChanged(const Jid &AStreamJid) =0;
 };
 
-Q_DECLARE_INTERFACE(IBookmarks,"Vacuum.Plugin.IBookmarks/1.2")
+Q_DECLARE_INTERFACE(IBookmarks,"Vacuum.Plugin.IBookmarks/1.3")
 
 #endif // IBOOKMARKS_H

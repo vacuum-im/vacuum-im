@@ -8,6 +8,16 @@
 
 #define PRESENCE_UUID "{511A07C4-FFA4-43ce-93B0-8C50409AFC0E}"
 
+#define PRESENCE_TYPE_AVAILABLE     ""
+#define PRESENCE_TYPE_INVISIBLE     "invisible"
+#define PRESENCE_TYPE_UNAVAILABLE   "unavailable"
+
+#define PRESENCE_SHOW_ONLINE        ""
+#define PRESENCE_SHOW_CHAT          "chat"
+#define PRESENCE_SHOW_AWAY          "away"
+#define PRESENCE_SHOW_DND           "dnd"
+#define PRESENCE_SHOW_XA            "xa"
+
 struct IPresenceItem 
 {
 	Jid itemJid;
@@ -16,7 +26,7 @@ struct IPresenceItem
 	QString status;
 	QDateTime sentTime;
 
-	IPresenceItem() { 
+	IPresenceItem() {
 		show = 0;
 		priority = 0;
 	}

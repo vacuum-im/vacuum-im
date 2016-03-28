@@ -90,6 +90,7 @@ QList<IRosterIndex *> RootIndex::findChilds(const QMultiMap<int, QVariant> &AFin
 {
 	QList<IRosterIndex *> indexes;
 	foreach(QStandardItem *item, FModel->findItems(AFindData, NULL, ARecursive ? Qt::MatchRecursive : Qt::MatchExactly))
-		indexes.append(static_cast<RosterIndex *>(item));
+		if (item->type() == IRosterIndex::RosterItemTypeValue)
+			indexes.append(static_cast<RosterIndex *>(item));
 	return indexes;
 }

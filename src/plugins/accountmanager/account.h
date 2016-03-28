@@ -17,6 +17,7 @@ public:
 	Account(IXmppStreamManager *AXmppStreamManager, const OptionsNode &AOptionsNode, QObject *AParent);
 	virtual QObject *instance() { return this; }
 	virtual QUuid accountId() const;
+	virtual int accountOrder() const;
 	virtual Jid accountJid() const;
 	virtual Jid streamJid() const;
 	virtual bool isActive() const;

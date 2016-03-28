@@ -15,6 +15,7 @@ class IAccount
 public:
 	virtual QObject *instance() = 0;
 	virtual QUuid accountId() const =0;
+	virtual int accountOrder() const =0;
 	virtual Jid accountJid() const =0;
 	virtual Jid streamJid() const =0;
 	virtual bool isActive() const =0;
@@ -49,7 +50,7 @@ protected:
 	virtual void accountOptionsChanged(IAccount *AAcount, const OptionsNode &ANode) =0;
 };
 
-Q_DECLARE_INTERFACE(IAccount,"Vacuum.Plugin.IAccount/1.1")
-Q_DECLARE_INTERFACE(IAccountManager,"Vacuum.Plugin.IAccountManager/1.1")
+Q_DECLARE_INTERFACE(IAccount,"Vacuum.Plugin.IAccount/1.2")
+Q_DECLARE_INTERFACE(IAccountManager,"Vacuum.Plugin.IAccountManager/1.2")
 
 #endif // IACCOUNTMANAGER_H

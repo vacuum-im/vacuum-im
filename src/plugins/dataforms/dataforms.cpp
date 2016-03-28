@@ -699,7 +699,15 @@ bool DataForms::isSubmitValid(const IDataForm &AForm, const IDataForm &ASubmit) 
 	return valid;
 }
 
-bool DataForms::isSupportedUri(const IDataMediaURI &AUri) const
+bool DataForms::isSupportedMedia(const IDataMedia &AMedia) const
+{
+	foreach(const IDataMediaURI &uri, AMedia.uris)
+		if (isSupportedMediaUri(uri))
+			return true;
+	return false;
+}
+
+bool DataForms::isSupportedMediaUri(const IDataMediaURI &AUri) const
 {
 	bool supportedType = false;
 	bool supportedScheme = false;

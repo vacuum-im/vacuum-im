@@ -90,7 +90,7 @@ void DataDialogWidget::onFormFieldChanged()
 {
 	if (FFormWidget)
 	{
-		bool valid = FAllowInvalid || FDataForms->isSubmitValid(FFormWidget->dataForm(),FFormWidget->userDataForm());
+		bool valid = FAllowInvalid || FFormWidget->isSubmitValid();
 		FDialogButtons->button(QDialogButtonBox::Ok)->setEnabled(valid);
 	}
 }

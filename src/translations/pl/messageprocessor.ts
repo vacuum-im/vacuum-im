@@ -9,5 +9,13 @@
         <source>Allows other modules to send and receive messages</source>
         <translation>Pozwala innym modułom przyjmować i wysyłać wiadomości</translation>
     </message>
+    <message>
+        <source>Out of Band Data</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Supports to communicate a URI to another user or application</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 </TS>
