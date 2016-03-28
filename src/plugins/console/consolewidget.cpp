@@ -192,13 +192,13 @@ void ConsoleWidget::showStanza(IXmppStream *AXmppStream, const Stanza &AStanza, 
 
 		if (accepted)
 		{
-			static QString sended =   QString(">>>>").toHtmlEscaped() + " <b>%1</b> %2 +%3 " + QString(">>>>").toHtmlEscaped();
-			static QString received = QString("<<<<").toHtmlEscaped() + " <b>%1</b> %2 +%3 " + QString("<<<<").toHtmlEscaped();
+			static QString sentHeader =   QString(">>>>").toHtmlEscaped() + " <b>%1</b> %2 +%3 " + QString(">>>>").toHtmlEscaped();
+			static QString recvHeader = QString("<<<<").toHtmlEscaped() + " <b>%1</b> %2 +%3 " + QString("<<<<").toHtmlEscaped();
 
 			int delta = FTimePoint.isValid() ? FTimePoint.msecsTo(QTime::currentTime()) : 0;
 			FTimePoint = QTime::currentTime();
 
-			QString header = (ASent ? sentHeader : recvHeader).arg(Qt::escape(AXmppStream->streamJid().uFull())).arg(FTimePoint.toString()).arg(delta);
+			QString header = (ASent ? sentHeader : recvHeader).arg(AXmppStream->streamJid().uFull().toHtmlEscaped()).arg(FTimePoint.toString()).arg(delta);
 			ui.tbrConsole->append(header);
 
 			QString xml = AStanza.toString(2);

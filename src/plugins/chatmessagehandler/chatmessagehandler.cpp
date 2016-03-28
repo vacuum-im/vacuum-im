@@ -716,7 +716,7 @@ void ChatMessageHandler::fillContentOptions(const Jid &AStreamJid, const Jid &AC
 		if (AStreamJid.pBare() != AContactJid.pBare())
 			AOptions.senderName = FMessageStyleManager->contactName(AStreamJid).toHtmlEscaped();
 		else
-			AOptions.senderName = !AStreamJid.hasResource().isEmpty() ? AStreamJid.resource().toHtmlEscaped() : AStreamJid.uNode().toHtmlEscaped();
+			AOptions.senderName = AStreamJid.hasResource() ? AStreamJid.resource().toHtmlEscaped() : AStreamJid.uNode().toHtmlEscaped();
 	}
 }
 

@@ -444,7 +444,7 @@ bool FileTransfer::messageViewUrlOpen(int AOrder, IMessageViewWidget *AWidget, c
 				}
 				else
 				{
-					showStatusEvent(AWidget,tr("Failed to send request for file '%1'").arg(Qt::escape(params.value("name"))));
+					showStatusEvent(AWidget,tr("Failed to send request for file '%1'").arg(params.value("name").toHtmlEscaped()));
 				}
 				return true;
 			}
@@ -505,7 +505,7 @@ bool FileTransfer::writeMessageToText(int AOrder, Message &AMessage, QTextDocume
 				params.insert("size",QString::number(file.size));
 				if (!file.mimeType.isEmpty())
 					params.insert("mime-type",file.mimeType);
-				urlList.append(QString("<a href='%1'>%2</a>").arg(FXmppUriQueries->makeXmppUri(file.ownerJid,XMPP_URI_RECV,params), Qt::escape(file.name)));
+				urlList.append(QString("<a href='%1'>%2</a>").arg(FXmppUriQueries->makeXmppUri(file.ownerJid,XMPP_URI_RECV,params), file.name.toHtmlEscaped()));
 			}
 
 			if (!cursor.atStart())
@@ -1017,9 +1017,9 @@ void FileTransfer::notifyStream(IFileStream *AStream)
 	if (!note.isEmpty())
 	{
 		if (mucWindow && FPublicStreams.contains(AStream))
-			showStatusEvent(mucWindow->viewWidget(),Qt::escape(note));
+			showStatusEvent(mucWindow->viewWidget(),note.toHtmlEscaped());
 		else if (chatWindow)
-			showStatusEvent(chatWindow->viewWidget(),Qt::escape(note));
+			showStatusEvent(chatWindow->viewWidget(),note.toHtmlEscaped());
 	}
 }
 
@@ -1105,7 +1105,7 @@ StreamDialog *FileTransfer::getStreamDialog(IFileStream *AStream)
 
 		if (FNotifications)
 		{
-			QString name = "<b>"+ Qt::escape(FNotifications->contactName(AStream->streamJid(), AStream->contactJid())) +"</b>";
+			QString name = "<b>"+ FNotifications->contactName(AStream->streamJid(), AStream->contactJid()).toHtmlEscaped() +"</b>";
 			if (AStream->contactJid().hasResource())
 				name += "/" + AStream->contactJid().resource().toHtmlEscaped();
 			dialog->setContactName(name);
@@ -1351,7 +1351,7 @@ void FileTransfer::onPublicStreamStartRejected(const QString &ARequestId, const 
 	{
 		LOG_INFO(QString("Start public file receive request rejected, id=%1: %2").arg(ARequestId,AError.condition()));
 		if (FPublicRequestView.contains(ARequestId))
-			showStatusEvent(FPublicRequestView.take(ARequestId),tr("File request rejected: %1").arg(Qt::escape(AError.errorMessage())));
+			showStatusEvent(FPublicRequestView.take(ARequestId),tr("File request rejected: %1").arg(AError.errorMessage().toHtmlEscaped()));
 		FPublicReceiveRequests.removeAll(ARequestId);
 		emit publicFileReceiveRejected(ARequestId,AError);
 	}
