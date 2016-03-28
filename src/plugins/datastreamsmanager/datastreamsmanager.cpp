@@ -8,6 +8,7 @@
 #include <definitions/menuicons.h>
 #include <definitions/xmpperrors.h>
 #include <definitions/internalerrors.h>
+#include <definitions/stanzahandlerorders.h>
 #include <utils/xmpperror.h>
 #include <utils/options.h>
 #include <utils/stanza.h>
@@ -92,9 +93,9 @@ bool DataStreamsManger::initObjects()
 	XmppError::registerError(NS_STREAM_INITIATION,XERR_SI_BAD_PROFILE,tr("The profile is not understood or invalid"));
 	XmppError::registerError(NS_STREAM_INITIATION,XERR_SI_NO_VALID_STREAMS,tr("None of the available streams are acceptable"));
 
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_DATASTREAMS_PROFILE_INVALID_SETTINGS,tr("Invalid profile settings"));
 	XmppError::registerError(NS_INTERNAL_ERROR,IERR_DATASTREAMS_STREAM_STREAMID_EXISTS,tr("Stream with same ID already exists"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_DATASTREAMS_STREAM_INVALID_INIT_RESPONCE,tr("Invalid stream initiation response"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_DATASTREAMS_STREAM_INVALID_RESPONSE,tr("Invalid stream initiation response"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_DATASTREAMS_STREAM_UNSUPPORTED_REQUEST,tr("Unsupported stream initiation request"));
 
 	if (FStanzaProcessor)
 	{
@@ -108,12 +109,12 @@ bool DataStreamsManger::initObjects()
 
 	if (FDiscovery)
 	{
-		IDiscoFeature dfeature;
-		dfeature.var = NS_STREAM_INITIATION;
-		dfeature.active = true;
-		dfeature.name = tr("Data Streams Initiation");
-		dfeature.description = tr("Supports the initiating of the custom stream of data between two XMPP entities");
-		FDiscovery->insertDiscoFeature(dfeature);
+		IDiscoFeature si;
+		si.active = true;
+		si.var = NS_STREAM_INITIATION;
+		si.name = tr("Data Streams Initiation");
+		si.description = tr("Supports the initiating of the custom stream of data between two XMPP entities");
+		FDiscovery->insertDiscoFeature(si);
 	}
 
 	return true;
@@ -153,9 +154,20 @@ bool DataStreamsManger::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, S
 	if (FDataForms && AHandlerId==FSHIInitStream)
 	{
 		AAccept = true;
+
+		XmppStanzaError err(XmppStanzaError::EC_BAD_REQUEST);
 		QDomElement siElem = AStanza.firstElement("si",NS_STREAM_INITIATION);
-		IDataStreamProfile *sprofile = FProfiles.value(siElem.attribute("profile"),NULL);
-		if (sprofile)
+		
+		IDataStream stream;
+		stream.kind = IDataStream::Target;
+		stream.streamJid = AStreamJid;
+		stream.contactJid = AStanza.from();
+		stream.streamId = siElem.attribute("id");
+		stream.requestId = AStanza.id();
+		stream.profileNS = siElem.attribute("profile");
+
+		IDataStreamProfile *sprofile = FProfiles.value(stream.profileNS);
+		if (sprofile != NULL)
 		{
 			QDomElement fnegElem = siElem.firstChildElement("feature");
 			while (!fnegElem.isNull() && fnegElem.namespaceURI()!=NS_FEATURENEG)
@@ -164,88 +176,73 @@ bool DataStreamsManger::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, S
 			QDomElement formElem = fnegElem.firstChildElement("x");
 			while (!formElem.isNull() && formElem.namespaceURI()!=NS_JABBER_DATA)
 				formElem = formElem.nextSiblingElement("x");
-			IDataForm form = FDataForms->dataForm(formElem);
+			stream.features = FDataForms->dataForm(formElem);
 
-			QList<QString> smethods;
-			int index = FDataForms->fieldIndex(DFV_STREAM_METHOD,form.fields);
+			QList<QString> methods;
+			int index = FDataForms->fieldIndex(DFV_STREAM_METHOD,stream.features.fields);
 			if (index >= 0)
 			{
-				foreach(const IDataOption &option, form.fields.at(index).options)
+				foreach(const IDataOption &option, stream.features.fields.at(index).options)
 					if (FMethods.contains(option.value))
-						smethods.append(option.value);
+						methods.append(option.value);
 			}
-
-			if (!smethods.isEmpty())
+			
+			if (!stream.streamId.isEmpty() && !methods.isEmpty() && !FStreams.contains(stream.streamId))
 			{
-				QString sid = siElem.attribute("id");
-				if (!FStreams.contains(sid))
+				FStreams.insert(stream.streamId,stream);
+				LOG_STRM_INFO(AStreamJid,QString("Data stream initiation request received from=%1, profile=%2, sid=%3").arg(AStanza.from(),stream.profileNS,stream.streamId));
+
+				if (!sprofile->dataStreamProcessRequest(stream.streamId,AStanza,methods))
 				{
-					StreamParams params;
-					params.streamJid = AStreamJid;
-					params.contactJid = AStanza.from();
-					params.requestId = AStanza.id();
-					params.profile = siElem.attribute("profile");
-					params.features = form;
-					FStreams.insert(sid,params);
-					if (sid.isEmpty() || !sprofile->dataStreamRequest(sid,AStanza,smethods))
-					{
-						FStreams.remove(sid);
-						LOG_STRM_WARNING(AStreamJid,QString("Rejected stream initiation from=%1: Invalid profile=%2 settings").arg(AStanza.from(),params.profile));
-						XmppStanzaError err(XmppStanzaError::EC_BAD_REQUEST);
-						err.setAppCondition(NS_INTERNAL_ERROR,IERR_DATASTREAMS_PROFILE_INVALID_SETTINGS);
-						Stanza error = FStanzaProcessor->makeReplyError(AStanza,err);
-						FStanzaProcessor->sendStanzaOut(AStreamJid,error);
-					}
-					else
-					{
-						LOG_STRM_INFO(AStreamJid,QString("Accepted stream initiation from=%1, profile=%2, sid=%3").arg(AStanza.from(),params.profile,sid));
-					}
+					FStreams.remove(stream.streamId);
+					LOG_STRM_WARNING(AStreamJid,QString("Failed to process data stream initiation request from=%1, profile=%2: Unsupported request").arg(AStanza.from(),stream.profileNS));
+					err.setAppCondition(NS_INTERNAL_ERROR,IERR_DATASTREAMS_STREAM_UNSUPPORTED_REQUEST);
 				}
 				else
 				{
-					LOG_STRM_WARNING(AStreamJid,QString("Rejected stream initiation from=%1: Duplicate stream id=%2").arg(AStanza.from(),sid));
-					XmppStanzaError err(XmppStanzaError::EC_BAD_REQUEST);
-					err.setAppCondition(NS_INTERNAL_ERROR,IERR_DATASTREAMS_STREAM_STREAMID_EXISTS);
-					Stanza error = FStanzaProcessor->makeReplyError(AStanza,err);
-					FStanzaProcessor->sendStanzaOut(AStreamJid,error);
+					emit streamInitStarted(stream);
+					return true;
 				}
+			}
+			else if (stream.streamId.isEmpty())
+			{
+				LOG_STRM_WARNING(AStreamJid,QString("Failed to process data stream initiation request from=%1: Invalid stream id").arg(AStanza.from()));
+			}
+			else if (methods.isEmpty())
+			{
+				LOG_STRM_WARNING(AStreamJid,QString("Failed to process data stream initiation request from=%1: No valid stream methods").arg(AStanza.from()));
+				err.setAppCondition(NS_STREAM_INITIATION,XERR_SI_NO_VALID_STREAMS);
 			}
 			else
 			{
-				LOG_STRM_WARNING(AStreamJid,QString("Rejected stream initiation from=%1: No valid stream methods").arg(AStanza.from()));
-				XmppStanzaError err(XmppStanzaError::EC_BAD_REQUEST);
-				err.setAppCondition(NS_STREAM_INITIATION,XERR_SI_NO_VALID_STREAMS);
-				Stanza error = FStanzaProcessor->makeReplyError(AStanza,err);
-				FStanzaProcessor->sendStanzaOut(AStreamJid,error);
+				LOG_STRM_WARNING(AStreamJid,QString("Failed to process data stream initiation request from=%1: Duplicate stream id=%2").arg(AStanza.from(),stream.streamId));
+				err.setAppCondition(NS_INTERNAL_ERROR,IERR_DATASTREAMS_STREAM_STREAMID_EXISTS);
 			}
 		}
 		else
 		{
-			LOG_STRM_WARNING(AStreamJid,QString("Rejected stream initiation from=%1: Bad profile=%2").arg(AStanza.from(),siElem.attribute("profile")));
-			XmppStanzaError err(XmppStanzaError::EC_BAD_REQUEST);
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to process data stream initiation request from=%1: Bad profile=%2").arg(AStanza.from(),stream.profileNS));
 			err.setAppCondition(NS_STREAM_INITIATION,XERR_SI_BAD_PROFILE);
-			Stanza error = FStanzaProcessor->makeReplyError(AStanza,err);
-			FStanzaProcessor->sendStanzaOut(AStreamJid,error);
 		}
-	}
-	else if (FDataForms)
-	{
-		REPORT_ERROR("Received unexpected stanza");
+
+		Stanza error = FStanzaProcessor->makeReplyError(AStanza,err);
+		FStanzaProcessor->sendStanzaOut(AStreamJid,error);
+
+		emit streamInitFinished(stream,err);
 	}
 	return false;
 }
 
 void DataStreamsManger::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 {
-	Q_UNUSED(AStreamJid);
-	QString sid = streamIdByRequestId(AStanza.id());
-	if (FDataForms && FStreams.contains(sid))
+	QString streamId = streamIdByRequestId(AStanza.id());
+	if (FDataForms && FStreams.contains(streamId))
 	{
-		StreamParams params = FStreams.take(sid);
-		IDataStreamProfile *sprofile = FProfiles.value(params.profile);
-		if (sprofile)
+		IDataStream stream = FStreams.value(streamId);
+		IDataStreamProfile *sprofile = FProfiles.value(stream.profileNS);
+		if (sprofile != NULL)
 		{
-			if (AStanza.type() == "result")
+			if (AStanza.isResult())
 			{
 				QDomElement fnegElem = AStanza.firstElement("si",NS_STREAM_INITIATION).firstChildElement("feature");
 				while (!fnegElem.isNull() && fnegElem.namespaceURI()!=NS_FEATURENEG)
@@ -257,28 +254,40 @@ void DataStreamsManger::stanzaRequestResult(const Jid &AStreamJid, const Stanza 
 				IDataForm form = FDataForms->dataForm(formElem);
 
 				int index = FDataForms->fieldIndex(DFV_STREAM_METHOD,form.fields);
-				QString smethod = index>=0 ? form.fields.at(index).value.toString() : QString::null;
-				if (FMethods.contains(smethod) && FDataForms->isSubmitValid(params.features,form))
+				QString method = index>=0 ? form.fields.at(index).value.toString() : QString::null;
+
+				if (FMethods.contains(method) && FDataForms->isSubmitValid(stream.features,form))
 				{
-					LOG_STRM_INFO(AStreamJid,QString("Received stream initiation response, sid=%1").arg(sid));
-					sprofile->dataStreamResponce(sid,AStanza,smethod);
+					LOG_STRM_INFO(AStreamJid,QString("Data stream initiation response received from=%1, sid=%2").arg(AStanza.from(),streamId));
+					if (sprofile->dataStreamProcessResponse(streamId,AStanza,method))
+					{
+						FStreams.remove(streamId);
+						emit streamInitFinished(stream,XmppError::null);
+					}
 				}
 				else
 				{
-					LOG_STRM_WARNING(AStreamJid,QString("Failed to receive stream initiation response, sid=%1: Invalid response").arg(sid));
-					sprofile->dataStreamError(sid,XmppError(IERR_DATASTREAMS_STREAM_INVALID_INIT_RESPONCE));
+					XmppError err(IERR_DATASTREAMS_STREAM_INVALID_RESPONSE);
+					LOG_STRM_WARNING(AStreamJid,QString("Failed to process data stream initiation response from=%1, sid=%2: %3").arg(AStanza.from(),streamId,err.condition()));
+					sprofile->dataStreamProcessError(streamId,err);
 				}
 			}
 			else
 			{
 				XmppStanzaError err(AStanza);
-				LOG_STRM_WARNING(AStreamJid,QString("Failed to receive stream initiation response, sid=%1: %2").arg(sid,err.condition()));
-				sprofile->dataStreamError(sid,err);
+				LOG_STRM_WARNING(AStreamJid,QString("Failed to process data stream initiation response from=%1, sid=%2: %3").arg(AStanza.from(),streamId,err.condition()));
+				sprofile->dataStreamProcessError(streamId,err);
 			}
 		}
 		else
 		{
-			REPORT_ERROR("Failed to receive stream initiation response: Profile not found");
+			REPORT_ERROR("Failed to process data stream response: Profile not found");
+		}
+
+		if (FStreams.contains(streamId))
+		{
+			FStreams.remove(streamId);
+			emit streamInitFinished(stream,XmppStanzaError(XmppStanzaError::EC_INTERNAL_SERVER_ERROR));
 		}
 	}
 }
@@ -290,7 +299,7 @@ QList<QString> DataStreamsManger::methods() const
 
 IDataStreamMethod *DataStreamsManger::method(const QString &AMethodNS) const
 {
-	return FMethods.value(AMethodNS,NULL);
+	return FMethods.value(AMethodNS);
 }
 
 void DataStreamsManger::insertMethod(IDataStreamMethod *AMethod)
@@ -320,15 +329,15 @@ QList<QString> DataStreamsManger::profiles() const
 
 IDataStreamProfile *DataStreamsManger::profile(const QString &AProfileNS)
 {
-	return FProfiles.value(AProfileNS,NULL);
+	return FProfiles.value(AProfileNS);
 }
 
 void DataStreamsManger::insertProfile(IDataStreamProfile *AProfile)
 {
-	if (AProfile!=NULL && !FProfiles.contains(AProfile->profileNS()) && !FProfiles.values().contains(AProfile))
+	if (AProfile!=NULL && !FProfiles.contains(AProfile->dataStreamProfile()) && !FProfiles.values().contains(AProfile))
 	{
-		LOG_DEBUG(QString("Stream profile inserted, ns=%1").arg(AProfile->profileNS()));
-		FProfiles.insert(AProfile->profileNS(),AProfile);
+		LOG_DEBUG(QString("Stream profile inserted, ns=%1").arg(AProfile->dataStreamProfile()));
+		FProfiles.insert(AProfile->dataStreamProfile(),AProfile);
 		emit profileInserted(AProfile);
 	}
 }
@@ -337,7 +346,7 @@ void DataStreamsManger::removeProfile(IDataStreamProfile *AProfile)
 {
 	if (FProfiles.values().contains(AProfile))
 	{
-		LOG_DEBUG(QString("Stream profile removed, ns=%1").arg(AProfile->profileNS()));
+		LOG_DEBUG(QString("Stream profile removed, ns=%1").arg(AProfile->dataStreamProfile()));
 		FProfiles.remove(FProfiles.key(AProfile));
 		emit profileRemoved(AProfile);
 	}
@@ -347,11 +356,11 @@ QList<QUuid> DataStreamsManger::settingsProfiles() const
 {
 	QList<QUuid> sprofiles;
 	sprofiles.append(QUuid().toString());
+
 	foreach(const QString &sprofile, Options::node(OPV_DATASTREAMS_ROOT).childNSpaces("settings-profile"))
-	{
 		if (!sprofiles.contains(sprofile))
 			sprofiles.append(sprofile);
-	}
+
 	return sprofiles;
 }
 
@@ -383,15 +392,16 @@ void DataStreamsManger::removeSettingsProfile(const QUuid &AProfileId)
 	}
 }
 
-bool DataStreamsManger::initStream(const Jid &AStreamJid, const Jid &AContactJid, const QString &AStreamId, const QString &AProfileNS, const QList<QString> &AMethods, int ATimeout)
+bool DataStreamsManger::initStream(const QString &AStreamId, const Jid &AStreamJid, const Jid &AContactJid, const QString &AProfileNS, const QList<QString> &AMethods, int ATimeout)
 {
 	if (FStanzaProcessor && FDataForms && !AStreamId.isEmpty() && !FStreams.contains(AStreamId) && !FMethods.isEmpty())
 	{
-		IDataStreamProfile *sprofile = FProfiles.value(AProfileNS,NULL);
+		IDataStreamProfile *sprofile = FProfiles.value(AProfileNS);
 		if (sprofile)
 		{
-			Stanza request("iq");
-			request.setTo(AContactJid.full()).setType("set").setId(FStanzaProcessor->newId());
+			Stanza request(STANZA_KIND_IQ);
+			request.setType(STANZA_TYPE_SET).setTo(AContactJid.full()).setUniqueId();
+
 			QDomElement siElem = request.addElement("si",NS_STREAM_INITIATION);
 			siElem.setAttribute("id",AStreamId);
 			siElem.setAttribute("profile",AProfileNS);
@@ -409,47 +419,53 @@ bool DataStreamsManger::initStream(const Jid &AStreamJid, const Jid &AContactJid
 				}
 			}
 
-			if (!field.options.isEmpty() && sprofile->requestDataStream(AStreamId,request))
+			if (!field.options.isEmpty() && sprofile->dataStreamMakeRequest(AStreamId,request))
 			{
 				IDataForm form;
 				form.type = DATAFORM_TYPE_FORM;
 				form.fields.append(field);
 				QDomElement negElem = siElem.appendChild(request.createElement("feature",NS_FEATURENEG)).toElement();
 				FDataForms->xmlForm(form,negElem);
+
 				if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,ATimeout))
 				{
-					StreamParams params;
-					params.streamJid = AStreamJid;
-					params.contactJid = AContactJid;
-					params.requestId = request.id();
-					params.profile = AProfileNS;
-					params.features = form;
-					FStreams.insert(AStreamId,params);
-					LOG_STRM_INFO(AStreamJid,QString("Stream initiation request sent, to=%1, profile=%2, sid=%3").arg(AContactJid.full(),AProfileNS,AStreamId));
+					IDataStream stream;
+					stream.kind = IDataStream::Initiator;
+					stream.streamJid = AStreamJid;
+					stream.contactJid = AContactJid;
+					stream.streamId = AStreamId;
+					stream.requestId = request.id();
+					stream.profileNS = AProfileNS;
+					stream.features = form;
+					FStreams.insert(AStreamId,stream);
+
+					LOG_STRM_INFO(AStreamJid,QString("Data stream initiation request sent, to=%1, profile=%2, sid=%3").arg(AContactJid.full(),AProfileNS,AStreamId));
+					emit streamInitStarted(stream);
+
 					return true;
 				}
 				else
 				{
-					LOG_STRM_WARNING(AStreamJid,QString("Failed to send stream initiation request"));
+					LOG_STRM_WARNING(AStreamJid,QString("Failed to send data stream initiation request to=%1, profile=%2, sid=%3: Request not sent").arg(AContactJid.full(),AProfileNS,AStreamId));
 				}
 			}
 			else if (field.options.isEmpty())
 			{
-				LOG_WARNING(QString("Failed to request stream initiation: Methods not supported"));
+				LOG_WARNING(QString("Failed to send data stream initiation request to=%1, profile=%2, sid=%3: Methods not supported").arg(AContactJid.full(),AProfileNS,AStreamId));
 			}
 			else
 			{
-				LOG_WARNING(QString("Failed to request stream initiation: Profile=%1 not ready").arg(AProfileNS));
+				LOG_WARNING(QString("Failed to send data stream initiation request to=%1, profile=%2, sid=%3: Unsupported request").arg(AContactJid.full(),AProfileNS,AStreamId));
 			}
 		}
 		else
 		{
-			LOG_WARNING(QString("Failed to request stream initiation: Profile=%1 not found").arg(AProfileNS));
+			LOG_WARNING(QString("Failed to send data stream initiation request, to=%1, profile=%2, sid=%3: Profile not found").arg(AContactJid.full(),AProfileNS,AStreamId));
 		}
 	}
 	else if (FStanzaProcessor && FDataForms)
 	{
-		REPORT_ERROR("Failed to request stream initiation: Invalid params");
+		REPORT_ERROR("Failed to send data stream initiation request: Invalid params");
 	}
 	return false;
 }
@@ -458,81 +474,80 @@ bool DataStreamsManger::acceptStream(const QString &AStreamId, const QString &AM
 {
 	if (FStanzaProcessor && FDataForms && FStreams.contains(AStreamId) && FMethods.contains(AMethodNS))
 	{
-		StreamParams params = FStreams.value(AStreamId);
-		IDataStreamProfile *sprofile = FProfiles.value(params.profile,NULL);
-		int index = FDataForms->fieldIndex(DFV_STREAM_METHOD,params.features.fields);
-		if (sprofile && index>=0 && FDataForms->isOptionValid(params.features.fields.at(index).options,AMethodNS))
+		IDataStream stream = FStreams.value(AStreamId);
+		IDataStreamProfile *sprofile = FProfiles.value(stream.profileNS);
+		int methodField = FDataForms->fieldIndex(DFV_STREAM_METHOD,stream.features.fields);
+		if (sprofile!=NULL && methodField>=0 && FDataForms->isOptionValid(stream.features.fields.at(methodField).options,AMethodNS))
 		{
-			Stanza response("iq");
-			response.setType("result").setId(params.requestId).setTo(params.contactJid.full());
-			QDomElement siElem = response.addElement("si",NS_STREAM_INITIATION);
-			if (sprofile->responceDataStream(AStreamId,response))
+			Stanza reply(STANZA_KIND_IQ);
+			reply.setType(STANZA_TYPE_RESULT).setTo(stream.contactJid.full()).setId(stream.requestId);
+
+			QDomElement siElem = reply.addElement("si",NS_STREAM_INITIATION);
+			if (sprofile->dataStreamMakeResponse(AStreamId,reply))
 			{
-				QDomElement negElem = siElem.appendChild(response.createElement("feature",NS_FEATURENEG)).toElement();
-				params.features.fields[index].value = AMethodNS;
-				FDataForms->xmlForm(FDataForms->dataSubmit(params.features),negElem);
-				if (FStanzaProcessor->sendStanzaOut(params.streamJid,response))
+				QDomElement negElem = siElem.appendChild(reply.createElement("feature",NS_FEATURENEG)).toElement();
+				stream.features.fields[methodField].value = AMethodNS;
+				FDataForms->xmlForm(FDataForms->dataSubmit(stream.features),negElem);
+
+				if (FStanzaProcessor->sendStanzaOut(stream.streamJid,reply))
 				{
-					LOG_STRM_DEBUG(params.streamJid,QString("Stream accept response sent, sid=%1, method=%2").arg(AStreamId,AMethodNS));
 					FStreams.remove(AStreamId);
+					LOG_STRM_INFO(stream.streamJid,QString("Data stream initiation response sent to=%1, sid=%2, method=%3").arg(stream.contactJid.full(),AStreamId,AMethodNS));
+					emit streamInitFinished(stream,XmppError::null);
 					return true;
 				}
 				else
 				{
-					LOG_STRM_WARNING(params.streamJid,QString("Failed to send stream accept response, sid=%1").arg(AStreamId));
+					LOG_STRM_WARNING(stream.streamJid,QString("Failed to send data stream initiation response to=%1, sid=%2").arg(stream.contactJid.full(),AStreamId));
 				}
 			}
 			else
 			{
-				LOG_STRM_WARNING(params.streamJid,QString("Failed to accept stream, sid=%1: Profile not ready").arg(AStreamId));
+				LOG_STRM_WARNING(stream.streamJid,QString("Failed to send data stream initiation response to=%1, sid=%2: Unsupported response").arg(stream.contactJid.full(),AStreamId));
 			}
 		}
 		else if (sprofile == NULL)
 		{
-			REPORT_ERROR("Failed to accept stream: Profile not found");
+			REPORT_ERROR("Failed to send data stream initiation response: Profile not found");
 		}
 		else
 		{
-			REPORT_ERROR("Failed to accept stream: Method not supported");
+			REPORT_ERROR("Failed to send data stream initiation response: Method not supported");
 		}
 	}
 	else if (FStanzaProcessor && FDataForms)
 	{
-		REPORT_ERROR("Failed to accept stream: Invalid params");
+		REPORT_ERROR("Failed to send data stream initiation response: Invalid params");
 	}
 	return false;
 }
 
-bool DataStreamsManger::rejectStream(const QString &AStreamId, const XmppStanzaError &AError)
+void DataStreamsManger::rejectStream(const QString &AStreamId, const XmppStanzaError &AError)
 {
 	if (FStanzaProcessor && FStreams.contains(AStreamId))
 	{
-		StreamParams params = FStreams.take(AStreamId);
+		IDataStream stream = FStreams.take(AStreamId);
 		
-		Stanza error("iq");
-		error.setId(params.requestId).setFrom(params.contactJid.full());
-		error = FStanzaProcessor->makeReplyError(error,AError);
+		Stanza reply(STANZA_KIND_IQ);
+		reply.setFrom(stream.contactJid.full()).setId(stream.requestId);
+		reply = FStanzaProcessor->makeReplyError(reply,AError);
 
-		if (FStanzaProcessor->sendStanzaOut(params.streamJid,error))
-		{
-			LOG_STRM_INFO(params.streamJid,QString("Stream reject response sent, sid=%1: %2").arg(AStreamId,AError.condition()));
-			return true;
-		}
+		if (FStanzaProcessor->sendStanzaOut(stream.streamJid,reply))
+			LOG_STRM_INFO(stream.streamJid,QString("Data stream initiation reject sent to=%1, sid=%2: %3").arg(stream.contactJid.full(),AStreamId,AError.condition()));
 		else
-		{
-			LOG_STRM_WARNING(params.streamJid,QString("Failed to send stream reject response, sid=%1").arg(AStreamId));
-		}
+			LOG_STRM_WARNING(stream.streamJid,QString("Failed to send data stream initiation reject to=%1, sid=%2: Reject not sent").arg(stream.contactJid.full(),AStreamId));
+
+		emit streamInitFinished(stream,AError);
 	}
 	else if (FStanzaProcessor)
 	{
-		REPORT_ERROR("Failed to reject stream: Invalid params");
+		REPORT_ERROR("Failed to send data stream initiation reject: Stream not found");
 	}
-	return false;
 }
 
 QString DataStreamsManger::streamIdByRequestId(const QString &ARequestId) const
 {
-	for (QMap<QString, StreamParams>::const_iterator it = FStreams.constBegin(); it!=FStreams.constEnd(); ++it)
+	for (QMap<QString, IDataStream>::const_iterator it = FStreams.constBegin(); it!=FStreams.constEnd(); ++it)
 		if (it->requestId == ARequestId)
 			return it.key();
 	return QString::null;
@@ -540,19 +555,20 @@ QString DataStreamsManger::streamIdByRequestId(const QString &ARequestId) const
 
 void DataStreamsManger::onXmppStreamClosed(IXmppStream *AXmppStream)
 {
-	QMap<QString, StreamParams>::iterator it = FStreams.begin();
-	while (it != FStreams.end())
+	XmppStanzaError err(XmppStanzaError::EC_RECIPIENT_UNAVAILABLE);
+	foreach(const IDataStream &stream, FStreams.values())
 	{
-		if (it->streamJid == AXmppStream->streamJid())
+		if (stream.streamJid == AXmppStream->streamJid())
 		{
-			IDataStreamProfile *sprofile = FProfiles.value(it->profile,NULL);
-			if (sprofile)
-				sprofile->dataStreamError(it.key(),XmppStanzaError(XmppStanzaError::EC_RECIPIENT_UNAVAILABLE));
-			it = FStreams.erase(it);
-		}
-		else
-		{
-			++it;
+			IDataStreamProfile *sprofile = FProfiles.value(stream.profileNS);
+			if (sprofile != NULL)
+				sprofile->dataStreamProcessError(stream.streamId,err);
+			
+			if (FStreams.contains(stream.streamId))
+			{
+				FStreams.remove(stream.streamId);
+				emit streamInitFinished(stream,err);
+			}
 		}
 	}
 }

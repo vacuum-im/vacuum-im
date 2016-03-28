@@ -347,7 +347,7 @@ void DatabaseTaskLoadHeaders::run()
 			QStringList conditions;
 			QVariantList bindValues;
 
-			if (!FRequest.with.node().isEmpty())
+			if (FRequest.with.hasNode())
 			{
 				conditions.append("(with_node = ?)");
 				bindValues.append(FRequest.with.pNode());
@@ -361,7 +361,7 @@ void DatabaseTaskLoadHeaders::run()
 				conditions.append("(gateway = ?)");
 				bindValues.append(FGateType);
 			}
-			else if (!FRequest.with.domain().isEmpty())
+			else if (FRequest.with.hasDomain())
 			{
 				conditions.append("(with_domain = ?)");
 				bindValues.append(FRequest.with.pDomain());
@@ -370,7 +370,7 @@ void DatabaseTaskLoadHeaders::run()
 			{
 				conditions.append("(with_domain = '')");
 			}
-			if (!FRequest.with.resource().isEmpty())
+			if (FRequest.with.hasResource())
 			{
 				conditions.append("(with_resource = ?)");
 				bindValues.append(FRequest.with.pResource());

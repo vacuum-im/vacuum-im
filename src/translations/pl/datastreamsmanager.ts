@@ -14,10 +14,6 @@
         <translation>Profil jest nierozpoznawalny lub uszkodzony</translation>
     </message>
     <message>
-        <source>Invalid profile settings</source>
-        <translation>Nieprawidłowe ustawienia profilu</translation>
-    </message>
-    <message>
         <source>Data Streams Initiation</source>
         <translation>Nawiązanie połączenia</translation>
     </message>
@@ -47,6 +43,10 @@
     </message>
     <message>
         <source>Transfer method %1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Unsupported stream initiation request</source>
         <translation type="unfinished"/>
     </message>
 </context>

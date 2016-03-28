@@ -10,8 +10,8 @@
 
 struct StanzaRequest {
 	StanzaRequest() {
-		timer=NULL;
-		owner=NULL;
+		timer = NULL;
+		owner = NULL;
 	}
 	Jid streamJid;
 	Jid contactJid;
@@ -43,7 +43,6 @@ public:
 	virtual bool xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder);
 	virtual bool xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder);
 	//IStanzaProcessor
-	virtual QString newId() const;
 	virtual bool sendStanzaIn(const Jid &AStreamJid, Stanza &AStanza);
 	virtual bool sendStanzaOut(const Jid &AStreamJid, Stanza &AStanza);
 	virtual bool sendStanzaRequest(IStanzaRequestOwner *AIqOwner, const Jid &AStreamJid, Stanza &AStanza, int ATimeout);
@@ -78,8 +77,8 @@ private:
 	IXmppStreamManager *FXmppStreamManager;
 private:
 	QMap<int, IStanzaHandle> FHandles;
-	QMap<QString, StanzaRequest> FRequests;
 	QMultiMap<int, int> FHandleIdByOrder;
+	QMap<QString, StanzaRequest> FRequests;
 };
 
 #endif // STANZAPROCESSOR_H

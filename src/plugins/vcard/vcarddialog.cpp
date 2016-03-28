@@ -28,7 +28,7 @@ VCardDialog::VCardDialog(IVCardManager *AVCardPlugin, const Jid &AStreamJid, con
 	ui.cmbGender->addItem(tr("Male"),QString(VCARD_GENDER_MALE));
 	ui.cmbGender->addItem(tr("Female"),QString(VCARD_GENDER_FEMALE));
 
-	if (FStreamJid && FContactJid)
+	if (FStreamJid.pBare() == FContactJid.pBare())
 		ui.btbButtons->setStandardButtons(QDialogButtonBox::Save|QDialogButtonBox::Close);
 	else
 		ui.btbButtons->setStandardButtons(QDialogButtonBox::Close);
@@ -87,7 +87,7 @@ Jid VCardDialog::contactJid() const
 
 void VCardDialog::updateDialog()
 {
-	bool readOnly = !(FContactJid && FStreamJid);
+	bool readOnly = FContactJid.pBare()!=FStreamJid.pBare();
 
 	ui.lneFullName->setText(FVCard->value(VVN_FULL_NAME));
 	ui.lneFullName->setReadOnly(readOnly);
@@ -328,13 +328,20 @@ void VCardDialog::onVCardPublished()
 
 void VCardDialog::onVCardError(const XmppError &AError)
 {
-	QMessageBox::critical(this,tr("Error"),
-		streamJid().pBare() != contactJid().pBare() ? 
-		tr("Failed to load profile: %1").arg(AError.errorMessage().toHtmlEscaped()) :
-		tr("Failed to publish your profile: %1").arg(AError.errorMessage().toHtmlEscaped()));
-
-	if (!FSaveClicked)
+	if (FSaveClicked)
+	{
+		QMessageBox::critical(this,tr("Error"), tr("Failed to publish your profile: %1").arg(AError.errorMessage().toHtmlEscaped()));
+	}
+	else if (streamJid().pBare() != contactJid().pBare())
+	{
+		QMessageBox::critical(this,tr("Error"), tr("Failed to load profile: %1").arg(AError.errorMessage().toHtmlEscaped()));
 		deleteLater();
+	}
+	else if (AError.toStanzaError().conditionCode() != XmppStanzaError::EC_ITEM_NOT_FOUND)
+	{
+		QMessageBox::critical(this,tr("Error"), tr("Failed to load profile: %1").arg(AError.errorMessage().toHtmlEscaped()));
+		deleteLater();
+	}
 
 	FSaveClicked = false;
 	ui.twtVCard->setEnabled(true);
@@ -415,7 +422,7 @@ void VCardDialog::onEmailDeleteClicked()
 
 void VCardDialog::onEmailItemDoubleClicked(QListWidgetItem *AItem)
 {
-	if (FStreamJid && FContactJid)
+	if (FStreamJid.pBare() == FContactJid.pBare())
 	{
 		static QStringList emailTagList = QStringList() << "HOME" << "WORK" << "INTERNET" << "X400";
 		EditItemDialog dialog(AItem->text(),AItem->data(Qt::UserRole).toStringList(),emailTagList,this);
@@ -449,7 +456,7 @@ void VCardDialog::onPhoneDeleteClicked()
 
 void VCardDialog::onPhoneItemDoubleClicked(QListWidgetItem *AItem)
 {
-	if (FStreamJid && FContactJid)
+	if (FStreamJid.pBare() == FContactJid.pBare())
 	{
 		static QStringList phoneTagList = QStringList() << "HOME" << "WORK" << "CELL" << "MODEM";
 		EditItemDialog dialog(AItem->text(),AItem->data(Qt::UserRole).toStringList(),phoneTagList,this);

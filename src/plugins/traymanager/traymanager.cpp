@@ -63,7 +63,7 @@ bool TrayManager::initObjects()
 	action->setIcon(RSR_STORAGE_MENUICONS,MNI_MAINWINDOW_QUIT);
 	action->setText(tr("Quit"));
 	connect(action,SIGNAL(triggered()),FPluginManager->instance(),SLOT(quit()));
-	FContextMenu->addAction(action,AG_TMTM_TRAYMANAGER);
+	FContextMenu->addAction(action,AG_TMTM_TRAYMANAGER_QUIT);
 	return true;
 }
 

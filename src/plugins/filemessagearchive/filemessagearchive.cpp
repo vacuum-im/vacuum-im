@@ -425,7 +425,7 @@ QString FileMessageArchive::collectionDirName(const Jid &AWith) const
 	{
 		Jid gateWith = gatewayJid(AWith);
 		QString dirName = Jid::encode(gateWith.pBare());
-		if (!gateWith.resource().isEmpty())
+		if (gateWith.hasResource())
 			dirName += "/" + Jid::encode(gateWith.pResource());
 		return dirName;
 	}
@@ -577,7 +577,7 @@ QList<IArchiveHeader> FileMessageArchive::loadFileHeaders(const Jid &AStreamJid,
 		{
 			dirPaths.append(streamPath);
 		}
-		else if (ARequest.with.node().isEmpty() && !ARequest.exactmatch)
+		else if (!ARequest.with.hasNode() && !ARequest.exactmatch)
 		{
 			QString gateDomain = gatewayJid(ARequest.with).pDomain();
 			QString encResource = Jid::encode(ARequest.with.pResource());
@@ -913,7 +913,7 @@ void FileMessageArchive::loadGatewayTypes()
 
 Jid FileMessageArchive::gatewayJid(const Jid &AJid) const
 {
-	if (!AJid.node().isEmpty())
+	if (AJid.hasNode())
 	{
 		QString gateType = contactGateType(AJid);
 		if (!gateType.isEmpty())
@@ -1006,9 +1006,9 @@ bool FileMessageArchive::checkRequestHeader(const IArchiveHeader &AHeader, const
 	{
 		if (!ARequest.exactmatch)
 		{
-			if (!ARequest.with.pNode().isEmpty() && ARequest.with.pNode()!=AHeader.with.pNode())
+			if (ARequest.with.hasNode() && ARequest.with.pNode()!=AHeader.with.pNode())
 				return false;
-			if (!ARequest.with.pResource().isEmpty() && ARequest.with.pResource()!=AHeader.with.pResource())
+			if (ARequest.with.hasResource() && ARequest.with.pResource()!=AHeader.with.pResource())
 				return false;
 			
 			QString headerGate = contactGateType(AHeader.with);
@@ -1406,7 +1406,7 @@ void FileMessageArchive::onAccountActiveChanged(IAccount *AAccount, bool AActive
 
 void FileMessageArchive::onDiscoInfoReceived(const IDiscoInfo &AInfo)
 {
-	if (AInfo.node.isEmpty() && AInfo.contactJid.node().isEmpty() && AInfo.contactJid.resource().isEmpty() && !FGatewayTypes.contains(AInfo.contactJid.pDomain()))
+	if (AInfo.node.isEmpty() && !AInfo.contactJid.hasNode() && !AInfo.contactJid.hasResource() && !FGatewayTypes.contains(AInfo.contactJid.pDomain()))
 	{
 		foreach(const IDiscoIdentity &identity, AInfo.identity)
 		{

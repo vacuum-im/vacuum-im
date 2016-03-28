@@ -110,14 +110,14 @@ bool OptionsManager::initObjects()
 
 	if (FMainWindowPlugin)
 	{
-		FMainWindowPlugin->mainWindow()->mainMenu()->addAction(FChangeProfileAction,AG_MMENU_OPTIONS,true);
-		FMainWindowPlugin->mainWindow()->mainMenu()->addAction(FShowOptionsDialogAction,AG_MMENU_OPTIONS,true);
+		FMainWindowPlugin->mainWindow()->mainMenu()->addAction(FChangeProfileAction,AG_MMENU_OPTIONS_PROFILE,true);
+		FMainWindowPlugin->mainWindow()->mainMenu()->addAction(FShowOptionsDialogAction,AG_MMENU_OPTIONS_OPTIONS,true);
 	}
 
 	if (FTrayManager)
 	{
-		FTrayManager->contextMenu()->addAction(FChangeProfileAction,AG_TMTM_OPTIONS,true);
-		FTrayManager->contextMenu()->addAction(FShowOptionsDialogAction,AG_TMTM_OPTIONS,true);
+		FTrayManager->contextMenu()->addAction(FChangeProfileAction,AG_TMTM_OPTIONS_OPTIONS,true);
+		FTrayManager->contextMenu()->addAction(FShowOptionsDialogAction,AG_TMTM_OPTIONS_PROFILE,true);
 	}
 
 	return true;
@@ -662,14 +662,20 @@ bool OptionsManager::saveProfile(const QString &AProfile, const QDomDocument &AP
 	QFile file(profilePath(AProfile) + "/" FILE_PROFILE);
 	if (file.open(QFile::WriteOnly|QFile::Truncate))
 	{
-		LOG_INFO(QString("Profile options saved, profile=%1").arg(AProfile));
-		file.write(AProfileDoc.toByteArray());
-		file.close();
-		return true;
+		QByteArray data = AProfileDoc.toByteArray();
+		if (file.write(data)==data.size() && file.flush())
+		{
+			LOG_INFO(QString("Profile options saved, profile=%1").arg(AProfile));
+			return true;
+		}
+		else
+		{
+			REPORT_ERROR(QString("Failed to save profile options to file: %1").arg(file.errorString()));
+		}
 	}
 	else
 	{
-		REPORT_ERROR(QString("Failed to save profile options to file: %1").arg(file.errorString()));
+		REPORT_ERROR(QString("Failed to create profile options file: %1").arg(file.errorString()));
 	}
 	return false;
 }
@@ -681,14 +687,20 @@ bool OptionsManager::saveCurrentProfileOptions() const
 		QFile file(QDir(profilePath(FProfile)).filePath(FILE_OPTIONS));
 		if (file.open(QIODevice::WriteOnly|QIODevice::Truncate))
 		{
-			LOG_DEBUG(QString("Current profile options saved, profile=%1").arg(FProfile));
-			file.write(FProfileOptions.toByteArray());
-			file.close();
-			return true;
+			QByteArray data = FProfileOptions.toByteArray();
+			if (file.write(data)==data.size() && file.flush())
+			{
+				LOG_DEBUG(QString("Current profile options saved, profile=%1").arg(FProfile));
+				return true;
+			}
+			else
+			{
+				REPORT_ERROR(QString("Failed to save current profile options to file: %1").arg(file.errorString()));
+			}
 		}
 		else
 		{
-			REPORT_ERROR(QString("Failed to save current profile options to file: %1").arg(file.errorString()));
+			REPORT_ERROR(QString("Failed to create current profile options file: %1").arg(file.errorString()));
 		}
 	}
 	else

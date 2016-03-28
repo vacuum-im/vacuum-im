@@ -26,23 +26,31 @@ public:
 	virtual Menu *addressMenu() const;
 	virtual bool isAddressMenuVisible() const;
 	virtual void setAddressMenuVisible(bool AVisible);
+	virtual bool isCaptionClickable() const;
+	virtual void setCaptionClickable(bool AEnabled);
 	virtual QVariant fieldValue(int AField) const;
 	virtual void setFieldValue(int AField, const QVariant &AValue);
 	virtual ToolBarChanger *infoToolBarChanger() const;
 signals:
+	void captionFieldClicked();
 	void fieldValueChanged(int AField);
+	void captionClickableChanged(bool AEnabled);
 	void addressMenuVisibleChanged(bool AVisible);
 	void addressMenuRequested(Menu *AMenu);
 	void contextMenuRequested(Menu *AMenu);
 	void toolTipsRequested(QMap<int,QString> &AToolTips);
 protected:
 	void updateFieldView(int AField);
+	void showContextMenu(const QPoint &AGlobalPos);
 protected:
 	bool event(QEvent *AEvent);
+	bool eventFilter(QObject *AObject, QEvent *AEvent);
 	void contextMenuEvent(QContextMenuEvent *AEvent);
 protected slots:
 	void onAddressMenuAboutToShow();
 	void onUpdateInfoToolBarVisibility();
+	void onInfoLabelLinkActivated(const QString &ALink);
+	void onInfoLabelCustomContextMenuRequested(const QPoint &APos);
 private:
 	Ui::InfoWidgetClass ui;
 private:
@@ -51,6 +59,10 @@ private:
 private:
 	Menu *FAddressMenu;
 	bool FAddressMenuVisible;
+private:
+	bool FCaptionClickable;
+	bool FInfoLabelUnderMouse;
+private:
 	IMessageWindow *FWindow;
 	ToolBarChanger *FInfoToolBar;
 	QMap<int, QVariant> FFieldValues;

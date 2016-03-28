@@ -24,7 +24,7 @@ protected:
 	void saveContext(const QUuid &AContextId);
 	void colorXml(QString &AXml) const;
 	void hidePasswords(QString &AXml) const;
-	void showElement(IXmppStream *AXmppStream, const QDomElement &AElem, bool ASended);
+	void showStanza(IXmppStream *AXmppStream, const Stanza &AStanza, bool ASent);
 protected slots:
 	void onAddConditionClicked();
 	void onRemoveConditionClicked();

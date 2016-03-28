@@ -8,7 +8,7 @@
 #include <definitions/shortcuts.h>
 #include <definitions/optionvalues.h>
 #include <definitions/messagedataroles.h>
-#include <definitions/messagechatwindowwidgets.h>
+#include <definitions/messagewindowwidgets.h>
 #include <utils/widgetmanager.h>
 #include <utils/textmanager.h>
 #include <utils/shortcuts.h>
@@ -107,6 +107,11 @@ IMessageReceiversWidget *ChatWindow::receiversWidget() const
 	return NULL;
 }
 
+SplitterWidget *ChatWindow::messageWidgetsBox() const
+{
+	return ui.spwMessageBox;
+}
+
 QString ChatWindow::tabPageId() const
 {
 	return "ChatWindow|"+streamJid().pBare()+"|"+contactJid().pBare();
@@ -185,11 +190,6 @@ void ChatWindow::setTabPageNotifier(IMessageTabPageNotifier *ANotifier)
 		FTabPageNotifier = ANotifier;
 		emit tabPageNotifierChanged();
 	}
-}
-
-SplitterWidget *ChatWindow::messageWidgetsBox() const
-{
-	return ui.spwMessageBox;
 }
 
 void ChatWindow::updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip)

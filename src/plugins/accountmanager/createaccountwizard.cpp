@@ -915,7 +915,7 @@ void RegisterRequestPage::cleanupPage()
 
 bool RegisterRequestPage::isComplete() const
 {
-	return dfwRegisterForm!=NULL ? FDataForms->isSubmitValid(dfwRegisterForm->dataForm(),dfwRegisterForm->userDataForm()) : false;
+	return dfwRegisterForm!=NULL ? dfwRegisterForm->isSubmitValid() : false;
 }
 
 bool RegisterRequestPage::validatePage()
@@ -1053,9 +1053,9 @@ void RegisterRequestPage::onRegisterFields(const QString &AId, const IRegisterFi
 			}
 		}
 
-		dfwRegisterForm = FDataForms->formWidget(FRegisterFields.form,this);
-		vltRegisterForm->addWidget(dfwRegisterForm->instance());
+		dfwRegisterForm = FDataForms->formWidget(FDataForms->localizeForm(FRegisterFields.form),this);
 		connect(dfwRegisterForm->instance(),SIGNAL(fieldChanged(IDataFieldWidget *)),SIGNAL(completeChanged()));
+		vltRegisterForm->addWidget(dfwRegisterForm->instance());
 
 		lblCaption->setVisible(false);
 		prbProgress->setVisible(false);

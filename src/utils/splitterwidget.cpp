@@ -9,6 +9,7 @@ SplitterWidget::SplitterWidget(QWidget *AParent, Qt::Orientation AOrientation) :
 	setLayout(new QVBoxLayout);
 	layout()->setMargin(0);
 
+	FLastSize = size();
 	FMovingWidgets = false;
 
 	FSplitter = new QSplitter(AOrientation,this);
@@ -441,9 +442,10 @@ bool SplitterWidget::eventFilter(QObject *AObject, QEvent *AEvent)
 
 			int deltaSize;
 			if (orientation() == Qt::Vertical)
-				deltaSize = resizeEvent->size().height() - resizeEvent->oldSize().height();
+				deltaSize = resizeEvent->size().height() - FLastSize.height();
 			else
-				deltaSize = resizeEvent->size().width() - resizeEvent->oldSize().width();
+				deltaSize = resizeEvent->size().width() - FLastSize.width();
+			FLastSize = resizeEvent->size();
 
 			if (deltaSize != 0)
 				adjustBoxWidgetSizes(deltaSize);

@@ -22,7 +22,7 @@ bool StartTLSFeature::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, in
 	if (AXmppStream==FXmppStream && AOrder==XSHO_XMPP_FEATURE)
 	{
 		FXmppStream->removeXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
-		if (AStanza.tagName() == "proceed")
+		if (AStanza.kind() == "proceed")
 		{
 			if (FXmppStream->connection()->startEncryption())
 			{
@@ -35,7 +35,7 @@ bool StartTLSFeature::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, in
 				emit error(XmppError(IERR_STARTTLS_NOT_STARTED));
 			}
 		}
-		else if (AStanza.tagName() == "failure")
+		else if (AStanza.kind() == "failure")
 		{
 			LOG_STRM_WARNING(FXmppStream->streamJid(),"Failed to negotiate StartTLS encryption: Negotiation failed");
 			emit error(XmppError(IERR_STARTTLS_NEGOTIATION_FAILED));
@@ -72,8 +72,7 @@ bool StartTLSFeature::start(const QDomElement &AElem)
 	{
 		if (FXmppStream->connection()->isEncryptionSupported() && !FXmppStream->connection()->isEncrypted())
 		{
-			Stanza request("starttls");
-			request.setAttribute("xmlns",NS_FEATURE_STARTTLS);
+			Stanza request("starttls",NS_FEATURE_STARTTLS);
 			FXmppStream->insertXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 			FXmppStream->sendStanza(request);
 			LOG_STRM_INFO(FXmppStream->streamJid(),"StartTLS negotiation request sent");

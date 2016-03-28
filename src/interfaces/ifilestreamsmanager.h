@@ -70,11 +70,11 @@ protected:
 	virtual void streamDestroyed() =0;
 };
 
-class IFileStreamsHandler
+class IFileStreamHandler
 {
 public:
-	virtual bool fileStreamRequest(int AOrder, const QString &AStreamId, const Stanza &ARequest, const QList<QString> &AMethods) =0;
-	virtual bool fileStreamResponce(const QString &AStreamId, const Stanza &AResponce, const QString &AMethodNS) =0;
+	virtual bool fileStreamProcessRequest(int AOrder, const QString &AStreamId, const Stanza &ARequest, const QList<QString> &AMethods) =0;
+	virtual bool fileStreamProcessResponse(const QString &AStreamId, const Stanza &AResponse, const QString &AMethodNS) =0;
 	virtual bool fileStreamShowDialog(const QString &AStreamId) =0;
 };
 
@@ -82,19 +82,24 @@ class IFileStreamsManager
 {
 public:
 	virtual QObject *instance() =0;
+	// File Streams
 	virtual QList<IFileStream *> streams() const =0;
-	virtual IFileStream *streamById(const QString &AStreamId) const =0;
-	virtual IFileStream *createStream(IFileStreamsHandler *AHandler, const QString &AStreamId, const Jid &AStreamJid, const Jid &AContactJid, IFileStream::StreamKind AKind, QObject *AParent = NULL) =0;
-	virtual IFileStreamsHandler *streamHandler(const QString &AStreamId) const =0;
-	virtual void insertStreamsHandler(IFileStreamsHandler *AHandler, int AOrder) =0;
-	virtual void removeStreamsHandler(IFileStreamsHandler *AHandler, int AOrder) =0;
+	virtual IFileStream *findStream(const QString &AStreamId) const =0;
+	virtual IFileStreamHandler *findStreamHandler(const QString &AStreamId) const =0;
+	virtual IFileStream *createStream(IFileStreamHandler *AHandler, const QString &AStreamId, const Jid &AStreamJid, const Jid &AContactJid, IFileStream::StreamKind AKind, QObject *AParent = NULL) =0;
+	// Stream Handlers
+	virtual QList<IFileStreamHandler *> streamHandlers() const =0;
+	virtual void insertStreamsHandler(int AOrder, IFileStreamHandler *AHandler) =0;
+	virtual void removeStreamsHandler(int AOrder, IFileStreamHandler *AHandler) =0;
 protected:
 	virtual void streamCreated(IFileStream *AStream) =0;
 	virtual void streamDestroyed(IFileStream *AStream) =0;
+	virtual void streamHandlerInserted(int AOrder, IFileStreamHandler *AHandler) =0;
+	virtual void streamHandlerRemoved(int AOrder, IFileStreamHandler *AHandler) =0;
 };
 
 Q_DECLARE_INTERFACE(IFileStream,"Vacuum.Plugin.IFileStream/1.2")
-Q_DECLARE_INTERFACE(IFileStreamsHandler,"Vacuum.Plugin.IFileStreamsHandler/1.0")
-Q_DECLARE_INTERFACE(IFileStreamsManager,"Vacuum.Plugin.IFileStreamsManager/1.2")
+Q_DECLARE_INTERFACE(IFileStreamHandler,"Vacuum.Plugin.IFileStreamHandler/1.1")
+Q_DECLARE_INTERFACE(IFileStreamsManager,"Vacuum.Plugin.IFileStreamsManager/1.3")
 
 #endif // IFILESTREAMSMANAGER_H

@@ -22,7 +22,7 @@ signals:
 private:
 	int FLevel;
 	QDomText FElemSpace;
-	QDomElement FRootElem;
+	QDomElement FStanzaElem;
 	QDomElement FCurrentElem;
 	QXmlStreamReader FReader;
 };

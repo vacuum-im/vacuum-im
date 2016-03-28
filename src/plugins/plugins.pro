@@ -67,7 +67,8 @@ SUBDIRS += spellchecker
 SUBDIRS += messagecarbons
 SUBDIRS += recentcontacts 
 SUBDIRS += metacontacts 
-SUBDIRS += statistics 
+SUBDIRS += statistics
+SUBDIRS += datastreamspublisher 
 
 contains(QT_MODULES, webkit) {
   SUBDIRS += adiummessagestyle

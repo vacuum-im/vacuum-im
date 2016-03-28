@@ -100,14 +100,14 @@ ConsoleWidget::~ConsoleWidget()
 bool ConsoleWidget::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
 	if (AOrder == XSHO_CONSOLE)
-		showElement(AXmppStream,AStanza.element(),false);
+		showStanza(AXmppStream,AStanza,false);
 	return false;
 }
 
 bool ConsoleWidget::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
 	if (AOrder == XSHO_CONSOLE)
-		showElement(AXmppStream,AStanza.element(),true);
+		showStanza(AXmppStream,AStanza,true);
 	return false;
 }
 
@@ -181,27 +181,27 @@ void ConsoleWidget::hidePasswords(QString &AXml) const
 	AXml.replace(passRegExp,passNewStr);
 }
 
-void ConsoleWidget::showElement(IXmppStream *AXmppStream, const QDomElement &AElem, bool ASended)
+void ConsoleWidget::showStanza(IXmppStream *AXmppStream, const Stanza &AStanza, bool ASent)
 {
 	Jid streamJid = ui.cmbStreamJid->currentIndex()>0 ? ui.cmbStreamJid->itemData(ui.cmbStreamJid->currentIndex()).toString() : QString::null;
 	if (streamJid.isEmpty() || streamJid==AXmppStream->streamJid())
 	{
-		Stanza stanza(AElem);
 		bool accepted = FStanzaProcessor==NULL || ui.ltwConditions->count()==0;
 		for (int i=0; !accepted && i<ui.ltwConditions->count(); i++)
-			accepted = FStanzaProcessor->checkStanza(stanza,ui.ltwConditions->item(i)->text());
+			accepted = FStanzaProcessor->checkStanza(AStanza,ui.ltwConditions->item(i)->text());
 
 		if (accepted)
 		{
-			static QString sended =   QString(">>>>").toHtmlEscaped() + " <b>%1</b> %2 +%3 " + QString(">>>>").toHtmlEscaped();
-			static QString received = QString("<<<<").toHtmlEscaped() + " <b>%1</b> %2 +%3 " + QString("<<<<").toHtmlEscaped();
+			static QString sentHeader =   QString(">>>>").toHtmlEscaped() + " <b>%1</b> %2 +%3 " + QString(">>>>").toHtmlEscaped();
+			static QString recvHeader = QString("<<<<").toHtmlEscaped() + " <b>%1</b> %2 +%3 " + QString("<<<<").toHtmlEscaped();
 
 			int delta = FTimePoint.isValid() ? FTimePoint.msecsTo(QTime::currentTime()) : 0;
 			FTimePoint = QTime::currentTime();
-			QString caption = (ASended ? sended : received).arg(AXmppStream->streamJid().uFull().toHtmlEscaped()).arg(FTimePoint.toString()).arg(delta);
-			ui.tbrConsole->append(caption);
 
-			QString xml = stanza.toString(2);
+			QString header = (ASent ? sentHeader : recvHeader).arg(AXmppStream->streamJid().uFull().toHtmlEscaped()).arg(FTimePoint.toString()).arg(delta);
+			ui.tbrConsole->append(header);
+
+			QString xml = AStanza.toString(2);
 			hidePasswords(xml);
 			xml = "<pre>"+xml.toHtmlEscaped().replace('\n',"<br>")+"</pre>";
 			if (ui.chbHilightXML->checkState() == Qt::Checked)
@@ -238,7 +238,7 @@ void ConsoleWidget::onSendXMLClicked()
 	if (FXmppStreamManager!=NULL && doc.setContent(ui.tedSendXML->toPlainText(),true))
 	{
 		Stanza stanza(doc.documentElement());
-		if (stanza.isValid())
+		if (!stanza.isNull())
 		{
 			ui.tbrConsole->append("<b>"+tr("Start sending user stanza...")+"</b><br>");
 			foreach(IXmppStream *stream, FXmppStreamManager->xmppStreams())

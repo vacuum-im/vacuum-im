@@ -41,10 +41,6 @@
         <translation>Por defecto</translation>
     </message>
     <message>
-        <source>Unknown</source>
-        <translation>Desconocido</translation>
-    </message>
-    <message>
         <source>Active</source>
         <translation>Activo</translation>
     </message>
@@ -57,24 +53,32 @@
         <translation>Distraído</translation>
     </message>
     <message>
-        <source>User chat status</source>
-        <translation>Actividad del chat del interlocutor</translation>
-    </message>
-    <message>
-        <source>Always send</source>
-        <translation>Enviar siempre</translation>
-    </message>
-    <message>
-        <source>Never send</source>
-        <translation>Nunca enviar</translation>
-    </message>
-    <message>
         <source>Inactive %1</source>
         <translation>Inactivo %1</translation>
     </message>
     <message>
         <source>Gone %1</source>
         <translation>Fuera %1</translation>
+    </message>
+    <message>
+        <source>User activity in chat</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>and %1 other</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Always send my chat activity</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Never send my chat activity</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Participants activity in conference</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>

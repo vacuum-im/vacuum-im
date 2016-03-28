@@ -235,11 +235,13 @@ QMultiMap<int, IOptionsDialogWidget *> Notifications::optionsDialogWidgets(const
 		widgets.insertMulti(OHO_NOTIFICATIONS,FOptionsManager->newOptionsDialogHeader(tr("Notifications"),AParent));
 		widgets.insertMulti(OWO_NOTIFICATIONS_DISABLEIFAWAY,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_NOTIFICATIONS_SILENTIFAWAY),tr("Disable sounds and popup windows if status is 'Away'"),AParent));
 		widgets.insertMulti(OWO_NOTIFICATIONS_DISABLEIFDND,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_NOTIFICATIONS_SILENTIFDND),tr("Disable sounds and popup windows if status is 'Do not disturb'"),AParent));
-		widgets.insertMulti(OWO_NOTIFICATIONS_NATIVEPOPUPS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_NOTIFICATIONS_NATIVEPOPUPS),tr("Use native popup notifications if available"),AParent));
 		widgets.insertMulti(OWO_NOTIFICATIONS_FORCESOUND,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_NOTIFICATIONS_FORCESOUND),tr("Play notification sound when received a message in the active window"),AParent));
 		widgets.insertMulti(OWO_NOTIFICATIONS_HIDEMESSAGE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_NOTIFICATIONS_HIDEMESSAGE),tr("Do not show the message body in the popup window"),AParent));
 		widgets.insertMulti(OWO_NOTIFICATIONS_EXPANDGROUPS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_NOTIFICATIONS_EXPANDGROUPS),tr("Expand contact groups in roster"),AParent));
-		
+
+		if (FTrayManager && FTrayManager->isMessagesSupported())
+			widgets.insertMulti(OWO_NOTIFICATIONS_NATIVEPOPUPS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_NOTIFICATIONS_NATIVEPOPUPS),tr("Use native popup notifications"),AParent));
+
 		QSpinBox *spbPopupTimeout = new QSpinBox(AParent);
 		spbPopupTimeout->setRange(0,120);
 		spbPopupTimeout->setSuffix(tr(" seconds"));
@@ -557,10 +559,10 @@ ushort Notifications::typeNotificationKinds(const QString &ATypeId) const
 {
 	if (FTypeRecords.contains(ATypeId))
 	{
-		TypeRecord &typeRecord = FTypeRecords[ATypeId];
-		if (typeRecord.kinds == UNDEFINED_KINDS)
-			typeRecord.kinds = Options::node(OPV_NOTIFICATIONS_TYPEKINDS_ITEM,ATypeId).value().toInt() ^ typeRecord.type.kindDefs;
-		return typeRecord.kinds;
+		TypeRecord &rec = FTypeRecords[ATypeId];
+		if (rec.kinds == UNDEFINED_KINDS)
+			rec.kinds = Options::node(OPV_NOTIFICATIONS_TYPEKINDS_ITEM,ATypeId).value().toInt() ^ rec.type.kindDefs;
+		return rec.kinds & rec.type.kindMask;
 	}
 	return 0;
 }
@@ -574,9 +576,9 @@ void Notifications::setTypeNotificationKinds(const QString &ATypeId, ushort AKin
 {
 	if (FTypeRecords.contains(ATypeId))
 	{
-		TypeRecord &typeRecord = FTypeRecords[ATypeId];
-		typeRecord.kinds = AKinds & typeRecord.type.kindMask;
-		Options::node(OPV_NOTIFICATIONS_TYPEKINDS_ITEM,ATypeId).setValue(typeRecord.kinds ^ typeRecord.type.kindDefs);
+		TypeRecord &rec = FTypeRecords[ATypeId];
+		rec.kinds = AKinds & rec.type.kindMask;
+		Options::node(OPV_NOTIFICATIONS_TYPEKINDS_ITEM,ATypeId).setValue(rec.kinds ^ rec.type.kindDefs);
 	}
 }
 
@@ -602,7 +604,7 @@ void Notifications::removeNotificationHandler(int AOrder, INotificationHandler *
 
 QImage Notifications::contactAvatar(const Jid &AContactJid) const
 {
-	return FAvatars!=NULL ? FAvatars->loadAvatarImage(FAvatars->avatarHash(AContactJid), QSize(32,32)) : QImage();
+	return FAvatars!=NULL ? FAvatars->visibleAvatarImage(FAvatars->avatarHash(AContactJid),FAvatars->avatarSize(IAvatars::AvatarNormal)) : QImage();
 }
 
 QIcon Notifications::contactIcon(const Jid &AStreamJid, const Jid &AContactJid) const
@@ -624,7 +626,7 @@ QString Notifications::contactName(const Jid &AStreamJid, const Jid &AContactJid
 		name = roster!=NULL ? roster->findItem(AContactJid).name : AContactJid.uNode();
 	}
 
-	return name.isEmpty() ? AContactJid.uBare() : name;
+	return name.isEmpty() ? AContactJid.uNode() : name;
 }
 
 int Notifications::notifyIdByRosterId(int ARosterId) const
@@ -805,7 +807,7 @@ void Notifications::onOptionsOpened()
 
 void Notifications::onOptionsChanged(const OptionsNode &ANode)
 {
-	if (Options::cleanNSpaces(ANode.path()) == OPV_NOTIFICATIONS_KINDENABLED_ITEM)
+	if (ANode.cleanPath() == OPV_NOTIFICATIONS_KINDENABLED_ITEM)
 	{
 		if (ANode.nspace().toInt() == INotification::SoundPlay)
 		{

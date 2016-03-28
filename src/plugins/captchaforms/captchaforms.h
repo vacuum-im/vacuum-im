@@ -8,6 +8,11 @@
 #include <interfaces/inotifications.h>
 #include <interfaces/istanzaprocessor.h>
 
+struct TriggerItem {
+	QString id;
+	QDateTime sent;
+};
+
 struct ChallengeItem {
 	Jid streamJid;
 	Jid challenger;
@@ -53,12 +58,17 @@ signals:
 	void challengeRejected(const QString &AChallengeId, const XmppError &AError);
 	void challengeCanceled(const QString &AChallengeId);
 protected:
+	void appendTrigger(const Jid &AStreamJid, const Stanza &AStanza);
+	bool hasTrigger(const Jid &AStreamJid, const IDataForm &AForm) const;
+protected:
+	IDataForm getChallengeForm(const Stanza &AStanza) const;
+	bool isValidChallenge(const Stanza &AStanza, const IDataForm &AForm) const;
 	bool isSupportedChallenge(IDataForm &AForm) const;
-	bool isValidChallenge(const Jid &AStreamJid, const Stanza &AStanza, IDataForm &AForm) const;
 	void notifyChallenge(const ChallengeItem &AChallenge);
 	QString findChallenge(IDataDialogWidget *ADialog) const;
 	QString findChallenge(const Jid &AStreamJid, const Jid &AContactJid) const;
-	bool setFocusToEditableWidget(QWidget *AWidget);
+protected:
+	bool setFocusToEditableField(IDataDialogWidget *ADialog);
 protected:
 	bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:
@@ -70,15 +80,17 @@ protected slots:
 	void onNotificationRemoved(int ANotifyId);
 private:
 	IDataForms *FDataForms;
-	IXmppStreamManager *FXmppStreamManager;
 	INotifications *FNotifications;
 	IStanzaProcessor *FStanzaProcessor;
+	IXmppStreamManager *FXmppStreamManager;
 private:
+	QMap<Jid, int> FSHITrigger;
 	QMap<Jid, int> FSHIChallenge;
 private:
 	QMap<int, QString> FChallengeNotify;
 	QMap<QString, QString> FChallengeRequest;
 	QMap<QString, ChallengeItem> FChallenges;
+	QMap<Jid, QHash<Jid, QList<TriggerItem> > > FTriggers;
 };
 
 #endif // CAPTCHAFORMS_H

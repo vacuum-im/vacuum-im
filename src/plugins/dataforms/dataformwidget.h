@@ -12,12 +12,14 @@ class DataFormWidget :
 public:
 	DataFormWidget(IDataForms *ADataForms, const IDataForm &AForm, QWidget *AParent);
 	virtual QWidget *instance() { return this; }
+	virtual bool isSubmitValid() const;
 	virtual bool checkForm(bool AAllowInvalid) const;
 	virtual IDataTableWidget *tableWidget() const;
 	virtual IDataFieldWidget *fieldWidget(int AIndex) const;
 	virtual IDataFieldWidget *fieldWidget(const QString &AVar) const;
-	virtual IDataForm userDataForm() const;
 	virtual const IDataForm &dataForm() const;
+	virtual IDataForm userDataForm() const;
+	virtual IDataForm submitDataForm() const;
 signals:
 	void cellActivated(int ARow, int AColumn);
 	void cellChanged(int ARow, int AColumn, int APrevRow, int APrevColumn);

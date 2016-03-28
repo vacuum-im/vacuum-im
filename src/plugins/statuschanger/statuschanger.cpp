@@ -203,14 +203,14 @@ bool StatusChanger::initObjects()
 
 	if (FTrayManager)
 	{
-		FTrayManager->contextMenu()->addAction(FMainMenu->menuAction(),AG_TMTM_STATUSCHANGER,true);
+		FTrayManager->contextMenu()->addAction(FMainMenu->menuAction(),AG_TMTM_STATUSCHANGER_STATUS,true);
 	}
 
 	if (FNotifications)
 	{
 		INotificationType notifyType;
 		notifyType.order = NTO_CONNECTION_ERROR;
-		notifyType.icon = FStatusIcons!=NULL ? FStatusIcons->iconByStatus(IPresence::Error,QString::null,false) : QIcon();
+		notifyType.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_SCHANGER_CONNECTION_ERROR);
 		notifyType.title = tr("On loss of connection to the server");
 		notifyType.kindMask = INotification::PopupWindow|INotification::SoundPlay;
 		notifyType.kindDefs = notifyType.kindMask;
@@ -927,8 +927,13 @@ void StatusChanger::autoReconnect(IPresence *APresence)
 				int reconSecs = FFastReconnect.contains(APresence) ? 1 : 30;
 				FPendingReconnect.insert(APresence,QPair<QDateTime,int>(QDateTime::currentDateTime().addSecs(reconSecs),statusId));
 				QTimer::singleShot(reconSecs*1000+100,this,SLOT(onReconnectTimer()));
+				LOG_STRM_INFO(APresence->streamJid(),QString("Automatically reconnection scheduled after %1 seconds").arg(reconSecs));
 			}
 		}
+	}
+	else
+	{
+		LOG_STRM_INFO(APresence->streamJid(),QString("Automatically reconnection stopped due to error: %1").arg(APresence->xmppStream()->error().condition()));
 	}
 }
 
@@ -1151,7 +1156,7 @@ void StatusChanger::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &A
 				action->setMenu(menu);
 				action->setText(tr("Status"));
 				action->setIcon(menu->menuAction()->icon());
-				AMenu->addAction(action,AG_RVCM_STATUSCHANGER,true);
+				AMenu->addAction(action,AG_RVCM_STATUSCHANGER_STATUS,true);
 			}
 		}
 		else if (index->kind() == RIK_CONTACTS_ROOT)
@@ -1165,7 +1170,7 @@ void StatusChanger::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &A
 					menu->addAction(action,AG_SCSM_STATUSCHANGER_CUSTOM_STATUS,true);
 				foreach(Action *action, FMainMenu->actions(AG_SCSM_STATUSCHANGER_DEFAULT_STATUS))
 					menu->addAction(action,AG_SCSM_STATUSCHANGER_DEFAULT_STATUS,true);
-				AMenu->addAction(menu->menuAction(),AG_RVCM_STATUSCHANGER,true);
+				AMenu->addAction(menu->menuAction(),AG_RVCM_STATUSCHANGER_STATUS,true);
 			}
 		}
 	}
@@ -1288,7 +1293,7 @@ void StatusChanger::onApplicationShutdownStarted()
 
 void StatusChanger::onReconnectTimer()
 {
-	QMap<IPresence *,QPair<QDateTime,int> >::iterator it = FPendingReconnect.begin();
+	QMap<IPresence *, QPair<QDateTime,int> >::iterator it = FPendingReconnect.begin();
 	while (it != FPendingReconnect.end())
 	{
 		if (it.value().first <= QDateTime::currentDateTime())
@@ -1296,9 +1301,10 @@ void StatusChanger::onReconnectTimer()
 			IPresence *presence = it.key();
 			int statusId = FStatusItems.contains(it.value().second) ? it.value().second : STATUS_MAIN_ID;
 			it = FPendingReconnect.erase(it);
+
 			if (presence->show() == IPresence::Error)
 			{
-				LOG_STRM_INFO(presence->streamJid(),"Automatically reconnecting stream on error");
+				LOG_STRM_INFO(presence->streamJid(),"Automatically reconnecting stream");
 				setStreamStatus(presence->streamJid(),statusId);
 			}
 		}

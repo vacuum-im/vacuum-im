@@ -58,7 +58,7 @@ bool ConsolePlugin::initObjects()
 		action->setText(tr("XML Console"));
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_CONSOLE);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onShowXMLConsole(bool)));
-		FMainWindowPlugin->mainWindow()->mainMenu()->addAction(action,AG_MMENU_CONSOLE,true);
+		FMainWindowPlugin->mainWindow()->mainMenu()->addAction(action,AG_MMENU_CONSOLE_XML,true);
 	}
 	return true;
 }

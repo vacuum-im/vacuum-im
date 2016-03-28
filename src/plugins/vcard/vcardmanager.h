@@ -73,7 +73,7 @@ public:
 	virtual QDialog *showVCardDialog(const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent = NULL);
 signals:
 	void vcardReceived(const Jid &AContactJid);
-	void vcardPublished(const Jid &AContactJid);
+	void vcardPublished(const Jid &AStreamJid);
 	void vcardError(const Jid &AContactJid, const XmppError &AError);
 	// IRosterDataHolder
 	void rosterDataChanged(IRosterIndex *AIndex, int ARole);
@@ -122,8 +122,7 @@ private:
 	QMap<Jid,VCardItem> FVCards;
 	QMultiMap<Jid,Jid> FUpdateQueue;
 	QMap<QString,Jid> FVCardRequestId;
-	QMap<QString,Jid> FVCardPublishId;
-	QMap<QString,Stanza> FVCardPublishStanza;
+	QMap<QString,Stanza> FVCardPublishId;
 	QMap<Jid,VCardDialog *> FVCardDialogs;
 	mutable QHash<Jid,QStringList> FSearchStrings;
 };

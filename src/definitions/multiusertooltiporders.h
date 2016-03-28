@@ -1,10 +1,13 @@
 #ifndef DEF_MULTIUSERTOOLTIPORDERS_H
 #define DEF_MULTIUSERTOOLTIPORDERS_H
 
-#define MUTTO_MUC_NICKNAME                    100
-#define MUTTO_MUC_REALJID                     200
-#define MUTTO_MUC_ROLE                        400
-#define MUTTO_MUC_AFFILIATION                 500
-#define MUTTO_MUC_STATUS                      800
+#include <definitions/rostertooltiporders.h>
+
+#define MUTTO_MULTIUSERCHAT_AVATAR                      RTTO_AVATAR_IMAGE
+#define MUTTO_MULTIUSERCHAT_NICKNAME                    RTTO_ROSTERSVIEW_INFO_NAME
+#define MUTTO_MULTIUSERCHAT_REALJID                     RTTO_ROSTERSVIEW_INFO_JABBERID
+#define MUTTO_MULTIUSERCHAT_ROLE                        RTTO_MULTIUSERCHAT_ROLE
+#define MUTTO_MULTIUSERCHAT_AFFILIATION                 RTTO_MULTIUSERCHAT_AFFILIATION
+#define MUTTO_MULTIUSERCHAT_STATUS                      RTTO_ROSTERSVIEW_RESOURCE_STATUS_TEXT
 
 #endif // DEF_MULTIUSERTOOLTIPORDERS_H

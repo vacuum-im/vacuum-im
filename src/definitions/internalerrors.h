@@ -26,9 +26,9 @@
 #define IERR_DATAFORMS_URL_NETWORK_ERROR                     "dataforms-url-network-error"
 
 // DataStreamsManager
-#define IERR_DATASTREAMS_PROFILE_INVALID_SETTINGS            "datastreams-profile-invalid-settings"
 #define IERR_DATASTREAMS_STREAM_STREAMID_EXISTS              "datastreams-stream-streamid-exists"
-#define IERR_DATASTREAMS_STREAM_INVALID_INIT_RESPONCE        "datastreams-stream-invalid-init-responce"
+#define IERR_DATASTREAMS_STREAM_INVALID_RESPONSE             "datastreams-stream-invalid-response"
+#define IERR_DATASTREAMS_STREAM_UNSUPPORTED_REQUEST          "datastreams-stream-invalid-request"
 
 // FileMessageArchive
 #define IERR_FILEARCHIVE_DATABASE_NOT_CREATED                "filearchive-database-not-created"

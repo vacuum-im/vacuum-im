@@ -1,72 +1,68 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>EditUsersListDialogClass</class>
- <widget class="QDialog" name="EditUsersListDialogClass" >
-  <property name="geometry" >
+ <widget class="QDialog" name="EditUsersListDialogClass">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>412</width>
-    <height>382</height>
+    <width>535</width>
+    <height>377</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" >
-   <property name="margin" >
+  <property name="windowTitle">
+   <string/>
+  </property>
+  <layout class="QVBoxLayout">
+   <property name="margin">
     <number>5</number>
    </property>
    <item>
-    <widget class="QTableWidget" name="tbwTable" >
-     <property name="editTriggers" >
-      <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed</set>
+    <widget class="SearchLineEdit" name="sleSearch">
+     <property name="placeholderText">
+      <string>Search users</string>
      </property>
-     <property name="alternatingRowColors" >
-      <bool>true</bool>
-     </property>
-     <property name="selectionMode" >
-      <enum>QAbstractItemView::SingleSelection</enum>
-     </property>
-     <property name="selectionBehavior" >
-      <enum>QAbstractItemView::SelectRows</enum>
-     </property>
-     <property name="sortingEnabled" >
-      <bool>true</bool>
-     </property>
-     <property name="columnCount" >
-      <number>2</number>
-     </property>
-     <column>
-      <property name="text" >
-       <string>Jid</string>
-      </property>
-     </column>
-     <column>
-      <property name="text" >
-       <string>Reason</string>
-      </property>
-     </column>
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" >
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
      <item>
-      <widget class="QPushButton" name="pbtAdd" >
-       <property name="text" >
+      <widget class="QTabBar" name="tbrTabs" native="true"/>
+     </item>
+     <item>
+      <widget class="QTableView" name="tbvItems">
+       <property name="contextMenuPolicy">
+        <enum>Qt::CustomContextMenu</enum>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout">
+     <item>
+      <widget class="QPushButton" name="pbtAdd">
+       <property name="text">
         <string>Add</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pbtDelete" >
-       <property name="text" >
+      <widget class="QPushButton" name="pbtDelete">
+       <property name="text">
         <string>Delete</string>
        </property>
       </widget>
      </item>
      <item>
       <spacer>
-       <property name="orientation" >
+       <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
-       <property name="sizeHint" stdset="0" >
+       <property name="sizeHint" stdset="0">
         <size>
          <width>40</width>
          <height>20</height>
@@ -75,9 +71,9 @@
       </spacer>
      </item>
      <item>
-      <widget class="QDialogButtonBox" name="btbButtons" >
-       <property name="standardButtons" >
-        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <widget class="QDialogButtonBox" name="dbbButtons">
+       <property name="standardButtons">
+        <set>QDialogButtonBox::Close|QDialogButtonBox::Save</set>
        </property>
       </widget>
      </item>
@@ -85,46 +81,27 @@
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11" />
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>SearchLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">utils/searchlineedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QTabBar</class>
+   <extends>QWidget</extends>
+   <header location="global">QTabBar</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <tabstops>
-  <tabstop>tbwTable</tabstop>
+  <tabstop>sleSearch</tabstop>
+  <tabstop>tbvItems</tabstop>
   <tabstop>pbtAdd</tabstop>
   <tabstop>pbtDelete</tabstop>
-  <tabstop>btbButtons</tabstop>
+  <tabstop>dbbButtons</tabstop>
  </tabstops>
  <resources/>
- <connections>
-  <connection>
-   <sender>btbButtons</sender>
-   <signal>accepted()</signal>
-   <receiver>EditUsersListDialogClass</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>250</x>
-     <y>363</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>225</x>
-     <y>376</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>btbButtons</sender>
-   <signal>rejected()</signal>
-   <receiver>EditUsersListDialogClass</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>359</x>
-     <y>362</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>388</x>
-     <y>376</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

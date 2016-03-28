@@ -792,7 +792,7 @@ void Statistics::onSessionTimerTimeout()
 		{
 			foreach(const IRosterItem &ritem, roster->items())
 			{
-				if (ritem.itemJid.node().isEmpty())
+				if (!ritem.itemJid.hasNode())
 					agentsCount++;
 				else
 					contactsCount++;

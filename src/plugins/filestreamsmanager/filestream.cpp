@@ -279,7 +279,7 @@ bool FileStream::initStream(const QList<QString> &AMethods)
 	{
 		if (updateFileInfo() && !FFileName.isEmpty() && FFileSize>0)
 		{
-			if (FDataManager->initStream(FStreamJid,FContactJid,FStreamId,NS_SI_FILETRANSFER,AMethods))
+			if (FDataManager->initStream(FStreamId,FStreamJid,FContactJid,NS_SI_FILETRANSFER,AMethods))
 			{
 				setStreamState(Negotiating,tr("Waiting for a response to send a file request"));
 				return true;
@@ -304,7 +304,7 @@ bool FileStream::startStream(const QString &AMethodNS)
 		if (openFile())
 		{
 			IDataStreamMethod *stremMethod = FDataManager->method(AMethodNS);
-			FSocket = stremMethod!=NULL ? stremMethod->dataStreamSocket(FStreamId,FStreamJid,FContactJid,IDataStreamSocket::Initiator,this) : NULL;
+			FSocket = stremMethod!=NULL ? stremMethod->dataStreamSocket(FStreamId,FStreamJid,FContactJid,IDataStream::Initiator,this) : NULL;
 			if (FSocket)
 			{
 				stremMethod->loadMethodSettings(FSocket,FDataManager->settingsProfileNode(FProfileId, AMethodNS));
@@ -339,7 +339,7 @@ bool FileStream::startStream(const QString &AMethodNS)
 			if (FDataManager->acceptStream(FStreamId,AMethodNS))
 			{
 				IDataStreamMethod *stremMethod = FDataManager->method(AMethodNS);
-				FSocket = stremMethod!=NULL ? stremMethod->dataStreamSocket(FStreamId,FStreamJid,FContactJid,IDataStreamSocket::Target,this) : NULL;
+				FSocket = stremMethod!=NULL ? stremMethod->dataStreamSocket(FStreamId,FStreamJid,FContactJid,IDataStream::Target,this) : NULL;
 				if (FSocket)
 				{
 					stremMethod->loadMethodSettings(FSocket,FDataManager->settingsProfileNode(FProfileId, AMethodNS));

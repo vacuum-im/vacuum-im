@@ -8,8 +8,6 @@
 
 #define STANZAPROCESSOR_UUID "{1175D470-5D4A-4c29-A69E-EDA46C2BC387}"
 
-#define SHO_DEFAULT  1000
-
 class IStanzaHandler
 {
 public:
@@ -31,9 +29,9 @@ struct IStanzaHandle
 		DirectionOut
 	};
 	IStanzaHandle() { 
-		order = SHO_DEFAULT;
-		direction = DirectionIn;
+		order = 0;
 		handler = NULL;
+		direction = DirectionIn;
 	}
 	int order;
 	int direction;
@@ -46,7 +44,6 @@ class IStanzaProcessor
 {
 public:
 	virtual QObject *instance() =0;
-	virtual QString newId() const =0;
 	virtual bool sendStanzaIn(const Jid &AStreamJid, Stanza &AStanza) =0;
 	virtual bool sendStanzaOut(const Jid &AStreamJid, Stanza &AStanza) =0;
 	virtual bool sendStanzaRequest(IStanzaRequestOwner *AOwner, const Jid &AStreamJid, Stanza &AStanza, int ATimeout) =0;
@@ -66,6 +63,6 @@ protected:
 
 Q_DECLARE_INTERFACE(IStanzaHandler,"Vacuum.Plugin.IStanzaHandler/1.0");
 Q_DECLARE_INTERFACE(IStanzaRequestOwner,"Vacuum.Plugin.IStanzaRequestOwner/1.1");
-Q_DECLARE_INTERFACE(IStanzaProcessor,"Vacuum.Plugin.IStanzaProcessor/1.1");
+Q_DECLARE_INTERFACE(IStanzaProcessor,"Vacuum.Plugin.IStanzaProcessor/1.2");
 
-#endif
+#endif // ISTANZAPROCESSOR_H

@@ -23,4 +23,4 @@ protected:
 
 Q_DECLARE_INTERFACE(ICaptchaForms,"Vacuum.Plugin.ICaptchaForms/1.1")
 
-#endif
+#endif // ICAPTCHAFORMS_H

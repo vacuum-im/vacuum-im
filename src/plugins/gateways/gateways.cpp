@@ -197,7 +197,7 @@ void Gateways::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 	Q_UNUSED(AStreamJid);
 	if (FPromptRequests.contains(AStanza.id()))
 	{
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			LOG_STRM_DEBUG(AStreamJid,QString("Legacy user prompt received, id=%1").arg(AStanza.id()));
 			QString desc = AStanza.firstElement("query",NS_JABBER_GATEWAY).firstChildElement("desc").text();
@@ -214,7 +214,7 @@ void Gateways::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 	}
 	else if (FUserJidRequests.contains(AStanza.id()))
 	{
-		if (AStanza.type() == "result")
+		if (AStanza.isResult())
 		{
 			LOG_STRM_DEBUG(AStreamJid,QString("Legacy user JID received, id=%1").arg(AStanza.id()));
 			Jid userJid = AStanza.firstElement("query",NS_JABBER_GATEWAY).firstChildElement("jid").text();
@@ -327,7 +327,7 @@ QList<Jid> Gateways::streamServices(const Jid &AStreamJid, const IDiscoIdentity 
 	QList<IRosterItem> ritems = roster!=NULL ? roster->items() : QList<IRosterItem>();
 	foreach(const IRosterItem &ritem, ritems)
 	{
-		if (ritem.itemJid.node().isEmpty())
+		if (!ritem.itemJid.hasNode())
 		{
 			if (FDiscovery && (!AIdentity.category.isEmpty() || !AIdentity.type.isEmpty()))
 			{
@@ -356,7 +356,7 @@ QList<Jid> Gateways::serviceContacts(const Jid &AStreamJid, const Jid &AServiceJ
 	IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(AStreamJid) : NULL;
 	QList<IRosterItem> ritems = roster!=NULL ? roster->items() : QList<IRosterItem>();
 	foreach(const IRosterItem &ritem, ritems)
-		if (!ritem.itemJid.node().isEmpty() && ritem.itemJid.pDomain()==AServiceJid.pDomain())
+		if (ritem.itemJid.hasNode() && ritem.itemJid.pDomain()==AServiceJid.pDomain())
 			contacts.append(ritem.itemJid);
 	return contacts;
 }
@@ -468,8 +468,8 @@ bool Gateways::changeService(const Jid &AStreamJid, const Jid &AServiceFrom, con
 
 QString Gateways::sendPromptRequest(const Jid &AStreamJid, const Jid &AServiceJid)
 {
-	Stanza request("iq");
-	request.setType("get").setTo(AServiceJid.full()).setId(FStanzaProcessor->newId());
+	Stanza request(STANZA_KIND_IQ);
+	request.setType(STANZA_TYPE_GET).setTo(AServiceJid.full()).setUniqueId();
 	request.addElement("query",NS_JABBER_GATEWAY);
 	if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,GATEWAY_TIMEOUT))
 	{
@@ -486,8 +486,8 @@ QString Gateways::sendPromptRequest(const Jid &AStreamJid, const Jid &AServiceJi
 
 QString Gateways::sendUserJidRequest(const Jid &AStreamJid, const Jid &AServiceJid, const QString &AContactID)
 {
-	Stanza request("iq");
-	request.setType("set").setTo(AServiceJid.full()).setId(FStanzaProcessor->newId());
+	Stanza request(STANZA_KIND_IQ);
+	request.setType(STANZA_TYPE_SET).setTo(AServiceJid.full()).setUniqueId();
 	QDomElement elem = request.addElement("query",NS_JABBER_GATEWAY);
 	elem.appendChild(request.createElement("prompt")).appendChild(request.createTextNode(AContactID));
 	if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,GATEWAY_TIMEOUT))
@@ -621,7 +621,7 @@ void Gateways::onResolveActionTriggered(bool)
 		for (int i=0; i<streams.count(); i++)
 		{
 			Jid serviceJid = services.at(i);
-			if (serviceJid.node().isEmpty())
+			if (!serviceJid.hasNode())
 			{
 				IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(streams.at(i)) : NULL;
 				foreach(const Jid &contactJid, serviceContacts(streams.at(i),serviceJid))
@@ -740,7 +740,7 @@ void Gateways::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndex
 				{
 					foreach(const IPresenceItem &pitem, presence->items())
 					{
-						if (pitem.show!=IPresence::Error && pitem.itemJid.node().isEmpty() && FDiscovery->discoInfo(presence->streamJid(),pitem.itemJid).features.contains(NS_JABBER_GATEWAY))
+						if (pitem.show!=IPresence::Error && !pitem.itemJid.hasNode() && FDiscovery->discoInfo(presence->streamJid(),pitem.itemJid).features.contains(NS_JABBER_GATEWAY))
 						{
 							Action *action = new Action(addUserMenu);
 							action->setText(pitem.itemJid.uFull());
@@ -1038,7 +1038,7 @@ void Gateways::onDiscoItemContextMenu(const QModelIndex &AIndex, Menu *AMenu)
 {
 	Jid itemJid = AIndex.data(DIDR_JID).toString();
 	QString itemNode = AIndex.data(DIDR_NODE).toString();
-	if (itemJid.node().isEmpty() && itemNode.isEmpty())
+	if (!itemJid.hasNode() && itemNode.isEmpty())
 	{
 		Jid streamJid = AIndex.data(DIDR_STREAM_JID).toString();
 		IDiscoInfo dinfo = FDiscovery->discoInfo(streamJid,itemJid,itemNode);

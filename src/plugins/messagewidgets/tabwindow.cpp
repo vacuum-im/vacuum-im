@@ -652,11 +652,13 @@ void TabWindow::onActionTriggered(bool)
 	Action *action = qobject_cast<Action *>(sender());
 	if (action == FNextTab)
 	{
-		ui.twtTabs->setCurrentIndex((ui.twtTabs->currentIndex()+1) % ui.twtTabs->count());
+		if (ui.twtTabs->count() > 0)
+			ui.twtTabs->setCurrentIndex((ui.twtTabs->currentIndex()+1) % ui.twtTabs->count());
 	}
 	else if (action == FPrevTab)
 	{
-		ui.twtTabs->setCurrentIndex(ui.twtTabs->currentIndex()>0 ? ui.twtTabs->currentIndex()-1 : ui.twtTabs->count()-1);
+		if (ui.twtTabs->count() > 0)
+			ui.twtTabs->setCurrentIndex(ui.twtTabs->currentIndex()>0 ? ui.twtTabs->currentIndex()-1 : ui.twtTabs->count()-1);
 	}
 	else if (action == FShowCloseButtons)
 	{
