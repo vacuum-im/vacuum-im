@@ -4,7 +4,6 @@
 #include <QDirIterator>
 #include <QDomDocument>
 #include <QCoreApplication>
-#include <QtDebug>
 
 void qtMessagesHandler(QtMsgType AType, const QMessageLogContext &AContext, const QString &AMessage)
 {

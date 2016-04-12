@@ -1,5 +1,9 @@
 TEMPLATE = subdirs
 
+contains(QT_MODULES, webkit) {
+  SUBDIRS += adiummessagestyle
+}
+
 SUBDIRS += optionsmanager
 SUBDIRS += xmppstreams
 SUBDIRS += iqauth
@@ -69,7 +73,3 @@ SUBDIRS += recentcontacts
 SUBDIRS += metacontacts 
 SUBDIRS += statistics
 SUBDIRS += datastreamspublisher 
-
-contains(QT_MODULES, webkit) {
-  SUBDIRS += adiummessagestyle
-}
