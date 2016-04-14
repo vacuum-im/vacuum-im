@@ -19,8 +19,8 @@ MultiUserView::MultiUserView(IMultiUserChat *AMultiChat, QWidget *AParent) : QTr
 	setContextMenuPolicy(Qt::DefaultContextMenu);
 	setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 
+	FViewMode = -1;
 	FAvatarSize = 24;
-	FViewMode = IMultiUserView::ViewFull;
 
 	header()->hide();
 	header()->setStretchLastSection(true);
