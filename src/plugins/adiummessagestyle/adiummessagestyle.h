@@ -3,7 +3,6 @@
 
 #include <QList>
 #include <QTimer>
-#include <QWebView>
 #include <QNetworkAccessManager>
 #include <interfaces/imessagestylemanager.h>
 #include "styleviewer.h"
@@ -146,7 +145,7 @@ protected:
 	void fillStyleKeywords(QString &AHtml, const IMessageStyleOptions &AOptions) const;
 	void setVariant(StyleViewer *AView, const QString &AVariant);
 protected:
-	QWebHitTestResult hitTest(QWidget *AWidget, const QPoint &APosition) const;
+	//QWebHitTestResult hitTest(QWidget *AWidget, const QPoint &APosition) const;
 	bool isConsecutive(const IMessageStyleContentOptions &AOptions, const WidgetStatus &AStatus) const;
 	QString makeContentTemplate(const IMessageStyleContentOptions &AOptions, const WidgetStatus &AStatus) const;
 	void fillContentKeywords(QString &AHtml, const IMessageStyleContentOptions &AOptions, const WidgetStatus &AStatus) const;

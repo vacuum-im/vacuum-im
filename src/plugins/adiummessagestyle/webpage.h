@@ -1,15 +1,18 @@
 #ifndef WEBPAGE_H
 #define WEBPAGE_H
 
-#include <QWebPage>
+#include <QWebEnginePage>
 
 class WebPage :
-	public QWebPage
+	public QWebEnginePage
 {
 	Q_OBJECT;
 public:
-	WebPage(QObject *AParent = NULL);
-	~WebPage();
+	WebPage(QObject *AParent);
+signals:
+	void linkClicked(const QUrl &AUrl);
+private:
+	bool acceptNavigationRequest(const QUrl &AUrl, NavigationType AType, bool AIsMainFrame);
 };
 
 #endif // WEBPAGE_H

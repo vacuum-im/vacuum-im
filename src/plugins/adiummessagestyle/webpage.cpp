@@ -1,15 +1,13 @@
 #include "webpage.h"
 
-#include <QAction>
-
-WebPage::WebPage(QObject *AParent) : QWebPage(AParent)
+WebPage::WebPage(QObject *AParent) : QWebEnginePage(AParent)
 {
-	setContentEditable(false);
-	setNetworkAccessManager(NULL);
-	setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+
 }
 
-WebPage::~WebPage()
+bool WebPage::acceptNavigationRequest(const QUrl &AUrl, QWebEnginePage::NavigationType AType, bool AIsMainFrame)
 {
-
+	if (AIsMainFrame && AType==QWebEnginePage::NavigationTypeLinkClicked)
+		emit linkClicked(AUrl);
+	return false;
 }

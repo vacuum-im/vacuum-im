@@ -7,18 +7,15 @@
 #include <QFile>
 #include <QRegExp>
 #include <QMimeData>
-#include <QWebFrame>
 #include <QTextBlock>
-#include <QWebElement>
 #include <QByteArray>
 #include <QClipboard>
 #include <QStringList>
 #include <QTextCursor>
-#include <QWebSettings>
 #include <QDomDocument>
 #include <QApplication>
 #include <QTextDocument>
-#include <QWebHitTestResult>
+#include <QWebEngineSettings>
 #include <definitions/resources.h>
 #include <utils/filestorage.h>
 #include <utils/textmanager.h>
@@ -110,8 +107,8 @@ QList<QWidget *> AdiumMessageStyle::styleWidgets() const
 QWidget *AdiumMessageStyle::createWidget(const IMessageStyleOptions &AOptions, QWidget *AParent)
 {
 	StyleViewer *view = new StyleViewer(AParent);
-	if (FNetworkAccessManager)
-		view->page()->setNetworkAccessManager(FNetworkAccessManager);
+	//if (FNetworkAccessManager)
+	//	view->page()->setNetworkAccessManager(FNetworkAccessManager);
 	changeOptions(view,AOptions,true);
 	return view;
 }
@@ -127,16 +124,8 @@ QString AdiumMessageStyle::senderColorById(const QString &ASenderId) const
 QTextDocumentFragment AdiumMessageStyle::selection(QWidget *AWidget) const
 {
 	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
-#if QT_VERSION >= 0x040800
 	if (view && view->hasSelection())
-		return QTextDocumentFragment::fromHtml(view->selectedHtml());
-#else
-	if (view && !view->page()->selectedText().isEmpty())
-	{
-		view->page()->triggerAction(QWebPage::Copy);
-		return QTextDocumentFragment::fromHtml(QApplication::clipboard()->mimeData()->html());
-	}
-#endif
+		return QTextDocumentFragment::fromPlainText(view->selectedText());
 	return QTextDocumentFragment();
 }
 
@@ -159,13 +148,13 @@ QTextDocumentFragment AdiumMessageStyle::textFragmentAt(QWidget *AWidget, const 
 	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
 	if (view)
 	{
-		QWebHitTestResult result = hitTest(AWidget,APosition);
-		if (result.linkUrl().isValid())
-			return QTextDocumentFragment::fromHtml(result.linkElement().toOuterXml());
-		else if (!result.element().isNull())
-			return QTextDocumentFragment::fromHtml(result.element().toOuterXml());
-		else if (!result.enclosingBlockElement().isNull())
-			return QTextDocumentFragment::fromHtml(result.enclosingBlockElement().toOuterXml());
+		//QWebHitTestResult result = hitTest(AWidget,APosition);
+		//if (result.linkUrl().isValid())
+		//	return QTextDocumentFragment::fromHtml(result.linkElement().toOuterXml());
+		//else if (!result.element().isNull())
+		//	return QTextDocumentFragment::fromHtml(result.element().toOuterXml());
+		//else if (!result.enclosingBlockElement().isNull())
+		//	return QTextDocumentFragment::fromHtml(result.enclosingBlockElement().toOuterXml());
 	}
 	return QTextDocumentFragment();
 }
@@ -211,8 +200,8 @@ bool AdiumMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptio
 
 		int fontSize = AOptions.extended.value(MSO_FONT_SIZE).toInt();
 		QString fontFamily = AOptions.extended.value(MSO_FONT_FAMILY).toString();
-		view->page()->settings()->setFontSize(QWebSettings::DefaultFontSize, fontSize!=0 ? fontSize : QWebSettings::globalSettings()->fontSize(QWebSettings::DefaultFontSize));
-		view->page()->settings()->setFontFamily(QWebSettings::StandardFont, !fontFamily.isEmpty() ? fontFamily : QWebSettings::globalSettings()->fontFamily(QWebSettings::StandardFont));
+		view->page()->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, fontSize!=0 ? fontSize : QWebEngineSettings::globalSettings()->fontSize(QWebEngineSettings::DefaultFontSize));
+		view->page()->settings()->setFontFamily(QWebEngineSettings::StandardFont, !fontFamily.isEmpty() ? fontFamily : QWebEngineSettings::globalSettings()->fontFamily(QWebEngineSettings::StandardFont));
 
 		emit optionsChanged(view,AOptions,AClear);
 		return true;
@@ -488,15 +477,15 @@ void AdiumMessageStyle::setVariant(StyleViewer *AView, const QString &AVariant)
 	escapeStringForScript(variantFile);
 	QString script = QString("setStylesheet(\"%1\",\"%2\");").arg("mainStyle").arg(variantFile);
 
-	AView->page()->mainFrame()->evaluateJavaScript(script);
+	AView->page()->runJavaScript(script);
 }
 
-QWebHitTestResult AdiumMessageStyle::hitTest(QWidget *AWidget, const QPoint &APosition) const
-{
-	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
-	QWebFrame *frame = view!=NULL ? view->page()->frameAt(APosition) : NULL;
-	return frame!=NULL ? frame->hitTestContent(APosition) : QWebHitTestResult();
-}
+//QWebHitTestResult AdiumMessageStyle::hitTest(QWidget *AWidget, const QPoint &APosition) const
+//{
+//	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
+//	QWebFrame *frame = view!=NULL ? view->page()->frameAt(APosition) : NULL;
+//	return frame!=NULL ? frame->hitTestContent(APosition) : QWebHitTestResult();
+//}
 
 bool AdiumMessageStyle::isConsecutive(const IMessageStyleContentOptions &AOptions, const WidgetStatus &AStatus) const
 {
@@ -751,8 +740,8 @@ bool AdiumMessageStyle::eventFilter(QObject *AWatched, QEvent *AEvent)
 		if (FWidgetStatus.contains(view))
 		{
 			WidgetStatus &wstatus = FWidgetStatus[view];
-			QWebFrame *frame = view->page()->mainFrame();
-			if (!wstatus.scrollStarted && frame->scrollBarValue(Qt::Vertical)==frame->scrollBarMaximum(Qt::Vertical))
+			//QWebFrame *frame = view->page()->mainFrame();
+			//if (!wstatus.scrollStarted && frame->scrollBarValue(Qt::Vertical)==frame->scrollBarMaximum(Qt::Vertical))
 			{
 				wstatus.scrollStarted = true;
 				FScrollTimer.start(SCROLL_TIMEOUT);
@@ -770,9 +759,9 @@ void AdiumMessageStyle::onScrollTimerTimeout()
 		if (it->scrollStarted)
 		{
 			StyleViewer *view = qobject_cast<StyleViewer *>(it.key());
-			QWebFrame *frame = view->page()->mainFrame();
-			frame->evaluateJavaScript("alignChat(false);");
-			frame->setScrollBarValue(Qt::Vertical,frame->scrollBarMaximum(Qt::Vertical));
+			QWebEnginePage *page = view->page();
+			page->runJavaScript("alignChat(false);");
+			//page->setScrollBarValue(Qt::Vertical,frame->scrollBarMaximum(Qt::Vertical));
 			it->scrollStarted = false;
 		}
 	}
@@ -785,7 +774,7 @@ void AdiumMessageStyle::onContentTimerTimeout()
 		if (it->ready && !it->pending.isEmpty())
 		{
 			StyleViewer *view = qobject_cast<StyleViewer *>(it.key());
-			view->page()->mainFrame()->evaluateJavaScript(it->pending.takeFirst());
+			view->page()->runJavaScript(it->pending.takeFirst());
 			FContentTimer.start(CONTENT_TIMEOUT);
 		}
 	}
@@ -825,7 +814,7 @@ void AdiumMessageStyle::onStyleWidgetLoadFinished(bool AOk)
 			{
 				wstatus.ready = true;
 				FContentTimer.start(CONTENT_TIMEOUT);
-				view->page()->mainFrame()->evaluateJavaScript("alignChat(false);");
+				view->page()->runJavaScript("alignChat(false);");
 			}
 			else
 			{

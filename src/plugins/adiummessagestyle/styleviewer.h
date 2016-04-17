@@ -1,18 +1,18 @@
 #ifndef STYLEVIEWER_H
 #define STYLEVIEWER_H
 
-#include <QWebView>
-#include "webpage.h"
+#include <QWebEngineView>
 
 class StyleViewer :
-	public QWebView
+	public QWebEngineView
 {
 	Q_OBJECT;
 public:
 	StyleViewer(QWidget *AParent);
-	~StyleViewer();
 	QSize sizeHint() const;
 	QSize minimumSizeHint() const;
+signals:
+	void linkClicked(const QUrl &AUrl);
 protected slots:
 	void onShortcutActivated();
 };
