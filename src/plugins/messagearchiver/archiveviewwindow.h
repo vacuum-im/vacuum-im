@@ -106,6 +106,7 @@ protected:
 	QStandardItem *createHeaderItem(const ArchiveHeader &AHeader);
 	QStandardItem *createParentItem(const ArchiveHeader &AHeader);
 	QStandardItem *createDateGroupItem(const QDateTime &ADateTime, QStandardItem *AParent);
+	QStandardItem *createMonthGroupItem(const QDateTime &ADateTime, QStandardItem *AParent);
 	QStandardItem *createContactItem(const Jid &AStreamJid, const Jid &AContactJid, QStandardItem *AParent);
 	QStandardItem *createPrivateChatItem(const Jid &AStreamJid, const Jid &AContactJid, QStandardItem *AParent);
 	QStandardItem *createMetacontactItem(const Jid &AStreamJid, const IMetaContact &AMeta, QStandardItem *AParent);
