@@ -11,8 +11,8 @@
 #include <definitions/stanzahandlerorders.h>
 #include <utils/logger.h>
 
-#define SHC_PRIVACY         "/iq[@type='set']/query[@xmlns='"NS_JABBER_PRIVACY"']"
-#define SHC_ROSTER          "/iq/query[@xmlns='"NS_JABBER_ROSTER"']"
+#define SHC_PRIVACY         "/iq[@type='set']/query[@xmlns='" NS_JABBER_PRIVACY "']"
+#define SHC_ROSTER          "/iq/query[@xmlns='" NS_JABBER_ROSTER "']"
 
 #define PRIVACY_TIMEOUT     60000
 #define AUTO_LISTS_TIMEOUT  2000
