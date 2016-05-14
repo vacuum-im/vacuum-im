@@ -1,11 +1,14 @@
 #################
 ## Vacuum-IM
 #################
+*.dll
+*.exe
 /VacuumIM/
 /plugins/*
 /src/libs/*
 gitinfo.h
 vacuum
+vacuum.vc.*
 autotranslate
 txprepare
 

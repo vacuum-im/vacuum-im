@@ -13,8 +13,6 @@ public:
 	QSize minimumSizeHint() const;
 signals:
 	void linkClicked(const QUrl &AUrl);
-protected slots:
-	void onShortcutActivated();
 };
 
 #endif // STYLEVIEWER_H

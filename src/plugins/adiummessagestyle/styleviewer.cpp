@@ -1,16 +1,11 @@
 #include "styleviewer.h"
 
-#include <QShortcut>
-
 #include "webpage.h"
 
 StyleViewer::StyleViewer(QWidget *AParent) : QWebEngineView(AParent)
 {
 	WebPage *webPage = new WebPage(this);
-	connect(webPage, SIGNAL(linkCliked(const QUrl &)), SIGNAL(linkClicked(const QUrl &)));
-
-	QShortcut *shortcut = new QShortcut(QKeySequence::Copy, this, NULL, NULL, Qt::WidgetShortcut);
-	connect(shortcut, SIGNAL(activated()), SLOT(onShortcutActivated()));
+	connect(webPage, SIGNAL(linkClicked(const QUrl &)), SIGNAL(linkClicked(const QUrl &)));
 
 	setPage(webPage);
 	setAcceptDrops(false);
@@ -26,9 +21,4 @@ QSize StyleViewer::sizeHint() const
 QSize StyleViewer::minimumSizeHint() const
 {
 	return QSize(70,50);
-}
-
-void StyleViewer::onShortcutActivated()
-{
-	triggerPageAction(QWebEnginePage::Copy);
 }
