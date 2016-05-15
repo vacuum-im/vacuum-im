@@ -1,6 +1,7 @@
 #include "webpage.h"
 
-WebPage::WebPage(QObject *AParent) : QWebEnginePage(AParent)
+
+WebPage::WebPage(QWebEngineProfile *AProfile, QObject *AParent) : QWebEnginePage(AProfile, AParent)
 {
 
 }

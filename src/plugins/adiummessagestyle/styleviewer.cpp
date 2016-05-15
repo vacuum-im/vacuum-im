@@ -1,10 +1,14 @@
 #include "styleviewer.h"
 
+#include <QWebEngineProfile>
+
 #include "webpage.h"
 
 StyleViewer::StyleViewer(QWidget *AParent) : QWebEngineView(AParent)
 {
-	WebPage *webPage = new WebPage(this);
+	QWebEngineProfile *webProfile = new QWebEngineProfile(this);
+
+	WebPage *webPage = new WebPage(webProfile, this);
 	connect(webPage, SIGNAL(linkClicked(const QUrl &)), SIGNAL(linkClicked(const QUrl &)));
 
 	setPage(webPage);

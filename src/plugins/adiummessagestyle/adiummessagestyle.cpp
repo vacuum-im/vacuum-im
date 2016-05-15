@@ -1,7 +1,5 @@
 #include "adiummessagestyle.h"
 
-#include <QtDebug>
-
 #include <QUrl>
 #include <QDir>
 #include <QFile>
@@ -22,8 +20,6 @@
 #include <utils/logger.h>
 
 #define SCROLL_TIMEOUT                      100
-#define CONTENT_TIMEOUT                     10
-
 #define CONSECUTIVE_TIMEOUT                 2*60
 
 #define SHARED_STYLE_PATH                   RESOURCES_DIR "/" RSR_STORAGE_ADIUMMESSAGESTYLES "/" FILE_STORAGE_SHARED_DIR
@@ -38,7 +34,7 @@
 #define APPEND_NEXT_MESSAGE_NO_SCROLL       "appendNextMessageNoScroll(\"%1\");"
 #define REPLACE_LAST_MESSAGE                "replaceLastMessage(\"%1\");"
 
-#define TOPIC_MAIN_DIV	                    "<div id=\"topic\"></div>"
+#define TOPIC_MAIN_DIV	                      "<div id=\"topic\"></div>"
 #define TOPIC_INDIVIDUAL_WRAPPER            "<span id=\"topicEdit\" ondblclick=\"this.setAttribute('contentEditable', true); this.focus();\">%1</span>"
 
 static const char *SenderColors[] =  {
@@ -56,7 +52,7 @@ static int SenderColorsCount = sizeof(SenderColors)/sizeof(SenderColors[0]);
 
 QString AdiumMessageStyle::FSharedPath = QString::null;
 
-AdiumMessageStyle::AdiumMessageStyle(const QString &AStylePath, QNetworkAccessManager *ANetworkAccessManager, QObject *AParent) : QObject(AParent)
+AdiumMessageStyle::AdiumMessageStyle(const QString &AStylePath, QObject *AParent) : QObject(AParent)
 {
 	if (FSharedPath.isEmpty())
 	{
@@ -69,13 +65,9 @@ AdiumMessageStyle::AdiumMessageStyle(const QString &AStylePath, QNetworkAccessMa
 	FInfo = styleInfo(AStylePath);
 	FVariants = styleVariants(AStylePath);
 	FResourcePath = AStylePath+"/"+STYLE_RESOURCES_PATH;
-	FNetworkAccessManager = ANetworkAccessManager;
 
 	FScrollTimer.setSingleShot(true);
 	connect(&FScrollTimer,SIGNAL(timeout()),SLOT(onScrollTimerTimeout()));
-
-	FContentTimer.setSingleShot(true);
-	connect(&FContentTimer,SIGNAL(timeout()),SLOT(onContentTimerTimeout()));
 
 	connect(AParent,SIGNAL(styleWidgetAdded(IMessageStyle *, QWidget *)),SLOT(onStyleWidgetAdded(IMessageStyle *, QWidget *)));
 
@@ -107,8 +99,6 @@ QList<QWidget *> AdiumMessageStyle::styleWidgets() const
 QWidget *AdiumMessageStyle::createWidget(const IMessageStyleOptions &AOptions, QWidget *AParent)
 {
 	StyleViewer *view = new StyleViewer(AParent);
-	//if (FNetworkAccessManager)
-	//	view->page()->setNetworkAccessManager(FNetworkAccessManager);
 	changeOptions(view,AOptions,true);
 	return view;
 }
@@ -145,17 +135,7 @@ QTextCharFormat AdiumMessageStyle::textFormatAt(QWidget *AWidget, const QPoint &
 
 QTextDocumentFragment AdiumMessageStyle::textFragmentAt(QWidget *AWidget, const QPoint &APosition) const
 {
-	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
-	if (view)
-	{
-		//QWebHitTestResult result = hitTest(AWidget,APosition);
-		//if (result.linkUrl().isValid())
-		//	return QTextDocumentFragment::fromHtml(result.linkElement().toOuterXml());
-		//else if (!result.element().isNull())
-		//	return QTextDocumentFragment::fromHtml(result.element().toOuterXml());
-		//else if (!result.enclosingBlockElement().isNull())
-		//	return QTextDocumentFragment::fromHtml(result.enclosingBlockElement().toOuterXml());
-	}
+	Q_UNUSED(AWidget); Q_UNUSED(APosition);
 	return QTextDocumentFragment();
 }
 
@@ -200,8 +180,10 @@ bool AdiumMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptio
 
 		int fontSize = AOptions.extended.value(MSO_FONT_SIZE).toInt();
 		QString fontFamily = AOptions.extended.value(MSO_FONT_FAMILY).toString();
-		view->page()->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, fontSize!=0 ? fontSize : QWebEngineSettings::globalSettings()->fontSize(QWebEngineSettings::DefaultFontSize));
-		view->page()->settings()->setFontFamily(QWebEngineSettings::StandardFont, !fontFamily.isEmpty() ? fontFamily : QWebEngineSettings::globalSettings()->fontFamily(QWebEngineSettings::StandardFont));
+		int defaultFontSize = QWebEngineSettings::globalSettings()->fontSize(QWebEngineSettings::DefaultFontSize);
+		QString defaultFontFamily = QWebEngineSettings::globalSettings()->fontFamily(QWebEngineSettings::StandardFont);
+		view->page()->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, fontSize>0 ? fontSize : defaultFontSize);
+		view->page()->settings()->setFontFamily(QWebEngineSettings::StandardFont, !fontFamily.isEmpty() ? fontFamily : defaultFontFamily);
 
 		emit optionsChanged(view,AOptions,AClear);
 		return true;
@@ -234,11 +216,13 @@ bool AdiumMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, co
 			wstatus.lastKind = AOptions.kind;
 			wstatus.lastId = AOptions.senderId;
 			wstatus.lastTime = AOptions.time;
-			wstatus.pending.append(script);
 
-			FContentTimer.start(CONTENT_TIMEOUT);
+			if (wstatus.ready)
+				view->page()->runJavaScript(script);
+			else
+				wstatus.pending.append(script);
+
 			emit contentAppended(view,AHtml,AOptions);
-
 			return true;
 		}
 	}
@@ -479,13 +463,6 @@ void AdiumMessageStyle::setVariant(StyleViewer *AView, const QString &AVariant)
 
 	AView->page()->runJavaScript(script);
 }
-
-//QWebHitTestResult AdiumMessageStyle::hitTest(QWidget *AWidget, const QPoint &APosition) const
-//{
-//	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
-//	QWebFrame *frame = view!=NULL ? view->page()->frameAt(APosition) : NULL;
-//	return frame!=NULL ? frame->hitTestContent(APosition) : QWebHitTestResult();
-//}
 
 bool AdiumMessageStyle::isConsecutive(const IMessageStyleContentOptions &AOptions, const WidgetStatus &AStatus) const
 {
@@ -740,8 +717,7 @@ bool AdiumMessageStyle::eventFilter(QObject *AWatched, QEvent *AEvent)
 		if (FWidgetStatus.contains(view))
 		{
 			WidgetStatus &wstatus = FWidgetStatus[view];
-			//QWebFrame *frame = view->page()->mainFrame();
-			//if (!wstatus.scrollStarted && frame->scrollBarValue(Qt::Vertical)==frame->scrollBarMaximum(Qt::Vertical))
+			if (!wstatus.scrollStarted)
 			{
 				wstatus.scrollStarted = true;
 				FScrollTimer.start(SCROLL_TIMEOUT);
@@ -756,26 +732,11 @@ void AdiumMessageStyle::onScrollTimerTimeout()
 {
 	for (QMap<QWidget*,WidgetStatus>::iterator it = FWidgetStatus.begin(); it!= FWidgetStatus.end(); ++it)
 	{
-		if (it->scrollStarted)
+		if (it->ready && it->scrollStarted)
 		{
 			StyleViewer *view = qobject_cast<StyleViewer *>(it.key());
-			QWebEnginePage *page = view->page();
-			page->runJavaScript("alignChat(false);");
-			//page->setScrollBarValue(Qt::Vertical,frame->scrollBarMaximum(Qt::Vertical));
+			view->page()->runJavaScript("alignChat(true);");
 			it->scrollStarted = false;
-		}
-	}
-}
-
-void AdiumMessageStyle::onContentTimerTimeout()
-{
-	for(QMap<QWidget *, WidgetStatus>::iterator it=FWidgetStatus.begin(); it!=FWidgetStatus.end(); ++it)
-	{
-		if (it->ready && !it->pending.isEmpty())
-		{
-			StyleViewer *view = qobject_cast<StyleViewer *>(it.key());
-			view->page()->runJavaScript(it->pending.takeFirst());
-			FContentTimer.start(CONTENT_TIMEOUT);
 		}
 	}
 }
@@ -813,8 +774,9 @@ void AdiumMessageStyle::onStyleWidgetLoadFinished(bool AOk)
 			if (AOk)
 			{
 				wstatus.ready = true;
-				FContentTimer.start(CONTENT_TIMEOUT);
-				view->page()->runJavaScript("alignChat(false);");
+				while (!wstatus.pending.isEmpty())
+					view->page()->runJavaScript(wstatus.pending.takeFirst());
+				view->page()->runJavaScript("alignChat(true);");
 			}
 			else
 			{

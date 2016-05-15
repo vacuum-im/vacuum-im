@@ -8,7 +8,7 @@ class WebPage :
 {
 	Q_OBJECT;
 public:
-	WebPage(QObject *AParent);
+	WebPage(QWebEngineProfile *AProfile, QObject *AParent);
 signals:
 	void linkClicked(const QUrl &AUrl);
 private:
