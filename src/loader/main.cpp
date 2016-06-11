@@ -11,10 +11,13 @@ int main(int argc, char *argv[])
 		QFont::insertSubstitution(".Helvetica Neue DeskInterface", "Helvetica Neue");
 	}
 #endif
+
+	QApplication::setAttribute(Qt::AA_EnableHighDpiScaling,true);
+	QApplication::setAttribute(Qt::AA_DontShowIconsInMenus,false);
+
 	QApplication app(argc, argv);
 	app.setQuitOnLastWindowClosed(false);
 	app.addLibraryPath(app.applicationDirPath());
-	app.setAttribute(Qt::AA_DontShowIconsInMenus,false);
 
 	QLibrary utils(app.applicationDirPath()+"/utils",&app);
 	utils.load();
