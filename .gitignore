@@ -6,6 +6,7 @@
 /src/libs/*
 gitinfo.h
 vacuum
+txprepare
 autotranslate
 
 
@@ -36,6 +37,7 @@ Makefile.Release
 ## Qt Creator
 #################
 *.pro.user
+*.pro.user.*
 
 
 #################
