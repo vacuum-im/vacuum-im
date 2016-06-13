@@ -2,10 +2,17 @@
 #include <QApplication>
 #include "pluginmanager.h"
 
-static const int ext_argc = 1;
-static const char *ext_argv[ext_argc] = {
-	"--disable-web-security"            // Command line argument to enable local content in QWebEngine
+#ifndef NO_WEBENGINE
+#  include <QtWebEngine/QtWebEngine>
+#endif
+
+static const char *ext_argv[] = {
+#ifndef NO_WEBENGINE
+	"--disable-web-security",            // Command line argument to enable local content in QWebEngine
+#endif
+	"DUMMY"
 };
+static const int ext_argc = sizeof(ext_argv)/sizeof(ext_argv[0]) - 1;
 
 int main(int argc, char *argv[])
 {
@@ -29,6 +36,10 @@ int main(int argc, char *argv[])
 	QApplication app(all_argc, all_argv);
 	app.setQuitOnLastWindowClosed(false);
 	app.addLibraryPath(app.applicationDirPath());
+
+#ifndef NO_WEBENGINE
+	QtWebEngine::initialize();
+#endif
 
 	QLibrary utils(app.applicationDirPath()+"/utils",&app);
 	utils.load();

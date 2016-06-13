@@ -1,6 +1,6 @@
 TEMPLATE = subdirs
 
-contains(QT_MODULES, webengine) {
+qtHaveModule(webengine): !CONFIG(no_webengine) {
   SUBDIRS += adiummessagestyle
 }
 

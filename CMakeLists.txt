@@ -42,6 +42,7 @@ set(LANGS "" CACHE STRING "List of languages to build localization for (this var
 set(USED_LANGS "" CACHE INTERNAL "List of languages actually used for generating targets")
 add_lang_options()
 
+set(NO_WEBENGINE NO CACHE BOOL "Exclude QtWebEngine from dependencies")
 set(FORCE_BUNDLED_MINIZIP NO CACHE BOOL "Use bundled minizip even if local system have one")
 
 find_library(SYSTEM_ZLIB_FOUND z)
@@ -52,6 +53,10 @@ find_library(SYSTEM_QTLOCKEDFILE_FOUND QtSolutions_LockedFile-2.4)
 if (FORCE_BUNDLED_MINIZIP)
 	set(SYSTEM_MINIZIP_FOUND NO)
 endif (FORCE_BUNDLED_MINIZIP)
+
+if (NO_WEBENGINE)
+	add_definitions(-DNO_WEBENGINE)
+endif (NO_WEBENGINE)
 
 if (SYSTEM_ZLIB_FOUND)
 	add_definitions(-DUSE_SYSTEM_ZLIB)
