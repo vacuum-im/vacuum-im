@@ -1114,7 +1114,7 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 			presence.show = IPresence::Away;
 		else if (showText == PRESENCE_SHOW_DND)
 			presence.show = IPresence::DoNotDisturb;
-		else if (showText == PRESENCE_SHOW_DND)
+		else if (showText == PRESENCE_SHOW_XA)
 			presence.show = IPresence::ExtendedAway;
 		else
 			presence.show = IPresence::Online;
