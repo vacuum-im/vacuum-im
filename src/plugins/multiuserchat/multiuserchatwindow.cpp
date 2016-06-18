@@ -1949,6 +1949,7 @@ void MultiUserChatWindow::showPrivateChatMessage(IMessageChatWindow *AWindow, co
 		options.kind = IMessageStyleContentOptions::KindMessage;
 		options.type = IMessageStyleContentOptions::TypeEmpty;
 
+		options.time = AMessage.dateTime();
 		if (options.time.secsTo(FWindowStatus.value(AWindow->viewWidget()).createTime)>HISTORY_TIME_DELTA)
 			options.type |= IMessageStyleContentOptions::TypeHistory;
 
@@ -1957,7 +1958,6 @@ void MultiUserChatWindow::showPrivateChatMessage(IMessageChatWindow *AWindow, co
 		else
 			options.direction = IMessageStyleContentOptions::DirectionIn;
 
-		options.time = AMessage.dateTime();
 		fillPrivateChatContentOptions(AWindow,options);
 
 		showDateSeparator(AWindow->viewWidget(),options.time);
