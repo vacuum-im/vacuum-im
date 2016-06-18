@@ -44,17 +44,14 @@ public:
 		FInstance = NULL;
 		FHasInstance = false;
 	}
-	inline I* operator->() const {
-		return getInstance();
+	inline bool isNull() const {
+		return getInstance() == NULL;
 	}
 	inline operator I*() const {
 		return getInstance();
 	}
-	inline bool isNull() const {
-		return getInstance() == NULL;
-	}
-	inline operator bool() const {
-		return getInstance() != NULL;
+	inline I* operator->() const {
+		return getInstance();
 	}
 	inline bool operator!() const {
 		return getInstance() == NULL;
