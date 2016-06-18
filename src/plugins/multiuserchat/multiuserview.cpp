@@ -343,9 +343,10 @@ void MultiUserView::removeItemNotify(int ANotifyId)
 	{
 		LOG_STRM_DEBUG(FMultiChat->streamJid(),QString("Removing item notify, notify=%1, room=%2").arg(ANotifyId).arg(FMultiChat->roomJid().bare()));
 
-		QStandardItem *item = FItemNotifies.key(ANotifyId);
 		FNotifies.remove(ANotifyId);
-		FItemNotifies.remove(item);
+
+		QStandardItem *item = FItemNotifies.key(ANotifyId);
+		FItemNotifies.remove(item,ANotifyId);
 		updateItemNotify(item);
 
 		emit itemNotifyRemoved(ANotifyId);
