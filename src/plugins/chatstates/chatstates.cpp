@@ -26,11 +26,8 @@
 #include <utils/options.h>
 #include <utils/logger.h>
 
-#define SHC_CHAT_OUT_MESSAGES     "/message[@type='chat']/body"
-#define SHC_CHAT_IN_MESSAGES      "/message[@type='chat']/[@xmlns='" NS_CHATSTATES "']"
-
-#define SHC_ROOM_OUT_MESSAGES     "/message[@type='groupchat']/body"
-#define SHC_ROOM_IN_MESSAGES      "/message[@type='groupchat']/[@xmlns='" NS_CHATSTATES "']"
+#define SHC_OUT_MESSAGES          "/message/body"
+#define SHC_IN_MESSAGES           "/message/[@xmlns='" NS_CHATSTATES "']"
 
 #define STATE_UNKNIWN             "unknown"
 #define STATE_ACTIVE              "active"
@@ -365,74 +362,75 @@ void ChatStates::sessionLocalize(const IStanzaSession &ASession, IDataForm &AFor
 
 bool ChatStates::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
-	if (FSHIChatMessagesIn.value(AStreamJid)==AHandlerId && isReady(AStreamJid) && !AStanza.isError())
+	if (FSHIMessagesIn.value(AStreamJid)==AHandlerId && isReady(AStreamJid) && !AStanza.isError())
 	{
 		Message message(AStanza);
 		bool hasBody = !message.body().isEmpty();
 		if (!message.isDelayed())
 		{
-			Jid contactJid = AStanza.from();
-			QDomElement elem = AStanza.firstElement(QString::null,NS_CHATSTATES);
-			if (!elem.isNull())
+			if (message.type() != Message::GroupChat)
 			{
-				if (hasBody || FChatParams.value(AStreamJid).value(contactJid).canSendStates)
+				Jid contactJid = AStanza.from();
+				QDomElement elem = AStanza.firstElement(QString::null,NS_CHATSTATES);
+				if (!elem.isNull())
 				{
-					AAccept = true;
-					setSupported(AStreamJid,contactJid,true);
-					FChatParams[AStreamJid][contactJid].canSendStates = true;
+					if (hasBody || FChatParams.value(AStreamJid).value(contactJid).canSendStates)
+					{
+						AAccept = true;
+						setSupported(AStreamJid,contactJid,true);
+						FChatParams[AStreamJid][contactJid].canSendStates = true;
 
-					int state = stateTagToCode(elem.tagName());
-					setChatUserState(AStreamJid,contactJid,state);
+						int state = stateTagToCode(elem.tagName());
+						setChatUserState(AStreamJid,contactJid,state);
+					}
+				}
+				else if (hasBody)
+				{
+					if (userChatState(AStreamJid,contactJid) != IChatStates::StateUnknown)
+						setChatUserState(AStreamJid,contactJid,IChatStates::StateUnknown);
+					setSupported(AStreamJid,contactJid,false);
 				}
 			}
-			else if (hasBody)
+			else
 			{
-				if (userChatState(AStreamJid,contactJid) != IChatStates::StateUnknown)
-					setChatUserState(AStreamJid,contactJid,IChatStates::StateUnknown);
-				setSupported(AStreamJid,contactJid,false);
+				QDomElement elem = AStanza.firstElement(QString::null,NS_CHATSTATES);
+				if (!elem.isNull())
+				{
+					AAccept = true;
+					Jid roomJid = AStanza.from();
+					int state = stateTagToCode(elem.tagName());
+					setRoomUserState(AStreamJid,roomJid,state);
+				}
 			}
 		}
 		return !hasBody;
 	}
-	else if (FSHIChatMessagesOut.value(AStreamJid)==AHandlerId && isReady(AStreamJid) && !AStanza.isError())
-	{
-		Jid contactJid = AStanza.to();
-		IMessageChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,contactJid,true) : NULL;
-		if (window)
-		{
-			if (isSupported(AStreamJid,contactJid))
-			{
-				AStanza.addElement(STATE_ACTIVE,NS_CHATSTATES);
-				FChatParams[AStreamJid][contactJid].canSendStates = true;
-			}
-			setChatSelfState(AStreamJid,contactJid,IChatStates::StateActive,false);
-		}
-	}
-	else if (FSHIRoomMessagesIn.value(AStreamJid)==AHandlerId && isReady(AStreamJid) && !AStanza.isError())
+	else if (FSHIMessagesOut.value(AStreamJid)==AHandlerId && isReady(AStreamJid) && !AStanza.isError())
 	{
 		Message message(AStanza);
-		bool hasBody = !message.body().isEmpty();
-		if (!message.isDelayed())
+		if (message.type() != Message::GroupChat)
 		{
-			QDomElement elem = AStanza.firstElement(QString::null,NS_CHATSTATES);
-			if (!elem.isNull())
+			Jid contactJid = AStanza.to();
+			IMessageChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,contactJid,true) : NULL;
+			if (window)
 			{
-				AAccept = true;
-				Jid roomJid = AStanza.from();
-				int state = stateTagToCode(elem.tagName());
-				setRoomUserState(AStreamJid,roomJid,state);
+				if (isSupported(AStreamJid,contactJid))
+				{
+					AStanza.addElement(STATE_ACTIVE,NS_CHATSTATES);
+					FChatParams[AStreamJid][contactJid].canSendStates = true;
+				}
+				setChatSelfState(AStreamJid,contactJid,IChatStates::StateActive,false);
 			}
 		}
-		return !hasBody;
-	}
-	else if (FSHIRoomMessagesOut.value(AStreamJid)==AHandlerId && isReady(AStreamJid) && !AStanza.isError())
-	{
-		Jid roomJid = AStanza.to();
-		IMultiUserChatWindow *window = FMultiChatManager!=NULL ? FMultiChatManager->findMultiChatWindow(AStreamJid,roomJid) : NULL;
-		if (window)
+		else
 		{
-			AStanza.addElement(STATE_ACTIVE,NS_CHATSTATES);
-			setRoomSelfState(AStreamJid,roomJid,IChatStates::StateActive,false);
+			Jid roomJid = AStanza.to();
+			IMultiUserChatWindow *window = FMultiChatManager!=NULL ? FMultiChatManager->findMultiChatWindow(AStreamJid,roomJid) : NULL;
+			if (window)
+			{
+				AStanza.addElement(STATE_ACTIVE,NS_CHATSTATES);
+				setRoomSelfState(AStreamJid,roomJid,IChatStates::StateActive,false);
+			}
 		}
 	}
 
@@ -568,7 +566,7 @@ int ChatStates::stateTagToCode(const QString &AState) const
 	return state;
 }
 
-void ChatStates::sendStateMessage(Message::MessageType AType, const Jid &AStreamJid, const Jid &AContactJid, int AState) const
+bool ChatStates::sendStateMessage(Message::MessageType AType, const Jid &AStreamJid, const Jid &AContactJid, int AState) const
 {
 	if (FStanzaProcessor)
 	{
@@ -578,9 +576,10 @@ void ChatStates::sendStateMessage(Message::MessageType AType, const Jid &AStream
 			Message message;
 			message.setType(AType).setTo(AContactJid.full());
 			message.stanza().addElement(state,NS_CHATSTATES);
-			FStanzaProcessor->sendStanzaOut(AStreamJid,message.stanza());
+			return FStanzaProcessor->sendStanzaOut(AStreamJid,message.stanza());
 		}
 	}
+	return false;
 }
 
 bool ChatStates::isChatCanSend(const Jid &AStreamJid, const Jid &AContactJid) const
@@ -712,12 +711,23 @@ void ChatStates::setRoomUserState(const Jid &AStreamJid, const Jid &AUserJid, in
 	{
 		RoomParams &roomParams = FRoomParams[AStreamJid][AUserJid.bare()];
 		UserParams &userParams = roomParams.user[AUserJid];
+		
 		if (userParams.state != AState)
 		{
 			LOG_STRM_DEBUG(AStreamJid,QString("Room user chat state changed, user=%1, state=%2").arg(AUserJid.full()).arg(AState));
 			userParams.state = AState;
 			notifyUserState(AStreamJid,AUserJid);
 			emit userRoomStateChanged(AStreamJid,AUserJid,AState);
+		}
+
+		if (roomParams.delayedSend)
+		{
+			roomParams.waitEcho = sendStateMessage(Message::GroupChat,AStreamJid,AUserJid.bare(),roomParams.self.state);
+			roomParams.delayedSend = false;
+		}
+		else
+		{
+			roomParams.waitEcho = false;
 		}
 	}
 }
@@ -736,7 +746,16 @@ void ChatStates::setRoomSelfState(const Jid &AStreamJid, const Jid &ARoomJid, in
 			LOG_STRM_DEBUG(AStreamJid,QString("Room self state changed, room=%1, state=%2").arg(ARoomJid.full()).arg(AState));
 			roomParams.self.state = AState;
 			if (ASend && isRoomCanSend(AStreamJid,ARoomJid))
-				sendStateMessage(Message::GroupChat,AStreamJid,ARoomJid,AState);
+			{
+				if (!roomParams.waitEcho)
+					roomParams.waitEcho = sendStateMessage(Message::GroupChat,AStreamJid,ARoomJid,AState);
+				else
+					roomParams.delayedSend = true;
+			}
+			else
+			{
+				roomParams.delayedSend = false;
+			}
 			emit selfRoomStateChanged(AStreamJid,ARoomJid,AState);
 		}
 	}
@@ -834,23 +853,13 @@ void ChatStates::onPresenceOpened(IPresence *APresence)
 
 		shandle.direction = IStanzaHandle::DirectionOut;
 		shandle.order = SHO_MO_CHATSTATES;
-		shandle.conditions = QList<QString>() << SHC_CHAT_OUT_MESSAGES;
-		FSHIChatMessagesOut.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
+		shandle.conditions = QList<QString>() << SHC_OUT_MESSAGES;
+		FSHIMessagesOut.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
 
 		shandle.direction = IStanzaHandle::DirectionIn;
 		shandle.order = SHO_MI_CHATSTATES;
-		shandle.conditions = QList<QString>() << SHC_CHAT_IN_MESSAGES;
-		FSHIChatMessagesIn.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
-
-		shandle.direction = IStanzaHandle::DirectionOut;
-		shandle.order = SHO_MO_CHATSTATES;
-		shandle.conditions = QList<QString>() << SHC_ROOM_OUT_MESSAGES;
-		FSHIRoomMessagesOut.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
-
-		shandle.direction = IStanzaHandle::DirectionIn;
-		shandle.order = SHO_MI_CHATSTATES;
-		shandle.conditions = QList<QString>() << SHC_ROOM_IN_MESSAGES;
-		FSHIRoomMessagesIn.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
+		shandle.conditions = QList<QString>() << SHC_IN_MESSAGES;
+		FSHIMessagesIn.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
 	}
 
 	FNotSupported[APresence->streamJid()].clear();
@@ -890,10 +899,8 @@ void ChatStates::onPresenceClosed(IPresence *APresence)
 
 	if (FStanzaProcessor)
 	{
-		FStanzaProcessor->removeStanzaHandle(FSHIChatMessagesIn.take(APresence->streamJid()));
-		FStanzaProcessor->removeStanzaHandle(FSHIChatMessagesOut.take(APresence->streamJid()));
-		FStanzaProcessor->removeStanzaHandle(FSHIRoomMessagesIn.take(APresence->streamJid()));
-		FStanzaProcessor->removeStanzaHandle(FSHIRoomMessagesOut.take(APresence->streamJid()));
+		FStanzaProcessor->removeStanzaHandle(FSHIMessagesIn.take(APresence->streamJid()));
+		FStanzaProcessor->removeStanzaHandle(FSHIMessagesOut.take(APresence->streamJid()));
 	}
 
 	FNotSupported.remove(APresence->streamJid());
