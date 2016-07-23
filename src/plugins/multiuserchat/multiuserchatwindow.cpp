@@ -1951,6 +1951,7 @@ void MultiUserChatWindow::showPrivateChatMessage(IMessageChatWindow *AWindow, co
 		IMessageStyleContentOptions options;
 		options.kind = IMessageStyleContentOptions::KindMessage;
 		options.type = IMessageStyleContentOptions::TypeEmpty;
+
 		options.time = AMessage.dateTime();
 		if (options.time.secsTo(FWindowStatus.value(AWindow->viewWidget()).createTime)>HISTORY_TIME_DELTA)
 			options.type |= IMessageStyleContentOptions::TypeHistory;
