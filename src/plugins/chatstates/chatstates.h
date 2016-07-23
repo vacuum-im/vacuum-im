@@ -49,8 +49,12 @@ struct ChatParams {
 struct RoomParams {
 	RoomParams() {
 		notifyId = 0;
+		waitEcho = false;
+		delayedSend = false;
 	}
 	int notifyId;
+	bool waitEcho;
+	bool delayedSend;
 	SelfParams self;
 	QHash<Jid, UserParams> user;
 };
@@ -110,7 +114,7 @@ protected:
 	void registerDiscoFeatures();
 	QString stateCodeToTag(int AState) const;
 	int stateTagToCode(const QString &AState) const;
-	void sendStateMessage(Message::MessageType AType, const Jid &AStreamJid, const Jid &AContactJid, int AState) const;
+	bool sendStateMessage(Message::MessageType AType, const Jid &AStreamJid, const Jid &AContactJid, int AState) const;
 protected:
 	bool isChatCanSend(const Jid &AStreamJid, const Jid &AContactJid) const;
 	void resetSupported(const Jid &AContactJid = Jid::null);
@@ -157,10 +161,8 @@ private:
 	ISessionNegotiation *FSessionNegotiation;
 	IMultiUserChatManager *FMultiChatManager;
 private:
-	QMap<Jid, int> FSHIChatMessagesIn;
-	QMap<Jid, int> FSHIChatMessagesOut;
-	QMap<Jid, int> FSHIRoomMessagesIn;
-	QMap<Jid, int> FSHIRoomMessagesOut;
+	QMap<Jid, int> FSHIMessagesIn;
+	QMap<Jid, int> FSHIMessagesOut;
 private:
 	QTimer FUpdateTimer;
 	QMap<Jid, int> FPermitStatus;

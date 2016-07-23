@@ -33,6 +33,7 @@
 
 enum HistoryItemType {
 	HIT_CONTACT,
+	HIT_MONTHGROUP,
 	HIT_DATEGROUP,
 	HIT_HEADER
 };
@@ -41,6 +42,7 @@ enum HistoryDataRoles {
 	HDR_TYPE                = Qt::UserRole+1,
 	HDR_CONTACT_JID,
 	HDR_METACONTACT_ID,
+	HDR_MONTHGROUP_DATE,
 	HDR_DATEGROUP_DATE,
 	HDR_HEADER_WITH,
 	HDR_HEADER_STREAM,
@@ -78,10 +80,16 @@ bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex 
 			}
 			return QString::localeAwareCompare(leftDisplay,rightDisplay) < 0;
 		}
+		else if (leftType == HIT_MONTHGROUP)
+		{
+			QDate leftDate = ALeft.data(HDR_MONTHGROUP_DATE).toDate();
+			QDate rightDate = ARight.data(HDR_MONTHGROUP_DATE).toDate();
+			return leftDate >= rightDate;
+		}
 		else if (leftType == HIT_DATEGROUP)
 		{
-			QDate leftDate = ALeft.data(HDR_DATEGROUP_DATE).toDate();
-			QDate rightDate = ARight.data(HDR_DATEGROUP_DATE).toDate();
+			QDate leftDate = ALeft.data(HDR_MONTHGROUP_DATE).toDate();
+			QDate rightDate = ARight.data(HDR_MONTHGROUP_DATE).toDate();
 			return leftDate >= rightDate;
 		}
 		else if (leftType == HIT_HEADER)
@@ -657,7 +665,7 @@ void ArchiveViewWindow::setMessageStatus(RequestStatus AStatus, const QString &A
 
 QStandardItem *ArchiveViewWindow::createHeaderItem(const ArchiveHeader &AHeader)
 {
-	QStandardItem *item = new QStandardItem(AHeader.start.toString("dd MMM, ddd"));
+	QStandardItem *item = new QStandardItem(AHeader.start.toString("hh:mm"));
 	
 	item->setData(HIT_HEADER,HDR_TYPE);
 	item->setData(AHeader.stream.pFull(),HDR_HEADER_STREAM);
@@ -695,6 +703,7 @@ QStandardItem *ArchiveViewWindow::createParentItem(const ArchiveHeader &AHeader)
 	if (!FAddresses.contains(AHeader.stream,AHeader.with) && isConferencePrivateChat(AHeader.with))
 		item = createPrivateChatItem(AHeader.stream,AHeader.with,item);
 
+	item = createMonthGroupItem(AHeader.start,item);
 	item = createDateGroupItem(AHeader.start,item);
 
 	return item;
@@ -702,13 +711,28 @@ QStandardItem *ArchiveViewWindow::createParentItem(const ArchiveHeader &AHeader)
 
 QStandardItem *ArchiveViewWindow::createDateGroupItem(const QDateTime &ADateTime, QStandardItem *AParent)
 {
-	QDate date(ADateTime.date().year(),ADateTime.date().month(),1);
+	QDate date = ADateTime.date();
 	QStandardItem *item = findItem(HIT_DATEGROUP,HDR_DATEGROUP_DATE,date,AParent);
 	if (item == NULL)
 	{
-		item = new QStandardItem(date.toString("MMMM yyyy"));
+		item = new QStandardItem(date.toString("dd MMM, ddd"));
 		item->setData(HIT_DATEGROUP,HDR_TYPE);
 		item->setData(date,HDR_DATEGROUP_DATE);
+		item->setIcon(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY_DATE));
+		AParent->appendRow(item);
+	}
+	return item;
+}
+
+QStandardItem *ArchiveViewWindow::createMonthGroupItem(const QDateTime &ADateTime, QStandardItem *AParent)
+{
+	QDate date(ADateTime.date().year(),ADateTime.date().month(),1);
+	QStandardItem *item = findItem(HIT_MONTHGROUP,HDR_MONTHGROUP_DATE,date,AParent);
+	if (item == NULL)
+	{
+		item = new QStandardItem(date.toString("MMMM yyyy"));
+		item->setData(HIT_MONTHGROUP,HDR_TYPE);
+		item->setData(date,HDR_MONTHGROUP_DATE);
 		item->setIcon(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY_DATE));
 		AParent->appendRow(item);
 	}
@@ -1284,11 +1308,17 @@ void ArchiveViewWindow::onHeaderContextMenuRequested(const QPoint &APos)
 				headerWith.append(it.value().pFull());
 
 				int itemType = item->data(HDR_TYPE).toInt();
-				if (itemType == HIT_DATEGROUP)
+				if (itemType == HIT_MONTHGROUP)
 				{
-					QDate date = item->data(HDR_DATEGROUP_DATE).toDate();
+					QDate date = item->data(HDR_MONTHGROUP_DATE).toDate();
 					headerStart.append(QDateTime(date));
 					headerEnd.append(QDateTime(date).addMonths(1));
+				}
+				else if (itemType == HIT_DATEGROUP)
+				{
+					QDate date = item->data(HDR_MONTHGROUP_DATE).toDate();
+					headerStart.append(QDateTime(date));
+					headerEnd.append(QDateTime(date).addDays(1));
 				}
 				else if (itemType == HIT_HEADER)
 				{
@@ -1333,6 +1363,17 @@ void ArchiveViewWindow::onHeaderContextMenuRequested(const QPoint &APos)
 			removeAll->setData(ADR_HEADER_END,headerEnd);
 			connect(removeAll,SIGNAL(triggered()),SLOT(onRemoveCollectionsByAction()));
 			menu->addAction(removeAll,AG_DEFAULT+500);
+		}
+		else if (itemType == HIT_MONTHGROUP)
+		{
+			Action *removeMonth = new Action(menu);
+			removeMonth->setText(tr("Remove History for %1").arg(item->text()));
+			removeMonth->setData(ADR_HEADER_STREAM,headerStream);
+			removeMonth->setData(ADR_HEADER_WITH,headerWith);
+			removeMonth->setData(ADR_HEADER_START,headerStart);
+			removeMonth->setData(ADR_HEADER_END,headerEnd);
+			connect(removeMonth,SIGNAL(triggered()),SLOT(onRemoveCollectionsByAction()));
+			menu->addAction(removeMonth,AG_DEFAULT+500);
 		}
 		else if (itemType == HIT_DATEGROUP)
 		{

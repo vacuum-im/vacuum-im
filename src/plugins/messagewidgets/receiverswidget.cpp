@@ -1067,7 +1067,10 @@ void ReceiversWidget::onRosterItemReceived(IRoster *ARoster, const IRosterItem &
 				{
 					QStandardItem *contactItem = findContactItem(ARoster->streamJid(),AItem.itemJid,group);
 					if (contactItem)
+					{
+						contactItems.removeAll(contactItem);
 						contactItem->parent()->removeRow(contactItem->row());
+					}
 				}
 			}
 
