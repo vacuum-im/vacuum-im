@@ -2,7 +2,7 @@ include("${CMAKE_SOURCE_DIR}/src/make/config.cmake")
 
 project(hunspell CXX)
 
-set(SOURCES affentry.cxx affixmgr.cxx csutil.cxx dictmgr.cxx filemgr.cxx hashmgr.cxx hunspell.cxx hunzip.cxx phonet.cxx replist.cxx suggestmgr.cxx)
+set(SOURCES affentry.cxx affixmgr.cxx csutil.cxx filemgr.cxx hashmgr.cxx hunspell.cxx hunzip.cxx phonet.cxx replist.cxx suggestmgr.cxx)
 
 add_definitions(-DHUNSPELL_STATIC)
  
