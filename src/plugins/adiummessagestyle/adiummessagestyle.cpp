@@ -135,7 +135,13 @@ QTextCharFormat AdiumMessageStyle::textFormatAt(QWidget *AWidget, const QPoint &
 
 QTextDocumentFragment AdiumMessageStyle::textFragmentAt(QWidget *AWidget, const QPoint &APosition) const
 {
-	Q_UNUSED(AWidget); Q_UNUSED(APosition);
+	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
+	if (view)
+	{
+		WebHitTestResult result = view->hitTestContent(APosition);
+		if (!result.isNull())
+			return QTextDocumentFragment::fromHtml(result.outerHtml());
+	}
 	return QTextDocumentFragment();
 }
 
