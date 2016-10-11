@@ -4,6 +4,7 @@
 #include <QFileInfo>
 #include <QFileDialog>
 #include <QFontDialog>
+#include <QWebSettings>
 
 AdiumOptionsWidget::AdiumOptionsWidget(AdiumMessageStyleEngine *AEngine, const OptionsNode &ANode, QWidget *AParent) : QWidget(AParent)
 {

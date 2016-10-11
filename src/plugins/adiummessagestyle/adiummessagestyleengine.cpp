@@ -12,7 +12,9 @@
 
 AdiumMessageStyleEngine::AdiumMessageStyleEngine()
 {
+	FUrlProcessor = NULL;
 	FMessageStyleManager = NULL;
+	FNetworkAccessManager = NULL;
 }
 
 AdiumMessageStyleEngine::~AdiumMessageStyleEngine()
@@ -39,11 +41,18 @@ bool AdiumMessageStyleEngine::initConnections(IPluginManager *APluginManager, in
 		FMessageStyleManager = qobject_cast<IMessageStyleManager *>(plugin->instance());
 	}
 
+	plugin = APluginManager->pluginInterface("IUrlProcessor").value(0);
+	if (plugin)
+	{
+		FUrlProcessor = qobject_cast<IUrlProcessor *>(plugin->instance());
+	}
+
 	return true;
 }
 
 bool AdiumMessageStyleEngine::initObjects()
 {
+	FNetworkAccessManager = FUrlProcessor!=NULL ? FUrlProcessor->networkAccessManager() : new QNetworkAccessManager(this);
 	updateAvailStyles();
 
 	if (FMessageStyleManager)
@@ -83,7 +92,7 @@ IMessageStyle *AdiumMessageStyleEngine::styleForOptions(const IMessageStyleOptio
 		QString stylePath = FStylePaths.value(AOptions.styleId);
 		if (!stylePath.isEmpty())
 		{
-			AdiumMessageStyle *style = new AdiumMessageStyle(stylePath, this);
+			AdiumMessageStyle *style = new AdiumMessageStyle(stylePath, FNetworkAccessManager, this);
 			if (style->isValid())
 			{
 				LOG_INFO(QString("Adium style created, id=%1").arg(style->styleId()));

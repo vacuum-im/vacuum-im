@@ -3,6 +3,7 @@
 
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagestylemanager.h>
+#include <interfaces/iurlprocessor.h>
 #include "adiummessagestyle.h"
 #include "adiumoptionswidget.h"
 
@@ -51,10 +52,12 @@ protected slots:
 	void onStyleWidgetRemoved(QWidget *AWidget);
 	void onClearEmptyStyles();
 private:
+	IUrlProcessor *FUrlProcessor;
 	IMessageStyleManager *FMessageStyleManager;
 private:
 	QMap<QString, QString> FStylePaths;
 	QMap<QString, AdiumMessageStyle *> FStyles;
+	QNetworkAccessManager *FNetworkAccessManager;
 };
 
 #endif // ADIUMMESSAGESTYLEPLUGIN_H

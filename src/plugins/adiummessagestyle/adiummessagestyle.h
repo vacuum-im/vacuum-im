@@ -3,6 +3,7 @@
 
 #include <QList>
 #include <QTimer>
+#include <QWebView>
 #include <QNetworkAccessManager>
 #include <interfaces/imessagestylemanager.h>
 #include "styleviewer.h"
@@ -107,7 +108,7 @@ public:
 		QMap<QString, QVariant> options;
 	};
 public:
-	AdiumMessageStyle(const QString &AStylePath, QObject *AParent);
+	AdiumMessageStyle(const QString &AStylePath, QNetworkAccessManager *ANetworkAccessManager, QObject *AParent);
 	~AdiumMessageStyle();
 	//IMessageStyle
 	virtual QObject *instance() { return this; }
@@ -145,6 +146,7 @@ protected:
 	void fillStyleKeywords(QString &AHtml, const IMessageStyleOptions &AOptions) const;
 	void setVariant(StyleViewer *AView, const QString &AVariant);
 protected:
+	QWebHitTestResult hitTest(QWidget *AWidget, const QPoint &APosition) const;
 	bool isConsecutive(const IMessageStyleContentOptions &AOptions, const WidgetStatus &AStatus) const;
 	QString makeContentTemplate(const IMessageStyleContentOptions &AOptions, const WidgetStatus &AStatus) const;
 	void fillContentKeywords(QString &AHtml, const IMessageStyleContentOptions &AOptions, const WidgetStatus &AStatus) const;
@@ -154,12 +156,14 @@ protected:
 	bool eventFilter(QObject *AWatched, QEvent *AEvent);
 protected slots:
 	void onScrollTimerTimeout();
+	void onContentTimerTimeout();
 	void onLinkClicked(const QUrl &AUrl);
 	void onStyleWidgetAdded(IMessageStyle *AStyle, QWidget *AWidget);
 	void onStyleWidgetLoadFinished(bool AOk);
 	void onStyleWidgetDestroyed(QObject *AObject);
 private:
 	QTimer FScrollTimer;
+	QTimer FContentTimer;
 	bool FCombineConsecutive;
 	bool FUsingCustomTemplate;
 	bool FAllowCustomBackground;
@@ -181,6 +185,7 @@ private:
 	QList<QString> FSenderColors;
 	QMap<QString, QVariant> FInfo;
 	QMap<QWidget *, WidgetStatus> FWidgetStatus;
+	QNetworkAccessManager *FNetworkAccessManager;
 private:
 	static QString FSharedPath;
 };
