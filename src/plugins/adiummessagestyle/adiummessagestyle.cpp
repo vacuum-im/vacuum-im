@@ -626,7 +626,7 @@ void AdiumMessageStyle::fillContentKeywords(QString &AHtml, const IMessageStyleC
 		if (!isDirectionIn && !QFile::exists(FResourcePath+"/"+avatar))
 			avatar = "Incoming/buddy_icon.png";
 	}
-	AHtml.replace("%userIconPath%",avatar);
+	AHtml.replace("%userIconPath%",QUrl::fromLocalFile(avatar).toString());
 
 	QString timeFormat = !AOptions.timeFormat.isEmpty() ? AOptions.timeFormat : tr("hh:mm:ss");
 	QString time = AOptions.time.toString(timeFormat).toHtmlEscaped();
