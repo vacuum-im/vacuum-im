@@ -8,6 +8,10 @@ include("loader.cmake")
 
 project(loader CXX)
 
+if (UNIX AND NOT APPLE)
+	set(CMAKE_INSTALL_RPATH "$ORIGIN/../${INSTALL_LIB_DIR}/")
+endif (UNIX AND NOT APPLE)
+
 include_directories("${CMAKE_SOURCE_DIR}/src" "${CMAKE_BINARY_DIR}/src/loader")
 
 set(GIT_HASH "" CACHE STRING "GIT HASH: git log -n 1 --format=%H")
@@ -48,11 +52,12 @@ add_executable(${VACUUM_LOADER_NAME} WIN32 MACOSX_BUNDLE ${SOURCES} ${MOC_SOURCE
 set_target_properties(${VACUUM_LOADER_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 target_link_libraries(${VACUUM_LOADER_NAME} ${VACUUM_UTILS_NAME})
 
-if (NO_WEBENGINE)
+if (NO_WEBKIT)
 	qt5_use_modules(${VACUUM_LOADER_NAME} Widgets Xml)
-else (NO_WEBENGINE)
-	qt5_use_modules(${VACUUM_LOADER_NAME} Widgets Xml WebEngine)
-endif (NO_WEBENGINE)
+else (NO_WEBKIT)
+	Find_package(Qt5WebKitWidgets)
+	target_link_libraries(${PLUGIN_NAME} Qt5::WebKitWidgets)
+endif (NO_WEBKIT)
 
 install(TARGETS ${VACUUM_LOADER_NAME}
 	DESTINATION "${INSTALL_BINS}"
