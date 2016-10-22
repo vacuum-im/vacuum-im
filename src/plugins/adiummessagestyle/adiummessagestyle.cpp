@@ -1,7 +1,5 @@
 #include "adiummessagestyle.h"
 
-#include <QtDebug>
-
 #include <QUrl>
 #include <QDir>
 #include <QFile>
@@ -63,15 +61,15 @@ AdiumMessageStyle::AdiumMessageStyle(const QString &AStylePath, QNetworkAccessMa
 {
 	if (FSharedPath.isEmpty())
 	{
-		if (QDir::isRelativePath( SHARED_STYLE_PATH ))
-			FSharedPath = qApp->applicationDirPath()+"/"+SHARED_STYLE_PATH;
+		if (QDir::isRelativePath(SHARED_STYLE_PATH))
+			FSharedPath = qApp->applicationDirPath() + "/" SHARED_STYLE_PATH;
 		else
 			FSharedPath = SHARED_STYLE_PATH;
 	}
 
 	FInfo = styleInfo(AStylePath);
 	FVariants = styleVariants(AStylePath);
-	FResourcePath = AStylePath+"/"+STYLE_RESOURCES_PATH;
+	FResourcePath = AStylePath + "/" STYLE_RESOURCES_PATH;
 	FNetworkAccessManager = ANetworkAccessManager;
 
 	FScrollTimer.setSingleShot(true);
@@ -272,7 +270,7 @@ QList<QString> AdiumMessageStyle::styleVariants(const QString &AStylePath)
 	QList<QString> files;
 	if (!AStylePath.isEmpty())
 	{
-		QDir dir(AStylePath+"/"+STYLE_RESOURCES_PATH"/Variants");
+		QDir dir(AStylePath + "/" STYLE_RESOURCES_PATH "/Variants");
 		files = dir.entryList(QStringList("*.css"),QDir::Files,QDir::Name);
 		for (int i=0; i<files.count();i++)
 			files[i].chop(4);
@@ -287,7 +285,7 @@ QList<QString> AdiumMessageStyle::styleVariants(const QString &AStylePath)
 QMap<QString, QVariant> AdiumMessageStyle::styleInfo(const QString &AStylePath)
 {
 	QMap<QString, QVariant> info;
-	QFile file(AStylePath+"/"+STYLE_CONTENTS_PATH"/Info.plist");
+	QFile file(AStylePath + "/" STYLE_CONTENTS_PATH "/Info.plist");
 	if (!AStylePath.isEmpty() && file.open(QFile::ReadOnly))
 	{
 		QString xmlError;
