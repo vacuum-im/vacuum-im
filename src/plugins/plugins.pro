@@ -1,6 +1,6 @@
 TEMPLATE = subdirs
 
-qtHaveModule(webengine): !CONFIG(no_webengine) {
+qtHaveModule(webkit): !CONFIG(no_webkit) {
   SUBDIRS += adiummessagestyle
 }
 

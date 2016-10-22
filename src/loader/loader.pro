@@ -13,11 +13,6 @@ include(loader.pri)
 #Appication icon
 win32:RC_FILE      = loader.rc
 
-#QtWebEngine could not be initialized in plugin
-!CONFIG(no_webengine) {
-  QT              += webengine
-}
-
 #GIT Info
 GIT_HASH = $$system(git log -n 1 --format=%H)
 GIT_DATE = $$system(git log -n 1 --format=%ct)

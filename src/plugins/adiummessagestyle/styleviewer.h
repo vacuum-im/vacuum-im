@@ -1,32 +1,20 @@
 #ifndef STYLEVIEWER_H
 #define STYLEVIEWER_H
 
-#include <QTimer>
-#include <QWebEngineView>
-#include "webhittestresult.h"
+#include <QWebView>
+#include "webpage.h"
 
 class StyleViewer :
-	public QWebEngineView
+	public QWebView
 {
 	Q_OBJECT;
 public:
 	StyleViewer(QWidget *AParent);
+	~StyleViewer();
 	QSize sizeHint() const;
 	QSize minimumSizeHint() const;
-	WebHitTestResult hitTestContent(const QPoint &APosition) const;
-private:
-	void enterEvent(QEvent *AEvent);
-	void leaveEvent(QEvent *AEvent);
-signals:
-	void linkClicked(const QUrl &AUrl);
-private slots:
-	void onHitTimerTimeout();
-	void onWebPageHitTestResult(const QString &AId, const WebHitTestResult &AResult);
-private:
-	QTimer FHitTimer;
-	QPoint FHitPoint;
-	QString FHitRequestId;
-	WebHitTestResult FHitResult;
+protected slots:
+	void onShortcutActivated();
 };
 
 #endif // STYLEVIEWER_H
