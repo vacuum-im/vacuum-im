@@ -1,6 +1,7 @@
 #include "textmanager.h"
 
-#include <QRegExp>
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
 #include <QTextBlock>
 
 TextManager::TextManager()
@@ -10,11 +11,11 @@ TextManager::TextManager()
 
 QString TextManager::getDocumentBody(const QTextDocument &ADocument)
 {
-	QRegExp body("<body.*>(.*)</body>");
-	body.setMinimal(false);
+	QRegularExpression body("<body.*>(.*)</body>");
 
 	QString html = ADocument.toHtml();
-	html = html.indexOf(body)>=0 ? body.cap(1).trimmed() : html;
+	QRegularExpressionMatch bodyMatch = body.match(html);
+	html = bodyMatch.hasMatch() ? bodyMatch.captured(1).trimmed() : html;
 
 	// XXX Replace <P> inserted by QTextDocument with <SPAN>
 	if (html.leftRef(3).compare("<p ", Qt::CaseInsensitive)==0 && html.rightRef(4).compare("</p>", Qt::CaseInsensitive)==0)
@@ -58,13 +59,18 @@ QString TextManager::getTextFragmentHref(const QTextDocumentFragment &AFragment)
 
 void TextManager::insertQuotedFragment(QTextCursor ACursor, const QTextDocumentFragment &AFragment)
 {
+	static QRegularExpression re = QRegularExpression(QLatin1String("^"), QRegularExpression::MultilineOption);
+
 	if (!AFragment.isEmpty())
 	{
 		ACursor.beginEditBlock();
 		if (!ACursor.atBlockStart())
+		{
 			ACursor.insertText("\n");
-		ACursor.insertText("> ");
-		ACursor.insertFragment(AFragment);
+		}
+
+		QString quotedText = AFragment.toPlainText().replace(re, QLatin1String("> "));
+		ACursor.insertText(quotedText);
 		ACursor.insertText("\n");
 		ACursor.endEditBlock();
 	}
