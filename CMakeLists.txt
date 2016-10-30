@@ -15,7 +15,6 @@ if(POLICY CMP0043)
 endif()
 
 find_package (Qt5Widgets REQUIRED)
-find_package (Qt5WebKit)
 find_package (Qt5LinguistTools REQUIRED)
 
 add_custom_target(updatets)
@@ -56,6 +55,8 @@ endif (FORCE_BUNDLED_MINIZIP)
 
 if (NO_WEBKIT)
 	add_definitions(-DNO_WEBKIT)
+else (NO_WEBKIT)
+	find_package (Qt5WebKit 5.602.2)
 endif (NO_WEBKIT)
 
 if (SYSTEM_ZLIB_FOUND)
