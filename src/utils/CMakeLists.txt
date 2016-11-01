@@ -61,7 +61,7 @@ target_link_libraries(${VACUUM_UTILS_NAME} ${ADD_LIBS})
 if (UNIX AND NOT APPLE)
 	target_link_libraries(${VACUUM_UTILS_NAME} ${Qt5Gui_LIBRARY} LINK_PRIVATE)
 endif (UNIX AND NOT APPLE)
-qt5_use_modules(${VACUUM_UTILS_NAME} Widgets Xml Network)
+qt5_use_modules(${VACUUM_UTILS_NAME} Gui Widgets Xml Network)
 
 if (WIN32)
 	set_target_properties(${VACUUM_UTILS_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
