@@ -66,7 +66,7 @@ void TextManager::insertQuotedFragment(QTextCursor ACursor, const QTextDocumentF
 
 		cursor.movePosition(QTextCursor::Start);
 		do { cursor.insertText("> "); } while (cursor.movePosition(QTextCursor::NextBlock));
-		cursor.select(QTextCursor::SelectionType::Document);
+		cursor.select(QTextCursor::Document);
 
 		ACursor.beginEditBlock();
 		if (!ACursor.atBlockStart())
