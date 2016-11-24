@@ -151,10 +151,10 @@ public:
 	void setModelData(QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex) const;
 	void updateEditorGeometry(QWidget *AEditor, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
 public:
-	AdvancedDelegateItems getIndexItems(const QModelIndex &AIndex, const QStyleOptionViewItemV4 &AIndexOption) const;
-	QStyleOptionViewItemV4 indexStyleOption(const QStyleOptionViewItem &AOption, const QModelIndex &AIndex, bool ACorrect=false) const;
-	QStyleOptionViewItemV4 itemStyleOption(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AIndexOption) const;
-	ItemsLayout *createItemsLayout(const AdvancedDelegateItems &AItems, const QStyleOptionViewItemV4 &AIndexOption) const;
+	AdvancedDelegateItems getIndexItems(const QModelIndex &AIndex, const QStyleOptionViewItem &AIndexOption) const;
+	QStyleOptionViewItem indexStyleOption(const QStyleOptionViewItem &AOption, const QModelIndex &AIndex, bool ACorrect=false) const;
+	QStyleOptionViewItem itemStyleOption(const AdvancedDelegateItem &AItem, const QStyleOptionViewItem &AIndexOption) const;
+	ItemsLayout *createItemsLayout(const AdvancedDelegateItems &AItems, const QStyleOptionViewItem &AIndexOption) const;
 	void destroyItemsLayout(ItemsLayout *ALayout) const;
 public:
 	QRect itemRect(quint32 AItemId, const ItemsLayout *ALayout, const QRect &AGeometry) const;
@@ -162,11 +162,11 @@ public:
 	quint32 itemAt(const QPoint &APoint, const ItemsLayout *ALayout, const QRect &AGeometry) const;
 	quint32 itemAt(const QPoint &APoint, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
 public:
-	static bool isItemVisible(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AItemOption);
-	static QSize itemSizeHint(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AItemOption);
+	static bool isItemVisible(const AdvancedDelegateItem &AItem, const QStyleOptionViewItem &AItemOption);
+	static QSize itemSizeHint(const AdvancedDelegateItem &AItem, const QStyleOptionViewItem &AItemOption);
 protected:
-	void drawBackground(QPainter *APainter, const QStyleOptionViewItemV4 &AIndexOption) const;
-	void drawFocusRect(QPainter *APainter, const QStyleOptionViewItemV4 &AIndexOption, const QRect &ARect) const;
+	void drawBackground(QPainter *APainter, const QStyleOptionViewItem &AIndexOption) const;
+	void drawFocusRect(QPainter *APainter, const QStyleOptionViewItem &AIndexOption, const QRect &ARect) const;
 protected:
 	bool editorEvent(QEvent *AEvent, QAbstractItemModel *AModel, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex);
 private:

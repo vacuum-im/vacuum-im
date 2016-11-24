@@ -1055,9 +1055,9 @@ void RostersView::setDropIndicatorRect(const QRect &ARect)
 	}
 }
 
-QStyleOptionViewItemV4 RostersView::indexOption(const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
+QStyleOptionViewItem RostersView::indexOption(const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
 {
-	QStyleOptionViewItemV4 option = AOption;
+	QStyleOptionViewItem option = AOption;
 	
 	if (wordWrap())
 		option.features = QStyleOptionViewItemV2::WrapText;
@@ -1231,7 +1231,7 @@ void RostersView::mouseMoveEvent(QMouseEvent *AEvent)
 			QAbstractItemDelegate *itemDeletage = itemDelegate(FPressedIndex);
 			if (itemDeletage)
 			{
-				QStyleOptionViewItemV4 option = indexOption(viewOptions(),FPressedIndex);
+				QStyleOptionViewItem option = indexOption(viewOptions(),FPressedIndex);
 				QPoint indexPos = option.rect.topLeft();
 				option.state &= ~QStyle::State_Selected;
 				option.state &= ~QStyle::State_MouseOver;

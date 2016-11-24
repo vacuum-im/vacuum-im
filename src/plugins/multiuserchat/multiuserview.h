@@ -65,7 +65,7 @@ protected:
 	void updateUserItem(IMultiUser *AUser);
 	void updateItemNotify(QStandardItem *AItem);
 	void repaintUserItem(const QStandardItem *AItem);
-	QStyleOptionViewItemV4 indexOption(const QModelIndex &AIndex) const;
+	QStyleOptionViewItem indexOption(const QModelIndex &AIndex) const;
 protected:
 	bool event(QEvent *AEvent);
 protected slots:

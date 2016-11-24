@@ -480,9 +480,9 @@ void MultiUserView::repaintUserItem(const QStandardItem *AItem)
 		viewport()->repaint(rect);
 }
 
-QStyleOptionViewItemV4 MultiUserView::indexOption(const QModelIndex &AIndex) const
+QStyleOptionViewItem MultiUserView::indexOption(const QModelIndex &AIndex) const
 {
-	QStyleOptionViewItemV4 option = viewOptions();
+	QStyleOptionViewItem option = viewOptions();
 
 	option.index = AIndex;
 	option.rect = visualRect(AIndex);

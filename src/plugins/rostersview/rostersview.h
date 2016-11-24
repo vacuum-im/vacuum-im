@@ -123,7 +123,7 @@ protected:
 	void appendBlinkItem(quint32 ALabelId, int ANotifyId);
 	void removeBlinkItem(quint32 ALabelId, int ANotifyId);
 	void setDropIndicatorRect(const QRect &ARect);
-	QStyleOptionViewItemV4 indexOption(const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
+	QStyleOptionViewItem indexOption(const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
 protected:
 	//QTreeView
 	void drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const;
