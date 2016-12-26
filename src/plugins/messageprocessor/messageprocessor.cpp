@@ -137,7 +137,7 @@ bool MessageProcessor::writeMessageToText(int AOrder, Message &AMessage, QTextDo
 			{
 				QString desc = oobElem.firstChildElement("desc").text().trimmed();
 				QUrl url = QUrl::fromUserInput(oobElem.firstChildElement("url").text());
-				if (!url.isEmpty())
+				if (!url.isEmpty() && url.toString() != html)
 				{
 					QTextCharFormat linkFormat;
 					linkFormat.setAnchor(true);
