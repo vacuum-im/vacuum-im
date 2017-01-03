@@ -360,7 +360,7 @@
     </message>
     <message>
         <source>Account %1 successfully registered, click &apos;Finish&apos; button to add the account.</source>
-        <translation type="unfinished"/>
+        <translation>La cuenta %1 se ha registrado satisfactoriamente, haz clic en el botón &quot;Terminar&quot; para añadir la cuenta.</translation>
     </message>
 </context>
 <context>

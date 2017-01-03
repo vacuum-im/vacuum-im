@@ -66,7 +66,7 @@
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Error</translation>
     </message>
 </context>
 <context>
@@ -85,23 +85,23 @@
     </message>
     <message>
         <source>Conference:</source>
-        <translation type="unfinished"/>
+        <translation>Sala</translation>
     </message>
     <message>
         <source>Conference as &apos;name@service.server.com&apos;</source>
-        <translation type="unfinished"/>
+        <translation>Sala en la forma &apos;name@service.server.com&apos;</translation>
     </message>
     <message>
         <source>Nickname:</source>
-        <translation type="unfinished"/>
+        <translation>Apodo:</translation>
     </message>
     <message>
         <source>Your nickname in conference</source>
-        <translation type="unfinished"/>
+        <translation>Su apodo en la sala</translation>
     </message>
     <message>
         <source>Conference password if required</source>
-        <translation type="unfinished"/>
+        <translation>Contraseña de la sala si se requiere</translation>
     </message>
     <message>
         <source>Name:</source>
@@ -109,23 +109,23 @@
     </message>
     <message>
         <source>Bookmark to Conference</source>
-        <translation type="unfinished"/>
+        <translation>Marcador para la sala</translation>
     </message>
     <message>
         <source>Bookmark to Link</source>
-        <translation type="unfinished"/>
+        <translation>Marcador para el enlace</translation>
     </message>
     <message>
         <source>Link:</source>
-        <translation type="unfinished"/>
+        <translation>Enlace:</translation>
     </message>
     <message>
         <source>Any valid link</source>
-        <translation type="unfinished"/>
+        <translation>Cualquier enlace válido</translation>
     </message>
     <message>
         <source>Bookmark name</source>
-        <translation type="unfinished"/>
+        <translation>Nombre del marcador</translation>
     </message>
 </context>
 <context>
@@ -140,7 +140,7 @@
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Error</translation>
     </message>
 </context>
 <context>
