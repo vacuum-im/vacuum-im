@@ -5,6 +5,7 @@
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/shortcuts.h>
+#include <definitions/optionvalues.h>
 #include <definitions/messagedataroles.h>
 #include <definitions/rosterindexkinds.h>
 #include <definitions/rosterindexroles.h>
@@ -55,6 +56,10 @@ NormalWindow::NormalWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJ
 	ui.wdtReceiversTree->layout()->setMargin(0);
 	FReceiversWidget = FMessageWidgets->newReceiversWidget(this,ui.wdtReceivers);
 	connect(FReceiversWidget->instance(),SIGNAL(addressSelectionChanged()),SLOT(onReceiverslAddressSelectionChanged()));
+	if (Options::node(OPV_ROSTER_SORTMODE).value().toInt() == IRostersView::SortByStatus)
+		FReceiversWidget->setSortMode(IMessageReceiversWidget::SortByStatus);
+	else
+		FReceiversWidget->setSortMode(IMessageReceiversWidget::SortAlphabetically);
 	FReceiversWidget->setAddressSelection(AStreamJid,AContactJid,true);
 	ui.wdtReceiversTree->layout()->addWidget(FReceiversWidget->instance());
 

@@ -40,6 +40,7 @@
 #define AG_MWRWCM_MWIDGETS_EXPAND_ALL                           800
 #define AG_MWRWCM_MWIDGETS_COLLAPSE_ALL                         800
 #define AG_MWRWCM_MWIDGETS_HIDE_OFFLINE                         900
+#define AG_MWRWCM_MWIDGETS_SORT_BY_STATUS                       900
 
 //MessageWidgets - TabWindowMenu
 #define AG_MWTW_MWIDGETS_TAB_ACTIONS                            500
