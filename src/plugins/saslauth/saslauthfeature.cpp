@@ -107,7 +107,7 @@ bool SASLAuthFeature::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, in
 			
 			QMap<QByteArray, QByteArray> responseMap;
 			QMap<QByteArray, QByteArray> challengeMap = parseChallenge(challengeData);
-			if (challengeMap.value("qop","auth") == "auth")
+			if (!challengeMap.isEmpty() && challengeMap.value("qop","auth") == "auth")
 			{
 				QByteArray randBytes(32,' ');
 				for (int i=0; i<randBytes.size(); i++)
