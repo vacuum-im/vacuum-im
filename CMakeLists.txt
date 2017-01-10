@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.0)
 
 project(vacuum-im)
 
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
 if(POLICY CMP0020)
 	cmake_policy(SET CMP0020 NEW)
 endif()
