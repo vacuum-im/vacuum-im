@@ -94,25 +94,33 @@ void ChatWindowMenu::restoreSessionPrefs(const Jid &AContactJid)
 
 void ChatWindowMenu::createActions()
 {
+	QActionGroup *archivingGroup = new QActionGroup(this);
+
 	FEnableArchiving = new Action(this);
 	FEnableArchiving->setCheckable(true);
 	FEnableArchiving->setText(tr("Enable Message Archiving"));
+	EnableArchiving->setActionGroup(archivingGroup);
 	connect(FEnableArchiving,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 	addAction(FEnableArchiving,AG_DEFAULT,false);
 
 	FDisableArchiving = new Action(this);
 	FDisableArchiving->setCheckable(true);
 	FDisableArchiving->setText(tr("Disable Message Archiving"));
+	FDisableArchiving->setActionGroup(archivingGroup);
 	connect(FDisableArchiving,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 	addAction(FDisableArchiving,AG_DEFAULT,false);
 
+	QActionGroup *OTRGroup = new QActionGroup(this);
+
 	FStartOTRSession = new Action(this);
 	FStartOTRSession->setText(tr("Start Off-The-Record Session"));
+	FStartOTRSession->setActionGroup(OTRGroup);
 	connect(FStartOTRSession,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 	addAction(FStartOTRSession,AG_DEFAULT+100,false);
 
 	FStopOTRSession = new Action(this);
 	FStopOTRSession->setText(tr("Terminate Off-The-Record Session"));
+	FStopOTRSession->setActionGroup(OTRGroup);
 	connect(FStopOTRSession,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 	addAction(FStopOTRSession,AG_DEFAULT+100,false);
 }
@@ -222,7 +230,6 @@ void ChatWindowMenu::onActionTriggered(bool)
 			if (FSessionNegotiation)
 				FSessionNegotiation->terminateSession(streamJid(),contactJid());
 		}
-		updateMenu();
 	}
 }
 

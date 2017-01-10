@@ -15,7 +15,7 @@ public:
 	StateWidget(IChatStates *AChatStates, IMessageWindow *AWindow, QWidget *AParent);
 	~StateWidget();
 protected slots:
-	void onStatusActionTriggered(bool);
+	void onStatusActionTriggered(QAction*);
 	void onPermitStatusChanged(const Jid &AContactJid, int AStatus);
 	void onUserChatStateChanged(const Jid &AStreamJid, const Jid &AContactJid, int AState);
 	void onUserRoomStateChanged(const Jid &AStreamJid, const Jid &AUserJid, int AState);
