@@ -99,7 +99,7 @@ void ChatWindowMenu::createActions()
 	FEnableArchiving = new Action(this);
 	FEnableArchiving->setCheckable(true);
 	FEnableArchiving->setText(tr("Enable Message Archiving"));
-	EnableArchiving->setActionGroup(archivingGroup);
+	FEnableArchiving->setActionGroup(archivingGroup);
 	connect(FEnableArchiving,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 	addAction(FEnableArchiving,AG_DEFAULT,false);
 
