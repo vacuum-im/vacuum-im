@@ -230,6 +230,7 @@ void ChatWindowMenu::onActionTriggered(bool)
 			if (FSessionNegotiation)
 				FSessionNegotiation->terminateSession(streamJid(),contactJid());
 		}
+		updateMenu();
 	}
 }
 
