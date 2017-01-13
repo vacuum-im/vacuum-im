@@ -110,17 +110,13 @@ void ChatWindowMenu::createActions()
 	connect(FDisableArchiving,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 	addAction(FDisableArchiving,AG_DEFAULT,false);
 
-	QActionGroup *OTRGroup = new QActionGroup(this);
-
 	FStartOTRSession = new Action(this);
 	FStartOTRSession->setText(tr("Start Off-The-Record Session"));
-	FStartOTRSession->setActionGroup(OTRGroup);
 	connect(FStartOTRSession,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 	addAction(FStartOTRSession,AG_DEFAULT+100,false);
 
 	FStopOTRSession = new Action(this);
 	FStopOTRSession->setText(tr("Terminate Off-The-Record Session"));
-	FStopOTRSession->setActionGroup(OTRGroup);
 	connect(FStopOTRSession,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 	addAction(FStopOTRSession,AG_DEFAULT+100,false);
 }
