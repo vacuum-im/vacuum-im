@@ -304,6 +304,10 @@
         <source>Hide Offline Contacts</source>
         <translation type="unfinished"/>
     </message>
+    <message>
+        <source>Sort Contacts by Status</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>ReceiversWidgetClass</name>

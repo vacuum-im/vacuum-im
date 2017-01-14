@@ -6,6 +6,7 @@
 #include <QFileInfo>
 #include <QDateTime>
 #include <QApplication>
+#include <QDesktopServices>
 #include <QCryptographicHash>
 #include <definitions/actiongroups.h>
 #include <definitions/commandline.h>
@@ -38,6 +39,23 @@
 #define ADR_PROFILE                     Action::DR_Parametr1
 
 #define AUTO_SAVE_TIMEOUT               5*60*1000
+
+
+static const int StandardLocationsCount = 11;
+static const struct { QDesktopServices::StandardLocation location; QString key; } StandardLocations[StandardLocationsCount] = {
+	{ QDesktopServices::DesktopLocation,        "%DesktopLocation%"      },
+	{ QDesktopServices::DocumentsLocation,      "%DocumentsLocation%"    },
+	{ QDesktopServices::FontsLocation,          "%FontsLocation%"        },
+	{ QDesktopServices::ApplicationsLocation,   "%ApplicationsLocation%" },
+	{ QDesktopServices::MusicLocation,          "%MusicLocation%"        },
+	{ QDesktopServices::MoviesLocation,         "%MoviesLocation%"       },
+	{ QDesktopServices::PicturesLocation,       "%PicturesLocation%"     },
+	{ QDesktopServices::TempLocation,           "%TempLocation%"         },
+	{ QDesktopServices::HomeLocation,           "%HomeLocation%"         },
+	{ QDesktopServices::DataLocation,           "%DataLocation%"         },
+	{ QDesktopServices::CacheLocation,          "%CacheLocation%"        },
+};
+
 
 OptionsManager::OptionsManager()
 {
@@ -731,6 +749,7 @@ QMap<QString, QVariant> OptionsManager::loadOptionValues(const QString &AFilePat
 	{
 		QByteArray data = file.readAll();
 
+		// Replace system environment variables
 		foreach(const QString &env, QProcess::systemEnvironment())
 		{
 			int keyPos = env.indexOf('=');
@@ -740,6 +759,12 @@ QMap<QString, QVariant> OptionsManager::loadOptionValues(const QString &AFilePat
 				QString envVal = env.right(env.length() - keyPos - 1);
 				data.replace(envKey.toUtf8(),envVal.toUtf8());
 			}
+		}
+
+		// Replace standard storage locations variables
+		for(int i=0; i<StandardLocationsCount; i++)
+		{
+			data.replace(StandardLocations[i].key.toUtf8(), QDesktopServices::storageLocation(StandardLocations[i].location).toUtf8());
 		}
 
 		QString xmlError;

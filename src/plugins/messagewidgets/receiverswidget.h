@@ -18,12 +18,15 @@ class ReceiversProxyModel:
 {
 public:
 	ReceiversProxyModel(QObject *AParent);
+	int sortMode() const;
+	void setSortMode(int AMode);
 	bool isOfflineContactsVisible() const;
 	void setOfflineContactsVisible(bool AVisible);
 protected:
 	bool lessThan(const QModelIndex &ALeft, const QModelIndex &ARight)  const;
 	bool filterAcceptsRow(int AModelRow, const QModelIndex &AModelParent) const;
 private:
+	int FSortMode;
 	bool FOfflineVisible;
 };
 
@@ -51,6 +54,8 @@ public:
 	virtual QModelIndex mapModelToView(QStandardItem *AItem);
 	virtual QStandardItem *mapViewToModel(const QModelIndex &AIndex);
 	virtual void contextMenuForItems(QList<QStandardItem *> AItems, Menu *AMenu);
+	virtual int sortMode() const;
+	virtual void setSortMode(int AMode);
 	virtual bool isOfflineContactsVisible() const;
 	virtual void setOfflineContactsVisible(bool AVisible);
 	virtual QMultiMap<Jid, Jid> selectedAddresses() const;
@@ -114,6 +119,7 @@ protected slots:
 	void onExpandAllChilds();
 	void onCollapseAllChilds();
 	void onHideOfflineContacts();
+	void onSortContactByStatus();
 protected slots:
 	void onDeleteDelayedItems();
 	void onStartSearchContacts();

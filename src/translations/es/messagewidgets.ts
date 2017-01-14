@@ -304,6 +304,10 @@
         <source>Hide Offline Contacts</source>
         <translation>Ocultar contactos desconectados</translation>
     </message>
+    <message>
+        <source>Sort Contacts by Status</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>ReceiversWidgetClass</name>

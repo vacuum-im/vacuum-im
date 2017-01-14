@@ -310,6 +310,10 @@
         <source>Hide Offline Contacts</source>
         <translation>Не показывать отключенные контакты</translation>
     </message>
+    <message>
+        <source>Sort Contacts by Status</source>
+        <translation>Сортировать контакты по статусу</translation>
+    </message>
 </context>
 <context>
     <name>ReceiversWidgetClass</name>

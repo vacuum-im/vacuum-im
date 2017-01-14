@@ -146,6 +146,11 @@ class IMessageReceiversWidget :
 	public IMessageWidget
 {
 public:
+	enum SortMode {
+		SortByStatus,
+		SortAlphabetically,
+	};
+public:
 	virtual QWidget *instance() = 0;
 	virtual QList<Jid> availStreams() const =0;
 	virtual QTreeView *receiversView() const =0;
@@ -156,6 +161,8 @@ public:
 	virtual QModelIndex mapModelToView(QStandardItem *AItem) =0;
 	virtual QStandardItem *mapViewToModel(const QModelIndex &AIndex) =0;
 	virtual void contextMenuForItems(QList<QStandardItem *> AItems, Menu *AMenu) =0;
+	virtual int sortMode() const =0;
+	virtual void setSortMode(int AMode) =0;
 	virtual bool isOfflineContactsVisible() const =0;
 	virtual void setOfflineContactsVisible(bool AVisible) =0;
 	virtual QMultiMap<Jid, Jid> selectedAddresses() const =0;

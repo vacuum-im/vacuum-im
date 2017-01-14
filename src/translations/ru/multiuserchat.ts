@@ -1411,7 +1411,7 @@
     </message>
     <message>
         <source> by moderator %1</source>
-        <translation>модератором %1</translation>
+        <translation> модератором %1</translation>
     </message>
     <message>
         <source>Your nickname changed to %1</source>

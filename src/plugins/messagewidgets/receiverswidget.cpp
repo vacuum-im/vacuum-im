@@ -21,10 +21,26 @@ static const QList<int> GroupKinds = QList<int>() << RIK_STREAM_ROOT << RIK_GROU
 ReceiversProxyModel::ReceiversProxyModel(QObject *AParent) : QSortFilterProxyModel(AParent)
 {
 	FOfflineVisible = true;
+	FSortMode = IMessageReceiversWidget::SortByStatus;
+
 	setSortLocaleAware(true);
 	setDynamicSortFilter(true);
 	setSortCaseSensitivity(Qt::CaseInsensitive);
 	setFilterCaseSensitivity(Qt::CaseInsensitive);
+}
+
+int ReceiversProxyModel::sortMode() const
+{
+	return FSortMode;
+}
+
+void ReceiversProxyModel::setSortMode(int AMode)
+{
+	if (FSortMode != AMode)
+	{
+		FSortMode = AMode;
+		invalidate();
+	}
 }
 
 bool ReceiversProxyModel::isOfflineContactsVisible() const
@@ -51,7 +67,7 @@ bool ReceiversProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex &
 		int rightSortOrder = ARight.data(RDR_SORT_ORDER).toInt();
 		if (leftSortOrder == rightSortOrder)
 		{
-			if (leftTypeOrder != RIKO_STREAM_ROOT)
+			if (FSortMode==IMessageReceiversWidget::SortByStatus && leftTypeOrder!=RIKO_STREAM_ROOT)
 			{
 				int leftShow = ALeft.data(RDR_SHOW).toInt();
 				int rightShow = ARight.data(RDR_SHOW).toInt();
@@ -361,10 +377,27 @@ void ReceiversWidget::contextMenuForItems(QList<QStandardItem *> AItems, Menu *A
 			hideOffline->setChecked(!isOfflineContactsVisible());
 			connect(hideOffline,SIGNAL(triggered()),SLOT(onHideOfflineContacts()));
 			AMenu->addAction(hideOffline,AG_MWRWCM_MWIDGETS_HIDE_OFFLINE);
+
+			Action *sortByStatus = new Action(AMenu);
+			sortByStatus->setText(tr("Sort Contacts by Status"));
+			sortByStatus->setCheckable(true);
+			sortByStatus->setChecked(sortMode() == IMessageReceiversWidget::SortByStatus);
+			connect(sortByStatus,SIGNAL(triggered()),SLOT(onSortContactByStatus()));
+			AMenu->addAction(sortByStatus,AG_MWRWCM_MWIDGETS_SORT_BY_STATUS);
 		}
 	}
 
 	emit contextMenuForItemsRequested(AItems,AMenu);
+}
+
+int ReceiversWidget::sortMode() const
+{
+	return FProxyModel->sortMode();
+}
+
+void ReceiversWidget::setSortMode(int AMode)
+{
+	FProxyModel->setSortMode(AMode);
 }
 
 bool ReceiversWidget::isOfflineContactsVisible() const
@@ -1150,6 +1183,13 @@ void ReceiversWidget::onHideOfflineContacts()
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 		setOfflineContactsVisible(!action->isChecked());
+}
+
+void ReceiversWidget::onSortContactByStatus()
+{
+	Action *action = qobject_cast<Action *>(sender());
+	if (action)
+		setSortMode(action->isChecked() ? IMessageReceiversWidget::SortByStatus : IMessageReceiversWidget::SortAlphabetically);
 }
 
 void ReceiversWidget::onDeleteDelayedItems()

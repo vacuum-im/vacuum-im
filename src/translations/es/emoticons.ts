@@ -15,11 +15,11 @@
     </message>
     <message>
         <source>Do not convert text smileys to images</source>
-        <translation type="unfinished"/>
+        <translation>No convertir emoticonos de texto a imágenes</translation>
     </message>
     <message>
         <source>Smileys:</source>
-        <translation type="unfinished"/>
+        <translation>Emoticonos:</translation>
     </message>
 </context>
 </TS>
