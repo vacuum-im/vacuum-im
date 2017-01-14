@@ -42,18 +42,18 @@
 
 
 static const int StandardLocationsCount = 11;
-static const struct { QDesktopServices::StandardLocation location; QString key; } StandardLocations[StandardLocationsCount] = {
-	{ QDesktopServices::DesktopLocation,        "%DesktopLocation%"      },
-	{ QDesktopServices::DocumentsLocation,      "%DocumentsLocation%"    },
-	{ QDesktopServices::FontsLocation,          "%FontsLocation%"        },
-	{ QDesktopServices::ApplicationsLocation,   "%ApplicationsLocation%" },
-	{ QDesktopServices::MusicLocation,          "%MusicLocation%"        },
-	{ QDesktopServices::MoviesLocation,         "%MoviesLocation%"       },
-	{ QDesktopServices::PicturesLocation,       "%PicturesLocation%"     },
-	{ QDesktopServices::TempLocation,           "%TempLocation%"         },
-	{ QDesktopServices::HomeLocation,           "%HomeLocation%"         },
-	{ QDesktopServices::DataLocation,           "%DataLocation%"         },
-	{ QDesktopServices::CacheLocation,          "%CacheLocation%"        },
+static const struct { QStandardPaths::StandardLocation location; QString key; } StandardLocations[StandardLocationsCount] = {
+	{ QStandardPaths::DesktopLocation,        "%DesktopLocation%"      },
+	{ QStandardPaths::DocumentsLocation,      "%DocumentsLocation%"    },
+	{ QStandardPaths::FontsLocation,          "%FontsLocation%"        },
+	{ QStandardPaths::ApplicationsLocation,   "%ApplicationsLocation%" },
+	{ QStandardPaths::MusicLocation,          "%MusicLocation%"        },
+	{ QStandardPaths::MoviesLocation,         "%MoviesLocation%"       },
+	{ QStandardPaths::PicturesLocation,       "%PicturesLocation%"     },
+	{ QStandardPaths::TempLocation,           "%TempLocation%"         },
+	{ QStandardPaths::HomeLocation,           "%HomeLocation%"         },
+	{ QStandardPaths::DataLocation,           "%DataLocation%"         },
+	{ QStandardPaths::CacheLocation,          "%CacheLocation%"        },
 };
 
 
@@ -764,7 +764,7 @@ QMap<QString, QVariant> OptionsManager::loadOptionValues(const QString &AFilePat
 		// Replace standard storage locations variables
 		for(int i=0; i<StandardLocationsCount; i++)
 		{
-			data.replace(StandardLocations[i].key.toUtf8(), QDesktopServices::storageLocation(StandardLocations[i].location).toUtf8());
+			data.replace(StandardLocations[i].key.toUtf8(), QString(QStandardPaths::standardLocations(StandardLocations[i].location).at(0)).toUtf8());
 		}
 
 		QString xmlError;
