@@ -16,27 +16,29 @@ StateWidget::StateWidget(IChatStates *AChatStates, IMessageWindow *AWindow, QWid
 	FMultiWindow = qobject_cast<IMultiUserChatWindow *>(AWindow->instance());
 
 	FMenu = new Menu(this);
+	QActionGroup *actionGroup = new QActionGroup(FMenu);
+	connect(actionGroup,SIGNAL(triggered(QAction*)),SLOT(onStatusActionTriggered(QAction*)));
 	setMenu(FMenu);
 
 	Action *permitDefault = new Action(FMenu);
 	permitDefault->setCheckable(true);
 	permitDefault->setText(tr("Default"));
 	permitDefault->setData(ADR_PERMIT_STATUS, IChatStates::StatusDefault);
-	connect(permitDefault,SIGNAL(triggered(bool)),SLOT(onStatusActionTriggered(bool)));
+	permitDefault->setActionGroup(actionGroup);
 	FMenu->addAction(permitDefault);
 
 	Action *permitEnable = new Action(FMenu);
 	permitEnable->setCheckable(true);
 	permitEnable->setText(tr("Always send my chat activity"));
 	permitEnable->setData(ADR_PERMIT_STATUS, IChatStates::StatusEnable);
-	connect(permitEnable,SIGNAL(triggered(bool)),SLOT(onStatusActionTriggered(bool)));
+	permitEnable->setActionGroup(actionGroup);
 	FMenu->addAction(permitEnable);
 
 	Action *permitDisable = new Action(FMenu);
 	permitDisable->setCheckable(true);
 	permitDisable->setText(tr("Never send my chat activity"));
 	permitDisable->setData(ADR_PERMIT_STATUS, IChatStates::StatusDisable);
-	connect(permitDisable,SIGNAL(triggered(bool)),SLOT(onStatusActionTriggered(bool)));
+	permitDisable->setActionGroup(actionGroup);
 	FMenu->addAction(permitDisable);
 
 	connect(FChatStates->instance(),SIGNAL(permitStatusChanged(const Jid &, int)),SLOT(onPermitStatusChanged(const Jid &, int)));
@@ -61,7 +63,7 @@ StateWidget::~StateWidget()
 
 }
 
-void StateWidget::onStatusActionTriggered(bool)
+void StateWidget::onStatusActionTriggered(QAction*)
 {
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)

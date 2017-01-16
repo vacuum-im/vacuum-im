@@ -94,15 +94,19 @@ void ChatWindowMenu::restoreSessionPrefs(const Jid &AContactJid)
 
 void ChatWindowMenu::createActions()
 {
+	QActionGroup *archivingGroup = new QActionGroup(this);
+
 	FEnableArchiving = new Action(this);
 	FEnableArchiving->setCheckable(true);
 	FEnableArchiving->setText(tr("Enable Message Archiving"));
+	FEnableArchiving->setActionGroup(archivingGroup);
 	connect(FEnableArchiving,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 	addAction(FEnableArchiving,AG_DEFAULT,false);
 
 	FDisableArchiving = new Action(this);
 	FDisableArchiving->setCheckable(true);
 	FDisableArchiving->setText(tr("Disable Message Archiving"));
+	FDisableArchiving->setActionGroup(archivingGroup);
 	connect(FDisableArchiving,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 	addAction(FDisableArchiving,AG_DEFAULT,false);
 
