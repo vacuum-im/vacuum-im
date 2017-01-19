@@ -1,1 +1,29 @@
 IDI_ICON1	ICON	DISCARDABLE	"../../vacuum.ico"
+
+#include <windows.h>
+#include "../definitions/version.h"
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION     CLIENT_VERSION_RC
+PRODUCTVERSION  CLIENT_VERSION_RC
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904E4"
+        BEGIN
+			VALUE "CompanyName",        CLIENT_HOME_PAGE
+            VALUE "FileDescription",    CLINET_DESCRIPTION
+            VALUE "FileVersion",        CLIENT_VERSION
+            VALUE "InternalName",       CLIENT_NAME
+            VALUE "LegalCopyright",     CLINET_COPYRIGHT
+            VALUE "OriginalFilename",   CLIENT_FILENAME_WIN
+            VALUE "ProductName",        CLIENT_NAME
+            VALUE "ProductVersion",     CLIENT_VERSION_FULL
+        END
+    END
+	
+	BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
