@@ -68,9 +68,4 @@ set(HEADERS "action.h"
 			"widgetmanager.h"
 			"xmpperror.h")
 
-if (UNIX AND NOT APPLE)
-	set(SOURCES ${SOURCES} "x11info.cpp")
-	set(HEADERS ${HEADERS} "x11info.h")
-endif (UNIX AND NOT APPLE)
-
 qt5_wrap_cpp(MOC_SOURCES ${HEADERS})
