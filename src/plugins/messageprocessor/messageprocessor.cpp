@@ -116,7 +116,6 @@ bool MessageProcessor::writeMessageHasText(int AOrder, Message &AMessage, const 
 	}
 	return false;
 }
-
 bool MessageProcessor::writeMessageToText(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang)
 {
 	bool changed = false;
@@ -153,8 +152,8 @@ bool MessageProcessor::writeMessageToText(int AOrder, Message &AMessage, QTextDo
 	}
 	else if (AOrder == MWO_MESSAGEPROCESSOR_ANCHORS)
 	{
-		QRegExp regexp("\\b((https?|ftp)://|www\\.|xmpp:|magnet:|mailto:)\\S+(/|#|~|@|&|=|-|\\+|\\*|\\$|\\b)");
-		regexp.setCaseSensitivity(Qt::CaseInsensitive);
+		QRegularExpression regexp("(https?://|ftp://|www.|xmpp:|magnet:|mailto:).?([^\\s\\/?\\.#]+\\.?)+(/[^\\s|\"|\'|«|»|]*)?");
+		regexp.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
 		for (QTextCursor cursor = ADocument->find(regexp); !cursor.isNull(); cursor = ADocument->find(regexp,cursor))
 		{
 			QTextCharFormat linkFormat = cursor.charFormat();
@@ -475,7 +474,7 @@ QString MessageProcessor::convertTextToBody(const QString &AString) const
 QString MessageProcessor::convertBodyToHtml(const QString &AString) const
 {
 	QString result = AString.toHtmlEscaped();
-	result.replace('\n',"<br>");
+	result.replace('\n'," <br>");
 	result.replace("  ","&nbsp; ");
 	result.replace('\t',"&nbsp; &nbsp; ");
 	return result;
