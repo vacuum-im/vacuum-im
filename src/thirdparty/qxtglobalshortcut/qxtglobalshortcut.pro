@@ -5,6 +5,10 @@ TEMPLATE       = lib
 CONFIG        += staticlib warn_off
 DESTDIR        = ../../libs
 DEFINES       += QXT_STATIC
-QT            += widgets
 INCLUDEPATH   += ../..
+
+QT            += widgets
+unix:!macx:!haiku {
+  QT          += x11extras
+}
 include(qxtglobalshortcut.pri)
