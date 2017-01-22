@@ -152,7 +152,7 @@ bool MessageProcessor::writeMessageToText(int AOrder, Message &AMessage, QTextDo
 	}
 	else if (AOrder == MWO_MESSAGEPROCESSOR_ANCHORS)
 	{
-		QRegularExpression regexp("(https?://|ftp://|www.|xmpp:|magnet:|mailto:).?([^\\s\\/?\\.#]+\\.?)+(/[^\\s|\"|\'|«|»|]*)?");
+		QRegularExpression regexp("((https?://|ftp://|www.|xmpp:|magnet:|mailto:)|[a-z0-9.\\-]+[.][a-z]{2,4}/)(?:[^\\s()<>]+|\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\))+(?:\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\)|[^\\s`!()\\[\\]{};:'\".,<>?«»“”‘’\\\\])");
 		regexp.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
 		for (QTextCursor cursor = ADocument->find(regexp); !cursor.isNull(); cursor = ADocument->find(regexp,cursor))
 		{
@@ -474,7 +474,7 @@ QString MessageProcessor::convertTextToBody(const QString &AString) const
 QString MessageProcessor::convertBodyToHtml(const QString &AString) const
 {
 	QString result = AString.toHtmlEscaped();
-	result.replace('\n'," <br>");
+	result.replace('\n',"<br>");
 	result.replace("  ","&nbsp; ");
 	result.replace('\t',"&nbsp; &nbsp; ");
 	return result;
