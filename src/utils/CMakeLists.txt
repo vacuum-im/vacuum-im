@@ -22,7 +22,6 @@ set_target_properties(${VACUUM_UTILS_NAME} PROPERTIES
 	FRAMEWORK TRUE)
 
 if (UNIX AND NOT APPLE)
-	include_directories(${Qt5Gui_PRIVATE_INCLUDE_DIRS})
 	include(FindX11)
 	include_directories(AFTER ${X11_INCLUDE_DIR})
 	list(APPEND ADD_LIBS ${X11_LIBRARIES})
@@ -58,9 +57,6 @@ if (APPLE)
 endif (APPLE)
 
 target_link_libraries(${VACUUM_UTILS_NAME} ${ADD_LIBS})
-if (UNIX AND NOT APPLE)
-	target_link_libraries(${VACUUM_UTILS_NAME} ${Qt5Gui_LIBRARY} LINK_PRIVATE)
-endif (UNIX AND NOT APPLE)
 qt5_use_modules(${VACUUM_UTILS_NAME} Gui Widgets Xml Network)
 
 if (WIN32)

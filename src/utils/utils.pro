@@ -22,7 +22,7 @@ LIBS              += -lqxtglobalshortcut -lidle -lidn -lminizip -lzlib
 macx {
   QMAKE_LFLAGS    += -framework Carbon -framework IOKit -framework Cocoa
 } else:unix:!haiku {
-  QT              += gui-private
+  QT              += x11extras
   LIBS            += -lXss
   CONFIG          += x11
 } else:win32 {

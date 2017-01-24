@@ -5,7 +5,7 @@
 #include <QDesktopWidget>
 
 #ifdef Q_OS_LINUX
-	#include "x11info.h"
+	#include <QtX11Extras/QX11Info>
 	#include <X11/Xutil.h>
 	#include <X11/Xlib.h>
 	#include <X11/Xatom.h>
@@ -16,7 +16,7 @@
 #endif //Q_OS_LINUX
 
 // WindowSticker
-class WindowSticker : 
+class WindowSticker :
 	public QObject
 {
 public:
@@ -152,7 +152,7 @@ void WidgetManager::raiseWidget(QWidget *AWidget)
 
 	if (NET_ACTIVE_WINDOW == 0)
 	{
-		Display *dpy      = X11Info::display();
+		Display *dpy      = QX11Info::display();
 		NET_ACTIVE_WINDOW = XInternAtom(dpy, "_NET_ACTIVE_WINDOW", False);
 	}
 
@@ -164,7 +164,7 @@ void WidgetManager::raiseWidget(QWidget *AWidget)
 	xev.data.l[1]    = 0;//X11Info::appUserTime();
 	xev.data.l[2]    = xev.data.l[3] = xev.data.l[4] = 0;
 
-	XSendEvent(X11Info::display(), X11Info::appRootWindow(), False, SubstructureNotifyMask | SubstructureRedirectMask, (XEvent*)&xev);
+	XSendEvent(QX11Info::display(), QX11Info::appRootWindow(), False, SubstructureNotifyMask | SubstructureRedirectMask, (XEvent*)&xev);
 #endif //Q_OS_LINUX
 
 	AWidget->raise();
