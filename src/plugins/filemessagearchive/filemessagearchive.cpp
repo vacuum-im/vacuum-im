@@ -219,10 +219,9 @@ bool FileMessageArchive::saveMessage(const Jid &AStreamJid, const Message &AMess
 			QString filePath = collectionFilePath(AStreamJid,header.with,header.start);
 			writer = newFileWriter(AStreamJid,header,filePath);
 		}
-		if (writer)
+		if (writer && FArchiver->isArchivingAllowed(AStreamJid,itemJid))
 		{
-			IArchiveItemPrefs prefs = FArchiver->archiveItemPrefs(AStreamJid,itemJid,AMessage.threadId());
-			written = writer->writeMessage(AMessage,prefs.save,ADirectionIn);
+			written = writer->writeMessage(AMessage,ADirectionIn);
 		}
 	}
 	else
@@ -695,7 +694,7 @@ IArchiveHeader FileMessageArchive::saveFileCollection(const Jid &AStreamJid, con
 		{
 			QDomDocument doc;
 			QDomElement chatElem = doc.appendChild(doc.createElement("chat")).toElement();
-			FArchiver->collectionToElement(collection,chatElem,ARCHIVE_SAVE_MESSAGE);
+			FArchiver->collectionToElement(collection,chatElem);
 			file.write(doc.toByteArray());
 			file.close();
 

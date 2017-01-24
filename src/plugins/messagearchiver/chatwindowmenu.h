@@ -26,27 +26,15 @@ protected slots:
 	void onArchivePrefsChanged(const Jid &AStreamJid);
 	void onArchiveRequestCompleted(const QString &AId);
 	void onArchiveRequestFailed(const QString &AId, const XmppError &AError);
-	void onDiscoInfoChanged(const IDiscoInfo &ADiscoInfo);
-	void onStanzaSessionActivated(const IStanzaSession &ASession);
-	void onStanzaSessionTerminated(const IStanzaSession &ASession);
 	void onToolBarWidgetAddressChanged(const Jid &AStreamBefore, const Jid &AContactBefore);
 private:
-	IMessageToolBarWidget *FToolBarWidget;
-	IDataForms *FDataForms;
 	IMessageArchiver *FArchiver;
-	IServiceDiscovery *FDiscovery;
-	ISessionNegotiation *FSessionNegotiation;
+	IMessageToolBarWidget *FToolBarWidget;
 private:
 	Action *FEnableArchiving;
 	Action *FDisableArchiving;
-	Action *FStartOTRSession;
-	Action *FStopOTRSession;
 private:
 	QString FSaveRequest;
-	QString FSessionRequest;
-private:
-	bool FRestorePrefs;
-	IArchiveItemPrefs FSessionPrefs;
 };
 
 #endif // CHATWINDOWMENU_H

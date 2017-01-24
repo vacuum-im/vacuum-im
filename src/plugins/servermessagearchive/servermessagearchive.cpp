@@ -269,11 +269,11 @@ quint32 ServerMessageArchive::capabilities(const Jid &AStreamJid) const
 	quint32 caps = 0;
 	if (FArchiver->isReady(AStreamJid))
 	{
-		if (FArchiver->isSupported(AStreamJid,NS_ARCHIVE_AUTO))
+		if (FArchiver->isSupported(AStreamJid))
 			caps |= AutomaticArchiving;
-		if (FArchiver->isSupported(AStreamJid,NS_ARCHIVE_MANAGE))
+		if (FArchiver->isSupported(AStreamJid))
 			caps |= ArchiveManagement;
-		if (FArchiver->isSupported(AStreamJid,NS_ARCHIVE_MANUAL))
+		if (FArchiver->isSupported(AStreamJid))
 			caps |= ManualArchiving;
 		if ((caps & ArchiveManagement)>0 && (caps & ManualArchiving)>0)
 			caps |= ArchiveReplication;
@@ -461,9 +461,7 @@ QString ServerMessageArchive::saveServerCollection(const Jid &AStreamJid, const 
 		stanza.setType(STANZA_TYPE_SET).setUniqueId();
 
 		QDomElement chatElem = stanza.addElement("save",FNamespaces.value(AStreamJid)).appendChild(stanza.createElement("chat")).toElement();
-
-		IArchiveItemPrefs itemPrefs = FArchiver->archiveItemPrefs(AStreamJid,ACollection.header.with,ACollection.header.threadId);
-		FArchiver->collectionToElement(ACollection,chatElem,itemPrefs.save);
+		FArchiver->collectionToElement(ACollection,chatElem);
 
 		int curItem = 0;
 		int firstItem = !ANextRef.isEmpty() ? ANextRef.toInt() : 0;
@@ -690,7 +688,7 @@ bool ServerMessageArchive::checkRequestHeader(const IArchiveHeader &AHeader, con
 
 void ServerMessageArchive::onArchivePrefsOpened(const Jid &AStreamJid)
 {
-	FNamespaces.insert(AStreamJid,FArchiver->prefsNamespace(AStreamJid));
+	FNamespaces.insert(AStreamJid,FArchiver->supportedNamespace(AStreamJid));
 	emit capabilitiesChanged(AStreamJid);
 }
 

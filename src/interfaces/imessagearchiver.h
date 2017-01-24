@@ -14,71 +14,27 @@
 #include <utils/menu.h>
 #include <utils/jid.h>
 
-#define MESSAGEARCHIVER_UUID "{66FEAE08-BE4D-4fd4-BCEA-494F3A70997A}"
+#define MESSAGEARCHIVER_UUID    "{66FEAE08-BE4D-4fd4-BCEA-494F3A70997A}"
 
-#define ARCHIVE_SCOPE_GLOBAL    "global"    //the setting will remain for next streams
-#define ARCHIVE_SCOPE_STREAM    "stream"    //the setting is true only until the end of the stream. For next stream, server default value will be used
+#define ARCHIVE_SAVE_ROSTER     "roster"    // messages are archived only if the contact's bare JID is in the user's roster
+#define ARCHIVE_SAVE_ALWAYS     "always"    // all messages are archived by default
+#define ARCHIVE_SAVE_NEVER      "never"     // messages are never archived by default
 
-#define ARCHIVE_OTR_APPROVE     "approve"   //the user MUST explicitly approve off-the-record communication.
-#define ARCHIVE_OTR_CONCEDE     "concede"   //communications MAY be off the record if requested by another user.
-#define ARCHIVE_OTR_FORBID      "forbid"    //communications MUST NOT be off the record.
-#define ARCHIVE_OTR_OPPOSE      "oppose"    //communications SHOULD NOT be off the record even if requested.
-#define ARCHIVE_OTR_PREFER      "prefer"    //communications SHOULD be off the record if possible.
-#define ARCHIVE_OTR_REQUIRE     "require"   //communications MUST be off the record.
-
-#define ARCHIVE_SAVE_FALSE      "false"     //the saving entity MUST save nothing.
-#define ARCHIVE_SAVE_BODY       "body"      //the saving entity SHOULD save only <body/> elements.
-#define ARCHIVE_SAVE_MESSAGE    "message"   //the saving entity SHOULD save the full XML content of each <message/> element.
-#define ARCHIVE_SAVE_STREAM     "stream"    //the saving entity SHOULD save every byte that passes over the stream in either direction.
-
-#define ARCHIVE_METHOD_CONCEDE  "concede"   //this method MAY be used if no other methods are available.
-#define ARCHIVE_METHOD_FORBID   "forbid"    //this method MUST NOT be used.
-#define ARCHIVE_METHOD_PREFER   "prefer"    //this method SHOULD be used if available.
-
-struct IArchiveItemPrefs
-{
-	IArchiveItemPrefs() {
-		expire = 0;
-		exactmatch = false;
-	}
-	QString otr;
-	QString save;
-	quint32 expire;
-	bool exactmatch;
-	bool operator==(const IArchiveItemPrefs &AOther) const {
-		return save==AOther.save && otr==AOther.otr && expire==AOther.expire && exactmatch==AOther.exactmatch;
-	}
-	bool operator!=(const IArchiveItemPrefs &AOther) const {
-		return !operator==(AOther);
-	}
-};
-
-struct IArchiveSessionPrefs 
-{
-	IArchiveSessionPrefs() {
-		timeout = -1;
-	}
-	int timeout;
-	QString otr;
-	QString save;
-	bool operator==(const IArchiveSessionPrefs &AOther) const {
-		return save==AOther.save && otr==AOther.otr && timeout==AOther.timeout;
-	}
-	bool operator!=(const IArchiveSessionPrefs &AOther) const {
-		return !operator==(AOther);
-	}
-};
 
 struct IArchiveStreamPrefs
 {
-	bool autoSave;
-	QString autoScope;
-	QString methodAuto;
-	QString methodLocal;
-	QString methodManual;
-	IArchiveItemPrefs defaultPrefs;
-	QMap<Jid,IArchiveItemPrefs> itemPrefs;
-	QMap<QString,IArchiveSessionPrefs> sessionPrefs;
+	IArchiveStreamPrefs() {
+		defaults = ARCHIVE_SAVE_ROSTER;
+	}
+	QSet<Jid> never;
+	QSet<Jid> always;
+	QString defaults;
+	bool operator==(const IArchiveStreamPrefs &AOther) const {
+		return never==AOther.never && always==AOther.always && defaults==AOther.defaults;
+	}
+	bool operator!=(const IArchiveStreamPrefs &AOther) const {
+		return !operator==(AOther);
+	}
 };
 
 struct IArchiveHeader
@@ -224,21 +180,15 @@ class IMessageArchiver
 public:
 	virtual QObject *instance() =0;
 	virtual bool isReady(const Jid &AStreamJid) const =0;
+	virtual bool isSupported(const Jid &AStreamJid) const =0;
+	virtual QString supportedNamespace(const Jid &AStreamJid) const =0;
 	virtual QString archiveDirPath(const Jid &AStreamJid = Jid::null) const =0;
-	virtual bool isSupported(const Jid &AStreamJid, const QString &AFeatureNS) const =0;
 	virtual QWidget *showArchiveWindow(const QMultiMap<Jid,Jid> &AAddresses) =0;
 	//Archive Preferences
-	virtual QString prefsNamespace(const Jid &AStreamJid) const =0;
-	virtual bool isArchivePrefsEnabled(const Jid &AStreamJid) const =0;
-	virtual bool isArchiveReplicationEnabled(const Jid &AStreamJid) const =0;
-	virtual bool isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId) const =0;
+	virtual bool isPrefsSupported(const Jid &AStreamJid) const =0;
 	virtual IArchiveStreamPrefs archivePrefs(const Jid &AStreamJid) const =0;
-	virtual IArchiveItemPrefs archiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId = QString::null) const =0;
-	virtual bool isArchiveAutoSave(const Jid &AStreamJid) const =0;
-	virtual QString setArchiveAutoSave(const Jid &AStreamJid, bool AAuto, bool AGlobal=true) =0;
 	virtual QString setArchivePrefs(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs) =0;
-	virtual QString removeArchiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid) =0;
-	virtual QString removeArchiveSessionPrefs(const Jid &AStreamJid, const QString &AThreadId) =0;
+	virtual bool isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid) const =0;
 	//Direct Archiving
 	virtual bool saveMessage(const Jid &AStreamJid, const Jid &AItemJid, const Message &AMessage) =0;
 	virtual bool saveNote(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANote, const QString &AThreadId = QString::null) =0;
@@ -249,7 +199,7 @@ public:
 	virtual QString removeCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest) =0;
 	//Archive Utilities
 	virtual void elementToCollection(const Jid &AStreamJid, const QDomElement &AChatElem, IArchiveCollection &ACollection) const =0;
-	virtual void collectionToElement(const IArchiveCollection &ACollection, QDomElement &AChatElem, const QString &ASaveMode) const =0;
+	virtual void collectionToElement(const IArchiveCollection &ACollection, QDomElement &AChatElem) const =0;
 	//Archive Handlers
 	virtual void insertArchiveHandler(int AOrder, IArchiveHandler *AHandler) =0;
 	virtual void removeArchiveHandler(int AOrder, IArchiveHandler *AHandler) =0;

@@ -32,7 +32,6 @@
 // Compress
 #define OPV_ACCOUNT_STREAMCOMPRESS                      "accounts.account.stream-compress"
 // MessageArchiver
-#define OPV_ACCOUNT_HISTORYREPLICATE                    "accounts.account.history-replicate"
 #define OPV_ACCOUNT_HISTORYDUPLICATE                    "accounts.account.history-duplicate"
 
 // Avatars
@@ -134,8 +133,6 @@
 // MessageArchiver
 #define OPV_HISTORY_ENGINE_ITEM                         "history.engine"
 #define OPV_HISTORY_ENGINE_ENABLED                      "history.engine.enabled"
-#define OPV_HISTORY_ENGINE_REPLICATEAPPEND              "history.engine.replicate-append"
-#define OPV_HISTORY_ENGINE_REPLICATEREMOVE              "history.engine.replicate-remove"
 #define OPV_HISTORY_ARCHIVEVIEW_FONTPOINTSIZE           "history.archiveview.font-point-size"
 // FileMessageArchive
 #define OPV_FILEARCHIVE_HOMEPATH                        "history.file-archive.home-path"

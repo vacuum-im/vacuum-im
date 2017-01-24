@@ -20,7 +20,7 @@ public:
 	int notesCount() const;
 	int messagesCount() const;
 	int recordsCount() const;
-	bool writeMessage(const Message &AMessage, const QString &ASaveMode, bool ADirectionIn);
+	bool writeMessage(const Message &AMessage, bool ADirectionIn);
 	bool writeNote(const QString &ANote);
 	void closeAndDeleteLater();
 signals:

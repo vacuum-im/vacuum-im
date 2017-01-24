@@ -90,9 +90,9 @@ int FileWriter::recordsCount() const
 	return FMessagesCount + FNotesCount;
 }
 
-bool FileWriter::writeMessage(const Message &AMessage, const QString &ASaveMode, bool ADirectionIn)
+bool FileWriter::writeMessage(const Message &AMessage, bool ADirectionIn)
 {
-	if (isOpened() && ASaveMode!=ARCHIVE_SAVE_FALSE)
+	if (isOpened())
 	{
 		Jid contactJid = AMessage.from();
 		FGroupchat |= AMessage.type()==Message::GroupChat;
@@ -110,10 +110,7 @@ bool FileWriter::writeMessage(const Message &AMessage, const QString &ASaveMode,
 			if (FGroupchat)
 				FXmlWriter->writeAttribute("name",contactJid.resource());
 
-			if (ASaveMode == ARCHIVE_SAVE_BODY)
-				FXmlWriter->writeTextElement("body",AMessage.body());
-			else
-				writeElementChilds(AMessage.stanza().element());
+			writeElementChilds(AMessage.stanza().element());
 
 			FXmlWriter->writeEndElement();
 			FXmlFile->flush();

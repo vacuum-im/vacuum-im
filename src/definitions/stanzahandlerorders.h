@@ -10,7 +10,6 @@
 #define SHO_MI_MULTIUSERCHAT          500
 
 //Message Out
-#define SHO_MO_ARCHIVER               200
 #define SHO_MO_CHATSTATES             500
 
 //Presence In
