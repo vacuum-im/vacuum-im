@@ -9,7 +9,7 @@ env:
  - BUILD_SYSTEM=qmake
 before_install:
  - wget https://www.cmake.org/files/v3.4/cmake-3.4.3-Linux-x86_64.tar.gz && sudo mkdir /opt/cmake && sudo tar xf cmake-3.4.3-Linux-x86_64.tar.gz -C /opt/cmake --strip-components=1
- - sudo apt-add-repository -y ppa:beineri/opt-qt57-trusty
+ - sudo apt-add-repository -y ppa:beineri/opt-qt571-trusty
  - sudo apt-add-repository -y ppa:vacuum-im/qtwebkit5
  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
  - sudo apt-get update -qq
