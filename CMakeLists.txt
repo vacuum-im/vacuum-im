@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 3.0)
 project(vacuum-im)
 
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
 
 if(POLICY CMP0020)
 	cmake_policy(SET CMP0020 NEW)
@@ -17,6 +20,8 @@ if(POLICY CMP0043)
 endif()
 
 find_package (Qt5Widgets REQUIRED)
+find_package (Qt5Network REQUIRED)
+find_package (Qt5Xml REQUIRED)
 find_package (Qt5LinguistTools REQUIRED)
 
 add_custom_target(updatets)
@@ -95,9 +100,7 @@ if (WIN32)
 	cpack_add_component_group(libs
 		DISPLAY_NAME "Shared libraries"
 		DESCRIPTION "Required libraries that already may be present in your system")
-	set(QT_LIBS "${_qt5Core_install_prefix}/bin/icudt53.dll"
-		"${_qt5Core_install_prefix}/bin/icuin53.dll"
-		"${_qt5Core_install_prefix}/bin/icuuc53.dll"
+	set(QT_LIBS
 		"${_qt5Core_install_prefix}/bin/libEGL.dll"
 		"${_qt5Core_install_prefix}/bin/libGLESv2.dll"
 		"${_qt5Core_install_prefix}/bin/Qt5Core.dll"
@@ -113,8 +116,6 @@ if (WIN32)
 		"${_qt5Core_install_prefix}/bin/Qt5Sensors.dll"
 		"${_qt5Core_install_prefix}/bin/Qt5Sql.dll"
 		"${_qt5Core_install_prefix}/bin/Qt5Svg.dll"
-		"${_qt5Core_install_prefix}/bin/Qt5WebKit.dll"
-		"${_qt5Core_install_prefix}/bin/Qt5WebKitWidgets.dll"
 		"${_qt5Core_install_prefix}/bin/Qt5Widgets.dll"
 		"${_qt5Core_install_prefix}/bin/Qt5Xml.dll"
 		"${_qt5Core_install_prefix}/bin/Qt5XmlPatterns.dll")
