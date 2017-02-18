@@ -19,6 +19,10 @@ if(POLICY CMP0043)
 	cmake_policy(SET CMP0043 NEW)
 endif()
 
+find_package (Qt5PrintSupport)
+find_package (Qt5Multimedia)
+find_package (Qt5Sql)
+find_package (Qt5Svg)
 find_package (Qt5Widgets REQUIRED)
 find_package (Qt5Network REQUIRED)
 find_package (Qt5Xml REQUIRED)
@@ -47,6 +51,10 @@ set(INSTALL_DOCS YES CACHE BOOL "Install documentation (currently it's only AUTH
 set(LANGS "" CACHE STRING "List of languages to build localization for (this variable overrides any of LANG_*)")
 set(USED_LANGS "" CACHE INTERNAL "List of languages actually used for generating targets")
 add_lang_options()
+
+if (APPLE)
+	set_property(GLOBAL PROPERTY ALL_PLUGINS_DYLIB_FILES "")
+endif (APPLE)
 
 set(NO_WEBKIT NO CACHE BOOL "Exclude QtWebKit from dependencies")
 set(FORCE_BUNDLED_MINIZIP NO CACHE BOOL "Use bundled minizip even if local system have one")
@@ -196,36 +204,6 @@ if (WIN32)
 			GROUP libs)
 	endif (MINGW)
 endif (WIN32)
-
-if (APPLE)
-	set_target_properties(${VACUUM_LOADER_NAME} PROPERTIES
-		MACOSX_BUNDLE_BUNDLE_NAME "vacuum"
-		MACOSX_BUNDLE_INFO_STRING "Vacuum-IM"
-		MACOSX_BUNDLE_BUNDLE_VERSION "${VERSION}"
-		MACOSX_BUNDLE_ICON_FILE "vacuum"
-		MACOSX_BUNDLE_GUI_IDENTIFIER "org.vacuum-im"
-		MACOSX_BUNDLE_COPYRIGHT "Copyright 2010-2015, Potapov S.A.")
-	list(APPEND DIRS
-		${QT_LIBRARY_DIR}
-		${CMAKE_INSTALL_PREFIX}/${LIBDIR})
-
-	file(COPY vacuum.icns DESTINATION "${INSTALL_RESOURCES}")
-	file(WRITE "${CMAKE_BINARY_DIR}/${INSTALL_RESOURCES}/qt.conf" "[Paths]\nPlugins = PlugIns")
-	file(COPY "${_qt5Core_install_prefix}/plugins/imageformats" DESTINATION "${INSTALL_PLUGINS}")
-	file(COPY "${_qt5Core_install_prefix}/plugins/audio" DESTINATION "${INSTALL_PLUGINS}")
-	file(COPY "${_qt5Core_install_prefix}/plugins/platforms" DESTINATION "${INSTALL_PLUGINS}")
-	file(COPY "${_qt5Core_install_prefix}/plugins/sqldrivers/libqsqlite.dylib" DESTINATION "${INSTALL_PLUGINS}/sqldrivers")
-	foreach(LANG ${LOCALIZED_LANGS})
-		string(SUBSTRING ${LANG} 0 2 SHORTLANG)
-		file(COPY "${_qt5Core_install_prefix}/translations/qt_${SHORTLANG}.qm" DESTINATION "${INSTALL_TRANSLATIONS}/${LANG}")
-	endforeach(LANG)
-
-	install(CODE "
-		include(BundleUtilities)
-		file(GLOB_RECURSE PLUGINS \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_APP_DIR}/Contents/PlugIns/*.dylib\")
-		fixup_bundle(\"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_APP_DIR}\"   \"\${PLUGINS}\"   \"${DIRS}\")"
-		COMPONENT xxx-this_should_be_the_last_component_in_lexicographical_order_because_cmake_sucks)
-endif (APPLE)
 
 if (INSTALL_SDK)
 	cpack_add_component(sdk
