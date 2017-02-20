@@ -276,15 +276,15 @@ QStyleOptionViewItem IconsetDelegate::indexStyleOption(const QStyleOptionViewIte
 
 	value = AIndex.data(Qt::CheckStateRole);
 	if (value.isValid() && !value.isNull()) 
-		indexOption.features |= QStyleOptionViewItemV2::HasCheckIndicator;
+		indexOption.features |= QStyleOptionViewItem::HasCheckIndicator;
 
 	value = AIndex.data(Qt::DecorationRole);
 	if (value.isValid() && !value.isNull()) 
-		indexOption.features |= QStyleOptionViewItemV2::HasDecoration;
+		indexOption.features |= QStyleOptionViewItem::HasDecoration;
 
 	value = AIndex.data(Qt::DisplayRole);
 	if (value.isValid() && !value.isNull()) 
-		indexOption.features |= QStyleOptionViewItemV2::HasDisplay;
+		indexOption.features |= QStyleOptionViewItem::HasDisplay;
 
 	indexOption.backgroundBrush = qvariant_cast<QBrush>(AIndex.data(Qt::BackgroundRole));
 

@@ -507,7 +507,7 @@ QStyleOptionViewItem MultiUserView::indexOption(const QModelIndex &AIndex) const
 	option.state &= ~(QStyle::State_Sibling|QStyle::State_Item);
 
 	if (wordWrap())
-		option.features |= QStyleOptionViewItemV2::WrapText;
+		option.features |= QStyleOptionViewItem::WrapText;
 
 	return option;
 }

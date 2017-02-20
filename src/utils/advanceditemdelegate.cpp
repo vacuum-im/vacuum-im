@@ -761,15 +761,15 @@ QStyleOptionViewItem AdvancedItemDelegate::indexStyleOption(const QStyleOptionVi
 
 	value = AIndex.data(Qt::CheckStateRole);
 	if (value.isValid() && !value.isNull()) 
-		indexOption.features |= QStyleOptionViewItemV2::HasCheckIndicator;
+		indexOption.features |= QStyleOptionViewItem::HasCheckIndicator;
 
 	value = AIndex.data(Qt::DecorationRole);
 	if (value.isValid() && !value.isNull()) 
-		indexOption.features |= QStyleOptionViewItemV2::HasDecoration;
+		indexOption.features |= QStyleOptionViewItem::HasDecoration;
 
 	value = AIndex.data(Qt::DisplayRole);
 	if (value.isValid() && !value.isNull()) 
-		indexOption.features |= QStyleOptionViewItemV2::HasDisplay;
+		indexOption.features |= QStyleOptionViewItem::HasDisplay;
 
 	indexOption.backgroundBrush = qvariant_cast<QBrush>(AIndex.data(Qt::BackgroundRole));
 
@@ -783,7 +783,7 @@ QStyleOptionViewItem AdvancedItemDelegate::itemStyleOption(const AdvancedDelegat
 	if (AItem.d->kind == AdvancedDelegateItem::CheckBox)
 	{
 		itemOption.state &= ~QStyle::State_HasFocus;
-		itemOption.features |= QStyleOptionViewItemV2::HasCheckIndicator;
+		itemOption.features |= QStyleOptionViewItem::HasCheckIndicator;
 		itemOption.checkState = static_cast<Qt::CheckState>(AItem.c->value.toInt());
 
 		switch (itemOption.checkState)
@@ -801,7 +801,7 @@ QStyleOptionViewItem AdvancedItemDelegate::itemStyleOption(const AdvancedDelegat
 	}
 	else
 	{
-		itemOption.features &= ~QStyleOptionViewItemV2::HasCheckIndicator;
+		itemOption.features &= ~QStyleOptionViewItem::HasCheckIndicator;
 	}
 
 	if (!AItem.c->value.isNull() && AItem.c->value.canConvert<QString>())

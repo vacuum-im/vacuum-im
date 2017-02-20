@@ -1060,7 +1060,7 @@ QStyleOptionViewItem RostersView::indexOption(const QStyleOptionViewItem &AOptio
 	QStyleOptionViewItem option = AOption;
 	
 	if (wordWrap())
-		option.features = QStyleOptionViewItemV2::WrapText;
+		option.features = QStyleOptionViewItem::WrapText;
 	option.widget = this;
 	option.locale = locale();
 	option.locale.setNumberOptions(QLocale::OmitGroupSeparator);
