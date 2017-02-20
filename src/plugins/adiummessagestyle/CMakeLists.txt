@@ -11,12 +11,10 @@ if (IS_ENABLED)
 	target_link_libraries(${PLUGIN_NAME} Qt5::WebKitWidgets)
 	if (APPLE)
 		file(COPY "${CMAKE_SOURCE_DIR}/resources/adiummessagestyles"
-			DESTINATION "${CMAKE_BINARY_DIR}/${INSTALL_RESOURCES}"
-			PATTERN ".svn" EXCLUDE)
+			DESTINATION "${CMAKE_BINARY_DIR}/${INSTALL_RESOURCES}")
 	else (APPLE)
 		install(DIRECTORY "${CMAKE_SOURCE_DIR}/resources/adiummessagestyles"
 			DESTINATION "${INSTALL_RESOURCES}"
-			COMPONENT ${PLUGIN_NAME}
-			PATTERN ".svn" EXCLUDE)
+			COMPONENT ${PLUGIN_NAME})
 	endif (APPLE)
 endif (IS_ENABLED)

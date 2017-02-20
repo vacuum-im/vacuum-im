@@ -2,6 +2,10 @@ include("${CMAKE_SOURCE_DIR}/src/make/config.cmake")
 
 project(idle CXX)
 
+if (UNIX AND NOT APPLE)
+	find_package (Qt5X11Extras REQUIRED)
+endif (UNIX AND NOT APPLE)
+
 set(SOURCES "idle.cpp")
 
 if (APPLE)
@@ -17,16 +21,14 @@ elseif (WIN32)
 	set(SOURCES ${SOURCES} "idle_win.cpp")
 endif (APPLE)
 
-qt5_wrap_cpp(MOC_SOURCES "idle.h")
-
 add_definitions(-DUNICODE)
 
 add_library(idle STATIC ${SOURCES} ${MOC_SOURCES})
 
 if (UNIX AND NOT APPLE)
-    qt5_use_modules(idle Widgets X11Extras)
-elseif (UNIX AND NOT APPLE)
-    qt5_use_modules(idle Widgets)
+    target_link_libraries(idle Qt5::Widgets Qt5::X11Extras)
+else (UNIX AND NOT APPLE)
+    target_link_libraries(idle Qt5::Widgets)
 endif (UNIX AND NOT APPLE)
 
 set_target_properties(idle PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/src/libs"

@@ -11,5 +11,5 @@ include("${CMAKE_SOURCE_DIR}/src/plugins/plugins.cmake")
 
 if (IS_ENABLED)
 	find_package(Qt5Sql REQUIRED)
-	qt5_use_modules(${PLUGIN_NAME} Sql)
+	target_link_libraries(${PLUGIN_NAME} Qt5::Sql)
 endif (IS_ENABLED)

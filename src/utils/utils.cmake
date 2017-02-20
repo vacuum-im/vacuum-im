@@ -67,5 +67,3 @@ set(HEADERS "action.h"
 			"versionparser.h"
 			"widgetmanager.h"
 			"xmpperror.h")
-
-qt5_wrap_cpp(MOC_SOURCES ${HEADERS})

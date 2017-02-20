@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 3.0)
 project(vacuum-im)
 
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
 
 if(POLICY CMP0020)
 	cmake_policy(SET CMP0020 NEW)
@@ -16,7 +19,13 @@ if(POLICY CMP0043)
 	cmake_policy(SET CMP0043 NEW)
 endif()
 
+find_package (Qt5PrintSupport)
+find_package (Qt5Multimedia)
+find_package (Qt5Sql)
+find_package (Qt5Svg)
 find_package (Qt5Widgets REQUIRED)
+find_package (Qt5Network REQUIRED)
+find_package (Qt5Xml REQUIRED)
 find_package (Qt5LinguistTools REQUIRED)
 
 add_custom_target(updatets)
@@ -42,6 +51,10 @@ set(INSTALL_DOCS YES CACHE BOOL "Install documentation (currently it's only AUTH
 set(LANGS "" CACHE STRING "List of languages to build localization for (this variable overrides any of LANG_*)")
 set(USED_LANGS "" CACHE INTERNAL "List of languages actually used for generating targets")
 add_lang_options()
+
+if (APPLE)
+	set_property(GLOBAL PROPERTY ALL_PLUGINS_DYLIB_FILES "")
+endif (APPLE)
 
 set(NO_WEBKIT NO CACHE BOOL "Exclude QtWebKit from dependencies")
 set(FORCE_BUNDLED_MINIZIP NO CACHE BOOL "Use bundled minizip even if local system have one")
@@ -95,9 +108,7 @@ if (WIN32)
 	cpack_add_component_group(libs
 		DISPLAY_NAME "Shared libraries"
 		DESCRIPTION "Required libraries that already may be present in your system")
-	set(QT_LIBS "${_qt5Core_install_prefix}/bin/icudt53.dll"
-		"${_qt5Core_install_prefix}/bin/icuin53.dll"
-		"${_qt5Core_install_prefix}/bin/icuuc53.dll"
+	set(QT_LIBS
 		"${_qt5Core_install_prefix}/bin/libEGL.dll"
 		"${_qt5Core_install_prefix}/bin/libGLESv2.dll"
 		"${_qt5Core_install_prefix}/bin/Qt5Core.dll"
@@ -113,8 +124,6 @@ if (WIN32)
 		"${_qt5Core_install_prefix}/bin/Qt5Sensors.dll"
 		"${_qt5Core_install_prefix}/bin/Qt5Sql.dll"
 		"${_qt5Core_install_prefix}/bin/Qt5Svg.dll"
-		"${_qt5Core_install_prefix}/bin/Qt5WebKit.dll"
-		"${_qt5Core_install_prefix}/bin/Qt5WebKitWidgets.dll"
 		"${_qt5Core_install_prefix}/bin/Qt5Widgets.dll"
 		"${_qt5Core_install_prefix}/bin/Qt5Xml.dll"
 		"${_qt5Core_install_prefix}/bin/Qt5XmlPatterns.dll")
@@ -195,36 +204,6 @@ if (WIN32)
 			GROUP libs)
 	endif (MINGW)
 endif (WIN32)
-
-if (APPLE)
-	set_target_properties(${VACUUM_LOADER_NAME} PROPERTIES
-		MACOSX_BUNDLE_BUNDLE_NAME "vacuum"
-		MACOSX_BUNDLE_INFO_STRING "Vacuum-IM"
-		MACOSX_BUNDLE_BUNDLE_VERSION "${VERSION}"
-		MACOSX_BUNDLE_ICON_FILE "vacuum"
-		MACOSX_BUNDLE_GUI_IDENTIFIER "org.vacuum-im"
-		MACOSX_BUNDLE_COPYRIGHT "Copyright 2010-2015, Potapov S.A.")
-	list(APPEND DIRS
-		${QT_LIBRARY_DIR}
-		${CMAKE_INSTALL_PREFIX}/${LIBDIR})
-
-	file(COPY vacuum.icns DESTINATION "${INSTALL_RESOURCES}")
-	file(WRITE "${CMAKE_BINARY_DIR}/${INSTALL_RESOURCES}/qt.conf" "[Paths]\nPlugins = PlugIns")
-	file(COPY "${_qt5Core_install_prefix}/plugins/imageformats" DESTINATION "${INSTALL_PLUGINS}")
-	file(COPY "${_qt5Core_install_prefix}/plugins/audio" DESTINATION "${INSTALL_PLUGINS}")
-	file(COPY "${_qt5Core_install_prefix}/plugins/platforms" DESTINATION "${INSTALL_PLUGINS}")
-	file(COPY "${_qt5Core_install_prefix}/plugins/sqldrivers/libqsqlite.dylib" DESTINATION "${INSTALL_PLUGINS}/sqldrivers")
-	foreach(LANG ${LOCALIZED_LANGS})
-		string(SUBSTRING ${LANG} 0 2 SHORTLANG)
-		file(COPY "${_qt5Core_install_prefix}/translations/qt_${SHORTLANG}.qm" DESTINATION "${INSTALL_TRANSLATIONS}/${LANG}")
-	endforeach(LANG)
-
-	install(CODE "
-		include(BundleUtilities)
-		file(GLOB_RECURSE PLUGINS \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_APP_DIR}/Contents/PlugIns/*.dylib\")
-		fixup_bundle(\"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_APP_DIR}\"   \"\${PLUGINS}\"   \"${DIRS}\")"
-		COMPONENT xxx-this_should_be_the_last_component_in_lexicographical_order_because_cmake_sucks)
-endif (APPLE)
 
 if (INSTALL_SDK)
 	cpack_add_component(sdk
