@@ -7,6 +7,10 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 
+if(APPLE)
+	 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9")
+endif()
+
 if(POLICY CMP0020)
 	cmake_policy(SET CMP0020 NEW)
 endif()
@@ -53,7 +57,7 @@ set(USED_LANGS "" CACHE INTERNAL "List of languages actually used for generating
 add_lang_options()
 
 if (APPLE)
-	set_property(GLOBAL PROPERTY ALL_PLUGINS_DYLIB_FILES "")
+	set_property(GLOBAL PROPERTY ALL_PLUGINS_FULLPATHS "")
 endif (APPLE)
 
 set(NO_WEBKIT NO CACHE BOOL "Exclude QtWebKit from dependencies")
