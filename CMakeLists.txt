@@ -4,11 +4,10 @@ project(vacuum-im)
 
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
 
 if(APPLE)
 	 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9")
+	 set_property(GLOBAL PROPERTY ALL_PLUGINS_FULLPATHS "")
 endif()
 
 if(POLICY CMP0020)
@@ -39,13 +38,9 @@ include("src/translations/languages.cmake")
 include_directories("${CMAKE_SOURCE_DIR}/src")
 
 if (APPLE)
-	file(COPY "resources/menuicons"
-		DESTINATION "${INSTALL_RESOURCES}"
-		PATTERN ".svn" EXCLUDE)
+	file(COPY "resources/menuicons" DESTINATION "${INSTALL_RESOURCES}")
 else (APPLE)
-	install(DIRECTORY "resources/menuicons"
-		DESTINATION "${INSTALL_RESOURCES}"
-		PATTERN ".svn" EXCLUDE)
+	install(DIRECTORY "resources/menuicons" DESTINATION "${INSTALL_RESOURCES}")
 endif (APPLE)
 
 include("src/packages/package.cmake")
@@ -55,10 +50,6 @@ set(INSTALL_DOCS YES CACHE BOOL "Install documentation (currently it's only AUTH
 set(LANGS "" CACHE STRING "List of languages to build localization for (this variable overrides any of LANG_*)")
 set(USED_LANGS "" CACHE INTERNAL "List of languages actually used for generating targets")
 add_lang_options()
-
-if (APPLE)
-	set_property(GLOBAL PROPERTY ALL_PLUGINS_FULLPATHS "")
-endif (APPLE)
 
 set(NO_WEBKIT NO CACHE BOOL "Exclude QtWebKit from dependencies")
 set(FORCE_BUNDLED_MINIZIP NO CACHE BOOL "Use bundled minizip even if local system have one")

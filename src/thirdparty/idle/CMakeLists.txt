@@ -7,6 +7,7 @@ if (UNIX AND NOT APPLE)
 endif (UNIX AND NOT APPLE)
 
 set(SOURCES "idle.cpp")
+set(HEADERS "idle.h")
 
 if (APPLE)
 	set(SOURCES ${SOURCES} "idle_mac.cpp")
@@ -22,6 +23,8 @@ elseif (WIN32)
 endif (APPLE)
 
 add_definitions(-DUNICODE)
+
+qt5_wrap_cpp(MOC_SOURCES ${HEADERS})
 
 add_library(idle STATIC ${SOURCES} ${MOC_SOURCES})
 

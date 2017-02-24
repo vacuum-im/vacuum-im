@@ -18,6 +18,9 @@ if (IS_ENABLED)
 		".")
 	add_definitions(-DQT_PLUGIN -DQT_SHARED)
 
+	qt5_wrap_cpp(MOC_SOURCES ${HEADERS})
+	qt5_wrap_ui(UI_HEADERS ${UIS})
+
 	add_translations(TRANSLATIONS ${PLUGIN_NAME} ${HEADERS} ${SOURCES} ${UIS})
 	add_library(${PLUGIN_NAME} SHARED ${SOURCES} ${MOC_SOURCES} ${UI_HEADERS} ${TRANSLATIONS})
 	target_link_libraries(${PLUGIN_NAME} ${VACUUM_UTILS_NAME} ${ADD_LIBS} Qt5::Widgets Qt5::Xml Qt5::Network)
