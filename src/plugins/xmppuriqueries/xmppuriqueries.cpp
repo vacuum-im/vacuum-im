@@ -1,6 +1,7 @@
 #include "xmppuriqueries.h"
 
 #include <QPair>
+#include <QUrlQuery>
 #include <definitions/messageviewurlhandlerorders.h>
 #include <utils/logger.h>
 
@@ -72,7 +73,7 @@ bool XmppUriQueries::parseXmppUri(const QUrl &AUrl, Jid &AContactJid, QString &A
 	{
 		QUrl url =  QUrl::fromEncoded(AUrl.toEncoded().replace(';','&'), QUrl::StrictMode);
 
-		QList< QPair<QString, QString> > keyValues = url.queryItems();
+		QList< QPair<QString, QString> > keyValues = QUrlQuery(url).queryItems();
 		if (!keyValues.isEmpty())
 		{
 			AContactJid = url.path();
@@ -93,16 +94,18 @@ QString XmppUriQueries::makeXmppUri(const Jid &AContactJid, const QString &AActi
 	if (AContactJid.isValid() && !AAction.isEmpty())
 	{
 		QUrl url;
-		url.setQueryDelimiters('=',';');
+		QUrlQuery query;
+		query.setQueryDelimiters('=',';');
 
 		url.setScheme(XMPP_URI_SCHEME);
 		url.setPath(AContactJid.full());
 
-		QList< QPair<QString, QString> > query;
-		query.append(qMakePair<QString,QString>(AAction,QString::null));
+		QList< QPair<QString, QString> > queryItems;
+		queryItems.append(qMakePair<QString,QString>(AAction,QString::null));
 		for(QMultiMap<QString, QString>::const_iterator it=AParams.constBegin(); it!=AParams.end(); ++it)
-			query.append(qMakePair<QString,QString>(it.key(),it.value()));
-		url.setQueryItems(query);
+			queryItems.append(qMakePair<QString,QString>(it.key(),it.value()));
+		query.setQueryItems(queryItems);
+		url.setQuery(query);
 
 		return url.toString().replace(QString("?%1=;").arg(AAction),QString("?%1;").arg(AAction));
 	}
@@ -128,5 +131,3 @@ void XmppUriQueries::removeUriHandler(int AOrder, IXmppUriHandler *AHandler)
 		emit uriHandlerRemoved(AOrder, AHandler);
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_xmppuriqueries, XmppUriQueries)

@@ -68,3 +68,8 @@ SOURCES  = jid.cpp \
            logger.cpp \
            pluginhelper.cpp \
            passworddialog.cpp
+
+unix:!mac:!haiku {
+  HEADERS += x11info.h
+  SOURCES += x11info.cpp
+}

@@ -651,5 +651,3 @@ void Commands::onRequestActionTriggered(bool)
 		FDiscovery->requestDiscoItems(streamJid,commandJid,NS_COMMANDS);
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_commands, Commands)

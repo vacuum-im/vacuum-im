@@ -466,7 +466,7 @@ bool AppendSettingsPage::validatePage()
 	IAccountManager *accountManager = PluginHelper::pluginInstance<IAccountManager>();
 	if (accountManager!=NULL && accountManager->findAccountByStream(streamJid())!=NULL)
 	{
-		QMessageBox::warning(this,tr("Duplicate Account"),tr("Account with Jabber ID <b>%1</b> already exists.").arg(Qt::escape(streamJid().uBare())));
+		QMessageBox::warning(this,tr("Duplicate Account"),tr("Account with Jabber ID <b>%1</b> already exists.").arg(streamJid().uBare().toHtmlEscaped()));
 		return false;
 	}
 	

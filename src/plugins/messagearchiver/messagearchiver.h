@@ -71,6 +71,7 @@ class MessageArchiver :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IMessageArchiver IStanzaHandler IStanzaRequestOwner IOptionsDialogHolder ISessionNegotiator);
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.MessageArchiver");
 public:
 	MessageArchiver();
 	~MessageArchiver();

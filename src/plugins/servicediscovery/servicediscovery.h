@@ -53,6 +53,7 @@ class ServiceDiscovery :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IServiceDiscovery IStanzaHandler IStanzaRequestOwner IXmppUriHandler IRostersClickHooker IDiscoHandler IDiscoFeatureHandler);
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.ServiceDiscovery");
 public:
 	ServiceDiscovery();
 	~ServiceDiscovery();

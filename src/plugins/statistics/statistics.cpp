@@ -1,6 +1,7 @@
 #include "statistics.h"
 
 #include <QDir>
+#include <QUrlQuery>
 #include <QSslError>
 #include <QDataStream>
 #include <QNetworkProxy>
@@ -478,7 +479,7 @@ QString Statistics::userAgent() const
 
 QString Statistics::windowsVersion() const
 {
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WIN
 	OSVERSIONINFOEX versionInfo;
 
 	ZeroMemory(&versionInfo, sizeof(versionInfo));
@@ -496,113 +497,119 @@ QString Statistics::windowsVersion() const
 QUrl Statistics::buildHitUrl(const IStatisticsHit &AHit) const
 {
 	QUrl url(MP_URL);
-	url.setQueryDelimiters('=','&');
+
+	QList< QPair<QString,QString> > query;
 
 	// Protocol Version
-	url.addQueryItem("v",MP_VER);
+	query.append(qMakePair<QString,QString>("v",QUrl::toPercentEncoding(MP_VER)));
 
 	// Tracking ID
-	url.addQueryItem("tid",MP_ID);
+	query.append(qMakePair<QString,QString>("tid",QUrl::toPercentEncoding(MP_ID)));
 
 	// Queue Time
 	qint64 qt = AHit.timestamp.msecsTo(QDateTime::currentDateTime());
 	if (qt > 0)
-		url.addQueryItem("qt",QString::number(qt));
+		query.append(qMakePair<QString,QString>("qt",QUrl::toPercentEncoding(QString::number(qt))));
 
 	// Client ID
 	QString cid = !AHit.profile.isNull() ? AHit.profile.toString() : FProfileId.toString();
 	cid.remove(0,1); cid.chop(1);
-	url.addQueryItem("cid",cid);
+	query.append(qMakePair<QString,QString>("cid",QUrl::toPercentEncoding(cid)));
 
 	// Session Control
 	if (AHit.session == IStatisticsHit::SessionStart)
-		url.addQueryItem("sc","start");
+		query.append(qMakePair<QString,QString>("sc",QUrl::toPercentEncoding("start")));
 	else if (AHit.session == IStatisticsHit::SessionEnd)
-		url.addQueryItem("sc","end");
+		query.append(qMakePair<QString,QString>("sc",QUrl::toPercentEncoding("end")));
 
 	// Screen Resolution
 	QRect sr = FDesktopWidget->screenGeometry();
-	url.addQueryItem("sr",QString("%1.%2").arg(sr.width()).arg(sr.height()));
+	query.append(qMakePair<QString,QString>("sr",QUrl::toPercentEncoding(QString("%1.%2").arg(sr.width()).arg(sr.height()))));
 
 	// User Language
-	url.addQueryItem("ul",QLocale().name());
+	query.append(qMakePair<QString,QString>("ul",QUrl::toPercentEncoding(QLocale().name())));
 
 	// Flash Version (Qt Version)
-	url.addQueryItem("fl",qVersion());
+	query.append(qMakePair<QString,QString>("fl",QUrl::toPercentEncoding(qVersion())));
 
 	// Screen Name
-	url.addQueryItem("cd",AHit.screen);
+	query.append(qMakePair<QString,QString>("cd",QUrl::toPercentEncoding(AHit.screen)));
 
 	// Application Name
-	url.addQueryItem("an",CLIENT_NAME);
+	query.append(qMakePair<QString,QString>("an",QUrl::toPercentEncoding(CLIENT_NAME)));
 
 	// Application Version
-	url.addQueryItem("av",FClientVersion);
+	query.append(qMakePair<QString,QString>("av",QUrl::toPercentEncoding(FClientVersion)));
 
 	// Custom Metric
 	for (QMap<int, qint64>::const_iterator it=AHit.metrics.constBegin(); it!=AHit.metrics.constEnd(); ++it)
-		url.addQueryItem(QString("cm%1").arg(it.key()),QString::number(it.value()));
+		query.append(qMakePair<QString,QString>(QString("cm%1").arg(it.key()),QUrl::toPercentEncoding(QString::number(it.value()))));
 
 	// Custom Dimension
 	for (QMap<int, QString>::const_iterator it=AHit.dimensions.constBegin(); it!=AHit.dimensions.constEnd(); ++it)
-		url.addQueryItem(QString("cd%1").arg(it.key()),it.value());
+		query.append(qMakePair<QString,QString>(QString("cd%1").arg(it.key()),QUrl::toPercentEncoding(it.value())));
 
 	if (AHit.type == IStatisticsHit::HitView)
 	{
 		// Hit Type
-		url.addQueryItem("t","screenview");
+		query.append(qMakePair<QString,QString>("t",QUrl::toPercentEncoding("screenview")));
 	}
 	else if (AHit.type == IStatisticsHit::HitEvent)
 	{
 		// Hit Type
-		url.addQueryItem("t","event");
+		query.append(qMakePair<QString,QString>("t",QUrl::toPercentEncoding("event")));
 
 		// Event Category
-		url.addQueryItem("ec",AHit.event.category);
+		query.append(qMakePair<QString,QString>("ec",QUrl::toPercentEncoding(AHit.event.category)));
 
 		// Event Action
-		url.addQueryItem("ea",AHit.event.action);
+		query.append(qMakePair<QString,QString>("ea",QUrl::toPercentEncoding(AHit.event.action)));
 
 		// Event Label
 		if (!AHit.event.label.isEmpty())
-			url.addQueryItem("el",AHit.event.label);
+			query.append(qMakePair<QString,QString>("el",QUrl::toPercentEncoding(AHit.event.label)));
 
 		// Event Value
 		if (AHit.event.value >= 0)
-			url.addQueryItem("ev",QString::number(AHit.event.value));
+			query.append(qMakePair<QString,QString>("ev",QUrl::toPercentEncoding(QString::number(AHit.event.value))));
 	}
 	else if (AHit.type == IStatisticsHit::HitTiming)
 	{
 		// Hit Type
-		url.addQueryItem("t","timing");
+		query.append(qMakePair<QString,QString>("t",QUrl::toPercentEncoding("timing")));
 
 		// User timing category
-		url.addQueryItem("utc",AHit.timing.category);
+		query.append(qMakePair<QString,QString>("utc",QUrl::toPercentEncoding(AHit.timing.category)));
 
 		// User timing variable name
-		url.addQueryItem("utv",AHit.timing.variable);
+		query.append(qMakePair<QString,QString>("utv",QUrl::toPercentEncoding(AHit.timing.variable)));
 
 		// User timing time
-		url.addQueryItem("utt",QString::number(AHit.timing.time));
+		query.append(qMakePair<QString,QString>("utt",QUrl::toPercentEncoding(QString::number(AHit.timing.time))));
 
 		// User timing label
 		if (!AHit.timing.label.isEmpty())
-			url.addQueryItem("utl",AHit.timing.label);
+			query.append(qMakePair<QString,QString>("utl",QUrl::toPercentEncoding(AHit.timing.label)));
 	}
 	else if (AHit.type == IStatisticsHit::HitException)
 	{
 		// Hit Type
-		url.addQueryItem("t","exception");
+		query.append(qMakePair<QString,QString>("t",QUrl::toPercentEncoding("exception")));
 
 		// Exception Description
-		url.addQueryItem("exd",AHit.exception.descr);
+		query.append(qMakePair<QString,QString>("exd",QUrl::toPercentEncoding(AHit.exception.descr)));
 
 		// Is Exception Fatal?
-		url.addQueryItem("exf",AHit.exception.fatal ? "1" : "0");
+		query.append(qMakePair<QString,QString>("exf",QUrl::toPercentEncoding(AHit.exception.fatal ? "1" : "0")));
 	}
 
 	// Cache Buster
-	url.addQueryItem("z",QString::number(qrand()));
+	query.append(qMakePair<QString,QString>("z",QUrl::toPercentEncoding(QString::number(qrand()))));
+
+	QUrlQuery urlQuery;
+	urlQuery.setQueryDelimiters('=','&');
+	urlQuery.setQueryItems(query);
+	url.setQuery(urlQuery);
 
 	return url;
 }
@@ -902,5 +909,3 @@ void Statistics::onLoggerTimingReported(const QString &AClass, const QString &AC
 		sendStatisticsHit(hit);
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_statistics, Statistics)

@@ -39,7 +39,7 @@ ASpellChecker::ASpellChecker()
 
 	FConfig = new_aspell_config();
 	aspell_config_replace(FConfig, "encoding", "utf-8");
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
 	aspell_config_replace(FConfig, "conf-dir", QString("%1/aspell").arg(QCoreApplication::applicationDirPath()).toUtf8().constData());
 	aspell_config_replace(FConfig, "data-dir", QString("%1/aspell/data").arg(QCoreApplication::applicationDirPath()).toUtf8().constData());
 	aspell_config_replace(FConfig, "dict-dir", QString("%1/aspell/dict").arg(QCoreApplication::applicationDirPath()).toUtf8().constData());

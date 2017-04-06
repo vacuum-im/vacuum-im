@@ -311,5 +311,3 @@ void JabberSearch::onSearchActionTriggered(bool)
 		showSearchDialog(streamJid,serviceJid,NULL);
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_jabbersearch, JabberSearch)

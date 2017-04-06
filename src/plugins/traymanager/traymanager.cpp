@@ -239,5 +239,3 @@ void TrayManager::onApplicationShutdownStarted()
 {
 	setTrayIconVisible(false);
 }
-
-Q_EXPORT_PLUGIN2(plg_traymanager, TrayManager)

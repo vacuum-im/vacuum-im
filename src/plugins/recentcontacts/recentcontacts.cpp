@@ -1,9 +1,11 @@
 #include "recentcontacts.h"
 
 #include <QDir>
+#include <QDrag>
 #include <QFile>
 #include <QStyle>
 #include <QPalette>
+#include <QMimeData>
 #include <QMouseEvent>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
@@ -1096,7 +1098,7 @@ QList<IRecentItem> RecentContacts::loadItemsFromXML(const QDomElement &AElement,
 			QString propValue = propElem.text();
 			bool decryptValue = !APlainPassword && propName=="password";
 
-			item.properties.insert(propName, decryptValue ? Options::decrypt(propValue.toAscii()).toString() : propValue);
+			item.properties.insert(propName, decryptValue ? Options::decrypt(propValue.toLatin1()).toString() : propValue);
 			propElem = propElem.nextSiblingElement("property");
 		}
 		items.append(item);
@@ -1124,7 +1126,7 @@ void RecentContacts::saveItemsToXML(QDomElement &AElement, const QList<IRecentIt
 
 			QDomElement propElem = AElement.ownerDocument().createElement("property");
 			propElem.setAttribute("name",propName);
-			propElem.appendChild(AElement.ownerDocument().createTextNode(encryptValue ? QString::fromAscii(Options::encrypt(propValue)) : propValue));
+			propElem.appendChild(AElement.ownerDocument().createTextNode(encryptValue ? QString::fromLatin1(Options::encrypt(propValue)) : propValue));
 			itemElem.appendChild(propElem);
 		}
 		
@@ -1458,7 +1460,7 @@ void RecentContacts::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 AL
 		{
 			Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
 			IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(streamJid) : NULL;
-			AToolTips.insert(RTTO_ROSTERSVIEW_INFO_ACCOUNT,tr("<b>Account:</b> %1").arg(Qt::escape(account!=NULL ? account->name() : streamJid.uBare())));
+			AToolTips.insert(RTTO_ROSTERSVIEW_INFO_ACCOUNT,tr("<b>Account:</b> %1").arg(QString(account!=NULL ? account->name() : streamJid.uBare()).toHtmlEscaped()));
 		}
 	}
 }
@@ -1638,5 +1640,3 @@ uint qHash(const IRecentItem &AKey)
 {
 	return qHash(AKey.type+"~"+AKey.streamJid.pFull()+"~"+AKey.reference);
 }
-
-Q_EXPORT_PLUGIN2(plg_recentcontacts, RecentContacts)

@@ -1,5 +1,6 @@
 #include "bookmarks.h"
 
+#include <QUrlQuery>
 #include <QInputDialog>
 #include <QDesktopServices>
 #include <QItemEditorFactory>
@@ -1048,15 +1049,16 @@ void Bookmarks::onDiscoWindowAddBookmarkActionTriggered(bool)
 		if (isReady(streamJid) && !discoJid.isEmpty())
 		{
 			QUrl url;
+			QUrlQuery query;
 			url.setScheme("xmpp");
-			url.setQueryDelimiters('=',';');
+			query.setQueryDelimiters('=',';');
 			url.setPath(discoJid);
 
 			QList< QPair<QString, QString> > queryItems;
 			queryItems << qMakePair(QString("disco"),QString()) << qMakePair(QString("type"),QString("get")) << qMakePair(QString("request"),QString("items"));
 			if (!discoNode.isEmpty())
 				queryItems << qMakePair(QString("node"),discoNode);
-			url.setQueryItems(queryItems);
+			query.setQueryItems(queryItems);
 
 			QList<IBookmark> bookmarkList = FBookmarks.value(streamJid);
 
@@ -1083,6 +1085,7 @@ void Bookmarks::onDiscoWindowAddBookmarkActionTriggered(bool)
 				LOG_STRM_INFO(streamJid,QString("Adding bookmark from disco window, name=%1").arg(ref.name));
 				setBookmarks(streamJid,bookmarkList);
 			}
+			url.setQuery(query);
 		}
 	}
 }
@@ -1311,5 +1314,3 @@ void Bookmarks::onShortcutActivated(const QString &AId, QWidget *AWidget)
 		}
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_bookmarks, Bookmarks)

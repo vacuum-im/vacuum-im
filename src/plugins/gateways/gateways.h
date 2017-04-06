@@ -25,6 +25,7 @@ class Gateways :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IGateways IStanzaRequestOwner IDiscoFeatureHandler);
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.Gateways");
 public:
 	Gateways();
 	~Gateways();

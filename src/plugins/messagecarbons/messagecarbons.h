@@ -17,6 +17,7 @@ class MessageCarbons :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IMessageCarbons IStanzaHandler IStanzaRequestOwner);
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.MessageCarbons");
 public:
 	MessageCarbons();
 	~MessageCarbons();

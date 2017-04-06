@@ -2,7 +2,6 @@
 
 #include <QMessageBox>
 #include <QInputDialog>
-#include <QTextDocument>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <utils/iconstorage.h>
@@ -115,7 +114,7 @@ void EditProfilesDialog::onRemoveProfileClicked()
 	if (listItem)
 	{
 		QString profile = listItem->text();
-		if (QMessageBox::question(this,tr("Remove Profile"),tr("Are you sure you want to delete profile '<b>%1</b>'?").arg(Qt::escape(profile)),QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes)
+		if (QMessageBox::question(this,tr("Remove Profile"),tr("Are you sure you want to delete profile '<b>%1</b>'?").arg(profile.toHtmlEscaped()),QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes)
 		{
 			if (!FOptionsManager->removeProfile(profile))
 			{

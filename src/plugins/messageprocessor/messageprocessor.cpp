@@ -474,7 +474,7 @@ QString MessageProcessor::convertTextToBody(const QString &AString) const
 
 QString MessageProcessor::convertBodyToHtml(const QString &AString) const
 {
-	QString result = Qt::escape(AString);
+	QString result = AString.toHtmlEscaped();
 	result.replace('\n',"<br>");
 	result.replace("  ","&nbsp; ");
 	result.replace('\t',"&nbsp; &nbsp; ");
@@ -509,5 +509,3 @@ void MessageProcessor::onXmppStreamJidChanged(IXmppStream *AXmppStream, const Ji
 		FActiveStreams.insert(AXmppStream->streamJid(),handleId);
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_messageprocessor, MessageProcessor)

@@ -183,5 +183,3 @@ void PEPManager::onPEPHandlerDestroyed(QObject *AHandler)
 		}
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_pepmanager, PEPManager)

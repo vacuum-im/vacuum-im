@@ -74,5 +74,3 @@ void IqAuthFeatureFactory::onFeatureDestroyed()
 		emit featureDestroyed(feature);
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_iqauth, IqAuthFeatureFactory)

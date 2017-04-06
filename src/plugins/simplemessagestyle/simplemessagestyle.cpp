@@ -40,7 +40,7 @@ SimpleMessageStyle::SimpleMessageStyle(const QString &AStylePath, QNetworkAccess
 	if (FSharedPath.isEmpty())
 	{
 		if (QDir::isRelativePath(SHARED_STYLE_PATH))
-			FSharedPath = qApp->applicationDirPath() + "/" SHARED_STYLE_PATH;
+			FSharedPath = qApp->applicationDirPath()+"/"+SHARED_STYLE_PATH;
 		else
 			FSharedPath = SHARED_STYLE_PATH;
 	}
@@ -506,7 +506,7 @@ void SimpleMessageStyle::fillContentKeywords(QString &AHtml, const IMessageStyle
 	AHtml.replace("%messageClasses%", messageClasses.join(" "));
 
 	AHtml.replace("%senderStatusIcon%",AOptions.senderIcon);
-	AHtml.replace("%shortTime%", Qt::escape(AOptions.time.toString(tr("hh:mm"))));
+	AHtml.replace("%shortTime%", AOptions.time.toString(tr("hh:mm")).toHtmlEscaped());
 
 	QString avatar = AOptions.senderAvatar;
 	if (!QFile::exists(avatar))
@@ -520,7 +520,7 @@ void SimpleMessageStyle::fillContentKeywords(QString &AHtml, const IMessageStyle
 	AHtml.replace("%userIconPath%",avatar);
 
 	QString timeFormat = !AOptions.timeFormat.isEmpty() ? AOptions.timeFormat : tr("hh:mm:ss");
-	QString time = Qt::escape(AOptions.time.toString(timeFormat));
+	QString time = AOptions.time.toString(timeFormat).toHtmlEscaped();
 	AHtml.replace("%time%", time);
 
 	QString senderColor = AOptions.senderColor;

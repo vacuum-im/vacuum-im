@@ -13,6 +13,7 @@ class XmppUriQueries :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IXmppUriQueries IMessageViewUrlHandler);
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.XmppUriQueries");
 public:
 	XmppUriQueries();
 	~XmppUriQueries();

@@ -42,11 +42,11 @@ EditBookmarksDialog::EditBookmarksDialog(IBookmarks *ABookmarks, const Jid &AStr
 	}
 
 	QHeaderView *header = ui.tbwBookmarks->horizontalHeader();
-	header->setClickable(true);
+	header->setSectionsClickable(true);
+	header->setSectionResizeMode(COL_NAME,QHeaderView::ResizeToContents);
+	header->setSectionResizeMode(COL_VALUE,QHeaderView::Stretch);
+	header->setSectionResizeMode(COL_NICK,QHeaderView::ResizeToContents);
 	header->hideSection(COL_SORT);
-	header->setResizeMode(COL_NAME,QHeaderView::ResizeToContents);
-	header->setResizeMode(COL_VALUE,QHeaderView::Stretch);
-	header->setResizeMode(COL_NICK,QHeaderView::ResizeToContents);
 	connect(header,SIGNAL(sectionClicked(int)),SLOT(onSortingStateChange(int)));
 
 	connect(ui.pbtAdd,SIGNAL(clicked()),SLOT(onEditButtonClicked()));

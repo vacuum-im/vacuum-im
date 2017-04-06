@@ -20,6 +20,7 @@ class PrivacyLists :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IPrivacyLists IStanzaHandler IStanzaRequestOwner);
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.PrivacyLists");
 public:
 	PrivacyLists();
 	~PrivacyLists();

@@ -322,5 +322,3 @@ void AutoStatus::onProfileClosed(const QString &AName)
 	Q_UNUSED(AName);
 	setActiveRule(QUuid());
 }
-
-Q_EXPORT_PLUGIN2(plg_autostatus, AutoStatus)

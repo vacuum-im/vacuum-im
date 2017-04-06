@@ -76,25 +76,23 @@ QString SystemManager::osVersion()
 	static QString osver;
 	if (osver.isEmpty())
 	{
-#if defined(Q_WS_WIN) || defined(Q_OS_CYGWIN)
+#if defined(Q_OS_WIN) || defined(Q_OS_CYGWIN)
 		QSettings settings("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", QSettings::NativeFormat);
 		osver = settings.value("ProductName").toString();
-#elif defined(Q_WS_MAC)
+#elif defined(Q_OS_MAC)
 		switch (QSysInfo::MacintoshVersion)
 		{
-# if QT_VERSION >= 0x040807
+#if QT_VERSION >= 0x050400
 		case QSysInfo::MV_YOSEMITE:
 			osver = "OS X 10.10 Yosemite";
 			break;
+#endif
 		case QSysInfo::MV_MAVERICKS:
 			osver = "OS X 10.9 Mavericks";
 			break;
-# endif
-# if QT_VERSION >= 0x040803
 		case QSysInfo::MV_MOUNTAINLION:
 			osver = "OS X 10.8 Mountain Lion";
 			break;
-# endif
 		case QSysInfo::MV_LION:
 			osver = "OS X 10.7 Lion";
 			break;
@@ -127,7 +125,7 @@ QString SystemManager::osVersion()
 			osver = "MacOS (unknown)";
 			break;
 		}
-#elif defined(Q_WS_X11)
+#elif defined(Q_OS_UNIX)
 		if (QFile::exists(QLatin1String("/etc/os-release")))
 		{
 			QSettings s(QLatin1String("/etc/os-release"), QSettings::IniFormat);

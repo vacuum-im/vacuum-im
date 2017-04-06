@@ -21,6 +21,7 @@ class FileStreamsManager :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IOptionsDialogHolder IFileStreamsManager IDataStreamProfile);
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.FileStreamsManager");
 public:
 	FileStreamsManager();
 	~FileStreamsManager();

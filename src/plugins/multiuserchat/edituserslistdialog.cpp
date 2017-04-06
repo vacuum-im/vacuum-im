@@ -78,7 +78,7 @@ EditUsersListDialog::EditUsersListDialog(IMultiUserChat *AMultiChat, const QStri
 	ui.tbvItems->verticalHeader()->hide();
 	ui.tbvItems->horizontalHeader()->hide();
 	ui.tbvItems->setEditTriggers(QAbstractItemView::NoEditTriggers);
-	ui.tbvItems->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+	ui.tbvItems->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	connect(ui.tbvItems,SIGNAL(customContextMenuRequested(const QPoint &)),SLOT(onItemsTableContextMenuRequested(const QPoint &)));
 
 	connect(ui.sleSearch,SIGNAL(searchStart()),SLOT(onSearchLineEditSearchStart()));

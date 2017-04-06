@@ -618,5 +618,3 @@ void StatusIcons::onSetCustomIconsetByAction(bool)
 		}
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_statusicons, StatusIcons)

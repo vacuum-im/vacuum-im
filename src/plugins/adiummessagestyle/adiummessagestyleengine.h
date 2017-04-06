@@ -3,7 +3,6 @@
 
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagestylemanager.h>
-#include <interfaces/iurlprocessor.h>
 #include "adiummessagestyle.h"
 #include "adiumoptionswidget.h"
 
@@ -16,6 +15,7 @@ class AdiumMessageStyleEngine :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IMessageStyleEngine);
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.AdiumMessageStyle");
 public:
 	AdiumMessageStyleEngine();
 	~AdiumMessageStyleEngine();
@@ -51,12 +51,10 @@ protected slots:
 	void onStyleWidgetRemoved(QWidget *AWidget);
 	void onClearEmptyStyles();
 private:
-	IUrlProcessor *FUrlProcessor;
 	IMessageStyleManager *FMessageStyleManager;
 private:
 	QMap<QString, QString> FStylePaths;
 	QMap<QString, AdiumMessageStyle *> FStyles;
-	QNetworkAccessManager *FNetworkAccessManager;
 };
 
 #endif // ADIUMMESSAGESTYLEPLUGIN_H

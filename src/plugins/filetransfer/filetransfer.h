@@ -37,6 +37,7 @@ class FileTransfer :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IFileTransfer IMessageWriter IXmppUriHandler IFileStreamHandler IOptionsDialogHolder IDiscoFeatureHandler IRostersDragDropHandler IMessageViewDropHandler IMessageViewUrlHandler IPublicDataStreamHandler);
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.FileTransfer");
 public:
 	FileTransfer();
 	~FileTransfer();

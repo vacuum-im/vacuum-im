@@ -751,7 +751,7 @@ QString FileMessageArchive::databaseArchiveFile(const Jid &AStreamJid) const
 {
 	QString archiveDir = AStreamJid.isValid() ? FArchiver->archiveDirPath(AStreamJid) : QString::null;
 	if (!archiveDir.isEmpty())
-		return archiveDir + "/" DATABASE_FILE_NAME;
+		return archiveDir + "/" + DATABASE_FILE_NAME;
 	return QString::null;
 }
 
@@ -1418,5 +1418,3 @@ void FileMessageArchive::onDiscoInfoReceived(const IDiscoInfo &AInfo)
 		}
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_filemessagearchive, FileMessageArchive)

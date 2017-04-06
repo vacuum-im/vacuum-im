@@ -219,5 +219,3 @@ void RosterManager::onXmppStreamActiveChanged(IXmppStream *AXmppStream, bool AAc
 		destroyRoster(roster);
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_roster, RosterManager)

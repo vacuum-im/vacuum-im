@@ -28,6 +28,7 @@ class Statistics :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IStatistics IOptionsDialogHolder);
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.Statistics");
 public:
 	Statistics();
 	~Statistics();

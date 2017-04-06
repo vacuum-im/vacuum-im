@@ -229,9 +229,9 @@ void AccountsOptionsWidget::onRemoveButtonClicked(const QUuid &AAccountId)
 	if (item)
 	{
 		QMessageBox::StandardButton res = QMessageBox::warning(this, tr("Remove Account"),
-			tr("You are assured that wish to remove an account <b>%1</b>?<br>All settings will be lost.").arg(Qt::escape(item->name())),
+			tr("You are assured that wish to remove an account <b>%1</b>?<br>All settings will be lost.").arg(item->name().toHtmlEscaped()),
 			QMessageBox::Ok | QMessageBox::Cancel);
-		
+
 		if (res == QMessageBox::Ok)
 		{
 			removeAccountItemWidget(AAccountId);

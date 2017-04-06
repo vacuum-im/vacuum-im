@@ -482,17 +482,17 @@ void ConnectionManager::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALab
 			tooltips += tr("<b>Certificate holder:</b>");
 			for (uint i=0; i<certInfoNamesCount; i++)
 			{
-				QString value = cert.subjectInfo(certInfoNames[i].info);
+				QString value = cert.subjectInfo(certInfoNames[i].info).join("; ");
 				if (!value.isEmpty())
-					tooltips += certInfoNames[i].name.arg(Qt::escape(value));
+					tooltips += certInfoNames[i].name.arg(value.toHtmlEscaped());
 			}
 
 			tooltips += "<br>" + tr("<b>Certificate issuer:</b>");
 			for (uint i=0; i<certInfoNamesCount; i++)
 			{
-				QString value = cert.issuerInfo(certInfoNames[i].info);
+				QString value = cert.issuerInfo(certInfoNames[i].info).join("; ");
 				if (!value.isEmpty())
-					tooltips += certInfoNames[i].name.arg(Qt::escape(value));
+					tooltips += certInfoNames[i].name.arg(value.toHtmlEscaped());
 			}
 
 			tooltips += "<br>" + tr("<b>Certificate details:</b>");
@@ -504,5 +504,3 @@ void ConnectionManager::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALab
 		}
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_connectionmanager, ConnectionManager)

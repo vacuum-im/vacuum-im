@@ -17,6 +17,8 @@ class DataStreamsPublisher :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IDataStreamsPublisher IStanzaHandler IStanzaRequestOwner);
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.DataStreamsPublisher");
+
 public:
 	DataStreamsPublisher();
 	~DataStreamsPublisher();

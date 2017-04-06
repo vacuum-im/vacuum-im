@@ -203,11 +203,11 @@ void InfoWidget::updateFieldView(int AField)
 
 			QString info;
 			if (!caption.isEmpty() && !status.isEmpty())
-				info = QString("%1 - %2").arg(captionTemplate.arg(Qt::escape(caption))).arg(Qt::escape(status));
+				info = QString("%1 - %2").arg(captionTemplate.arg(caption.toHtmlEscaped())).arg(status.toHtmlEscaped());
 			else if (!caption.isEmpty())
-				info = captionTemplate.arg(Qt::escape(caption));
+				info = captionTemplate.arg(caption.toHtmlEscaped());
 			else if (!status.isEmpty())
-				info = Qt::escape(status);
+				info = status.toHtmlEscaped();
 
 			QPalette::ColorGroup colorGroup = ui.lblInfo->isEnabled() ? (isActiveWindow() ? QPalette::Active : QPalette::Inactive) : QPalette::Disabled;
 			QString colorName = ui.lblInfo->palette().color(colorGroup, QPalette::WindowText).name();

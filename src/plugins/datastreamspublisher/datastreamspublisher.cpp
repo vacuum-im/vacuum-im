@@ -277,5 +277,3 @@ void DataStreamsPublisher::removeStreamHandler(int AOrder, IPublicDataStreamHand
 		emit streamHandlerRemoved(AOrder,AHandler);
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_datastreamspublisher, DataStreamsPublisher);

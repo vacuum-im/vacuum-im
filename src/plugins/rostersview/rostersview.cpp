@@ -1,8 +1,10 @@
 #include "rostersview.h"
 
+#include <QDrag>
 #include <QCursor>
 #include <QToolTip>
 #include <QPainter>
+#include <QMimeData>
 #include <QDropEvent>
 #include <QHelpEvent>
 #include <QClipboard>

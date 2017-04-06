@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="ru_RU" sourcelanguage="en">
+<TS version="2.1" language="ru_RU" sourcelanguage="en">
+<context>
+    <name>CombineContactsDialog</name>
+    <message>
+        <source>Combine Contacts</source>
+        <translation>Объединение контактов</translation>
+    </message>
+    <message numerus="yes">
+        <source>The following &lt;b&gt;%n contact(s)&lt;/b&gt; will be merged into metacontact:</source>
+        <translation>
+            <numerusform>Следующий &lt;b&gt;%n контакт&lt;/b&gt; будет объединен в метаконтакт:</numerusform>
+            <numerusform>Следующие &lt;b&gt;%n контакта&lt;/b&gt; будут объединены в метаконтакт:</numerusform>
+            <numerusform>Следующие &lt;b&gt;%n контактов&lt;/b&gt; будут объединены в метаконтакт:</numerusform>
+        </translation>
+    </message>
+</context>
 <context>
     <name>CombineContactsDialog</name>
     <message>

@@ -18,6 +18,7 @@ class RostersModel :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IRostersModel IRosterDataHolder);
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.RostersModel");
 public:
 	RostersModel();
 	~RostersModel();

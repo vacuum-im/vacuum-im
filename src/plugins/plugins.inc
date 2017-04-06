@@ -2,7 +2,7 @@ include(../make/config.inc)
 
 TEMPLATE            = lib
 CONFIG             += plugin
-QT                 += network xml
+QT                 += widgets network xml
 LIBS               += -L../../libs
 LIBS               += -l$$VACUUM_UTILS_NAME
 DEPENDPATH         += ../..

@@ -174,7 +174,7 @@ void SetupPluginsDialog::updatePlugins()
 		else if (!isLoaded)
 		{
 			errorsCount++;
-			descrLabel.d->hints.insert(AdvancedDelegateItem::Foreground, Qt::red);
+			descrLabel.d->hints.insert(AdvancedDelegateItem::Foreground, QColor(Qt::red));
 			nameLabel.d->hints.insert(AdvancedDelegateItem::Foreground, ui.tbvPlugins->palette().color(QPalette::Disabled, QPalette::Text));
 		}
 
@@ -187,7 +187,7 @@ void SetupPluginsDialog::updatePlugins()
 
 		pluginElem = pluginElem.nextSiblingElement();
 	}
-	ui.tbvPlugins->horizontalHeader()->setResizeMode(0,QHeaderView::Stretch);
+	ui.tbvPlugins->horizontalHeader()->setSectionResizeMode(0,QHeaderView::Stretch);
 	ui.tbvPlugins->verticalHeader()->resizeSections(QHeaderView::ResizeToContents);
 
 	FModel.sort(0);
@@ -219,13 +219,13 @@ void SetupPluginsDialog::onCurrentPluginChanged(const QModelIndex &ACurrent, con
 	if (ACurrent.isValid())
 	{
 		ui.lblName->setText(QString("<b>%1</b> %2 (%3)").arg(
-			Qt::escape(ACurrent.data(PDR_NAME).toString()),
+			ACurrent.data(PDR_NAME).toString().toHtmlEscaped(),
 			ACurrent.data(PDR_VERSION).toString(),
-			ACurrent.data(PDR_FILE).toString()));
+			ACurrent.data(PDR_FILE).toString().toHtmlEscaped()));
 
 		ui.lblHomePage->setText(QString("<a href='%1'>%2</a>").arg(
 			ACurrent.data(PDR_HOMEPAGE).toString(),
-			Qt::escape(ACurrent.data(PDR_HOMEPAGE).toString())));
+			ACurrent.data(PDR_HOMEPAGE).toString().toHtmlEscaped()));
 
 		ui.lblDescription->setText(ACurrent.data(PDR_DESCR).toString());
 

@@ -3,6 +3,7 @@
 #include <QFrame>
 #include <QTextDocumentFragment>
 #include <QAbstractTextDocumentLayout>
+#include <QMimeData>
 
 MessageEditor::MessageEditor(QWidget *AParent) : QTextEdit(AParent)
 {

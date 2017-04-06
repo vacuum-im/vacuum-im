@@ -338,5 +338,3 @@ void SpellChecker::onOptionsChanged(const OptionsNode &ANode)
 		}
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_spellchecker, SpellChecker)

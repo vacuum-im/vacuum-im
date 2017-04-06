@@ -3,6 +3,7 @@
 #include <QUrl>
 #include <QFile>
 #include <QFileInfo>
+#include <QFileDialog>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QVBoxLayout>
@@ -46,7 +47,7 @@ StreamDialog::StreamDialog(IDataStreamsManager *ADataManager, IFileStreamsManage
 			ui.cmbMethod->addItem(method->methodName(),method->methodNS());
 	}
 
-	ui.lblContact->setText(Qt::escape(FFileStream->contactJid().uFull()));
+	ui.lblContact->setText(FFileStream->contactJid().uFull().toHtmlEscaped());
 
 	connect(FFileStream->instance(),SIGNAL(stateChanged()),SLOT(onStreamStateChanged()));
 	connect(FFileStream->instance(),SIGNAL(speedChanged()),SLOT(onStreamSpeedChanged()));

@@ -90,10 +90,10 @@ DiscoItemsWindow::DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &ASt
 	ui.trvItems->setSortingEnabled(true);
 
 	FHeader = ui.trvItems->header();
-	FHeader->setClickable(true);
-	FHeader->setResizeMode(DiscoItemsModel::COL_NAME,QHeaderView::Interactive);
-	FHeader->setResizeMode(DiscoItemsModel::COL_JID,QHeaderView::Interactive);
-	FHeader->setResizeMode(DiscoItemsModel::COL_NODE,QHeaderView::Stretch);
+	FHeader->setSectionsClickable(true);
+	FHeader->setSectionResizeMode(DiscoItemsModel::COL_NAME,QHeaderView::Interactive);
+	FHeader->setSectionResizeMode(DiscoItemsModel::COL_JID,QHeaderView::Interactive);
+	FHeader->setSectionResizeMode(DiscoItemsModel::COL_NODE,QHeaderView::Stretch);
 	FHeader->setSortIndicator(DiscoItemsModel::COL_NAME,Qt::AscendingOrder);
 
 	FSearchTimer.setSingleShot(true);

@@ -1,15 +1,21 @@
 #ifndef WEBPAGE_H
 #define WEBPAGE_H
 
-#include <QWebPage>
+#include <QWebEnginePage>
+#include "webhittestresult.h"
 
 class WebPage :
-	public QWebPage
+	public QWebEnginePage
 {
 	Q_OBJECT;
 public:
-	WebPage(QObject *AParent = NULL);
-	~WebPage();
+	WebPage(QWebEngineProfile *AProfile, QObject *AParent);
+	QString requestWebHitTest(const QPoint &APosition);
+signals:
+	void linkClicked(const QUrl &AUrl);
+	void webHitTestResult(const QString &AId, const WebHitTestResult &AResult);
+private:
+	bool acceptNavigationRequest(const QUrl &AUrl, NavigationType AType, bool AIsMainFrame);
 };
 
 #endif // WEBPAGE_H

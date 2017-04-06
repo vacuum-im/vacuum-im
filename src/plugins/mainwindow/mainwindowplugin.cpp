@@ -164,5 +164,3 @@ void MainWindowPlugin::onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::Act
 			FMainWindow->showWindow();
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_mainwindow, MainWindowPlugin)

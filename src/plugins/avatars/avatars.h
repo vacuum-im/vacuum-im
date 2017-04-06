@@ -45,6 +45,7 @@ class Avatars :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IAvatars IStanzaHandler IRosterDataHolder IRostersLabelHolder IStanzaRequestOwner);
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.Avatars");
 public:
 	Avatars();
 	~Avatars();

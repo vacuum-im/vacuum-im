@@ -330,16 +330,16 @@ void VCardDialog::onVCardError(const XmppError &AError)
 {
 	if (FSaveClicked)
 	{
-		QMessageBox::critical(this,tr("Error"), tr("Failed to publish your profile: %1").arg(Qt::escape(AError.errorMessage())));
+		QMessageBox::critical(this,tr("Error"), tr("Failed to publish your profile: %1").arg(AError.errorMessage().toHtmlEscaped()));
 	}
 	else if (streamJid().pBare() != contactJid().pBare())
 	{
-		QMessageBox::critical(this,tr("Error"), tr("Failed to load profile: %1").arg(Qt::escape(AError.errorMessage())));
+		QMessageBox::critical(this,tr("Error"), tr("Failed to load profile: %1").arg(AError.errorMessage().toHtmlEscaped()));
 		deleteLater();
 	}
 	else if (AError.toStanzaError().conditionCode() != XmppStanzaError::EC_ITEM_NOT_FOUND)
 	{
-		QMessageBox::critical(this,tr("Error"), tr("Failed to load profile: %1").arg(Qt::escape(AError.errorMessage())));
+		QMessageBox::critical(this,tr("Error"), tr("Failed to load profile: %1").arg(AError.errorMessage().toHtmlEscaped()));
 		deleteLater();
 	}
 

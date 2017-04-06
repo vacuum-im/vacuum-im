@@ -691,16 +691,16 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 		{
 			QString name = AIndex->data(RDR_NAME).toString();
 			if (!name.isEmpty())
-				AToolTips.insert(RTTO_ROSTERSVIEW_INFO_NAME,QString("<big><b>%1</b></big>").arg(Qt::escape(name)));
+				AToolTips.insert(RTTO_ROSTERSVIEW_INFO_NAME,QString("<big><b>%1</b></big>").arg(name.toHtmlEscaped()));
 
 			if (streamJid.isValid() && AIndex->kind()!=RIK_STREAM_ROOT && FRostersModel && FRostersModel->streamsLayout()==IRostersModel::LayoutMerged)
 			{
 				IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(streamJid) : NULL;
-				AToolTips.insert(RTTO_ROSTERSVIEW_INFO_ACCOUNT,tr("<b>Account:</b> %1").arg(Qt::escape(account!=NULL ? account->name() : streamJid.uBare())));
+				AToolTips.insert(RTTO_ROSTERSVIEW_INFO_ACCOUNT,tr("<b>Account:</b> %1").arg(account!=NULL ? account->name().toHtmlEscaped() : streamJid.uBare()));
 			}
 
 			if (!contactJid.isEmpty())
-				AToolTips.insert(RTTO_ROSTERSVIEW_INFO_JABBERID,tr("<b>Jabber ID:</b> %1").arg(Qt::escape(contactJid.uBare())));
+				AToolTips.insert(RTTO_ROSTERSVIEW_INFO_JABBERID,tr("<b>Jabber ID:</b> %1").arg(contactJid.uBare().toHtmlEscaped()));
 
 			QString ask = AIndex->data(RDR_SUBSCRIPTION_ASK).toString();
 			QString subscription = AIndex->data(RDR_SUBSCRIBTION).toString();
@@ -715,9 +715,9 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 					subsName = tr("Provided from you");
 
 				if (ask == SUBSCRIPTION_SUBSCRIBE)
-					AToolTips.insert(RTTO_ROSTERSVIEW_INFO_SUBCRIPTION,tr("<b>Subscription:</b> %1, request sent").arg(Qt::escape(subsName)));
+					AToolTips.insert(RTTO_ROSTERSVIEW_INFO_SUBCRIPTION,tr("<b>Subscription:</b> %1, request sent").arg(subsName.toHtmlEscaped()));
 				else
-					AToolTips.insert(RTTO_ROSTERSVIEW_INFO_SUBCRIPTION,tr("<b>Subscription:</b> %1").arg(Qt::escape(subsName)));
+					AToolTips.insert(RTTO_ROSTERSVIEW_INFO_SUBCRIPTION,tr("<b>Subscription:</b> %1").arg(subsName.toHtmlEscaped()));
 			}
 		}
 
@@ -734,10 +734,10 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 				{
 					QString resource = pItem.itemJid.hasResource() ? pItem.itemJid.resource() : pItem.itemJid.uBare();
 					QString statusIcon = FStatusIcons!=NULL ? FStatusIcons->iconFileName(streamJid,pItem.itemJid) : QString::null;
-					AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_NAME+orderShift,QString("<img src='%1'> %2 (%3)").arg(statusIcon).arg(Qt::escape(resource)).arg(pItem.priority));
-					
+					AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_NAME+orderShift,QString("<img src='%1'> %2 (%3)").arg(statusIcon).arg(resource.toHtmlEscaped()).arg(pItem.priority));
+
 					if (!pItem.status.isEmpty())
-						AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_STATUS_TEXT+orderShift,Qt::escape(pItem.status).replace('\n',"<br>"));
+						AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_STATUS_TEXT+orderShift,pItem.status.toHtmlEscaped().replace('\n',"<br>"));
 
 					if (resIndex < resources.count()-1)
 						AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_MIDDLELINE+orderShift,"<hr>");
@@ -759,11 +759,11 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 			QString statusIconSet = FStatusIcons!=NULL ? FStatusIcons->iconsetByJid(contactJid) : QString::null;
 			QString statusIconKey = FStatusIcons!=NULL ? FStatusIcons->iconKeyByStatus(show,subscription,subscription_ask) : QString::null;
 			QString statusIconFile = FStatusIcons!=NULL ? FStatusIcons->iconFileName(statusIconSet,statusIconKey) : QString::null;
-			AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_NAME,QString("<img src='%1'> %2 (%3)").arg(statusIconFile).arg(Qt::escape(resource)).arg(priority));
+			AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_NAME,QString("<img src='%1'> %2 (%3)").arg(statusIconFile).arg(resource.toHtmlEscaped()).arg(priority));
 
 			QString statusText = AIndex->data(RDR_STATUS).toString();
 			if (!statusText.isEmpty())
-				AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_STATUS_TEXT,Qt::escape(statusText).replace('\n',"<br>"));
+				AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_STATUS_TEXT,statusText.toHtmlEscaped().replace('\n',"<br>"));
 
 			AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_BOTTOMLINE,"<hr>");
 		}
@@ -863,4 +863,3 @@ void RostersViewPlugin::onShowOfflineContactsAction(bool)
 	node.setValue(!node.value().toBool());
 }
 
-Q_EXPORT_PLUGIN2(plg_rostersview, RostersViewPlugin)

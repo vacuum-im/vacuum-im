@@ -595,8 +595,8 @@ RoomPage::RoomPage(QWidget *AParent) : QWizardPage(AParent)
 	tbvRoomView->setSelectionMode(QTableView::SingleSelection);
 	tbvRoomView->verticalHeader()->hide();
 	tbvRoomView->horizontalHeader()->setHighlightSections(false);
-	tbvRoomView->horizontalHeader()->setResizeMode(RMC_NAME,QHeaderView::Stretch);
-	tbvRoomView->horizontalHeader()->setResizeMode(RMC_USERS,QHeaderView::ResizeToContents);
+	tbvRoomView->horizontalHeader()->setSectionResizeMode(RMC_NAME,QHeaderView::Stretch);
+	tbvRoomView->horizontalHeader()->setSectionResizeMode(RMC_USERS,QHeaderView::ResizeToContents);
 	tbvRoomView->horizontalHeader()->setSortIndicator(RMC_NAME,Qt::AscendingOrder);
 	connect(tbvRoomView->selectionModel(),SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),SLOT(onCurrentRoomChanged(const QModelIndex &, const QModelIndex &)));
 
@@ -725,7 +725,7 @@ void RoomPage::setRoomJid(const QString &ARoomJid)
 void RoomPage::onRoomSearchStart()
 {
 	FRoomProxy->setFilterFixedString(sleSearch->text());
-	tbvRoomView->verticalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+	tbvRoomView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 }
 
 void RoomPage::onRoomNodeTextChanged()
@@ -859,7 +859,7 @@ void RoomPage::onDiscoItemsRecieved(const IDiscoItems &AItems)
 				FRoomModel->appendRow(QList<QStandardItem *>() << nameItem << usersItem);
 			}
 			lblInfo->setText(QString::null);
-			tbvRoomView->verticalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+			tbvRoomView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 			FRoomProxy->sort(tbvRoomView->horizontalHeader()->sortIndicatorSection(), tbvRoomView->horizontalHeader()->sortIndicatorOrder());
 		}
 		else

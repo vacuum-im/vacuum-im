@@ -574,5 +574,3 @@ void CaptchaForms::onNotificationRemoved(int ANotifyId)
 	}
 	FChallengeNotify.remove(ANotifyId);
 }
-
-Q_EXPORT_PLUGIN2(plg_captchaforms, CaptchaForms)

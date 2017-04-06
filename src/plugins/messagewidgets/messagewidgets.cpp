@@ -3,6 +3,7 @@
 #include <QPair>
 #include <QBuffer>
 #include <QMimeData>
+#include <QUrlQuery>
 #include <QClipboard>
 #include <QTextBlock>
 #include <QTextCursor>
@@ -641,7 +642,9 @@ void MessageWidgets::onViewContextSearchActionTriggered(bool)
 	{
 		QString domain = tr("google.com","Your google domain");
 		QUrl url = QString("http://www.%1/search").arg(domain);
-		url.setQueryItems(QList<QPair<QString,QString> >() << qMakePair<QString,QString>(QString("q"),action->data(ADR_CONTEXT_DATA).toString()));
+		QUrlQuery query;
+		query.setQueryItems(QList<QPair<QString,QString> >() << qMakePair<QString,QString>(QString("q"),action->data(ADR_CONTEXT_DATA).toString()));
+		url.setQuery(query);
 		QDesktopServices::openUrl(url);
 	}
 }
@@ -827,5 +830,3 @@ void MessageWidgets::onOptionsChanged(const OptionsNode &ANode)
 		}
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_messagewidgets, MessageWidgets)

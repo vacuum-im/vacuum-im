@@ -1,7 +1,3 @@
-if (QT_QTWEBKIT_LIBRARY)
-  add_subdirectory(adiummessagestyle)
-endif (QT_QTWEBKIT_LIBRARY)
-
 add_subdirectory(accountmanager)
 add_subdirectory(annotations)
 add_subdirectory(autostatus)
@@ -71,3 +67,7 @@ add_subdirectory(vcard)
 add_subdirectory(xmppstreams)
 add_subdirectory(xmppuriqueries)
 add_subdirectory(datastreamspublisher)
+
+if (Qt5WebKit_FOUND)
+  add_subdirectory(adiummessagestyle)
+endif (Qt5WebKit_FOUND)

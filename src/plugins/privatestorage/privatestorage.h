@@ -18,6 +18,7 @@ class PrivateStorage :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IPrivateStorage IStanzaHandler IStanzaRequestOwner);
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.PrivateStorage");
 public:
 	PrivateStorage();
 	~PrivateStorage();

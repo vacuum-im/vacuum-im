@@ -1620,7 +1620,7 @@ void MultiUserChatManager::onRostersViewIndexToolTips(IRosterIndex *AIndex, quin
 			if (user)
 			{
 				window->toolTipsForUser(user,AToolTips);
-				AToolTips.insert(RTTO_ROSTERSVIEW_INFO_NAME,tr("<big><b>[%1]</b></big> in [%2]").arg(Qt::escape(user->nick()),Qt::escape(window->multiUserChat()->roomName())));
+				AToolTips.insert(RTTO_ROSTERSVIEW_INFO_NAME,tr("<big><b>[%1]</b></big> in [%2]").arg(user->nick().toHtmlEscaped(),window->multiUserChat()->roomName().toHtmlEscaped()));
 				AToolTips.insert(RTTO_MULTIUSERCHAT_ROOM,tr("<b>Conference:</b> %1").arg(window->multiUserChat()->roomJid().uBare()));
 			}
 		}
@@ -1716,11 +1716,11 @@ void MultiUserChatManager::onNotificationActivated(int ANotifyId)
 		int identIndex = !roomIdent.isEmpty() ? FDiscovery->findIdentity(roomIdent,DIC_CONFERENCE,QString::null) : -1;
 		QString identName = identIndex>=0 ? roomIdent.value(identIndex).name : QString::null;
 
-		QString roomName = Qt::escape(!identName.isEmpty() ? QString("%1 <%2>").arg(identName,invite.roomJid.uBare()) : invite.roomJid.uBare());
-		QString userName = Qt::escape(FNotifications->contactName(invite.streamJid,invite.fromJid));
+		QString roomName = !identName.isEmpty() ? QString("%1 <%2>").arg(identName,invite.roomJid.uBare().toHtmlEscaped()) : invite.roomJid.uBare().toHtmlEscaped();
+		QString userName = FNotifications->contactName(invite.streamJid,invite.fromJid).toHtmlEscaped();
 
 		QString msg = tr("You are invited to the conference <b>%1</b> by user <b>%2</b>.").arg(roomName,userName);
-		msg += QString("<br>%1<br>").arg(Qt::escape(invite.reason));
+		msg += QString("<br>%1<br>").arg(invite.reason.toHtmlEscaped());
 		msg += tr("Do you want to join to the conference?");
 
 		QMessageBox *inviteDialog = new QMessageBox(QMessageBox::Question,tr("Invitation to Conference"),msg,QMessageBox::Yes|QMessageBox::No);
@@ -1929,6 +1929,3 @@ void MultiUserChatManager::onMessageArchiverCollectionLoaded(const QString &AId,
 		onConvertMessageChatWindowFinish(convert);
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_multiuserchat, MultiUserChatManager)
-

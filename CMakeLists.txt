@@ -1,12 +1,22 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 
 project(vacuum-im)
 
-if(POLICY CMP0022)
-   cmake_policy(SET CMP0022 NEW)
+if(POLICY CMP0020)
+	cmake_policy(SET CMP0020 NEW)
 endif()
 
-find_package(Qt4 REQUIRED)
+if(POLICY CMP0022)
+	cmake_policy(SET CMP0022 NEW)
+endif()
+
+if(POLICY CMP0043)
+	cmake_policy(SET CMP0043 NEW)
+endif()
+
+find_package (Qt5Widgets REQUIRED)
+find_package (Qt5WebKit)
+find_package (Qt5LinguistTools REQUIRED)
 
 add_custom_target(updatets)
 
@@ -32,6 +42,7 @@ set(LANGS "" CACHE STRING "List of languages to build localization for (this var
 set(USED_LANGS "" CACHE INTERNAL "List of languages actually used for generating targets")
 add_lang_options()
 
+set(NO_WEBENGINE NO CACHE BOOL "Exclude QtWebEngine from dependencies")
 set(FORCE_BUNDLED_MINIZIP NO CACHE BOOL "Use bundled minizip even if local system have one")
 
 find_library(SYSTEM_ZLIB_FOUND z)
@@ -42,6 +53,10 @@ find_library(SYSTEM_QTLOCKEDFILE_FOUND QtSolutions_LockedFile-2.4)
 if (FORCE_BUNDLED_MINIZIP)
 	set(SYSTEM_MINIZIP_FOUND NO)
 endif (FORCE_BUNDLED_MINIZIP)
+
+if (NO_WEBENGINE)
+	add_definitions(-DNO_WEBENGINE)
+endif (NO_WEBENGINE)
 
 if (SYSTEM_ZLIB_FOUND)
 	add_definitions(-DUSE_SYSTEM_ZLIB)
@@ -74,43 +89,76 @@ add_subdirectory(src)
 
 # runtime deps on Windows
 if (WIN32)
-	set(WEBKIT_WITHOUT_PHONON NO CACHE BOOL "Turn this flag ON if you use QtWebKit built without Phonon support")
-	set(WEBKIT_WITHOUT_XMLPATTERNS NO CACHE BOOL "Turn this flag ON if you use QtWebKit built without QtXmlPatterns")
 	cpack_add_component_group(libs
 		DISPLAY_NAME "Shared libraries"
 		DESCRIPTION "Required libraries that already may be present in your system")
-	set(QT_LIBS "${QT_LIBRARY_DIR}/../bin/QtCore4.dll"
-		"${QT_LIBRARY_DIR}/../bin/QtGui4.dll"
-		"${QT_LIBRARY_DIR}/../bin/QtNetwork4.dll"
-		"${QT_LIBRARY_DIR}/../bin/QtXml4.dll"
-		"${QT_LIBRARY_DIR}/../bin/QtWebkit4.dll")
-	if (NOT WEBKIT_WITHOUT_PHONON)
-		set(QT_LIBS ${QT_LIBS} "${QT_LIBRARY_DIR}/../bin/phonon4.dll")
-	endif (NOT WEBKIT_WITHOUT_PHONON)
-	if (NOT WEBKIT_WITHOUT_XMLPATTERNS)
-		set(QT_LIBS ${QT_LIBS} "${QT_LIBRARY_DIR}/../bin/QtXmlPatterns4.dll")
-	endif (NOT WEBKIT_WITHOUT_XMLPATTERNS)
+	set(QT_LIBS "${_qt5Core_install_prefix}/bin/icudt53.dll"
+		"${_qt5Core_install_prefix}/bin/icuin53.dll"
+		"${_qt5Core_install_prefix}/bin/icuuc53.dll"
+		"${_qt5Core_install_prefix}/bin/libEGL.dll"
+		"${_qt5Core_install_prefix}/bin/libGLESv2.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5Core.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5Gui.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5Multimedia.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5MultimediaWidgets.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5Network.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5OpenGL.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5Positioning.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5PrintSupport.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5Qml.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5Quick.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5Sensors.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5Sql.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5Svg.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5WebKit.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5WebKitWidgets.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5Widgets.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5Xml.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5XmlPatterns.dll")
 	install(FILES ${QT_LIBS}
 		DESTINATION "${INSTALL_LIBS}"
 		COMPONENT qt_libs)
-	install(DIRECTORY "${QT_PLUGINS_DIR}/imageformats"
+	install(DIRECTORY "${_qt5Core_install_prefix}/plugins/audio"
 		DESTINATION "${INSTALL_LIBS}"
 		COMPONENT qt_libs
 		FILES_MATCHING
 		PATTERN "*.dll"
-		PATTERN "*d4.dll" EXCLUDE)
+		PATTERN "*d.dll" EXCLUDE)
+	install(DIRECTORY "${_qt5Core_install_prefix}/plugins/imageformats"
+		DESTINATION "${INSTALL_LIBS}"
+		COMPONENT qt_libs
+		FILES_MATCHING
+		PATTERN "*.dll"
+		PATTERN "*d.dll" EXCLUDE)
+	install(DIRECTORY "${_qt5Core_install_prefix}/plugins/platforms"
+		DESTINATION "${INSTALL_LIBS}"
+		COMPONENT qt_libs
+		FILES_MATCHING
+		PATTERN "qwindows.dll")
+	install(DIRECTORY "${_qt5Core_install_prefix}/plugins/printsupport"
+		DESTINATION "${INSTALL_LIBS}"
+		COMPONENT qt_libs
+		FILES_MATCHING
+		PATTERN "*.dll"
+		PATTERN "*d.dll" EXCLUDE)
+	install(DIRECTORY "${_qt5Core_install_prefix}/plugins/sensors"
+		DESTINATION "${INSTALL_LIBS}"
+		COMPONENT qt_libs
+		FILES_MATCHING
+		PATTERN "*.dll"
+		PATTERN "*d.dll" EXCLUDE)
 	cpack_add_component(qt_libs
-		DISPLAY_NAME "Qt4 libraries"
-		DESCRIPTION "May be unchecked if you already have working Qt4 installation"
+		DISPLAY_NAME "Qt5 libraries"
+		DESCRIPTION "May be unchecked if you already have working Qt5 installation"
 		GROUP libs)
 	# Qt localization
 	foreach(LANG ${LOCALIZED_LANGS})
 		string(SUBSTRING ${LANG} 0 2 SHORTLANG)
-		install(FILES "${QT_TRANSLATIONS_DIR}/qt_${SHORTLANG}.qm"
+		install(FILES "${_qt5Core_install_prefix}/translations/qt_${SHORTLANG}.qm"
 			DESTINATION "${INSTALL_TRANSLATIONS}/${LANG}"
 			COMPONENT qt_${LANG})
 		cpack_add_component(qt_${LANG}
-			DISPLAY_NAME "Qt4 translation"
+			DISPLAY_NAME "Qt5 translation"
 			GROUP ${LANG}_translation
 			DEPENDS qt_libs)
 	endforeach(LANG)
@@ -132,7 +180,7 @@ if (WIN32)
 			DESCRIPTION "May be unchecked if you already have MinGW installed"
 			GROUP libs)
 	elseif (MSVC)
-		# TODO: check these patterns
+		# TODO: check these patterns, indeed, don't work.
 		file(GLOB MSVC_DLLS "msvc*.dll")
 		file(GLOB MANIFEST "Microsoft.VC*.CRT.manifest")
 		install(FILES ${MSVC_DLLS} ${MANIFEST}
@@ -151,30 +199,28 @@ if (APPLE)
 		MACOSX_BUNDLE_INFO_STRING "Vacuum-IM"
 		MACOSX_BUNDLE_BUNDLE_VERSION "${VERSION}"
 		MACOSX_BUNDLE_ICON_FILE "vacuum"
-		MACOSX_BUNDLE_GUI_IDENTIFIER "com.jrudevels.vacuum"
-		MACOSX_BUNDLE_COPYRIGHT "Copyright 2010-2012, Potapov S.A.")
+		MACOSX_BUNDLE_GUI_IDENTIFIER "org.vacuum-im"
+		MACOSX_BUNDLE_COPYRIGHT "Copyright 2010-2015, Potapov S.A.")
 	list(APPEND DIRS
 		${QT_LIBRARY_DIR}
 		${CMAKE_INSTALL_PREFIX}/${LIBDIR})
+
+	file(COPY vacuum.icns DESTINATION "${INSTALL_RESOURCES}")
+	file(WRITE "${CMAKE_BINARY_DIR}/${INSTALL_RESOURCES}/qt.conf" "[Paths]\nPlugins = PlugIns")
+	file(COPY "${_qt5Core_install_prefix}/plugins/imageformats" DESTINATION "${INSTALL_PLUGINS}")
+	file(COPY "${_qt5Core_install_prefix}/plugins/audio" DESTINATION "${INSTALL_PLUGINS}")
+	file(COPY "${_qt5Core_install_prefix}/plugins/platforms" DESTINATION "${INSTALL_PLUGINS}")
+	file(COPY "${_qt5Core_install_prefix}/plugins/sqldrivers/libqsqlite.dylib" DESTINATION "${INSTALL_PLUGINS}/sqldrivers")
+	foreach(LANG ${LOCALIZED_LANGS})
+		string(SUBSTRING ${LANG} 0 2 SHORTLANG)
+		file(COPY "${_qt5Core_install_prefix}/translations/qt_${SHORTLANG}.qm" DESTINATION "${INSTALL_TRANSLATIONS}/${LANG}")
+	endforeach(LANG)
+
 	install(CODE "
 		include(BundleUtilities)
 		file(GLOB_RECURSE PLUGINS \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_APP_DIR}/Contents/PlugIns/*.dylib\")
 		fixup_bundle(\"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_APP_DIR}\"   \"\${PLUGINS}\"   \"${DIRS}\")"
 		COMPONENT xxx-this_should_be_the_last_component_in_lexicographical_order_because_cmake_sucks)
-	file(COPY vacuum.icns
-		DESTINATION "${INSTALL_RESOURCES}")
-
-	file(WRITE "${CMAKE_BINARY_DIR}/${INSTALL_RESOURCES}/qt.conf" "[Paths]\nPlugins = PlugIns")
-	file(COPY "${QT_PLUGINS_DIR}/imageformats"
-		DESTINATION "${INSTALL_PLUGINS}")
-	file(COPY "${QT_PLUGINS_DIR}/sqldrivers/libqsqlite.dylib"
-		DESTINATION "${INSTALL_PLUGINS}/sqldrivers")
-	# Qt localization
-	foreach(LANG ${LOCALIZED_LANGS})
-		string(SUBSTRING ${LANG} 0 2 SHORTLANG)
-		file(COPY "${QT_TRANSLATIONS_DIR}/qt_${SHORTLANG}.qm"
-			DESTINATION "${INSTALL_TRANSLATIONS}/${LANG}")
-	endforeach(LANG)
 endif (APPLE)
 
 if (INSTALL_SDK)

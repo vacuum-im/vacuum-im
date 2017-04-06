@@ -1,7 +1,6 @@
 #include "gateways.h"
 
 #include <QMessageBox>
-#include <QTextDocument>
 #include <definitions/namespaces.h>
 #include <definitions/actiongroups.h>
 #include <definitions/toolbargroups.h>
@@ -697,7 +696,7 @@ void Gateways::onRemoveActionTriggered(bool)
 		{
 			Jid serviceJid = services.first();
 			button = QMessageBox::question(NULL,tr("Remove transport and its contacts"),
-				tr("Are you sure you wish to remove transport '<b>%1</b>' and its <b>%n contact(s)</b> from the roster?","",serviceContacts(streams.first(),serviceJid).count()).arg(Qt::escape(serviceJid.domain())),
+				tr("Are you sure you wish to remove transport '<b>%1</b>' and its <b>%n contact(s)</b> from the roster?","",serviceContacts(streams.first(),serviceJid).count()).arg(serviceJid.domain().toHtmlEscaped()),
 				QMessageBox::Yes | QMessageBox::No);
 		}
 		else if (services.count() > 1)
@@ -1093,5 +1092,3 @@ void Gateways::onRegisterError(const QString &AId, const XmppError &AError)
 	Q_UNUSED(AError);
 	FShowRegisterRequests.remove(AId);
 }
-
-Q_EXPORT_PLUGIN2(plg_gateways, Gateways)

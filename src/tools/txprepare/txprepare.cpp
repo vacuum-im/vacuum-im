@@ -5,28 +5,30 @@
 #include <QDomDocument>
 #include <QCoreApplication>
 
-void myMessageHandler(QtMsgType type, const char *msg)
+void qtMessagesHandler(QtMsgType AType, const QMessageLogContext &AContext, const QString &AMessage)
 {
-	switch (type)
+	Q_UNUSED(AContext);
+	QByteArray localMsg = AMessage.toLocal8Bit();
+	switch (AType)
 	{
 	case QtDebugMsg:
-		fprintf(stderr, "%s\n", msg);
+		fprintf(stderr, "%s\n", localMsg.constData());
 		break;
 	case QtWarningMsg:
-		fprintf(stderr, "Warning: %s\n", msg);
+		fprintf(stderr, "Warning: %s\n", localMsg.constData());
 		break;
 	case QtCriticalMsg:
-		fprintf(stderr, "Critical: %s\n", msg);
+		fprintf(stderr, "Critical: %s\n", localMsg.constData());
 		break;
 	case QtFatalMsg:
-		fprintf(stderr, "Fatal: %s\n", msg);
+		fprintf(stderr, "Fatal: %s\n", localMsg.constData());
 		abort();
 	}
 }
 
 int main(int argc, char *argv[])
 {
-	qInstallMsgHandler(myMessageHandler);
+	qInstallMessageHandler(qtMessagesHandler);
 	QCoreApplication app(argc, argv);
 
 	if (argc != 4)

@@ -1,5 +1,4 @@
-QT += webkit
-QT -= phonon xmlpatterns
+QT += webenginewidgets
 TARGET = adiummessagestyle 
 include(adiummessagestyle.pri) 
 include(../plugins.inc) 

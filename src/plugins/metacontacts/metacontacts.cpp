@@ -1,6 +1,7 @@
 #include "metacontacts.h"
 
 #include <QDir>
+#include <QMimeData>
 #include <QMouseEvent>
 #include <QInputDialog>
 #include <QTextDocument>
@@ -1230,7 +1231,7 @@ void MetaContacts::updateMetaRecentItems(const Jid &AStreamJid, const QUuid &AMe
 		}
 		else foreach(const IRecentItem &item, FRecentContacts->streamItems(AStreamJid))
 		{
-			if (item.type==REIT_METACONTACT && item.reference==meta.id)
+			if (item.type==REIT_METACONTACT && meta.id==item.reference)
 			{
 				FUpdatingRecentItem = item;
 				FMetaRecentItems[sRoot].remove(AMetaId);
@@ -2069,10 +2070,10 @@ void MetaContacts::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALab
 				QString statusIconSet = FStatusIcons!=NULL ? FStatusIcons->iconsetByJid(pItem.itemJid) : QString::null;
 				QString statusIconKey = FStatusIcons!=NULL ? FStatusIcons->iconKeyByStatus(pItem.show,SUBSCRIPTION_BOTH,false) : QString::null;
 				QString statusIconFile = FStatusIcons!=NULL ? FStatusIcons->iconFileName(statusIconSet,statusIconKey) : QString::null;
-				AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_NAME+orderShift,QString("<img src='%1'> %2 (%3)").arg(statusIconFile).arg(Qt::escape(pItem.itemJid.uFull())).arg(pItem.priority));
+				AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_NAME+orderShift,QString("<img src='%1'> %2 (%3)").arg(statusIconFile).arg(pItem.itemJid.uFull().toHtmlEscaped()).arg(pItem.priority));
 
 				if (!pItem.status.isEmpty())
-					AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_STATUS_TEXT+orderShift,Qt::escape(pItem.status).replace('\n',"<br>"));
+					AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_STATUS_TEXT+orderShift,pItem.status.toHtmlEscaped().replace('\n',"<br>"));
 
 				if (resIndex < metaPresences.count()-1)
 					AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_MIDDLELINE+orderShift,"<hr>");
@@ -2399,5 +2400,3 @@ void MetaContacts::onShortcutActivated(const QString &AId, QWidget *AWidget)
 		}
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_metacontacts, MetaContacts)

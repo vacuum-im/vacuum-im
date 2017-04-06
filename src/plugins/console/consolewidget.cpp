@@ -161,13 +161,8 @@ void ConsoleWidget::colorXml(QString &AXml) const
 		{ "\n",                                 "<br>"                                          ,                     false      },
 		{ "&lt;([\\w:-]+)((\\s|/|&gt))",        "&lt;<span style='color:navy;'>\\1</span>\\2"   ,                     false      },   //open tagName
 		{ "&lt;/([\\w:-]+)&gt;",                "&lt;/<span style='color:navy;'>\\1</span>&gt;" ,                     false      },   //close tagName
-#if QT_VERSION <= 0x040503
-		{ "\\sxmlns\\s?=\\s?\"(.+)\"",          " <u><span style='color:darkred;'>xmlns</span>=\"<i>\\1</i>\"</u>",   true       },   //xmlns
-		{ "\\s([\\w:-]+\\s?)=\\s?\"",           " <span style='color:darkred;'>\\1</span>=\"",                        false      }    //attribute
-#else
 		{ "\\sxmlns\\s?=\\s?&quot;(.+)&quot;",  " <u><span style='color:darkred;'>xmlns</span>=\"<i>\\1</i>\"</u>",   true       },   //xmlns
 		{ "\\s([\\w:-]+\\s?)=\\s?&quot;",       " <span style='color:darkred;'>\\1</span>=\"",                        false      }    //attribute
-#endif
 	};
 	static const int changesCount = sizeof(changes)/sizeof(changes[0]);
 
@@ -197,18 +192,18 @@ void ConsoleWidget::showStanza(IXmppStream *AXmppStream, const Stanza &AStanza, 
 
 		if (accepted)
 		{
-			static QString sentHeader = Qt::escape(">>>>") + " <b>%1</b> %2 +%3 " + Qt::escape(">>>>");
-			static QString recvHeader = Qt::escape("<<<<") + " <b>%1</b> %2 +%3 " + Qt::escape("<<<<");
+			static QString sentHeader =   QString(">>>>").toHtmlEscaped() + " <b>%1</b> %2 +%3 " + QString(">>>>").toHtmlEscaped();
+			static QString recvHeader = QString("<<<<").toHtmlEscaped() + " <b>%1</b> %2 +%3 " + QString("<<<<").toHtmlEscaped();
 
 			int delta = FTimePoint.isValid() ? FTimePoint.msecsTo(QTime::currentTime()) : 0;
 			FTimePoint = QTime::currentTime();
 
-			QString header = (ASent ? sentHeader : recvHeader).arg(Qt::escape(AXmppStream->streamJid().uFull())).arg(FTimePoint.toString()).arg(delta);
+			QString header = (ASent ? sentHeader : recvHeader).arg(AXmppStream->streamJid().uFull().toHtmlEscaped()).arg(FTimePoint.toString()).arg(delta);
 			ui.tbrConsole->append(header);
 
 			QString xml = AStanza.toString(2);
 			hidePasswords(xml);
-			xml = "<pre>"+Qt::escape(xml).replace('\n',"<br>")+"</pre>";
+			xml = "<pre>"+xml.toHtmlEscaped().replace('\n',"<br>")+"</pre>";
 			if (ui.chbHilightXML->checkState() == Qt::Checked)
 				colorXml(xml);
 			else if (ui.chbHilightXML->checkState()==Qt::PartiallyChecked && xml.size()<5000)

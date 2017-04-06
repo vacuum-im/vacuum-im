@@ -1,6 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="ru" sourcelanguage="en">
+<TS version="2.1" language="ru" sourcelanguage="en">
+<context>
+    <name>Account</name>
+    <message>
+        <source>Enter password for account &lt;b&gt;%1&lt;/b&gt;</source>
+        <translation>Введите пароль для аккаунта &lt;b&gt;%1&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Account Password</source>
+        <translation>Пароль аккаунта</translation>
+    </message>
+</context>
+<context>
+    <name>AccountItemWidget</name>
+    <message>
+        <source>Settings...</source>
+        <translation>Настройки...</translation>
+    </message>
+</context>
 <context>
     <name>Account</name>
     <message>

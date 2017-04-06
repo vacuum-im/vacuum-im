@@ -836,5 +836,3 @@ void ServerMessageArchive::onServerModificationsLoaded(const QString &AId, const
 		}
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_servermessagearchive, ServerMessageArchive)

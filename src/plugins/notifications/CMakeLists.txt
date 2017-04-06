@@ -8,6 +8,7 @@ include("notifications.cmake")
 include("${CMAKE_SOURCE_DIR}/src/plugins/plugins.cmake")
 
 if (IS_ENABLED)
+	qt5_use_modules(${PLUGIN_NAME} Multimedia)
 	if (APPLE)
 		file(COPY "${CMAKE_SOURCE_DIR}/resources/sounds"
 			DESTINATION "${CMAKE_BINARY_DIR}/${INSTALL_RESOURCES}"

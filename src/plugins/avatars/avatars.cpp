@@ -1075,5 +1075,3 @@ void Avatars::onOptionsChanged(const OptionsNode &ANode)
 		emit rosterLabelChanged(FAvatarLabelId,NULL);
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_avatars, Avatars)

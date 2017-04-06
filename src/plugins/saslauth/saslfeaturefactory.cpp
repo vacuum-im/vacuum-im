@@ -138,5 +138,3 @@ void SASLFeatureFactory::onFeatureDestroyed()
 		emit featureDestroyed(feature);
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_saslauth, SASLFeatureFactory)

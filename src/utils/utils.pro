@@ -1,10 +1,11 @@
 include(../make/config.inc)
 
-TARGET             = $$VACUUM_UTILS_NAME
 TEMPLATE           = lib
+TARGET             = $$VACUUM_UTILS_NAME
 VERSION            = $$VACUUM_UTILS_ABI
+
 CONFIG            += dll
-QT                += xml network
+QT                += widgets xml network
 DEFINES           += UTILS_DLL QXT_STATIC
 
 DEPENDPATH        += ..
@@ -21,6 +22,7 @@ LIBS              += -lqxtglobalshortcut -lidle -lidn -lminizip -lzlib
 macx {
   QMAKE_LFLAGS    += -framework Carbon -framework IOKit -framework Cocoa
 } else:unix:!haiku {
+  QT              += gui-private
   LIBS            += -lXss
   CONFIG          += x11
 } else:win32 {

@@ -360,5 +360,3 @@ void SocksStreams::onServerConnectionDisconnected()
 		LOG_INFO(QString("Socks local connection disconnected, address=%1").arg(tcpsocket->peerAddress().toString()));
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_socksstreams, SocksStreams);

@@ -1,13 +1,16 @@
 #################
 ## Vacuum-IM
 #################
+*.dll
+*.exe
 /VacuumIM/
 /plugins/*
 /src/libs/*
 gitinfo.h
 vacuum
-txprepare
+vacuum.vc.*
 autotranslate
+txprepare
 
 
 #################
@@ -91,6 +94,9 @@ build/
 *.pidb
 *.log
 *.scc
+*.embed.manifest
+*_manifest.rc
+*_manifest.res
 
 # Visual C++ cache files
 ipch/
@@ -179,6 +185,7 @@ UpgradeLog*.htm
 # SQL Server files
 App_Data/*.mdf
 App_Data/*.ldf
+
 
 #############
 ## Windows detritus

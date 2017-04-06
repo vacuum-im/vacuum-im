@@ -78,5 +78,3 @@ void ConsolePlugin::onShowXMLConsole(bool)
 	FCleanupHandler.add(widget);
 	widget->show();
 }
-
-Q_EXPORT_PLUGIN2(plg_console, ConsolePlugin)

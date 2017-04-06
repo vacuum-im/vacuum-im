@@ -55,7 +55,7 @@ void ConnectionOptionsWidget::setEngineById(const QString &AEngineId)
 		{
 			delete FEngineSettings->instance();
 			FEngineSettings = NULL;
-			FEngineId = QUuid();
+			FEngineId = QUuid().toString();
 		}
 
 		IConnectionEngine *engine = FManager->findConnectionEngine(AEngineId);
@@ -82,5 +82,5 @@ void ConnectionOptionsWidget::onComboConnectionsChanged(int AIndex)
 	if (AIndex != -1)
 		setEngineById(ui.cmbConnections->itemData(AIndex).toString());
 	else
-		setEngineById(QUuid());
+		setEngineById(QUuid().toString());
 }

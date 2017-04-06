@@ -1453,7 +1453,7 @@ void MessageArchiver::registerArchiveEngine(IArchiveEngine *AEngine)
 {
 	if (AEngine!=NULL && !FArchiveEngines.contains(AEngine->engineId()))
 	{
-		LOG_DEBUG(QString("Archive engine registered, id=%1, name=%2").arg(AEngine->engineId(),AEngine->engineName()));
+		LOG_DEBUG(QString("Archive engine registered, id=%1, name=%2").arg(AEngine->engineId().toString(),AEngine->engineName()));
 		connect(AEngine->instance(),SIGNAL(capabilitiesChanged(const Jid &)),
 			SLOT(onEngineCapabilitiesChanged(const Jid &)));
 		connect(AEngine->instance(),SIGNAL(requestFailed(const QString &, const XmppError &)),
@@ -2911,5 +2911,3 @@ void MessageArchiver::onOptionsChanged(const OptionsNode &ANode)
 		emit totalCapabilitiesChanged(Jid::null);
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_messagearchiver, MessageArchiver)

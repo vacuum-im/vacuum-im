@@ -597,5 +597,3 @@ void Registration::onRegisterActionTriggered(bool)
 		showRegisterDialog(streamJid,serviceJid,operation,NULL);
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_registration, Registration)

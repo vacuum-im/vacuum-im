@@ -38,6 +38,7 @@ class NormalMessageHandler :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IOptionsDialogHolder IXmppUriHandler IMessageHandler IRostersClickHooker IMessageEditSendHandler);
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.NormalMessageHandler");
 public:
 	NormalMessageHandler();
 	~NormalMessageHandler();

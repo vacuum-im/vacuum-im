@@ -1,6 +1,7 @@
 #include "editwidget.h"
 
 #include <QKeyEvent>
+#include <QMimeData>
 #include <definitions/actiongroups.h>
 #include <definitions/optionvalues.h>
 #include <definitions/resources.h>

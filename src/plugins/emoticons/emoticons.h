@@ -25,6 +25,7 @@ class Emoticons :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IEmoticons IMessageWriter IOptionsDialogHolder IMessageEditContentsHandler);
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.Emoticons");
 public:
 	Emoticons();
 	~Emoticons();

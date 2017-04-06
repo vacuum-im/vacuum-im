@@ -799,5 +799,3 @@ void VCardManager::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AIt
 		}
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_vcard, VCardManager)

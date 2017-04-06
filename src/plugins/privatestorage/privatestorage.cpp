@@ -380,5 +380,3 @@ void PrivateStorage::onPresenceAboutToClose(IPresence *APresence, int AShow, con
 		emit storageNotifyAboutToClose(APresence->streamJid());
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_privatestorage, PrivateStorage)

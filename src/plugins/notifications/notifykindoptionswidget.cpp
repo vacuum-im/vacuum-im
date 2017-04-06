@@ -39,21 +39,21 @@ NotifyKindOptionsWidget::NotifyKindOptionsWidget(INotifications *ANotifications,
 
 	tbwNotifies->setColumnCount(NTC__COUNT);
 	tbwNotifies->setHorizontalHeaderLabels(QStringList() << tr("Event") << "" << "" << "" << "" );
-	tbwNotifies->horizontalHeader()->setResizeMode(NTC_TYPE,QHeaderView::Stretch);
+	tbwNotifies->horizontalHeader()->setSectionResizeMode(NTC_TYPE,QHeaderView::Stretch);
 
-	tbwNotifies->horizontalHeader()->setResizeMode(NTC_SOUND,QHeaderView::ResizeToContents);
+	tbwNotifies->horizontalHeader()->setSectionResizeMode(NTC_SOUND,QHeaderView::ResizeToContents);
 	tbwNotifies->horizontalHeaderItem(NTC_SOUND)->setToolTip(tr("Play sound at the notification"));
 	tbwNotifies->horizontalHeaderItem(NTC_SOUND)->setIcon(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_NOTIFICATIONS_SOUNDPLAY));
 
-	tbwNotifies->horizontalHeader()->setResizeMode(NTC_POPUP,QHeaderView::ResizeToContents);
+	tbwNotifies->horizontalHeader()->setSectionResizeMode(NTC_POPUP,QHeaderView::ResizeToContents);
 	tbwNotifies->horizontalHeaderItem(NTC_POPUP)->setToolTip(tr("Display a notification in popup window"));
 	tbwNotifies->horizontalHeaderItem(NTC_POPUP)->setIcon(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_NOTIFICATIONS_PUPUPWINDOW));
 
-	tbwNotifies->horizontalHeader()->setResizeMode(NTC_MINIMIZED,QHeaderView::ResizeToContents);
+	tbwNotifies->horizontalHeader()->setSectionResizeMode(NTC_MINIMIZED,QHeaderView::ResizeToContents);
 	tbwNotifies->horizontalHeaderItem(NTC_MINIMIZED)->setToolTip(tr("Show the corresponding window minimized in the taskbar"));
 	tbwNotifies->horizontalHeaderItem(NTC_MINIMIZED)->setIcon(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_NOTIFICATIONS_SHOWMINIMIZED));
 
-	tbwNotifies->horizontalHeader()->setResizeMode(NTC_TRAY,QHeaderView::ResizeToContents);
+	tbwNotifies->horizontalHeader()->setSectionResizeMode(NTC_TRAY,QHeaderView::ResizeToContents);
 	tbwNotifies->horizontalHeaderItem(NTC_TRAY)->setToolTip(tr("Display a notification icon in the system tray"));
 	tbwNotifies->horizontalHeaderItem(NTC_TRAY)->setIcon(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_NOTIFICATIONS_TRAYICON));
 
@@ -119,7 +119,7 @@ NotifyKindOptionsWidget::NotifyKindOptionsWidget(INotifications *ANotifications,
 		tray->setCheckState(Qt::Unchecked);
 		tbwNotifies->setItem(row,NTC_TRAY,tray);
 
-		tbwNotifies->verticalHeader()->setResizeMode(row,QHeaderView::ResizeToContents);
+		tbwNotifies->verticalHeader()->setSectionResizeMode(row,QHeaderView::ResizeToContents);
 	}
 
 	reset();

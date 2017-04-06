@@ -3,7 +3,7 @@
 #include <QSet>
 #include <QDir>
 #include <QComboBox>
-#include <QDesktopServices>
+#include <QStandardPaths>
 #include <definitions/namespaces.h>
 #include <definitions/menuicons.h>
 #include <definitions/resources.h>
@@ -115,7 +115,7 @@ bool FileStreamsManager::initObjects()
 bool FileStreamsManager::initSettings()
 {
 	QStringList availMethods = FDataManager!=NULL ? FDataManager->methods() : QStringList();
-	Options::setDefaultValue(OPV_FILESTREAMS_DEFAULTDIR,QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation));
+	Options::setDefaultValue(OPV_FILESTREAMS_DEFAULTDIR,QStandardPaths::writableLocation(QStandardPaths::DownloadLocation));
 	Options::setDefaultValue(OPV_FILESTREAMS_GROUPBYSENDER,false);
 	Options::setDefaultValue(OPV_FILESTREAMS_DEFAULTMETHOD,NS_SOCKS5_BYTESTREAMS);
 	Options::setDefaultValue(OPV_FILESTREAMS_ACCEPTABLEMETHODS,availMethods);
@@ -377,5 +377,3 @@ void FileStreamsManager::onProfileClosed(const QString &AName)
 	foreach(IFileStream *stream, FStreams.values())
 		delete stream->instance();
 }
-
-Q_EXPORT_PLUGIN2(plg_filestreamsmanager, FileStreamsManager);

@@ -1335,5 +1335,3 @@ void StatusChanger::onNotificationActivated(int ANotifyId)
 	if (FNotifyId.values().contains(ANotifyId))
 		FNotifications->removeNotification(ANotifyId);
 }
-
-Q_EXPORT_PLUGIN2(plg_statuschanger, StatusChanger)

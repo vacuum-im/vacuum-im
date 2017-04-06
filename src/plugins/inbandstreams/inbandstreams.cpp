@@ -130,5 +130,3 @@ void InBandStreams::loadMethodSettings(IDataStreamSocket *ASocket, const Options
 		REPORT_ERROR("Failed to load inband stream settings: Invalid socket");
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_inbandstreams, InBandStreams);

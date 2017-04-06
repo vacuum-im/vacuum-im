@@ -1,6 +1,7 @@
 #include "rosterchanger.h"
 
 #include <QMap>
+#include <QMimeData>
 #include <QDropEvent>
 #include <QMessageBox>
 #include <QInputDialog>
@@ -636,7 +637,7 @@ bool RosterChanger::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, c
 		if (roster && roster->isOpen() && roster->hasItem(AContactJid))
 		{
 			if (QMessageBox::question(NULL, tr("Remove contact"),
-				tr("Are you sure you wish to remove a contact <b>%1</b> from the roster?").arg(Qt::escape(AContactJid.uBare())),
+				tr("Are you sure you wish to remove a contact <b>%1</b> from the roster?").arg(AContactJid.uBare().toHtmlEscaped()),
 				QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
 			{
 				roster->removeItem(AContactJid);
@@ -651,7 +652,7 @@ bool RosterChanger::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, c
 		if (roster && roster->isOpen() && ritem.subscription!=SUBSCRIPTION_BOTH && ritem.subscription!=SUBSCRIPTION_TO)
 		{
 			if (QMessageBox::question(NULL, tr("Subscribe for contact presence"),
-				tr("Are you sure you wish to subscribe for a contact <b>%1</b> presence?").arg(Qt::escape(AContactJid.uBare())),
+				tr("Are you sure you wish to subscribe for a contact <b>%1</b> presence?").arg(AContactJid.uBare().toHtmlEscaped()),
 				QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
 			{
 				roster->sendSubscription(AContactJid, IRoster::Subscribe);
@@ -666,7 +667,7 @@ bool RosterChanger::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, c
 		if (roster && roster->isOpen() && ritem.subscription!=SUBSCRIPTION_NONE && ritem.subscription!=SUBSCRIPTION_FROM)
 		{
 			if (QMessageBox::question(NULL, tr("Unsubscribe from contact presence"),
-				tr("Are you sure you wish to unsubscribe from a contact <b>%1</b> presence?").arg(Qt::escape(AContactJid.uBare())),
+				tr("Are you sure you wish to unsubscribe from a contact <b>%1</b> presence?").arg(AContactJid.uBare().toHtmlEscaped()),
 				QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
 			{
 				roster->sendSubscription(AContactJid, IRoster::Unsubscribe);
@@ -1082,7 +1083,7 @@ void RosterChanger::renameContact(const Jid &AStreamJid, const Jid &AContactJid,
 	IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(AStreamJid) : NULL;
 	if (roster && roster->isOpen() && roster->hasItem(AContactJid))
 	{
-		QString newName = QInputDialog::getText(NULL,tr("Rename Contact"),tr("Enter name for: <b>%1</b>").arg(Qt::escape(AContactJid.uBare())),QLineEdit::Normal,AOldName);
+		QString newName = QInputDialog::getText(NULL,tr("Rename Contact"),tr("Enter name for: <b>%1</b>").arg(AContactJid.uBare().toHtmlEscaped()),QLineEdit::Normal,AOldName);
 		if (!newName.isEmpty() && newName!=AOldName)
 			roster->renameItem(AContactJid,newName);
 	}
@@ -1178,7 +1179,7 @@ void RosterChanger::removeContactsFromRoster(const QStringList &AStreams, const 
 			if (!ritem.isNull())
 			{
 				button = QMessageBox::question(NULL,tr("Remove Contact"),
-					tr("Are you sure you wish to remove a contact <b>%1</b> from the roster?").arg(Qt::escape(name)),
+					tr("Are you sure you wish to remove a contact <b>%1</b> from the roster?").arg(name.toHtmlEscaped()),
 					QMessageBox::Yes | QMessageBox::No);
 			}
 			else 
@@ -2030,5 +2031,3 @@ void RosterChanger::onSubscriptionDialogDestroyed()
 			FNotifications->removeNotification(notifyId);
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_rosterchanger, RosterChanger)

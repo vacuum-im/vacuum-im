@@ -1,7 +1,6 @@
 #include "sessionnegotiation.h"
 
 #include <QUuid>
-#include <QTextDocument>
 #include <QCryptographicHash>
 #include <definitions/namespaces.h>
 #include <definitions/dataformtypes.h>
@@ -1423,5 +1422,3 @@ void SessionNegotiation::onDiscoInfoRecieved(const IDiscoInfo &AInfo)
 			resumeSession(session.streamJid,session.contactJid);
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_sessionnegotiation, SessionNegotiation)

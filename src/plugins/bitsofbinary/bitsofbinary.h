@@ -20,6 +20,7 @@ class BitsOfBinary :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IBitsOfBinary IXmppStanzaHadler IStanzaHandler IStanzaRequestOwner);
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.BitsOfBinary");
 public:
 	BitsOfBinary();
 	~BitsOfBinary();

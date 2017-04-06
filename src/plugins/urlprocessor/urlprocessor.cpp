@@ -77,5 +77,3 @@ void UrlProcessor::onProxyAuthenticationRequired(const QNetworkProxy &AProxy, QA
 	AAuth->setUser(AProxy.user());
 	AAuth->setPassword(AProxy.password());
 }
-
-Q_EXPORT_PLUGIN2(plg_urlprocessor, UrlProcessor)

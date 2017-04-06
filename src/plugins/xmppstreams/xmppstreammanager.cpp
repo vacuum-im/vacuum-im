@@ -206,5 +206,3 @@ void XmppStreamManager::onXmppStreamDestroyed()
 		LOG_STRM_INFO(stream->streamJid(),"XMPP stream destroyed");
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_xmppstreams, XmppStreamManager)

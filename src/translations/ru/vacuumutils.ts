@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="ru" sourcelanguage="en">
+<TS version="2.1" language="ru" sourcelanguage="en">
+<context>
+    <name>PasswordDialog</name>
+    <message>
+        <source>Enter password:</source>
+        <translation>Введите пароль:</translation>
+    </message>
+    <message>
+        <source>Save password</source>
+        <translation>Сохранить пароль</translation>
+    </message>
+</context>
 <context>
     <name>PasswordDialog</name>
     <message>

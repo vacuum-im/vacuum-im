@@ -1,5 +1,6 @@
 #include "rosteritemexchange.h"
 
+#include <QMimeData>
 #include <QDropEvent>
 #include <QDataStream>
 #include <QMessageBox>
@@ -581,11 +582,7 @@ void RosterItemExchange::processRequest(const IRosterExchangeRequest &ARequest)
 			{
 				if (ritem.isNull())
 					approveList.append(*it);
-#if QT_VERSION >= QT_VERSION_CHECK(4,6,0)
 				else if (!it->groups.isEmpty() && !ritem.groups.contains(it->groups))
-#else
-				else if (!it->groups.isEmpty())
-#endif
 					approveList.append(*it);
 			}
 			else if (!ritem.isNull() && it->action==ROSTEREXCHANGE_ACTION_DELETE)
@@ -698,11 +695,7 @@ bool RosterItemExchange::applyRequest(const IRosterExchangeRequest &ARequest, bo
 							roster->sendSubscription(it->itemJid,IRoster::Subscribe);
 					}
 				}
-#if QT_VERSION >= QT_VERSION_CHECK(4,6,0)
 				else if (!it->groups.isEmpty() && !ritem.groups.contains(it->groups))
-#else
-				else if (!it->groups.isEmpty())
-#endif
 				{
 					applied = true;
 					roster->setItem(ritem.itemJid,ritem.name,ritem.groups+it->groups);
@@ -859,5 +852,3 @@ void RosterItemExchange::onExchangeApproveDialogDestroyed()
 		FNotifications->removeNotification(notifyId);
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_rosteritemexchange, RosterItemExchange)

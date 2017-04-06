@@ -237,5 +237,3 @@ void PresenceManager::onXmppStreamActiveChanged(IXmppStream *AXmppStream, bool A
 		destroyPresence(presence);
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_presence, PresenceManager)

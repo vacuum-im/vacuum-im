@@ -786,5 +786,3 @@ void ClientInfo::onOptionsChanged(const OptionsNode &ANode)
 		FDiscovery->updateSelfEntityCapabilities();
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_clientinfo, ClientInfo)

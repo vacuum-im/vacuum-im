@@ -2,6 +2,18 @@
 #include <QApplication>
 #include "pluginmanager.h"
 
+#ifndef NO_WEBENGINE
+#  include <QtWebEngine/QtWebEngine>
+#endif
+
+static const char *ext_argv[] = {
+#ifndef NO_WEBENGINE
+	"--disable-web-security",            // Command line argument to enable local content in QWebEngine
+#endif
+	"DUMMY"
+};
+static const int ext_argc = sizeof(ext_argv)/sizeof(ext_argv[0]) - 1;
+
 int main(int argc, char *argv[])
 {
 #ifdef Q_OS_MACX
@@ -11,10 +23,23 @@ int main(int argc, char *argv[])
 		QFont::insertSubstitution(".Helvetica Neue DeskInterface", "Helvetica Neue");
 	}
 #endif
-	QApplication app(argc, argv);
+
+	// Extend command line arguments
+	int all_argc = argc + ext_argc;
+	char **all_argv = new char*[all_argc];
+	memcpy(all_argv, argv, sizeof(char *) * argc);
+	memcpy(all_argv + argc, ext_argv, sizeof(char *) * ext_argc);
+
+	QApplication::setAttribute(Qt::AA_EnableHighDpiScaling,true);
+	QApplication::setAttribute(Qt::AA_DontShowIconsInMenus,false);
+
+	QApplication app(all_argc, all_argv);
 	app.setQuitOnLastWindowClosed(false);
 	app.addLibraryPath(app.applicationDirPath());
-	app.setAttribute(Qt::AA_DontShowIconsInMenus,false);
+
+#ifndef NO_WEBENGINE
+	QtWebEngine::initialize();
+#endif
 
 	QLibrary utils(app.applicationDirPath()+"/utils",&app);
 	utils.load();

@@ -193,16 +193,16 @@ void DefaultConnectionEngine::onConnectionSSLErrorsOccured(const QList<QSslError
 				certInfo += tr("Certificate holder:");
 				for (uint i=0; i<certInfoNamesCount; i++)
 				{
-					QString value = peerCert.subjectInfo(certInfoNames[i].info);
+					QString value = peerCert.subjectInfo(certInfoNames[i].info).join("; ");
 					if (!value.isEmpty())
-						certInfo += "   " + certInfoNames[i].name.arg(Qt::escape(value));
+						certInfo += "   " + certInfoNames[i].name.arg((value).toHtmlEscaped());
 				}
 				certInfo += "\n" + tr("Certificate issuer:");
 				for (uint i=0; i<certInfoNamesCount; i++)
 				{
-					QString value = peerCert.issuerInfo(certInfoNames[i].info);
+					QString value = peerCert.issuerInfo(certInfoNames[i].info).join("; ");
 					if (!value.isEmpty())
-						certInfo += "   " + certInfoNames[i].name.arg(Qt::escape(value));
+						certInfo += "   " + certInfoNames[i].name.arg((value).toHtmlEscaped());
 				}
 				certInfo += "\n" + tr("Certificate details:");
 				certInfo += "   " + tr("Effective from: %1").arg(peerCert.effectiveDate().date().toString());
@@ -264,5 +264,3 @@ void DefaultConnectionEngine::onConnectionDestroyed()
 		emit connectionDestroyed(connection);
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_defaultconnection, DefaultConnectionEngine)

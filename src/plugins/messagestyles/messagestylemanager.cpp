@@ -340,5 +340,3 @@ void MessageStyleManager::onApplyPendingChanges()
 	}
 	FPendingChages.clear();
 }
-
-Q_EXPORT_PLUGIN2(plg_messagestylemanager, MessageStyleManager)

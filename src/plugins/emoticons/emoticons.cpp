@@ -626,5 +626,3 @@ void Emoticons::onOptionsChanged(const OptionsNode &ANode)
 		FMaxEmoticonsInMessage = ANode.value().toInt();
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_emoticons, Emoticons)

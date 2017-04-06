@@ -236,5 +236,3 @@ void MessageCarbons::onDiscoInfoReceived(const IDiscoInfo &AInfo)
 			setEnabled(AInfo.streamJid,true);
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_messagecarbons, MessageCarbons)

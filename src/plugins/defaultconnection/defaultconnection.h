@@ -1,9 +1,15 @@
 #ifndef DEFAULTCONNECTION_H
 #define DEFAULTCONNECTION_H
 
+#include <QDnsLookup>
+#include <definitions/internalerrors.h>
 #include <interfaces/idefaultconnection.h>
-#include <thirdparty/jdns/qjdns.h>
 #include <utils/xmpperror.h>
+
+struct SrvRecord {
+	QString target;
+	quint16 port;
+};
 
 class DefaultConnection :
 	public QObject,
@@ -59,9 +65,7 @@ signals:
 protected:
 	void connectToNextHost();
 protected slots:
-	void onDnsResultsReady(int AId, const QJDns::Response &AResults);
-	void onDnsError(int AId, QJDns::Error AError);
-	void onDnsShutdownFinished();
+	void onDnsLookupFinished();
 	void onSocketProxyAuthenticationRequired(const QNetworkProxy &AProxy, QAuthenticator *AAuth);
 	void onSocketConnected();
 	void onSocketEncrypted();
@@ -72,10 +76,8 @@ protected slots:
 private:
 	IConnectionEngine *FEngine;
 private:
-	QJDns FDns;
-	int FSrvQueryId;
-	QList<QJDns::Record> FRecords;
-private:
+	QDnsLookup FDnsLookup;
+	QList<SrvRecord> FRecords;
 	bool FSSLError;
 	bool FDisconnecting;
 	QSslSocket FSocket;

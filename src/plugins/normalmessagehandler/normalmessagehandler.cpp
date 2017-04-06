@@ -748,7 +748,7 @@ void NormalMessageHandler::setMessageStyle(IMessageNormalWindow *AWindow)
 void NormalMessageHandler::fillContentOptions(IMessageNormalWindow *AWindow, IMessageStyleContentOptions &AOptions) const
 {
 	AOptions.senderId = AWindow->contactJid().pFull();
-	AOptions.senderName = Qt::escape(FMessageStyleManager->contactName(AWindow->streamJid(),AWindow->contactJid()));
+	AOptions.senderName = FMessageStyleManager->contactName(AWindow->streamJid(),AWindow->contactJid()).toHtmlEscaped();
 	AOptions.senderAvatar = FMessageStyleManager->contactAvatar(AWindow->contactJid());
 	AOptions.senderIcon = FMessageStyleManager->contactIcon(AWindow->streamJid(),AWindow->contactJid());
 }
@@ -772,7 +772,7 @@ void NormalMessageHandler::showStyledMessage(IMessageNormalWindow *AWindow, cons
 	{
 		XmppStanzaError err(AMessage.stanza());
 		QString html = tr("<b>The message with a error is received</b>");
-		html += "<p style='color:red;'>"+Qt::escape(err.errorMessage())+"</p>";
+		html += "<p style='color:red;'>"+err.errorMessage().toHtmlEscaped()+"</p>";
 		html += "<hr>";
 		options.kind = IMessageStyleContentOptions::KindMessage;
 		AWindow->viewWidget()->appendHtml(html,options);
@@ -1175,5 +1175,3 @@ void NormalMessageHandler::onStyleOptionsChanged(const IMessageStyleOptions &AOp
 		}
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_normalmessagehandler, NormalMessageHandler)

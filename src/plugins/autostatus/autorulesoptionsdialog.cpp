@@ -193,11 +193,11 @@ AutoRulesOptionsDialog::AutoRulesOptionsDialog(IAutoStatus *AAutoStatus, IStatus
 	connect(tbwRules,SIGNAL(itemSelectionChanged()),SLOT(onRuledItemSelectionChanged()));
 
 	tbwRules->setHorizontalHeaderLabels(QStringList() << QString::null << tr("Time") << tr("Status") << tr("Text") << tr("Priority"));
-	tbwRules->horizontalHeader()->setResizeMode(RTC_ENABLED,QHeaderView::ResizeToContents);
-	tbwRules->horizontalHeader()->setResizeMode(RTC_TIME,QHeaderView::ResizeToContents);
-	tbwRules->horizontalHeader()->setResizeMode(RTC_SHOW,QHeaderView::ResizeToContents);
-	tbwRules->horizontalHeader()->setResizeMode(RTC_TEXT,QHeaderView::Stretch);
-	tbwRules->horizontalHeader()->setResizeMode(RTC_PRIORITY,QHeaderView::ResizeToContents);
+	tbwRules->horizontalHeader()->setSectionResizeMode(RTC_ENABLED,QHeaderView::ResizeToContents);
+	tbwRules->horizontalHeader()->setSectionResizeMode(RTC_TIME,QHeaderView::ResizeToContents);
+	tbwRules->horizontalHeader()->setSectionResizeMode(RTC_SHOW,QHeaderView::ResizeToContents);
+	tbwRules->horizontalHeader()->setSectionResizeMode(RTC_TEXT,QHeaderView::Stretch);
+	tbwRules->horizontalHeader()->setSectionResizeMode(RTC_PRIORITY,QHeaderView::ResizeToContents);
 	tbwRules->horizontalHeader()->setHighlightSections(false);
 
 	dbbButtonBox = new QDialogButtonBox(this);

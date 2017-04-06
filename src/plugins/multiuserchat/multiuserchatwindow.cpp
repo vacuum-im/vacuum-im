@@ -6,6 +6,7 @@
 #include <QInputDialog>
 #include <QCoreApplication>
 #include <QContextMenuEvent>
+#include <QUrlQuery>
 #include <definitions/namespaces.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
@@ -367,9 +368,9 @@ bool MultiUserChatWindow::messageViewUrlOpen(int AOrder, IMessageViewWidget *AWi
 			const struct { QString var; QString value; } fileds[] =
 			{
 				{ "FORM_TYPE",         QString(DFT_MUC_REQUEST)  },
-				{ "muc#role",          AUrl.queryItemValue("role")     },
-				{ "muc#jid",           AUrl.queryItemValue("jid")      },
-				{ "muc#roomnick",      AUrl.queryItemValue("roomnick") },
+				{ "muc#role",          QUrlQuery(AUrl).queryItemValue("role")     },
+				{ "muc#jid",           QUrlQuery(AUrl).queryItemValue("jid")      },
+				{ "muc#roomnick",      QUrlQuery(AUrl).queryItemValue("roomnick") },
 				{ "muc#request_allow", QString("true")                 },
 				{ QString::null,       QString::null                   }
 			};
@@ -385,12 +386,12 @@ bool MultiUserChatWindow::messageViewUrlOpen(int AOrder, IMessageViewWidget *AWi
 			}
 
 			Message message;
-			message.setTo(FMultiChat->roomJid().bare()).setId(AUrl.queryItemValue("id"));
+			message.setTo(FMultiChat->roomJid().bare()).setId(QUrlQuery(AUrl).queryItemValue("id"));
 			
 			QDomElement formElem = message.stanza().element();
 			FDataForms->xmlForm(form,formElem);
 			
-			QString nick = AUrl.queryItemValue("roomnick");
+			QString nick = QUrlQuery(AUrl).queryItemValue("roomnick");
 			IMultiUser *user = FMultiChat->findUser(nick);
 
 			if (user == NULL)
@@ -489,15 +490,17 @@ bool MultiUserChatWindow::messageDisplay(const Message &AMessage, int ADirection
 				displayed = true;
 
 				QUrl grantUrl;
+				QUrlQuery grantQuery;
 				grantUrl.setScheme(MUC_URL_SCHEME);
 				grantUrl.setPath(user->userJid().full());
 				grantUrl.setFragment(MUC_URL_GRANT_VOICE);
-				grantUrl.addQueryItem("id",AMessage.id());
-				grantUrl.addQueryItem("jid",reqJid.full());
-				grantUrl.addQueryItem("role",reqRole);
-				grantUrl.addQueryItem("roomnick",reqNick);
+				grantQuery.addQueryItem("id",AMessage.id());
+				grantQuery.addQueryItem("jid",reqJid.full());
+				grantQuery.addQueryItem("role",reqRole);
+				grantQuery.addQueryItem("roomnick",reqNick);
+				grantUrl.setQuery(grantQuery);
 
-				QString html = tr("User %1 requests a voice in the conference, %2").arg(Qt::escape(reqNick),QString("<a href='%1'>%2</a>").arg(grantUrl.toString(),tr("Grant Voice")));
+				QString html = tr("User %1 requests a voice in the conference, %2").arg(reqNick.toHtmlEscaped(),QString("<a href='%1'>%2</a>").arg(grantUrl.toString(),tr("Grant Voice")));
 				showHTMLStatusMessage(FViewWidget,html,IMessageStyleContentOptions::TypeNotification);
 			}
 		}
@@ -981,10 +984,10 @@ void MultiUserChatWindow::toolTipsForUser(IMultiUser *AUser, QMap<int,QString> &
 			AToolTips.insert(MUTTO_MULTIUSERCHAT_AVATAR,avatarMask.arg(fileName).arg(imageSize.width()).arg(imageSize.height()));
 		}
 
-		AToolTips.insert(MUTTO_MULTIUSERCHAT_NICKNAME,QString("<big><b>%1</b></big>").arg(Qt::escape(AUser->nick())));
+		AToolTips.insert(MUTTO_MULTIUSERCHAT_NICKNAME,QString("<big><b>%1</b></big>").arg(AUser->nick().toHtmlEscaped()));
 
 		if (AUser->realJid().isValid())
-			AToolTips.insert(MUTTO_MULTIUSERCHAT_REALJID,tr("<b>Jabber ID:</b> %1").arg(Qt::escape(AUser->realJid().uBare())));
+			AToolTips.insert(MUTTO_MULTIUSERCHAT_REALJID,tr("<b>Jabber ID:</b> %1").arg(AUser->realJid().uBare().toHtmlEscaped()));
 
 		QString role = AUser->role();
 		if (!role.isEmpty())
@@ -996,7 +999,7 @@ void MultiUserChatWindow::toolTipsForUser(IMultiUser *AUser, QMap<int,QString> &
 				roleName = tr("Participant");
 			else if (role == MUC_ROLE_MODERATOR)
 				roleName = tr("Moderator");
-			AToolTips.insert(MUTTO_MULTIUSERCHAT_ROLE,tr("<b>Role:</b> %1").arg(Qt::escape(roleName)));
+			AToolTips.insert(MUTTO_MULTIUSERCHAT_ROLE,tr("<b>Role:</b> %1").arg(roleName.toHtmlEscaped()));
 		}
 
 		QString affiliation = AUser->affiliation();
@@ -1011,15 +1014,15 @@ void MultiUserChatWindow::toolTipsForUser(IMultiUser *AUser, QMap<int,QString> &
 				affilName = tr("Administrator");
 			else if (affiliation == MUC_AFFIL_OWNER)
 				affilName = tr("Owner");
-			AToolTips.insert(MUTTO_MULTIUSERCHAT_AFFILIATION,tr("<b>Affiliation:</b> %1").arg(Qt::escape(affilName)));
+			AToolTips.insert(MUTTO_MULTIUSERCHAT_AFFILIATION,tr("<b>Affiliation:</b> %1").arg(affilName.toHtmlEscaped()));
 		}
 
 		QString ttStatus;
 		QString statusText = AUser->presence().status;
 		QString statusName = FStatusChanger!=NULL ? FStatusChanger->nameByShow(AUser->presence().show) : QString::null;
-		ttStatus = tr("<b>Status:</b> %1").arg(Qt::escape(statusName));
+		ttStatus = tr("<b>Status:</b> %1").arg(statusName.toHtmlEscaped());
 		if (!statusText.isEmpty())
-			ttStatus +="<br>"+Qt::escape(statusText).replace('\n',"<br>");
+			ttStatus +="<br>"+statusText.toHtmlEscaped().replace('\n',"<br>");
 		AToolTips.insert(MUTTO_MULTIUSERCHAT_STATUS,ttStatus);
 
 		emit multiUserToolTips(AUser,AToolTips);
@@ -1614,7 +1617,7 @@ void MultiUserChatWindow::showMultiChatTopic(const QString &ATopic, const QStrin
 		options.timeFormat = FMessageStyleManager->timeFormat(options.time);
 
 		options.senderId = QString::null;
-		options.senderName = Qt::escape(ANick);
+		options.senderName = ANick.toHtmlEscaped();
 
 		showDateSeparator(FViewWidget,options.time);
 		FViewWidget->appendText(tr("Subject: %1").arg(ATopic),options);
@@ -1747,7 +1750,7 @@ void MultiUserChatWindow::showMultiChatUserMessage(const Message &AMessage, cons
 			options.timeFormat = FMessageStyleManager->timeFormat(options.time);
 
 		options.senderId = userJid.pFull();
-		options.senderName = Qt::escape(ANick);
+		options.senderName = ANick.toHtmlEscaped();
 		options.senderAvatar = FMessageStyleManager->contactAvatar(userJid);
 		options.senderColor = FViewWidget->messageStyle()!=NULL ? FViewWidget->messageStyle()->senderColorById(ANick) : QString::null;
 
@@ -1911,7 +1914,7 @@ void MultiUserChatWindow::fillPrivateChatContentOptions(IMessageChatWindow *AWin
 	if (AOptions.direction == IMessageStyleContentOptions::DirectionIn)
 	{
 		AOptions.senderId = AWindow->contactJid().pFull();
-		AOptions.senderName = Qt::escape(AWindow->contactJid().resource());
+		AOptions.senderName = AWindow->contactJid().resource().toHtmlEscaped();
 	}
 	else
 	{
@@ -1919,7 +1922,7 @@ void MultiUserChatWindow::fillPrivateChatContentOptions(IMessageChatWindow *AWin
 			AOptions.senderId = FMultiChat->mainUser()->userJid().pFull();
 		else
 			AOptions.senderId = FMultiChat->roomJid().pBare() + "/" + FMultiChat->nickname();
-		AOptions.senderName = Qt::escape(FMultiChat->nickname());
+		AOptions.senderName = FMultiChat->nickname().toHtmlEscaped();
 	}
 }
 
@@ -2591,7 +2594,7 @@ void MultiUserChatWindow::onMultiChatRoomDestroyed(const QString &AId, const QSt
 		exitUrl.setFragment(MUC_URL_EXIT_ROOM);
 
 		QString html = tr("This conference was destroyed by owner %1 %2")
-			.arg(!AReason.isEmpty() ? Qt::escape("("+AReason+")") : QString::null)
+			.arg(!AReason.isEmpty() ? "("+AReason.toHtmlEscaped()+")" : QString::null)
 			.arg(QString("<a href='%1'>%2</a>").arg(exitUrl.toString(),tr("exit")));
 
 		showHTMLStatusMessage(FViewWidget,html,IMessageStyleContentOptions::TypeNotification);

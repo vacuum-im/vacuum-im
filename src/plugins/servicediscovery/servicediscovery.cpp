@@ -1561,5 +1561,3 @@ void ServiceDiscovery::onSelfCapsChanged()
 	}
 	FUpdateSelfCapsStarted = false;
 }
-
-Q_EXPORT_PLUGIN2(plg_servicediscovery, ServiceDiscovery)

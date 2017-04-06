@@ -114,7 +114,6 @@ void Action::copyActionProperties(Action *ADestination, QAction *ASource)
 		ADestination->setPriority(ASource->priority());
 		ADestination->setSeparator(ASource->isSeparator());
 		ADestination->setShortcuts(ASource->shortcuts());
-		ADestination->setSoftKeyRole(ASource->softKeyRole());
 		ADestination->setStatusTip(ASource->statusTip());
 		ADestination->setText(ASource->text());
 		ADestination->setToolTip(ASource->toolTip());

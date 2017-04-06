@@ -58,7 +58,7 @@ QString AccountItemWidget::name() const
 void AccountItemWidget::setName(const QString &AName)
 {
 	FName = AName;
-	ui.lblName->setText(QString("<b>%1<b>").arg(Qt::escape(AName)));
+	ui.lblName->setText(QString("<b>%1<b>").arg(AName.toHtmlEscaped()));
 }
 
 Jid AccountItemWidget::accountJid() const

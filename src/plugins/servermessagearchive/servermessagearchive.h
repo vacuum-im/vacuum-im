@@ -53,7 +53,7 @@ struct LocalModificationsRequest {
 	IArchiveModifications modifications;
 };
 
-class ServerMessageArchive : 
+class ServerMessageArchive :
 	public QObject,
 	public IPlugin,
 	public IStanzaRequestOwner,
@@ -61,6 +61,7 @@ class ServerMessageArchive :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IStanzaRequestOwner IArchiveEngine IServerMesssageArchive);
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.ServerMesssageArchive");
 public:
 	ServerMessageArchive();
 	~ServerMessageArchive();

@@ -706,7 +706,7 @@ void ChatMessageHandler::fillContentOptions(const Jid &AStreamJid, const Jid &AC
 		AOptions.senderId = AContactJid.pFull();
 		AOptions.senderAvatar = FMessageStyleManager->contactAvatar(AContactJid);
 		AOptions.senderIcon = FMessageStyleManager->contactIcon(AStreamJid,AContactJid);
-		AOptions.senderName = Qt::escape(FMessageStyleManager->contactName(AStreamJid,AContactJid));
+		AOptions.senderName = FMessageStyleManager->contactName(AStreamJid,AContactJid).toHtmlEscaped();
 	}
 	else
 	{
@@ -714,9 +714,9 @@ void ChatMessageHandler::fillContentOptions(const Jid &AStreamJid, const Jid &AC
 		AOptions.senderAvatar = FMessageStyleManager->contactAvatar(AStreamJid);
 		AOptions.senderIcon = FMessageStyleManager->contactIcon(AStreamJid);
 		if (AStreamJid.pBare() != AContactJid.pBare())
-			AOptions.senderName = Qt::escape(FMessageStyleManager->contactName(AStreamJid));
+			AOptions.senderName = FMessageStyleManager->contactName(AStreamJid).toHtmlEscaped();
 		else
-			AOptions.senderName = Qt::escape(AStreamJid.hasResource() ? AStreamJid.resource() : AStreamJid.uNode());
+			AOptions.senderName = AStreamJid.hasResource() ? AStreamJid.resource().toHtmlEscaped() : AStreamJid.uNode().toHtmlEscaped();
 	}
 }
 
@@ -1142,5 +1142,3 @@ void ChatMessageHandler::onStyleOptionsChanged(const IMessageStyleOptions &AOpti
 		}
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_chatmessagehandler, ChatMessageHandler)

@@ -428,5 +428,3 @@ void AccountManager::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 		}
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_accountmanager, AccountManager)

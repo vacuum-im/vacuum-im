@@ -10,7 +10,7 @@
 #include <definitions/menuicons.h>
 #include <definitions/stanzahandlerorders.h>
 #include <utils/logger.h>
-
+ 
 #define SHC_PRIVACY         "/iq[@type='set']/query[@xmlns='" NS_JABBER_PRIVACY "']"
 #define SHC_ROSTER          "/iq/query[@xmlns='" NS_JABBER_ROSTER "']"
 
@@ -1692,5 +1692,3 @@ void PrivacyLists::onMultiUserChatCreated(IMultiUserChat *AMultiChat)
 {
 	setContactAutoListed(AMultiChat->streamJid(),AMultiChat->roomJid(),PRIVACY_LIST_CONFERENCES,true);
 }
-
-Q_EXPORT_PLUGIN2(plg_privacylists, PrivacyLists)

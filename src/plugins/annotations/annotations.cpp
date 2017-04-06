@@ -419,7 +419,7 @@ void Annotations::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALabe
 	{
 		QString note = AIndex->data(RDR_ANNOTATIONS).toString();
 		if (!note.isEmpty())
-			AToolTips.insert(RTTO_ANNOTATIONS, tr("<b>Annotation:</b>")+"<br>"+Qt::escape(note).replace("\n","<br>"));
+			AToolTips.insert(RTTO_ANNOTATIONS, tr("<b>Annotation:</b>")+"<br>"+note.toHtmlEscaped().replace("\n","<br>"));
 	}
 }
 
@@ -443,5 +443,3 @@ void Annotations::onEditNoteDialogDestroyed()
 	if (dialog)
 		FEditDialogs[dialog->streamJid()].remove(dialog->contactJid());
 }
-
-Q_EXPORT_PLUGIN2(plg_annotations, Annotations)

@@ -295,5 +295,3 @@ void SimpleMessageStyleEngine::onClearEmptyStyles()
 		}
 	}
 }
-
-Q_EXPORT_PLUGIN2(plg_simplemessagestyle, SimpleMessageStyleEngine)

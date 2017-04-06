@@ -2,7 +2,7 @@ include(../make/config.inc)
 
 TARGET             = $$VACUUM_LOADER_NAME
 TEMPLATE           = app
-QT                += xml
+QT                += widgets xml
 LIBS              += -L../libs
 LIBS              += -l$$VACUUM_UTILS_NAME
 DEPENDPATH        += ..
@@ -12,6 +12,11 @@ include(loader.pri)
 
 #Appication icon
 win32:RC_FILE      = loader.rc
+
+#QtWebEngine could not be initialized in plugin
+!CONFIG(no_webengine) {
+  QT              += webengine
+}
 
 #GIT Info
 GIT_HASH = $$system(git log -n 1 --format=%H)

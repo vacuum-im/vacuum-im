@@ -63,6 +63,7 @@ class MultiUserChatManager :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IMultiUserChatManager IXmppUriHandler IDiscoFeatureHandler IDataLocalizer IOptionsDialogHolder IRostersClickHooker IRecentItemHandler IStanzaHandler IStanzaRequestOwner);
+	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.MultiUserChat");
 public:
 	MultiUserChatManager();
 	~MultiUserChatManager();

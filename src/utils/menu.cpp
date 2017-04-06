@@ -105,6 +105,16 @@ QList<Action *> Menu::findActions(const QMultiHash<int, QVariant> &AData, bool A
 
 void Menu::addAction(Action *ABefore, Action *AAction, int AGroup)
 {
+#ifdef Q_OS_MAC
+	// https://bugreports.qt.io/browse/QTBUG-34160
+	QList<QWidget *> actionWidgets = AAction->associatedWidgets();
+	QList<QWidget *> menuWidgets = AAction->menu()!=NULL ? AAction->menu()->menuAction()->associatedWidgets() : QList<QWidget *>();
+	if ((!actionWidgets.isEmpty() && !actionWidgets.contains(this)) || (!menuWidgets.isEmpty() && !menuWidgets.contains(this)))
+	{
+		AAction = Action::duplicateActionAndMenu(AAction,this);
+	}
+#endif
+
 	removeAction(AAction);
 	QList<Action *> &groupActions = FActions[AGroup];
 

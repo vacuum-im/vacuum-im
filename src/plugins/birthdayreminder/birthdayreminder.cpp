@@ -399,5 +399,3 @@ void BirthdayReminder::onOptionsClosed()
 	Options::setFileValue(FNotifyDate,"birthdays.notify.date");
 	Options::setFileValue(notified,"birthdays.notify.notified");
 }
-
-Q_EXPORT_PLUGIN2(plg_birthdayreminder, BirthdayReminder)
