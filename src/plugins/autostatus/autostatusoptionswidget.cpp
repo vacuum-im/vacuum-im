@@ -24,6 +24,7 @@ AutoStatusOptionsWidget::AutoStatusOptionsWidget(IAutoStatus *AAutoStatus, IStat
 	connect(ui.chbAwayEnable,SIGNAL(stateChanged(int)),SIGNAL(modified()));
 	connect(ui.cmbAwayStatus,SIGNAL(currentIndexChanged(int)),SIGNAL(modified()));
 	connect(ui.spbAwayTime,SIGNAL(valueChanged(int)),SIGNAL(modified()));
+	connect(ui.spbAwayTime,SIGNAL(valueChanged(int)),SLOT(onCorrectOfflineTime(int)));
 	connect(ui.lneAwayText,SIGNAL(textChanged(const QString &)),SIGNAL(modified()));
 	connect(ui.chbOfflineEnable,SIGNAL(stateChanged(int)),SIGNAL(modified()));
 
@@ -51,9 +52,9 @@ void AutoStatusOptionsWidget::apply()
 
 void AutoStatusOptionsWidget::reset()
 {
-	static const QList<int> awayShows = QList<int>() 
+	static const QList<int> awayShows = QList<int>()
 		<< IPresence::Away << IPresence::DoNotDisturb << IPresence::ExtendedAway << IPresence::Invisible;
-	static const QList<int> offlineShows = QList<int>() 
+	static const QList<int> offlineShows = QList<int>()
 		<< IPresence::Offline;
 
 	QList<QUuid> availRules = FAutoStatus->rules();
@@ -79,7 +80,7 @@ void AutoStatusOptionsWidget::reset()
 		awayId = FAutoStatus->insertRule(awayRule);
 	}
 	Options::node(OPV_AUTOSTARTUS_AWAYRULE).setValue(awayId.toString());
-	
+
 	QUuid offlineId = Options::node(OPV_AUTOSTARTUS_OFFLINERULE).value().toString();
 	if (availRules.contains(offlineId))
 	{
@@ -120,37 +121,37 @@ void AutoStatusOptionsWidget::reset()
 void AutoStatusOptionsWidget::onHelpButtonClicked()
 {
   QMessageBox::information(this,tr("Auto Status"),
-    tr("You can insert date and time into auto status text:") + "\n" + \
-    tr("   %(<format>) - current date and time") + "\n" + \
-    tr("   $(<format>) - date and time you are idle form") + "\n" + \
-    tr("   #(<format>) - time you are idle for") + "\n\n" + \
-    tr("Date Format:") + "\n" + \
-    tr("   d - the day as number without a leading zero (1 to 31)") + "\n" + \
-    tr("   dd - the day as number with a leading zero (01 to 31)") + "\n" + \
-    tr("   ddd - the abbreviated localized day name (e.g. 'Mon' to 'Sun')") + "\n" + \
-    tr("   dddd - the long localized day name (e.g. 'Monday' to 'Sunday')") + "\n" + \
-    tr("   M - the month as number without a leading zero (1-12)") + "\n" + \
-    tr("   MM - the month as number with a leading zero (01-12)") + "\n" + \
-    tr("   MMM - the abbreviated localized month name (e.g. 'Jan' to 'Dec')") + "\n" + \
-    tr("   MMMM - the long localized month name (e.g. 'January' to 'December')") + "\n" + \
-    tr("   yy - the year as two digit number (00-99)") + "\n" + \
-    tr("   yyyy - the year as four digit number") + "\n\n" + \
-    tr("Time Format:") + "\n" + \
-    tr("   h - the hour without a leading zero (0 to 23 or 1 to 12 if AM/PM display)") + "\n" + \
-    tr("   hh - the hour with a leading zero (00 to 23 or 01 to 12 if AM/PM display)") + "\n" + \
-    tr("   H - the hour without a leading zero (0 to 23, even with AM/PM display)") + "\n" + \
-    tr("   HH - the hour with a leading zero (00 to 23, even with AM/PM display)") + "\n" + \
-    tr("   m - the minute without a leading zero (0 to 59)") + "\n" + \
-    tr("   mm - the minute with a leading zero (00 to 59)") + "\n" + \
-    tr("   s - the second without a leading zero (0 to 59)") + "\n" + \
-    tr("   ss - the second with a leading zero (00 to 59)") + "\n" + \
-    tr("   z - the milliseconds without leading zeroes (0 to 999)") + "\n" + \
-    tr("   zzz - the milliseconds with leading zeroes (000 to 999)") + "\n" + \
-    tr("   AP or A - interpret as an AM/PM time. AP must be either 'AM' or 'PM'") + "\n" + \
-    tr("   ap or a - interpret as an AM/PM time. ap must be either 'am' or 'pm'") + "\n\n" + \
-    tr("Example:") + "\n" + \
-    tr("   Status is set to 'away' at %(hh:mm:ss), because of idle from $(hh:mm:ss) for #(mm) minutes and #(ss) seconds")
-    );
+	tr("You can insert date and time into auto status text:") + "\n" + \
+	tr("   %(<format>) - current date and time") + "\n" + \
+	tr("   $(<format>) - date and time you are idle form") + "\n" + \
+	tr("   #(<format>) - time you are idle for") + "\n\n" + \
+	tr("Date Format:") + "\n" + \
+	tr("   d - the day as number without a leading zero (1 to 31)") + "\n" + \
+	tr("   dd - the day as number with a leading zero (01 to 31)") + "\n" + \
+	tr("   ddd - the abbreviated localized day name (e.g. 'Mon' to 'Sun')") + "\n" + \
+	tr("   dddd - the long localized day name (e.g. 'Monday' to 'Sunday')") + "\n" + \
+	tr("   M - the month as number without a leading zero (1-12)") + "\n" + \
+	tr("   MM - the month as number with a leading zero (01-12)") + "\n" + \
+	tr("   MMM - the abbreviated localized month name (e.g. 'Jan' to 'Dec')") + "\n" + \
+	tr("   MMMM - the long localized month name (e.g. 'January' to 'December')") + "\n" + \
+	tr("   yy - the year as two digit number (00-99)") + "\n" + \
+	tr("   yyyy - the year as four digit number") + "\n\n" + \
+	tr("Time Format:") + "\n" + \
+	tr("   h - the hour without a leading zero (0 to 23 or 1 to 12 if AM/PM display)") + "\n" + \
+	tr("   hh - the hour with a leading zero (00 to 23 or 01 to 12 if AM/PM display)") + "\n" + \
+	tr("   H - the hour without a leading zero (0 to 23, even with AM/PM display)") + "\n" + \
+	tr("   HH - the hour with a leading zero (00 to 23, even with AM/PM display)") + "\n" + \
+	tr("   m - the minute without a leading zero (0 to 59)") + "\n" + \
+	tr("   mm - the minute with a leading zero (00 to 59)") + "\n" + \
+	tr("   s - the second without a leading zero (0 to 59)") + "\n" + \
+	tr("   ss - the second with a leading zero (00 to 59)") + "\n" + \
+	tr("   z - the milliseconds without leading zeroes (0 to 999)") + "\n" + \
+	tr("   zzz - the milliseconds with leading zeroes (000 to 999)") + "\n" + \
+	tr("   AP or A - interpret as an AM/PM time. AP must be either 'AM' or 'PM'") + "\n" + \
+	tr("   ap or a - interpret as an AM/PM time. ap must be either 'am' or 'pm'") + "\n\n" + \
+	tr("Example:") + "\n" + \
+	tr("   Status is set to 'away' at %(hh:mm:ss), because of idle from $(hh:mm:ss) for #(mm) minutes and #(ss) seconds")
+	);
 }
 
 void AutoStatusOptionsWidget::onShowRulesLinkActivayed()
@@ -160,4 +161,10 @@ void AutoStatusOptionsWidget::onShowRulesLinkActivayed()
 	AutoRulesOptionsDialog *dialog = new AutoRulesOptionsDialog(FAutoStatus,FStatusChanger,this);
 	connect(dialog,SIGNAL(accepted()),SLOT(reset()));
 	dialog->show();
+}
+
+void AutoStatusOptionsWidget::onCorrectOfflineTime(int AAwayTime)
+{
+	if (ui.spbOfflineTime->value() < AAwayTime)
+		ui.spbOfflineTime->setValue(AAwayTime);
 }
