@@ -206,5 +206,7 @@ $RECYCLE.BIN/
 !/src/packages/macosx/DS_Store
 *.xcodeproj
 
-# Microsoft Visual Code
+# Microsoft Visual Code and Studio 2017
 .vscode
+.vs
+CMakeSettings.json
