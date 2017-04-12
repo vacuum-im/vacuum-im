@@ -169,7 +169,7 @@ void CreateMultiChatWizard::initialize()
 	setWindowModality(Qt::WindowModal);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	setWindowTitle(tr("Create Conference Wizard"));
-#ifndef Q_WS_MAC
+#ifndef Q_OS_MACOS
 	setWizardStyle(QWizard::ModernStyle);
 #endif
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_MUC_JOIN,0,0,"windowIcon");
