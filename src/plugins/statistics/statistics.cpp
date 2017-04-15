@@ -368,7 +368,7 @@ QString Statistics::userAgent() const
 #elif defined Q_WS_MAEMO_6
 			"MeeGo"
 #elif defined Q_OS_WIN
-			// Nothing
+			""
 #elif defined Q_OS_LINUX
 			"X11; "
 #else
