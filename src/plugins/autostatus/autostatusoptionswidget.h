@@ -32,6 +32,8 @@ private:
 private:
 	IAutoStatus *FAutoStatus;
 	IStatusChanger *FStatusChanger;
+private slots:
+	void onCorrectOfflineTime(int);
 };
 
 #endif // AUTOSTATUSOPTIONSWIDGET_H
