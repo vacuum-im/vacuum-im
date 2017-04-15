@@ -125,7 +125,7 @@ CreateAccountWizard::CreateAccountWizard(QWidget *AParent) : QWizard(AParent)
 	setWindowModality(Qt::WindowModal);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	setWindowTitle(tr("Create Account Wizard"));
-#ifndef Q_WS_MAC
+#ifndef Q_OS_MACOS
 	setWizardStyle(QWizard::ModernStyle);
 #endif
 

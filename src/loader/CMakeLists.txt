@@ -2,6 +2,8 @@
 set(PLUGIN_NAME ${VACUUM_LOADER_NAME})
 set(PLUGIN_DISPLAY_NAME "loader")
 
+include_directories("${CMAKE_SOURCE_DIR}/src" "${CMAKE_BINARY_DIR}/src/loader")
+
 include("${CMAKE_SOURCE_DIR}/src/make/config.cmake")
 include("${CMAKE_SOURCE_DIR}/src/translations/languages.cmake") 
 include("loader.cmake")
@@ -11,8 +13,6 @@ project(loader CXX)
 if (UNIX AND NOT APPLE)
 	set(CMAKE_INSTALL_RPATH "$ORIGIN/../${INSTALL_LIB_DIR}/")
 endif (UNIX AND NOT APPLE)
-
-include_directories("${CMAKE_SOURCE_DIR}/src" "${CMAKE_BINARY_DIR}/src/loader")
 
 set(GIT_HASH "" CACHE STRING "GIT HASH: git log -n 1 --format=%H")
 set(GIT_DATE "" CACHE STRING "GIT DATE: git log -n 1 --format=%ct")

@@ -7,6 +7,7 @@ if (UNIX AND NOT APPLE)
 endif (UNIX AND NOT APPLE)
 
 set(SOURCES "qxtglobal.cpp" "qxtglobalshortcut.cpp")
+set(HEADERS "qxtglobalshortcut.h")
 
 if (APPLE)
 	set(SOURCES ${SOURCES} "qxtglobalshortcut_mac.cpp")
@@ -20,8 +21,9 @@ elseif (WIN32)
 	set(SOURCES ${SOURCES} "qxtglobalshortcut_win.cpp")
 endif (APPLE)
 
-add_definitions(-DUNICODE)
-add_definitions(-DQXT_STATIC)
+add_definitions(-DUNICODE -DQXT_STATIC)
+
+qt5_wrap_cpp(MOC_SOURCES ${HEADERS})
 
 add_library(qxtglobalshortcut STATIC ${SOURCES} ${MOC_SOURCES})
 

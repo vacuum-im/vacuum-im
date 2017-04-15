@@ -181,7 +181,7 @@ QMultiMap<int, IOptionsDialogWidget *> OptionsManager::optionsDialogWidgets(cons
 	if (ANodeId == OPN_COMMON)
 	{
 		widgets.insertMulti(OHO_COMMON_SETTINGS, newOptionsDialogHeader(tr("Common settings"),AParent));
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
 		widgets.insertMulti(OWO_COMMON_AUTOSTART, newOptionsDialogWidget(Options::node(OPV_COMMON_AUTOSTART), tr("Auto run application on system startup"), AParent));
 #else
 		Q_UNUSED(AParent);

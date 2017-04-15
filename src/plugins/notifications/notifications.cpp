@@ -247,7 +247,7 @@ QMultiMap<int, IOptionsDialogWidget *> Notifications::optionsDialogWidgets(const
 		spbPopupTimeout->setSuffix(tr(" seconds"));
 		widgets.insertMulti(OWO_NOTIFICATIONS_POPUPTIMEOUT,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_NOTIFICATIONS_POPUPTIMEOUT),tr("Time to display a pop-up window (0 - always visible):"),spbPopupTimeout,AParent));
 
-#if defined Q_WS_X11 && 0 
+#if defined Q_OS_LINUX && 0 
 		widgets.insertMulti(OWO_NOTIFICATIONS_SOUNDCOMMAND,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_NOTIFICATIONS_SOUNDCOMMAND),tr("System command to play sound:"),AParent));
 #endif
 

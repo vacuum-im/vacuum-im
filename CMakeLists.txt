@@ -4,8 +4,11 @@ project(vacuum-im)
 
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
+
+if(APPLE)
+	 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9")
+	 set_property(GLOBAL PROPERTY ALL_PLUGINS_FULLPATHS "")
+endif()
 
 if(POLICY CMP0020)
 	cmake_policy(SET CMP0020 NEW)
@@ -35,13 +38,9 @@ include("src/translations/languages.cmake")
 include_directories("${CMAKE_SOURCE_DIR}/src")
 
 if (APPLE)
-	file(COPY "resources/menuicons"
-		DESTINATION "${INSTALL_RESOURCES}"
-		PATTERN ".svn" EXCLUDE)
+	file(COPY "resources/menuicons" DESTINATION "${INSTALL_RESOURCES}")
 else (APPLE)
-	install(DIRECTORY "resources/menuicons"
-		DESTINATION "${INSTALL_RESOURCES}"
-		PATTERN ".svn" EXCLUDE)
+	install(DIRECTORY "resources/menuicons" DESTINATION "${INSTALL_RESOURCES}")
 endif (APPLE)
 
 include("src/packages/package.cmake")
@@ -51,10 +50,6 @@ set(INSTALL_DOCS YES CACHE BOOL "Install documentation (currently it's only AUTH
 set(LANGS "" CACHE STRING "List of languages to build localization for (this variable overrides any of LANG_*)")
 set(USED_LANGS "" CACHE INTERNAL "List of languages actually used for generating targets")
 add_lang_options()
-
-if (APPLE)
-	set_property(GLOBAL PROPERTY ALL_PLUGINS_DYLIB_FILES "")
-endif (APPLE)
 
 set(NO_WEBKIT NO CACHE BOOL "Exclude QtWebKit from dependencies")
 set(FORCE_BUNDLED_MINIZIP NO CACHE BOOL "Use bundled minizip even if local system have one")
@@ -103,107 +98,6 @@ endif (INSTALL_DOCS)
 
 add_subdirectory(src)
 
-# runtime deps on Windows
-if (WIN32)
-	cpack_add_component_group(libs
-		DISPLAY_NAME "Shared libraries"
-		DESCRIPTION "Required libraries that already may be present in your system")
-	set(QT_LIBS
-		"${_qt5Core_install_prefix}/bin/libEGL.dll"
-		"${_qt5Core_install_prefix}/bin/libGLESv2.dll"
-		"${_qt5Core_install_prefix}/bin/Qt5Core.dll"
-		"${_qt5Core_install_prefix}/bin/Qt5Gui.dll"
-		"${_qt5Core_install_prefix}/bin/Qt5Multimedia.dll"
-		"${_qt5Core_install_prefix}/bin/Qt5MultimediaWidgets.dll"
-		"${_qt5Core_install_prefix}/bin/Qt5Network.dll"
-		"${_qt5Core_install_prefix}/bin/Qt5OpenGL.dll"
-		"${_qt5Core_install_prefix}/bin/Qt5Positioning.dll"
-		"${_qt5Core_install_prefix}/bin/Qt5PrintSupport.dll"
-		"${_qt5Core_install_prefix}/bin/Qt5Qml.dll"
-		"${_qt5Core_install_prefix}/bin/Qt5Quick.dll"
-		"${_qt5Core_install_prefix}/bin/Qt5Sensors.dll"
-		"${_qt5Core_install_prefix}/bin/Qt5Sql.dll"
-		"${_qt5Core_install_prefix}/bin/Qt5Svg.dll"
-		"${_qt5Core_install_prefix}/bin/Qt5Widgets.dll"
-		"${_qt5Core_install_prefix}/bin/Qt5Xml.dll"
-		"${_qt5Core_install_prefix}/bin/Qt5XmlPatterns.dll")
-	install(FILES ${QT_LIBS}
-		DESTINATION "${INSTALL_LIBS}"
-		COMPONENT qt_libs)
-	install(DIRECTORY "${_qt5Core_install_prefix}/plugins/audio"
-		DESTINATION "${INSTALL_LIBS}"
-		COMPONENT qt_libs
-		FILES_MATCHING
-		PATTERN "*.dll"
-		PATTERN "*d.dll" EXCLUDE)
-	install(DIRECTORY "${_qt5Core_install_prefix}/plugins/imageformats"
-		DESTINATION "${INSTALL_LIBS}"
-		COMPONENT qt_libs
-		FILES_MATCHING
-		PATTERN "*.dll"
-		PATTERN "*d.dll" EXCLUDE)
-	install(DIRECTORY "${_qt5Core_install_prefix}/plugins/platforms"
-		DESTINATION "${INSTALL_LIBS}"
-		COMPONENT qt_libs
-		FILES_MATCHING
-		PATTERN "qwindows.dll")
-	install(DIRECTORY "${_qt5Core_install_prefix}/plugins/printsupport"
-		DESTINATION "${INSTALL_LIBS}"
-		COMPONENT qt_libs
-		FILES_MATCHING
-		PATTERN "*.dll"
-		PATTERN "*d.dll" EXCLUDE)
-	install(DIRECTORY "${_qt5Core_install_prefix}/plugins/sensors"
-		DESTINATION "${INSTALL_LIBS}"
-		COMPONENT qt_libs
-		FILES_MATCHING
-		PATTERN "*.dll"
-		PATTERN "*d.dll" EXCLUDE)
-	cpack_add_component(qt_libs
-		DISPLAY_NAME "Qt5 libraries"
-		DESCRIPTION "May be unchecked if you already have working Qt5 installation"
-		GROUP libs)
-	# Qt localization
-	foreach(LANG ${LOCALIZED_LANGS})
-		string(SUBSTRING ${LANG} 0 2 SHORTLANG)
-		install(FILES "${_qt5Core_install_prefix}/translations/qt_${SHORTLANG}.qm"
-			DESTINATION "${INSTALL_TRANSLATIONS}/${LANG}"
-			COMPONENT qt_${LANG})
-		cpack_add_component(qt_${LANG}
-			DISPLAY_NAME "Qt5 translation"
-			GROUP ${LANG}_translation
-			DEPENDS qt_libs)
-	endforeach(LANG)
-
-#	install(FILES "libeay32.dll" "ssleay32.dll"
-#		DESTINATION "${INSTALL_LIBS}"
-#		COMPONENT openssl_libs)
-#	cpack_add_component(openssl_libs
-#		DISPLAY_NAME "OpenSSL libraries"
-#		DESCRIPTION "May be unchecked if you already have OpenSSL installed"
-#		GROUP libs)
-
-	if (MINGW)
-		install(FILES "mingwm10.dll" "libgcc_s_dw2-1.dll"
-			DESTINATION "${INSTALL_LIBS}"
-			COMPONENT mingw_runtime)
-		cpack_add_component(mingw_runtime
-			DISPLAY_NAME "MinGW runtime libraries"
-			DESCRIPTION "May be unchecked if you already have MinGW installed"
-			GROUP libs)
-	elseif (MSVC)
-		# TODO: check these patterns, indeed, don't work.
-		file(GLOB MSVC_DLLS "msvc*.dll")
-		file(GLOB MANIFEST "Microsoft.VC*.CRT.manifest")
-		install(FILES ${MSVC_DLLS} ${MANIFEST}
-			DESTINATION "${INSTALL_LIBS}"
-			COMPONENT msvc_runtime)
-		cpack_add_component(msvc_runtime
-			DISPLAY_NAME "MSVC runtime libraries"
-			DESCRIPTION "May be unchecked if you already have MS Visual C++ or it's redistributable package installed"
-			GROUP libs)
-	endif (MINGW)
-endif (WIN32)
 
 if (INSTALL_SDK)
 	cpack_add_component(sdk
