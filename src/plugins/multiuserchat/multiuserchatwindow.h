@@ -147,7 +147,7 @@ protected:
 	bool isMentionMessage(const Message &AMessage) const;
 	void setMultiChatMessageStyle();
 	void showMultiChatTopic(const QString &ATopic, const QString &ANick = QString::null);
-	void showMultiChatStatusMessage(const QString &AMessage, int AType=0, int AStatus=0, bool ADontSave=false, const QDateTime &ATime=QDateTime::currentDateTime());
+	void showMultiChatStatusMessage(const QString &AMessage, int AType=0, int AStatus=0, const QDateTime &ATime=QDateTime::currentDateTime());
 	bool showMultiChatStatusCodes(const QList<int> &ACodes, const QString &ANick=QString::null, const QString &AMessage=QString::null);
 	void showMultiChatUserMessage(const Message &AMessage, const QString &ANick);
 	void requestMultiChatHistory();

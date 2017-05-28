@@ -87,9 +87,6 @@ public:
 	virtual IArchiveStreamPrefs archivePrefs(const Jid &AStreamJid) const;
 	virtual QString setArchivePrefs(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs);
 	virtual bool isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid) const;
-	//Direct Archiving
-	virtual bool saveMessage(const Jid &AStreamJid, const Jid &AItemJid, const Message &AMessage);
-	virtual bool saveNote(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANote, const QString &AThreadId = QString::null);
 	//Archive Management
 	virtual QString loadMessages(const Jid &AStreamJid, const IArchiveRequest &ARequest);
 	virtual QString loadHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest);
@@ -137,6 +134,7 @@ protected:
 	void processPendingMessages(const Jid &AStreamJid);
 	bool prepareMessage(const Jid &AStreamJid, Message &AMessage, bool ADirectionIn);
 	bool processMessage(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn);
+	bool saveMessage(const Jid &AStreamJid, const Jid &AItemJid, const Message &AMessage);
 protected:
 	IArchiveEngine *findEngineByCapability(const Jid &AStreamJid, quint32 ACapability) const;
 	QMultiMap<int, IArchiveEngine *> engineOrderByCapability(const Jid &AStreamJid, quint32 ACapability) const;

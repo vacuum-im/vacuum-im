@@ -259,6 +259,11 @@ bool FileMessageArchive::saveNote(const Jid &AStreamJid, const Message &AMessage
 	return written;
 }
 
+QString FileMessageArchive::loadMessages( const Jid &AStreamJid, const IArchiveRequest &ARequest, const QString &ANextRef)
+{
+	return QString::null;
+}
+
 QString FileMessageArchive::saveCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection)
 {
 	if (isCapable(AStreamJid,ManualArchiving) && ACollection.header.with.isValid() && ACollection.header.start.isValid())

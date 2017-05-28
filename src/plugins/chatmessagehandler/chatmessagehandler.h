@@ -80,7 +80,7 @@ protected:
 	void setMessageStyle(IMessageChatWindow *AWindow);
 	void showDateSeparator(IMessageChatWindow *AWindow, const QDateTime &ADateTime);
 	void fillContentOptions(const Jid &AStreamJid, const Jid &AContactJid, IMessageStyleContentOptions &AOptions) const;
-	void showStyledStatus(IMessageChatWindow *AWindow, const QString &AMessage, bool ADontSave=false, const QDateTime &ATime=QDateTime::currentDateTime());
+	void showStyledStatus(IMessageChatWindow *AWindow, const QString &AMessage, const QDateTime &ATime=QDateTime::currentDateTime());
 	void showStyledMessage(IMessageChatWindow *AWindow, const Message &AMessage);
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 	QMap<Jid, QList<Jid> > getSortedAddresses(const QMultiMap<Jid,Jid> &AAddresses) const;

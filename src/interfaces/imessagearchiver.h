@@ -119,12 +119,19 @@ struct IArchiveRequest
 	Jid with;
 	QDateTime start;
 	QDateTime end;
-	bool openOnly;
-	bool exactmatch;
 	QString text;
 	quint32 maxItems;
-	QString threadId;
 	Qt::SortOrder order;
+
+	// Old params
+	bool openOnly;
+	bool exactmatch;
+	QString threadId;
+};
+
+struct IArchiveReply {
+	QString nextRef;
+	QList<Message> messages;
 };
 
 class IArchiveHandler
@@ -156,7 +163,8 @@ public:
 	virtual int capabilityOrder(quint32 ACapability, const Jid &AStreamJid = Jid::null) const =0;
 	//Direct Archiving
 	virtual bool saveMessage(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn) =0;
-	virtual bool saveNote(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn) =0;
+	//Archive Management
+	virtual QString loadMessages(const Jid &AStreamJid, const IArchiveRequest &ARequest, const QString &ANextRef = QString::null) =0;
 	//Manual Archiving
 	virtual QString saveCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection) =0;
 	//Archive Management
@@ -168,6 +176,9 @@ public:
 protected:
 	virtual void capabilitiesChanged(const Jid &AStreamJid) =0;
 	virtual void requestFailed(const QString &AId, const XmppError &AError) =0;
+	virtual void messagesLoaded(const QString &AId, const IArchiveReply &AReply) =0;
+
+
 	virtual void headersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders) =0;
 	virtual void collectionSaved(const QString &AId, const IArchiveCollection &ACollection) =0;
 	virtual void collectionLoaded(const QString &AId, const IArchiveCollection &ACollection) =0;
@@ -189,9 +200,6 @@ public:
 	virtual IArchiveStreamPrefs archivePrefs(const Jid &AStreamJid) const =0;
 	virtual QString setArchivePrefs(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs) =0;
 	virtual bool isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid) const =0;
-	//Direct Archiving
-	virtual bool saveMessage(const Jid &AStreamJid, const Jid &AItemJid, const Message &AMessage) =0;
-	virtual bool saveNote(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANote, const QString &AThreadId = QString::null) =0;
 	//Archive Management
 	virtual QString loadMessages(const Jid &AStreamJid, const IArchiveRequest &ARequest) =0;
 	virtual QString loadHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest) =0;

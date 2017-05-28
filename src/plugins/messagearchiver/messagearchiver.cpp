@@ -478,43 +478,6 @@ bool MessageArchiver::isArchivingAllowed(const Jid &AStreamJid, const Jid &AItem
 	return false;
 }
 
-bool MessageArchiver::saveMessage(const Jid &AStreamJid, const Jid &AItemJid, const Message &AMessage)
-{
-	if (!isSupported(AStreamJid) || isArchiveDuplicationEnabled(AStreamJid))
-	{
-		if (isArchivingAllowed(AStreamJid,AItemJid))
-		{
-			IArchiveEngine *engine = findEngineByCapability(AStreamJid,IArchiveEngine::DirectArchiving);
-			if (engine)
-			{
-				Message message = AMessage;
-				bool directionIn = AItemJid==message.from() || AStreamJid==message.to();
-				if (prepareMessage(AStreamJid,message,directionIn))
-					return engine->saveMessage(AStreamJid,message,directionIn);
-			}
-		}
-	}
-	return false;
-}
-
-bool MessageArchiver::saveNote(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANote, const QString &AThreadId)
-{
-	if (!isSupported(AStreamJid) || isArchiveDuplicationEnabled(AStreamJid))
-	{
-		if (isArchivingAllowed(AStreamJid,AItemJid))
-		{
-			IArchiveEngine *engine = findEngineByCapability(AStreamJid,IArchiveEngine::DirectArchiving);
-			if (engine)
-			{
-				Message message;
-				message.setTo(AStreamJid.full()).setFrom(AItemJid.full()).setBody(ANote).setThreadId(AThreadId);
-				return engine->saveNote(AStreamJid,message,true);
-			}
-		}
-	}
-	return false;
-}
-
 QString MessageArchiver::loadMessages(const Jid &AStreamJid, const IArchiveRequest &ARequest)
 {
 	QString id = loadHeaders(AStreamJid,ARequest);
@@ -1122,6 +1085,25 @@ bool MessageArchiver::processMessage(const Jid &AStreamJid, const Message &AMess
 	return saveMessage(AStreamJid,itemJid,AMessage);
 }
 
+bool MessageArchiver::saveMessage(const Jid &AStreamJid, const Jid &AItemJid, const Message &AMessage)
+{
+	if (!isSupported(AStreamJid) || isArchiveDuplicationEnabled(AStreamJid))
+	{
+		if (isArchivingAllowed(AStreamJid,AItemJid))
+		{
+			IArchiveEngine *engine = findEngineByCapability(AStreamJid,IArchiveEngine::DirectArchiving);
+			if (engine)
+			{
+				Message message = AMessage;
+				bool directionIn = AItemJid==message.from() || AStreamJid==message.to();
+				if (prepareMessage(AStreamJid,message,directionIn))
+					return engine->saveMessage(AStreamJid,message,directionIn);
+			}
+		}
+	}
+	return false;
+}
+
 IArchiveEngine *MessageArchiver::findEngineByCapability(const Jid &AStreamJid, quint32 ACapability) const
 {
 	QMultiMap<int, IArchiveEngine *> order = engineOrderByCapability(AStreamJid,ACapability);
@@ -1259,7 +1241,7 @@ void MessageArchiver::registerDiscoFeatures()
 	IDiscoFeature dfeature;
 	dfeature.active = false;
 	dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY);
-	dfeature.var = NS_ARCHIVE_MAM;
+	dfeature.var = NS_ARCHIVE_MAM_2;
 	dfeature.name = tr("Message Archive Management");
 	dfeature.description = tr("Supports query and control an archive of messages stored on a server");
 	FDiscovery->insertDiscoFeature(dfeature);
@@ -1833,9 +1815,14 @@ void MessageArchiver::onDiscoveryInfoReceived(const IDiscoInfo &AInfo)
 {
 	if (!FNamespaces.contains(AInfo.streamJid) && !FInStoragePrefs.contains(AInfo.streamJid) && AInfo.node.isEmpty() && AInfo.streamJid.pDomain()==AInfo.contactJid.pFull())
 	{
-		if (AInfo.features.contains(NS_ARCHIVE_MAM))
+		if (AInfo.features.contains(NS_ARCHIVE_MAM_2))
 		{
-			FNamespaces.insert(AInfo.streamJid,NS_ARCHIVE_MAM);
+			FNamespaces.insert(AInfo.streamJid,NS_ARCHIVE_MAM_2);
+			loadServerPrefs(AInfo.streamJid);
+		}
+		else if (AInfo.features.contains(NS_ARCHIVE_MAM_1))
+		{
+			FNamespaces.insert(AInfo.streamJid,NS_ARCHIVE_MAM_1);
 			loadServerPrefs(AInfo.streamJid);
 		}
 		else if (AInfo.features.contains(NS_ARCHIVE_MAM_0))

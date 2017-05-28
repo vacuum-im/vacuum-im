@@ -2,6 +2,7 @@
 #define DEF_STANZAHANDLERORDERS_H
 
 //Message In
+#define SHO_MI_ARCHIVE_RESULT         100
 #define SHO_MI_REMOTECONTROL          100
 #define SHO_MI_PRIVATESTORAGE         300
 #define SHO_MI_CAPTCHAFORMS           300

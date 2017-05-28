@@ -108,7 +108,6 @@ bool MessageWidgets::initSettings()
 	Options::setDefaultValue(OPV_MESSAGES_CLEANCHATTIMEOUT,30);
 
 	Options::setDefaultValue(OPV_MESSAGES_SHOWSTATUS,true);
-	Options::setDefaultValue(OPV_MESSAGES_ARCHIVESTATUS,false);
 
 	Options::setDefaultValue(OPV_MESSAGES_TABWINDOWS_ENABLE,false);
 	Options::setDefaultValue(OPV_MESSAGES_TABWINDOW_NAME,tr("Tab Window"));
@@ -139,7 +138,6 @@ QMultiMap<int, IOptionsDialogWidget *> MessageWidgets::optionsDialogWidgets(cons
 
 		widgets.insertMulti(OHO_MESSAGES_BEHAVIOR,FOptionsManager->newOptionsDialogHeader(tr("Message window behavior"),AParent));
 		widgets.insertMulti(OWO_MESSAGES_SHOWSTATUS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_SHOWSTATUS),tr("Show contacts status changes"),AParent));
-		widgets.insertMulti(OWO_MESSAGES_ARCHIVESTATUS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_ARCHIVESTATUS),tr("Save contacts status messages in history"),AParent));
 	}
 	return widgets;
 }

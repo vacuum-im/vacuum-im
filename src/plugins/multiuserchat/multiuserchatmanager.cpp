@@ -231,7 +231,6 @@ bool MultiUserChatManager::initSettings()
 {
 	Options::setDefaultValue(OPV_MUC_SHOWENTERS,true);
 	Options::setDefaultValue(OPV_MUC_SHOWSTATUS,true);
-	Options::setDefaultValue(OPV_MUC_ARCHIVESTATUS,false);
 	Options::setDefaultValue(OPV_MUC_QUITONWINDOWCLOSE,false);
 	Options::setDefaultValue(OPV_MUC_REJOINAFTERKICK,false);
 	Options::setDefaultValue(OPV_MUC_REFERENUMERATION,false);
@@ -257,7 +256,6 @@ QMultiMap<int, IOptionsDialogWidget *> MultiUserChatManager::optionsDialogWidget
 		widgets.insertMulti(OHO_CONFERENCES_MESSAGES,FOptionsManager->newOptionsDialogHeader(tr("Messages"),AParent));
 		widgets.insertMulti(OWO_CONFERENCES_SHOWENTERS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_SHOWENTERS),tr("Show users connections and disconnections"),AParent));
 		widgets.insertMulti(OWO_CONFERENCES_SHOWSTATUS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_SHOWSTATUS),tr("Show users status changes"),AParent));
-		widgets.insertMulti(OWO_CONFERENCES_ARCHIVESTATUS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_ARCHIVESTATUS),tr("Save users status messages in history"),AParent));
 		widgets.insertMulti(OWO_CONFERENCES_QUITONWINDOWCLOSE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_QUITONWINDOWCLOSE),tr("Leave the conference when window closed"),AParent));
 		widgets.insertMulti(OWO_CONFERENCES_REJOINAFTERKICK,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_REJOINAFTERKICK),tr("Automatically rejoin to conference after kick"),AParent));
 		widgets.insertMulti(OWO_CONFERENCES_REFERENUMERATION,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_REFERENUMERATION),tr("Select a user to refer by enumeration in the input field"),AParent));

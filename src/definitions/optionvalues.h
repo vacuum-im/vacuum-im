@@ -90,7 +90,6 @@
 #define OPV_MESSAGES_ROOT                               "messages"
 #define OPV_MESSAGES_LOADHISTORY                        "messages.load-history"
 #define OPV_MESSAGES_SHOWSTATUS                         "messages.show-status"
-#define OPV_MESSAGES_ARCHIVESTATUS                      "messages.archive-status"
 #define OPV_MESSAGES_EDITORAUTORESIZE                   "messages.editor-auto-resize"
 #define OPV_MESSAGES_EDITORMINIMUMLINES                 "messages.editor-minimum-lines"
 #define OPV_MESSAGES_CLEANCHATTIMEOUT                   "messages.clean-chat-timeout"
@@ -119,7 +118,6 @@
 // MultiUserChat
 #define OPV_MUC_SHOWENTERS                              "muc.show-enters"
 #define OPV_MUC_SHOWSTATUS                              "muc.show-status"
-#define OPV_MUC_ARCHIVESTATUS                           "muc.archive-status"
 #define OPV_MUC_REJOINAFTERKICK                         "muc.rejoin-after-kick"
 #define OPV_MUC_QUITONWINDOWCLOSE                       "muc.quit-on-window-close"
 #define OPV_MUC_REFERENUMERATION                        "muc.refer-enumeration"
@@ -140,8 +138,6 @@
 #define OPV_FILEARCHIVE_COLLECTION_MINSIZE              "history.file-archive.collection.min-size"
 #define OPV_FILEARCHIVE_COLLECTION_MAXSIZE              "history.file-archive.collection.max-size"
 #define OPV_FILEARCHIVE_COLLECTION_CRITICALSIZE         "history.file-archive.collection.critical-size"
-// ServerMessageArchive
-#define OPV_SERVERARCHIVE_MAXUPLOADSIZE                 "history.server-archive.max-upload-size"
 
 // MessageStyleManager
 #define OPV_MESSAGESTYLE_ROOT                           "message-styles"

@@ -5,7 +5,9 @@
 #include <definitions/namespaces.h>
 #include <definitions/optionvalues.h>
 #include <definitions/internalerrors.h>
+#include <definitions/stanzahandlerorders.h>
 #include <definitions/archivecapabilityorders.h>
+#include <utils/datetime.h>
 #include <utils/options.h>
 #include <utils/logger.h>
 
@@ -15,9 +17,14 @@
 
 #define ARCHIVE_REQUEST_TIMEOUT   30000
 
+#define SHC_ARCHIVE_RESULT        "/message/result[@xmlns=" NS_ARCHIVE_MAM "]"
+#define SHC_ARCHIVE_RESULT_0      "/message/result[@xmlns=" NS_ARCHIVE_MAM_0 "]"
+
+
 ServerMessageArchive::ServerMessageArchive()
 {
 	FArchiver = NULL;
+	FDataForms = NULL;
 	FStanzaProcessor = NULL;
 }
 
@@ -30,9 +37,10 @@ void ServerMessageArchive::pluginInfo(IPluginInfo *APluginInfo)
 {
 	APluginInfo->name = tr("Server Message Archive");
 	APluginInfo->description = tr("Allows to save the history of communications on the server");
-	APluginInfo->version = "1.0";
+	APluginInfo->version = "2.0";
 	APluginInfo->author = "Potapov S.A. aka Lion";
 	APluginInfo->homePage = "http://www.vacuum-im.org";
+	APluginInfo->dependences.append(DATAFORMS_UUID);
 	APluginInfo->dependences.append(MESSAGEARCHIVER_UUID);
 	APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
@@ -57,17 +65,13 @@ bool ServerMessageArchive::initConnections(IPluginManager *APluginManager, int &
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 	}
 
-	connect(this,SIGNAL(serverHeadersLoaded(const QString &, const QList<IArchiveHeader> &, const QString &)),
-		SLOT(onServerHeadersLoaded(const QString &, const QList<IArchiveHeader> &, const QString &)));
-	connect(this,SIGNAL(serverCollectionSaved(const QString &, const IArchiveCollection &, const QString &)),
-		SLOT(onServerCollectionSaved(const QString &, const IArchiveCollection &, const QString &)));
-	connect(this,SIGNAL(serverCollectionLoaded(const QString &, const IArchiveCollection &, const QString &)),
-		SLOT(onServerCollectionLoaded(const QString &, const IArchiveCollection &, const QString &)));
-	connect(this,SIGNAL(serverModificationsLoaded(const QString &, const IArchiveModifications &, const QString &)),
-		SLOT(onServerModificationsLoaded(const QString &, const IArchiveModifications &, const QString &)));
-	connect(this,SIGNAL(requestFailed(const QString &, const XmppError &)),SLOT(onServerRequestFailed(const QString &, const XmppError &)));
+	plugin = APluginManager->pluginInterface("IDataForms").value(0,NULL);
+	if (plugin)
+	{
+		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
+	}
 
-	return FArchiver!=NULL && FStanzaProcessor!=NULL;
+	return FArchiver!=NULL && FStanzaProcessor!=NULL && FDataForms!=NULL;
 }
 
 bool ServerMessageArchive::initObjects()
@@ -79,167 +83,53 @@ bool ServerMessageArchive::initObjects()
 
 bool ServerMessageArchive::initSettings()
 {
-	Options::setDefaultValue(OPV_SERVERARCHIVE_MAXUPLOADSIZE,4096);
 	return true;
+}
+
+bool ServerMessageArchive::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
+{
+	if (FSHIResult.value(AStreamJid) == AHandlerId)
+	{
+		AAccept = true;
+		QDomElement resultElem = AStanza.firstElement("result", FNamespaces.value(AStreamJid));
+
+		QString queryid = resultElem.attribute("queryid");
+		if (FLoadMessagesRequests.contains(queryid))
+		{
+			QDomElement forwardElem = Stanza::findElement(resultElem,"forwarded",NS_MESSAGE_FORWARD);
+			QDomElement messageElem =  forwardElem.firstChildElement("message");
+			if (!messageElem.isNull())
+			{
+				Stanza stanza(messageElem);
+				Message message(stanza);
+
+				QDomElement delayElem = Stanza::findElement(forwardElem,"delay",NS_XMPP_DELAY);
+				if (!delayElem.isNull())
+					message.setDateTime(DateTime(delayElem.attribute("stamp")).toLocal());
+
+				FLoadMessagesRequests[queryid].reply.messages.append(message);
+			}
+		}
+
+		return true;
+	}
+	return false;
 }
 
 void ServerMessageArchive::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 {
-	Q_UNUSED(AStreamJid);
-	if (FServerLoadHeadersRequests.contains(AStanza.id()))
+	if (FLoadMessagesRequests.contains(AStanza.id()))
 	{
-		IArchiveRequest request = FServerLoadHeadersRequests.take(AStanza.id());
+		LoadMessagesRequest request = FLoadMessagesRequests.take(AStanza.id());
 		if (AStanza.isResult())
 		{
-			LOG_STRM_DEBUG(AStreamJid,QString("Headers loaded, id=%1").arg(AStanza.id()));
-
-			int skipHeadersCount = 0;
-			QList<IArchiveHeader> headers;
-			QDomElement listElem = AStanza.firstElement("list");
-			QDomElement chatElem = listElem.firstChildElement("chat");
-			while (!chatElem.isNull())
-			{
-				IArchiveHeader header;
-				header.engineId = engineId();
-				header.with = chatElem.attribute("with");
-				header.start = DateTime(chatElem.attribute("start")).toLocal();
-				header.subject = chatElem.attribute("subject");
-				header.threadId = chatElem.attribute("thread");
-				header.version = chatElem.attribute("version").toInt();
-				
-				if (checkRequestHeader(header,request))
-					headers.append(header);
-				else
-					skipHeadersCount++;
-				
-				chatElem = chatElem.nextSiblingElement("chat");
-			}
-
-			if (skipHeadersCount > 0)
-				LOG_STRM_WARNING(AStreamJid,QString("Received %1 headers not matching the request, id=%2").arg(skipHeadersCount).arg(AStanza.id()));
-
-			if (request.order == Qt::AscendingOrder)
-				qSort(headers.begin(),headers.end(),qLess<IArchiveHeader>());
-			else
-				qSort(headers.begin(),headers.end(),qGreater<IArchiveHeader>());
-
-			if ((quint32)headers.count() > request.maxItems)
-				headers = headers.mid(0,request.maxItems);
-
-			QString nextRef = getNextRef(readResultSetAnswer(listElem),headers.count()+skipHeadersCount,MAX_HEADER_ITEMS,request.maxItems,request.order);
-			emit serverHeadersLoaded(AStanza.id(),headers,nextRef);
+			ResultSet resultSet = readResultSetReply(AStanza.firstElement("fin", FNamespaces.value(AStreamJid)));
+			request.reply.nextRef = request.request.order==Qt::AscendingOrder ? resultSet.last : resultSet.first;
+			emit messagesLoaded(AStanza.id(), request.reply);
 		}
 		else
 		{
-			XmppStanzaError err(AStanza);
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to load headers, id=%1: %2").arg(AStanza.id(),err.condition()));
-			emit requestFailed(AStanza.id(),err);
-		}
-	}
-	else if (FServerSaveCollectionRequests.contains(AStanza.id()))
-	{
-		ServerCollectionRequest request = FServerSaveCollectionRequests.take(AStanza.id());
-		if (AStanza.isResult())
-		{
-			LOG_STRM_DEBUG(AStreamJid,QString("Collection saved, id=%1").arg(AStanza.id()));
-			
-			QDomElement chatElem = AStanza.firstElement("save").firstChildElement("chat");
-			request.collection.header.engineId = engineId();
-			request.collection.header.subject = chatElem.attribute("subject",request.collection.header.subject);
-			request.collection.header.threadId = chatElem.attribute("thread",request.collection.header.threadId);
-			request.collection.header.version = chatElem.attribute("version",QString::number(request.collection.header.version)).toInt();
-			
-			emit serverCollectionSaved(AStanza.id(),request.collection,request.nextRef);
-		}
-		else
-		{
-			XmppStanzaError err(AStanza);
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to save collection, id=%1: %2").arg(AStanza.id(),err.condition()));
-			emit requestFailed(AStanza.id(),err);
-		}
-	}
-	else if (FServerLoadCollectionRequests.contains(AStanza.id()))
-	{
-		FServerLoadCollectionRequests.remove(AStanza.id());
-		if (AStanza.isResult())
-		{
-			LOG_STRM_DEBUG(AStreamJid,QString("Collection loaded, id=%1").arg(AStanza.id()));
-			
-			IArchiveCollection collection;
-			QDomElement chatElem = AStanza.firstElement("chat");
-			FArchiver->elementToCollection(AStreamJid,chatElem,collection);
-			collection.header.engineId = engineId();
-
-			QString nextRef = getNextRef(readResultSetAnswer(chatElem),collection.body.messages.count()+collection.body.notes.count(),MAX_MESSAGE_ITEMS);
-			emit serverCollectionLoaded(AStanza.id(),collection,nextRef);
-		}
-		else
-		{
-			XmppStanzaError err(AStanza);
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to load collection, id=%1: %2").arg(AStanza.id(),err.condition()));
-			emit requestFailed(AStanza.id(),err);
-		}
-	}
-	else if (FServerRemoveCollectionsRequests.contains(AStanza.id()))
-	{
-		IArchiveRequest request = FServerRemoveCollectionsRequests.take(AStanza.id());
-		if (AStanza.isResult())
-		{
-			LOG_STRM_DEBUG(AStreamJid,QString("Collections removed, id=%1").arg(AStanza.id()));
-			emit collectionsRemoved(AStanza.id(),request);
-		}
-		else
-		{
-			XmppStanzaError err(AStanza);
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to remove collections, id=%1: %2").arg(AStanza.id(),err.condition()));
-			emit requestFailed(AStanza.id(),err);
-		}
-	}
-	else if (FServerLoadModificationsRequests.contains(AStanza.id()))
-	{
-		ServerModificationsRequest request = FServerLoadModificationsRequests.take(AStanza.id());
-		if (AStanza.isResult())
-		{
-			LOG_STRM_DEBUG(AStreamJid,QString("Modifications loaded, id=%1").arg(AStanza.id()));
-
-			IArchiveModifications modifications;
-			modifications.isValid = true;
-
-			QDomElement modifsElem = AStanza.firstElement("modified");
-			QDomElement changeElem = modifsElem.firstChildElement();
-			while (!changeElem.isNull())
-			{
-				IArchiveModification modif;
-				modif.header.engineId = engineId();
-				modif.header.with = changeElem.attribute("with");
-				modif.header.start = DateTime(changeElem.attribute("start")).toLocal();
-				modif.header.version = changeElem.attribute("version").toInt();
-				if (changeElem.tagName() == "changed")
-				{
-					modif.action = IArchiveModification::Changed;
-					modifications.items.append(modif);
-				}
-				else if (changeElem.tagName() == "removed")
-				{
-					modif.action = IArchiveModification::Removed;
-					modifications.items.append(modif);
-				}
-				changeElem = changeElem.nextSiblingElement();
-			}
-
-			ResultSet resultSet = readResultSetAnswer(modifsElem);
-			QString nextRef = getNextRef(resultSet,modifications.items.count(),MAX_MODIFICATION_ITEMS,request.count);
-			modifications.next = resultSet.last;
-			modifications.start = resultSet.last.isEmpty() ? QDateTime::currentDateTime() : request.start;
-
-			emit serverModificationsLoaded(AStanza.id(),modifications,nextRef);
-		}
-		else
-		{
-			XmppStanzaError err(AStanza);
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to load modifications, id=%1: %2").arg(AStanza.id(),err.condition()));
-			emit requestFailed(AStanza.id(),err);
-		}
+			XmppStanzaError err(AStanza);			LOG_STRM_WARNING(AStreamJid,QString("Failed to load messages, id=%1: %2").arg(AStanza.id(),err.condition()));			emit requestFailed(AStanza.id(),err);		}
 	}
 }
 
@@ -266,19 +156,7 @@ IOptionsDialogWidget *ServerMessageArchive::engineSettingsWidget(QWidget *AParen
 
 quint32 ServerMessageArchive::capabilities(const Jid &AStreamJid) const
 {
-	quint32 caps = 0;
-	if (FArchiver->isReady(AStreamJid))
-	{
-		if (FArchiver->isSupported(AStreamJid))
-			caps |= AutomaticArchiving;
-		if (FArchiver->isSupported(AStreamJid))
-			caps |= ArchiveManagement;
-		if (FArchiver->isSupported(AStreamJid))
-			caps |= ManualArchiving;
-		if ((caps & ArchiveManagement)>0 && (caps & ManualArchiving)>0)
-			caps |= ArchiveReplication;
-	}
-	return caps;
+	return FArchiver->isSupported(AStreamJid) ? IArchiveEngine::AutomaticArchiving|IArchiveEngine::ArchiveManagement : 0;
 }
 
 bool ServerMessageArchive::isCapable(const Jid &AStreamJid, quint32 ACapability) const
@@ -292,14 +170,10 @@ int ServerMessageArchive::capabilityOrder(quint32 ACapability, const Jid &AStrea
 	{
 		switch (ACapability)
 		{
-		case ManualArchiving:
-			return ACO_MANUAL_SERVERARCHIVE;
 		case AutomaticArchiving:
 			return ACO_AUTOMATIC_SERVERARCHIVE;
 		case ArchiveManagement:
 			return ACO_MANAGE_SERVERARCHIVE;
-		case ArchiveReplication:
-			return ACO_REPLICATION_SERVERARCHIVE;
 		default:
 			break;
 		}
@@ -313,306 +187,103 @@ bool ServerMessageArchive::saveMessage(const Jid &AStreamJid, const Message &AMe
 	return false;
 }
 
-bool ServerMessageArchive::saveNote(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn)
+QString ServerMessageArchive::loadMessages(const Jid &AStreamJid, const IArchiveRequest &ARequest, const QString &ANextRef)
 {
-	Q_UNUSED(AStreamJid); Q_UNUSED(AMessage); Q_UNUSED(ADirectionIn);
-	return false;
+	if (FStanzaProcessor && FDataForms && isCapable(AStreamJid,ArchiveManagement))
+	{
+		Stanza stanza(STANZA_KIND_IQ);
+		stanza.setType(STANZA_TYPE_SET).setUniqueId();
+
+		QDomElement queryElem = stanza.addElement("query",FNamespaces.value(AStreamJid));
+		queryElem.setAttribute("queryid", stanza.id());
+
+		IDataForm form;
+		form.type == DATAFORM_TYPE_SUBMIT;
+		if (!ARequest.with.isEmpty())
+		{
+			IDataField with;
+			with.var = "with";
+			with.value = ARequest.with.full();
+			form.fields.append(with);
+		}
+		if (ARequest.start.isValid())
+		{
+			IDataField start;
+			start.var = "start";
+			start.value = DateTime(ARequest.start).toX85UTC();
+			form.fields.append(start);
+		}
+		if (ARequest.end.isValid())
+		{
+			IDataField end;
+			end.var = "end";
+			end.value = DateTime(ARequest.end).toX85UTC();
+			form.fields.append(end);
+		}
+		if (!form.fields.isEmpty())
+		{
+			IDataField type;
+			type.var = "FORM_TYPE";
+			type.type = DATAFIELD_TYPE_HIDDEN;
+			type.value = FNamespaces.value(AStreamJid);
+			form.fields.prepend(type);
+
+			FDataForms->xmlForm(form, queryElem);
+		}
+
+		insertResultSetRequest(queryElem,ANextRef,MAX_MESSAGE_ITEMS,ARequest.maxItems,ARequest.order);
+
+		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,ARCHIVE_REQUEST_TIMEOUT))
+		{
+			LOG_STRM_DEBUG(AStreamJid,QString("Load messages request sent, id=%1, nextref=%2").arg(stanza.id(),ANextRef));
+			LoadMessagesRequest request;
+			request.request = ARequest;
+			FLoadMessagesRequests.insert(stanza.id(),request);
+			return stanza.id();
+		}
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,"Failed to send load messages request");
+		}
+	}
+	else if (FStanzaProcessor && FDataForms)
+	{
+		LOG_STRM_ERROR(AStreamJid,"Failed to load messages: Not capable");
+	}
+	return QString::null;
+
 }
 
 QString ServerMessageArchive::saveCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection)
 {
-	QString id = saveServerCollection(AStreamJid,ACollection);
-	if (!id.isEmpty())
-	{
-		LocalCollectionRequest request;
-		request.id = QUuid::createUuid().toString();
-		request.streamJid = AStreamJid;
-		request.collection = ACollection;
-		FLocalSaveCollectionRequests.insert(id,request);
-		return request.id;
-	}
 	return QString::null;
 }
 
 QString ServerMessageArchive::loadHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest)
 {
-	QString id = loadServerHeaders(AStreamJid,ARequest);
-	if (!id.isEmpty())
-	{
-		LocalHeadersRequest request;
-		request.id = QUuid::createUuid().toString();
-		request.streamJid = AStreamJid;
-		request.request = ARequest;
-		FLocalLoadHeadersRequests.insert(id,request);
-		return request.id;
-	}
 	return QString::null;
 }
 
 QString ServerMessageArchive::loadCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader)
 {
-	QString id = loadServerCollection(AStreamJid,AHeader);
-	if (!id.isEmpty())
-	{
-		LocalCollectionRequest request;
-		request.id = QUuid::createUuid().toString();
-		request.streamJid = AStreamJid;
-		request.collection.header = AHeader;
-		FLocalLoadCollectionRequests.insert(id,request);
-		return request.id;
-	}
 	return QString::null;
 }
 
 QString ServerMessageArchive::removeCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest)
 {
-	if (FStanzaProcessor && isCapable(AStreamJid,ArchiveManagement))
-	{
-		Stanza stanza(STANZA_KIND_IQ);
-		stanza.setType(STANZA_TYPE_SET).setUniqueId();
-
-		QDomElement removeElem = stanza.addElement("remove",FNamespaces.value(AStreamJid));
-		if (ARequest.with.isValid())
-			removeElem.setAttribute("with",ARequest.with.full());
-		if (ARequest.with.isValid() && ARequest.exactmatch)
-			removeElem.setAttribute("exactmatch",QVariant(ARequest.exactmatch).toString());
-		if (ARequest.start.isValid())
-			removeElem.setAttribute("start",DateTime(ARequest.start).toX85UTC());
-		if (ARequest.end.isValid())
-			removeElem.setAttribute("end",DateTime(ARequest.end).toX85UTC());
-		if (ARequest.openOnly)
-			removeElem.setAttribute("open",QVariant(ARequest.openOnly).toString());
-
-		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,ARCHIVE_REQUEST_TIMEOUT))
-		{
-			LOG_STRM_DEBUG(AStreamJid,QString("Remove collections request sent, id=%1").arg(stanza.id()));
-			FServerRemoveCollectionsRequests.insert(stanza.id(),ARequest);
-			return stanza.id();
-		}
-		else
-		{
-			LOG_STRM_WARNING(AStreamJid,"Failed to send remove collections request");
-		}
-	}
-	else if (FStanzaProcessor)
-	{
-		LOG_STRM_ERROR(AStreamJid,"Failed to remove collections: Not capable");
-	}
 	return QString::null;
 }
 
 QString ServerMessageArchive::loadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &ANextRef)
 {
-	QString id = loadServerModifications(AStreamJid,AStart,ACount,ANextRef);
-	if (!id.isEmpty())
-	{
-		LocalModificationsRequest request;
-		request.id = QUuid::createUuid().toString();
-		request.streamJid = AStreamJid;
-		request.start = AStart;
-		request.count = ACount;
-		FLocalLoadModificationsRequests.insert(id,request);
-		return request.id;
-	}
 	return QString::null;
 }
 
-QString ServerMessageArchive::loadServerHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest, const QString &ANextRef)
-{
-	if (FStanzaProcessor && isCapable(AStreamJid,ArchiveManagement))
-	{
-		Stanza stanza(STANZA_KIND_IQ);
-		stanza.setType(STANZA_TYPE_GET).setUniqueId();
-
-		QDomElement listElem = stanza.addElement("list",FNamespaces.value(AStreamJid));
-		if (ARequest.with.isValid())
-			listElem.setAttribute("with",ARequest.with.full());
-		if (ARequest.with.isValid() && ARequest.exactmatch)
-			listElem.setAttribute("exactmatch",QVariant(ARequest.exactmatch).toString());
-		if (ARequest.start.isValid())
-			listElem.setAttribute("start",DateTime(ARequest.start).toX85UTC());
-		if (ARequest.end.isValid())
-			listElem.setAttribute("end",DateTime(ARequest.end).toX85UTC());
-		insertResultSetRequest(listElem,ANextRef,MAX_HEADER_ITEMS,ARequest.maxItems,ARequest.order);
-		
-		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,ARCHIVE_REQUEST_TIMEOUT))
-		{
-			LOG_STRM_DEBUG(AStreamJid,QString("Load headers request sent, id=%1, nextref=%2").arg(stanza.id(),ANextRef));
-			FServerLoadHeadersRequests.insert(stanza.id(),ARequest);
-			return stanza.id();
-		}
-		else
-		{
-			LOG_STRM_WARNING(AStreamJid,"Failed to send load headers request");
-		}
-	}
-	else if (FStanzaProcessor)
-	{
-		LOG_STRM_ERROR(AStreamJid,"Failed to load headers: Not capable");
-	}
-	return QString::null;
-}
-
-QString ServerMessageArchive::saveServerCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection, const QString &ANextRef)
-{
-	if (FStanzaProcessor && isCapable(AStreamJid,ManualArchiving) && ACollection.header.with.isValid() && ACollection.header.start.isValid())
-	{
-		Stanza stanza(STANZA_KIND_IQ);
-		stanza.setType(STANZA_TYPE_SET).setUniqueId();
-
-		QDomElement chatElem = stanza.addElement("save",FNamespaces.value(AStreamJid)).appendChild(stanza.createElement("chat")).toElement();
-		FArchiver->collectionToElement(ACollection,chatElem);
-
-		int curItem = 0;
-		int firstItem = !ANextRef.isEmpty() ? ANextRef.toInt() : 0;
-
-		QByteArray uploadData;
-		QTextStream ts(&uploadData, QIODevice::WriteOnly);
-		ts.setCodec("UTF-8");
-		int maxUploadSize = Options::node(OPV_SERVERARCHIVE_MAXUPLOADSIZE).value().toInt();
-
-		QString nextRef;
-		QDomElement itemElem = chatElem.firstChildElement();
-		while(!itemElem.isNull())
-		{
-			bool removeItem;
-			if (curItem < firstItem)
-			{
-				removeItem = true;
-			}
-			else if (curItem == firstItem)
-			{
-				itemElem.save(ts,0);
-				removeItem = false;
-			}
-			else if (uploadData.size() > maxUploadSize)
-			{
-				removeItem = true;
-			}
-			else
-			{
-				itemElem.save(ts,0);
-				removeItem = (uploadData.size() > maxUploadSize);
-			}
-
-			if (removeItem)
-			{
-				if (curItem>firstItem && nextRef.isEmpty())
-					nextRef = QString::number(curItem);
-
-				QDomElement deleteElem = itemElem;
-				itemElem = itemElem.nextSiblingElement();
-				chatElem.removeChild(deleteElem);
-			}
-			else
-			{
-				itemElem = itemElem.nextSiblingElement();
-			}
-
-			curItem++;
-		}
-
-		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,ARCHIVE_REQUEST_TIMEOUT))
-		{
-			LOG_STRM_DEBUG(AStreamJid,QString("Save collection request sent, id=%1, nextref=%2").arg(stanza.id(),ANextRef));
-			ServerCollectionRequest requet;
-			requet.nextRef = nextRef;
-			requet.collection = ACollection;
-			FServerSaveCollectionRequests.insert(stanza.id(),requet);
-			return stanza.id();
-		}
-		else
-		{
-			LOG_STRM_WARNING(AStreamJid,"Failed to send save collection request");
-		}
-	}
-	else if (!isCapable(AStreamJid,ManualArchiving))
-	{
-		LOG_STRM_ERROR(AStreamJid,"Failed to save collection: Not capable");
-	}
-	else if (FStanzaProcessor)
-	{
-		REPORT_ERROR("Failed to save collection: Invalid params");
-	}
-	return QString::null;
-}
-
-QString ServerMessageArchive::loadServerCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &ANextRef)
-{
-	if (FStanzaProcessor && isCapable(AStreamJid,ArchiveManagement) && AHeader.with.isValid() && AHeader.start.isValid())
-	{
-		Stanza stanza(STANZA_KIND_IQ);
-		stanza.setType(STANZA_TYPE_GET).setUniqueId();
-
-		QDomElement retrieveElem = stanza.addElement("retrieve",FNamespaces.value(AStreamJid));
-		retrieveElem.setAttribute("with",AHeader.with.full());
-		retrieveElem.setAttribute("start",DateTime(AHeader.start).toX85UTC());
-		insertResultSetRequest(retrieveElem,ANextRef,MAX_MESSAGE_ITEMS);
-
-		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,ARCHIVE_REQUEST_TIMEOUT))
-		{
-			LOG_STRM_DEBUG(AStreamJid,QString("Load collection request sent, id=%1").arg(stanza.id()));
-			FServerLoadCollectionRequests.insert(stanza.id(),AHeader);
-			return stanza.id();
-		}
-		else
-		{
-			LOG_STRM_WARNING(AStreamJid,"Failed to send load collection request");
-		}
-	}
-	else if (!isCapable(AStreamJid,ArchiveManagement))
-	{
-		LOG_STRM_ERROR(AStreamJid,"Failed to load collection: Not capable");
-	}
-	else if (FStanzaProcessor)
-	{
-		REPORT_ERROR("Failed to load collection: Invalid params");
-	}
-	return QString::null;
-}
-
-QString ServerMessageArchive::loadServerModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &ANextRef)
-{
-	if (FStanzaProcessor && isCapable(AStreamJid,ArchiveManagement) && AStart.isValid() && ACount>0)
-	{
-		Stanza stanza(STANZA_KIND_IQ);
-		stanza.setType(STANZA_TYPE_GET).setUniqueId();
-
-		QDomElement modifyElem = stanza.addElement("modified",FNamespaces.value(AStreamJid));
-		modifyElem.setAttribute("start",DateTime(AStart).toX85UTC());
-		insertResultSetRequest(modifyElem,ANextRef,MAX_MODIFICATION_ITEMS,ACount);
-		
-		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,ARCHIVE_REQUEST_TIMEOUT))
-		{
-			LOG_STRM_DEBUG(AStreamJid,QString("Load server modifications request sent, id=%1, nextref=%2").arg(stanza.id(),ANextRef));
-			ServerModificationsRequest request = { AStart, (quint32)ACount };
-			FServerLoadModificationsRequests.insert(stanza.id(),request);
-			return stanza.id();
-		}
-		else
-		{
-			LOG_STRM_WARNING(AStreamJid,"Failed to send load modifications request");
-		}
-	}
-	else if (!isCapable(AStreamJid,ArchiveManagement))
-	{
-		LOG_STRM_ERROR(AStreamJid,"Failed to load modifications: Not capable");
-	}
-	else if (FStanzaProcessor)
-	{
-		REPORT_ERROR("Failed to load modifications: Invalid params");
-	}
-	return QString::null;
-}
-
-ResultSet ServerMessageArchive::readResultSetAnswer(const QDomElement &AElem) const
+ResultSet ServerMessageArchive::readResultSetReply(const QDomElement &AElem) const
 {
 	ResultSet resultSet;
 
-	QDomElement setElem = AElem.firstChildElement("set");
-	while (!setElem.isNull() && setElem.namespaceURI()!=NS_RESULTSET)
-		setElem = setElem.nextSiblingElement("set");
-
+	QDomElement setElem = Stanza::findElement(AElem, "set", NS_RESULTSET);
 	if (!setElem.isNull())
 	{
 		bool countOk = false;
@@ -639,200 +310,30 @@ void ServerMessageArchive::insertResultSetRequest(QDomElement &AElem, const QStr
 		setElem.appendChild(AElem.ownerDocument().createElement("before"));
 }
 
-QString ServerMessageArchive::getNextRef(const ResultSet &AResultSet, quint32 ACount, quint32 ALimit, quint32 AMax, Qt::SortOrder AOrder) const
-{
-	QString nextRef;
-	if (ACount > 0)
-	{
-		if (AResultSet.hasCount)
-		{
-			bool hasMore = AOrder==Qt::AscendingOrder ? AResultSet.index+ACount<AResultSet.count : AResultSet.index>0;
-			if (hasMore && ACount<AMax)
-				nextRef = AOrder==Qt::AscendingOrder ? AResultSet.last : AResultSet.first;
-		}
-		else
-		{
-			bool hasMore = ACount >= qMin(AMax,ALimit);
-			if (hasMore && ACount<AMax)
-				nextRef = AOrder==Qt::AscendingOrder ? AResultSet.last : AResultSet.first;
-		}
-	}
-	return nextRef;
-}
-
-bool ServerMessageArchive::checkRequestHeader(const IArchiveHeader &AHeader, const IArchiveRequest &ARequest) const
-{
-	if (ARequest.start.isValid() && ARequest.start>AHeader.start)
-		return false;
-
-	if (ARequest.end.isValid() && ARequest.end<AHeader.start)
-		return false;
-
-	if (!ARequest.threadId.isEmpty() && ARequest.threadId!=AHeader.threadId)
-		return false;
-
-	if (ARequest.with.isValid() && ARequest.with!=AHeader.with)
-	{
-		if (ARequest.exactmatch)
-			return false;
-
-		if (ARequest.with.hasNode() && ARequest.with.pNode()!=AHeader.with.pNode())
-			return false;
-
-		if (ARequest.with.hasResource() && ARequest.with.pResource()!=AHeader.with.pResource())
-			return false;
-	}
-
-	return true;
-}
-
 void ServerMessageArchive::onArchivePrefsOpened(const Jid &AStreamJid)
 {
+	if (FStanzaProcessor)
+	{
+		IStanzaHandle shandle;
+		shandle.handler = this;
+		shandle.streamJid = AStreamJid;
+		shandle.order = SHO_MI_ARCHIVE_RESULT;
+		shandle.direction = IStanzaHandle::DirectionIn;
+		shandle.conditions.append(SHC_ARCHIVE_RESULT);
+		shandle.conditions.append(SHC_ARCHIVE_RESULT_0);
+		FSHIResult.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
+	}
+
 	FNamespaces.insert(AStreamJid,FArchiver->supportedNamespace(AStreamJid));
+
 	emit capabilitiesChanged(AStreamJid);
 }
 
 void ServerMessageArchive::onArchivePrefsClosed(const Jid &AStreamJid)
 {
+	FSHIResult.remove(AStreamJid);
 	FNamespaces.remove(AStreamJid);
 	emit capabilitiesChanged(AStreamJid);
-}
-
-void ServerMessageArchive::onServerRequestFailed(const QString &AId, const XmppError &AError)
-{
-	if (FLocalLoadHeadersRequests.contains(AId))
-	{
-		LocalHeadersRequest request = FLocalLoadHeadersRequests.take(AId);
-		emit requestFailed(request.id,AError);
-	}
-	else if (FLocalSaveCollectionRequests.contains(AId))
-	{
-		LocalCollectionRequest request = FLocalSaveCollectionRequests.take(AId);
-		emit requestFailed(request.id,AError);
-	}
-	else if (FLocalLoadCollectionRequests.contains(AId))
-	{
-		LocalCollectionRequest request = FLocalLoadCollectionRequests.take(AId);
-		emit requestFailed(request.id,AError);
-	}
-	else if (FLocalLoadModificationsRequests.contains(AId))
-	{
-		LocalModificationsRequest request = FLocalLoadModificationsRequests.take(AId);
-		emit requestFailed(request.id,AError);
-	}
-}
-
-void ServerMessageArchive::onServerHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders, const QString &ANextRef)
-{
-	if (FLocalLoadHeadersRequests.contains(AId))
-	{
-		LocalHeadersRequest request = FLocalLoadHeadersRequests.take(AId);
-		request.headers += AHeaders;
-
-		if (!ANextRef.isEmpty() && ANextRef!=request.lastRef && (quint32)request.headers.count()<request.request.maxItems)
-		{
-			IArchiveRequest nextRequest = request.request;
-			nextRequest.maxItems -= request.headers.count();
-
-			QString id = loadServerHeaders(request.streamJid,nextRequest,ANextRef);
-			if (!id.isEmpty())
-			{
-				request.lastRef = ANextRef;
-				FLocalLoadHeadersRequests.insert(id,request);
-			}
-			else
-			{
-				emit requestFailed(request.id,XmppError(IERR_HISTORY_HEADERS_LOAD_ERROR));
-			}
-		}
-		else
-		{
-			emit headersLoaded(request.id,request.headers);
-		}
-	}
-}
-
-void ServerMessageArchive::onServerCollectionSaved(const QString &AId, const IArchiveCollection &ACollection, const QString &ANextRef)
-{
-	if (FLocalSaveCollectionRequests.contains(AId))
-	{
-		LocalCollectionRequest request = FLocalSaveCollectionRequests.take(AId);
-		if (!ANextRef.isEmpty() && ANextRef!=request.lastRef)
-		{
-			QString id = saveServerCollection(request.streamJid,request.collection,ANextRef);
-			if (!id.isEmpty())
-			{
-				request.lastRef = ANextRef;
-				FLocalSaveCollectionRequests.insert(id,request);
-			}
-			else
-			{
-				emit requestFailed(request.id,XmppError(IERR_HISTORY_CONVERSATION_SAVE_ERROR));
-			}
-		}
-		else
-		{
-			emit collectionSaved(request.id,ACollection);
-		}
-	}
-}
-
-void ServerMessageArchive::onServerCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection, const QString &ANextRef)
-{
-	if (FLocalLoadCollectionRequests.contains(AId))
-	{
-		LocalCollectionRequest request = FLocalLoadCollectionRequests.take(AId);
-		request.collection.header = ACollection.header;
-		request.collection.body.messages += ACollection.body.messages;
-		request.collection.body.notes += ACollection.body.notes;
-		if (!ANextRef.isEmpty() && ANextRef!=request.lastRef)
-		{
-			QString id = loadServerCollection(request.streamJid,ACollection.header,ANextRef);
-			if (!id.isEmpty())
-			{
-				request.lastRef = ANextRef;
-				FLocalLoadCollectionRequests.insert(id,request);
-			}
-			else
-			{
-				emit requestFailed(request.id,XmppError(IERR_HISTORY_CONVERSATION_LOAD_ERROR));
-			}
-		}
-		else
-		{
-			emit collectionLoaded(request.id,request.collection);
-		}
-	}
-}
-
-void ServerMessageArchive::onServerModificationsLoaded(const QString &AId, const IArchiveModifications &AModifs, const QString &ANextRef)
-{
-	if (FLocalLoadModificationsRequests.contains(AId))
-	{
-		LocalModificationsRequest request = FLocalLoadModificationsRequests.take(AId);
-		request.modifications.start = AModifs.start;
-		request.modifications.next = AModifs.next;
-		request.modifications.items += AModifs.items;
-
-		if (!ANextRef.isEmpty() && ANextRef!=request.lastRef && (quint32)request.modifications.items.count()<request.count)
-		{
-			quint32 nextCount = request.count-request.modifications.items.count();
-			QString id = loadServerModifications(request.streamJid,request.start,nextCount,ANextRef);
-			if (!id.isEmpty())
-			{
-				request.lastRef = ANextRef;
-				FLocalLoadModificationsRequests.insert(id,request);
-			}
-			else
-			{
-				emit requestFailed(request.id,XmppError(IERR_HISTORY_MODIFICATIONS_LOAD_ERROR));
-			}
-		}
-		else
-		{
-			emit modificationsLoaded(request.id,request.modifications);
-		}
-	}
 }
 
 Q_EXPORT_PLUGIN2(plg_servermessagearchive, ServerMessageArchive)

@@ -604,7 +604,7 @@ void ChatMessageHandler::showHistory(IMessageChatWindow *AWindow)
 			}
 			else if (noteIt != history.notes.constEnd())
 			{
-				showStyledStatus(AWindow,noteIt.value(),true,noteIt.key());
+				showStyledStatus(AWindow,noteIt.value(),noteIt.key());
 				++noteIt;
 			}
 		}
@@ -635,7 +635,7 @@ void ChatMessageHandler::requestHistory(IMessageChatWindow *AWindow)
 			request.maxItems = HISTORY_MESSAGES;
 		request.end = QDateTime::currentDateTime();
 
-		showStyledStatus(AWindow,tr("Loading history..."),true);
+		showStyledStatus(AWindow,tr("Loading history..."));
 		QMultiMap<Jid,Jid> addresses = AWindow->address()->availAddresses(true);
 		for (QMultiMap<Jid,Jid>::const_iterator it=addresses.constBegin(); it!=addresses.constEnd(); ++it)
 		{
@@ -720,15 +720,12 @@ void ChatMessageHandler::fillContentOptions(const Jid &AStreamJid, const Jid &AC
 	}
 }
 
-void ChatMessageHandler::showStyledStatus(IMessageChatWindow *AWindow, const QString &AMessage, bool ADontSave, const QDateTime &ATime)
+void ChatMessageHandler::showStyledStatus(IMessageChatWindow *AWindow, const QString &AMessage, const QDateTime &ATime)
 {
 	IMessageStyleContentOptions options;
 	options.kind = IMessageStyleContentOptions::KindStatus;
 	options.direction = IMessageStyleContentOptions::DirectionIn;
 	options.time = ATime;
-
-	if (!ADontSave && FMessageArchiver && Options::node(OPV_MESSAGES_ARCHIVESTATUS).value().toBool())
-		FMessageArchiver->saveNote(AWindow->streamJid(), AWindow->contactJid(), AMessage);
 
 	showDateSeparator(AWindow,options.time);
 	fillContentOptions(AWindow->streamJid(),AWindow->contactJid(),options);
@@ -1095,7 +1092,7 @@ void ChatMessageHandler::onArchiveRequestFailed(const QString &AId, const XmppEr
 		IMessageChatWindow *window = FHistoryRequests.take(AId);
 		LOG_STRM_WARNING(window->streamJid(),QString("Failed to load chat history, id=%1: %2").arg(AId,AError.condition()));
 		showHistory(window);
-		showStyledStatus(window,tr("Failed to load history: %1").arg(AError.errorMessage()),true);
+		showStyledStatus(window,tr("Failed to load history: %1").arg(AError.errorMessage()));
 	}
 }
 

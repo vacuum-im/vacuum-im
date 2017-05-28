@@ -64,8 +64,10 @@
 
 #define NS_COMMANDS                             "http://jabber.org/protocol/commands"
 
-#define NS_ARCHIVE_MAM                          "urn:xmpp:mam:1"
+#define NS_ARCHIVE_MAM                          "urn:xmpp:mam"
 #define NS_ARCHIVE_MAM_0                        "urn:xmpp:mam:0"
+#define NS_ARCHIVE_MAM_1                        "urn:xmpp:mam:1"
+#define NS_ARCHIVE_MAM_2                        "urn:xmpp:mam:2"
 
 #define NS_RESULTSET                            "http://jabber.org/protocol/rsm"
 

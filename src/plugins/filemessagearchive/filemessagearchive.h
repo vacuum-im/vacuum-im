@@ -41,6 +41,9 @@ public:
 	virtual int capabilityOrder(quint32 ACapability, const Jid &AStreamJid = Jid::null) const;
 	virtual bool saveMessage(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn);
 	virtual bool saveNote(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn);
+	virtual QString loadMessages(const Jid &AStreamJid, const IArchiveRequest &ARequest, const QString &ANextRef = QString::null);
+
+
 	virtual QString saveCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection);
 	virtual QString loadHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest);
 	virtual QString loadCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader);
@@ -70,6 +73,9 @@ signals:
 	//IArchiveEngine
 	void capabilitiesChanged(const Jid &AStreamJid);
 	void requestFailed(const QString &AId, const XmppError &AError);
+	void messagesLoaded(const QString &AId, const IArchiveReply &AReply);
+	
+	
 	void headersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders);
 	void collectionSaved(const QString &AId, const IArchiveCollection &ACollection);
 	void collectionLoaded(const QString &AId, const IArchiveCollection &ACollection);

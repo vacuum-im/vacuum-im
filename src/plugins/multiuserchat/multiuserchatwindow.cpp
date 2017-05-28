@@ -1621,7 +1621,7 @@ void MultiUserChatWindow::showMultiChatTopic(const QString &ATopic, const QStrin
 	}
 }
 
-void MultiUserChatWindow::showMultiChatStatusMessage(const QString &AMessage, int AType, int AStatus, bool ADontSave, const QDateTime &ATime)
+void MultiUserChatWindow::showMultiChatStatusMessage(const QString &AMessage, int AType, int AStatus, const QDateTime &ATime)
 {
 	if (FMessageStyleManager)
 	{
@@ -1636,9 +1636,6 @@ void MultiUserChatWindow::showMultiChatStatusMessage(const QString &AMessage, in
 			options.timeFormat = FMessageStyleManager->timeFormat(options.time,options.time);
 		else
 			options.timeFormat = FMessageStyleManager->timeFormat(options.time);
-
-		if (!ADontSave && FMessageArchiver && Options::node(OPV_MUC_ARCHIVESTATUS).value().toBool())
-			FMessageArchiver->saveNote(FMultiChat->streamJid(), FMultiChat->roomJid(), AMessage);
 
 		showDateSeparator(FViewWidget,options.time);
 		FViewWidget->appendText(AMessage,options);
@@ -1787,7 +1784,7 @@ void MultiUserChatWindow::requestMultiChatHistory()
 		if (!reqId.isEmpty())
 		{
 			LOG_STRM_INFO(streamJid(),QString("Load multi chat history request sent, room=%1, id=%2").arg(request.with.bare(),reqId));
-			showMultiChatStatusMessage(tr("Loading history..."),IMessageStyleContentOptions::TypeEmpty,IMessageStyleContentOptions::StatusEmpty,true);
+			showMultiChatStatusMessage(tr("Loading history..."),IMessageStyleContentOptions::TypeEmpty,IMessageStyleContentOptions::StatusEmpty);
 			FHistoryRequests.insert(reqId,NULL);
 		}
 		else
@@ -3109,7 +3106,7 @@ void MultiUserChatWindow::onArchiveRequestFailed(const QString &AId, const XmppE
 		else
 		{
 			LOG_STRM_WARNING(streamJid(),QString("Failed to load multi chat history, room=%1, id=%2: %3").arg(contactJid().bare(),AId,AError.condition()));
-			showMultiChatStatusMessage(tr("Failed to load history: %1").arg(AError.errorMessage()),IMessageStyleContentOptions::TypeNotification,IMessageStyleContentOptions::StatusError,true);
+			showMultiChatStatusMessage(tr("Failed to load history: %1").arg(AError.errorMessage()),IMessageStyleContentOptions::TypeNotification,IMessageStyleContentOptions::StatusError);
 		}
 		FPendingMessages.remove(window);
 		FPendingContent.remove(window);
@@ -3157,7 +3154,7 @@ void MultiUserChatWindow::onArchiveMessagesLoaded(const QString &AId, const IArc
 				if (window)
 					showPrivateChatStatusMessage(window,noteIt.value(),IMessageStyleContentOptions::StatusEmpty,noteIt.key());
 				else
-					showMultiChatStatusMessage(noteIt.value(),IMessageStyleContentOptions::TypeEmpty,IMessageStyleContentOptions::StatusEmpty,true,noteIt.key());
+					showMultiChatStatusMessage(noteIt.value(),IMessageStyleContentOptions::TypeEmpty,IMessageStyleContentOptions::StatusEmpty);
 				++noteIt;
 			}
 		}
