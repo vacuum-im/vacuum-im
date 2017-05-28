@@ -320,7 +320,7 @@
     </message>
     <message numerus="yes">
         <source>Are you sure you wish to remove &lt;b&gt;%n contact(s)&lt;/b&gt; from the roster?</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
 </context>
 <context>

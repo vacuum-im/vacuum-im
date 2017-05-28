@@ -139,7 +139,7 @@
     </message>
     <message numerus="yes">
         <source>%n message(s) from &apos;%1&apos;</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
     <message>
         <source>There are no unread messages</source>

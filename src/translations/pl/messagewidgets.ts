@@ -200,7 +200,7 @@
     <name>NormalWindow</name>
     <message numerus="yes">
         <source>Selected %n contact(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
     <message>
         <source>Subject</source>

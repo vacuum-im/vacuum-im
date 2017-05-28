@@ -7,7 +7,7 @@
     </message>
     <message numerus="yes">
         <source>The following &lt;b&gt;%n contact(s)&lt;/b&gt; will be merged into metacontact:</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
 </context>
 <context>

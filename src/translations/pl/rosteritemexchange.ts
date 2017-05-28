@@ -65,7 +65,7 @@
     </message>
     <message numerus="yes">
         <source>Send %n Contact(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
     <message>
         <source>Roster modification request from %1</source>
@@ -81,7 +81,7 @@
     </message>
     <message numerus="yes">
         <source>Failed to send %n contact(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
     <message>
         <source>Contacts list management</source>
@@ -93,7 +93,7 @@
     </message>
     <message numerus="yes">
         <source>%n contact(s) sent</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
 </context>
 </TS>

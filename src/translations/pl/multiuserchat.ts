@@ -145,11 +145,11 @@
     </message>
     <message numerus="yes">
         <source>Move %n user(s) to &apos;%1&apos;</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
     <message numerus="yes">
         <source>Delete %n user(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
     <message>
         <source>Users Lists - %1</source>
@@ -890,7 +890,7 @@
     </message>
     <message numerus="yes">
         <source>Conference with %1 and %n other contact(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
     <message>
         <source>Conference with %1</source>
@@ -1433,7 +1433,7 @@
     </message>
     <message numerus="yes">
         <source>You invited %1 and %n other contact(s) to this conference. %2</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
     <message>
         <source>You invited %1 to this conference. %2</source>
@@ -1461,7 +1461,7 @@
     </message>
     <message numerus="yes">
         <source>Failed to invite %1 and %n other contact(s) to this conference: %2</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
     </message>
     <message>
         <source>Failed to invite %1 to this conference: %2</source>
