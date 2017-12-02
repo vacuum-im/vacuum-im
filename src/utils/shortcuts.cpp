@@ -5,7 +5,12 @@
 #include <QVariant>
 #include <QApplication>
 #include <QDesktopWidget>
-#include <thirdparty/qxtglobalshortcut/qxtglobalshortcut.h>
+
+#ifdef USE_SYSTEM_QXTGLOBALSHORTCUT
+#       include <qxtglobalshortcut/qxtglobalshortcut.h>
+#else
+#       include <thirdparty/qxtglobalshortcut/qxtglobalshortcut.h>
+#endif
 
 QKeySequence correctKeySequence(const QKeySequence &AKey)
 {

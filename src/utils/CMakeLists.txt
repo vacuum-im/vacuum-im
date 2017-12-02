@@ -9,10 +9,9 @@ include("utils.cmake")
 project(${VACUUM_UTILS_NAME})
 
 add_definitions("-DUTILS_DLL")
-add_definitions("-DQXT_STATIC")
 link_directories("${CMAKE_BINARY_DIR}/libs")
 
-set(ADD_LIBS qxtglobalshortcut idle)
+set(ADD_LIBS idle)
 
 add_translations(TRANSLATIONS "${VACUUM_UTILS_NAME}" ${SOURCES})
 add_library(${VACUUM_UTILS_NAME} SHARED ${SOURCES} ${MOC_SOURCES} ${TRANSLATIONS})
@@ -51,6 +50,13 @@ if (SYSTEM_MINIZIP_FOUND)
 else (SYSTEM_MINIZIP_FOUND)
 	list(APPEND ADD_LIBS minizip)
 endif (SYSTEM_MINIZIP_FOUND)
+
+if (SYSTEM_QXTGLOBALSHORTCUT_FOUND)
+	list(APPEND ADD_LIBS "${SYSTEM_QXTGLOBALSHORTCUT_FOUND}")
+else (SYSTEM_QXTGLOBALSHORTCUT_FOUND)
+	list(APPEND ADD_LIBS qxtglobalshortcut)
+	add_definitions("-DQXT_STATIC")
+endif (SYSTEM_QXTGLOBALSHORTCUT_FOUND)
 
 if (APPLE)
 	list(APPEND ADD_LIBS "-framework Carbon -framework IOKit -framework Cocoa")
