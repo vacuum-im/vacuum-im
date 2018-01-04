@@ -136,9 +136,11 @@ bool ViewWidget::appendMessage(const Message &AMessage, const IMessageStyleConte
 		IMessageStyleContentOptions options = AOptions;
 		if (AOptions.kind==IMessageStyleContentOptions::KindMessage && !AOptions.senderName.isEmpty())
 		{
+			static const QRegExp me("/me\\s");
+
 			QTextCursor cursor(&doc);
 			cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor,4);
-			if (cursor.selectedText() == "/me ")
+			if (me.exactMatch(cursor.selectedText()))
 			{
 				options.kind = IMessageStyleContentOptions::KindMeCommand;
 				cursor.removeSelectedText();
