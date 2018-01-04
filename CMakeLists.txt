@@ -51,7 +51,6 @@ set(LANGS "" CACHE STRING "List of languages to build localization for (this var
 set(USED_LANGS "" CACHE INTERNAL "List of languages actually used for generating targets")
 add_lang_options()
 
-set(NO_WEBKIT NO CACHE BOOL "Exclude QtWebKit from dependencies")
 set(FORCE_BUNDLED_MINIZIP NO CACHE BOOL "Use bundled minizip even if local system have one")
 
 find_library(SYSTEM_ZLIB_FOUND z)
@@ -63,12 +62,6 @@ find_library(SYSTEM_QXTGLOBALSHORTCUT_FOUND qxtglobalshortcut)
 if (FORCE_BUNDLED_MINIZIP)
 	set(SYSTEM_MINIZIP_FOUND NO)
 endif (FORCE_BUNDLED_MINIZIP)
-
-if (NO_WEBKIT)
-	add_definitions(-DNO_WEBKIT)
-else (NO_WEBKIT)
-	find_package (Qt5WebKit)
-endif (NO_WEBKIT)
 
 if (SYSTEM_ZLIB_FOUND)
 	add_definitions(-DUSE_SYSTEM_ZLIB)
