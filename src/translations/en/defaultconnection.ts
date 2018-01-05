@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
-<TS version="2.0" sourcelanguage="en" language="en">
+<TS version="2.1" sourcelanguage="en" language="en">
  <context>
   <name>ConnectionOptionsWidget</name>
   <message>
@@ -20,10 +20,6 @@
    <translation>Allow only trusted</translation>
   </message>
   <message>
-   <source>TLSv1</source>
-   <translation>TLSv1</translation>
-  </message>
-  <message>
    <source>SSLv3</source>
    <translation>SSLv3</translation>
   </message>
@@ -34,6 +30,18 @@
   <message>
    <source>Auto</source>
    <translation>Auto</translation>
+  </message>
+  <message>
+   <source>TLSv1.0</source>
+   <translation>TLSv1.0</translation>
+  </message>
+  <message>
+   <source>TLSv1.1</source>
+   <translation>TLSv1.1</translation>
+  </message>
+  <message>
+   <source>TLSv1.2</source>
+   <translation>TLSv1.2</translation>
   </message>
  </context>
  <context>

@@ -17,21 +17,6 @@
     </message>
 </context>
 <context>
-    <name>CombineContactsDialog</name>
-    <message>
-        <source>Combine Contacts</source>
-        <translation>Объединение контактов</translation>
-    </message>
-    <message numerus="yes">
-        <source>The following &lt;b&gt;%n contact(s)&lt;/b&gt; will be merged into metacontact:</source>
-        <translation>
-            <numerusform>Следующий &lt;b&gt;%n контакт&lt;/b&gt; будет объединен в метаконтакт:</numerusform>
-            <numerusform>Следующие &lt;b&gt;%n контакта&lt;/b&gt; будут объединены в метаконтакт:</numerusform>
-            <numerusform>Следующие &lt;b&gt;%n контактов&lt;/b&gt; будут объединены в метаконтакт:</numerusform>
-        </translation>
-    </message>
-</context>
-<context>
     <name>MetaContacts</name>
     <message>
         <source>Copy Metacontact to Group</source>

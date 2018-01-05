@@ -33,50 +33,15 @@
     </message>
     <message>
         <source>TLSv1.0</source>
-        <translation type="unfinished">TLSv1.0</translation>
+        <translation>TLSv1.0</translation>
     </message>
     <message>
         <source>TLSv1.1</source>
-        <translation type="unfinished">TLSv1.1</translation>
+        <translation>TLSv1.1</translation>
     </message>
     <message>
         <source>TLSv1.2</source>
-        <translation type="unfinished">TLSv1.2</translation>
-    </message>
-</context>
-<context>
-    <name>ConnectionOptionsWidget</name>
-    <message>
-        <source>Disable check</source>
-        <translation>Отключить проверку</translation>
-    </message>
-    <message>
-        <source>Request on errors</source>
-        <translation>Спрашивать при ошибках</translation>
-    </message>
-    <message>
-        <source>Disconnect on errors</source>
-        <translation>Отключаться при ошибках</translation>
-    </message>
-    <message>
-        <source>Allow only trusted</source>
-        <translation>Разрешать только доверенные</translation>
-    </message>
-    <message>
-        <source>TLSv1</source>
-        <translation>TLSv1</translation>
-    </message>
-    <message>
-        <source>SSLv3</source>
-        <translation>SSLv3</translation>
-    </message>
-    <message>
-        <source>SSLv2</source>
-        <translation>SSLv2</translation>
-    </message>
-    <message>
-        <source>Auto</source>
-        <translation>Автоматически</translation>
+        <translation>TLSv1.2</translation>
     </message>
 </context>
 <context>
