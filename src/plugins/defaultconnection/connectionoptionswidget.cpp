@@ -12,8 +12,8 @@ ConnectionOptionsWidget::ConnectionOptionsWidget(IConnectionManager *AManager, c
 
 	ui.cmbSslProtocol->addItem(tr("Auto"),QSsl::SecureProtocols);
 	ui.cmbSslProtocol->addItem(tr("TLSv1.0"),QSsl::TlsV1_0);
-	ui.cmbSslProtocol->addItem(tr("TLSv1.1"),QSsl::TlsV1_0);
-	ui.cmbSslProtocol->addItem(tr("TLSv1.2"),QSsl::TlsV1_0);
+	ui.cmbSslProtocol->addItem(tr("TLSv1.1"),QSsl::TlsV1_1);
+	ui.cmbSslProtocol->addItem(tr("TLSv1.2"),QSsl::TlsV1_2);
 	ui.cmbSslProtocol->addItem(tr("SSLv2"),QSsl::SslV2);
 	ui.cmbSslProtocol->addItem(tr("SSLv3"),QSsl::SslV3);
 
