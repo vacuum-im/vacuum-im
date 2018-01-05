@@ -28,6 +28,7 @@ moc_*.cpp
 Makefile
 Makefile.Debug
 Makefile.Release
+.qmake.stash
 
 
 #################
