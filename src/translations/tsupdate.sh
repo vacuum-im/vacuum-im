@@ -3,8 +3,8 @@
 LOPTIONS="-no-obsolete -locations none -source-language en"
 
 lupdate=lupdate
-if which -s lupdate-qt4; then
-	lupdate=lupdate-qt4
+if which -s lupdate-qt5; then
+	lupdate=lupdate-qt5
 fi
 
 lupdate="${lupdate} ${LOPTIONS}"
