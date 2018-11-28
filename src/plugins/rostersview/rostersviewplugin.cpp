@@ -46,6 +46,7 @@ RostersViewPlugin::RostersViewPlugin()
 	FShowOfflineAction = NULL;
 	FShowStatus = true;
 	FShowResource = true;
+	FExpandStateActive = 1;
 	FStartRestoreExpandState = false;
 
 	FViewSavedState.sliderPos = 0;
@@ -374,6 +375,24 @@ void RostersViewPlugin::startRestoreExpandState()
 	}
 }
 
+bool RostersViewPlugin::isExpandStateActive() const
+{
+	return FExpandStateActive > 0;
+}
+
+void RostersViewPlugin::setExpandStateActive(bool active)
+{
+	if (active)
+		FExpandStateActive++;
+	else
+		FExpandStateActive--;
+
+	if (!active && FExpandStateActive == 0)
+		emit expandStateActiveChanged(false);
+	else if (active && FExpandStateActive == 1)
+		emit expandStateActiveChanged(true);
+}
+
 void RostersViewPlugin::restoreExpandState(const QModelIndex &AParent)
 {
 	QAbstractItemModel *curModel = FRostersView->model();
@@ -428,18 +447,21 @@ void RostersViewPlugin::loadExpandState(const QModelIndex &AIndex)
 
 void RostersViewPlugin::saveExpandState(const QModelIndex &AIndex)
 {
-	QString indexId = indexExpandId(AIndex);
-	if (!indexId.isEmpty())
+	if (FExpandStateActive > 0)
 	{
-		QString rootId = rootExpandId(AIndex);
-		if (!rootId.isEmpty())
+		QString indexId = indexExpandId(AIndex);
+		if (!indexId.isEmpty())
 		{
-			bool expanded = FRostersView->isExpanded(AIndex);
-			bool defExpanded = FExpandableDefaults.value(AIndex.data(RDR_KIND).toInt(),true);
-			if (expanded != defExpanded)
-				FExpandStates[rootId][indexId] = expanded;
-			else
-				FExpandStates[rootId].remove(indexId);
+			QString rootId = rootExpandId(AIndex);
+			if (!rootId.isEmpty())
+			{
+				bool expanded = FRostersView->isExpanded(AIndex);
+				bool defExpanded = FExpandableDefaults.value(AIndex.data(RDR_KIND).toInt(),true);
+				if (expanded != defExpanded)
+					FExpandStates[rootId][indexId] = expanded;
+				else
+					FExpandStates[rootId].remove(indexId);
+			}
 		}
 	}
 }

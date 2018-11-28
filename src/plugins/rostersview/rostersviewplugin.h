@@ -47,6 +47,8 @@ public:
 	//IRostersViewPlugin
 	virtual IRostersView *rostersView();
 	virtual void startRestoreExpandState();
+	virtual bool isExpandStateActive() const;
+	virtual void setExpandStateActive(bool active);
 	virtual void restoreExpandState(const QModelIndex &AParent = QModelIndex());
 	virtual void registerExpandableRosterIndexKind(int AKind, int AUniqueRole, bool ADefaultExpanded = true);
 signals:
@@ -54,6 +56,8 @@ signals:
 	void rosterDataChanged(IRosterIndex *AIndex, int ARole);
 	//IRostersLabelHolder
 	void rosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex = NULL);
+	//IRostersViewPlugin
+	void expandStateActiveChanged(bool active);
 protected:
 	QString rootExpandId(const QModelIndex &AIndex) const;
 	QString indexExpandId(const QModelIndex &AIndex) const;
@@ -89,6 +93,7 @@ private:
 	IAccountManager *FAccountManager;
 	IMainWindowPlugin *FMainWindowPlugin;
 private:
+	int FExpandStateActive;
 	bool FStartRestoreExpandState;
 	QMap<int, int> FExpandableKinds;
 	QMap<int, int> FExpandableDefaults;
