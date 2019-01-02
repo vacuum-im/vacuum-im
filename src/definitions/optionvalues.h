@@ -94,6 +94,7 @@
 #define OPV_MESSAGES_ARCHIVESTATUS                      "messages.archive-status"
 #define OPV_MESSAGES_EDITORAUTORESIZE                   "messages.editor-auto-resize"
 #define OPV_MESSAGES_EDITORMINIMUMLINES                 "messages.editor-minimum-lines"
+#define OPV_MESSAGES_EDITORBASEFONTSIZE                 "messages.editor-base-font-size"
 #define OPV_MESSAGES_CLEANCHATTIMEOUT                   "messages.clean-chat-timeout"
 #define OPV_MESSAGES_COMBINEWITHROSTER                  "messages.combine-with-roster"
 #define OPV_MESSAGES_TABWINDOWS_ROOT                    "messages.tab-windows"
