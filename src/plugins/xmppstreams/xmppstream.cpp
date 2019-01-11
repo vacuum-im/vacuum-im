@@ -427,7 +427,7 @@ void XmppStream::startStream()
 	stream.setAttribute("to", FStreamJid.domain());
 	stream.setAttribute("xmlns", NS_JABBER_CLIENT);
 	stream.setAttribute("xmlns:xml", NS_XML);
-	stream.setAttribute("xml:lang", !FDefLang.isEmpty() ? FDefLang : QLocale().name());
+	stream.setAttribute("xml:lang", !FDefLang.isEmpty() ? FDefLang : QLocale().name().split('_').value(0));
 
 	setStreamState(SS_INITIALIZE);
 	if (!processStanzaHandlers(stream,true))
