@@ -51,5 +51,9 @@
             <numerusform>%1 исполняется %n лет</numerusform>
         </translation>
     </message>
+    <message>
+        <source>Birthday tomorrow!</source>
+        <translation>День рождения завтра!</translation>
+    </message>
 </context>
 </TS>
