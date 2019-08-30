@@ -150,7 +150,9 @@ bool SASLAuthFeature::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, in
 				QByteArray salt = QByteArray::fromBase64(challengeMap.value("s"));
 				QByteArray serverNonce = challengeMap.value("r");
 				if (!serverNonce.startsWith(SCRAMSHA1_clientNonce))
-					goto error_jmp;
+				{
+					return challengeResponseError(FXmppStream->streamJid(), AStanza);
+				}
 
 				QByteArray clientFinalMessageBare = "c=biws,r=" + serverNonce;
 				// Sha1 dkLen always 20
@@ -185,7 +187,9 @@ bool SASLAuthFeature::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, in
 					QByteArray verificationServerSignature = QByteArray::fromBase64(AStanza.element().text().toLatin1());
 					QByteArray savedServerSignature = QByteArray("v=").append(SCRAMSHA1_ServerSignature.toBase64());
 					if (verificationServerSignature != savedServerSignature)
-						goto error_jmp;
+					{
+						return challengeResponseError(FXmppStream->streamJid(), AStanza);
+					}
 				}
 
 				LOG_STRM_INFO(FXmppStream->streamJid(),"Authorization successes");
@@ -199,15 +203,18 @@ bool SASLAuthFeature::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, in
 				emit error(err);
 			}
 			else
-			{
-				error_jmp:
-				XmppError err(IERR_SASL_AUTH_INVALID_RESPONSE);
-				LOG_STRM_WARNING(FXmppStream->streamJid(),QString("Authorization error: Invalid stanza kind=%1").arg(AStanza.kind()));
-				emit error(err);
-			}
+				return challengeResponseError(FXmppStream->streamJid(), AStanza);
 		}
 		return true;
 	}
+	return false;
+}
+
+bool SASLAuthFeature::challengeResponseError(const Jid &streamJid, const Stanza &AStanza)
+{
+	XmppError err(IERR_SASL_AUTH_INVALID_RESPONSE);
+	LOG_STRM_WARNING(streamJid,QString("Authorization error: Invalid stanza kind=%1").arg(AStanza.kind()));
+	emit error(err);
 	return false;
 }
 
