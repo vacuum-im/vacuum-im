@@ -10,7 +10,7 @@ compiler:
  
 env:
   global:
-   - DOCKER_IMAGE=krab90/ubuntu-qt5:16.10_5.6.1
+   - DOCKER_IMAGE=krab90/ubuntu-qt5:18.04_5.9.5
   matrix:
    - BUILD_SYSTEM=cmake
    - BUILD_SYSTEM=qmake
