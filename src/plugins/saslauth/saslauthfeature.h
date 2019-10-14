@@ -36,10 +36,7 @@ private:
 	QString FSelectedMechanism;
 	QByteArray SCRAMSHA1_clientNonce;
 	QByteArray SCRAMSHA1_initialMessage;
-	QByteArray SCRAMSHA1_GS2Header;
 	QByteArray SCRAMSHA1_ServerSignature;
-
-	bool challengeResponseError(const Jid &streamJid, const Stanza &AStanza);
 };
 
 #endif // SASLAUTHFEATURE_H
