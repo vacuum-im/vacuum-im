@@ -255,8 +255,8 @@ void ArchiveViewWindow::setAddresses(const QMultiMap<Jid,Jid> &AAddresses)
 			if (!it.value().isEmpty())
 				namesList.append(contactName(it.key(),it.value(),isConferenceDomain(it.value())));
 		}
-		namesList = namesList.toSet().toList(); qSort(namesList);
-		setWindowTitle(tr("Conversation History") + (!namesList.isEmpty() ? " - " + namesList.join(", ") : QString::null));
+		namesList = namesList.toSet().toList(); std::sort(namesList.begin(), namesList.end());
+		setWindowTitle(tr("Conversation History") + (!namesList.isEmpty() ? " - " + namesList.join(", ") : QString()));
 
 		FArchiveSearchEnabled = false;
 		foreach(const Jid &streamJid, FAddresses.uniqueKeys())
@@ -833,14 +833,14 @@ void ArchiveViewWindow::showCollection(const ArchiveCollection &ACollection)
 
 		FViewOptions.style = NULL;
 		FViewOptions.isGroupChat = false;
-		FViewOptions.lastInfo = QString::null;
-		FViewOptions.lastSubject = QString::null;
+		FViewOptions.lastInfo = QString();
+		FViewOptions.lastSubject = QString();
 
 		FViewOptions.isPrivateChat = isConferencePrivateChat(ACollection.header.with);
 	}
 
 	FViewOptions.lastTime = QDateTime();
-	FViewOptions.lastSenderId = QString::null;
+	FViewOptions.lastSenderId = QString();
 
 	for (int i=0; !FViewOptions.isGroupChat && i<ACollection.body.messages.count(); i++)
 	{
@@ -873,7 +873,7 @@ void ArchiveViewWindow::showCollection(const ArchiveCollection &ACollection)
 			options.type = IMessageStyleContentOptions::TypeEmpty;
 			options.senderId = senderJid.pFull();
 			options.time = messageIt->dateTime();
-			options.timeFormat = FMessageStyleManager!=NULL ? FMessageStyleManager->timeFormat(options.time,ACollection.header.start) : QString::null;
+			options.timeFormat = FMessageStyleManager!=NULL ? FMessageStyleManager->timeFormat(options.time,ACollection.header.start) : QString();
 
 			if (FViewOptions.isGroupChat)
 			{
@@ -889,8 +889,8 @@ void ArchiveViewWindow::showCollection(const ArchiveCollection &ACollection)
 				{
 					options.kind = IMessageStyleContentOptions::KindStatus;
 					options.direction = IMessageStyleContentOptions::DirectionIn;
-					options.senderName = QString::null;
-					options.senderColor = QString::null;
+			        options.senderName = QString();
+			        options.senderColor = QString();
 					html += showNote(messageIt->body(),options);
 				}
 			}
@@ -915,11 +915,11 @@ void ArchiveViewWindow::showCollection(const ArchiveCollection &ACollection)
 		{
 			options.kind = IMessageStyleContentOptions::KindStatus;
 			options.type = IMessageStyleContentOptions::TypeEmpty;
-			options.senderId = QString::null;
-			options.senderName = QString::null;
-			options.senderColor = QString::null;
+			options.senderId = QString();
+			options.senderName = QString();
+			options.senderColor = QString();
 			options.time = noteIt.key();
-			options.timeFormat = FMessageStyleManager!=NULL ? FMessageStyleManager->timeFormat(options.time,ACollection.header.start) : QString::null;
+			options.timeFormat = FMessageStyleManager!=NULL ? FMessageStyleManager->timeFormat(options.time,ACollection.header.start) : QString();
 
 			html += showNote(*noteIt,options);
 			++noteIt;
@@ -1428,7 +1428,7 @@ void ArchiveViewWindow::onExportConversationsByAction()
 	{
 		bool isHtml = action->data(ADR_EXPORT_AS_HTML).toBool();
 		QString filter = isHtml ? tr("HTML file (*.html)") : tr("Text file (*.txt)");
-		QString fileName = QFileDialog::getSaveFileName(this, tr("Save Conversations to File"),QString::null,filter);
+		QString fileName = QFileDialog::getSaveFileName(this, tr("Save Conversations to File"),QString(),filter);
 		if (!fileName.isEmpty())
 		{
 			QFile file(fileName);
@@ -1529,7 +1529,7 @@ void ArchiveViewWindow::onHeadersLoadMoreLinkClicked()
 void ArchiveViewWindow::onCollectionsRequestTimerTimeout()
 {
 	QList<ArchiveHeader> headers = itemsHeaders(selectedItems());
-	qSort(headers);
+	std::sort(headers.begin(), headers.end());
 
 	if (FSelectedHeaders != headers)
 	{

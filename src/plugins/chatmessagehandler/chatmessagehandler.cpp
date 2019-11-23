@@ -545,7 +545,7 @@ void ChatMessageHandler::updateWindow(IMessageChatWindow *AWindow)
 	if (AWindow->tabPageNotifier() && AWindow->tabPageNotifier()->activeNotify()>0)
 		tabIcon = AWindow->tabPageNotifier()->notifyById(AWindow->tabPageNotifier()->activeNotify()).icon;
 
-	AWindow->updateWindow(tabIcon,name,tr("%1 - Chat").arg(name),QString::null);
+	AWindow->updateWindow(tabIcon,name,tr("%1 - Chat").arg(name),QString());
 }
 
 void ChatMessageHandler::removeNotifiedMessages(IMessageChatWindow *AWindow)
@@ -566,7 +566,7 @@ void ChatMessageHandler::showHistory(IMessageChatWindow *AWindow)
 
 		QList<Message> pending = FPendingMessages.take(AWindow);
 		IArchiveCollectionBody history = FHistoryMessages.take(AWindow);
-		qStableSort(history.messages.begin(),history.messages.end(),qGreater<Message>());
+		std::stable_sort(history.messages.begin(),history.messages.end(),qGreater<Message>());
 		
 		// Remove extra history messages
 		if (history.messages.count() > HISTORY_MESSAGES)
@@ -1026,7 +1026,7 @@ void ChatMessageHandler::onPresenceItemReceived(IPresence *APresence, const IPre
 		{
 			if (Options::node(OPV_MESSAGES_SHOWSTATUS).value().toBool())
 			{
-				QString show = FStatusChanger ? FStatusChanger->nameByShow(AItem.show) : QString::null;
+			    QString show = FStatusChanger ? FStatusChanger->nameByShow(AItem.show) : QString();
 				QString name = FMessageStyleManager!=NULL ? FMessageStyleManager->contactName(APresence->streamJid(),AItem.itemJid) : AItem.itemJid.uBare();
 				if (AItem.itemJid.hasResource() && name!=AItem.itemJid.resource())
 					name += "/" + AItem.itemJid.resource();

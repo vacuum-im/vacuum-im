@@ -122,7 +122,7 @@ void SetupPluginsDialog::updatePlugins()
 
 		const IPluginInfo *info = FPluginManager->pluginInfo(uuid);
 		bool isLoaded = info!=NULL;
-		QString homePage = info!=NULL ? info->homePage.toString() : QString::null;
+		QString homePage = info!=NULL ? info->homePage.toString() : QString();
 
 		QStringList dependsOn, dependsFor;
 		if (info != NULL)
@@ -264,8 +264,8 @@ void SetupPluginsDialog::onCurrentPluginChanged(const QModelIndex &ACurrent, con
 			if (!dependsFailed.isEmpty())
 				ui.lblDependsFor->setText(QString("<a href='depend-failed'>%1</a>").arg(tr("%n dependency(ies) not found.","",dependsFailed.count())));
 			else
-				ui.lblDependsFor->setText(QString::null);
-			ui.lblDependsOn->setText(QString::null);
+			    ui.lblDependsFor->setText(QString());
+			ui.lblDependsOn->setText(QString());
 		}
 	}
 }
@@ -316,7 +316,7 @@ void SetupPluginsDialog::onDependsLinkActivated(const QString &ALink)
 				tooltip.append(dependUid);
 		}
 
-		qSort(tooltip.begin(),tooltip.end());
+		std::sort(tooltip.begin(),tooltip.end());
 		QToolTip::showText(QCursor::pos(),tooltip.join("\n"),this);
 	}
 }

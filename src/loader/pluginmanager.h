@@ -46,7 +46,7 @@ public:
 	virtual void setHomePath(const QString &APath);
 	virtual void setLocale(QLocale::Language ALanguage, QLocale::Country ACountry);
 	virtual IPlugin* pluginInstance(const QUuid &AUuid) const;
-	virtual QList<IPlugin *> pluginInterface(const QString &AInterface = QString::null) const;
+	virtual QList<IPlugin *> pluginInterface(const QString &AInterface = QString()) const;
 	virtual const IPluginInfo *pluginInfo(const QUuid &AUuid) const;
 	virtual QSet<QUuid> pluginDependencesOn(const QUuid &AUuid) const;
 	virtual QSet<QUuid> pluginDependencesFor(const QUuid &AUuid) const;
@@ -74,7 +74,7 @@ protected:
 	void closeTopLevelWidgets();
 protected:
 	void removePluginItem(const QUuid &AUuid, const QString &AError);
-	void unloadPlugin(const QUuid &AUuid, const QString &AError = QString::null);
+	void unloadPlugin(const QUuid &AUuid, const QString &AError = QString());
 	bool checkDependences(const QUuid &AUuid) const;
 	bool checkConflicts(const QUuid &AUuid) const;
 	QList<QUuid> getConflicts(const QUuid &AUuid) const;

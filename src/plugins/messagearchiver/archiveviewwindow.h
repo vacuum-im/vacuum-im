@@ -100,8 +100,8 @@ protected:
 	void removeRequestItems(const Jid &AStreamJid, const IArchiveRequest &ARequest);
 protected:
 	void setRequestStatus(RequestStatus AStatus, const QString &AMessage);
-	void setHeaderStatus(RequestStatus AStatus, const QString &AMessage = QString::null);
-	void setMessageStatus(RequestStatus AStatus, const QString &AMessage = QString::null);
+	void setHeaderStatus(RequestStatus AStatus, const QString &AMessage = QString());
+	void setMessageStatus(RequestStatus AStatus, const QString &AMessage = QString());
 protected:
 	QStandardItem *createHeaderItem(const ArchiveHeader &AHeader);
 	QStandardItem *createParentItem(const ArchiveHeader &AHeader);

@@ -614,7 +614,7 @@ int MessageArchiver::sessionApply(const IStanzaSession &ASession)
 	if (FDataForms && isReady(ASession.streamJid))
 	{
 		int index = FDataForms->fieldIndex(SFP_LOGGING,ASession.form.fields);
-		QString sessionValue = index>=0 ? ASession.form.fields.at(index).value.toString() : QString::null;
+		QString sessionValue = index>=0 ? ASession.form.fields.at(index).value.toString() : QString();
 		if (itemPrefs.otr==ARCHIVE_OTR_REQUIRE && sessionValue==SFV_MAY_LOGGING)
 		{
 			result = ISessionNegotiator::Cancel;
@@ -693,7 +693,7 @@ QString MessageArchiver::archiveDirPath(const Jid &AStreamJid) const
 	{
 		QDir dir(FPluginManager->homePath());
 		dir.mkdir(ARCHIVE_DIR_NAME);
-		FArchiveDirPath = dir.cd(ARCHIVE_DIR_NAME) ? dir.absolutePath() : QString::null;
+		FArchiveDirPath = dir.cd(ARCHIVE_DIR_NAME) ? dir.absolutePath() : QString();
 	}
 	if (AStreamJid.isValid() && !FArchiveDirPath.isEmpty())
 	{
@@ -701,7 +701,7 @@ QString MessageArchiver::archiveDirPath(const Jid &AStreamJid) const
 
 		QDir dir(FArchiveDirPath);
 		dir.mkdir(streamDir);
-		return dir.cd(streamDir) ? dir.absolutePath() : QString::null;
+		return dir.cd(streamDir) ? dir.absolutePath() : QString();
 	}
 	return FArchiveDirPath;
 }
@@ -835,7 +835,7 @@ QString MessageArchiver::setArchiveAutoSave(const Jid &AStreamJid, bool AAuto, b
 			LOG_STRM_WARNING(AStreamJid,"Failed to send update auto save request");
 		}
 	}
-	return QString::null;
+	return QString();
 }
 
 QString MessageArchiver::setArchivePrefs(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs)
@@ -964,7 +964,7 @@ QString MessageArchiver::setArchivePrefs(const Jid &AStreamJid, const IArchiveSt
 		{
 			QString requestId;
 			if (storage)
-				requestId = FPrivateStorage!=NULL ? FPrivateStorage->saveData(AStreamJid,prefElem) : QString::null;
+			    requestId = FPrivateStorage!=NULL ? FPrivateStorage->saveData(AStreamJid,prefElem) : QString();
 			else if (FStanzaProcessor && FStanzaProcessor->sendStanzaRequest(this,AStreamJid,save,ARCHIVE_REQUEST_TIMEOUT))
 				requestId = save.id();
 			if (!requestId.isEmpty())
@@ -979,7 +979,7 @@ QString MessageArchiver::setArchivePrefs(const Jid &AStreamJid, const IArchiveSt
 			}
 		}
 	}
-	return QString::null;
+	return QString();
 }
 
 QString MessageArchiver::removeArchiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid)
@@ -1006,12 +1006,12 @@ QString MessageArchiver::removeArchiveItemPrefs(const Jid &AStreamJid, const Jid
 		else
 		{
 			IArchiveStreamPrefs prefs;
-			prefs.itemPrefs[AItemJid].otr = QString::null;
-			prefs.itemPrefs[AItemJid].save = QString::null;
+			prefs.itemPrefs[AItemJid].otr = QString();
+			prefs.itemPrefs[AItemJid].save = QString();
 			return setArchivePrefs(AStreamJid,prefs);
 		}
 	}
-	return QString::null;
+	return QString();
 }
 
 QString MessageArchiver::removeArchiveSessionPrefs(const Jid &AStreamJid, const QString &AThreadId)
@@ -1038,12 +1038,12 @@ QString MessageArchiver::removeArchiveSessionPrefs(const Jid &AStreamJid, const 
 		else
 		{
 			IArchiveStreamPrefs prefs;
-			prefs.sessionPrefs[AThreadId].save = QString::null;
-			prefs.sessionPrefs[AThreadId].otr = QString::null;
+			prefs.sessionPrefs[AThreadId].save = QString();
+			prefs.sessionPrefs[AThreadId].otr = QString();
 			return setArchivePrefs(AStreamJid,prefs);
 		}
 	}
-	return QString::null;
+	return QString();
 }
 
 bool MessageArchiver::saveMessage(const Jid &AStreamJid, const Jid &AItemJid, const Message &AMessage)
@@ -1102,7 +1102,7 @@ QString MessageArchiver::loadMessages(const Jid &AStreamJid, const IArchiveReque
 	{
 		LOG_STRM_WARNING(AStreamJid,"Failed to send load messages request: Headers not requested");
 	}
-	return QString::null;
+	return QString();
 }
 
 QString MessageArchiver::loadHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest)
@@ -1139,7 +1139,7 @@ QString MessageArchiver::loadHeaders(const Jid &AStreamJid, const IArchiveReques
 		LOG_STRM_WARNING(AStreamJid,"Failed to send load headers request to any engine");
 	}
 
-	return QString::null;
+	return QString();
 }
 
 QString MessageArchiver::loadCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader)
@@ -1166,7 +1166,7 @@ QString MessageArchiver::loadCollection(const Jid &AStreamJid, const IArchiveHea
 	{
 		REPORT_ERROR("Failed to send load collection request: Engine not found");
 	}
-	return QString::null;
+	return QString();
 }
 
 QString MessageArchiver::removeCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest)
@@ -1199,7 +1199,7 @@ QString MessageArchiver::removeCollections(const Jid &AStreamJid, const IArchive
 		LOG_STRM_WARNING(AStreamJid,"Failed to send remove collections request to any engine");
 	}
 
-	return QString::null;
+	return QString();
 }
 
 void MessageArchiver::elementToCollection(const Jid &AStreamJid, const QDomElement &AChatElem, IArchiveCollection &ACollection) const
@@ -1478,7 +1478,7 @@ QString MessageArchiver::archiveFilePath(const Jid &AStreamJid, const QString &A
 		if (!dirPath.isEmpty())
 			return dirPath+"/"+AFileName;
 	}
-	return QString::null;
+	return QString();
 }
 
 QString MessageArchiver::loadServerPrefs(const Jid &AStreamJid)
@@ -1505,12 +1505,12 @@ QString MessageArchiver::loadServerPrefs(const Jid &AStreamJid)
 			LOG_STRM_WARNING(AStreamJid,"Failed to send load server archive prefs request: StanzaProcessor is NULL");
 			applyArchivePrefs(AStreamJid,QDomElement());
 	}
-	return QString::null;
+	return QString();
 }
 
 QString MessageArchiver::loadStoragePrefs(const Jid &AStreamJid)
 {
-	QString requestId = FPrivateStorage!=NULL ? FPrivateStorage->loadData(AStreamJid,PST_ARCHIVE_PREFS,PSN_ARCHIVE_PREFS) : QString::null;
+	QString requestId = FPrivateStorage!=NULL ? FPrivateStorage->loadData(AStreamJid,PST_ARCHIVE_PREFS,PSN_ARCHIVE_PREFS) : QString();
 	if (!requestId.isEmpty())
 	{
 		LOG_STRM_INFO(AStreamJid,QString("Load storage archive prefs request sent, id=%1").arg(requestId));
@@ -1782,7 +1782,7 @@ bool MessageArchiver::prepareMessage(const Jid &AStreamJid, Message &AMessage, b
 	if (AMessage.type()==Message::Chat || AMessage.type()==Message::GroupChat)
 	{
 		if (!AMessage.threadId().isEmpty())
-			AMessage.setThreadId(QString::null);
+			AMessage.setThreadId(QString());
 	}
 
 	return true;
@@ -1833,9 +1833,9 @@ void MessageArchiver::processMessagesRequest(const QString &ALocalId, MessagesRe
 	else if (ARequest.headers.isEmpty() || (quint32)ARequest.body.messages.count()>ARequest.request.maxItems)
 	{
 		if (ARequest.request.order == Qt::AscendingOrder)
-			qSort(ARequest.body.messages.begin(),ARequest.body.messages.end(),qLess<Message>());
+			std::sort(ARequest.body.messages.begin(),ARequest.body.messages.end(),qLess<Message>());
 		else
-			qSort(ARequest.body.messages.begin(),ARequest.body.messages.end(),qGreater<Message>());
+			std::sort(ARequest.body.messages.begin(),ARequest.body.messages.end(),qGreater<Message>());
 
 		REPORT_TIMING(STMP_HISTORY_MESSAGES_LOAD,Logger::finishTiming(STMP_HISTORY_MESSAGES_LOAD,ALocalId));
 		LOG_DEBUG(QString("Messages successfully loaded, id=%1").arg(ALocalId));
@@ -1875,9 +1875,9 @@ void MessageArchiver::processHeadersRequest(const QString &ALocalId, HeadersRequ
 			}
 
 			if (ARequest.request.order == Qt::AscendingOrder)
-				qSort(headers.begin(),headers.end(),qLess<IArchiveHeader>());
+			    std::sort(headers.begin(),headers.end(),qLess<IArchiveHeader>());
 			else
-				qSort(headers.begin(),headers.end(),qGreater<IArchiveHeader>());
+			    std::sort(headers.begin(),headers.end(),qGreater<IArchiveHeader>());
 
 			if ((quint32)headers.count() > ARequest.request.maxItems)
 				headers = headers.mid(0,ARequest.request.maxItems);
@@ -2231,8 +2231,8 @@ Menu *MessageArchiver::createContextMenu(const QStringList &AStreams, const QStr
 	bool isAllSupported = true;
 	bool isAllPrefsEnabled = true;
 	bool isAllDefaultPrefs = !isStreamMenu;
-	QString allPrefsSave = QString::null;
-	QString allPrefsOtr = QString::null;
+	QString allPrefsSave = QString();
+	QString allPrefsOtr = QString();
 	for (int i=0; i<AStreams.count(); i++)
 	{
 		isAllAutoSave = isAllAutoSave && isArchiveAutoSave(AStreams.at(i));
@@ -2772,8 +2772,8 @@ void MessageArchiver::onRemoveItemPrefsByAction(bool)
 					streamPrefs[streams.at(i)] = archivePrefs(streams.at(i));
 				IArchiveStreamPrefs &prefs = streamPrefs[streams.at(i)];
 
-				prefs.itemPrefs[contacts.at(i)].save = QString::null;
-				prefs.itemPrefs[contacts.at(i)].otr = QString::null;
+			    prefs.itemPrefs[contacts.at(i)].save = QString();
+			    prefs.itemPrefs[contacts.at(i)].otr = QString();
 			}
 			else
 			{

@@ -244,7 +244,7 @@ void OptionsDialogWidget::rigisterEditor(const OptionsNode &ANode, const QString
 	{
 		FCheckBox->setChecked(FValue.toBool());
 		connect(FCheckBox,SIGNAL(stateChanged(int)),SIGNAL(modified()));
-		insertEditor(QString::null,FCheckBox,hlayout);
+		insertEditor(QString(),FCheckBox,hlayout);
 	}
 	else if (FLineEdit != NULL)
 	{

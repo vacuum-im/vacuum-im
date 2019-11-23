@@ -222,7 +222,7 @@ void EditUsersListDialog::updateModelItem(QStandardItem *AModelItem, const IMult
 	AModelItem->setData(AListItem.affiliation,UDR_AFFILIATION);
 
 	AModelItem->setData(AListItem.realJid.uFull() + " " + AListItem.reason,UDR_FILTER);
-	AModelItem->setData(!AListItem.reason.isEmpty() ? QString(" - %1").arg(AListItem.reason) : QString::null,UDR_REASON_LABEL);
+	AModelItem->setData(!AListItem.reason.isEmpty() ? QString(" - %1").arg(AListItem.reason) : QString(),UDR_REASON_LABEL);
 }
 
 void EditUsersListDialog::applyListItems(const QList<IMultiUserListItem> &AListItems)

@@ -254,7 +254,7 @@ void DataStreamsManger::stanzaRequestResult(const Jid &AStreamJid, const Stanza 
 				IDataForm form = FDataForms->dataForm(formElem);
 
 				int index = FDataForms->fieldIndex(DFV_STREAM_METHOD,form.fields);
-				QString method = index>=0 ? form.fields.at(index).value.toString() : QString::null;
+			    QString method = index>=0 ? form.fields.at(index).value.toString() : QString();
 
 				if (FMethods.contains(method) && FDataForms->isSubmitValid(stream.features,form))
 				{
@@ -550,7 +550,7 @@ QString DataStreamsManger::streamIdByRequestId(const QString &ARequestId) const
 	for (QMap<QString, IDataStream>::const_iterator it = FStreams.constBegin(); it!=FStreams.constEnd(); ++it)
 		if (it->requestId == ARequestId)
 			return it.key();
-	return QString::null;
+	return QString();
 }
 
 void DataStreamsManger::onXmppStreamClosed(IXmppStream *AXmppStream)

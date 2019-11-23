@@ -119,9 +119,9 @@ void ServerMessageArchive::stanzaRequestResult(const Jid &AStreamJid, const Stan
 				LOG_STRM_WARNING(AStreamJid,QString("Received %1 headers not matching the request, id=%2").arg(skipHeadersCount).arg(AStanza.id()));
 
 			if (request.order == Qt::AscendingOrder)
-				qSort(headers.begin(),headers.end(),qLess<IArchiveHeader>());
+			    std::sort(headers.begin(),headers.end(),qLess<IArchiveHeader>());
 			else
-				qSort(headers.begin(),headers.end(),qGreater<IArchiveHeader>());
+			    std::sort(headers.begin(),headers.end(),qGreater<IArchiveHeader>());
 
 			if ((quint32)headers.count() > request.maxItems)
 				headers = headers.mid(0,request.maxItems);
@@ -331,7 +331,7 @@ QString ServerMessageArchive::saveCollection(const Jid &AStreamJid, const IArchi
 		FLocalSaveCollectionRequests.insert(id,request);
 		return request.id;
 	}
-	return QString::null;
+	return QString();
 }
 
 QString ServerMessageArchive::loadHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest)
@@ -346,7 +346,7 @@ QString ServerMessageArchive::loadHeaders(const Jid &AStreamJid, const IArchiveR
 		FLocalLoadHeadersRequests.insert(id,request);
 		return request.id;
 	}
-	return QString::null;
+	return QString();
 }
 
 QString ServerMessageArchive::loadCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader)
@@ -361,7 +361,7 @@ QString ServerMessageArchive::loadCollection(const Jid &AStreamJid, const IArchi
 		FLocalLoadCollectionRequests.insert(id,request);
 		return request.id;
 	}
-	return QString::null;
+	return QString();
 }
 
 QString ServerMessageArchive::removeCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest)
@@ -398,7 +398,7 @@ QString ServerMessageArchive::removeCollections(const Jid &AStreamJid, const IAr
 	{
 		LOG_STRM_ERROR(AStreamJid,"Failed to remove collections: Not capable");
 	}
-	return QString::null;
+	return QString();
 }
 
 QString ServerMessageArchive::loadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &ANextRef)
@@ -414,7 +414,7 @@ QString ServerMessageArchive::loadModifications(const Jid &AStreamJid, const QDa
 		FLocalLoadModificationsRequests.insert(id,request);
 		return request.id;
 	}
-	return QString::null;
+	return QString();
 }
 
 QString ServerMessageArchive::loadServerHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest, const QString &ANextRef)
@@ -450,7 +450,7 @@ QString ServerMessageArchive::loadServerHeaders(const Jid &AStreamJid, const IAr
 	{
 		LOG_STRM_ERROR(AStreamJid,"Failed to load headers: Not capable");
 	}
-	return QString::null;
+	return QString();
 }
 
 QString ServerMessageArchive::saveServerCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection, const QString &ANextRef)
@@ -536,7 +536,7 @@ QString ServerMessageArchive::saveServerCollection(const Jid &AStreamJid, const 
 	{
 		REPORT_ERROR("Failed to save collection: Invalid params");
 	}
-	return QString::null;
+	return QString();
 }
 
 QString ServerMessageArchive::loadServerCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &ANextRef)
@@ -570,7 +570,7 @@ QString ServerMessageArchive::loadServerCollection(const Jid &AStreamJid, const 
 	{
 		REPORT_ERROR("Failed to load collection: Invalid params");
 	}
-	return QString::null;
+	return QString();
 }
 
 QString ServerMessageArchive::loadServerModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &ANextRef)
@@ -604,7 +604,7 @@ QString ServerMessageArchive::loadServerModifications(const Jid &AStreamJid, con
 	{
 		REPORT_ERROR("Failed to load modifications: Invalid params");
 	}
-	return QString::null;
+	return QString();
 }
 
 ResultSet ServerMessageArchive::readResultSetAnswer(const QDomElement &AElem) const

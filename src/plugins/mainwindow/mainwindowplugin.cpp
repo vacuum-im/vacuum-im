@@ -68,7 +68,7 @@ bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &AIni
 bool MainWindowPlugin::initObjects()
 {
 	Shortcuts::declareShortcut(SCT_GLOBAL_SHOWROSTER,tr("Show roster"),QKeySequence::UnknownKey,Shortcuts::GlobalShortcut);
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_CLOSEWINDOW,QString::null,tr("Esc","Close main window"));
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_CLOSEWINDOW,QString(),tr("Esc","Close main window"));
 	
 	Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_CLOSEWINDOW,FMainWindow);
 

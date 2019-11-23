@@ -239,7 +239,7 @@ QString DiscoItemsModel::itemToolTip(const IDiscoInfo &ADiscoInfo) const
 		if (!ADiscoInfo.features.isEmpty())
 		{
 			QStringList features = ADiscoInfo.features;
-			qSort(features);
+			std::sort(features.begin(), features.end());
 			toolTip+=tr("<li><b>Features:</b></li>");
 			foreach(const QString &feature, features)
 			{
@@ -335,7 +335,7 @@ void DiscoItemsModel::removeChildren(DiscoItemIndex *AParent, QList<DiscoItemInd
 			if (!index->childs.isEmpty())
 				removeChildren(index,index->childs);
 		}
-		qSort(rows);
+		std::sort(rows.begin(), rows.end());
 
 		int firstRow = -1;
 		int lastRow = -1;

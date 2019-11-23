@@ -67,7 +67,7 @@ void StyleSelectOptionsWidget::apply()
 	QString engineId = params.value(0);
 	QString styleId = params.value(1);
 
-	OptionsNode node = Options::node(OPV_MESSAGESTYLE_MTYPE_ITEM,QString::number(FMessageType)).node("context",QString::null);
+	OptionsNode node = Options::node(OPV_MESSAGESTYLE_MTYPE_ITEM,QString::number(FMessageType)).node("context",QString());
 	node.node("engine-id").setValue(engineId);
 	node.node("engine",engineId).node("style-id").setValue(styleId);
 

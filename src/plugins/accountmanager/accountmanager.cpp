@@ -279,7 +279,7 @@ void AccountManager::showAccountOptionsDialog(const QUuid &AAccountId, QWidget *
 	if (FOptionsManager)
 	{
 		QString rootId = OPN_ACCOUNTS"."+AAccountId.toString();
-		FOptionsManager->showOptionsDialog(QString::null, rootId, AParent);
+		FOptionsManager->showOptionsDialog(QString(), rootId, AParent);
 	}
 }
 

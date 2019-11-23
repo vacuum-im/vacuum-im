@@ -427,7 +427,7 @@ QString RostersViewPlugin::rootExpandId(const QModelIndex &AIndex) const
 QString RostersViewPlugin::indexExpandId(const QModelIndex &AIndex) const
 {
 	int role = FExpandableKinds.value(AIndex.data(RDR_KIND).toInt());
-	return role>0 ? AIndex.data(role).toString() : QString::null;
+	return role>0 ? AIndex.data(role).toString() : QString();
 }
 
 void RostersViewPlugin::loadExpandState(const QModelIndex &AIndex)
@@ -755,7 +755,7 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 				if (!pItem.isNull())
 				{
 					QString resource = pItem.itemJid.hasResource() ? pItem.itemJid.resource() : pItem.itemJid.uBare();
-					QString statusIcon = FStatusIcons!=NULL ? FStatusIcons->iconFileName(streamJid,pItem.itemJid) : QString::null;
+			        QString statusIcon = FStatusIcons!=NULL ? FStatusIcons->iconFileName(streamJid,pItem.itemJid) : QString();
 					AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_NAME+orderShift,QString("<img src='%1'> %2 (%3)").arg(statusIcon).arg(resource.toHtmlEscaped()).arg(pItem.priority));
 
 					if (!pItem.status.isEmpty())
@@ -778,9 +778,9 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 			bool subscription_ask = AIndex->data(RDR_SUBSCRIPTION_ASK).toString() == SUBSCRIPTION_SUBSCRIBE;
 			QString resource = contactJid.hasResource() ? contactJid.resource() : contactJid.uBare();
 
-			QString statusIconSet = FStatusIcons!=NULL ? FStatusIcons->iconsetByJid(contactJid) : QString::null;
-			QString statusIconKey = FStatusIcons!=NULL ? FStatusIcons->iconKeyByStatus(show,subscription,subscription_ask) : QString::null;
-			QString statusIconFile = FStatusIcons!=NULL ? FStatusIcons->iconFileName(statusIconSet,statusIconKey) : QString::null;
+			QString statusIconSet = FStatusIcons!=NULL ? FStatusIcons->iconsetByJid(contactJid) : QString();
+			QString statusIconKey = FStatusIcons!=NULL ? FStatusIcons->iconKeyByStatus(show,subscription,subscription_ask) : QString();
+			QString statusIconFile = FStatusIcons!=NULL ? FStatusIcons->iconFileName(statusIconSet,statusIconKey) : QString();
 			AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_NAME,QString("<img src='%1'> %2 (%3)").arg(statusIconFile).arg(resource.toHtmlEscaped()).arg(priority));
 
 			QString statusText = AIndex->data(RDR_STATUS).toString();

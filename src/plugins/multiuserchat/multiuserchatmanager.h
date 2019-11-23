@@ -139,9 +139,9 @@ protected:
 protected:
 	void updateMultiChatRecentItem(IRosterIndex *AChatIndex);
 	void updateMultiChatRecentItemProperties(IMultiUserChat *AChat);
-	void updateMultiUserRecentItems(IMultiUserChat *AChat, const QString &ANick = QString::null);
+	void updateMultiUserRecentItems(IMultiUserChat *AChat, const QString &ANick = QString());
 	QString multiChatRecentName(const Jid &AStreamJid, const Jid &ARoomJid) const;
-	IRecentItem multiChatRecentItem(IMultiUserChat *AChat, const QString &ANick = QString::null) const;
+	IRecentItem multiChatRecentItem(IMultiUserChat *AChat, const QString &ANick = QString()) const;
 protected:
 	Action *createWizardAction(QWidget *AParent) const;
 	Action *createJoinAction(const Jid &AStreamJid, const Jid &ARoomJid, QWidget *AParent) const;

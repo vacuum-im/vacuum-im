@@ -51,7 +51,7 @@ QString ArchiveReplicator::replicationDatabasePath() const
 	QString dirPath = FArchiver->archiveDirPath(FStreamJid);
 	if (!dirPath.isEmpty())
 		return dirPath + "/" + DATABASE_FILE_NAME;
-	return QString::null;
+	return QString();
 }
 
 QString ArchiveReplicator::replicationDatabaseConnection() const

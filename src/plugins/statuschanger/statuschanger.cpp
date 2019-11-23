@@ -425,7 +425,7 @@ QString StatusChanger::statusItemName(int AStatusId) const
 {
 	if (FStatusItems.contains(AStatusId))
 		return FStatusItems.value(AStatusId).name;
-	return QString::null;
+	return QString();
 }
 
 int StatusChanger::statusItemShow(int AStatusId) const
@@ -439,7 +439,7 @@ QString StatusChanger::statusItemText(int AStatusId) const
 {
 	if (FStatusItems.contains(AStatusId))
 		return FStatusItems.value(AStatusId).text;
-	return QString::null;
+	return QString();
 }
 
 int StatusChanger::statusItemPriority(int AStatusId) const
@@ -554,7 +554,7 @@ void StatusChanger::removeStatusItem(int AStatusId)
 
 QIcon StatusChanger::iconByShow(int AShow) const
 {
-	return FStatusIcons!=NULL ? FStatusIcons->iconByStatus(AShow,QString::null,false) : QIcon();
+	return FStatusIcons!=NULL ? FStatusIcons->iconByStatus(AShow,QString(),false) : QIcon();
 }
 
 QString StatusChanger::nameByShow(int AShow) const
@@ -988,7 +988,7 @@ void StatusChanger::insertStatusNotification(IPresence *APresence)
 		if (notify.kinds > 0)
 		{
 			notify.typeId = NNT_CONNECTION_ERROR;
-			notify.data.insert(NDR_ICON,FStatusIcons!=NULL ? FStatusIcons->iconByStatus(IPresence::Error,QString::null,false) : QIcon());
+			notify.data.insert(NDR_ICON,FStatusIcons!=NULL ? FStatusIcons->iconByStatus(IPresence::Error,QString(),false) : QIcon());
 			notify.data.insert(NDR_POPUP_CAPTION, tr("Connection error"));
 			notify.data.insert(NDR_POPUP_TITLE,FAccountManager!=NULL ? FAccountManager->findAccountByStream(APresence->streamJid())->name() : APresence->streamJid().uFull());
 			notify.data.insert(NDR_STREAM_JID,APresence->streamJid().full());

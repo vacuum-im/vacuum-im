@@ -1128,12 +1128,12 @@ void ReceiversWidget::onSelectionLast()
 
 void ReceiversWidget::onSelectionLoad()
 {
-	selectionLoad(QFileDialog::getOpenFileName(this,tr("Load Contacts from File"),QString::null,"*.cts"));
+	selectionLoad(QFileDialog::getOpenFileName(this,tr("Load Contacts from File"),QString(),"*.cts"));
 }
 
 void ReceiversWidget::onSelectionSave()
 {
-	selectionSave(QFileDialog::getSaveFileName(this,tr("Save Contacts to File"),QString::null,"*.cts"));
+	selectionSave(QFileDialog::getSaveFileName(this,tr("Save Contacts to File"),QString(),"*.cts"));
 }
 
 void ReceiversWidget::onSelectAllContacts()

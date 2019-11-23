@@ -21,7 +21,7 @@ SelectIconMenu::~SelectIconMenu()
 
 QString SelectIconMenu::iconset() const
 {
-	return FStorage!=NULL ? FStorage->subStorage() : QString::null;
+	return FStorage!=NULL ? FStorage->subStorage() : QString();
 }
 
 void SelectIconMenu::setIconset(const QString &ASubStorage)

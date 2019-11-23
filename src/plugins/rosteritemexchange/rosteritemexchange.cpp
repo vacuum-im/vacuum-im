@@ -216,8 +216,8 @@ bool RosterItemExchange::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, S
 			IRosterExchangeRequest request;
 			request.streamJid = AStreamJid;
 			request.contactJid = AStanza.from();
-			request.id = AStanza.kind()==STANZA_KIND_IQ ? AStanza.id() : QString::null;
-			request.message = AStanza.kind()==STANZA_KIND_MESSAGE ? Message(AStanza).body() : QString::null;
+			request.id = AStanza.kind()==STANZA_KIND_IQ ? AStanza.id() : QString();
+			request.message = AStanza.kind()==STANZA_KIND_MESSAGE ? Message(AStanza).body() : QString();
 
 			QList<Jid> existItems;
 			QDomElement itemElem = xElem.firstChildElement("item");
@@ -427,7 +427,7 @@ QString RosterItemExchange::sendExchangeRequest(const IRosterExchangeRequest &AR
 			}
 		}
 	}
-	return QString::null;
+	return QString();
 }
 
 QList<IRosterItem> RosterItemExchange::dragDataContacts(const QMimeData *AData) const
@@ -690,7 +690,7 @@ bool RosterItemExchange::applyRequest(const IRosterExchangeRequest &ARequest, bo
 					if (ASubscribe)
 					{
 						if (FRosterChanger)
-							FRosterChanger->subscribeContact(ARequest.streamJid,it->itemJid,QString::null,ASilent);
+			                FRosterChanger->subscribeContact(ARequest.streamJid,it->itemJid,QString(),ASilent);
 						else
 							roster->sendSubscription(it->itemJid,IRoster::Subscribe);
 					}

@@ -93,7 +93,7 @@ void ConnectionOptionsWidget::saveOptions(IAccount *AAccount) const
 
 QString ConnectionOptionsWidget::connectionEngine() const
 {
-	return FConnectionEngine!=NULL ? FConnectionEngine->engineId() : QString::null;
+	return FConnectionEngine!=NULL ? FConnectionEngine->engineId() : QString();
 }
 
 void ConnectionOptionsWidget::setConnectionEngine(const QString &AEngineId)
@@ -180,7 +180,7 @@ void CreateAccountWizard::accept()
 			if (optionsManager != NULL)
 			{
 				QString rootId = OPN_ACCOUNTS"."+account->accountId().toString();
-				optionsManager->showOptionsDialog(QString::null, rootId, parentWidget());
+			    optionsManager->showOptionsDialog(QString(), rootId, parentWidget());
 			}
 		}
 
@@ -804,7 +804,7 @@ RegisterRequestPage::RegisterRequestPage(QWidget *AParent) : QWizardPage(AParent
 	FXmppStream = NULL;
 	FReinitialize = false;
 	dfwRegisterForm = NULL;
-	FRegisterId = QString::null;
+	FRegisterId = QString();
 
 	lblCaption = new QLabel(this);
 	lblCaption->setAlignment(Qt::AlignCenter);
@@ -967,7 +967,7 @@ void RegisterRequestPage::setRegisterId(const QString &AId)
 
 QString RegisterRequestPage::accountNode() const
 {
-	return FXmppStream!=NULL ? FXmppStream->streamJid().node() : QString::null;
+	return FXmppStream!=NULL ? FXmppStream->streamJid().node() : QString();
 }
 
 void RegisterRequestPage::setAccountNode(const QString &ANode)
@@ -977,7 +977,7 @@ void RegisterRequestPage::setAccountNode(const QString &ANode)
 
 QString RegisterRequestPage::accountPassword() const
 {
-	return FXmppStream!=NULL ? FXmppStream->password() : QString::null;
+	return FXmppStream!=NULL ? FXmppStream->password() : QString();
 }
 
 void RegisterRequestPage::setAccountPassword(const QString &APassword)

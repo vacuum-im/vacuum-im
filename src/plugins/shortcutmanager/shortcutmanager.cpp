@@ -164,7 +164,7 @@ void ShortcutManager::showHiddenWidgets(bool ACheckPassword)
 		LOG_INFO("Restoring all hidden widgets");
 
 		QString password;
-		QString profile = FOptionsManager!=NULL ? FOptionsManager->currentProfile() : QString::null;
+		QString profile = FOptionsManager!=NULL ? FOptionsManager->currentProfile() : QString();
 		QString title = QString("%1 - %2").arg(CLIENT_NAME).arg(profile);
 
 		if (ACheckPassword && FOptionsManager!=NULL && FOptionsManager->isOpened() && !FOptionsManager->checkProfilePassword(profile,password))

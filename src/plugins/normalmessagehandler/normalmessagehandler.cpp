@@ -691,7 +691,7 @@ void NormalMessageHandler::updateWindow(IMessageNormalWindow *AWindow) const
 	}
 
 	updateWindowMenu(AWindow);
-	AWindow->updateWindow(tabIcon,name,title,QString::null);
+	AWindow->updateWindow(tabIcon,name,title,QString());
 }
 
 bool NormalMessageHandler::showNextMessage(IMessageNormalWindow *AWindow)
@@ -837,14 +837,14 @@ QMap<int,QStringList> NormalMessageHandler::indexesRolesMap(const QList<IRosterI
 		{
 			QString group;
 			if (indexKind != RIK_GROUP)
-				group = FRostersModel!=NULL ? FRostersModel->singleGroupName(indexKind) : QString::null;
+			    group = FRostersModel!=NULL ? FRostersModel->singleGroupName(indexKind) : QString();
 			else
 				group = index->data(RDR_GROUP).toString();
 
 			foreach(const QString &streamJid, index->data(RDR_STREAMS).toStringList())
 			{
 				rolesMap[RDR_STREAM_JID].append(streamJid);
-				rolesMap[RDR_PREP_BARE_JID].append(QString::null);
+			    rolesMap[RDR_PREP_BARE_JID].append(QString());
 				rolesMap[RDR_GROUP].append(group);
 			}
 		}
@@ -857,7 +857,7 @@ QMap<int,QStringList> NormalMessageHandler::indexesRolesMap(const QList<IRosterI
 				{
 					rolesMap[RDR_STREAM_JID].append(child->data(RDR_STREAM_JID).toString());
 					rolesMap[RDR_PREP_BARE_JID].append(child->data(RDR_PREP_BARE_JID).toString());
-					rolesMap[RDR_GROUP].append(QString::null);
+			        rolesMap[RDR_GROUP].append(QString());
 				}
 			}
 		}
@@ -866,15 +866,15 @@ QMap<int,QStringList> NormalMessageHandler::indexesRolesMap(const QList<IRosterI
 			if (isAnyPresenceOpened(index->data(RDR_STREAM_JID).toStringList()))
 			{
 				rolesMap[RDR_STREAM_JID].append(index->data(RDR_STREAM_JID).toString());
-				rolesMap[RDR_PREP_BARE_JID].append(QString::null);
-				rolesMap[RDR_GROUP].append(QString::null);
+			    rolesMap[RDR_PREP_BARE_JID].append(QString());
+			    rolesMap[RDR_GROUP].append(QString());
 			}
 		}
 		else
 		{
 			rolesMap[RDR_STREAM_JID].append(index->data(RDR_STREAM_JID).toString());
 			rolesMap[RDR_PREP_BARE_JID].append(index->data(RDR_PREP_BARE_JID).toString());
-			rolesMap[RDR_GROUP].append(QString::null);
+			rolesMap[RDR_GROUP].append(QString());
 		}
 	}
 	return rolesMap;

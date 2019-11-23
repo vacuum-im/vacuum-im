@@ -191,7 +191,7 @@ bool PrivacyLists::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza
 					if (denied && !FOfflinePresences.value(AStreamJid).contains(ritem.itemJid))
 					{
 						LOG_STRM_DEBUG(AStreamJid,QString("Sending offline presence to contact=%1").arg(ritem.itemJid.full()));
-						presence->sendPresence(ritem.itemJid,IPresence::Offline,QString::null,0);
+			            presence->sendPresence(ritem.itemJid,IPresence::Offline,QString(),0);
 						FOfflinePresences[AStreamJid] += ritem.itemJid;
 					}
 					else if (!denied && directionIn && FOfflinePresences.value(AStreamJid).contains(ritem.itemJid))
@@ -269,7 +269,7 @@ void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 					list.rules.append(rule);
 					ruleElem = ruleElem.nextSiblingElement("item");
 				}
-				qSort(list.rules);
+			    std::sort(list.rules.begin(), list.rules.end());
 
 				if (loadListName.isEmpty())
 				{
@@ -474,7 +474,7 @@ void PrivacyLists::setGroupAutoListed(const Jid &AStreamJid, const QString &AGro
 
 			IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(AStreamJid) : NULL;
 			QStringList groups = roster!=NULL ? (roster->groups()<<AGroup).toList() : QStringList(AGroup);
-			qSort(groups);
+			std::sort(groups.begin(), groups.end());
 
 			foreach(const QString &group, groups)
 			{
@@ -617,8 +617,8 @@ void PrivacyLists::setAutoPrivacy(const Jid &AStreamJid, const QString &AAutoLis
 		else
 		{
 			FApplyAutoLists.remove(AStreamJid);
-			setDefaultList(AStreamJid,QString::null);
-			setActiveList(AStreamJid,QString::null);
+			setDefaultList(AStreamJid,QString());
+			setActiveList(AStreamJid,QString());
 		}
 	}
 }
@@ -709,7 +709,7 @@ QString PrivacyLists::setActiveList(const Jid &AStreamJid, const QString &AList)
 			LOG_STRM_WARNING(AStreamJid,QString("Failed to send change active list request, list=%1").arg(AList));
 		}
 	}
-	return QString::null;
+	return QString();
 }
 
 QString PrivacyLists::defaultList(const Jid &AStreamJid, bool APending) const
@@ -747,7 +747,7 @@ QString PrivacyLists::setDefaultList(const Jid &AStreamJid, const QString &AList
 			LOG_STRM_WARNING(AStreamJid,QString("Failed to send change default list request, list=%1").arg(AList));
 		}
 	}
-	return QString::null;
+	return QString();
 }
 
 IPrivacyList PrivacyLists::privacyList(const Jid &AStreamJid, const QString &AList, bool APending) const
@@ -806,7 +806,7 @@ QString PrivacyLists::loadPrivacyList(const Jid &AStreamJid, const QString &ALis
 			LOG_STRM_WARNING(AStreamJid,QString("Failed to send load privacy list request, list=%1").arg(AList));
 		}
 	}
-	return QString::null;
+	return QString();
 }
 
 QString PrivacyLists::savePrivacyList(const Jid &AStreamJid, const IPrivacyList &AList)
@@ -861,7 +861,7 @@ QString PrivacyLists::savePrivacyList(const Jid &AStreamJid, const IPrivacyList 
 			return QString("");
 		}
 	}
-	return QString::null;
+	return QString();
 }
 
 QString PrivacyLists::removePrivacyList(const Jid &AStreamJid, const QString &AList)
@@ -884,7 +884,7 @@ QString PrivacyLists::removePrivacyList(const Jid &AStreamJid, const QString &AL
 			LOG_STRM_WARNING(AStreamJid,QString("Failed to send privacy list remove request, list=%1").arg(AList));
 		}
 	}
-	return QString::null;
+	return QString();
 }
 
 QDialog *PrivacyLists::showEditListsDialog(const Jid &AStreamJid, QWidget *AParent)
@@ -913,7 +913,7 @@ QString PrivacyLists::loadPrivacyLists(const Jid &AStreamJid)
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,PRIVACY_TIMEOUT))
 		{
 			LOG_STRM_INFO(AStreamJid,QString("Load list of privacy lists request sent, id=%1").arg(request.id()));
-			FLoadRequests.insert(request.id(),QString::null);
+			FLoadRequests.insert(request.id(),QString());
 			return request.id();
 		}
 		else
@@ -921,7 +921,7 @@ QString PrivacyLists::loadPrivacyLists(const Jid &AStreamJid)
 			LOG_STRM_WARNING(AStreamJid,QString("Failed to send load list of privacy lists request"));
 		}
 	}
-	return QString::null;
+	return QString();
 }
 
 Menu *PrivacyLists::createPrivacyMenu(Menu *AMenu) const
@@ -1231,7 +1231,7 @@ void PrivacyLists::sendOfflinePresences(const Jid &AStreamJid, const IPrivacyLis
 		{
 			LOG_STRM_INFO(AStreamJid,"Sending offline presence to all denied contacts");
 			foreach(const Jid &contactJid, offline)
-				presence->sendPresence(contactJid,IPresence::Offline,QString::null,0);
+			    presence->sendPresence(contactJid,IPresence::Offline,QString(),0);
 		}
 		FOfflinePresences[AStreamJid] += offline;
 	}
@@ -1273,7 +1273,7 @@ void PrivacyLists::updatePrivacyLabels(const Jid &AStreamJid)
 			setPrivacyLabel(AStreamJid,contactJid,false);
 
 		IRosterIndex *sroot = FRostersModel->streamRoot(AStreamJid);
-		IRosterIndex *groupIndex = FRostersModel->findGroupIndex(RIK_GROUP_NOT_IN_ROSTER,QString::null,sroot);
+		IRosterIndex *groupIndex = FRostersModel->findGroupIndex(RIK_GROUP_NOT_IN_ROSTER,QString(),sroot);
 		if (groupIndex)
 		{
 			for (int i=0;i<groupIndex->childCount();i++)

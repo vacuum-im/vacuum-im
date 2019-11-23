@@ -919,7 +919,7 @@ MetaMergedContact MetaContacts::getMergedContact(const Jid &AStreamJid, const QU
 	else
 	{
 		QList<Jid> items = meta.items.values();
-		qSort(items.begin(),items.end());
+		std::sort(items.begin(),items.end());
 		meta.itemJid = items.value(0);
 		meta.stream = meta.items.key(meta.itemJid);
 	}
@@ -956,7 +956,7 @@ void MetaContacts::updateMetaIndexes(const Jid &AStreamJid, const QUuid &AMetaId
 			foreach(IRosterIndex *metaIndex, metaIndexesRef)
 				groupMetaIndexMap.insert(metaIndex->data(RDR_GROUP).toString(),metaIndex);
 
-			QSet<QString> metaGroups = !meta.groups.isEmpty() ? meta.groups : QSet<QString>()<<QString::null;
+			QSet<QString> metaGroups = !meta.groups.isEmpty() ? meta.groups : QSet<QString>()<<QString();
 			QSet<QString> curGroups = groupMetaIndexMap.keys().toSet();
 			QSet<QString> newGroups = metaGroups - curGroups;
 			QSet<QString> oldGroups = curGroups - metaGroups;
@@ -1143,7 +1143,7 @@ void MetaContacts::updateMetaWindows(const Jid &AStreamJid, const QUuid &AMetaId
 					chatWindow->address()->removeAddress(itemIt.key(),itemIt.value());
 
 				if (chatWindow->tabPageCaption() != meta.name)
-					chatWindow->updateWindow(chatWindow->tabPageIcon(),meta.name,tr("%1 - Chat").arg(meta.name),QString::null);
+			        chatWindow->updateWindow(chatWindow->tabPageIcon(),meta.name,tr("%1 - Chat").arg(meta.name),QString());
 			}
 			else
 			{
@@ -1644,7 +1644,7 @@ void MetaContacts::saveMetaContactsToFile(const QString &AFileName, const QList<
 
 void MetaContacts::onRosterOpened(IRoster *ARoster)
 {
-	QString id = FPrivateStorage!=NULL ? FPrivateStorage->loadData(ARoster->streamJid(),"storage",NS_STORAGE_METACONTACTS) : QString::null;
+	QString id = FPrivateStorage!=NULL ? FPrivateStorage->loadData(ARoster->streamJid(),"storage",NS_STORAGE_METACONTACTS) : QString();
 	if (!id.isEmpty())
 	{
 		FLoadRequestId[ARoster->streamJid()] = id;
@@ -2067,9 +2067,9 @@ void MetaContacts::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALab
 				int orderShift = resIndex*100;
 				IPresenceItem pItem = metaPresences.at(resIndex);
 
-				QString statusIconSet = FStatusIcons!=NULL ? FStatusIcons->iconsetByJid(pItem.itemJid) : QString::null;
-				QString statusIconKey = FStatusIcons!=NULL ? FStatusIcons->iconKeyByStatus(pItem.show,SUBSCRIPTION_BOTH,false) : QString::null;
-				QString statusIconFile = FStatusIcons!=NULL ? FStatusIcons->iconFileName(statusIconSet,statusIconKey) : QString::null;
+			    QString statusIconSet = FStatusIcons!=NULL ? FStatusIcons->iconsetByJid(pItem.itemJid) : QString();
+			    QString statusIconKey = FStatusIcons!=NULL ? FStatusIcons->iconKeyByStatus(pItem.show,SUBSCRIPTION_BOTH,false) : QString();
+			    QString statusIconFile = FStatusIcons!=NULL ? FStatusIcons->iconFileName(statusIconSet,statusIconKey) : QString();
 				AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_NAME+orderShift,QString("<img src='%1'> %2 (%3)").arg(statusIconFile).arg(pItem.itemJid.uFull().toHtmlEscaped()).arg(pItem.priority));
 
 				if (!pItem.status.isEmpty())

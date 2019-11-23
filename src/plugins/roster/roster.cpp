@@ -670,7 +670,7 @@ void Roster::requestRosterItems()
 	if (FStanzaProcessor->sendStanzaRequest(this,FXmppStream->streamJid(),query,Options::node(OPV_XMPPSTREAMS_TIMEOUT_ROSTERREQUEST).value().toInt()))
 	{
 		FOpenRequestId = query.id();
-		LOG_STRM_INFO(streamJid(),QString("Roster items request sent, ver=%1").arg(FVerSupported ? FRosterVer : QString::null));
+		LOG_STRM_INFO(streamJid(),QString("Roster items request sent, ver=%1").arg(FVerSupported ? FRosterVer : QString()));
 	}
 	else
 	{

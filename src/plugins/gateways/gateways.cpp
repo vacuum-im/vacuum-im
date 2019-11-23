@@ -414,7 +414,7 @@ bool Gateways::changeService(const Jid &AStreamJid, const Jid &AServiceFrom, con
 
 		//Remove subscription from old service
 		if (!ritemOld.isNull() && !ARemove)
-			FRosterChanger->unsubscribeContact(AStreamJid,AServiceFrom,QString::null,true);
+			FRosterChanger->unsubscribeContact(AStreamJid,AServiceFrom,QString(),true);
 
 		//Adding contact of old service to new
 		QList<IRosterItem> newItems, oldItems, curItems;
@@ -481,7 +481,7 @@ QString Gateways::sendPromptRequest(const Jid &AStreamJid, const Jid &AServiceJi
 	{
 		LOG_STRM_WARNING(AStreamJid,QString("Failed to send legacy user prompt request to=%1").arg(AServiceJid.full()));
 	}
-	return QString::null;
+	return QString();
 }
 
 QString Gateways::sendUserJidRequest(const Jid &AStreamJid, const Jid &AServiceJid, const QString &AContactID)
@@ -500,7 +500,7 @@ QString Gateways::sendUserJidRequest(const Jid &AStreamJid, const Jid &AServiceJ
 	{
 		LOG_STRM_WARNING(AStreamJid,QString("Failed to send legacy user JID request to=%1").arg(AServiceJid.full()));
 	}
-	return QString::null;
+	return QString();
 }
 
 QDialog *Gateways::showAddLegacyContactDialog(const Jid &AStreamJid, const Jid &AServiceJid, QWidget *AParent)
@@ -676,7 +676,7 @@ void Gateways::onChangeActionTriggered(bool)
 		Jid serviceTo = action->data(ADR_NEW_SERVICE_JID).toString();
 		if (changeService(streamJid,serviceFrom,serviceTo,true,true))
 		{
-			QString id = FRegistration!=NULL ?  FRegistration->sendRegisterRequest(streamJid,serviceTo) : QString::null;
+			QString id = FRegistration!=NULL ?  FRegistration->sendRegisterRequest(streamJid,serviceTo) : QString();
 			if (!id.isEmpty())
 				FShowRegisterRequests.insert(id,streamJid);
 		}
@@ -973,7 +973,7 @@ void Gateways::onPrivateDataLoaded(const QString &AId, const Jid &AStreamJid, co
 		{
 			Jid serviceJid = elem.text();
 			FSubscribeServices.insertMulti(AStreamJid,serviceJid);
-			QString id = FRegistration!=NULL ? FRegistration->sendRegisterRequest(AStreamJid,serviceJid) : QString::null;
+			QString id = FRegistration!=NULL ? FRegistration->sendRegisterRequest(AStreamJid,serviceJid) : QString();
 			if (!id.isEmpty())
 				FShowRegisterRequests.insert(id,AStreamJid);
 			elem = elem.nextSiblingElement("service");
@@ -1003,7 +1003,7 @@ void Gateways::onKeepTimerTimeout()
 					const QList<IPresenceItem> pitems = presence->findItems(service);
 					if (pitems.isEmpty() || pitems.at(0).show==IPresence::Error)
 					{
-						presence->sendPresence(service,IPresence::Offline,QString::null,0);
+			            presence->sendPresence(service,IPresence::Offline,QString(),0);
 						presence->sendPresence(service,presence->show(),presence->status(),presence->priority());
 					}
 				}

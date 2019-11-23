@@ -75,7 +75,7 @@ InBandStream::~InBandStream()
 
 bool InBandStream::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
-	QDomElement elem = AStanza.firstElement(QString::null,NS_INBAND_BYTESTREAMS);
+	QDomElement elem = AStanza.firstElement(QString(),NS_INBAND_BYTESTREAMS);
 	if (AHandleId==FSHIData && elem.attribute("sid")==FStreamId)
 	{
 		AAccept = true;
@@ -560,7 +560,7 @@ void InBandStream::setStreamError(const XmppError &AError)
 	{
 		QWriteLocker locker(&FThreadLock);
 		FError = AError;
-		setErrorString(!FError.isNull() ? FError.errorString() : QString::null);
+		setErrorString(!FError.isNull() ? FError.errorString() : QString());
 	}
 }
 

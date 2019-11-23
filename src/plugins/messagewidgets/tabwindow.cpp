@@ -118,7 +118,7 @@ QString TabWindow::centralPageCaption() const
 	IMessageTabPage *page = currentTabPage();
 	if (page)
 		return page->tabPageCaption();
-	return QString::null;
+	return QString();
 }
 
 void TabWindow::showWindow()

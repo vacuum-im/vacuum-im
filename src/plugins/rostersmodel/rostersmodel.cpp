@@ -204,7 +204,7 @@ IRosterIndex *RostersModel::addStream(const Jid &AStreamJid)
 			if (FLayout == LayoutMerged)
 			{
 				insertRosterIndex(FContactsRoot,FRootIndex);
-				insertRosterIndex(sindex,getGroupIndex(RIK_GROUP_ACCOUNTS,QString::null,FContactsRoot));
+			    insertRosterIndex(sindex,getGroupIndex(RIK_GROUP_ACCOUNTS,QString(),FContactsRoot));
 			}
 			else
 			{
@@ -311,7 +311,7 @@ void RostersModel::setStreamsLayout(StreamsLayout ALayout)
 			if (ALayout == LayoutMerged)
 			{
 				foreach(IRosterIndex *sindex, FStreamIndexes.values())
-					insertRosterIndex(sindex,getGroupIndex(RIK_GROUP_ACCOUNTS,QString::null,FContactsRoot));
+			        insertRosterIndex(sindex,getGroupIndex(RIK_GROUP_ACCOUNTS,QString(),FContactsRoot));
 			}
 			else //if (ALayout == LayoutSeparately)
 			{
@@ -502,9 +502,9 @@ QList<IRosterIndex *> RostersModel::getContactIndexes(const Jid &AStreamJid, con
 			if (AParent)
 				groupIndex = AParent;
 			else if (type == RIK_MY_RESOURCE)
-				groupIndex = getGroupIndex(RIK_GROUP_MY_RESOURCES,QString::null,sroot);
+			    groupIndex = getGroupIndex(RIK_GROUP_MY_RESOURCES,QString(),sroot);
 			else
-				groupIndex = getGroupIndex(RIK_GROUP_NOT_IN_ROSTER,QString::null,sroot);
+			    groupIndex = getGroupIndex(RIK_GROUP_NOT_IN_ROSTER,QString(),sroot);
 
 			IRosterIndex *itemIndex = newRosterIndex(type);
 			itemIndex->setData(AStreamJid.pFull(),RDR_STREAM_JID);
@@ -727,12 +727,12 @@ void RostersModel::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AIt
 		if (itemKind == RIK_AGENT)
 		{
 			groupKind = RIK_GROUP_AGENTS;
-			itemGroups += QString::null;
+			itemGroups += QString();
 		}
 		else if (AItem.groups.isEmpty())
 		{
 			groupKind = RIK_GROUP_BLANK;
-			itemGroups += QString::null;
+			itemGroups += QString();
 		}
 		else
 		{
@@ -768,7 +768,7 @@ void RostersModel::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AIt
 					IRosterIndex *oldGroupIndex;
 					QString oldGroup = oldGroups.values().value(0);
 					if (oldGroup.isEmpty())
-						oldGroupIndex = findGroupIndex(RIK_GROUP_BLANK,QString::null,sroot);
+			            oldGroupIndex = findGroupIndex(RIK_GROUP_BLANK,QString(),sroot);
 					else
 						oldGroupIndex = findGroupIndex(RIK_GROUP,oldGroup,sroot);
 
@@ -910,7 +910,7 @@ void RostersModel::onPresenceItemReceived(IPresence *APresence, const IPresenceI
 			{
 				if (itemIndex == NULL)
 				{
-					IRosterIndex *groupIndex = getGroupIndex(RIK_GROUP_MY_RESOURCES,QString::null,sroot);
+			        IRosterIndex *groupIndex = getGroupIndex(RIK_GROUP_MY_RESOURCES,QString(),sroot);
 					itemIndex = newRosterIndex(itemKind);
 					itemIndex->setData(APresence->streamJid().pFull(),RDR_STREAM_JID);
 					itemIndex->setData(AItem.itemJid.pBare(),RDR_PREP_BARE_JID);

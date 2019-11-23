@@ -854,7 +854,7 @@ QString FileTransfer::registerPublicFile(const Jid &AOwnerJid, const QString &AF
 			LOG_WARNING(QString("Failed to register public file=%1, owner=%2: File not found").arg(AFileName,AOwnerJid.full()));
 		}
 	}
-	return QString::null;
+	return QString();
 }
 
 void FileTransfer::removePublicFile(const QString &AFileId)
@@ -910,12 +910,12 @@ QString FileTransfer::receivePublicFile(const Jid &AStreamJid, const Jid &AConta
 	{
 		LOG_STRM_WARNING(AStreamJid,QString("Failed send start receive public file request to=%1, id=%2: Not supported").arg(AContactJid.full(),AFileId));
 	}
-	return QString::null;
+	return QString();
 }
 
 void FileTransfer::notifyStream(IFileStream *AStream)
 {
-	QString streamFile = !AStream->fileName().isEmpty() ? AStream->fileName().split("/").last() : QString::null;
+	QString streamFile = !AStream->fileName().isEmpty() ? AStream->fileName().split("/").last() : QString();
 
 	IMessageChatWindow *chatWindow = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStream->streamJid(),AStream->contactJid()) : NULL;
 	IMultiUserChatWindow *mucWindow = FMultiChatManager!=NULL ? FMultiChatManager->findMultiChatWindow(AStream->streamJid(),AStream->contactJid()) : NULL;

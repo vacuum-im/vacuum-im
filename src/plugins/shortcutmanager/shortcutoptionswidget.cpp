@@ -6,8 +6,8 @@
 // SortFilterProxyModel
 bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex &ARight) const
 {
-	bool leftHasChild = ALeft.child(0,0).isValid();
-	bool rightHasChild = ARight.child(0,0).isValid();
+	bool leftHasChild = ALeft.model()->index(0,0).isValid();
+	bool rightHasChild = ARight.model()->index(0,0).isValid();
 	
 	if (leftHasChild && !rightHasChild)
 		return true;
@@ -131,9 +131,9 @@ QStandardItem *ShortcutOptionsWidget::createTreeRow(const QString &AId, QStandar
 	{
 		int dotIndex = AId.lastIndexOf('.');
 		QString actionName = dotIndex>0 ? AId.mid(dotIndex+1) : AId;
-		QString actionPath = dotIndex>0 ? AId.left(dotIndex) : QString::null;
+		QString actionPath = dotIndex>0 ? AId.left(dotIndex) : QString();
 		
-		QString actionText = AGroup ? Shortcuts::groupDescription(AId) : QString::null;
+		QString actionText = AGroup ? Shortcuts::groupDescription(AId) : QString();
 		nameItem = new QStandardItem(!actionText.isEmpty() ? actionText : actionName);
 		nameItem->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
 
@@ -195,7 +195,7 @@ void ShortcutOptionsWidget::onClearClicked()
 	if (Shortcuts::shortcuts().contains(shortcut))
 	{
 		QStandardItem *keyItem = nameItem->parent()->child(nameItem->row(),SCL_KEY);
-		keyItem->setText(QString::null);
+		keyItem->setText(QString());
 		keyItem->setData(QKeySequence(QKeySequence::UnknownKey),SDR_ACTIVE_KEYSEQUENCE);
 	}
 	ui.trvShortcuts->setFocus();
@@ -285,7 +285,7 @@ void ShortcutOptionsWidget::onModelItemChanged(QStandardItem *AItem)
 
 void ShortcutOptionsWidget::onIndexDoubleClicked(const QModelIndex &AIndex)
 {
-	QModelIndex editIndex = AIndex.parent().child(AIndex.row(),1);
+	QModelIndex editIndex = AIndex.parent().model()->index(AIndex.row(),1);
 	if (editIndex.isValid() && (editIndex.flags() & Qt::ItemIsEditable)>0)
 		ui.trvShortcuts->edit(editIndex);
 }

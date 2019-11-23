@@ -33,7 +33,7 @@
 #define SHC_MESSAGE_ADDRESS             "/message/addresses[@xmlns='" NS_ADDRESS "']/address[@type='ofrom']"
 
 struct OptionsFormItem {
-	OptionsFormItem(QString ANode = QString::null, QString ALabel = QString::null) {
+	OptionsFormItem(QString ANode = QString(), QString ALabel = QString()) {
 		node = ANode;
 		label = ALabel;
 	}
@@ -225,7 +225,7 @@ QString RemoteControl::commandName(const QString &ANode) const
 		return tr("Set options");
 	if (ANode == COMMAND_NODE_FORWARD_MESSAGES)
 		return tr("Forward unread messages");
-	return QString::null;
+	return QString();
 }
 
 bool RemoteControl::receiveCommandRequest(const ICommandRequest &ARequest)
@@ -679,7 +679,7 @@ bool RemoteControl::processForwardMessages(const ICommandRequest &ARequest)
 				{
 					foreach(Message message, notifiedMessages(ARequest.streamJid,senderJid))
 					{
-						message.setTo(ARequest.contactJid.full()).setDelayed(message.dateTime(),message.from()).setFrom(QString::null);
+			            message.setTo(ARequest.contactJid.full()).setDelayed(message.dateTime(),message.from()).setFrom(QString());
 
 						QDomElement addresses = message.stanza().firstElement("addresses",NS_ADDRESS);
 						if (!addresses.isNull())

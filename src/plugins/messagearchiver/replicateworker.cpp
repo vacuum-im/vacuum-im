@@ -100,7 +100,7 @@ void ReplicateTaskLoadState::run(QSqlDatabase &ADatabase)
 				}
 				else
 				{
-					FNextRef = QString::null;
+			        FNextRef = QString();
 					FStartTime = QDateTime(QDate(1970,1,1),QTime(0,0),Qt::UTC);
 
 					insertStateQuery.bindValue(":engine_id",FEngineId.toString());

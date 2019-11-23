@@ -201,7 +201,7 @@ QString PrivateStorage::saveData(const Jid &AStreamJid, const QDomElement &AElem
 	{
 		REPORT_ERROR("Failed to save private data: Invalid data");
 	}
-	return QString::null;
+	return QString();
 }
 
 QString PrivateStorage::loadData(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace)
@@ -231,7 +231,7 @@ QString PrivateStorage::loadData(const Jid &AStreamJid, const QString &ATagName,
 	{
 		REPORT_ERROR("Failed to load private data: Invalid params");
 	}
-	return QString::null;
+	return QString();
 }
 
 QString PrivateStorage::removeData(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace)
@@ -266,7 +266,7 @@ QString PrivateStorage::removeData(const Jid &AStreamJid, const QString &ATagNam
 	{
 		REPORT_ERROR("Failed to remove private data: Invalid params");
 	}
-	return QString::null;
+	return QString();
 }
 
 void PrivateStorage::notifyDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace)

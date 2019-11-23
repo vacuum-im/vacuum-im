@@ -82,10 +82,10 @@ public:
 	virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
 	//IServiceDiscovery
 	virtual bool isReady(const Jid &AStreamJid) const;
-	virtual IDiscoInfo selfDiscoInfo(const Jid &AStreamJid, const QString &ANode = QString::null) const;
+	virtual IDiscoInfo selfDiscoInfo(const Jid &AStreamJid, const QString &ANode = QString()) const;
 	virtual void showDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent = NULL);
 	virtual void showDiscoItems(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent = NULL);
-	virtual bool checkDiscoFeature(const Jid &AStreamJid, const Jid &AContactJid, const QString &AFeature, const QString &ANode=QString::null, bool ADefault=false);
+	virtual bool checkDiscoFeature(const Jid &AStreamJid, const Jid &AContactJid, const QString &AFeature, const QString &ANode=QString(), bool ADefault=false);
 	virtual QList<IDiscoInfo> findDiscoInfo(const Jid &AStreamJid, const IDiscoIdentity &AIdentity, const QStringList &AFeatures, const IDiscoItem &AParent) const;
 	virtual QIcon identityIcon(const QList<IDiscoIdentity> &AIdentity) const;
 	virtual QIcon serviceIcon(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANode) const;
@@ -105,13 +105,13 @@ public:
 	virtual IDiscoFeature discoFeature(const QString &AFeatureVar) const;
 	virtual void removeDiscoFeature(const QString &AFeatureVar);
 	//DiscoInfo
-	virtual bool hasDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode = QString::null) const;
-	virtual IDiscoInfo discoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode = QString::null) const;
-	virtual bool requestDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode = QString::null);
-	virtual void removeDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode = QString::null);
+	virtual bool hasDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode = QString()) const;
+	virtual IDiscoInfo discoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode = QString()) const;
+	virtual bool requestDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode = QString());
+	virtual void removeDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode = QString());
 	virtual int findIdentity(const QList<IDiscoIdentity> &AIdentity, const QString &ACategory, const QString &AType) const;
 	//DiscoItems
-	virtual bool requestDiscoItems(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode = QString::null);
+	virtual bool requestDiscoItems(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode = QString());
 signals:
 	void discoOpened(const Jid &AStreamJid);
 	void discoClosed(const Jid &AStreamJid);

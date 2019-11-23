@@ -129,7 +129,7 @@ class DatabaseTaskUpdateHeaders :
 	public DatabaseTask
 {
 public:
-	DatabaseTaskUpdateHeaders(const Jid &AStreamJid, const QList<IArchiveHeader> &AHeaders, bool AInsertIfNotExist=false, const QString &AGateType=QString::null);
+	DatabaseTaskUpdateHeaders(const Jid &AStreamJid, const QList<IArchiveHeader> &AHeaders, bool AInsertIfNotExist=false, const QString &AGateType=QString());
 	QList<IArchiveHeader> headers() const;
 protected:
 	void run();

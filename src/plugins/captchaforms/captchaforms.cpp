@@ -419,7 +419,7 @@ QString CaptchaForms::findChallenge(IDataDialogWidget *ADialog) const
 		if (it->dialog == ADialog)
 			return it.key();
 	}
-	return QString::null;
+	return QString();
 }
 
 QString CaptchaForms::findChallenge(const Jid &AStreamJid, const Jid &AContactJid) const
@@ -429,7 +429,7 @@ QString CaptchaForms::findChallenge(const Jid &AStreamJid, const Jid &AContactJi
 		if (AStreamJid==it->streamJid && AContactJid==it->challenger)
 			return it.key();
 	}
-	return QString::null;
+	return QString();
 }
 
 bool CaptchaForms::setFocusToEditableField(IDataDialogWidget *ADialog)

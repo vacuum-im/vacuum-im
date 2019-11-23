@@ -157,7 +157,7 @@ struct IArchiveRequest
 		openOnly = false;
 		exactmatch = false;
 		maxItems = 0xFFFFFFFF;
-		threadId = QString::null;
+		threadId = QString();
 		order = Qt::AscendingOrder;
 	}
 	Jid with;
@@ -233,7 +233,7 @@ public:
 	virtual bool isArchiveReplicationEnabled(const Jid &AStreamJid) const =0;
 	virtual bool isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId) const =0;
 	virtual IArchiveStreamPrefs archivePrefs(const Jid &AStreamJid) const =0;
-	virtual IArchiveItemPrefs archiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId = QString::null) const =0;
+	virtual IArchiveItemPrefs archiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId = QString()) const =0;
 	virtual bool isArchiveAutoSave(const Jid &AStreamJid) const =0;
 	virtual QString setArchiveAutoSave(const Jid &AStreamJid, bool AAuto, bool AGlobal=true) =0;
 	virtual QString setArchivePrefs(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs) =0;
@@ -241,7 +241,7 @@ public:
 	virtual QString removeArchiveSessionPrefs(const Jid &AStreamJid, const QString &AThreadId) =0;
 	//Direct Archiving
 	virtual bool saveMessage(const Jid &AStreamJid, const Jid &AItemJid, const Message &AMessage) =0;
-	virtual bool saveNote(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANote, const QString &AThreadId = QString::null) =0;
+	virtual bool saveNote(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANote, const QString &AThreadId = QString()) =0;
 	//Archive Management
 	virtual QString loadMessages(const Jid &AStreamJid, const IArchiveRequest &ARequest) =0;
 	virtual QString loadHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest) =0;

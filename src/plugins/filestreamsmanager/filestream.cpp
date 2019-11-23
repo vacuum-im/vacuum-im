@@ -75,7 +75,7 @@ int FileStream::streamState() const
 
 QString FileStream::methodNS() const
 {
-	return FSocket!=NULL ? FSocket->methodNS() : QString::null;
+	return FSocket!=NULL ? FSocket->methodNS() : QString();
 }
 
 qint64 FileStream::speed() const

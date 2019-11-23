@@ -138,7 +138,7 @@ bool RosterSearch::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, co
 		{
 			FSelectedIndexes.clear();
 			FSelectedIndexes.append(AIndex);
-			setSearchPattern(QString::null);
+			setSearchPattern(QString());
 		}
 	}
 	return false;
@@ -186,7 +186,7 @@ bool RosterSearch::rosterKeyReleased(int AOrder, const QList<IRosterIndex *> &AI
 
 void RosterSearch::startSearch()
 {
-	QString pattern = isSearchEnabled() ? searchPattern() : QString::null;
+	QString pattern = isSearchEnabled() ? searchPattern() : QString();
 
 	if (FRostersViewPlugin)
 	{

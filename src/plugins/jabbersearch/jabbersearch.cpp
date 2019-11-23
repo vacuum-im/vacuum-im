@@ -238,7 +238,7 @@ QString JabberSearch::sendRequest(const Jid &AStreamJid, const Jid &AServiceJid)
 			LOG_STRM_WARNING(AStreamJid,QString("Failed to send search request to=%1").arg(AServiceJid.full()));
 		}
 	}
-	return QString::null;
+	return QString();
 }
 
 QString JabberSearch::sendSubmit(const Jid &AStreamJid, const ISearchSubmit &ASubmit)
@@ -276,7 +276,7 @@ QString JabberSearch::sendSubmit(const Jid &AStreamJid, const ISearchSubmit &ASu
 			LOG_STRM_WARNING(AStreamJid,QString("Failed to send search submit to=%1").arg(ASubmit.serviceJid.full()));
 		}
 	}
-	return QString::null;
+	return QString();
 }
 
 void JabberSearch::showSearchDialog(const Jid &AStreamJid, const Jid &AServiceJid, QWidget *AParent)

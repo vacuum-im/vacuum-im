@@ -139,7 +139,7 @@ void ConsoleWidget::loadContext(const QUuid &AContextId)
 void ConsoleWidget::saveContext(const QUuid &AContextId)
 {
 	OptionsNode node = Options::node(OPV_CONSOLE_CONTEXT_ITEM, AContextId.toString());
-	node.setValue(ui.cmbStreamJid->currentIndex()>0 ? ui.cmbStreamJid->itemData(ui.cmbStreamJid->currentIndex()).toString() : QString::null,"streamjid");
+	node.setValue(ui.cmbStreamJid->currentIndex()>0 ? ui.cmbStreamJid->itemData(ui.cmbStreamJid->currentIndex()).toString() : QString(),"streamjid");
 
 	QStringList conditions;
 	for (int i=0; i<ui.ltwConditions->count(); i++)
@@ -183,7 +183,7 @@ void ConsoleWidget::hidePasswords(QString &AXml) const
 
 void ConsoleWidget::showStanza(IXmppStream *AXmppStream, const Stanza &AStanza, bool ASent)
 {
-	Jid streamJid = ui.cmbStreamJid->currentIndex()>0 ? ui.cmbStreamJid->itemData(ui.cmbStreamJid->currentIndex()).toString() : QString::null;
+	Jid streamJid = ui.cmbStreamJid->currentIndex()>0 ? ui.cmbStreamJid->itemData(ui.cmbStreamJid->currentIndex()).toString() : QString();
 	if (streamJid.isEmpty() || streamJid==AXmppStream->streamJid())
 	{
 		bool accepted = FStanzaProcessor==NULL || ui.ltwConditions->count()==0;

@@ -157,7 +157,7 @@ QString XmppError::errorText(const QString &ALang) const
 	{
 		value = d->FErrorText.value(ALang);
 		if (value.isEmpty() && !ALang.isEmpty())
-			value = d->FErrorText.value(QString::null);
+			value = d->FErrorText.value(QString());
 		if (value.isEmpty() && ALang!="en")
 			value = d->FErrorText.value("en");
 		if (value.isEmpty())
@@ -221,7 +221,7 @@ QString XmppError::getErrorString(const QString &ANsUri, const QString &AConditi
 {
 	registerErrors();
 	const QMap<QString,QString> &texts = FErrors.value(ANsUri).value(ACondition);
-	return !AContext.isEmpty() && texts.contains(AContext) ? texts.value(AContext) : texts.value(QString::null,ACondition);
+	return !AContext.isEmpty() && texts.contains(AContext) ? texts.value(AContext) : texts.value(QString(),ACondition);
 }
 
 void XmppError::registerError(const QString &ANsUri, const QString &ACondition, const QString &AErrorString, const QString &AContext)

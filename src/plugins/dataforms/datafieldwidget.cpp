@@ -21,11 +21,11 @@ DataFieldWidget::DataFieldWidget(IDataForms *ADataForms, const IDataField &AFiel
 	}
 
 	QString label = !FField.label.isEmpty() ? FField.label : FField.desc;
-	QString desc = !FField.desc.isEmpty() ? QString("<span>%1</span>").arg(FField.desc.toHtmlEscaped()) : QString::null;
+	QString desc = !FField.desc.isEmpty() ? QString("<span>%1</span>").arg(FField.desc.toHtmlEscaped()) : QString();
 	if (!FReadOnly && FField.type == DATAFIELD_TYPE_BOOLEAN)
 	{
 		FCheckBox = new QCheckBox(this);
-		FCheckBox->setText(label + (FField.required ? QString("*") : QString::null));
+		FCheckBox->setText(label + (FField.required ? QString("*") : QString()));
 		FCheckBox->setToolTip(desc);
 		FCheckBox->installEventFilter(this);
 		connect(FCheckBox,SIGNAL(stateChanged(int)),SIGNAL(changed()));
@@ -316,7 +316,7 @@ void DataFieldWidget::appendLabel(const QString &AText, QWidget *ABuddy)
 		FLabel = new QLabel(this);
 		FLabel->setWordWrap(true);
 		FLabel->setTextFormat(Qt::PlainText);
-		FLabel->setText(AText + (FField.required ? QString("*") : QString::null));
+		FLabel->setText(AText + (FField.required ? QString("*") : QString()));
 		FLabel->setBuddy(ABuddy);
 		layout()->addWidget(FLabel);
 	}

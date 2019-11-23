@@ -1071,9 +1071,9 @@ void Bookmarks::onDiscoWindowAddBookmarkActionTriggered(bool)
 			{
 				IBookmark bookmark = ref;
 				bookmark.name = "XMPP: ";
-				bookmark.name += !discoName.isEmpty() ? discoName + " | " : QString::null;
+			    bookmark.name += !discoName.isEmpty() ? discoName + " | " : QString();
 				bookmark.name += discoJid;
-				bookmark.name += !discoNode.isEmpty() ? " | " + discoNode : QString::null;
+			    bookmark.name += !discoNode.isEmpty() ? " | " + discoNode : QString();
 
 				index = bookmarkList.count();
 				bookmarkList.append(bookmark);

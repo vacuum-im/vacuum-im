@@ -68,7 +68,7 @@ bool PEPManager::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza &A
 	if (FStanzaHandles.value(AStreamJid) == AHandleId)
 	{
 		bool hooked = false;
-		QString node = AStanza.firstElement("event",NS_PUBSUB_EVENT).firstChildElement("items").attribute("node",QString::null);
+		QString node = AStanza.firstElement("event",NS_PUBSUB_EVENT).firstChildElement("items").attribute("node",QString());
 
 		foreach(int handlerId, FHandlersByNode.values(node))
 		{
