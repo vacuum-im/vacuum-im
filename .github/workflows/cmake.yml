@@ -1,0 +1,21 @@
+#.github/workflows/cmake.yml 
+
+name: Vacuum-IM Build
+
+on: [push]
+
+jobs:
+  build:
+    name: ubuntu 18.04
+    runs-on: ubuntu-18.04
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: packages
+      run: sudo apt update && sudo apt install build-essential qt5-default cmake openssl libqt5svg5-dev libqt5x11extras5-dev libx11-dev qtmultimedia5-dev zlib1g-dev libidn11-dev libxss-dev qttools5-dev-tools qttools5-dev libhunspell-dev
+    - name: cmake configure
+      run: mkdir build && cd build && cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DPLUGIN_adiummessagestyle=OFF -DSPELLCHECKER_BACKEND=HUNSPELL
+    - name: make
+      run: cd build && cmake --build . --parallel 4 
+    - name: make install
+      run: cd build && sudo make install
