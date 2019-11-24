@@ -3,6 +3,7 @@
 #include <QStyle>
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QScreen>
 
 #ifdef Q_OS_LINUX
 	#include <QtX11Extras/QX11Info>
@@ -287,6 +288,6 @@ QRect WidgetManager::alignRect(const QRect &ARect, const QRect &ABoundary, Qt::A
 
 QRect WidgetManager::alignGeometry(const QSize &ASize, const QWidget *AWidget, Qt::Alignment AAlign)
 {
-	QRect availRect = AWidget!=NULL ? QApplication::desktop()->availableGeometry(AWidget) : QApplication::desktop()->availableGeometry();
+	QRect availRect = AWidget!=NULL ? QApplication::desktop()->availableGeometry(AWidget) :  QApplication::primaryScreen()->availableGeometry();
 	return QStyle::alignedRect(Qt::LeftToRight,AAlign,ASize.boundedTo(availRect.size()),availRect);
 }

@@ -1,5 +1,7 @@
 #include "statistics.h"
 
+#include <QScreen>
+#include <QApplication>
 #include <QDir>
 #include <QUrlQuery>
 #include <QSslError>
@@ -519,7 +521,7 @@ QUrl Statistics::buildHitUrl(const IStatisticsHit &AHit) const
 		query.append(qMakePair<QString,QString>("sc",QUrl::toPercentEncoding("end")));
 
 	// Screen Resolution
-	QRect sr = FDesktopWidget->screenGeometry();
+	QRect sr =  QApplication::primaryScreen()->availableGeometry();
 	query.append(qMakePair<QString,QString>("sr",QUrl::toPercentEncoding(QString("%1.%2").arg(sr.width()).arg(sr.height()))));
 
 	// User Language
