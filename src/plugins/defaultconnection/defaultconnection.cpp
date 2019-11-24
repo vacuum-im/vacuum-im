@@ -1,5 +1,6 @@
 #include "defaultconnection.h"
 
+#include <QSslConfiguration>
 #include <QNetworkProxy>
 #include <QAuthenticator>
 #include <definitions/internalerrors.h>
@@ -209,7 +210,7 @@ void DefaultConnection::setLocalCertificate(const QSslCertificate &ACertificate)
 
 QList<QSslCertificate> DefaultConnection::caCertificates() const
 {
-	return FSocket.caCertificates();
+	return FSocket.sslConfiguration().caCertificates();
 }
 
 void DefaultConnection::addCaSertificates(const QList<QSslCertificate> &ACertificates)
@@ -224,7 +225,7 @@ void DefaultConnection::addCaSertificates(const QList<QSslCertificate> &ACertifi
 
 void DefaultConnection::setCaCertificates(const QList<QSslCertificate> &ACertificates)
 {
-	FSocket.setCaCertificates(ACertificates);
+	FSocket.sslConfiguration().setCaCertificates(ACertificates);
 }
 
 QNetworkProxy DefaultConnection::proxy() const
