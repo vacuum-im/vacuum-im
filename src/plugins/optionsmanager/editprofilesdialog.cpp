@@ -17,7 +17,7 @@ EditProfilesDialog::EditProfilesDialog(IOptionsManager *AOptionsManager, QWidget
 
 	FOptionsManager = AOptionsManager;
 	ui.lstProfiles->addItems(FOptionsManager->profiles());
-	ui.lstProfiles->setItemSelected(ui.lstProfiles->item(0),true);
+	ui.lstProfiles->item(0)->setSelected(true);
 
 	connect(FOptionsManager->instance(),SIGNAL(profileAdded(const QString &)),SLOT(onProfileAdded(const QString &)));
 	connect(FOptionsManager->instance(),SIGNAL(profileRenamed(const QString &, const QString &)),SLOT(onProfileRenamed(const QString &, const QString &)));
