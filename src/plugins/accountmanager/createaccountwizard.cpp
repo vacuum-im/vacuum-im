@@ -279,21 +279,18 @@ AppendServicePage::AppendServicePage(QWidget *AParent) : QWizardPage(AParent)
 
 	FServiceType = -1;
 
-	QSignalMapper *signalMapper = new QSignalMapper(this);
-	connect(signalMapper,SIGNAL(mapped(int)),SLOT(onServiceButtonClicked(int)));
-
 	QVBoxLayout *layout = new QVBoxLayout(this);
 	for (int i=0; i<CreateAccountWizard::Service_Count; i++)
 	{
 		QRadioButton *button = new QRadioButton(this);
 		button->setText(services[i].name);
-		connect(button,SIGNAL(clicked()),signalMapper,SLOT(map()));
 
-		signalMapper->setMapping(button, services[i].type);
+		connect(button, &QRadioButton::clicked, [=]() { onServiceButtonClicked(services[i].type); });
+
 		FTypeButton.insert(services[i].type, button);
-
 		layout->addWidget(button);
 	}
+
 	layout->setSpacing(layout->spacing()*2);
 	
 	registerField(WF_APPEND_SERVICE"*",this,"serviceType");
