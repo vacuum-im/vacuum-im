@@ -46,7 +46,7 @@ public:
 	virtual void setHomePath(const QString &APath) =0;
 	virtual void setLocale(QLocale::Language ALanguage, QLocale::Country ACountry) =0;
 	virtual IPlugin *pluginInstance(const QUuid &AUuid) const =0;
-	virtual QList<IPlugin *> pluginInterface(const QString &AInterface = QString::null) const =0;
+	virtual QList<IPlugin *> pluginInterface(const QString &AInterface = QString()) const =0;
 	virtual const IPluginInfo *pluginInfo(const QUuid &AUuid) const =0;
 	virtual QSet<QUuid> pluginDependencesOn(const QUuid &AUuid) const =0;
 	virtual QSet<QUuid> pluginDependencesFor(const QUuid &AUuid) const =0;
