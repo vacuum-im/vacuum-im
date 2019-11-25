@@ -288,6 +288,10 @@ QRect WidgetManager::alignRect(const QRect &ARect, const QRect &ABoundary, Qt::A
 
 QRect WidgetManager::alignGeometry(const QSize &ASize, const QWidget *AWidget, Qt::Alignment AAlign)
 {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
 	QRect availRect = AWidget!=NULL ? QApplication::desktop()->availableGeometry(AWidget) :  QApplication::screenAt(QCursor::pos())->availableGeometry();
+#else
+	QRect availRect = AWidget!=NULL ? QApplication::desktop()->availableGeometry(AWidget) : QApplication::desktop()->availableGeometry();
+#endif
 	return QStyle::alignedRect(Qt::LeftToRight,AAlign,ASize.boundedTo(availRect.size()),availRect);
 }
