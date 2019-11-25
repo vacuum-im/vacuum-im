@@ -6,8 +6,8 @@
 // SortFilterProxyModel
 bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex &ARight) const
 {
-	bool leftHasChild = ALeft.model()->index(0,0).isValid();
-	bool rightHasChild = ARight.model()->index(0,0).isValid();
+	bool leftHasChild = ALeft.model()->index(0,0, ALeft).isValid();
+	bool rightHasChild = ARight.model()->index(0,0, ARight).isValid();
 	
 	if (leftHasChild && !rightHasChild)
 		return true;
@@ -285,7 +285,7 @@ void ShortcutOptionsWidget::onModelItemChanged(QStandardItem *AItem)
 
 void ShortcutOptionsWidget::onIndexDoubleClicked(const QModelIndex &AIndex)
 {
-	QModelIndex editIndex = AIndex.parent().model()->index(AIndex.row(),1);
+	QModelIndex editIndex = AIndex.model()->index(AIndex.row(),1, AIndex.parent());
 	if (editIndex.isValid() && (editIndex.flags() & Qt::ItemIsEditable)>0)
 		ui.trvShortcuts->edit(editIndex);
 }
