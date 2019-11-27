@@ -382,7 +382,7 @@ bool RosterSearch::filterAcceptsRow(int ARow, const QModelIndex &AParent) const
 		}
 		else
 		{
-			for (int childRow = 0; index.model()->index(childRow,0,index).isValid(); childRow++)
+			for (int childRow = 0; sourceModel()->index(childRow,0,index).isValid(); childRow++)
 				if (filterAcceptsRow(childRow,index))
 					return true;
 			return false;
