@@ -1,6 +1,8 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
+ * Copyright (C) 2002-2017 Németh László
+ *
  * The contents of this file are subject to the Mozilla Public License Version
  * 1.1 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -11,12 +13,7 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is Hunspell, based on MySpell.
- *
- * The Initial Developers of the Original Code are
- * Kevin Hendricks (MySpell) and Németh László (Hunspell).
- * Portions created by the Initial Developers are Copyright (C) 2002-2005
- * the Initial Developers. All Rights Reserved.
+ * Hunspell is based on MySpell which is Copyright (C) 2002 Kevin Hendricks.
  *
  * Contributor(s): David Einstein, Davide Prina, Giuseppe Modugno,
  * Gianluca Turconi, Simon Brouwer, Noll János, Bíró Árpád,
@@ -38,9 +35,15 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-#include "csutil.hxx"
+// Unicode character encoding information
+struct unicode_info {
+  unsigned short c;
+  unsigned short cupper;
+  unsigned short clower;
+};
+
 /* fields: Unicode letter, toupper, tolower */
-static struct unicode_info utf_lst[] = {
+static const struct unicode_info utf_lst[] = {
     {0x0041, 0x0041, 0x0061}, {0x0042, 0x0042, 0x0062},
     {0x0043, 0x0043, 0x0063}, {0x0044, 0x0044, 0x0064},
     {0x0045, 0x0045, 0x0065}, {0x0046, 0x0046, 0x0066},

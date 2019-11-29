@@ -1,6 +1,8 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
+ * Copyright (C) 2002-2017 Németh László
+ *
  * The contents of this file are subject to the Mozilla Public License Version
  * 1.1 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -11,12 +13,7 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is Hunspell, based on MySpell.
- *
- * The Initial Developers of the Original Code are
- * Kevin Hendricks (MySpell) and Németh László (Hunspell).
- * Portions created by the Initial Developers are Copyright (C) 2002-2005
- * the Initial Developers. All Rights Reserved.
+ * Hunspell is based on MySpell which is Copyright (C) 2002 Kevin Hendricks.
  *
  * Contributor(s): David Einstein, Davide Prina, Giuseppe Modugno,
  * Gianluca Turconi, Simon Brouwer, Noll János, Bíró Árpád,
@@ -71,8 +68,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _SUGGESTMGR_HXX_
-#define _SUGGESTMGR_HXX_
+#ifndef SUGGESTMGR_HXX_
+#define SUGGESTMGR_HXX_
 
 #define MAX_ROOTS 100
 #define MAX_WORDS 100
@@ -80,11 +77,6 @@
 #define MAXNGRAMSUGS 4
 #define MAXPHONSUGS 2
 #define MAXCOMPOUNDSUGS 3
-
-// timelimit: max ~1/4 sec (process time on Linux) for a time consuming function
-#define TIMELIMIT (CLOCKS_PER_SEC >> 2)
-#define MINTIMER 100
-#define MAXPLUSTIMER 100
 
 #define NGRAM_LONGER_WORSE (1 << 0)
 #define NGRAM_ANY_MISMATCH (1 << 1)
@@ -95,7 +87,6 @@
 #include "affixmgr.hxx"
 #include "hashmgr.hxx"
 #include "langnum.hxx"
-#include <time.h>
 
 enum { LCS_UP, LCS_LEFT, LCS_UPLEFT };
 
@@ -112,6 +103,7 @@ class SuggestMgr {
   char* ctry;
   size_t ctryl;
   std::vector<w_char> ctry_utf;
+  bool lang_with_dash_usage;
 
   AffixMgr* pAMgr;
   unsigned int maxSug;
@@ -127,8 +119,8 @@ class SuggestMgr {
   SuggestMgr(const char* tryme, unsigned int maxn, AffixMgr* aptr);
   ~SuggestMgr();
 
-  void suggest(std::vector<std::string>& slst, const char* word, int* onlycmpdsug);
-  void ngsuggest(std::vector<std::string>& slst, const char* word, const std::vector<HashMgr*>& rHMgr);
+  bool suggest(std::vector<std::string>& slst, const char* word, int* onlycmpdsug);
+  void ngsuggest(std::vector<std::string>& slst, const char* word, const std::vector<HashMgr*>& rHMgr, int captype);
 
   std::string suggest_morph(const std::string& word);
   std::string suggest_gen(const std::vector<std::string>& pl, const std::string& pattern);
@@ -152,7 +144,7 @@ class SuggestMgr {
   int extrachar(std::vector<std::string>&, const char*, int);
   int badcharkey(std::vector<std::string>&, const char*, int);
   int badchar(std::vector<std::string>&, const char*, int);
-  int twowords(std::vector<std::string>&, const char*, int);
+  bool twowords(std::vector<std::string>&, const char*, int, bool);
 
   void capchars_utf(std::vector<std::string>&, const w_char*, int wl, int);
   int doubletwochars_utf(std::vector<std::string>&, const w_char*, int wl, int);
@@ -173,8 +165,12 @@ class SuggestMgr {
                   const std::vector<mapentry>&,
                   int*,
                   clock_t*);
+  int ngram(int n, const std::vector<w_char>& su1,
+            const std::vector<w_char>& su2, int opt);
   int ngram(int n, const std::string& s1, const std::string& s2, int opt);
   int mystrlen(const char* word);
+  int leftcommonsubstring(const std::vector<w_char>& su1,
+                          const std::vector<w_char>& su2);
   int leftcommonsubstring(const char* s1, const char* s2);
   int commoncharacterpositions(const char* s1, const char* s2, int* is_swap);
   void bubblesort(char** rwd, char** rwd2, int* rsc, int n);

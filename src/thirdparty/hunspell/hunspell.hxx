@@ -1,6 +1,8 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
+ * Copyright (C) 2002-2017 Németh László
+ *
  * The contents of this file are subject to the Mozilla Public License Version
  * 1.1 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -11,12 +13,7 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is Hunspell, based on MySpell.
- *
- * The Initial Developers of the Original Code are
- * Kevin Hendricks (MySpell) and Németh László (Hunspell).
- * Portions created by the Initial Developers are Copyright (C) 2002-2005
- * the Initial Developers. All Rights Reserved.
+ * Hunspell is based on MySpell which is Copyright (C) 2002 Kevin Hendricks.
  *
  * Contributor(s): David Einstein, Davide Prina, Giuseppe Modugno,
  * Gianluca Turconi, Simon Brouwer, Noll János, Bíró Árpád,
@@ -70,11 +67,12 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#ifndef _MYSPELLMGR_HXX_
-#define _MYSPELLMGR_HXX_
+#ifndef MYSPELLMGR_HXX_
+#define MYSPELLMGR_HXX_
 
 #include "hunvisapi.h"
 #include "w_char.hxx"
+#include "atypes.hxx"
 #include <string>
 #include <vector>
 
@@ -83,7 +81,11 @@
 #define MAXSUGGESTION 15
 #define MAXSHARPS 5
 
-#if __GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 1)
+#ifndef MAXWORDLEN
+#define MAXWORDLEN 100
+#endif
+
+#if defined __GNUC__ && (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 1))
 #  define H_DEPRECATED __attribute__((__deprecated__))
 #elif defined(_MSC_VER) && (_MSC_VER >= 1300)
 #  define H_DEPRECATED __declspec(deprecated)
@@ -153,7 +155,7 @@ class LIBHUNSPELL_DLL_EXPORTED Hunspell {
   H_DEPRECATED void free_list(char*** slst, int n);
 
   const std::string& get_dict_encoding() const;
-  H_DEPRECATED const char* get_dic_encoding() const;
+  char* get_dic_encoding();
 
   /* morphological functions */
 
@@ -208,15 +210,20 @@ class LIBHUNSPELL_DLL_EXPORTED Hunspell {
   /* other */
 
   /* get extra word characters definied in affix file for tokenization */
-  const std::string& get_wordchars() const;
+  const char* get_wordchars() const;
+  const std::string& get_wordchars_cpp() const;
   const std::vector<w_char>& get_wordchars_utf16() const;
 
-  const std::string& get_version() const;
+  struct cs_info* get_csconv();
+  
+  const char* get_version() const;
+  const std::string& get_version_cpp() const;
 
   int get_langnum() const;
 
   /* need for putdic */
   bool input_conv(const std::string& word, std::string& dest);
+  H_DEPRECATED int input_conv(const char* word, char* dest, size_t destsize);
 };
 
 #endif
