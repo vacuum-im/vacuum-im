@@ -86,7 +86,7 @@ bool HunspellChecker::isCorrect(const QString &AWord)
 	if(available())
 	{
 		QByteArray encWord = FDictCodec!=NULL ? FDictCodec->fromUnicode(AWord) : AWord.toUtf8();
-		return FHunSpell->spell(encWord.constData());
+		return FHunSpell->spell(encWord.toStdString());
 	}
 	return true;
 }
@@ -105,7 +105,7 @@ bool HunspellChecker::add(const QString &AWord)
 	{
 		QString trimmedWord = AWord.trimmed();
 		QByteArray encWord = FDictCodec!=NULL ? FDictCodec->fromUnicode(trimmedWord) : trimmedWord.toUtf8();
-		FHunSpell->add(encWord.constData());
+		FHunSpell->add(encWord.toStdString());
 		savePersonalDict(trimmedWord);
 		return true;
 	}
@@ -117,12 +117,10 @@ QList<QString> HunspellChecker::suggestions(const QString &AWord)
 	QList<QString> words;
 	if(available())
 	{
-		char **sugglist;
 		QByteArray encWord = FDictCodec ? FDictCodec->fromUnicode(AWord) : AWord.toUtf8();
-		int count = FHunSpell->suggest(&sugglist, encWord.data());
-		for(int i = 0; i < count; ++i)
-			words.append(FDictCodec ? FDictCodec->toUnicode(sugglist[i]) : QString::fromUtf8(sugglist[i]));
-		FHunSpell->free_list(&sugglist, count);
+		std::vector<std::string> sugglist = FHunSpell->suggest(encWord.toStdString());
+		foreach (std::string sugg, sugglist)
+			words.append(FDictCodec ? FDictCodec->toUnicode(sugg.data()) : QString::fromUtf8(sugg.data()));
 	}
 	return words;
 }
