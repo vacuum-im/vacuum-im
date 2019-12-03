@@ -3,6 +3,7 @@
 #include <QMessageBox>
 #include <QApplication>
 #include <QActionGroup>
+#include <QtConcurrent/QtConcurrentRun>
 
 #include <definitions/actiongroups.h>
 #include <definitions/optionvalues.h>
@@ -12,7 +13,7 @@
 #include "spellbackend.h"
 #include "spellchecker.h"
 
-#define MAX_SUGGESTIONS     15
+#define MAX_SUGGESTIONS     5
 #define SPELLDICTS_DIR      "spelldicts"
 #define PERSONALDICTS_DIR   "personal"
 
@@ -55,7 +56,6 @@ bool SpellChecker::initConnections(IPluginManager *APluginManager, int &AInitOrd
 
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
-
 	return FMessageWidgets != NULL;
 }
 
@@ -249,24 +249,50 @@ void SpellChecker::onEditWidgetContextMenuRequested(const QPoint &APosition, Men
 
 			if (!isCorrectWord(word))
 			{
-				QList<QString> suggests = wordSuggestions(word);
-				for(int i=0; i<suggests.count() && i<MAX_SUGGESTIONS; i++)
-				{
-					Action *suggestAction = new Action(AMenu);
-					suggestAction->setText(suggests.at(i));
-					suggestAction->setProperty("suggestion", suggests.at(i));
-					connect(suggestAction,SIGNAL(triggered()),SLOT(onRepairWordUnderCursor()));
-					AMenu->addAction(suggestAction,AG_MWEWCM_SPELLCHECKER_SUGGESTS);
-				}
+				connect(AMenu, SIGNAL(menuDestroyed(Menu *)), SLOT(removeMenu(Menu *)));
 
-				if (canAddWordToPersonalDict(word))
-				{
-					Action *appendAction = new Action(AMenu);
-					appendAction->setText(tr("Add '%1' to Dictionary").arg(word));
-					appendAction->setProperty("word",word);
-					connect(appendAction,SIGNAL(triggered()),SLOT(onAddUnknownWordToDictionary()));
-					AMenu->addAction(appendAction,AG_MWEWCM_SPELLCHECKER_SUGGESTS);
-				}
+				Menu *suggMenu = new Menu(AMenu);
+				suggMenu->setTitle(tr("Suggestions"));
+				AMenu->addAction(suggMenu->menuAction(),AG_MWEWCM_SPELLCHECKER_SUGGESTS);
+				suggMenu->setDisabled(true);
+
+				FWatcher = new QFutureWatcher<QList<QString>>();
+				FActiveMenu.insert(AMenu, suggMenu);
+				FActiveWatchers.insert(AMenu, FWatcher);
+				connect(FWatcher, &QFutureWatcher<QList<QString>>::finished, this, [=]() {
+					QList<QString> suggests = FWatcher->result();
+					if (FActiveMenu.contains(AMenu) && FActiveMenu.value(AMenu) == suggMenu)
+					{
+						if (suggests.isEmpty())
+							suggMenu->setTitle(tr("No suggestions found"));
+						else
+						{
+							QActionGroup *suggGroup = new QActionGroup(suggMenu);
+							for(int i=0; i<suggests.count() && i<MAX_SUGGESTIONS && FActiveMenu.contains(AMenu) && FActiveMenu.value(AMenu) == suggMenu; i++)
+							{
+								Action *suggestAction = new Action(suggMenu);
+								suggestAction->setText(suggests.at(i));
+								suggestAction->setProperty("suggestion", suggests.at(i));
+								suggGroup->addAction(suggestAction);
+								connect(suggestAction,SIGNAL(triggered()),SLOT(onRepairWordUnderCursor()));
+								suggMenu->addAction(suggestAction,AG_DEFAULT);
+								suggMenu->setEnabled(true);
+							}
+						}
+					}
+					removeMenu(AMenu);
+				});
+				QFuture<QList<QString>> future = QtConcurrent::run(this, &SpellChecker::wordSuggestions, word);
+				FWatcher->setFuture(future);
+			}
+
+			if (canAddWordToPersonalDict(word))
+			{
+				Action *appendAction = new Action(AMenu);
+				appendAction->setText(tr("Add '%1' to Dictionary").arg(word));
+				appendAction->setProperty("word",word);
+				connect(appendAction,SIGNAL(triggered()),SLOT(onAddUnknownWordToDictionary()));
+				AMenu->addAction(appendAction,AG_MWEWCM_SPELLCHECKER_SUGGESTS);
 			}
 		}
 
@@ -300,6 +326,13 @@ void SpellChecker::onEditWidgetContextMenuRequested(const QPoint &APosition, Men
 			dictsMenu->setEnabled(!dictsMenu->isEmpty());
 		}
 	}
+}
+
+void SpellChecker::removeMenu(Menu *AMenu)
+{
+	delete FActiveWatchers.value(AMenu);
+	FActiveWatchers.remove(AMenu);
+	FActiveMenu.remove(AMenu);
 }
 
 void SpellChecker::onTextEditDestroyed(QObject *AObject)

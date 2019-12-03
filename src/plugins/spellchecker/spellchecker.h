@@ -1,6 +1,8 @@
 #ifndef SPELLCHECKER_H
 #define SPELLCHECKER_H
 
+#include <QFutureWatcher>
+
 #include <interfaces/ispellchecker.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagewidgets.h>
@@ -51,6 +53,7 @@ protected slots:
 	void onEditWidgetCreated(IMessageEditWidget *AWidget);
 	void onEditWidgetContextMenuRequested(const QPoint &APosition, Menu *AMenu);
 	void onTextEditDestroyed(QObject *AObject);
+	void removeMenu(Menu *AMenu);
 protected slots:
 	void onOptionsOpened();
 	void onOptionsChanged(const OptionsNode &ANode);
@@ -60,6 +63,9 @@ private:
 private:
 	QTextEdit *FCurrentTextEdit;
 	int FCurrentCursorPosition;
+	QFutureWatcher<QList<QString>> *FWatcher;
+	QHash<Menu *, Menu *> FActiveMenu;
+	QHash<Menu *, QFutureWatcher<QList<QString>> *> FActiveWatchers;
 	QMap<QObject *, SpellHighlighter *> FSpellHighlighters;
 };
 
