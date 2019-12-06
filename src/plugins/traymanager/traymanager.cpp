@@ -52,7 +52,6 @@ bool TrayManager::initConnections(IPluginManager *APluginManager, int &AInitOrde
 	Q_UNUSED(AInitOrder);
 
 	FPluginManager = APluginManager;
-	connect(FPluginManager->instance(),SIGNAL(shutdownStarted()),SLOT(onApplicationShutdownStarted()));
 
 	return true;
 }
@@ -233,9 +232,4 @@ void TrayManager::onBlinkTimerTimeout()
 		FBlinkVisible = false;
 		FBlinkTimer.start(BLINK_INVISIBLE_TIME);
 	}
-}
-
-void TrayManager::onApplicationShutdownStarted()
-{
-	setTrayIconVisible(false);
 }

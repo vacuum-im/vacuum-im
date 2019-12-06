@@ -53,7 +53,6 @@ protected:
 protected slots:
 	void onTrayIconActivated(QSystemTrayIcon::ActivationReason AReason);
 	void onBlinkTimerTimeout();
-	void onApplicationShutdownStarted();
 private:
 	IPluginManager *FPluginManager;
 private:
