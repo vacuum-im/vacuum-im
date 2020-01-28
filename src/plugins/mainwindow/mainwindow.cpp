@@ -296,7 +296,7 @@ void MainWindow::setCentralWidgetVisible(bool AVisible)
 		bool windowVisible = isVisible();
 		saveWindowGeometryAndState();
 		closeWindow();
-		
+
 		FCentralVisible = AVisible;
 		if (AVisible)
 		{
@@ -310,7 +310,7 @@ void MainWindow::setCentralWidgetVisible(bool AVisible)
 			FSplitter->setHandleWidth(0);
 			FLeftWidget->setFrameShape(QFrame::NoFrame);
 			FCentralWidget->instance()->setVisible(false);
-			setWindowFlags(Qt::Window | Qt::WindowTitleHint);
+			setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint);
 		}
 
 		updateWindow();

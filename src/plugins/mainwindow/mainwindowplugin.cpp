@@ -20,7 +20,7 @@ MainWindowPlugin::MainWindowPlugin()
 	FStartShowLoopCount = 0;
 
 	FActivationChanged = QTime::currentTime();
-	FMainWindow = new MainWindow(NULL, Qt::Window|Qt::WindowTitleHint);
+	FMainWindow = new MainWindow(NULL, Qt::Window | Qt::WindowCloseButtonHint);
 	FMainWindow->installEventFilter(this);
 	WidgetManager::setWindowSticky(FMainWindow,true);
 }
