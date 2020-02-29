@@ -45,8 +45,6 @@ StatusChanger::StatusChanger()
 	FStatusIcons = NULL;
 	FChangingPresence = NULL;
 
-	FReconnectTimer = new QTimer(this);
-
 	FConnectingLabelId = 0;
 }
 
@@ -55,7 +53,6 @@ StatusChanger::~StatusChanger()
 	if (!FModifyStatusDialog.isNull())
 		FModifyStatusDialog->reject();
 	delete FMainMenu;
-	delete FReconnectTimer;
 }
 
 void StatusChanger::pluginInfo(IPluginInfo *APluginInfo)
@@ -927,10 +924,11 @@ void StatusChanger::autoReconnect(IPresence *APresence)
 			int statusShow = statusItemShow(statusId);
 			if (statusShow!=IPresence::Offline && statusShow!=IPresence::Error)
 			{
-				int reconSecs = FFastReconnect.contains(APresence) ? 1 : 10;
+				int reconSecs = FFastReconnect.contains(APresence) ? 1 : 30;
 				FPendingReconnect.insert(APresence,QPair<QDateTime,int>(QDateTime::currentDateTime().addSecs(reconSecs),statusId));
-				connect(FReconnectTimer, SIGNAL(timeout()), this, SLOT(onReconnectTimer()));
-				FReconnectTimer->start(reconSecs * 1000);
+				QTimer reconTimer;
+				reconTimer.setTimerType(Qt::PreciseTimer);
+				reconTimer.singleShot(reconSecs*1000+200,this,SLOT(onReconnectTimer()));
 				LOG_STRM_INFO(APresence->streamJid(),QString("Automatically reconnection scheduled after %1 seconds").arg(reconSecs));
 			}
 		}
@@ -1310,7 +1308,6 @@ void StatusChanger::onReconnectTimer()
 			{
 				LOG_STRM_INFO(presence->streamJid(),"Automatically reconnecting stream");
 				setStreamStatus(presence->streamJid(),statusId);
-				FReconnectTimer->stop();
 			}
 		}
 		else

@@ -153,7 +153,6 @@ private:
 	QMap<IPresence *, int> FNotifyId;
 	QMap<IPresence *, QPair<QDateTime,int> > FPendingReconnect;
 	QPointer<ModifyStatusDialog> FModifyStatusDialog;
-	QTimer *FReconnectTimer;
 };
 
 #endif // STATUSCHANGER_H
