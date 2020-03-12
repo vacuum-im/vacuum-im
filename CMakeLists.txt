@@ -1,25 +1,12 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.12)
 
 project(vacuum-im)
 
-SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 if(APPLE)
-	 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9")
+	 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13")
 	 set_property(GLOBAL PROPERTY ALL_PLUGINS_FULLPATHS "")
-endif()
-
-if(POLICY CMP0020)
-	cmake_policy(SET CMP0020 NEW)
-endif()
-
-if(POLICY CMP0022)
-	cmake_policy(SET CMP0022 NEW)
-endif()
-
-if(POLICY CMP0043)
-	cmake_policy(SET CMP0043 NEW)
 endif()
 
 find_package (Qt5PrintSupport)

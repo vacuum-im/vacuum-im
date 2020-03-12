@@ -21,6 +21,10 @@ if (IS_ENABLED)
 	qt5_wrap_cpp(MOC_SOURCES ${HEADERS})
 	qt5_wrap_ui(UI_HEADERS ${UIS})
 
+	if (UNIX AND NOT APPLE)
+		set(CMAKE_INSTALL_RPATH "$ORIGIN/../..")
+	endif (UNIX AND NOT APPLE)
+
 	add_translations(TRANSLATIONS ${PLUGIN_NAME} ${HEADERS} ${SOURCES} ${UIS})
 	add_library(${PLUGIN_NAME} SHARED ${SOURCES} ${MOC_SOURCES} ${UI_HEADERS} ${TRANSLATIONS})
 	target_link_libraries(${PLUGIN_NAME} ${VACUUM_UTILS_NAME} ${ADD_LIBS} Qt5::Widgets Qt5::Xml Qt5::Network)
