@@ -198,9 +198,9 @@ bool Avatars::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 		FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
 		if (FRostersViewPlugin)
 		{
-			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)), 
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)),
 				SLOT(onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
-			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)),
 				SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)),
 				SLOT(onRostersViewIndexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)));
@@ -232,7 +232,7 @@ bool Avatars::initObjects()
 		label.d->kind = AdvancedDelegateItem::CustomData;
 		label.d->data = RDR_AVATAR_IMAGE;
 		FAvatarLabelId = FRostersViewPlugin->rostersView()->registerLabel(label);
-		
+
 		FRostersViewPlugin->rostersView()->insertLabelHolder(RLHO_AVATARS,this);
 	}
 
@@ -281,7 +281,7 @@ bool Avatars::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &ASt
 		{
 			QDomElement vcardUpdate = AStanza.firstElement("x",NS_VCARD_UPDATE);
 			QDomElement iqUpdate = AStanza.firstElement("x",NS_JABBER_X_AVATAR);
-			
+
 			bool isMucPresence = !AStanza.firstElement("x",NS_MUC_USER).isNull();
 			Jid vcardJid = isMucPresence ? contactJid : contactJid.bare();
 
@@ -522,8 +522,8 @@ bool Avatars::setAvatar(const Jid &AStreamJid, const QByteArray &AData)
 			}
 			else
 			{
-			    vcard->setValueForTags(VVN_PHOTO_VALUE,QString());
-			    vcard->setValueForTags(VVN_PHOTO_TYPE,QString());
+				vcard->setValueForTags(VVN_PHOTO_VALUE,QString());
+				vcard->setValueForTags(VVN_PHOTO_TYPE,QString());
 			}
 			if (FVCardManager->publishVCard(AStreamJid,vcard))
 			{

@@ -153,9 +153,9 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &AInit
 		FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
 		if (FRostersViewPlugin)
 		{
-			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)), 
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)),
 				SLOT(onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
-			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)),
 				SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 		}
 	}
@@ -429,7 +429,7 @@ QMultiMap<int, IOptionsDialogWidget *> MessageArchiver::optionsDialogWidgets(con
 		if (account!=NULL && isReady(account->streamJid()))
 		{
 			OptionsNode options = account->optionsNode();
-			
+
 			widgets.insertMulti(OHO_ACCOUNTS_HISTORY_SERVERSETTINGS, FOptionsManager->newOptionsDialogHeader(tr("Archive preferences"),AParent));
 			widgets.insertMulti(OWO_ACCOUNTS_HISTORY_SERVERSETTINGS, new ArchiveAccountOptionsWidget(this,account->streamJid(),AParent));
 
@@ -964,7 +964,7 @@ QString MessageArchiver::setArchivePrefs(const Jid &AStreamJid, const IArchiveSt
 		{
 			QString requestId;
 			if (storage)
-			    requestId = FPrivateStorage!=NULL ? FPrivateStorage->saveData(AStreamJid,prefElem) : QString();
+				requestId = FPrivateStorage!=NULL ? FPrivateStorage->saveData(AStreamJid,prefElem) : QString();
 			else if (FStanzaProcessor && FStanzaProcessor->sendStanzaRequest(this,AStreamJid,save,ARCHIVE_REQUEST_TIMEOUT))
 				requestId = save.id();
 			if (!requestId.isEmpty())
@@ -1875,9 +1875,9 @@ void MessageArchiver::processHeadersRequest(const QString &ALocalId, HeadersRequ
 			}
 
 			if (ARequest.request.order == Qt::AscendingOrder)
-			    std::sort(headers.begin(),headers.end(),qLess<IArchiveHeader>());
+				std::sort(headers.begin(),headers.end(),qLess<IArchiveHeader>());
 			else
-			    std::sort(headers.begin(),headers.end(),qGreater<IArchiveHeader>());
+				std::sort(headers.begin(),headers.end(),qGreater<IArchiveHeader>());
 
 			if ((quint32)headers.count() > ARequest.request.maxItems)
 				headers = headers.mid(0,ARequest.request.maxItems);
@@ -1997,7 +1997,7 @@ void MessageArchiver::saveStanzaSessionContext(const Jid &AStreamJid, const Jid 
 		elem.appendChild(sessions.createElement("jid")).appendChild(sessions.createTextNode(AContactJid.pFull()));
 		if (!session.defaultPrefs)
 			elem.appendChild(sessions.createElement("saveMode")).appendChild(sessions.createTextNode(session.saveMode));
-		
+
 		file.write(sessions.toByteArray());
 		file.close();
 
@@ -2672,7 +2672,7 @@ void MessageArchiver::onRostersViewIndexContextMenu(const QList<IRosterIndex *> 
 		int indexKind = AIndexes.first()->kind();
 		QMap<int, QStringList> rolesMap = FRostersViewPlugin->rostersView()->indexesRolesMap(AIndexes,
 			QList<int>()<<RDR_STREAM_JID<<RDR_PREP_BARE_JID<<RDR_ANY_ROLE,RDR_PREP_BARE_JID,RDR_STREAM_JID);
-		
+
 		Menu *menu;
 		if (indexKind == RIK_STREAM_ROOT)
 			menu = createContextMenu(rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_ANY_ROLE),AMenu);
@@ -2772,8 +2772,8 @@ void MessageArchiver::onRemoveItemPrefsByAction(bool)
 					streamPrefs[streams.at(i)] = archivePrefs(streams.at(i));
 				IArchiveStreamPrefs &prefs = streamPrefs[streams.at(i)];
 
-			    prefs.itemPrefs[contacts.at(i)].save = QString();
-			    prefs.itemPrefs[contacts.at(i)].otr = QString();
+				prefs.itemPrefs[contacts.at(i)].save = QString();
+				prefs.itemPrefs[contacts.at(i)].otr = QString();
 			}
 			else
 			{

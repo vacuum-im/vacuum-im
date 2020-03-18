@@ -33,7 +33,7 @@ enum PluginItemDataRoles {
 };
 
 
-PluginsFilterProxyModel::PluginsFilterProxyModel( QObject *AParent) : QSortFilterProxyModel(AParent)	
+PluginsFilterProxyModel::PluginsFilterProxyModel( QObject *AParent) : QSortFilterProxyModel(AParent)
 {
 	FErrorsOnly = false;
 	FDisableOnly = false;
@@ -54,7 +54,7 @@ void PluginsFilterProxyModel::setDisabledOnly(bool ADisabled)
 bool PluginsFilterProxyModel::filterAcceptsRow(int ASourceRow, const QModelIndex &ASourceParent) const
 {
 	QModelIndex index = sourceModel()->index(ASourceRow,0,ASourceParent);
-	
+
 	if (FErrorsOnly && (index.data(PDR_ISLOADED).toBool() || !index.data(PDR_ISENABLED).toBool()))
 		return false;
 
@@ -94,7 +94,7 @@ SetupPluginsDialog::SetupPluginsDialog(IPluginManager *APluginManager, QDomDocum
 	connect(ui.tbvPlugins->selectionModel(),SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),SLOT(onCurrentPluginChanged(const QModelIndex &, const QModelIndex &)));
 
 	restoreGeometry(Options::fileValue("misc.setup-plugins-dialog.geometry").toByteArray());
-	
+
 	updatePlugins();
 }
 
@@ -146,7 +146,7 @@ void SetupPluginsDialog::updatePlugins()
 		pluginItem->setData(dependsFor, PDR_DEPENDS_FOR);
 		pluginItem->setData(file+" "+name+" "+descr+" "+error, PDR_FILTER);
 		pluginItem->setData(pluginItem->data(PDR_DESCR), Qt::ToolTipRole);
-		
+
 		AdvancedDelegateItem nameLabel(AdvancedDelegateItem::DisplayId);
 		nameLabel.d->kind = AdvancedDelegateItem::Display;
 		nameLabel.d->data = pluginItem->data(PDR_NAME);
@@ -264,7 +264,7 @@ void SetupPluginsDialog::onCurrentPluginChanged(const QModelIndex &ACurrent, con
 			if (!dependsFailed.isEmpty())
 				ui.lblDependsFor->setText(QString("<a href='depend-failed'>%1</a>").arg(tr("%n dependency(ies) not found.","",dependsFailed.count())));
 			else
-			    ui.lblDependsFor->setText(QString());
+				ui.lblDependsFor->setText(QString());
 			ui.lblDependsOn->setText(QString());
 		}
 	}

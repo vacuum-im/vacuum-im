@@ -150,7 +150,7 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &AIni
 		if (FRostersViewPlugin)
 		{
 			FRostersView = FRostersViewPlugin->rostersView();
-			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
+			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)),
 				SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 		}
 	}
@@ -990,8 +990,8 @@ void ServiceDiscovery::removeQueuedRequest(const DiscoveryRequest &ARequest)
 	while (it != FQueuedRequests.end())
 	{
 		if ((ARequest.streamJid.isEmpty() || it.value().streamJid==ARequest.streamJid) &&
-		    (ARequest.contactJid.isEmpty() || it.value().contactJid==ARequest.contactJid) &&
-		    (ARequest.node.isEmpty() || it.value().node==ARequest.node))
+			(ARequest.contactJid.isEmpty() || it.value().contactJid==ARequest.contactJid) &&
+			(ARequest.node.isEmpty() || it.value().node==ARequest.node))
 		{
 			it = FQueuedRequests.erase(it);
 		}
@@ -1135,7 +1135,7 @@ QString ServiceDiscovery::calcCapsHash(const IDiscoInfo &AInfo, const QString &A
 							values +=(field.value.toBool() ? "1" : "0");
 						else
 							values += field.value.toString();
-			            std::sort(values.begin(), values.end());
+						std::sort(values.begin(), values.end());
 						sortFields.insertMulti(field.var,values);
 					}
 				}
@@ -1436,7 +1436,7 @@ void ServiceDiscovery::onRostersViewIndexContextMenu(const QList<IRosterIndex *>
 
 			if (indexKind==RIK_STREAM_ROOT || indexKind==RIK_AGENT)
 			{
-			    Action *action = createDiscoItemsAction(streamJid,contactJid,QString(),AMenu);
+				Action *action = createDiscoItemsAction(streamJid,contactJid,QString(),AMenu);
 				AMenu->addAction(action,AG_RVCM_DISCOVERY_ITEMS,true);
 			}
 
@@ -1451,7 +1451,7 @@ void ServiceDiscovery::onRostersViewIndexContextMenu(const QList<IRosterIndex *>
 				IDiscoInfo dinfo = discoInfo(streamJid,itemJid);
 
 				IRosterItem ritem = roster!=NULL ? roster->findItem(itemJid) : IRosterItem();
-			    QString resName = (!ritem.name.isEmpty() ? ritem.name : itemJid.uBare()) + (itemJid.hasResource() ? QString("/")+itemJid.resource() : QString());
+				QString resName = (!ritem.name.isEmpty() ? ritem.name : itemJid.uBare()) + (itemJid.hasResource() ? QString("/")+itemJid.resource() : QString());
 
 				// Many clients support version info but don`t show it in disco info
 				if (dinfo.streamJid.isValid() && !dinfo.features.contains(NS_JABBER_VERSION))
@@ -1476,7 +1476,7 @@ void ServiceDiscovery::onRostersViewIndexContextMenu(const QList<IRosterIndex *>
 							action->setText(resName);
 							action->setParent(action->parent()==AMenu ? menu : action->parent());
 							action->setIcon(FStatusIcons!=NULL ? FStatusIcons->iconByJid(streamJid,itemJid) : QIcon());
-							menu->addAction(action,AG_RVCM_DISCOVERY_FEATURES,false); 
+							menu->addAction(action,AG_RVCM_DISCOVERY_FEATURES,false);
 						}
 						else
 						{

@@ -581,7 +581,7 @@ QList<IArchiveHeader> FileMessageArchive::loadFileHeaders(const Jid &AStreamJid,
 		{
 			QString gateDomain = gatewayJid(ARequest.with).pDomain();
 			QString encResource = Jid::encode(ARequest.with.pResource());
-			
+
 			// Check if gateway was saved as not gateway
 			if (ARequest.with.pDomain() != gateDomain)
 				dirPaths.append(collectionDirPath(AStreamJid,ARequest.with));
@@ -644,7 +644,7 @@ QList<IArchiveHeader> FileMessageArchive::loadFileHeaders(const Jid &AStreamJid,
 	{
 		REPORT_ERROR("Failed to load file headers: Invalid params");
 	}
-	
+
 	return headers;
 }
 
@@ -666,12 +666,12 @@ IArchiveHeader FileMessageArchive::saveFileCollection(const Jid &AStreamJid, con
 				QMultiMap<int, QString> curMessages;
 				foreach(const Message &message, collection.body.messages)
 					curMessages.insertMulti(collection.header.start.secsTo(message.dateTime()),message.body());
-					
+
 				foreach(const Message &message, ACollection.body.messages)
 					if (!curMessages.contains(collection.header.start.secsTo(message.dateTime()),message.body()))
 						newBody.messages.append(message);
 
-			    std::sort(newBody.messages.begin(), newBody.messages.end());
+				std::sort(newBody.messages.begin(), newBody.messages.end());
 			}
 			if (!ACollection.body.notes.isEmpty())
 			{
@@ -679,7 +679,7 @@ IArchiveHeader FileMessageArchive::saveFileCollection(const Jid &AStreamJid, con
 					if (!collection.body.notes.contains(it.key(),it.value()))
 						newBody.notes.insertMulti(it.key(),it.value());
 			}
-			
+
 			collection = ACollection;
 			collection.body = newBody;
 			collection.header.version = newVersion;
@@ -839,9 +839,9 @@ QList<IArchiveHeader> FileMessageArchive::loadDatabaseHeaders(const Jid &AStream
 			if (headers.count() > dbHeadersCount)
 			{
 				if (ARequest.order == Qt::AscendingOrder)
-			        std::sort(headers.begin(),headers.end(),qLess<IArchiveHeader>());
+					std::sort(headers.begin(),headers.end(),qLess<IArchiveHeader>());
 				else
-			        std::sort(headers.begin(),headers.end(),qGreater<IArchiveHeader>());
+					std::sort(headers.begin(),headers.end(),qGreater<IArchiveHeader>());
 
 				if ((quint32)headers.count() > ARequest.maxItems)
 					headers = headers.mid(0,ARequest.maxItems);
@@ -1010,7 +1010,7 @@ bool FileMessageArchive::checkRequestHeader(const IArchiveHeader &AHeader, const
 				return false;
 			if (ARequest.with.hasResource() && ARequest.with.pResource()!=AHeader.with.pResource())
 				return false;
-			
+
 			QString headerGate = contactGateType(AHeader.with);
 			QString requestGate = contactGateType(ARequest.with);
 			if (requestGate != headerGate)
@@ -1041,7 +1041,7 @@ bool FileMessageArchive::checkRequestFile(const QString &AFileName, const IArchi
 
 		QStringList elemStack;
 		bool checkElemText = false;
-		while (!reader.atEnd() && validState!=Qt::Unchecked && textState!=Qt::Unchecked && threadState!=Qt::Unchecked && 
+		while (!reader.atEnd() && validState!=Qt::Unchecked && textState!=Qt::Unchecked && threadState!=Qt::Unchecked &&
 			(validState==Qt::PartiallyChecked || textState==Qt::PartiallyChecked || threadState==Qt::PartiallyChecked))
 		{
 			reader.readNext();
@@ -1286,7 +1286,7 @@ void FileMessageArchive::onDatabaseTaskFinished(DatabaseTask *ATask)
 				FPluginManager->continueShutdown();
 				FDatabaseProperties.insert(task->streamJid(),task->databaseProperties());
 				emit databaseOpened(task->streamJid());
-				
+
 				startDatabaseSync(task->streamJid(),databaseProperty(task->streamJid(),FADP_DATABASE_NOT_CLOSED)!="false");
 				setDatabaseProperty(task->streamJid(),FADP_DATABASE_NOT_CLOSED,"true");
 			}

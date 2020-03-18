@@ -119,7 +119,7 @@ ArchiveViewWindow::ArchiveViewWindow(IMessageArchiver *AArchiver, const QMultiMa
 		connect(FRosterManager->instance(),SIGNAL(rosterActiveChanged(IRoster *, bool)),SLOT(onRosterActiveChanged(IRoster *, bool)));
 		connect(FRosterManager->instance(),SIGNAL(rosterStreamJidChanged(IRoster *, const Jid &)),SLOT(onRosterStreamJidChanged(IRoster *, const Jid &)));
 	}
-	
+
 	FStatusIcons = PluginHelper::pluginInstance<IStatusIcons>();
 	FUrlProcessor = PluginHelper::pluginInstance<IUrlProcessor>();
 	FMetaContacts = PluginHelper::pluginInstance<IMetaContacts>();
@@ -182,7 +182,7 @@ ArchiveViewWindow::ArchiveViewWindow(IMessageArchiver *AArchiver, const QMultiMa
 	connect(ui.trvHeaders->selectionModel(),SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
 		SLOT(onCurrentSelectionChanged(const QItemSelection &, const QItemSelection &)));
 	connect(ui.trvHeaders,SIGNAL(customContextMenuRequested(const QPoint &)),SLOT(onHeaderContextMenuRequested(const QPoint &)));
-	
+
 	FExportLabel = new QLabel(ui.stbStatusBar);
 	FExportLabel->setTextFormat(Qt::RichText);
 	FExportLabel->setText(QString("<a href='export'>%1</a>").arg(tr("Export")));
@@ -226,7 +226,7 @@ ArchiveViewWindow::ArchiveViewWindow(IMessageArchiver *AArchiver, const QMultiMa
 	if (!ui.sprSplitter->restoreState(Options::fileValue("history.archiveview.splitter-state").toByteArray()))
 		ui.sprSplitter->setSizes(QList<int>() << 50 << 150);
 	restoreState(Options::fileValue("history.archiveview.state").toByteArray());
-	
+
 	setAddresses(AAddresses);
 }
 
@@ -605,7 +605,7 @@ void ArchiveViewWindow::setHeaderStatus(RequestStatus AStatus, const QString &AM
 	{
 		if (FFocusWidget)
 			FFocusWidget->setFocus(Qt::MouseFocusReason);
-		
+
 		if (FHistoryTime < HistoryTimeCount)
 			FHeaderActionLabel->setText(QString("<a href='link'>%1</a>").arg(tr("Load more conversations")));
 		else
@@ -666,7 +666,7 @@ void ArchiveViewWindow::setMessageStatus(RequestStatus AStatus, const QString &A
 QStandardItem *ArchiveViewWindow::createHeaderItem(const ArchiveHeader &AHeader)
 {
 	QStandardItem *item = new QStandardItem(AHeader.start.toString("hh:mm"));
-	
+
 	item->setData(HIT_HEADER,HDR_TYPE);
 	item->setData(AHeader.stream.pFull(),HDR_HEADER_STREAM);
 	item->setData(AHeader.with.pFull(),HDR_HEADER_WITH);
@@ -889,8 +889,8 @@ void ArchiveViewWindow::showCollection(const ArchiveCollection &ACollection)
 				{
 					options.kind = IMessageStyleContentOptions::KindStatus;
 					options.direction = IMessageStyleContentOptions::DirectionIn;
-			        options.senderName = QString();
-			        options.senderColor = QString();
+					options.senderName = QString();
+					options.senderColor = QString();
 					html += showNote(messageIt->body(),options);
 				}
 			}
@@ -943,7 +943,7 @@ QString ArchiveViewWindow::showInfo(const ArchiveCollection &ACollection)
 		"  </tr>"
 		"</table>";
 
-	
+
 	QString startDate;
 	startDate = ACollection.header.start.toString(QString("dd MMM yyyy hh:mm"));
 
@@ -1028,7 +1028,7 @@ QString ArchiveViewWindow::showMessage(const Message &AMessage, const IMessageSt
 {
 	QString html;
 	bool hasText = false;
-	
+
 	QTextDocument doc;
 	if (FMessageProcessor)
 	{
@@ -1255,7 +1255,7 @@ void ArchiveViewWindow::onRemoveCollectionsByAction()
 				conversationSet += tr("with <b>%1</b> for all time?").arg(name.toHtmlEscaped());
 			}
 		}
-		
+
 		QStringList conversationList = conversationSet.toList();
 		if (conversationSet.count() > 15)
 		{
@@ -1410,10 +1410,10 @@ void ArchiveViewWindow::onHeaderContextMenuRequested(const QPoint &APos)
 void ArchiveViewWindow::onPrintConversationsByAction()
 {
 	QPrinter printer;
-	
+
 	QPrintDialog *dialog = new QPrintDialog(&printer, this);
 	dialog->setWindowTitle(tr("Print Conversation History"));
-	
+
 	if (ui.tbrMessages->textCursor().hasSelection())
 		dialog->addEnabledOption(QAbstractPrintDialog::PrintSelection);
 

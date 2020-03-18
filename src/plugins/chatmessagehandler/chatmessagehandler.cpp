@@ -166,7 +166,7 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &AI
 		if (rostersViewPlugin)
 		{
 			FRostersView = rostersViewPlugin->rostersView();
-			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
+			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)),
 				SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 		}
 	}
@@ -530,7 +530,7 @@ void ChatMessageHandler::updateWindow(IMessageChatWindow *AWindow)
 
 	QString name = FMessageStyleManager!=NULL ? FMessageStyleManager->contactName(AWindow->streamJid(),AWindow->contactJid()) : AWindow->contactJid().uFull();
 	AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::Caption,name);
-	
+
 	QIcon statusIcon = FStatusIcons!=NULL ? FStatusIcons->iconByJid(AWindow->streamJid(),AWindow->contactJid()) : QIcon();
 	AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::StatusIcon,statusIcon);
 
@@ -567,7 +567,7 @@ void ChatMessageHandler::showHistory(IMessageChatWindow *AWindow)
 		QList<Message> pending = FPendingMessages.take(AWindow);
 		IArchiveCollectionBody history = FHistoryMessages.take(AWindow);
 		std::stable_sort(history.messages.begin(),history.messages.end(),qGreater<Message>());
-		
+
 		// Remove extra history messages
 		if (history.messages.count() > HISTORY_MESSAGES)
 		{
@@ -1026,7 +1026,7 @@ void ChatMessageHandler::onPresenceItemReceived(IPresence *APresence, const IPre
 		{
 			if (Options::node(OPV_MESSAGES_SHOWSTATUS).value().toBool())
 			{
-			    QString show = FStatusChanger ? FStatusChanger->nameByShow(AItem.show) : QString();
+				QString show = FStatusChanger ? FStatusChanger->nameByShow(AItem.show) : QString();
 				QString name = FMessageStyleManager!=NULL ? FMessageStyleManager->contactName(APresence->streamJid(),AItem.itemJid) : AItem.itemJid.uBare();
 				if (AItem.itemJid.hasResource() && name!=AItem.itemJid.resource())
 					name += "/" + AItem.itemJid.resource();
@@ -1105,7 +1105,7 @@ void ChatMessageHandler::onArchiveMessagesLoaded(const QString &AId, const IArch
 	{
 		IMessageChatWindow *window = FHistoryRequests.take(AId);
 		LOG_STRM_INFO(window->streamJid(),QString("Chat history loaded, id=%1").arg(AId));
-		
+
 		FHistoryMessages[window].messages += ABody.messages;
 		FHistoryMessages[window].notes.unite(ABody.notes);
 		showHistory(window);

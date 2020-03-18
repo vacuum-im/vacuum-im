@@ -83,7 +83,7 @@ CombineContactsDialog::CombineContactsDialog(IMetaContacts *AMetaContacts, const
 			std::sort(contactNames.begin(), contactNames.end(), StringSizeLessThan);
 			if (contactNames.isEmpty())
 			{
-			    std::sort(contactNodes.begin(), contactNodes.end(), StringSizeLessThan);
+				std::sort(contactNodes.begin(), contactNodes.end(), StringSizeLessThan);
 				name = !contactNodes.isEmpty() ? contactNodes.last(): name;
 			}
 			else

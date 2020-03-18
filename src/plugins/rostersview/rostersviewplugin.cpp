@@ -755,7 +755,7 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 				if (!pItem.isNull())
 				{
 					QString resource = pItem.itemJid.hasResource() ? pItem.itemJid.resource() : pItem.itemJid.uBare();
-			        QString statusIcon = FStatusIcons!=NULL ? FStatusIcons->iconFileName(streamJid,pItem.itemJid) : QString();
+					QString statusIcon = FStatusIcons!=NULL ? FStatusIcons->iconFileName(streamJid,pItem.itemJid) : QString();
 					AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_NAME+orderShift,QString("<img src='%1'> %2 (%3)").arg(statusIcon).arg(resource.toHtmlEscaped()).arg(pItem.priority));
 
 					if (!pItem.status.isEmpty())

@@ -43,11 +43,11 @@ QString TextManager::getTextFragmentHref(const QTextDocumentFragment &AFragment)
 				if (href.isNull())
 					href = it.fragment().charFormat().anchorHref();
 				else if (href != it.fragment().charFormat().anchorHref())
-			        return QString();
+					return QString();
 			}
 			else
 			{
-			    return QString();
+				return QString();
 			}
 		}
 		block = block.next();

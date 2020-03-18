@@ -79,7 +79,7 @@ void MultiUserChatManager::pluginInfo(IPluginInfo *APluginInfo)
 
 bool MultiUserChatManager::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
-	Q_UNUSED(APluginManager); Q_UNUSED(AInitOrder); 
+	Q_UNUSED(APluginManager); Q_UNUSED(AInitOrder);
 
 	if (FMessageProcessor)
 	{
@@ -91,7 +91,7 @@ bool MultiUserChatManager::initConnections(IPluginManager *APluginManager, int &
 		connect(FXmppStreamManager->instance(),SIGNAL(streamOpened(IXmppStream *)),SLOT(onXmppStreamOpened(IXmppStream *)));
 		connect(FXmppStreamManager->instance(),SIGNAL(streamClosed(IXmppStream *)),SLOT(onXmppStreamClosed(IXmppStream *)));
 	}
-	
+
 	if (FStatusIcons)
 	{
 		connect(FStatusIcons->instance(),SIGNAL(statusIconsChanged()),SLOT(onStatusIconsChanged()));
@@ -106,9 +106,9 @@ bool MultiUserChatManager::initConnections(IPluginManager *APluginManager, int &
 
 	if (FRostersViewPlugin)
 	{
-		connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)), 
+		connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)),
 			SLOT(onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
-		connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
+		connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)),
 			SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 		connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexClipboardMenu(const QList<IRosterIndex *> &, quint32, Menu *)),
 			SLOT(onRostersViewIndexClipboardMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
@@ -365,7 +365,7 @@ void MultiUserChatManager::stanzaRequestResult(const Jid &AStreamJid, const Stan
 			else
 			{
 				LOG_STRM_WARNING(AStreamJid,QString("Failed to send registered nick request as register request to=%1").arg(stanza.to()));
-			    emit registeredNickReceived(AStanza.id(),QString());
+				emit registeredNickReceived(AStanza.id(),QString());
 			}
 		}
 	}
@@ -706,10 +706,10 @@ IMultiUserChatWindow *MultiUserChatManager::getMultiChatWindow(const Jid &AStrea
 			if (chat)
 			{
 				LOG_STRM_INFO(AStreamJid,QString("Creating multi user chat window, room=%1, nick=%2").arg(ARoomJid.bare(),ANick));
-				
+
 				window = new MultiUserChatWindow(this,chat);
 				WidgetManager::setWindowSticky(window->instance(),true);
-				
+
 				connect(window->instance(),SIGNAL(tabPageDestroyed()),SLOT(onMultiChatWindowDestroyed()));
 				connect(window->instance(),SIGNAL(multiChatContextMenu(Menu *)),SLOT(onMultiChatWindowContextMenu(Menu *)));
 				connect(window->instance(),SIGNAL(multiUserContextMenu(IMultiUser *, Menu *)),SLOT(onMultiChatWindowUserContextMenu(IMultiUser *, Menu *)));
@@ -725,7 +725,7 @@ IMultiUserChatWindow *MultiUserChatManager::getMultiChatWindow(const Jid &AStrea
 
 				connect(window->infoWidget()->instance(),SIGNAL(contextMenuRequested(Menu *)),SLOT(onMultiChatWindowInfoContextMenu(Menu *)));
 				connect(window->infoWidget()->instance(),SIGNAL(toolTipsRequested(QMap<int,QString> &)),SLOT(onMultiChatWindowInfoToolTips(QMap<int,QString> &)));
-				
+
 				FChatWindows.append(window);
 				getMultiChatRosterIndex(window->streamJid(),window->contactJid(),window->multiUserChat()->nickname(),window->multiUserChat()->password());
 
@@ -1223,7 +1223,7 @@ void MultiUserChatManager::onExitRoomActionTriggered(bool)
 		{
 			IMultiUserChatWindow *window = findMultiChatWindow(streamJid.at(i),roomJid.at(i));
 			if (window)
-			    window->exitAndDestroy(QString());
+				window->exitAndDestroy(QString());
 		}
 	}
 }
@@ -1259,7 +1259,7 @@ void MultiUserChatManager::onShortcutActivated(const QString &AId, QWidget *AWid
 		{
 			if (isReady(xmppStream->streamJid()))
 			{
-			    showJoinMultiChatWizard(xmppStream->streamJid(),Jid::null,QString(),QString());
+				showJoinMultiChatWizard(xmppStream->streamJid(),Jid::null,QString(),QString());
 				break;
 			}
 		}
@@ -1312,7 +1312,7 @@ void MultiUserChatManager::onMultiChatUserChanged(IMultiUser *AUser, int AData, 
 			{
 				IRecentItem oldItem = multiChatRecentItem(chat,ABefore.toString());
 				QList<IRecentItem> realItems = FRecentContacts->streamItems(chat->streamJid());
-				
+
 				int oldIndex = realItems.indexOf(oldItem);
 				if (oldIndex >= 0)
 				{
@@ -1451,7 +1451,7 @@ void MultiUserChatManager::onRostersModelIndexDataChanged(IRosterIndex *AIndex, 
 		{
 			IMultiUserChatWindow *window = findMultiChatWindow(AIndex->data(RDR_STREAM_JID).toString(),AIndex->data(RDR_PREP_BARE_JID).toString());
 			if (window)
-			    updateMultiUserRecentItems(window->multiUserChat(),QString());
+				updateMultiUserRecentItems(window->multiUserChat(),QString());
 		}
 	}
 }

@@ -324,7 +324,7 @@ void OptionsNode::removeChilds(const QString &AName, const QString &ANSpace)
 		{
 			OptionsNode childNode(childElem);
 			childNode.removeChilds();
-			
+
 			emit Options::instance()->optionsRemoved(childNode);
 			d->node.removeChild(childElem);
 		}
@@ -517,7 +517,7 @@ QString Options::cleanNSpaces(const QString &APath)
 			while(!nodePath.isEmpty())
 			{
 				QString nodeName, nodeNS, subPath;
-			    splitOptionsPath(nodePath,QString(),nodeName,nodeNS,subPath);
+				splitOptionsPath(nodePath,QString(),nodeName,nodeNS,subPath);
 
 				if (cleanPath.isEmpty())
 					cleanPath = nodeName;

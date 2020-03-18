@@ -349,8 +349,8 @@ void ArchiveAccountOptionsWidget::apply()
 				}
 				else
 				{
-			        prefs.itemPrefs[itemJid].otr = QString();
-			        prefs.itemPrefs[itemJid].save = QString();
+					prefs.itemPrefs[itemJid].otr = QString();
+					prefs.itemPrefs[itemJid].save = QString();
 				}
 			}
 		}
