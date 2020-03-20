@@ -90,7 +90,7 @@ QString RostersView::tabPageCaption() const
 
 QString RostersView::tabPageToolTip() const
 {
-	return QString::null;
+	return QString();
 }
 
 QList<int> RostersView::rosterDataRoles(int AOrder) const

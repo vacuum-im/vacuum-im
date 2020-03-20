@@ -84,11 +84,11 @@ public:
 	virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
 	//IFileTransfer
 	virtual bool isSupported(const Jid &AStreamJid, const Jid &AContactJid) const;
-	virtual IFileStream *sendFile(const Jid &AStreamJid, const Jid &AContactJid, const QString &AFileName=QString::null, const QString &AFileDesc=QString::null);
+	virtual IFileStream *sendFile(const Jid &AStreamJid, const Jid &AContactJid, const QString &AFileName=QString(), const QString &AFileDesc=QString());
 	//Send Public Files
 	virtual IPublicFile findPublicFile(const QString &AFileId) const;
-	virtual QList<IPublicFile> findPublicFiles(const Jid &AOwnerJid=Jid::null, const QString &AFileName=QString::null) const;
-	virtual QString registerPublicFile(const Jid &AOwnerJid, const QString &AFileName, const QString &AFileDesc=QString::null);
+	virtual QList<IPublicFile> findPublicFiles(const Jid &AOwnerJid=Jid::null, const QString &AFileName=QString()) const;
+	virtual QString registerPublicFile(const Jid &AOwnerJid, const QString &AFileName, const QString &AFileDesc=QString());
 	virtual void removePublicFile(const QString &AFileId);
 	//Receive Public Files
 	virtual QList<IPublicFile> readPublicFiles(const QDomElement &AParent) const;

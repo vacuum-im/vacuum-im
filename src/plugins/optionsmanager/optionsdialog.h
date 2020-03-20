@@ -22,7 +22,7 @@ class OptionsDialog :
 {
 	Q_OBJECT;
 public:
-	OptionsDialog(IOptionsManager *AOptionsManager, const QString &ARootId = QString::null, QWidget *AParent = NULL);
+	OptionsDialog(IOptionsManager *AOptionsManager, const QString &ARootId = QString(), QWidget *AParent = NULL);
 	~OptionsDialog();
 public:
 	void showNode(const QString &ANodeId);

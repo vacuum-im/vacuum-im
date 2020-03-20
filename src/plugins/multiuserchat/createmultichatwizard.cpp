@@ -109,8 +109,8 @@ void CreateMultiChatWizard::accept()
 		int wizardMode = field(WF_MODE).toInt();
 		bool isManualMode = wizardMode==CreateMultiChatWizard::ModeManual;
 		QString streamJid = !isManualMode ? field(WF_ACCOUNT).toString() : field(WF_MANUAL_ACCOUNT).toString();
-		QString serverJid = !isManualMode ? field(WF_SERVER).toString() : QString::null;
-		QString serviceJid = !isManualMode ? field(WF_SERVICE).toString() : QString::null;
+		QString serverJid = !isManualMode ? field(WF_SERVER).toString() : QString();
+		QString serviceJid = !isManualMode ? field(WF_SERVICE).toString() : QString();
 		QString roomJid = !isManualMode ? field(WF_ROOM_JID).toString() : field(WF_MANUAL_ROOM_JID).toString();
 		QString roomNick = !isManualMode ? field(WF_ROOM_NICK).toString(): field(WF_MANUAL_ROOM_NICK).toString();
 		QString roomPassword = !isManualMode ? field(WF_ROOM_PASSWORD).toString(): field(WF_MANUAL_ROOM_PASSWORD).toString();
@@ -470,7 +470,7 @@ void ServicePage::processDiscoInfo(const IDiscoInfo &AInfo)
 	else if (cmbService->count() == 0)
 		lblInfo->setText(tr("Conference services are not found on this server"));
 	else
-		lblInfo->setText(QString::null);
+		lblInfo->setText(QString());
 }
 
 void ServicePage::onCurrentAccountChanged()
@@ -482,7 +482,7 @@ void ServicePage::onCurrentServerChanged()
 {
 	FWaitInfo.clear();
 	cmbService->clear();
-	lblInfo->setText(QString::null);
+	lblInfo->setText(QString());
 
 	if (cmbAccount->count()>0 && cmbServer->count()>0)
 	{
@@ -578,7 +578,7 @@ RoomPage::RoomPage(QWidget *AParent) : QWizardPage(AParent)
 
 	FRoomModel = new QStandardItemModel(this);
 	FRoomModel->setColumnCount(RMC__COUNT);
-	FRoomModel->setHorizontalHeaderLabels(QStringList() << tr("Title") << QString::null);
+	FRoomModel->setHorizontalHeaderLabels(QStringList() << tr("Title") << QString());
 
 	FRoomProxy = new QSortFilterProxyModel(FRoomModel);
 	FRoomProxy->setSourceModel(FRoomModel);
@@ -713,7 +713,7 @@ Jid RoomPage::serviceJid() const
 
 QString RoomPage::roomJid() const
 {
-	return !lneRoomNode->text().isEmpty() ? Jid::fromUserInput(lneRoomNode->text() + "@" + field(WF_SERVICE).toString()).pBare() : QString::null;
+	return !lneRoomNode->text().isEmpty() ? Jid::fromUserInput(lneRoomNode->text() + "@" + field(WF_SERVICE).toString()).pBare() : QString();
 }
 
 void RoomPage::setRoomJid(const QString &ARoomJid)
@@ -764,7 +764,7 @@ void RoomPage::onRoomNodeTimerTimeout()
 	}
 	else
 	{
-		lblInfo->setText(QString::null);
+		lblInfo->setText(QString());
 	}
 }
 
@@ -805,7 +805,7 @@ void RoomPage::onDiscoInfoRecieved(const IDiscoInfo &AInfo)
 			}
 			else if (AInfo.error.conditionCode() == XmppStanzaError::EC_ITEM_NOT_FOUND)
 			{
-				lblInfo->setText(QString::null);
+			    lblInfo->setText(QString());
 
 				FRoomChecked = true;
 				emit completeChanged();
@@ -858,7 +858,7 @@ void RoomPage::onDiscoItemsRecieved(const IDiscoItems &AItems)
 
 				FRoomModel->appendRow(QList<QStandardItem *>() << nameItem << usersItem);
 			}
-			lblInfo->setText(QString::null);
+			lblInfo->setText(QString());
 			tbvRoomView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 			FRoomProxy->sort(tbvRoomView->horizontalHeader()->sortIndicatorSection(), tbvRoomView->horizontalHeader()->sortIndicatorOrder());
 		}
@@ -930,7 +930,7 @@ void ConfigPage::cleanupPage()
 	if (FMultiChat != NULL)
 	{
 		if (FRoomCreated)
-			FMultiChat->destroyRoom(QString::null);
+			FMultiChat->destroyRoom(QString());
 		delete FMultiChat->instance();
 		FMultiChat = NULL;
 	}
@@ -946,11 +946,11 @@ void ConfigPage::initializePage()
 	prbProgress->setVisible(true);
 	wdtConfig->setVisible(false);
 
-	lblInfo->setText(QString::null);
+	lblInfo->setText(QString());
 	lblInfo->setAlignment(Qt::AlignCenter);
 
 	IMultiUserChatManager *multiChatManager = PluginHelper::pluginInstance<IMultiUserChatManager>();
-	FMultiChat = multiChatManager!=NULL ? multiChatManager->getMultiUserChat(streamJid(),roomJid(),FRoomNick,QString::null,false) : NULL;
+	FMultiChat = multiChatManager!=NULL ? multiChatManager->getMultiUserChat(streamJid(),roomJid(),FRoomNick,QString(),false) : NULL;
 	if (FMultiChat != NULL)
 	{
 		FMultiChat->instance()->setParent(this);
@@ -990,7 +990,7 @@ bool ConfigPage::validatePage()
 		IDataForm form = FConfigFormWidget!=NULL ? FConfigFormWidget->submitDataForm() : IDataForm();
 		form.type = DATAFORM_TYPE_SUBMIT;
 
-		FConfigUpdateRequestId = FMultiChat!=NULL ? FMultiChat->updateRoomConfig(form) : QString::null;
+		FConfigUpdateRequestId = FMultiChat!=NULL ? FMultiChat->updateRoomConfig(form) : QString();
 		if (!FConfigUpdateRequestId.isEmpty())
 		{
 			lblInfo->setText(tr("Saving conference settings..."));
@@ -1080,7 +1080,7 @@ void ConfigPage::onMultiChatConfigLoaded(const QString &AId, const IDataForm &AF
 			wdtConfig->setVisible(true);
 			prbProgress->setVisible(false);
 
-			lblInfo->setText(QString::null);
+			lblInfo->setText(QString());
 			lblInfo->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
 
 			if (FConfigFormWidget)
@@ -1114,7 +1114,7 @@ void ConfigPage::onMultiChatConfigUpdated(const QString &AId, const IDataForm &A
 	if (FConfigUpdateRequestId == AId)
 	{
 		FConfigUpdateRequestId.clear();
-		lblInfo->setText(QString::null);
+		lblInfo->setText(QString());
 
 		FRoomConfigured = true;
 		wizard()->next();
@@ -1421,7 +1421,7 @@ void JoinPage::processDiscoInfo(const IDiscoInfo &AInfo)
 		}
 
 		FRoomChecked = true;
-		lblInfo->setText(QString::null);
+		lblInfo->setText(QString());
 	}
 	else
 	{
@@ -1484,11 +1484,11 @@ void JoinPage::onRegisterNickLinkActivated()
 void JoinPage::onRegisterNickDialogFinished()
 {
 	IMultiUserChatManager *multiChatManager = PluginHelper::pluginInstance<IMultiUserChatManager>();
-	FNickRequestId = multiChatManager!=NULL ? multiChatManager->requestRegisteredNick(streamJid(),roomJid()) : QString::null;
+	FNickRequestId = multiChatManager!=NULL ? multiChatManager->requestRegisteredNick(streamJid(),roomJid()) : QString();
 	if (!FNickRequestId.isEmpty())
 		lblRegister->setText(QString("<u>%1</u>").arg(tr("Loading...")));
 	else
-		onRegisteredNickRecieved(FNickRequestId, QString::null);
+		onRegisteredNickRecieved(FNickRequestId, QString());
 }
 
 void JoinPage::onDiscoInfoRecieved(const IDiscoInfo &AInfo)
@@ -1657,7 +1657,7 @@ void ManualPage::setStreamJid(const QString &AStreamJid)
 QString ManualPage::roomJid() const
 {
 	Jid room = Jid::fromUserInput(lneRoomJid->text());
-	return room.isValid() && room.hasNode() ? room.bare() : QString::null;
+	return room.isValid() && room.hasNode() ? room.bare() : QString();
 }
 
 void ManualPage::setRoomJid(const QString &ARoomJid)
@@ -1696,7 +1696,7 @@ void ManualPage::onRoomJidTextChanged()
 	FWaitInfo = false;
 	FRoomChecked = false;
 	FNickRequestId.clear();
-	lblInfo->setText(QString::null);
+	lblInfo->setText(QString());
 
 	FRoomInfoTimer.start(500);
 	onRoomNickTextChanged();
@@ -1760,11 +1760,11 @@ void ManualPage::onRegisterNickLinkActivated()
 void ManualPage::onRegisterNickDialogFinished()
 {
 	IMultiUserChatManager *multiChatManager = PluginHelper::pluginInstance<IMultiUserChatManager>();
-	FNickRequestId = multiChatManager!=NULL ? multiChatManager->requestRegisteredNick(streamJid(),roomJid()) : QString::null;
+	FNickRequestId = multiChatManager!=NULL ? multiChatManager->requestRegisteredNick(streamJid(),roomJid()) : QString();
 	if (!FNickRequestId.isEmpty())
 		lblRegister->setText(QString("<u>%1</u>").arg(tr("Loading...")));
 	else
-		onRegisteredNickRecieved(FNickRequestId, QString::null);
+		onRegisteredNickRecieved(FNickRequestId, QString());
 }
 
 void ManualPage::onDiscoInfoRecieved(const IDiscoInfo &AInfo)

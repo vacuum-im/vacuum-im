@@ -275,7 +275,7 @@ void StreamDialog::onStreamSpeedChanged()
 	else
 	{
 		ui.pgbPrgress->setValue(0);
-		ui.lblProgress->setText(QString::null);
+		ui.lblProgress->setText(QString());
 	}
 }
 
@@ -300,7 +300,7 @@ void StreamDialog::onFileButtonClicked(bool)
 		QString file = QDir(lastSelectedPath).absoluteFilePath(FFileStream->fileName());
 
 		if (FFileStream->streamKind() == IFileStream::ReceiveFile)
-			file = QFileDialog::getSaveFileName(this,tr("Select file for receive"),file,QString::null,NULL,QFileDialog::DontConfirmOverwrite);
+			file = QFileDialog::getSaveFileName(this,tr("Select file for receive"),file,QString(),NULL,QFileDialog::DontConfirmOverwrite);
 		else
 			file = QFileDialog::getOpenFileName(this,tr("Select file to send"),file);
 

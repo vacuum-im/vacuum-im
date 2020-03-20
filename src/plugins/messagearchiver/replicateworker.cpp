@@ -100,7 +100,7 @@ void ReplicateTaskLoadState::run(QSqlDatabase &ADatabase)
 				}
 				else
 				{
-					FNextRef = QString::null;
+					FNextRef = QString();
 					FStartTime = QDateTime(QDate(1970,1,1),QTime(0,0),Qt::UTC);
 
 					insertStateQuery.bindValue(":engine_id",FEngineId.toString());
@@ -537,7 +537,7 @@ bool ReplicateWorker::initializeDatabase(QSqlDatabase &ADatabase)
 	int compatibleVersion = properties.value("CompatibleVersion").toInt();
 	if (structureVersion < DATABASE_STRUCTURE_VERSION)
 	{
-		static const struct { QString createQuery; int compatible; } databaseUpdates[] = 
+		static const struct { QString createQuery; int compatible; } databaseUpdates[] =
 		{
 			{
 				"CREATE TABLE properties ("
@@ -593,7 +593,7 @@ bool ReplicateWorker::initializeDatabase(QSqlDatabase &ADatabase)
 				"INSERT INTO properties(property,value) VALUES('StructureVersion','1');"
 				"INSERT INTO properties(property,value) VALUES('CompatibleVersion','1');"
 				, 1
-			} 
+			}
 		};
 
 		ADatabase.transaction();

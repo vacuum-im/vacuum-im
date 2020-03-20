@@ -75,7 +75,7 @@ void DiscoInfoWindow::updateWindow()
 	}
 	ui.twtIdentity->verticalHeader()->resizeSections(QHeaderView::ResizeToContents);
 
-	qSort(dinfo.features);
+	std::sort(dinfo.features.begin(), dinfo.features.end());
 	ui.lwtFearures->clear();
 	foreach(const QString &featureVar, dinfo.features)
 	{
@@ -159,7 +159,7 @@ void DiscoInfoWindow::onCurrentFeatureChanged(QListWidgetItem *ACurrent, QListWi
 	if (ACurrent)
 		ui.lblFeatureDesc->setText(ACurrent->data(Qt::UserRole+1).toString());
 	else
-		ui.lblFeatureDesc->setText(QString::null);
+		ui.lblFeatureDesc->setText(QString());
 	ui.lblFeatureDesc->setMinimumHeight(ui.lblFeatureDesc->height());
 }
 

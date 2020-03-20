@@ -36,12 +36,12 @@ static void splitOptionsPath(const QString &APath, const QString &ANSpace, QStri
 	if (subStartAt > 0)
 		ASubPath = APath.mid(subStartAt+1);
 	else
-		ASubPath = QString::null;
+		ASubPath = QString();
 
 	if (nsStopAt > nsStartAt)
 		ANodeNS = APath.mid(nsStartAt+1,nsStopAt-nsStartAt-1);
 	else if (subStartAt > 0)
-		ANodeNS = QString::null;
+		ANodeNS = QString();
 	else
 		ANodeNS = ANSpace;
 }
@@ -64,7 +64,7 @@ static QDomText findChildText(const QDomElement &AParent)
 
 static QString fullFileName(const QString &APath, const QString &ANSpace)
 {
-	QString fileKey = APath + (!ANSpace.isEmpty() ? NsOpenChar+ANSpace+NsCloseChar : QString::null);
+	QString fileKey = APath + (!ANSpace.isEmpty() ? NsOpenChar+ANSpace+NsCloseChar : QString());
 	return Options::filesPath() + "/" + QCryptographicHash::hash(fileKey.toUtf8(), QCryptographicHash::Sha1).toHex();
 }
 
@@ -311,7 +311,7 @@ QString OptionsNode::childPath(const OptionsNode &ANode) const
 			path.prepend(pathItem + DelimChar);
 		childElem = childElem.parentNode().toElement();
 	}
-	return childElem==d->node ? path : QString::null;
+	return childElem==d->node ? path : QString();
 }
 
 void OptionsNode::removeChilds(const QString &AName, const QString &ANSpace)
@@ -324,7 +324,7 @@ void OptionsNode::removeChilds(const QString &AName, const QString &ANSpace)
 		{
 			OptionsNode childNode(childElem);
 			childNode.removeChilds();
-			
+
 			emit Options::instance()->optionsRemoved(childNode);
 			d->node.removeChild(childElem);
 		}
@@ -517,7 +517,7 @@ QString Options::cleanNSpaces(const QString &APath)
 			while(!nodePath.isEmpty())
 			{
 				QString nodeName, nodeNS, subPath;
-				splitOptionsPath(nodePath,QString::null,nodeName,nodeNS,subPath);
+				splitOptionsPath(nodePath,QString(),nodeName,nodeNS,subPath);
 
 				if (cleanPath.isEmpty())
 					cleanPath = nodeName;
@@ -529,7 +529,7 @@ QString Options::cleanNSpaces(const QString &APath)
 		}
 		return cleanPath;
 	}
-	return QString::null;
+	return QString();
 }
 
 bool Options::hasNode(const QString &APath, const QString &ANSpace)
@@ -745,7 +745,7 @@ void Options::exportNode(const QString &APath, QDomElement &AToElem)
 		while (!nodePath.isEmpty())
 		{
 			QString nodeName, nodeNS, subPath;
-			splitOptionsPath(nodePath,QString::null,nodeName,nodeNS,subPath);
+			splitOptionsPath(nodePath,QString(),nodeName,nodeNS,subPath);
 
 			QDomElement childElem = findChildElement(nodeElem,nodeName,nodeNS);
 			if (childElem.isNull())
@@ -769,7 +769,7 @@ void Options::importNode(const QString &APath, const QDomElement &AFromElem)
 	while (!nodeElem.isNull() && !nodePath.isEmpty())
 	{
 		QString nodeName, nodeNS, subPath;
-		splitOptionsPath(nodePath,QString::null,nodeName,nodeNS,subPath);
+		splitOptionsPath(nodePath,QString(),nodeName,nodeNS,subPath);
 
 		nodeElem = findChildElement(nodeElem,nodeName,nodeNS);
 		nodePath = subPath;

@@ -43,7 +43,7 @@ QList<Action *> Menu::actions() const
 
 void Menu::setIcon(const QIcon &AIcon)
 {
-	setIcon(QString::null,QString::null,0);
+	setIcon(QString(),QString(),0);
 	FMenuAction->setIcon(AIcon);
 	QMenu::setIcon(AIcon);
 }
@@ -67,7 +67,7 @@ QList<Action *> Menu::actions(int AGroup) const
 int Menu::actionGroup(const Action *AAction) const
 {
 	for (QMap<int, QList<Action *> >::const_iterator groupIt=FActions.constBegin(); groupIt!=FActions.constEnd(); ++groupIt)
-		if (qFind(groupIt->constBegin(),groupIt->constEnd(),AAction) != groupIt->constEnd())
+		if (std::find(groupIt->constBegin(),groupIt->constEnd(),AAction) != groupIt->constEnd())
 			return groupIt.key();
 	return AG_NULL;
 }
@@ -182,7 +182,7 @@ void Menu::removeAction(Action *AAction)
 {
 	for (QMap<int, QList<Action *> >::iterator groupIt=FActions.begin(); groupIt!=FActions.end(); ++groupIt)
 	{
-		QList<Action *>::iterator actionIt = qFind(groupIt->begin(), groupIt->end(), AAction);
+		QList<Action *>::iterator actionIt = std::find(groupIt->begin(), groupIt->end(), AAction);
 		if (actionIt != groupIt->end())
 		{
 			disconnect(AAction,SIGNAL(actionDestroyed(Action *)),this,SLOT(onActionDestroyed(Action *)));

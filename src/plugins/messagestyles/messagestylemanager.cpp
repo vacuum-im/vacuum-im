@@ -180,7 +180,7 @@ IMessageStyleOptions MessageStyleManager::styleOptions(int AMessageType, const Q
 
 QString MessageStyleManager::contactAvatar(const Jid &AContactJid) const
 {
-	return FAvatars!=NULL ? FAvatars->avatarFileName(FAvatars->avatarHash(AContactJid)) : QString::null;
+	return FAvatars!=NULL ? FAvatars->avatarFileName(FAvatars->avatarHash(AContactJid)) : QString();
 }
 
 QString MessageStyleManager::contactName(const Jid &AStreamJid, const Jid &AContactJid) const
@@ -210,7 +210,7 @@ QString MessageStyleManager::contactName(const Jid &AStreamJid, const Jid &ACont
 	else
 	{
 		IRoster *roster = FRosterManager!=NULL ? FRosterManager->findRoster(AStreamJid) : NULL;
-		name = roster!=NULL ? roster->findItem(AContactJid).name : QString::null;
+		name = roster!=NULL ? roster->findItem(AContactJid).name : QString();
 	}
 
 	if (name.isEmpty())
@@ -236,7 +236,7 @@ QString MessageStyleManager::contactIcon(const Jid &AStreamJid, const Jid &ACont
 		QString iconset = FStatusIcons->iconsetByJid(AContactJid.isValid() ? AContactJid : AStreamJid);
 		return FStatusIcons->iconFileName(iconset,iconKey);
 	}
-	return QString::null;
+	return QString();
 }
 
 QString MessageStyleManager::contactIcon(const Jid &AContactJid, int AShow, const QString &ASubscription, bool AAsk) const
@@ -247,7 +247,7 @@ QString MessageStyleManager::contactIcon(const Jid &AContactJid, int AShow, cons
 		QString iconKey = FStatusIcons->iconKeyByStatus(AShow,ASubscription,AAsk);
 		return FStatusIcons->iconFileName(iconset,iconKey);
 	}
-	return QString::null;
+	return QString();
 }
 
 QString MessageStyleManager::dateSeparator(const QDate &ADate, const QDate &ACurDate) const

@@ -38,8 +38,8 @@ public:
 	QString fileFullName(const QString &AKey, int AIndex = 0) const;
 	QString fileMime(const QString &AKey, int AIndex = 0) const;
 	QString fileCacheKey(const QString &AKey, int AIndex =0) const;
-	QString storageProperty(const QString &AName, const QString &ADefValue = QString::null) const;
-	QString fileProperty(const QString &AKey, const QString &AName, const QString &ADefValue = QString::null) const;
+	QString storageProperty(const QString &AName, const QString &ADefValue = QString()) const;
+	QString fileProperty(const QString &AKey, const QString &AName, const QString &ADefValue = QString()) const;
 	void reloadDefinitions();
 signals:
 	void storageChanged();

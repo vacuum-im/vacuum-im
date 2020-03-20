@@ -76,7 +76,7 @@ QString VersionParser::toString(Part toPart) const
 	if (toPart == BuildNumber)
 		return QString("%1.%2.%3.%4").arg(FMajor).arg(FMinor).arg(FRelease).arg(FBuild);
 
-	return QString::null;
+	return QString();
 }
 
 VersionParser& VersionParser::operator =(const VersionParser &AVersion)

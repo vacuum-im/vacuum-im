@@ -305,7 +305,7 @@ void Roster::setItems(const QList<IRosterItem> &AItems)
 	{
 		Stanza request(STANZA_KIND_IQ);
 		request.setType(STANZA_TYPE_SET).setUniqueId();
-		
+
 		QDomElement elem = request.addElement("query",NS_JABBER_ROSTER);
 		foreach(const IRosterItem &ritem, AItems)
 		{
@@ -321,7 +321,7 @@ void Roster::setItems(const QList<IRosterItem> &AItems)
 					itemElem.appendChild(request.createElement("group")).appendChild(request.createTextNode(group));
 			}
 		}
-		
+
 		if (FStanzaProcessor->sendStanzaOut(FXmppStream->streamJid(),request))
 			LOG_STRM_INFO(streamJid(),QString("Roster items update request sent, count=%1").arg(AItems.count()));
 		else
@@ -670,7 +670,7 @@ void Roster::requestRosterItems()
 	if (FStanzaProcessor->sendStanzaRequest(this,FXmppStream->streamJid(),query,Options::node(OPV_XMPPSTREAMS_TIMEOUT_ROSTERREQUEST).value().toInt()))
 	{
 		FOpenRequestId = query.id();
-		LOG_STRM_INFO(streamJid(),QString("Roster items request sent, ver=%1").arg(FVerSupported ? FRosterVer : QString::null));
+		LOG_STRM_INFO(streamJid(),QString("Roster items request sent, ver=%1").arg(FVerSupported ? FRosterVer : QString()));
 	}
 	else
 	{
@@ -753,7 +753,7 @@ void Roster::processItemsElement(const QDomElement &AItemsElem, bool ACompleteRo
 			itemElem = itemElem.nextSiblingElement("item");
 		}
 
-		foreach(const Jid &itemJid, oldItems) 
+		foreach(const Jid &itemJid, oldItems)
 		{
 			IRosterItem ritem = FItems.take(itemJid);
 			IRosterItem before = ritem;

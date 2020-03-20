@@ -41,7 +41,7 @@ class UTILS_EXPORT XmppError
 public:
 	XmppError();
 	XmppError(QDomElement AErrorElem, const QString &AErrorNS);
-	XmppError(const QString &ACondition, const QString &AText=QString::null, const QString &AErrorNS=NS_INTERNAL_ERROR);
+	XmppError(const QString &ACondition, const QString &AText=QString(), const QString &AErrorNS=NS_INTERNAL_ERROR);
 	bool isNull() const;
 	bool isSaslError() const;
 	bool isStreamError() const;
@@ -57,18 +57,18 @@ public:
 	QString conditionText() const;
 	void setConditionText(const QString &AText);
 	QList<QString> errorTextLangs() const;
-	QString errorText(const QString &ALang = QString::null) const;
-	void setErrorText(const QString &AText, const QString &ALang = QString::null);
+	QString errorText(const QString &ALang = QString()) const;
+	void setErrorText(const QString &AText, const QString &ALang = QString());
 	QList<QString> appConditionNsList() const;
 	QString appCondition(const QString &ANsUri) const;
 	void setAppCondition(const QString &ANsUri, const QString &ACondition);
-	QString errorString(const QString &AContext = QString::null) const;
-	QString errorMessage(const QString &AContext = QString::null, const QString &ALang = QString::null) const;
+	QString errorString(const QString &AContext = QString()) const;
+	QString errorMessage(const QString &AContext = QString(), const QString &ALang = QString()) const;
 public:
 	static const XmppError null;
 	static QString getErrorMessage(const QString &AErrorString, const QString &AErrorText);
-	static QString getErrorString(const QString &ANsUri, const QString &ACondition, const QString &AContext = QString::null);
-	static void registerError(const QString &ANsUri, const QString &ACondition, const QString &AErrorString, const QString &AContext = QString::null);
+	static QString getErrorString(const QString &ANsUri, const QString &ACondition, const QString &AContext = QString());
+	static void registerError(const QString &ANsUri, const QString &ACondition, const QString &AErrorString, const QString &AContext = QString());
 private:
 	static void initialize();
 	static void registerErrors();
@@ -113,7 +113,7 @@ public:
 public:
 	XmppStreamError();
 	XmppStreamError(QDomElement AErrorElem);
-	XmppStreamError(ErrorCondition ACondition, const QString &AText=QString::null);
+	XmppStreamError(ErrorCondition ACondition, const QString &AText=QString());
 	ErrorCondition conditionCode() const;
 	void setCondition(ErrorCondition ACondition);
 public:
@@ -149,7 +149,7 @@ public:
 	};
 	XmppSaslError();
 	XmppSaslError(QDomElement AErrorElem);
-	XmppSaslError(ErrorCondition ACondition, const QString &AText=QString::null);
+	XmppSaslError(ErrorCondition ACondition, const QString &AText=QString());
 	ErrorCondition conditionCode() const;
 	void setCondition(ErrorCondition ACondition);
 public:
@@ -205,7 +205,7 @@ public:
 	XmppStanzaError();
 	XmppStanzaError(QDomElement AErrorElem);
 	XmppStanzaError(const Stanza &AStanza);
-	XmppStanzaError(ErrorCondition ACondition, const QString &AText=QString::null, ErrorType AType = ET_UNKNOWN, const QString &AErrorBy = QString::null);
+	XmppStanzaError(ErrorCondition ACondition, const QString &AText=QString(), ErrorType AType = ET_UNKNOWN, const QString &AErrorBy = QString());
 	QString errorBy() const;
 	void setErrorBy(const QString &AErrorBy);
 	QString errorType() const;

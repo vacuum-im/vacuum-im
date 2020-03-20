@@ -93,7 +93,7 @@ bool ReceiversProxyModel::filterAcceptsRow(int AModelRow, const QModelIndex &AMo
 	QModelIndex index = source->index(AModelRow,0,AModelParent);
 	if (GroupKinds.contains(index.data(RDR_KIND).toInt()))
 	{
-		for (int childRow=0; index.child(childRow,0).isValid(); childRow++)
+		for (int childRow=0; source->index(childRow,0,index).isValid(); childRow++)
 			if (filterAcceptsRow(childRow,index))
 				return true;
 		return false;
@@ -1128,12 +1128,12 @@ void ReceiversWidget::onSelectionLast()
 
 void ReceiversWidget::onSelectionLoad()
 {
-	selectionLoad(QFileDialog::getOpenFileName(this,tr("Load Contacts from File"),QString::null,"*.cts"));
+	selectionLoad(QFileDialog::getOpenFileName(this,tr("Load Contacts from File"),QString(),"*.cts"));
 }
 
 void ReceiversWidget::onSelectionSave()
 {
-	selectionSave(QFileDialog::getSaveFileName(this,tr("Save Contacts to File"),QString::null,"*.cts"));
+	selectionSave(QFileDialog::getSaveFileName(this,tr("Save Contacts to File"),QString(),"*.cts"));
 }
 
 void ReceiversWidget::onSelectAllContacts()

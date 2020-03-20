@@ -259,7 +259,7 @@ void PluginManager::loadSettings()
 	}
 	QLocale::setDefault(locale);
 
-	FDataPath = QString::null;
+	FDataPath = QString();
 	if (args.contains(CLO_APP_DATA_DIR))
 	{
 		QDir dir(args.value(args.indexOf(CLO_APP_DATA_DIR)+1));

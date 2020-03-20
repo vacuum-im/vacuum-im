@@ -33,7 +33,7 @@
 #define SHC_MESSAGE_ADDRESS             "/message/addresses[@xmlns='" NS_ADDRESS "']/address[@type='ofrom']"
 
 struct OptionsFormItem {
-	OptionsFormItem(QString ANode = QString::null, QString ALabel = QString::null) {
+	OptionsFormItem(QString ANode = QString(), QString ALabel = QString()) {
 		node = ANode;
 		label = ALabel;
 	}
@@ -81,7 +81,7 @@ bool RemoteControl::initConnections(IPluginManager *APluginManager, int &AInitOr
 	{
 		FCommands = qobject_cast<ICommands *>(plugin->instance());
 	}
-	
+
 	plugin = APluginManager->pluginInterface("IDataForms").value(0,NULL);
 	if (plugin)
 	{
@@ -93,19 +93,19 @@ bool RemoteControl::initConnections(IPluginManager *APluginManager, int &AInitOr
 	{
 		FStatusChanger = qobject_cast<IStatusChanger *>(plugin->instance());
 	}
-	
+
 	plugin = APluginManager->pluginInterface("IMultiUserChatManager").value(0,NULL);
 	if (plugin)
 	{
 		FMultiChatManager = qobject_cast<IMultiUserChatManager *>(plugin->instance());
 	}
-	
+
 	plugin = APluginManager->pluginInterface("IFileStreamsManager").value(0,NULL);
 	if (plugin)
 	{
 		FFileStreamManager = qobject_cast<IFileStreamsManager *>(plugin->instance());
 	}
-	
+
 	plugin = APluginManager->pluginInterface("IMessageProcessor").value(0,NULL);
 	if (plugin)
 	{
@@ -211,13 +211,13 @@ bool RemoteControl::isCommandPermitted(const Jid &AStreamJid, const Jid &AContac
 
 QString RemoteControl::commandName(const QString &ANode) const
 {
-	if (ANode == COMMAND_NODE_PING) 
+	if (ANode == COMMAND_NODE_PING)
 		return tr("Ping");
 	if (ANode == COMMAND_NODE_SET_STATUS)
 		return tr("Change connection status");
 	if (ANode == COMMAND_NODE_SET_MAIN_STATUS)
 		return tr("Change main status");
-	if (ANode == COMMAND_NODE_LEAVE_MUC) 
+	if (ANode == COMMAND_NODE_LEAVE_MUC)
 		return tr("Leave conferences");
 	if (ANode == COMMAND_NODE_ACCEPT_FILES)
 		return tr("Accept pending file transfers");
@@ -225,7 +225,7 @@ QString RemoteControl::commandName(const QString &ANode) const
 		return tr("Set options");
 	if (ANode == COMMAND_NODE_FORWARD_MESSAGES)
 		return tr("Forward unread messages");
-	return QString::null;
+	return QString();
 }
 
 bool RemoteControl::receiveCommandRequest(const ICommandRequest &ARequest)
@@ -679,7 +679,7 @@ bool RemoteControl::processForwardMessages(const ICommandRequest &ARequest)
 				{
 					foreach(Message message, notifiedMessages(ARequest.streamJid,senderJid))
 					{
-						message.setTo(ARequest.contactJid.full()).setDelayed(message.dateTime(),message.from()).setFrom(QString::null);
+						message.setTo(ARequest.contactJid.full()).setDelayed(message.dateTime(),message.from()).setFrom(QString());
 
 						QDomElement addresses = message.stanza().firstElement("addresses",NS_ADDRESS);
 						if (!addresses.isNull())

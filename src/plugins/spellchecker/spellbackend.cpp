@@ -93,7 +93,7 @@ bool SpellBackend::writable() const
 
 QString SpellBackend::actuallLang()
 {
-	return QString::null;
+	return QString();
 }
 
 void SpellBackend::setLang(const QString &ALang)

@@ -434,7 +434,7 @@ void MultiUserView::updateUserItem(IMultiUser *AUser)
 		}
 
 		// User status
-		userIcon = FStatusIcons!=NULL ? FStatusIcons->iconByJidStatus(AUser->userJid(),userPresence.show,QString::null,false) : QIcon();
+		userIcon = FStatusIcons!=NULL ? FStatusIcons->iconByJidStatus(AUser->userJid(),userPresence.show,QString(),false) : QIcon();
 
 		userItem->setIcon(userIcon);
 		userItem->setText(AUser->nick());

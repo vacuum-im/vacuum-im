@@ -52,9 +52,9 @@ public:
 	virtual void showNotifiedMessage(int AMessageId);
 	virtual void removeMessageNotify(int AMessageId);
 	// Message Conversion
-	virtual bool messageHasText(const Message &AMessage, const QString &ALang=QString::null) const;
-	virtual bool messageToText(const Message &AMessage, QTextDocument *ADocument, const QString &ALang=QString::null) const;
-	virtual bool textToMessage(const QTextDocument *ADocument, Message &AMessage, const QString &ALang=QString::null) const;
+	virtual bool messageHasText(const Message &AMessage, const QString &ALang=QString()) const;
+	virtual bool messageToText(const Message &AMessage, QTextDocument *ADocument, const QString &ALang=QString()) const;
+	virtual bool textToMessage(const QTextDocument *ADocument, Message &AMessage, const QString &ALang=QString()) const;
 	// Message Windows
 	virtual IMessageWindow *getMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AAction) const;
 	// Message Handlers

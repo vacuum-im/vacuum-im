@@ -503,7 +503,7 @@ IRecentItem RecentContacts::recentItemForIndex(const IRosterIndex *AIndex) const
 QList<IRosterIndex *> RecentContacts::recentItemProxyIndexes(const IRecentItem &AItem) const
 {
 	QList<IRosterIndex *> proxies = FRostersModel!=NULL ? FRostersModel->findContactIndexes(AItem.streamJid,AItem.reference) : QList<IRosterIndex *>();
-	qSort(proxies.begin(),proxies.end());
+	std::sort(proxies.begin(),proxies.end());
 	return proxies;
 }
 
@@ -712,7 +712,7 @@ void RecentContacts::updateVisibleItems()
 				}
 			}
 		}
-		qSort(common.begin(),common.end(),recentItemLessThen);
+		std::sort(common.begin(),common.end(),recentItemLessThen);
 
 		QDateTime firstTime;
 		for (QList<IRecentItem>::iterator it=common.begin(); it!=common.end(); )
@@ -942,7 +942,7 @@ void RecentContacts::mergeRecentItems(const Jid &AStreamJid, const QList<IRecent
 
 	if (hasChanges)
 	{
-		qSort(curItems.begin(),curItems.end(),recentItemLessThen);
+		std::sort(curItems.begin(),curItems.end(),recentItemLessThen);
 
 		int favoriteCount = 0;
 		while(favoriteCount<curItems.count() && curItems.at(favoriteCount).properties.value(REIP_FAVORITE).toBool())

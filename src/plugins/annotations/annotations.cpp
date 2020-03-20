@@ -371,7 +371,7 @@ void Annotations::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AIte
 	if (AItem.subscription==SUBSCRIPTION_REMOVE && isEnabled(ARoster->streamJid()))
 	{
 		if (!annotation(ARoster->streamJid(),AItem.itemJid).isEmpty())
-			setAnnotation(ARoster->streamJid(),AItem.itemJid,QString::null);
+			setAnnotation(ARoster->streamJid(),AItem.itemJid,QString());
 	}
 }
 

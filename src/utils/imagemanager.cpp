@@ -14,7 +14,12 @@ QImage ImageManager::grayscaled(const QImage &AImage)
 	{
 		QImage result = AImage;
 		int pixels = result.width() * result.height();
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
+		if (pixels*(int)sizeof(QRgb) <= result.sizeInBytes())
+#else
 		if (pixels*(int)sizeof(QRgb) <= result.byteCount())
+#endif
 		{
 			QRgb *data = (QRgb *)result.bits();
 			for (int i = 0; i<pixels; i++)

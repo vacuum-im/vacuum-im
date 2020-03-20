@@ -77,13 +77,13 @@ CombineContactsDialog::CombineContactsDialog(IMetaContacts *AMetaContacts, const
 		}
 
 		QString name;
-		qSort(metaNames.begin(), metaNames.end(), StringSizeLessThan);
+		std::sort(metaNames.begin(), metaNames.end(), StringSizeLessThan);
 		if (metaNames.isEmpty())
 		{
-			qSort(contactNames.begin(), contactNames.end(), StringSizeLessThan);
+			std::sort(contactNames.begin(), contactNames.end(), StringSizeLessThan);
 			if (contactNames.isEmpty())
 			{
-				qSort(contactNodes.begin(), contactNodes.end(), StringSizeLessThan);
+				std::sort(contactNodes.begin(), contactNodes.end(), StringSizeLessThan);
 				name = !contactNodes.isEmpty() ? contactNodes.last(): name;
 			}
 			else

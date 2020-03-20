@@ -26,13 +26,13 @@ public:
 	QList<QString> childNSpaces(const QString &AName) const;
 	bool isChildNode(const OptionsNode &ANode) const;
 	QString childPath(const OptionsNode &ANode) const;
-	void removeChilds(const QString &AName = QString::null, const QString &ANSpace = QString::null);
-	bool hasNode(const QString &APath, const QString &ANSpace = QString::null) const;
-	OptionsNode node(const QString &APath, const QString &ANSpace = QString::null) const;
-	void removeNode(const QString &APath, const QString &ANSpace = QString::null);
-	bool hasValue(const QString &APath = QString::null, const QString &ANSpace = QString::null) const;
-	QVariant value(const QString &APath = QString::null, const QString &ANSpace = QString::null) const;
-	void setValue(const QVariant &AValue, const QString &APath = QString::null, const QString &ANSpace = QString::null);
+	void removeChilds(const QString &AName = QString(), const QString &ANSpace = QString());
+	bool hasNode(const QString &APath, const QString &ANSpace = QString()) const;
+	OptionsNode node(const QString &APath, const QString &ANSpace = QString()) const;
+	void removeNode(const QString &APath, const QString &ANSpace = QString());
+	bool hasValue(const QString &APath = QString(), const QString &ANSpace = QString()) const;
+	QVariant value(const QString &APath = QString(), const QString &ANSpace = QString()) const;
+	void setValue(const QVariant &AValue, const QString &APath = QString(), const QString &ANSpace = QString());
 public:
 	bool operator==(const OptionsNode &AOther) const;
 	bool operator!=(const OptionsNode &AOther) const;
@@ -56,10 +56,10 @@ public:
 	static QString filesPath();
 	static QByteArray cryptKey();
 	static QString cleanNSpaces(const QString &APath);
-	static bool hasNode(const QString &APath, const QString &ANSpace = QString::null);
-	static OptionsNode node(const QString &APath, const QString &ANSpace = QString::null);
-	static QVariant fileValue(const QString &APath, const QString &ANSpace = QString::null);
-	static void setFileValue(const QVariant &AValue, const QString &APath, const QString &ANSpace = QString::null);
+	static bool hasNode(const QString &APath, const QString &ANSpace = QString());
+	static OptionsNode node(const QString &APath, const QString &ANSpace = QString());
+	static QVariant fileValue(const QString &APath, const QString &ANSpace = QString());
+	static void setFileValue(const QVariant &AValue, const QString &APath, const QString &ANSpace = QString());
 	static void setOptions(const QDomDocument &AOptions, const QString &AFilesPath, const QByteArray &ACryptKey);
 	static QVariant defaultValue(const QString &APath);
 	static void setDefaultValue(const QString &APath, const QVariant &ADefault);

@@ -187,7 +187,7 @@ bool RosterItemExchange::initObjects()
 	{
 		FMessageWidgets->insertViewDropHandler(this);
 	}
-	
+
 	if (FRostersViewPlugin)
 	{
 		FRostersViewPlugin->rostersView()->insertDragDropHandler(this);
@@ -216,8 +216,8 @@ bool RosterItemExchange::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, S
 			IRosterExchangeRequest request;
 			request.streamJid = AStreamJid;
 			request.contactJid = AStanza.from();
-			request.id = AStanza.kind()==STANZA_KIND_IQ ? AStanza.id() : QString::null;
-			request.message = AStanza.kind()==STANZA_KIND_MESSAGE ? Message(AStanza).body() : QString::null;
+			request.id = AStanza.kind()==STANZA_KIND_IQ ? AStanza.id() : QString();
+			request.message = AStanza.kind()==STANZA_KIND_MESSAGE ? Message(AStanza).body() : QString();
 
 			QList<Jid> existItems;
 			QDomElement itemElem = xElem.firstChildElement("item");
@@ -237,7 +237,7 @@ bool RosterItemExchange::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, S
 					groupElem = groupElem.nextSiblingElement("group");
 				}
 
-				if (item.itemJid.isValid() && !existItems.contains(item.itemJid) && 
+				if (item.itemJid.isValid() && !existItems.contains(item.itemJid) &&
 					(item.action==ROSTEREXCHANGE_ACTION_ADD || item.action==ROSTEREXCHANGE_ACTION_DELETE || item.action==ROSTEREXCHANGE_ACTION_MODIFY))
 				{
 					request.items.append(item);
@@ -427,7 +427,7 @@ QString RosterItemExchange::sendExchangeRequest(const IRosterExchangeRequest &AR
 			}
 		}
 	}
-	return QString::null;
+	return QString();
 }
 
 QList<IRosterItem> RosterItemExchange::dragDataContacts(const QMimeData *AData) const
@@ -438,7 +438,7 @@ QList<IRosterItem> RosterItemExchange::dragDataContacts(const QMimeData *AData) 
 		QMap<int, QVariant> indexData;
 		QDataStream stream(AData->data(DDT_ROSTERSVIEW_INDEX_DATA));
 		operator>>(stream,indexData);
-		
+
 		int indexKind = indexData.value(RDR_KIND).toInt();
 		if (DragRosterKinds.contains(indexKind))
 		{
@@ -493,7 +493,7 @@ QList<IRosterItem> RosterItemExchange::dropDataContacts(const Jid &AStreamJid, c
 		QMap<int, QVariant> indexData;
 		QDataStream stream(AData->data(DDT_ROSTERSVIEW_INDEX_DATA));
 		operator>>(stream,indexData);
-		
+
 		if (AStreamJid!=AContactJid || AStreamJid!=indexData.value(RDR_STREAM_JID).toString())
 		{
 			contactList = dragDataContacts(AData);
@@ -537,7 +537,7 @@ bool RosterItemExchange::insertDropActions(const Jid &AStreamJid, const Jid &ACo
 		AMenu->addAction(action, AG_DEFAULT, true);
 		return true;
 	}
-	
+
 	return false;
 }
 
@@ -690,7 +690,7 @@ bool RosterItemExchange::applyRequest(const IRosterExchangeRequest &ARequest, bo
 					if (ASubscribe)
 					{
 						if (FRosterChanger)
-							FRosterChanger->subscribeContact(ARequest.streamJid,it->itemJid,QString::null,ASilent);
+							FRosterChanger->subscribeContact(ARequest.streamJid,it->itemJid,QString(),ASilent);
 						else
 							roster->sendSubscription(it->itemJid,IRoster::Subscribe);
 					}

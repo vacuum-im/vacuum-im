@@ -181,7 +181,7 @@ void FileStreamsWindow::updateStreamProperties(IFileStream *AStream)
 	QList<QStandardItem *> columns = streamColumns(AStream->streamId());
 	if (!columns.isEmpty())
 	{
-		QString fname = !AStream->fileName().isEmpty() ? AStream->fileName().split("/").last() : QString::null;
+		QString fname = !AStream->fileName().isEmpty() ? AStream->fileName().split("/").last() : QString();
 		columns[CMN_FILENAME]->setText(fname);
 		columns[CMN_FILENAME]->setData(fname, IDR_VALUE);
 

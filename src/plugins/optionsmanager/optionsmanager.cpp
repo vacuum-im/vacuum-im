@@ -147,7 +147,7 @@ bool OptionsManager::initSettings()
 	Options::setDefaultValue(OPV_COMMON_LANGUAGE,QString());
 
 	if (profiles().count() == 0)
-		addProfile(DEFAULT_PROFILE, QString::null);
+		addProfile(DEFAULT_PROFILE, QString());
 
 	IOptionsDialogNode commonNode = { ONO_COMMON, OPN_COMMON, MNI_OPTIONS_DIALOG, tr("Common") };
 	insertOptionsDialogNode(commonNode);
@@ -168,7 +168,7 @@ bool OptionsManager::startPlugin()
 	int profIndex = args.indexOf(CLO_PROFILE);
 	int passIndex = args.indexOf(CLO_PROFILE_PASSWORD);
 	QString profile = profIndex>0 ? args.value(profIndex+1) : lastActiveProfile();
-	QString password = passIndex>0 ? args.value(passIndex+1) : QString::null;
+	QString password = passIndex>0 ? args.value(passIndex+1) : QString();
 	if (profile.isEmpty() || !setCurrentProfile(profile, password))
 		showLoginDialog();
 
@@ -625,7 +625,7 @@ void OptionsManager::closeProfile()
 		qDeleteAll(FOptionDialogs);
 		FShowOptionsDialogAction->setEnabled(false);
 
-		Options::setOptions(QDomDocument(), QString::null, QByteArray());
+		Options::setOptions(QDomDocument(), QString(), QByteArray());
 		saveCurrentProfileOptions();
 
 		FProfile.clear();

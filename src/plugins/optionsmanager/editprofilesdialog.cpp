@@ -17,7 +17,7 @@ EditProfilesDialog::EditProfilesDialog(IOptionsManager *AOptionsManager, QWidget
 
 	FOptionsManager = AOptionsManager;
 	ui.lstProfiles->addItems(FOptionsManager->profiles());
-	ui.lstProfiles->setItemSelected(ui.lstProfiles->item(0),true);
+	ui.lstProfiles->item(0)->setSelected(true);
 
 	connect(FOptionsManager->instance(),SIGNAL(profileAdded(const QString &)),SLOT(onProfileAdded(const QString &)));
 	connect(FOptionsManager->instance(),SIGNAL(profileRenamed(const QString &, const QString &)),SLOT(onProfileRenamed(const QString &, const QString &)));
@@ -39,11 +39,11 @@ EditProfilesDialog::~EditProfilesDialog()
 void EditProfilesDialog::onAddProfileClicked()
 {
 	bool ok;
-	QString profile = QInputDialog::getText(this,tr("New Profile"),tr("Enter profile name:"),QLineEdit::Normal,QString::null,&ok);
+	QString profile = QInputDialog::getText(this,tr("New Profile"),tr("Enter profile name:"),QLineEdit::Normal,QString(),&ok);
 	if (ok && !profile.isEmpty())
 	{
-		QString password = QInputDialog::getText(this,tr("Profile Password"),tr("Enter profile password:"),QLineEdit::Password,QString::null,&ok);
-		if (ok && password==QInputDialog::getText(this,tr("Confirm Password"),tr("Reenter password:"),QLineEdit::Password,QString::null,&ok))
+		QString password = QInputDialog::getText(this,tr("Profile Password"),tr("Enter profile password:"),QLineEdit::Password,QString(),&ok);
+		if (ok && password==QInputDialog::getText(this,tr("Confirm Password"),tr("Reenter password:"),QLineEdit::Password,QString(),&ok))
 		{
 			if (!FOptionsManager->addProfile(profile,password))
 			{
@@ -65,11 +65,11 @@ void EditProfilesDialog::onPasswordProfileClicked()
 	{
 		bool ok;
 		QString profile = listItem->text();
-		QString oldPassword = QInputDialog::getText(this,tr("Profile Password"),tr("Enter current profile password:"),QLineEdit::Password,QString::null,&ok);
+		QString oldPassword = QInputDialog::getText(this,tr("Profile Password"),tr("Enter current profile password:"),QLineEdit::Password,QString(),&ok);
 		if (ok && FOptionsManager->checkProfilePassword(profile,oldPassword))
 		{
-			QString newPassword = QInputDialog::getText(this,tr("Profile Password"),tr("Enter new profile password:"),QLineEdit::Password,QString::null,&ok);
-			if (ok && newPassword==QInputDialog::getText(this,tr("Confirm Password"),tr("Reenter password:"),QLineEdit::Password,QString::null,&ok))
+			QString newPassword = QInputDialog::getText(this,tr("Profile Password"),tr("Enter new profile password:"),QLineEdit::Password,QString(),&ok);
+			if (ok && newPassword==QInputDialog::getText(this,tr("Confirm Password"),tr("Reenter password:"),QLineEdit::Password,QString(),&ok))
 			{
 				if (!FOptionsManager->changeProfilePassword(profile,oldPassword,newPassword))
 				{
@@ -96,7 +96,7 @@ void EditProfilesDialog::onRenameProfileClicked()
 	{
 		bool ok;
 		QString profile = listItem->text();
-		QString newname = QInputDialog::getText(this,tr("Rename Profile"),tr("Enter new name for profile:"),QLineEdit::Normal,QString::null,&ok);
+		QString newname = QInputDialog::getText(this,tr("Rename Profile"),tr("Enter new name for profile:"),QLineEdit::Normal,QString(),&ok);
 		if (ok && !newname.isEmpty())
 		{
 			if (!FOptionsManager->renameProfile(profile, newname))

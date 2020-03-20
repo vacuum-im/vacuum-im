@@ -35,7 +35,7 @@
 #define AVATAR_IQ_TIMEOUT         30000
 
 #define EMPTY_AVATAR_HASH         QString("")
-#define UNKNOWN_AVATAR_HASH       QString::null
+#define UNKNOWN_AVATAR_HASH       QString()
 
 static const QList<int> AvatarRosterKinds = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT;
 
@@ -198,9 +198,9 @@ bool Avatars::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 		FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
 		if (FRostersViewPlugin)
 		{
-			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)), 
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)),
 				SLOT(onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
-			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)),
 				SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)),
 				SLOT(onRostersViewIndexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)));
@@ -232,7 +232,7 @@ bool Avatars::initObjects()
 		label.d->kind = AdvancedDelegateItem::CustomData;
 		label.d->data = RDR_AVATAR_IMAGE;
 		FAvatarLabelId = FRostersViewPlugin->rostersView()->registerLabel(label);
-		
+
 		FRostersViewPlugin->rostersView()->insertLabelHolder(RLHO_AVATARS,this);
 	}
 
@@ -281,7 +281,7 @@ bool Avatars::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &ASt
 		{
 			QDomElement vcardUpdate = AStanza.firstElement("x",NS_VCARD_UPDATE);
 			QDomElement iqUpdate = AStanza.firstElement("x",NS_JABBER_X_AVATAR);
-			
+
 			bool isMucPresence = !AStanza.firstElement("x",NS_MUC_USER).isNull();
 			Jid vcardJid = isMucPresence ? contactJid : contactJid.bare();
 
@@ -465,7 +465,7 @@ bool Avatars::hasAvatar(const QString &AHash) const
 
 QString Avatars::avatarFileName(const QString &AHash) const
 {
-	return !AHash.isEmpty() ? FAvatarsDir.filePath(AHash.toLower()) : QString::null;
+	return !AHash.isEmpty() ? FAvatarsDir.filePath(AHash.toLower()) : QString();
 }
 
 QString Avatars::avatarHash(const Jid &AContactJid, bool AExact) const
@@ -522,8 +522,8 @@ bool Avatars::setAvatar(const Jid &AStreamJid, const QByteArray &AData)
 			}
 			else
 			{
-				vcard->setValueForTags(VVN_PHOTO_VALUE,QString::null);
-				vcard->setValueForTags(VVN_PHOTO_TYPE,QString::null);
+				vcard->setValueForTags(VVN_PHOTO_VALUE,QString());
+				vcard->setValueForTags(VVN_PHOTO_TYPE,QString());
 			}
 			if (FVCardManager->publishVCard(AStreamJid,vcard))
 			{
@@ -979,7 +979,7 @@ void Avatars::onSetAvatarByAction(bool)
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
-		QString fileName = QFileDialog::getOpenFileName(NULL, tr("Select avatar image"),QString::null,tr("Image Files (*.png *.jpg *.bmp *.gif)"));
+		QString fileName = QFileDialog::getOpenFileName(NULL, tr("Select avatar image"),QString(),tr("Image Files (*.png *.jpg *.bmp *.gif)"));
 		if (!fileName.isEmpty())
 		{
 			QByteArray data = loadFileData(fileName);

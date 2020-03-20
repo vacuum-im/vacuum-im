@@ -220,10 +220,10 @@ bool ChatStates::startPlugin()
 bool ChatStates::archiveMessageEdit(int AOrder, const Jid &AStreamJid, Message &AMessage, bool ADirectionIn)
 {
 	Q_UNUSED(AOrder); Q_UNUSED(AStreamJid); Q_UNUSED(ADirectionIn);
-	if (!AMessage.stanza().firstElement(QString::null,NS_CHATSTATES).isNull())
+	if (!AMessage.stanza().firstElement(QString(),NS_CHATSTATES).isNull())
 	{
 		AMessage.detach();
-		QDomElement elem = AMessage.stanza().firstElement(QString::null,NS_CHATSTATES);
+		QDomElement elem = AMessage.stanza().firstElement(QString(),NS_CHATSTATES);
 		elem.parentNode().removeChild(elem);
 	}
 	return false;
@@ -371,7 +371,7 @@ bool ChatStates::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &
 			if (message.type() != Message::GroupChat)
 			{
 				Jid contactJid = AStanza.from();
-				QDomElement elem = AStanza.firstElement(QString::null,NS_CHATSTATES);
+				QDomElement elem = AStanza.firstElement(QString(),NS_CHATSTATES);
 				if (!elem.isNull())
 				{
 					if (hasBody || FChatParams.value(AStreamJid).value(contactJid).canSendStates)
@@ -393,7 +393,7 @@ bool ChatStates::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &
 			}
 			else
 			{
-				QDomElement elem = AStanza.firstElement(QString::null,NS_CHATSTATES);
+				QDomElement elem = AStanza.firstElement(QString(),NS_CHATSTATES);
 				if (!elem.isNull())
 				{
 					AAccept = true;
@@ -711,7 +711,7 @@ void ChatStates::setRoomUserState(const Jid &AStreamJid, const Jid &AUserJid, in
 	{
 		RoomParams &roomParams = FRoomParams[AStreamJid][AUserJid.bare()];
 		UserParams &userParams = roomParams.user[AUserJid];
-		
+
 		if (userParams.state != AState)
 		{
 			LOG_STRM_DEBUG(AStreamJid,QString("Room user chat state changed, user=%1, state=%2").arg(AUserJid.full()).arg(AState));

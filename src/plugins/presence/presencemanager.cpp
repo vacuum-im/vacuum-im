@@ -126,7 +126,7 @@ QList<IPresenceItem> PresenceManager::sortPresenceItems(const QList<IPresenceIte
 	if (AItems.count() > 1)
 	{
 		QList<IPresenceItem> items = AItems;
-		qSort(items.begin(),items.end(),presenceItemLessThen);
+		std::sort(items.begin(),items.end(),presenceItemLessThen);
 		return items;
 	}
 	return AItems;

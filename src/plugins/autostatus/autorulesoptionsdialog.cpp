@@ -192,7 +192,7 @@ AutoRulesOptionsDialog::AutoRulesOptionsDialog(IAutoStatus *AAutoStatus, IStatus
 	tbwRules->setSelectionBehavior(QTableWidget::SelectRows);
 	connect(tbwRules,SIGNAL(itemSelectionChanged()),SLOT(onRuledItemSelectionChanged()));
 
-	tbwRules->setHorizontalHeaderLabels(QStringList() << QString::null << tr("Time") << tr("Status") << tr("Text") << tr("Priority"));
+	tbwRules->setHorizontalHeaderLabels(QStringList() << QString() << tr("Time") << tr("Status") << tr("Text") << tr("Priority"));
 	tbwRules->horizontalHeader()->setSectionResizeMode(RTC_ENABLED,QHeaderView::ResizeToContents);
 	tbwRules->horizontalHeader()->setSectionResizeMode(RTC_TIME,QHeaderView::ResizeToContents);
 	tbwRules->horizontalHeader()->setSectionResizeMode(RTC_SHOW,QHeaderView::ResizeToContents);

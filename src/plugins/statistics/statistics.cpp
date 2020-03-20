@@ -1,5 +1,7 @@
 #include "statistics.h"
 
+#include <QScreen>
+#include <QApplication>
 #include <QDir>
 #include <QUrlQuery>
 #include <QSslError>
@@ -7,6 +9,7 @@
 #include <QNetworkProxy>
 #include <QAuthenticator>
 #include <QNetworkRequest>
+#include <QOperatingSystemVersion>
 #include <definitions/version.h>
 #include <definitions/optionnodes.h>
 #include <definitions/optionvalues.h>
@@ -480,18 +483,13 @@ QString Statistics::userAgent() const
 QString Statistics::windowsVersion() const
 {
 #ifdef Q_OS_WIN
-	OSVERSIONINFOEX versionInfo;
-
-	ZeroMemory(&versionInfo, sizeof(versionInfo));
-	versionInfo.dwOSVersionInfoSize = sizeof(versionInfo);
-	GetVersionEx(reinterpret_cast<OSVERSIONINFO*>(&versionInfo));
-
-	int majorVersion = versionInfo.dwMajorVersion;
-	int minorVersion = versionInfo.dwMinorVersion;
+	QOperatingSystemVersion currentWindows = QOperatingSystemVersion::current();
+	int majorVersion = currentWindows.majorVersion();
+	int minorVersion = currentWindows.minorVersion();
 
 	return QString("Windows NT %1.%2").arg(majorVersion).arg(minorVersion);
 #endif
-	return QString::null;
+	return QString();
 }
 
 QUrl Statistics::buildHitUrl(const IStatisticsHit &AHit) const
@@ -523,7 +521,7 @@ QUrl Statistics::buildHitUrl(const IStatisticsHit &AHit) const
 		query.append(qMakePair<QString,QString>("sc",QUrl::toPercentEncoding("end")));
 
 	// Screen Resolution
-	QRect sr = FDesktopWidget->screenGeometry();
+	QRect sr =  QApplication::primaryScreen()->availableGeometry();
 	query.append(qMakePair<QString,QString>("sr",QUrl::toPercentEncoding(QString("%1.%2").arg(sr.width()).arg(sr.height()))));
 
 	// User Language
@@ -850,7 +848,7 @@ void Statistics::onSoftwareInfoChanged(const Jid &AContactJid)
 		{
 			IDiscoInfo info = FDiscovery->discoInfo(streamJid,AContactJid);
 			int index = FDiscovery->findIdentity(info.identity,"server","im");
-			sendServerInfoHit(index>=0 ? info.identity.value(index).name : QString::null, QString::null);
+			sendServerInfoHit(index>=0 ? info.identity.value(index).name : QString(), QString());
 		}
 	}
 }

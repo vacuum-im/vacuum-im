@@ -160,9 +160,9 @@ public:
 	virtual void setHistoryScope(const IMultiUserChatHistory &AHistory) =0;
 	virtual bool sendStreamPresence() =0;
 	virtual bool sendPresence(int AShow, const QString &AStatus, int APriority) =0;
-	virtual bool sendMessage(const Message &AMessage, const QString &AToNick=QString::null) =0;
-	virtual bool sendInvitation(const QList<Jid> &AContacts, const QString &AReason=QString::null, const QString &AThread=QString::null) =0;
-	virtual bool sendDirectInvitation(const QList<Jid> &AContacts, const QString &AReason=QString::null, const QString &AThread=QString::null) =0;
+	virtual bool sendMessage(const Message &AMessage, const QString &AToNick=QString()) =0;
+	virtual bool sendInvitation(const QList<Jid> &AContacts, const QString &AReason=QString(), const QString &AThread=QString()) =0;
+	virtual bool sendDirectInvitation(const QList<Jid> &AContacts, const QString &AReason=QString(), const QString &AThread=QString()) =0;
 	virtual bool sendVoiceRequest() =0;
 	// Moderator
 	virtual QString subject() const =0;
@@ -171,8 +171,8 @@ public:
 	// Administrator
 	virtual QString loadAffiliationList(const QString &AAffiliation) =0;
 	virtual QString updateAffiliationList(const QList<IMultiUserListItem> &AItems) =0;
-	virtual QString setUserRole(const QString &ANick, const QString &ARole, const QString &AReason=QString::null) =0;
-	virtual QString setUserAffiliation(const QString &ANick, const QString &AAffiliation, const QString &AReason=QString::null) =0;
+	virtual QString setUserRole(const QString &ANick, const QString &ARole, const QString &AReason=QString()) =0;
+	virtual QString setUserAffiliation(const QString &ANick, const QString &AAffiliation, const QString &AReason=QString()) =0;
 	// Owner
 	virtual QString loadRoomConfig() =0;
 	virtual QString updateRoomConfig(const IDataForm &AForm) =0;

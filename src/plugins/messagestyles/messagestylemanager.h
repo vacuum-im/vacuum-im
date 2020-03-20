@@ -37,7 +37,7 @@ public:
 	virtual IMessageStyleEngine *findStyleEngine(const QString &AEngineId) const;
 	virtual void registerStyleEngine(IMessageStyleEngine *AEngine);
 	virtual IMessageStyle *styleForOptions(const IMessageStyleOptions &AOptions) const;
-	virtual IMessageStyleOptions styleOptions(int AMessageType, const QString &AContext = QString::null) const;
+	virtual IMessageStyleOptions styleOptions(int AMessageType, const QString &AContext = QString()) const;
 	//Other functions
 	virtual QString contactAvatar(const Jid &AContactJid) const;
 	virtual QString contactName(const Jid &AStreamJid, const Jid &AContactJid = Jid::null) const;

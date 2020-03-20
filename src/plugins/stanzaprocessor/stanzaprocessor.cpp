@@ -133,7 +133,7 @@ Stanza StanzaProcessor::makeReplyResult(const Stanza &AStanza) const
 Stanza StanzaProcessor::makeReplyError(const Stanza &AStanza, const XmppStanzaError &AError) const
 {
 	Stanza error(AStanza);
-	error.setType(STANZA_TYPE_ERROR).setTo(AStanza.from()).setFrom(QString::null).setId(AStanza.id());
+	error.setType(STANZA_TYPE_ERROR).setTo(AStanza.from()).setFrom(QString()).setId(AStanza.id());
 	insertErrorElement(error,AError);
 	return error;
 }
@@ -257,7 +257,7 @@ bool StanzaProcessor::checkCondition(const QDomElement &AElem, const QString &AC
 		{
 			QString attrName = attrNames.at(attr);
 			QList<QString> attrValues = attributes.values(attrName);
-			bool attrBlankValue = attrValues.contains(QString::null);
+			bool attrBlankValue = attrValues.contains(QString());
 
 			bool elemHasAttr;
 			QString elemAttrValue;

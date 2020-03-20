@@ -283,7 +283,7 @@ QString FileMessageArchive::saveCollection(const Jid &AStreamJid, const IArchive
 	{
 		REPORT_ERROR("Failed to save collection: Invalid params");
 	}
-	return QString::null;
+	return QString();
 }
 
 QString FileMessageArchive::loadHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest)
@@ -305,7 +305,7 @@ QString FileMessageArchive::loadHeaders(const Jid &AStreamJid, const IArchiveReq
 	{
 		LOG_STRM_ERROR(AStreamJid,"Failed to load headers: Not capable");
 	}
-	return QString::null;
+	return QString();
 }
 
 QString FileMessageArchive::loadCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader)
@@ -331,7 +331,7 @@ QString FileMessageArchive::loadCollection(const Jid &AStreamJid, const IArchive
 	{
 		REPORT_ERROR("Failed to load collection: Invalid params");
 	}
-	return QString::null;
+	return QString();
 }
 
 QString FileMessageArchive::removeCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest)
@@ -353,7 +353,7 @@ QString FileMessageArchive::removeCollections(const Jid &AStreamJid, const IArch
 	{
 		LOG_STRM_ERROR(AStreamJid,"Failed to remove collections: Not capable");
 	}
-	return QString::null;
+	return QString();
 }
 
 QString FileMessageArchive::loadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &ANextRef)
@@ -379,7 +379,7 @@ QString FileMessageArchive::loadModifications(const Jid &AStreamJid, const QDate
 	{
 		REPORT_ERROR("Failed to load modifications: Invalid params");
 	}
-	return QString::null;
+	return QString();
 }
 
 QString FileMessageArchive::fileArchiveRootPath() const
@@ -408,9 +408,9 @@ QString FileMessageArchive::fileArchivePath(const Jid &AStreamJid) const
 			QMutexLocker locker(&FMutex);
 			FNewDirs.prepend(dir.absoluteFilePath(streamDir));
 		}
-		return dir.cd(streamDir) ? dir.absolutePath() : QString::null;
+		return dir.cd(streamDir) ? dir.absolutePath() : QString();
 	}
-	return QString::null;
+	return QString();
 }
 
 QString FileMessageArchive::contactGateType(const Jid &AContactJid) const
@@ -429,7 +429,7 @@ QString FileMessageArchive::collectionDirName(const Jid &AWith) const
 			dirName += "/" + Jid::encode(gateWith.pResource());
 		return dirName;
 	}
-	return QString::null;
+	return QString();
 }
 
 QString FileMessageArchive::collectionFileName(const QDateTime &AStart) const
@@ -440,7 +440,7 @@ QString FileMessageArchive::collectionFileName(const QDateTime &AStart) const
 		DateTime start(AStart.addMSecs(-AStart.time().msec()));
 		return start.toX85UTC().replace(":","=") + COLLECTION_EXT;
 	}
-	return QString::null;
+	return QString();
 }
 
 QString FileMessageArchive::collectionDirPath(const Jid &AStreamJid, const Jid &AWith) const
@@ -459,9 +459,9 @@ QString FileMessageArchive::collectionDirPath(const Jid &AStreamJid, const Jid &
 				FNewDirs.prepend(path);
 			}
 		}
-		return dir.cd(withDir) ? dir.absolutePath() : QString::null;
+		return dir.cd(withDir) ? dir.absolutePath() : QString();
 	}
-	return QString::null;
+	return QString();
 }
 
 QString FileMessageArchive::collectionFilePath(const Jid &AStreamJid, const Jid &AWith, const QDateTime &AStart) const
@@ -473,7 +473,7 @@ QString FileMessageArchive::collectionFilePath(const Jid &AStreamJid, const Jid 
 		if (!dirPath.isEmpty() && !fileName.isEmpty())
 			return dirPath+"/"+fileName;
 	}
-	return QString::null;
+	return QString();
 }
 
 IArchiveHeader FileMessageArchive::loadFileHeader(const QString &AFilePath) const
@@ -581,7 +581,7 @@ QList<IArchiveHeader> FileMessageArchive::loadFileHeaders(const Jid &AStreamJid,
 		{
 			QString gateDomain = gatewayJid(ARequest.with).pDomain();
 			QString encResource = Jid::encode(ARequest.with.pResource());
-			
+
 			// Check if gateway was saved as not gateway
 			if (ARequest.with.pDomain() != gateDomain)
 				dirPaths.append(collectionDirPath(AStreamJid,ARequest.with));
@@ -644,7 +644,7 @@ QList<IArchiveHeader> FileMessageArchive::loadFileHeaders(const Jid &AStreamJid,
 	{
 		REPORT_ERROR("Failed to load file headers: Invalid params");
 	}
-	
+
 	return headers;
 }
 
@@ -666,12 +666,12 @@ IArchiveHeader FileMessageArchive::saveFileCollection(const Jid &AStreamJid, con
 				QMultiMap<int, QString> curMessages;
 				foreach(const Message &message, collection.body.messages)
 					curMessages.insertMulti(collection.header.start.secsTo(message.dateTime()),message.body());
-					
+
 				foreach(const Message &message, ACollection.body.messages)
 					if (!curMessages.contains(collection.header.start.secsTo(message.dateTime()),message.body()))
 						newBody.messages.append(message);
 
-				qSort(newBody.messages);
+				std::sort(newBody.messages.begin(), newBody.messages.end());
 			}
 			if (!ACollection.body.notes.isEmpty())
 			{
@@ -679,7 +679,7 @@ IArchiveHeader FileMessageArchive::saveFileCollection(const Jid &AStreamJid, con
 					if (!collection.body.notes.contains(it.key(),it.value()))
 						newBody.notes.insertMulti(it.key(),it.value());
 			}
-			
+
 			collection = ACollection;
 			collection.body = newBody;
 			collection.header.version = newVersion;
@@ -749,10 +749,10 @@ bool FileMessageArchive::isDatabaseReady(const Jid &AStreamJid) const
 
 QString FileMessageArchive::databaseArchiveFile(const Jid &AStreamJid) const
 {
-	QString archiveDir = AStreamJid.isValid() ? FArchiver->archiveDirPath(AStreamJid) : QString::null;
+	QString archiveDir = AStreamJid.isValid() ? FArchiver->archiveDirPath(AStreamJid) : QString();
 	if (!archiveDir.isEmpty())
 		return archiveDir + "/" + DATABASE_FILE_NAME;
-	return QString::null;
+	return QString();
 }
 
 QString FileMessageArchive::databaseProperty(const Jid &AStreamJid, const QString &AProperty) const
@@ -839,9 +839,9 @@ QList<IArchiveHeader> FileMessageArchive::loadDatabaseHeaders(const Jid &AStream
 			if (headers.count() > dbHeadersCount)
 			{
 				if (ARequest.order == Qt::AscendingOrder)
-					qSort(headers.begin(),headers.end(),qLess<IArchiveHeader>());
+					std::sort(headers.begin(),headers.end(),qLess<IArchiveHeader>());
 				else
-					qSort(headers.begin(),headers.end(),qGreater<IArchiveHeader>());
+					std::sort(headers.begin(),headers.end(),qGreater<IArchiveHeader>());
 
 				if ((quint32)headers.count() > ARequest.maxItems)
 					headers = headers.mid(0,ARequest.maxItems);
@@ -1010,7 +1010,7 @@ bool FileMessageArchive::checkRequestHeader(const IArchiveHeader &AHeader, const
 				return false;
 			if (ARequest.with.hasResource() && ARequest.with.pResource()!=AHeader.with.pResource())
 				return false;
-			
+
 			QString headerGate = contactGateType(AHeader.with);
 			QString requestGate = contactGateType(ARequest.with);
 			if (requestGate != headerGate)
@@ -1041,7 +1041,7 @@ bool FileMessageArchive::checkRequestFile(const QString &AFileName, const IArchi
 
 		QStringList elemStack;
 		bool checkElemText = false;
-		while (!reader.atEnd() && validState!=Qt::Unchecked && textState!=Qt::Unchecked && threadState!=Qt::Unchecked && 
+		while (!reader.atEnd() && validState!=Qt::Unchecked && textState!=Qt::Unchecked && threadState!=Qt::Unchecked &&
 			(validState==Qt::PartiallyChecked || textState==Qt::PartiallyChecked || threadState==Qt::PartiallyChecked))
 		{
 			reader.readNext();
@@ -1286,7 +1286,7 @@ void FileMessageArchive::onDatabaseTaskFinished(DatabaseTask *ATask)
 				FPluginManager->continueShutdown();
 				FDatabaseProperties.insert(task->streamJid(),task->databaseProperties());
 				emit databaseOpened(task->streamJid());
-				
+
 				startDatabaseSync(task->streamJid(),databaseProperty(task->streamJid(),FADP_DATABASE_NOT_CLOSED)!="false");
 				setDatabaseProperty(task->streamJid(),FADP_DATABASE_NOT_CLOSED,"true");
 			}
@@ -1349,7 +1349,7 @@ void FileMessageArchive::onDatabaseSyncFinished(const Jid &AStreamJid, bool AFai
 
 void FileMessageArchive::onOptionsOpened()
 {
-	FArchiveRootPath = QString::null;
+	FArchiveRootPath = QString();
 	FArchiveHomePath = Options::node(OPV_FILEARCHIVE_HOMEPATH).value().toString();
 	if (!FArchiveHomePath.isEmpty())
 	{
@@ -1366,7 +1366,7 @@ void FileMessageArchive::onOptionsOpened()
 
 void FileMessageArchive::onOptionsClosed()
 {
-	FArchiveRootPath = QString::null;
+	FArchiveRootPath = QString();
 	FArchiveHomePath = FPluginManager->homePath();
 }
 

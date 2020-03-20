@@ -104,9 +104,9 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
 		if (rostersViewPlugin)
 		{
 			FRostersView = rostersViewPlugin->rostersView();
-			connect(FRostersView->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)), 
+			connect(FRostersView->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)),
 				SLOT(onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
-			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
+			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)),
 				SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 		}
 	}
@@ -337,7 +337,7 @@ bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AHo
 					action->setData(ADR_STREAM_JID,QStringList()<<hoverStreamJid);
 					action->setData(ADR_CONTACT_JID,QStringList()<<indexData.value(RDR_PREP_BARE_JID).toString());
 					action->setData(RDR_NAME,QStringList()<<indexData.value(RDR_NAME).toString());
-					action->setData(ADR_TO_GROUP,QVariant(QString::null));
+					action->setData(ADR_TO_GROUP,QVariant(QString()));
 					connect(action,SIGNAL(triggered(bool)),SLOT(onAddContactsToGroup(bool)));
 				}
 				else if (indexKind == RIK_GROUP)
@@ -376,7 +376,7 @@ bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AHo
 						action->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_COPY_GROUP);
 						action->setData(ADR_STREAM_JID,QStringList()<<hoverStreamJid);
 						action->setData(ADR_GROUP,QStringList()<<indexData.value(RDR_GROUP).toString());
-						action->setData(ADR_TO_GROUP,QStringList()<<QString::null);
+						action->setData(ADR_TO_GROUP,QStringList()<<QString());
 						connect(action,SIGNAL(triggered(bool)),SLOT(onCopyGroupsToGroup(bool)));
 					}
 					else if (AEvent->dropAction() == Qt::MoveAction)
@@ -385,7 +385,7 @@ bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AHo
 						action->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_COPY_GROUP);
 						action->setData(ADR_STREAM_JID,QStringList()<<hoverStreamJid);
 						action->setData(ADR_GROUP,QStringList()<<indexData.value(RDR_GROUP).toString());
-						action->setData(ADR_TO_GROUP,QStringList()<<QString::null);
+						action->setData(ADR_TO_GROUP,QStringList()<<QString());
 						connect(action,SIGNAL(triggered(bool)),SLOT(onMoveGroupsToGroup(bool)));
 					}
 				}
@@ -414,7 +414,7 @@ bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AHo
 					action->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_COPY_GROUP);
 					action->setData(ADR_STREAM_JID,streams);
 					action->setData(ADR_GROUP,groups);
-					action->setData(ADR_TO_GROUP,QStringList()<<QString::null);
+					action->setData(ADR_TO_GROUP,QStringList()<<QString());
 					connect(action,SIGNAL(triggered(bool)),SLOT(onCopyGroupsToGroup(bool)));
 				}
 				else if (AEvent->dropAction() == Qt::MoveAction)
@@ -423,7 +423,7 @@ bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AHo
 					action->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_COPY_GROUP);
 					action->setData(ADR_STREAM_JID,streams);
 					action->setData(ADR_GROUP,groups);
-					action->setData(ADR_TO_GROUP,QStringList()<<QString::null);
+					action->setData(ADR_TO_GROUP,QStringList()<<QString());
 					connect(action,SIGNAL(triggered(bool)),SLOT(onMoveGroupsToGroup(bool)));
 				}
 
@@ -577,7 +577,7 @@ AdvancedDelegateEditProxy *RosterChanger::rosterEditProxy(int AOrder, int ADataR
 
 bool RosterChanger::setModelData(const AdvancedItemDelegate *ADelegate, QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex)
 {
-	Q_UNUSED(AModel); 
+	Q_UNUSED(AModel);
 	if (ADelegate->editRole() == RDR_NAME)
 	{
 		QVariant value = AEditor->property(ADVANCED_DELEGATE_EDITOR_VALUE_PROPERTY);
@@ -625,7 +625,7 @@ bool RosterChanger::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, c
 			{
 				dialog->setContactJid(AContactJid);
 				dialog->setNickName(AParams.contains("name") ? AParams.value("name") : AContactJid.uNode());
-				dialog->setGroup(AParams.contains("group") ? AParams.value("group") : QString::null);
+				dialog->setGroup(AParams.contains("group") ? AParams.value("group") : QString());
 				dialog->instance()->show();
 			}
 		}
@@ -778,7 +778,7 @@ QString RosterChanger::subscriptionNotify(int ASubsType, const Jid &AContactJid)
 	case IRoster::Unsubscribed:
 		return tr("You are now unsubscribed from %1 presence.").arg(AContactJid.uBare());
 	}
-	return QString::null;
+	return QString();
 }
 
 QList<int> RosterChanger::findNotifies(const Jid &AStreamJid, const Jid &AContactJid) const
@@ -1182,7 +1182,7 @@ void RosterChanger::removeContactsFromRoster(const QStringList &AStreams, const 
 					tr("Are you sure you wish to remove a contact <b>%1</b> from the roster?").arg(name.toHtmlEscaped()),
 					QMessageBox::Yes | QMessageBox::No);
 			}
-			else 
+			else
 			{
 				button = QMessageBox::Yes;
 			}
@@ -1209,7 +1209,7 @@ void RosterChanger::removeContactsFromRoster(const QStringList &AStreams, const 
 					findData.insertMulti(RDR_PREP_BARE_JID,AContacts.at(i));
 
 					IRosterIndex *sroot = FRostersModel!=NULL ? FRostersModel->streamRoot(AStreams.at(i)) : NULL;
-					IRosterIndex *group = sroot!=NULL ? FRostersModel->findGroupIndex(RIK_GROUP_NOT_IN_ROSTER,QString::null,sroot) : NULL;
+					IRosterIndex *group = sroot!=NULL ? FRostersModel->findGroupIndex(RIK_GROUP_NOT_IN_ROSTER,QString(),sroot) : NULL;
 					if (group)
 					{
 						foreach(IRosterIndex *index, group->findChilds(findData,true))
@@ -1862,9 +1862,9 @@ void RosterChanger::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &A
 					isAllInEmptyGroup = false;
 				}
 				exceptGroups = !exceptGroups.isEmpty() ? (exceptGroups & ritem.groups) : ritem.groups;
-				exceptGroups += QString::null;
+				exceptGroups += QString();
 			}
-			exceptGroups -= QString::null;
+			exceptGroups -= QString();
 
 			if (isAllItemsValid)
 			{

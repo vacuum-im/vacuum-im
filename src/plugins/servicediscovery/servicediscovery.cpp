@@ -150,7 +150,7 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &AIni
 		if (FRostersViewPlugin)
 		{
 			FRostersView = FRostersViewPlugin->rostersView();
-			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
+			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)),
 				SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 		}
 	}
@@ -422,7 +422,7 @@ bool ServiceDiscovery::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex
 	Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
 	if (isReady(streamJid) && AIndex->kind()==RIK_AGENT)
 	{
-		showDiscoItems(streamJid,AIndex->data(RDR_FULL_JID).toString(),QString::null);
+		showDiscoItems(streamJid,AIndex->data(RDR_FULL_JID).toString(),QString());
 		return true;
 	}
 	return false;
@@ -482,7 +482,7 @@ IDiscoInfo ServiceDiscovery::selfDiscoInfo(const Jid &AStreamJid, const QString 
 
 	const EntityCapabilities myCaps = FSelfCaps.value(AStreamJid);
 	QString capsNode = QString("%1#%2").arg(myCaps.node).arg(myCaps.ver);
-	dinfo.node = ANode!=capsNode ? ANode : QString::null;
+	dinfo.node = ANode!=capsNode ? ANode : QString();
 
 	foreach(IDiscoHandler *handler, FDiscoHandlers)
 		handler->fillDiscoInfo(dinfo);
@@ -990,8 +990,8 @@ void ServiceDiscovery::removeQueuedRequest(const DiscoveryRequest &ARequest)
 	while (it != FQueuedRequests.end())
 	{
 		if ((ARequest.streamJid.isEmpty() || it.value().streamJid==ARequest.streamJid) &&
-		    (ARequest.contactJid.isEmpty() || it.value().contactJid==ARequest.contactJid) &&
-		    (ARequest.node.isEmpty() || it.value().node==ARequest.node))
+			(ARequest.contactJid.isEmpty() || it.value().contactJid==ARequest.contactJid) &&
+			(ARequest.node.isEmpty() || it.value().node==ARequest.node))
 		{
 			it = FQueuedRequests.erase(it);
 		}
@@ -1010,7 +1010,7 @@ bool ServiceDiscovery::hasEntityCaps(const EntityCapabilities &ACaps) const
 QString ServiceDiscovery::capsFileName(const EntityCapabilities &ACaps, bool AWithOwner) const
 {
 	QString hashString = ACaps.hash.isEmpty() ? ACaps.node+ACaps.ver : ACaps.ver+ACaps.hash;
-	hashString += AWithOwner ? ACaps.owner : QString::null;
+	hashString += AWithOwner ? ACaps.owner : QString();
 	QString fileName = QCryptographicHash::hash(hashString.toUtf8(),QCryptographicHash::Md5).toHex().toLower() + ".xml";
 	return FCapsFilesDir.absoluteFilePath(fileName);
 }
@@ -1106,11 +1106,11 @@ QString ServiceDiscovery::calcCapsHash(const IDiscoInfo &AInfo, const QString &A
 
 		foreach(const IDiscoIdentity &identity, AInfo.identity)
 			sortList.append(identity.category+"/"+identity.type+"/"+identity.lang+"/"+identity.name);
-		qSort(sortList);
+		std::sort(sortList.begin(), sortList.end());
 		hashList += sortList;
 
 		sortList = AInfo.features;
-		qSort(sortList);
+		std::sort(sortList.begin(), sortList.end());
 		hashList += sortList;
 
 		if (FDataForms && !AInfo.extensions.isEmpty())
@@ -1135,7 +1135,7 @@ QString ServiceDiscovery::calcCapsHash(const IDiscoInfo &AInfo, const QString &A
 							values +=(field.value.toBool() ? "1" : "0");
 						else
 							values += field.value.toString();
-						qSort(values);
+						std::sort(values.begin(), values.end());
 						sortFields.insertMulti(field.var,values);
 					}
 				}
@@ -1149,7 +1149,7 @@ QString ServiceDiscovery::calcCapsHash(const IDiscoInfo &AInfo, const QString &A
 				++iforms;
 			}
 		}
-		hashList.append(QString::null);
+		hashList.append(QString());
 		QByteArray hashData = hashList.join("<").toUtf8();
 		return QCryptographicHash::hash(hashData, AHash==CAPS_HASH_SHA1 ? QCryptographicHash::Sha1 : QCryptographicHash::Md5).toBase64();
 	}
@@ -1157,7 +1157,7 @@ QString ServiceDiscovery::calcCapsHash(const IDiscoInfo &AInfo, const QString &A
 	{
 		LOG_STRM_WARNING(AInfo.streamJid,QString("Failed to calculate caps hash, jid=%1: Invalid type=%2").arg(AInfo.contactJid.full(),AHash));
 	}
-	return QString::null;
+	return QString();
 }
 
 bool ServiceDiscovery::compareIdentities(const QList<IDiscoIdentity> &AIdentities, const IDiscoIdentity &AWith) const
@@ -1436,7 +1436,7 @@ void ServiceDiscovery::onRostersViewIndexContextMenu(const QList<IRosterIndex *>
 
 			if (indexKind==RIK_STREAM_ROOT || indexKind==RIK_AGENT)
 			{
-				Action *action = createDiscoItemsAction(streamJid,contactJid,QString::null,AMenu);
+				Action *action = createDiscoItemsAction(streamJid,contactJid,QString(),AMenu);
 				AMenu->addAction(action,AG_RVCM_DISCOVERY_ITEMS,true);
 			}
 
@@ -1451,7 +1451,7 @@ void ServiceDiscovery::onRostersViewIndexContextMenu(const QList<IRosterIndex *>
 				IDiscoInfo dinfo = discoInfo(streamJid,itemJid);
 
 				IRosterItem ritem = roster!=NULL ? roster->findItem(itemJid) : IRosterItem();
-				QString resName = (!ritem.name.isEmpty() ? ritem.name : itemJid.uBare()) + (itemJid.hasResource() ? QString("/")+itemJid.resource() : QString::null);
+				QString resName = (!ritem.name.isEmpty() ? ritem.name : itemJid.uBare()) + (itemJid.hasResource() ? QString("/")+itemJid.resource() : QString());
 
 				// Many clients support version info but don`t show it in disco info
 				if (dinfo.streamJid.isValid() && !dinfo.features.contains(NS_JABBER_VERSION))
@@ -1476,7 +1476,7 @@ void ServiceDiscovery::onRostersViewIndexContextMenu(const QList<IRosterIndex *>
 							action->setText(resName);
 							action->setParent(action->parent()==AMenu ? menu : action->parent());
 							action->setIcon(FStatusIcons!=NULL ? FStatusIcons->iconByJid(streamJid,itemJid) : QIcon());
-							menu->addAction(action,AG_RVCM_DISCOVERY_FEATURES,false); 
+							menu->addAction(action,AG_RVCM_DISCOVERY_FEATURES,false);
 						}
 						else
 						{

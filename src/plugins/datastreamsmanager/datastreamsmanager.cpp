@@ -157,7 +157,7 @@ bool DataStreamsManger::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, S
 
 		XmppStanzaError err(XmppStanzaError::EC_BAD_REQUEST);
 		QDomElement siElem = AStanza.firstElement("si",NS_STREAM_INITIATION);
-		
+
 		IDataStream stream;
 		stream.kind = IDataStream::Target;
 		stream.streamJid = AStreamJid;
@@ -186,7 +186,7 @@ bool DataStreamsManger::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, S
 					if (FMethods.contains(option.value))
 						methods.append(option.value);
 			}
-			
+
 			if (!stream.streamId.isEmpty() && !methods.isEmpty() && !FStreams.contains(stream.streamId))
 			{
 				FStreams.insert(stream.streamId,stream);
@@ -254,7 +254,7 @@ void DataStreamsManger::stanzaRequestResult(const Jid &AStreamJid, const Stanza 
 				IDataForm form = FDataForms->dataForm(formElem);
 
 				int index = FDataForms->fieldIndex(DFV_STREAM_METHOD,form.fields);
-				QString method = index>=0 ? form.fields.at(index).value.toString() : QString::null;
+				QString method = index>=0 ? form.fields.at(index).value.toString() : QString();
 
 				if (FMethods.contains(method) && FDataForms->isSubmitValid(stream.features,form))
 				{
@@ -527,7 +527,7 @@ void DataStreamsManger::rejectStream(const QString &AStreamId, const XmppStanzaE
 	if (FStanzaProcessor && FStreams.contains(AStreamId))
 	{
 		IDataStream stream = FStreams.take(AStreamId);
-		
+
 		Stanza reply(STANZA_KIND_IQ);
 		reply.setFrom(stream.contactJid.full()).setId(stream.requestId);
 		reply = FStanzaProcessor->makeReplyError(reply,AError);
@@ -550,7 +550,7 @@ QString DataStreamsManger::streamIdByRequestId(const QString &ARequestId) const
 	for (QMap<QString, IDataStream>::const_iterator it = FStreams.constBegin(); it!=FStreams.constEnd(); ++it)
 		if (it->requestId == ARequestId)
 			return it.key();
-	return QString::null;
+	return QString();
 }
 
 void DataStreamsManger::onXmppStreamClosed(IXmppStream *AXmppStream)
@@ -563,7 +563,7 @@ void DataStreamsManger::onXmppStreamClosed(IXmppStream *AXmppStream)
 			IDataStreamProfile *sprofile = FProfiles.value(stream.profileNS);
 			if (sprofile != NULL)
 				sprofile->dataStreamProcessError(stream.streamId,err);
-			
+
 			if (FStreams.contains(stream.streamId))
 			{
 				FStreams.remove(stream.streamId);

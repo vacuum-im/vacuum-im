@@ -91,10 +91,10 @@ public:
 	virtual QString removeCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest);
 	virtual QString loadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &ANextRef);
 	//IServerMesssageArchive
-	virtual QString loadServerHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest, const QString &ANextRef = QString::null);
-	virtual QString saveServerCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection, const QString &ANextRef = QString::null);
-	virtual QString loadServerCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &ANextRef = QString::null);
-	virtual QString loadServerModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &ANextRef = QString::null);
+	virtual QString loadServerHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest, const QString &ANextRef = QString());
+	virtual QString saveServerCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection, const QString &ANextRef = QString());
+	virtual QString loadServerCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &ANextRef = QString());
+	virtual QString loadServerModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &ANextRef = QString());
 signals:
 	//IArchiveEngine
 	void capabilitiesChanged(const Jid &AStreamJid);

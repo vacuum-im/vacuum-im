@@ -93,7 +93,7 @@ void ConnectionOptionsWidget::saveOptions(IAccount *AAccount) const
 
 QString ConnectionOptionsWidget::connectionEngine() const
 {
-	return FConnectionEngine!=NULL ? FConnectionEngine->engineId() : QString::null;
+	return FConnectionEngine!=NULL ? FConnectionEngine->engineId() : QString();
 }
 
 void ConnectionOptionsWidget::setConnectionEngine(const QString &AEngineId)
@@ -130,7 +130,7 @@ CreateAccountWizard::CreateAccountWizard(QWidget *AParent) : QWizard(AParent)
 #endif
 
 	setPage(PageWizardStart, new WizardStartPage(this));
-	
+
 	setPage(PageAppendService, new AppendServicePage(this));
 	setPage(PageAppendSettings, new AppendSettingsPage(this));
 	setPage(PageAppendCheck, new AppendCheckPage(this));
@@ -149,7 +149,7 @@ void CreateAccountWizard::accept()
 		accountJid = Jid::fromUserInput(field(WF_APPEND_NODE).toString() + "@" + field(WF_APPEND_DOMAIN).toString());
 	else if (field(WF_WIZARD_MODE).toInt() == ModeRegister)
 		accountJid = Jid::fromUserInput(field(WF_REGISTER_NODE).toString() + "@" + field(WF_REGISTER_DOMAIN).toString());
-	
+
 	LOG_INFO(QString("Creating account: jid=%1").arg(accountJid.full()));
 
 	IAccountManager *accountManager = PluginHelper::pluginInstance<IAccountManager>();
@@ -180,7 +180,7 @@ void CreateAccountWizard::accept()
 			if (optionsManager != NULL)
 			{
 				QString rootId = OPN_ACCOUNTS"."+account->accountId().toString();
-				optionsManager->showOptionsDialog(QString::null, rootId, parentWidget());
+				optionsManager->showOptionsDialog(QString(), rootId, parentWidget());
 			}
 		}
 
@@ -279,23 +279,20 @@ AppendServicePage::AppendServicePage(QWidget *AParent) : QWizardPage(AParent)
 
 	FServiceType = -1;
 
-	QSignalMapper *signalMapper = new QSignalMapper(this);
-	connect(signalMapper,SIGNAL(mapped(int)),SLOT(onServiceButtonClicked(int)));
-
 	QVBoxLayout *layout = new QVBoxLayout(this);
 	for (int i=0; i<CreateAccountWizard::Service_Count; i++)
 	{
 		QRadioButton *button = new QRadioButton(this);
 		button->setText(services[i].name);
-		connect(button,SIGNAL(clicked()),signalMapper,SLOT(map()));
 
-		signalMapper->setMapping(button, services[i].type);
+		connect(button, &QRadioButton::clicked, [=]() { onServiceButtonClicked(services[i].type); });
+
 		FTypeButton.insert(services[i].type, button);
-
 		layout->addWidget(button);
 	}
+
 	layout->setSpacing(layout->spacing()*2);
-	
+
 	registerField(WF_APPEND_SERVICE"*",this,"serviceType");
 }
 
@@ -342,17 +339,17 @@ AppendSettingsPage::AppendSettingsPage(QWidget *AParent) : QWizardPage(AParent)
 
 	QLabel *lblJabberId = new QLabel(this);
 	lblJabberId->setText(tr("Jabber ID:"));
-	
+
 	lneNode = new QLineEdit(this);
 	connect(lneNode,SIGNAL(textChanged(const QString &)),SIGNAL(completeChanged()));
-	
+
 	QLabel *lblDog = new QLabel("@", this);
 	lblDog->setText("@");
-	
+
 	cmbDomain = new QComboBox(this);
 	connect(cmbDomain,SIGNAL(editTextChanged(const QString &)),SIGNAL(completeChanged()));
 	connect(cmbDomain,SIGNAL(currentIndexChanged(const QString &)),SIGNAL(completeChanged()));
-	
+
 	QLabel *lblPassword = new QLabel(this);
 	lblPassword->setText(tr("Password:"));
 
@@ -403,7 +400,7 @@ void AppendSettingsPage::initializePage()
 		break;
 	case CreateAccountWizard::ServiceGoogle:
 		{
-			static const QStringList domains = QStringList() 
+			static const QStringList domains = QStringList()
 				<< "gmail.com" << "googlemail.com";
 
 			cmbDomain->setEditable(false);
@@ -412,7 +409,7 @@ void AppendSettingsPage::initializePage()
 		break;
 	case CreateAccountWizard::ServiceYandex:
 		{
-			static const QStringList domains = QStringList() 
+			static const QStringList domains = QStringList()
 				<< "ya.ru" << "yandex.ru" << "yandex.net" << "yandex.com" << "yandex.by"
 				<< "yandex.kz" << "yandex.ua" << "yandex-co.ru" << "narod.ru";
 
@@ -422,7 +419,7 @@ void AppendSettingsPage::initializePage()
 		break;
 	case CreateAccountWizard::ServiceOdnoklassniki:
 		{
-			static const QStringList domains = QStringList() 
+			static const QStringList domains = QStringList()
 				<< "odnoklassniki.ru";
 
 			cmbDomain->setEditable(false);
@@ -469,7 +466,7 @@ bool AppendSettingsPage::validatePage()
 		QMessageBox::warning(this,tr("Duplicate Account"),tr("Account with Jabber ID <b>%1</b> already exists.").arg(streamJid().uBare().toHtmlEscaped()));
 		return false;
 	}
-	
+
 	cowConnOptions->applyOptions();
 	return QWizardPage::validatePage();
 }
@@ -539,11 +536,11 @@ AppendCheckPage::AppendCheckPage(QWidget *AParent) : QWizardPage(AParent)
 	prbProgress->setRange(0,0);
 	prbProgress->setTextVisible(false);
 	prbProgress->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-	
+
 	lblError = new QLabel(this);
 	lblError->setWordWrap(true);
 	lblError->setAlignment(Qt::AlignCenter);
-	
+
 	lblDescription = new QLabel(this);
 	lblDescription->setWordWrap(true);
 	lblDescription->setAlignment(Qt::AlignCenter);
@@ -585,7 +582,7 @@ void AppendCheckPage::initializePage()
 	if (FXmppStream)
 	{
 		lblCaption->setText(QString("<h2>%1</h2>").arg(tr("Connecting...")));
-		
+
 		lblError->setVisible(false);
 		prbProgress->setVisible(true);
 		lblDescription->setVisible(false);
@@ -594,7 +591,7 @@ void AppendCheckPage::initializePage()
 		FXmppStream->setStreamJid(streamJid());
 		FXmppStream->setPassword(field(WF_APPEND_PASSWORD).toString());
 	}
-	
+
 	if (FXmppStream==NULL || !FXmppStream->open())
 	{
 		lblCaption->setText(QString("<h2>%1</h2>").arg(tr("Failed to check connection :(")));
@@ -740,7 +737,7 @@ RegisterServerPage::RegisterServerPage(QWidget *AParent) : QWizardPage(AParent)
 
 void RegisterServerPage::initializePage()
 {
-	static const QStringList knownServers = QStringList() 
+	static const QStringList knownServers = QStringList()
 		<< "jabbim.com" << "jabber.ru" << "xmpp.ru" << "jabber.cz" << "jabberpl.org"
 		<< "richim.org" << "linuxlovers.at" << "palita.net" << "creep.im" << "draugr.de"
 		<< "jabbim.pl" << "jabbim.cz" << "jabbim.hu"  << "jabbim.sk" << "jabster.pl"
@@ -804,7 +801,7 @@ RegisterRequestPage::RegisterRequestPage(QWidget *AParent) : QWizardPage(AParent
 	FXmppStream = NULL;
 	FReinitialize = false;
 	dfwRegisterForm = NULL;
-	FRegisterId = QString::null;
+	FRegisterId = QString();
 
 	lblCaption = new QLabel(this);
 	lblCaption->setAlignment(Qt::AlignCenter);
@@ -967,7 +964,7 @@ void RegisterRequestPage::setRegisterId(const QString &AId)
 
 QString RegisterRequestPage::accountNode() const
 {
-	return FXmppStream!=NULL ? FXmppStream->streamJid().node() : QString::null;
+	return FXmppStream!=NULL ? FXmppStream->streamJid().node() : QString();
 }
 
 void RegisterRequestPage::setAccountNode(const QString &ANode)
@@ -977,7 +974,7 @@ void RegisterRequestPage::setAccountNode(const QString &ANode)
 
 QString RegisterRequestPage::accountPassword() const
 {
-	return FXmppStream!=NULL ? FXmppStream->password() : QString::null;
+	return FXmppStream!=NULL ? FXmppStream->password() : QString();
 }
 
 void RegisterRequestPage::setAccountPassword(const QString &APassword)

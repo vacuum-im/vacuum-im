@@ -47,7 +47,7 @@ public:
 	virtual void loadRosterItems(const QString &AFileName);
 	//Operations  on subscription
 	virtual QSet<Jid> subscriptionRequests() const;
-	virtual void sendSubscription(const Jid &AItemJid, int AType, const QString &AText = QString::null);
+	virtual void sendSubscription(const Jid &AItemJid, int AType, const QString &AText = QString());
 	//Operations on items
 	virtual void renameItem(const Jid &AItemJid, const QString &AName);
 	virtual void copyItemToGroup(const Jid &AItemJid, const QString &AGroupTo);

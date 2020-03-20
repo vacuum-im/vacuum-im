@@ -59,7 +59,7 @@ void DatabaseSynchronizer::run()
 			IArchiveRequest loadRequest;
 			QHash<Jid, QList<QString> > databaseHeadersMap;
 			QHash<QString, DatabaseArchiveHeader> databaseFileHeaders;
-			DatabaseTaskLoadHeaders *loadTask = new DatabaseTaskLoadHeaders(streamJid,loadRequest,QString::null);
+			DatabaseTaskLoadHeaders *loadTask = new DatabaseTaskLoadHeaders(streamJid,loadRequest,QString());
 			if (!FDatabaseWorker->execTask(loadTask))
 			{
 				syncFailed = true;
@@ -87,7 +87,7 @@ void DatabaseSynchronizer::run()
 			while (!FQuit && !syncFailed && bareIt.hasNext())
 			{
 				QDirIterator filesIt(bareIt.next(), QDir::Files, QDirIterator::Subdirectories);
-				
+
 				Jid bareWith = Jid::decode(bareIt.fileName());
 				bool isGated = bareWith.pDomain().endsWith(".gateway");
 				int pathLength = bareIt.filePath().length()-bareIt.fileName().length();
@@ -129,7 +129,7 @@ void DatabaseSynchronizer::run()
 				QList<IArchiveHeader> oldHeaders;
 
 				QList<IArchiveHeader> &fileHeaders = it.value();
-				qSort(fileHeaders.begin(),fileHeaders.end());
+				std::sort(fileHeaders.begin(),fileHeaders.end());
 
 				QList<IArchiveHeader> databaseHeaders;
 				foreach(const QString &fileName, databaseHeadersMap.take(with))
@@ -138,7 +138,7 @@ void DatabaseSynchronizer::run()
 					if (dbHeaderIt != databaseFileHeaders.constEnd())
 						databaseHeaders.append(dbHeaderIt.value());
 				}
-				qSort(databaseHeaders.begin(),databaseHeaders.end());
+				std::sort(databaseHeaders.begin(),databaseHeaders.end());
 
 				if (databaseHeaders.isEmpty())
 				{
@@ -180,7 +180,7 @@ void DatabaseSynchronizer::run()
 
 				if (!syncFailed && !newHeaders.isEmpty())
 				{
-					QString gateType = with.hasNode() ? FFileArchive->contactGateType(with) : QString::null;
+					QString gateType = with.hasNode() ? FFileArchive->contactGateType(with) : QString();
 					DatabaseTaskInsertHeaders *insertTask = new DatabaseTaskInsertHeaders(streamJid,newHeaders,gateType);
 					if (!FDatabaseWorker->execTask(insertTask))
 					{

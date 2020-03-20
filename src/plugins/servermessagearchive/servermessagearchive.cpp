@@ -106,12 +106,12 @@ void ServerMessageArchive::stanzaRequestResult(const Jid &AStreamJid, const Stan
 				header.subject = chatElem.attribute("subject");
 				header.threadId = chatElem.attribute("thread");
 				header.version = chatElem.attribute("version").toInt();
-				
+
 				if (checkRequestHeader(header,request))
 					headers.append(header);
 				else
 					skipHeadersCount++;
-				
+
 				chatElem = chatElem.nextSiblingElement("chat");
 			}
 
@@ -119,9 +119,9 @@ void ServerMessageArchive::stanzaRequestResult(const Jid &AStreamJid, const Stan
 				LOG_STRM_WARNING(AStreamJid,QString("Received %1 headers not matching the request, id=%2").arg(skipHeadersCount).arg(AStanza.id()));
 
 			if (request.order == Qt::AscendingOrder)
-				qSort(headers.begin(),headers.end(),qLess<IArchiveHeader>());
+				std::sort(headers.begin(),headers.end(),qLess<IArchiveHeader>());
 			else
-				qSort(headers.begin(),headers.end(),qGreater<IArchiveHeader>());
+				std::sort(headers.begin(),headers.end(),qGreater<IArchiveHeader>());
 
 			if ((quint32)headers.count() > request.maxItems)
 				headers = headers.mid(0,request.maxItems);
@@ -142,13 +142,13 @@ void ServerMessageArchive::stanzaRequestResult(const Jid &AStreamJid, const Stan
 		if (AStanza.isResult())
 		{
 			LOG_STRM_DEBUG(AStreamJid,QString("Collection saved, id=%1").arg(AStanza.id()));
-			
+
 			QDomElement chatElem = AStanza.firstElement("save").firstChildElement("chat");
 			request.collection.header.engineId = engineId();
 			request.collection.header.subject = chatElem.attribute("subject",request.collection.header.subject);
 			request.collection.header.threadId = chatElem.attribute("thread",request.collection.header.threadId);
 			request.collection.header.version = chatElem.attribute("version",QString::number(request.collection.header.version)).toInt();
-			
+
 			emit serverCollectionSaved(AStanza.id(),request.collection,request.nextRef);
 		}
 		else
@@ -164,7 +164,7 @@ void ServerMessageArchive::stanzaRequestResult(const Jid &AStreamJid, const Stan
 		if (AStanza.isResult())
 		{
 			LOG_STRM_DEBUG(AStreamJid,QString("Collection loaded, id=%1").arg(AStanza.id()));
-			
+
 			IArchiveCollection collection;
 			QDomElement chatElem = AStanza.firstElement("chat");
 			FArchiver->elementToCollection(AStreamJid,chatElem,collection);
@@ -331,7 +331,7 @@ QString ServerMessageArchive::saveCollection(const Jid &AStreamJid, const IArchi
 		FLocalSaveCollectionRequests.insert(id,request);
 		return request.id;
 	}
-	return QString::null;
+	return QString();
 }
 
 QString ServerMessageArchive::loadHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest)
@@ -346,7 +346,7 @@ QString ServerMessageArchive::loadHeaders(const Jid &AStreamJid, const IArchiveR
 		FLocalLoadHeadersRequests.insert(id,request);
 		return request.id;
 	}
-	return QString::null;
+	return QString();
 }
 
 QString ServerMessageArchive::loadCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader)
@@ -361,7 +361,7 @@ QString ServerMessageArchive::loadCollection(const Jid &AStreamJid, const IArchi
 		FLocalLoadCollectionRequests.insert(id,request);
 		return request.id;
 	}
-	return QString::null;
+	return QString();
 }
 
 QString ServerMessageArchive::removeCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest)
@@ -398,7 +398,7 @@ QString ServerMessageArchive::removeCollections(const Jid &AStreamJid, const IAr
 	{
 		LOG_STRM_ERROR(AStreamJid,"Failed to remove collections: Not capable");
 	}
-	return QString::null;
+	return QString();
 }
 
 QString ServerMessageArchive::loadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &ANextRef)
@@ -414,7 +414,7 @@ QString ServerMessageArchive::loadModifications(const Jid &AStreamJid, const QDa
 		FLocalLoadModificationsRequests.insert(id,request);
 		return request.id;
 	}
-	return QString::null;
+	return QString();
 }
 
 QString ServerMessageArchive::loadServerHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest, const QString &ANextRef)
@@ -434,7 +434,7 @@ QString ServerMessageArchive::loadServerHeaders(const Jid &AStreamJid, const IAr
 		if (ARequest.end.isValid())
 			listElem.setAttribute("end",DateTime(ARequest.end).toX85UTC());
 		insertResultSetRequest(listElem,ANextRef,MAX_HEADER_ITEMS,ARequest.maxItems,ARequest.order);
-		
+
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,ARCHIVE_REQUEST_TIMEOUT))
 		{
 			LOG_STRM_DEBUG(AStreamJid,QString("Load headers request sent, id=%1, nextref=%2").arg(stanza.id(),ANextRef));
@@ -450,7 +450,7 @@ QString ServerMessageArchive::loadServerHeaders(const Jid &AStreamJid, const IAr
 	{
 		LOG_STRM_ERROR(AStreamJid,"Failed to load headers: Not capable");
 	}
-	return QString::null;
+	return QString();
 }
 
 QString ServerMessageArchive::saveServerCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection, const QString &ANextRef)
@@ -536,7 +536,7 @@ QString ServerMessageArchive::saveServerCollection(const Jid &AStreamJid, const 
 	{
 		REPORT_ERROR("Failed to save collection: Invalid params");
 	}
-	return QString::null;
+	return QString();
 }
 
 QString ServerMessageArchive::loadServerCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &ANextRef)
@@ -570,7 +570,7 @@ QString ServerMessageArchive::loadServerCollection(const Jid &AStreamJid, const 
 	{
 		REPORT_ERROR("Failed to load collection: Invalid params");
 	}
-	return QString::null;
+	return QString();
 }
 
 QString ServerMessageArchive::loadServerModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &ANextRef)
@@ -583,7 +583,7 @@ QString ServerMessageArchive::loadServerModifications(const Jid &AStreamJid, con
 		QDomElement modifyElem = stanza.addElement("modified",FNamespaces.value(AStreamJid));
 		modifyElem.setAttribute("start",DateTime(AStart).toX85UTC());
 		insertResultSetRequest(modifyElem,ANextRef,MAX_MODIFICATION_ITEMS,ACount);
-		
+
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,ARCHIVE_REQUEST_TIMEOUT))
 		{
 			LOG_STRM_DEBUG(AStreamJid,QString("Load server modifications request sent, id=%1, nextref=%2").arg(stanza.id(),ANextRef));
@@ -604,7 +604,7 @@ QString ServerMessageArchive::loadServerModifications(const Jid &AStreamJid, con
 	{
 		REPORT_ERROR("Failed to load modifications: Invalid params");
 	}
-	return QString::null;
+	return QString();
 }
 
 ResultSet ServerMessageArchive::readResultSetAnswer(const QDomElement &AElem) const

@@ -204,10 +204,10 @@ bool Presence::setPresence(int AShow, const QString &AStatus, int APriority)
 			showText = PRESENCE_SHOW_XA;
 			break;
 		case IPresence::Invisible:
-			showText = QString::null;
+			showText = QString();
 			break;
 		case IPresence::Offline:
-			showText = QString::null;
+			showText = QString();
 			break;
 		default:
 			REPORT_ERROR(QString("Failed to set presence: Invalid show=%1").arg(AShow));
@@ -310,10 +310,10 @@ bool Presence::sendPresence(const Jid &AContactJid, int AShow, const QString &AS
 			showText = PRESENCE_SHOW_XA;
 			break;
 		case IPresence::Invisible:
-			showText = QString::null;
+			showText = QString();
 			break;
 		case IPresence::Offline:
-			showText = QString::null;
+			showText = QString();
 			break;
 		default:
 			REPORT_ERROR(QString("Failed to send presence: Invalid show=%1").arg(AShow));
@@ -404,7 +404,7 @@ void Presence::clearPresenceItems()
 		{
 			IPresenceItem before = fullIt.value();
 			fullIt->priority = 0;
-			fullIt->status = QString::null;
+			fullIt->status = QString();
 			fullIt->show = IPresence::Offline;
 			emit itemReceived(fullIt.value(),before);
 		}

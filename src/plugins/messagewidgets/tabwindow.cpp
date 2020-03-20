@@ -118,7 +118,7 @@ QString TabWindow::centralPageCaption() const
 	IMessageTabPage *page = currentTabPage();
 	if (page)
 		return page->tabPageCaption();
-	return QString::null;
+	return QString();
 }
 
 void TabWindow::showWindow()
@@ -271,17 +271,13 @@ void TabWindow::removeTabPage(IMessageTabPage *APage)
 
 void TabWindow::createActions()
 {
-	QSignalMapper *tabMapper = new QSignalMapper(this);
 	for (int tabNumber=1; tabNumber<=10; tabNumber++)
 	{
 		Action *action = new Action(this);
 		action->setShortcutId(QString(SCT_TABWINDOW_QUICKTAB).arg(tabNumber));
 		FMenuButton->addAction(action);
-
-		tabMapper->setMapping(action, tabNumber-1); // QTabWidget's indices are 0-based
-		connect(action, SIGNAL(triggered()), tabMapper, SLOT(map()));
+		connect(action, &Action::triggered, [=]() { ui.twtTabs->setCurrentIndex(tabNumber-1); });
 	}
-	connect(tabMapper, SIGNAL(mapped(int)), ui.twtTabs, SLOT(setCurrentIndex(int)));
 
 	FNextTab = new Action(FWindowMenu);
 	FNextTab->setText(tr("Next Tab"));

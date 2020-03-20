@@ -281,7 +281,7 @@ QVariant VCardManager::rosterData(int AOrder, const IRosterIndex *AIndex, int AR
 
 			delete vcard;
 
-			strings.removeAll(QString::null);
+			strings.removeAll(QString());
 			FSearchStrings.insert(contactJid, strings);
 
 			return strings;

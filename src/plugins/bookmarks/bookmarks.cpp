@@ -145,7 +145,7 @@ bool Bookmarks::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 		if (rostersViewPlugin)
 		{
 			FRostersView = rostersViewPlugin->rostersView();
-			connect(FRostersView->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)), 
+			connect(FRostersView->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)),
 				SLOT(onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
 			connect(FRostersView->instance(), SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32 , Menu *)),
 				SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32 , Menu *)));
@@ -282,7 +282,7 @@ bool Bookmarks::setModelData(const AdvancedItemDelegate *ADelegate, QWidget *AEd
 
 		Jid streamJid = AIndex.data(RDR_STREAM_JID).toString();
 		QList<IBookmark> bookmarkList = FBookmarks.value(streamJid);
-		
+
 		int index = bookmarkList.indexOf(bookmark);
 		if (index >= 0)
 		{
@@ -575,7 +575,7 @@ QList<IBookmark> Bookmarks::loadBookmarksFromXML(const QDomElement &AElement) co
 			bookmark.room.password = elem.firstChildElement("password").text();
 			bookmark.room.autojoin = QVariant(elem.attribute("autojoin")).toBool();
 			bookmark.name = bookmark.name.isEmpty() ? bookmark.room.roomJid.uBare() : bookmark.name;
-			
+
 			if (!bookmark.isValid())
 				LOG_WARNING(QString("Skipped invalid conference bookmark, name=%1").arg(bookmark.name));
 			else if (bookmarkList.contains(bookmark))
@@ -753,7 +753,7 @@ void Bookmarks::onPrivateStorageClosed(const Jid &AStreamJid)
 	updateRoomIndexes(AStreamJid);
 	updateMultiChatWindows(AStreamJid);
 	FRoomIndexes.remove(AStreamJid);
-	
+
 	emit bookmarksClosed(AStreamJid);
 }
 
@@ -1071,9 +1071,9 @@ void Bookmarks::onDiscoWindowAddBookmarkActionTriggered(bool)
 			{
 				IBookmark bookmark = ref;
 				bookmark.name = "XMPP: ";
-				bookmark.name += !discoName.isEmpty() ? discoName + " | " : QString::null;
+				bookmark.name += !discoName.isEmpty() ? discoName + " | " : QString();
 				bookmark.name += discoJid;
-				bookmark.name += !discoNode.isEmpty() ? " | " + discoNode : QString::null;
+				bookmark.name += !discoNode.isEmpty() ? " | " + discoNode : QString();
 
 				index = bookmarkList.count();
 				bookmarkList.append(bookmark);

@@ -71,7 +71,7 @@ public:
 	virtual IOptionsDialogNode optionsDialogNode(const QString &ANodeId) const =0;
 	virtual void insertOptionsDialogNode(const IOptionsDialogNode &ANode) =0;
 	virtual void removeOptionsDialogNode(const QString &ANodeId) =0;
-	virtual QDialog *showOptionsDialog(const QString &ANodeId = QString::null, const QString &ARootId = QString::null, QWidget *AParent = NULL) =0;
+	virtual QDialog *showOptionsDialog(const QString &ANodeId = QString(), const QString &ARootId = QString(), QWidget *AParent = NULL) =0;
 	// OptionsDialogWidgets
 	virtual IOptionsDialogWidget *newOptionsDialogHeader(const QString &ACaption, QWidget *AParent) const =0;
 	virtual IOptionsDialogWidget *newOptionsDialogWidget(const OptionsNode &ANode, const QString &ACaption, QWidget *AParent) const =0;

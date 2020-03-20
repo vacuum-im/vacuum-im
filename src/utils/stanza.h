@@ -58,18 +58,18 @@ public:
 	QString lang() const;
 	Stanza &setLang(const QString &ALang);
 	bool hasAttribute(const QString &AName) const;
-	QString attribute(const QString &AName, const QString &ADefault=QString::null) const;
+	QString attribute(const QString &AName, const QString &ADefault=QString()) const;
 	Stanza &setAttribute(const QString &AName, const QString &AValue);
-	QDomElement firstElement(const QString &ATagName=QString::null, const QString &ANamespace=QString::null) const;
-	QDomElement addElement(const QString &AName, const QString &ANamespace=QString::null);
-	QDomElement createElement(const QString &AName, const QString &ANamespace=QString::null);
+	QDomElement firstElement(const QString &ATagName=QString(), const QString &ANamespace=QString()) const;
+	QDomElement addElement(const QString &AName, const QString &ANamespace=QString());
+	QDomElement createElement(const QString &AName, const QString &ANamespace=QString());
 	QDomText createTextNode(const QString &AData);
 	QString toString(int AIndent = 1) const;
 	QByteArray toByteArray() const;
 public:
 	static bool isValidXmlChar(quint32 ACode);
 	static QString replaceInvalidXmlChars(QString &AXml, const QChar &AWithChar='?');
-	static QDomElement findElement(const QDomElement &AParent, const QString &ATagName=QString::null, const QString &ANamespace=QString::null);
+	static QDomElement findElement(const QDomElement &AParent, const QString &ATagName=QString(), const QString &ANamespace=QString());
 private:
 	QSharedDataPointer<StanzaData> d;
 };

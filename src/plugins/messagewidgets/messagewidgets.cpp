@@ -82,13 +82,13 @@ bool MessageWidgets::initObjects()
 	Shortcuts::declareShortcut(SCT_TABWINDOW_DETACHTAB, tr("Detach tab to separate window"), QKeySequence::UnknownKey);
 	Shortcuts::declareShortcut(SCT_TABWINDOW_NEXTTAB, tr("Next tab"), QKeySequence::NextChild);
 	Shortcuts::declareShortcut(SCT_TABWINDOW_PREVTAB, tr("Previous tab"), QKeySequence::PreviousChild);
-	Shortcuts::declareShortcut(SCT_TABWINDOW_CLOSEWINDOW, QString::null, tr("Esc","Close tab window"));
+	Shortcuts::declareShortcut(SCT_TABWINDOW_CLOSEWINDOW, QString(), tr("Esc","Close tab window"));
 
 	for (int tabNumber=1; tabNumber<=10; tabNumber++)
-		Shortcuts::declareShortcut(QString(SCT_TABWINDOW_QUICKTAB).arg(tabNumber), QString::null, tr("Alt+%1","Show tab").arg(tabNumber % 10));
+		Shortcuts::declareShortcut(QString(SCT_TABWINDOW_QUICKTAB).arg(tabNumber), QString(), tr("Alt+%1","Show tab").arg(tabNumber % 10));
 
 	Shortcuts::declareGroup(SCTG_MESSAGEWINDOWS, tr("Message windows"), SGO_MESSAGEWINDOWS);
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_CLOSEWINDOW, QString::null, tr("Esc","Close message window"));
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_CLOSEWINDOW, QString(), tr("Esc","Close message window"));
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_QUOTE, tr("Quote selected text"), tr("Ctrl+Q","Quote selected text"));
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_EDITNEXTMESSAGE, tr("Edit next message"), tr("Ctrl+Down","Edit next message"), Shortcuts::WidgetShortcut);
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_EDITPREVMESSAGE, tr("Edit previous message"), tr("Ctrl+Up","Edit previous message"), Shortcuts::WidgetShortcut);

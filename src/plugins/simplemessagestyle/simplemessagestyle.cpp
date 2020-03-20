@@ -33,7 +33,7 @@ static const char *SenderColors[] =  {
 };
 static int SenderColorsCount = sizeof(SenderColors)/sizeof(SenderColors[0]);
 
-QString SimpleMessageStyle::FSharedPath = QString::null;
+QString SimpleMessageStyle::FSharedPath = QString();
 
 SimpleMessageStyle::SimpleMessageStyle(const QString &AStylePath, QNetworkAccessManager *ANetworkAccessManager, QObject *AParent) : QObject(AParent)
 {
@@ -139,7 +139,7 @@ bool SimpleMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOpti
 		{
 			WidgetStatus &wstatus = FWidgetStatus[view];
 			wstatus.lastKind = -1;
-			wstatus.lastId = QString::null;
+			wstatus.lastId = QString();
 			wstatus.lastTime = QDateTime();
 			wstatus.scrollStarted = false;
 			wstatus.content.clear();
@@ -326,15 +326,15 @@ void SimpleMessageStyle::initStyleSettings()
 
 void SimpleMessageStyle::loadTemplates()
 {
-	FIn_ContentHTML =      loadFileData(FStylePath+"/Incoming/Content.html",QString::null);
+	FIn_ContentHTML =      loadFileData(FStylePath+"/Incoming/Content.html",QString());
 	FIn_NextContentHTML =  loadFileData(FStylePath+"/Incoming/NextContent.html",FIn_ContentHTML);
 
 	FOut_ContentHTML =     loadFileData(FStylePath+"/Outgoing/Content.html",FIn_ContentHTML);
 	FOut_NextContentHTML = loadFileData(FStylePath+"/Outgoing/NextContent.html",FOut_ContentHTML);
 
-	FTopicHTML =           loadFileData(FStylePath+"/Topic.html",QString::null);
+	FTopicHTML =           loadFileData(FStylePath+"/Topic.html",QString());
 	FStatusHTML =          loadFileData(FStylePath+"/Status.html",FIn_ContentHTML);
-	FMeCommandHTML =       loadFileData(FStylePath+"/MeCommand.html",QString::null);
+	FMeCommandHTML =       loadFileData(FStylePath+"/MeCommand.html",QString());
 }
 
 void SimpleMessageStyle::loadSenderColors()
@@ -364,7 +364,7 @@ QString SimpleMessageStyle::makeStyleTemplate() const
 	QString htmlFileName = FStylePath+"/Template.html";
 	if (!QFile::exists(htmlFileName))
 		htmlFileName =FSharedPath+"/Template.html";
-	return loadFileData(htmlFileName,QString::null);;
+	return loadFileData(htmlFileName,QString());;
 }
 
 void SimpleMessageStyle::fillStyleKeywords(QString &AHtml, const IMessageStyleOptions &AOptions) const
@@ -389,7 +389,7 @@ void SimpleMessageStyle::setVariant(StyleViewer *AView, const QString &AVariant)
 {
 	QString variantName = !FVariants.contains(AVariant) ? FInfo.value(MSIV_DEFAULT_VARIANT,"main").toString() : AVariant;
 	QString variantFile = QString("Variants/%1.css").arg(variantName);
-	AView->document()->setDefaultStyleSheet(loadFileData(FStylePath+"/"+variantFile,QString::null));
+	AView->document()->setDefaultStyleSheet(loadFileData(FStylePath+"/"+variantFile,QString()));
 }
 
 bool SimpleMessageStyle::isConsecutive(const IMessageStyleContentOptions &AOptions, const WidgetStatus &AStatus) const
@@ -534,7 +534,7 @@ void SimpleMessageStyle::fillContentKeywords(QString &AHtml, const IMessageStyle
 	AHtml.replace("%senderColor%",senderColor);
 
 	AHtml.replace("%sender%",AOptions.senderName);
-	AHtml.replace("%senderScreenName%", QString::null);
+	AHtml.replace("%senderScreenName%", QString());
 	AHtml.replace("%textbackgroundcolor%",!AOptions.textBGColor.isEmpty() ? AOptions.textBGColor : "inherit");
 }
 

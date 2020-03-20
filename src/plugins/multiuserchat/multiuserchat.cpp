@@ -77,7 +77,7 @@ MultiUserChat::MultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const Q
 
 MultiUserChat::~MultiUserChat()
 {
-	abortConnection(QString::null,false);
+	abortConnection(QString(),false);
 	
 	if (FStanzaProcessor)
 	{
@@ -778,7 +778,7 @@ QString MultiUserChat::loadAffiliationList(const QString &AAffiliation)
 	{
 		REPORT_ERROR("Failed to load affiliation list: Affiliation is none");
 	}
-	return QString::null;
+	return QString();
 }
 
 QString MultiUserChat::updateAffiliationList(const QList<IMultiUserListItem> &AItems)
@@ -813,7 +813,7 @@ QString MultiUserChat::updateAffiliationList(const QList<IMultiUserListItem> &AI
 	{
 		LOG_STRM_WARNING(FStreamJid,QString("Failed to update affiliation list, room=%1: Conference is closed").arg(FRoomJid.bare()));
 	}
-	return QString::null;
+	return QString();
 }
 
 QString MultiUserChat::setUserRole(const QString &ANick, const QString &ARole, const QString &AReason)
@@ -853,7 +853,7 @@ QString MultiUserChat::setUserRole(const QString &ANick, const QString &ARole, c
 	{
 		LOG_STRM_WARNING(FStreamJid,QString("Failed to change user role, nick=%1, room=%2: Conference is closed").arg(ANick,FRoomJid.bare()));
 	}
-	return QString::null;
+	return QString();
 }
 
 QString MultiUserChat::setUserAffiliation(const QString &ANick, const QString &AAffiliation, const QString &AReason)
@@ -896,7 +896,7 @@ QString MultiUserChat::setUserAffiliation(const QString &ANick, const QString &A
 	{
 		LOG_STRM_WARNING(FStreamJid,QString("Failed to change user affiliation, nick=%1, room=%2: Conference is closed").arg(ANick,FRoomJid.bare()));
 	}
-	return QString::null;
+	return QString();
 }
 
 QString MultiUserChat::loadRoomConfig()
@@ -922,7 +922,7 @@ QString MultiUserChat::loadRoomConfig()
 	{
 		LOG_STRM_WARNING(FStreamJid,QString("Failed to load conference configuration, room=%1: Conference is closed").arg(FRoomJid.bare()));
 	}
-	return QString::null;
+	return QString();
 }
 
 QString MultiUserChat::updateRoomConfig(const IDataForm &AForm)
@@ -950,7 +950,7 @@ QString MultiUserChat::updateRoomConfig(const IDataForm &AForm)
 	{
 		LOG_STRM_WARNING(FStreamJid,QString("Failed to update conference configuration, room=%1: Conference is closed").arg(FRoomJid.bare()));
 	}
-	return QString::null;
+	return QString();
 }
 
 QString MultiUserChat::destroyRoom(const QString &AReason)
@@ -982,7 +982,7 @@ QString MultiUserChat::destroyRoom(const QString &AReason)
 		LOG_STRM_WARNING(FStreamJid,QString("Failed to destroy conference, room=%1: Conference is closed").arg(FRoomJid.bare()));
 	}
 
-	return QString::null;
+	return QString();
 }
 
 void MultiUserChat::setState(ChatState AState)
@@ -1222,7 +1222,7 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 		{
 			QString reason = xelem.firstChildElement("destroy").firstChildElement("reason").text();
 			LOG_STRM_INFO(FStreamJid,QString("Conference was destroyed by owner, room=%1: %2").arg(FRoomJid.bare(),reason));
-			emit roomDestroyed(QString::null,reason);
+			emit roomDestroyed(QString(),reason);
 		}
 
 		if (applyPresence)
@@ -1357,8 +1357,8 @@ void MultiUserChat::onDiscoveryInfoReceived(const IDiscoInfo &AInfo)
 {
 	if (AInfo.streamJid==streamJid() && AInfo.contactJid==roomJid())
 	{
-		int index = FDiscovery->findIdentity(AInfo.identity,DIC_CONFERENCE,QString::null);
-		QString name = index>=0 ? AInfo.identity.at(index).name : QString::null;
+		int index = FDiscovery->findIdentity(AInfo.identity,DIC_CONFERENCE,QString());
+		QString name = index>=0 ? AInfo.identity.at(index).name : QString();
 		if (!name.isEmpty() && FRoomTitle!=name)
 		{
 			FRoomTitle = name;

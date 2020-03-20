@@ -93,7 +93,7 @@ void SimpleOptionsWidget::updateOptionsWidgets()
 	ui.lneFont->setText(QString("%1 %2").arg(fontFamily).arg(fontSize));
 
 	QFileInfo fileInfo(FStyleOptions.extended.value(MSO_BG_IMAGE_FILE).toString());
-	ui.lneImage->setText(fileInfo.isFile() ? fileInfo.fileName() : QString::null);
+	ui.lneImage->setText(fileInfo.isFile() ? fileInfo.fileName() : QString());
 }
 
 void SimpleOptionsWidget::onVariantChanged(int AIndex)
@@ -133,7 +133,7 @@ void SimpleOptionsWidget::onColorChanged(int AIndex)
 
 void SimpleOptionsWidget::onImageChangeClicked()
 {
-	QString fileName = QFileDialog::getOpenFileName(this, tr("Select background image"),QString::null,tr("Image Files (*.png *.jpg *.bmp *.gif)"));
+	QString fileName = QFileDialog::getOpenFileName(this, tr("Select background image"),QString(),tr("Image Files (*.png *.jpg *.bmp *.gif)"));
 	if (!fileName.isEmpty())
 	{
 		FStyleOptions.extended.insert(MSO_BG_IMAGE_FILE,fileName);

@@ -243,7 +243,7 @@ void AccountsOptionsWidget::onRemoveButtonClicked(const QUuid &AAccountId)
 void AccountsOptionsWidget::onSettingsButtonClicked(const QUuid &AAccountId)
 {
 	QString rootId = OPN_ACCOUNTS"."+AAccountId.toString();
-	FOptionsManager->showOptionsDialog(QString::null, rootId, window());
+	FOptionsManager->showOptionsDialog(QString(), rootId, window());
 }
 
 void AccountsOptionsWidget::onAccountInserted(IAccount *AAccount)

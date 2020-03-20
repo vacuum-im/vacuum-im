@@ -237,7 +237,7 @@ QString StatusIcons::ruleIconset(const QString &APattern, RuleType ARuleType) co
 	case DefaultRule:
 		return FDefaultRules.value(APattern,FDefaultStorage!=NULL ? FDefaultStorage->subStorage() : FILE_STORAGE_SHARED_DIR);
 	}
-	return QString::null;
+	return QString();
 }
 
 void StatusIcons::insertRule(const QString &APattern, const QString &ASubStorage, RuleType ARuleType)
@@ -405,7 +405,7 @@ QString StatusIcons::iconFileName(const Jid &AStreamJid, const Jid &AContactJid)
 QString StatusIcons::iconFileName(const QString &ASubStorage, const QString &AIconKey) const
 {
 	IconStorage *storage = FStorages.value(ASubStorage,FDefaultStorage);
-	return storage!=NULL ? storage->fileFullName(AIconKey) : QString::null;
+	return storage!=NULL ? storage->fileFullName(AIconKey) : QString();
 }
 
 void StatusIcons::loadStorages()

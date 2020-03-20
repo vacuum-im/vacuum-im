@@ -27,7 +27,7 @@ void SortFilterProxyModel::invalidate()
 
 bool SortFilterProxyModel::compareVariant( const QVariant &ALeft, const QVariant &ARight ) const
 {
-	switch (ALeft.userType()) 
+	switch (ALeft.userType())
 	{
 	case QVariant::Invalid:
 		return (ARight.type() != QVariant::Invalid);
@@ -106,7 +106,7 @@ bool SortFilterProxyModel::filterAcceptsRow(int AModelRow, const QModelIndex &AM
 	}
 	else if (rootModel!=NULL && rootModel->isGroupKind(index.data(RDR_KIND).toInt()))
 	{
-		for (int childRow=0; index.child(childRow,0).isValid(); childRow++)
+		for (int childRow=0; sourceModel()->index(childRow,0, index).isValid(); childRow++)
 			if (filterAcceptsRow(childRow,index))
 				return true;
 		return false;
