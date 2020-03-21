@@ -20,14 +20,6 @@
         <translation>Разрешать только доверенные</translation>
     </message>
     <message>
-        <source>SSLv3</source>
-        <translation>SSLv3</translation>
-    </message>
-    <message>
-        <source>SSLv2</source>
-        <translation>SSLv2</translation>
-    </message>
-    <message>
         <source>Auto</source>
         <translation>Автоматически</translation>
     </message>
@@ -42,6 +34,10 @@
     <message>
         <source>TLSv1.2</source>
         <translation>TLSv1.2</translation>
+    </message>
+    <message>
+        <source>TLSv1.3</source>
+        <translation type="unfinished">TLSv1.3</translation>
     </message>
 </context>
 <context>

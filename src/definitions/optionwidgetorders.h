@@ -43,6 +43,7 @@
 
 //Node = ON_ROSTERVIEW
 #define OHO_ROSTER_VIEW                           100
+#define   OWO_ROSTER_MINIMIZE_ON_CLOSE            101
 #define   OWO_ROSTER_SHOWOFFLINE                  110
 #define   OWO_ROSTER_MERGESTREAMS                 120
 #define   OWO_ROSTER_SHOWRESOURCE                 130

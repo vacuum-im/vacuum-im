@@ -4,7 +4,9 @@
 #include <definitions/actiongroups.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
+#include <definitions/optionnodes.h>
 #include <definitions/optionvalues.h>
+#include <definitions/optionwidgetorders.h>
 #include <definitions/shortcuts.h>
 #include <definitions/shortcutgrouporders.h>
 #include <utils/widgetmanager.h>
@@ -56,6 +58,11 @@ bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &AIni
 				SLOT(onTrayNotifyActivated(int,QSystemTrayIcon::ActivationReason)));
 		}
 	}
+	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
+	if (plugin)
+	{
+		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
+	}
 
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 	connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
@@ -86,6 +93,10 @@ bool MainWindowPlugin::initObjects()
 		connect(showRosterAction,SIGNAL(triggered(bool)),SLOT(onShowMainWindowByAction(bool)));
 		FTrayManager->contextMenu()->addAction(showRosterAction,AG_TMTM_MAINWINDOW_SHOW,true);
 	}
+	if (FOptionsManager)
+	{
+		FOptionsManager->insertOptionsDialogHolder(this);
+	}
 
 	return true;
 }
@@ -93,7 +104,18 @@ bool MainWindowPlugin::initObjects()
 bool MainWindowPlugin::initSettings()
 {
 	Options::setDefaultValue(OPV_MAINWINDOW_SHOWONSTART,true);
+	Options::setDefaultValue(OPV_ROSTER_MINIMIZEONCLOSE,false);
 	return true;
+}
+
+QMultiMap<int, IOptionsDialogWidget *> MainWindowPlugin::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
+{
+	QMultiMap<int, IOptionsDialogWidget *> widgets;
+	if (ANodeId == OPN_ROSTERVIEW)
+	{
+		widgets.insertMulti(OWO_ROSTER_MINIMIZE_ON_CLOSE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_MINIMIZEONCLOSE),tr("Minimize roster window instead of closing it"),AParent));
+	}
+	return widgets;
 }
 
 bool MainWindowPlugin::startPlugin()

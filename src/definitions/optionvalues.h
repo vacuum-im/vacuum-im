@@ -204,6 +204,7 @@
 #define OPV_ROSTER_ROOT                                 "roster"
 #define OPV_ROSTER_VIEWMODE                             "roster.view-mode"
 #define OPV_ROSTER_SORTMODE                             "roster.sort-mode"
+#define OPV_ROSTER_MINIMIZEONCLOSE                      "roster.minimize-on-close"
 #define OPV_ROSTER_SHOWOFFLINE                          "roster.show-offline"
 #define OPV_ROSTER_SHOWRESOURCE                         "roster.show-resource"
 #define OPV_ROSTER_HIDESCROLLBAR                        "roster.hide-scrollbar"

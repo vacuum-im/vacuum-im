@@ -3,6 +3,7 @@
 
 #include <QTime>
 #include <interfaces/ipluginmanager.h>
+#include <interfaces/ioptionsmanager.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/itraymanager.h>
 #include "mainwindow.h"
@@ -10,10 +11,11 @@
 class MainWindowPlugin :
 	public QObject,
 	public IPlugin,
-	public IMainWindowPlugin
+	public IMainWindowPlugin,
+	public IOptionsDialogHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IMainWindowPlugin);
+	Q_INTERFACES(IPlugin IMainWindowPlugin IOptionsDialogHolder);
 	Q_PLUGIN_METADATA(IID "org.vacuum-im.plugins.MainWindow");
 public:
 	MainWindowPlugin();
@@ -28,6 +30,8 @@ public:
 	virtual bool startPlugin();
 	//IMainWindowPlugin
 	virtual IMainWindow *mainWindow() const;
+	//IOptionsHolder
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 protected:
 	bool eventFilter(QObject *AWatched, QEvent *AEvent);
 protected slots:
@@ -41,6 +45,7 @@ protected slots:
 private:
 	ITrayManager *FTrayManager;
 	IPluginManager *FPluginManager;
+	IOptionsManager *FOptionsManager;
 private:
 	int FStartShowLoopCount;
 	MainWindow *FMainWindow;

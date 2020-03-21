@@ -50,6 +50,7 @@ protected:
 	void restoreAcceptDrops(QWidget *AParent);
 	void setCentralWidgetVisible(bool AVisible);
 protected:
+	void closeEvent(QCloseEvent *AEvent);
 	void showEvent(QShowEvent *AEvent);
 	bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:

@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 
 #include <QTimer>
+#include <QCloseEvent>
 #include <QResizeEvent>
 #include <QApplication>
 #include <QDesktopWidget>
@@ -87,6 +88,8 @@ MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(A
 
 	FMainMenuBar = new MenuBarChanger(new QMenuBar());
 	setMenuBar(FMainMenuBar->menuBar());
+
+	this->installEventFilter(this);
 
 	updateWindow();
 }
@@ -342,6 +345,17 @@ void MainWindow::showEvent(QShowEvent *AEvent)
 	}
 }
 
+void MainWindow::closeEvent(QCloseEvent *AEvent)
+{
+	if (!Options::isNull())
+	{
+		if (Options::node(OPV_ROSTER_MINIMIZEONCLOSE).value().toBool() && AEvent->spontaneous())
+		{
+			AEvent->ignore();
+			setWindowState(Qt::WindowMinimized);
+		}
+	}
+}
 bool MainWindow::eventFilter(QObject *AObject, QEvent *AEvent)
 {
 	if (AObject == FSplitter)

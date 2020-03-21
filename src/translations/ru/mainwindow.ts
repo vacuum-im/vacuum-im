@@ -24,5 +24,9 @@
         <comment>Close main window</comment>
         <translation>Esc</translation>
     </message>
+    <message>
+        <source>Minimize roster window instead of closing it</source>
+        <translation>Сворачивать окно списка контактов вместо закрытия</translation>
+    </message>
 </context>
 </TS>
