@@ -28,15 +28,16 @@ signals:
 	void featureDestroyed();
 protected:
 	void sendAuthRequest(const QStringList &AMechanisms);
+	void authRequestSCRAM(Stanza &AAuth, const QString AMethod);
 protected slots:
 	void onXmppStreamPasswordProvided(const QString &APassword);
 private:
 	IXmppStream *FXmppStream;
 	QStringList FMechanisms;
 	QString FSelectedMechanism;
-	QByteArray SCRAMSHA1_clientNonce;
-	QByteArray SCRAMSHA1_initialMessage;
-	QByteArray SCRAMSHA1_ServerSignature;
+	QByteArray SCRAMSHA_clientNonce;
+	QByteArray SCRAMSHA_initialMessage;
+	QByteArray SCRAMSHA_ServerSignature;
 };
 
 #endif // SASLAUTHFEATURE_H
