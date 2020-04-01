@@ -17,15 +17,17 @@
 #define AUTH_ANONYMOUS      "ANONYMOUS"
 #define AUTH_DIGEST_MD5     "DIGEST-MD5"
 #define AUTH_SCRAM_SHA1     "SCRAM-SHA-1"
+#define AUTH_SCRAM_SHA224   "SCRAM-SHA-224"
 #define AUTH_SCRAM_SHA256   "SCRAM-SHA-256"
 #define AUTH_SCRAM_SHA384   "SCRAM-SHA-384"
 #define AUTH_SCRAM_SHA512   "SCRAM-SHA-512"
 #define SCRAM_SHA1_DKLEN    20
+#define SCRAM_SHA224_DKLEN  28
 #define SCRAM_SHA256_DKLEN  32
 #define SCRAM_SHA384_DKLEN  48
 #define SCRAM_SHA512_DKLEN  64
 
-static const QStringList SupportedMechanisms = QStringList() << AUTH_SCRAM_SHA512 << AUTH_SCRAM_SHA384 << AUTH_SCRAM_SHA256 << AUTH_SCRAM_SHA1 << AUTH_DIGEST_MD5 << AUTH_PLAIN << AUTH_ANONYMOUS;
+static const QStringList SupportedMechanisms = QStringList() << AUTH_SCRAM_SHA512 << AUTH_SCRAM_SHA384 << AUTH_SCRAM_SHA256 << AUTH_SCRAM_SHA224 << AUTH_SCRAM_SHA1 << AUTH_DIGEST_MD5 << AUTH_PLAIN << AUTH_ANONYMOUS;
 
 static QByteArray deriveKeyPbkdf2(QCryptographicHash::Algorithm algorithm, const QByteArray &password, const QByteArray &salt, int iterations, int dkLen)
 {
@@ -171,7 +173,7 @@ bool SASLAuthFeature::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, in
 
 				responseData = serializeResponse(responseMap);
 			}
-			else if (!challengeMap.value("r").isEmpty())
+			else if (FSelectedMechanism.startsWith("SCRAM-SHA") && SupportedMechanisms.contains(FSelectedMechanism) && !challengeMap.value("r").isEmpty())
 			{
 				QByteArray serverNonce = challengeMap.value("r");
 				if (!serverNonce.startsWith(SCRAMSHA_clientNonce))
@@ -183,12 +185,17 @@ bool SASLAuthFeature::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, in
 				}
 
 				QCryptographicHash::Algorithm method;
-				int len;
+				int len = 0;
 
 				if (FSelectedMechanism == AUTH_SCRAM_SHA1)
 				{
 					method = QCryptographicHash::Sha1;
 					len = SCRAM_SHA1_DKLEN;
+				}
+				else if (FSelectedMechanism == AUTH_SCRAM_SHA224)
+				{
+					method = QCryptographicHash::Sha224;
+					len = SCRAM_SHA224_DKLEN;
 				}
 				else if (FSelectedMechanism == AUTH_SCRAM_SHA256)
 				{
@@ -239,7 +246,7 @@ bool SASLAuthFeature::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, in
 			FXmppStream->removeXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 			if (AStanza.kind() == "success")
 			{
-				if (FSelectedMechanism == AUTH_SCRAM_SHA512 || FSelectedMechanism == AUTH_SCRAM_SHA384 || FSelectedMechanism == AUTH_SCRAM_SHA256 || FSelectedMechanism == AUTH_SCRAM_SHA1 )
+				if (FSelectedMechanism.startsWith("SCRAM-SHA") && SupportedMechanisms.contains(FSelectedMechanism))
 				{
 					QByteArray serverSignature = QByteArray::fromBase64(AStanza.element().text().toLatin1());
 					QByteArray savedServerSignature = QByteArray("v=").append(SCRAMSHA_ServerSignature.toBase64());
@@ -366,6 +373,11 @@ void SASLAuthFeature::sendAuthRequest(const QStringList &AMechanisms)
 	{
 		authRequestSCRAM(auth, AUTH_SCRAM_SHA256);
 		LOG_STRM_INFO(FXmppStream->streamJid(), "SCRAM-SHA-256 authorization request sent");
+	}
+	else if (AMechanisms.contains(AUTH_SCRAM_SHA224))
+	{
+		authRequestSCRAM(auth, AUTH_SCRAM_SHA224);
+		LOG_STRM_INFO(FXmppStream->streamJid(), "SCRAM-SHA-224 authorization request sent");
 	}
 	else if (AMechanisms.contains(AUTH_SCRAM_SHA1))
 	{
