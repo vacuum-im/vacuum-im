@@ -22,6 +22,7 @@ MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(A
 	setIconSize(QSize(16,16));
 
 	FAligned = false;
+	FCentralVisible = false;
 	FLeftWidgetWidth = 0;
 
 	QIcon icon;
@@ -59,7 +60,6 @@ MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(A
 	FSplitter->setCollapsible(1,false);
 	FSplitter->setStretchFactor(1,4);
 
-	FCentralVisible = false;
 	FSplitter->setHandleWidth(0);
 	FCentralWidget->instance()->setVisible(false);
 
