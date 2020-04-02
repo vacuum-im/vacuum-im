@@ -13,6 +13,10 @@
 #include <utils/stanza.h>
 #include <utils/logger.h>
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
+#include <QRandomGenerator>
+#endif
+
 #define AUTH_PLAIN          "PLAIN"
 #define AUTH_ANONYMOUS      "ANONYMOUS"
 #define AUTH_DIGEST_MD5     "DIGEST-MD5"
@@ -154,9 +158,15 @@ bool SASLAuthFeature::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, in
 
 			if (FSelectedMechanism==AUTH_DIGEST_MD5 && !challengeMap.value("nonce").isEmpty())
 			{
-				QByteArray randBytes(32,' ');
-				for (int i=0; i<randBytes.size(); i++)
-					randBytes[i] = static_cast<char>(256.0 * qrand() / (RAND_MAX + 1.0));
+				QByteArray randBytes(32, ' ');
+				for (int i = 0; i < randBytes.size(); i++)
+				{
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
+					randBytes[i] = static_cast<char>(QRandomGenerator::global()->bounded(0, 256));
+#else
+					randBytes[i] = static_cast<char>(static_cast<int>(256.0 * qrand() / (RAND_MAX + 1.0)));
+#endif
+				}
 
 				responseMap["cnonce"] = randBytes.toHex();
 				if (challengeMap.contains("realm"))
@@ -173,7 +183,7 @@ bool SASLAuthFeature::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, in
 
 				responseData = serializeResponse(responseMap);
 			}
-			else if (FSelectedMechanism.startsWith("SCRAM-SHA") && SupportedMechanisms.contains(FSelectedMechanism) && !challengeMap.value("r").isEmpty())
+			else if (FSelectedMechanism.startsWith("SCRAM-SHA") && !challengeMap.value("r").isEmpty())
 			{
 				QByteArray serverNonce = challengeMap.value("r");
 				if (!serverNonce.startsWith(SCRAMSHA_clientNonce))
@@ -184,15 +194,11 @@ bool SASLAuthFeature::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, in
 					return true;
 				}
 
-				QCryptographicHash::Algorithm method;
-				int len = 0;
+				// FSelectedMechanism == AUTH_SCRAM_SHA1
+				QCryptographicHash::Algorithm method = QCryptographicHash::Sha1;
+				int len = SCRAM_SHA1_DKLEN;
 
-				if (FSelectedMechanism == AUTH_SCRAM_SHA1)
-				{
-					method = QCryptographicHash::Sha1;
-					len = SCRAM_SHA1_DKLEN;
-				}
-				else if (FSelectedMechanism == AUTH_SCRAM_SHA224)
+				if (FSelectedMechanism == AUTH_SCRAM_SHA224)
 				{
 					method = QCryptographicHash::Sha224;
 					len = SCRAM_SHA224_DKLEN;
@@ -346,7 +352,13 @@ void SASLAuthFeature::authRequestSCRAM(Stanza &AAuth, const QString AMethod)
 {
 	QByteArray randBytes(32, ' ');
 	for (int i = 0; i < randBytes.size(); i++)
-		randBytes[i] = static_cast<char>(256.0 * qrand() / (RAND_MAX + 1.0));
+	{
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
+		randBytes[i] = static_cast<char>(QRandomGenerator::global()->bounded(0, 256));
+#else
+		randBytes[i] = static_cast<char>(static_cast<int>(256.0 * qrand() / (RAND_MAX + 1.0)));
+#endif
+	}
 	SCRAMSHA_clientNonce = randBytes.toHex();
 
 	QByteArray gs2Header = "n,,"; // TODO: SCRAM-SHA no Channel Binding support yet, base64 "biws"
