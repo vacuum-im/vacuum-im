@@ -1,0 +1,126 @@
+version: '1.3.0 {branch} build {build}'
+
+image: Visual Studio 2017
+
+branches:
+  only:
+  - master
+
+skip_non_tags: true
+
+environment:
+  QTDIR: C:\Qt\5.13.2\msvc2017
+  QTVER: 5.13.2
+
+init:
+  - set PATH=%PATH%;%QTDIR%\bin
+  - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" x86
+  
+install:
+  - curl -O -J -L -s -S http://download.qt.io/official_releases/jom/jom.zip & 7z x *.zip -oC:\jom > nul & del *.zip
+
+before_build:
+  - set
+  - mkdir _build
+  - cd _build
+  - qmake -r ../vacuum.pro CONFIG-=debug CONFIG+=release INSTALL_PREFIX=%APPVEYOR_BUILD_FOLDER%/_output
+
+build_script:
+  - C:\jom\jom.exe /NOLOGO
+  - C:\jom\jom.exe /NOLOGO install
+  
+after_build:
+  - set COPYDESTDIR=%APPVEYOR_BUILD_FOLDER%\_output\vacuum\
+  - copy /Y "C:\OpenSSL-v111-Win32\bin\libcrypto-1_1.dll" %COPYDESTDIR%
+  - copy /Y "C:\OpenSSL-v111-Win32\bin\libssl-1_1.dll" %COPYDESTDIR%
+  - copy /Y "C:\Windows\SysWOW64\D3DCompiler_47.dll" %COPYDESTDIR%
+  - copy /Y "%QTDIR%\bin\libEGL.dll" %COPYDESTDIR%
+  - copy /Y "%QTDIR%\bin\libGLESV2.dll" %COPYDESTDIR%
+  - copy /Y "%QTDIR%\bin\opengl32sw.dll" %COPYDESTDIR%
+  - copy /Y "%QTDIR%\bin\Qt5Core.dll" %COPYDESTDIR%
+  - copy /Y "%QTDIR%\bin\Qt5Gui.dll" %COPYDESTDIR%
+  - copy /Y "%QTDIR%\bin\Qt5Multimedia.dll" %COPYDESTDIR%
+  - copy /Y "%QTDIR%\bin\Qt5Network.dll" %COPYDESTDIR%
+  - copy /Y "%QTDIR%\bin\Qt5PrintSupport.dll" %COPYDESTDIR%
+  - copy /Y "%QTDIR%\bin\Qt5Sql.dll" %COPYDESTDIR%
+  - copy /Y "%QTDIR%\bin\Qt5Svg.dll" %COPYDESTDIR%
+  - copy /Y "%QTDIR%\bin\Qt5Widgets.dll" %COPYDESTDIR%
+  - copy /Y "%QTDIR%\bin\Qt5Xml.dll" %COPYDESTDIR%
+  - copy /Y "%VCToolsRedistDir%\vcredist_x86.exe" %COPYDESTDIR%
+  - mkdir "%COPYDESTDIR%\audio"
+  - copy /Y "%QTDIR%\plugins\audio\qtaudio_wasapi.dll" %COPYDESTDIR%\audio
+  - copy /Y "%QTDIR%\plugins\audio\qtaudio_windows.dll" %COPYDESTDIR%\audio
+  - mkdir "%COPYDESTDIR%\bearer"
+  - copy /Y "%QTDIR%\plugins\bearer\qgenericbearer.dll" %COPYDESTDIR%\bearer
+  - mkdir "%COPYDESTDIR%\iconengines"
+  - copy /Y "%QTDIR%\plugins\iconengines\qsvgicon.dll" %COPYDESTDIR%\iconengines
+  - mkdir "%COPYDESTDIR%\imageformats"
+  - copy /Y "%QTDIR%\plugins\imageformats\qgif.dll" %COPYDESTDIR%\imageformats
+  - copy /Y "%QTDIR%\plugins\imageformats\qicns.dll" %COPYDESTDIR%\imageformats
+  - copy /Y "%QTDIR%\plugins\imageformats\qico.dll" %COPYDESTDIR%\imageformats
+  - copy /Y "%QTDIR%\plugins\imageformats\qjpeg.dll" %COPYDESTDIR%\imageformats
+  - copy /Y "%QTDIR%\plugins\imageformats\qsvg.dll" %COPYDESTDIR%\imageformats
+  - copy /Y "%QTDIR%\plugins\imageformats\qtga.dll" %COPYDESTDIR%\imageformats
+  - copy /Y "%QTDIR%\plugins\imageformats\qtiff.dll" %COPYDESTDIR%\imageformats
+  - copy /Y "%QTDIR%\plugins\imageformats\qwbmp.dll" %COPYDESTDIR%\imageformats
+  - copy /Y "%QTDIR%\plugins\imageformats\qwebp.dll" %COPYDESTDIR%\imageformats
+  - mkdir "%COPYDESTDIR%\mediaservice"
+  - copy /Y "%QTDIR%\plugins\mediaservice\dsengine.dll" %COPYDESTDIR%\mediaservice
+  - copy /Y "%QTDIR%\plugins\mediaservice\qtmedia_audioengine.dll" %COPYDESTDIR%\mediaservice
+  - copy /Y "%QTDIR%\plugins\mediaservice\wmfengine.dll" %COPYDESTDIR%\mediaservice
+  - mkdir "%COPYDESTDIR%\platforms"
+  - copy /Y "%QTDIR%\plugins\platforms\qwindows.dll" %COPYDESTDIR%\platforms
+  - mkdir "%COPYDESTDIR%\printsupport"
+  - copy /Y "%QTDIR%\plugins\printsupport\windowsprintersupport.dll" %COPYDESTDIR%\printsupport
+  - mkdir "%COPYDESTDIR%\sqldrivers"
+  - copy /Y "%QTDIR%\plugins\sqldrivers\qsqlite.dll" %COPYDESTDIR%\sqldrivers
+  - copy /Y "%QTDIR%\plugins\sqldrivers\qsqlodbc.dll" %COPYDESTDIR%\sqldrivers
+  - copy /Y "%QTDIR%\plugins\sqldrivers\qsqlpsql.dll" %COPYDESTDIR%\sqldrivers
+  - mkdir "%COPYDESTDIR%\styles"
+  - copy /Y "%QTDIR%\plugins\styles\qwindowsvistastyle.dll" %COPYDESTDIR%\styles
+# Qt translation files: German
+  - copy /Y "%QTDIR%\translations\qt_de.qm" %COPYDESTDIR%\translations\de
+  - copy /Y "%QTDIR%\translations\qtbase_de.qm" %COPYDESTDIR%\translations\de
+  - copy /Y "%QTDIR%\translations\qtscript_de.qm" %COPYDESTDIR%\translations\de
+  - copy /Y "%QTDIR%\translations\qtmultimedia_de.qm" %COPYDESTDIR%\translations\de
+  - copy /Y "%QTDIR%\translations\qtxmlpatterns_de.qm" %COPYDESTDIR%\translations\de
+# Qt translation files: Spanish
+  - copy /Y "%QTDIR%\translations\qt_es.qm" %COPYDESTDIR%\translations\es
+  - copy /Y "%QTDIR%\translations\qtbase_es.qm" %COPYDESTDIR%\translations\es
+  - copy /Y "%QTDIR%\translations\qtscript_es.qm" %COPYDESTDIR%\translations\es
+  - copy /Y "%QTDIR%\translations\qtmultimedia_es.qm" %COPYDESTDIR%\translations\es
+  - copy /Y "%QTDIR%\translations\qtxmlpatterns_es.qm" %COPYDESTDIR%\translations\es
+# Qt translation files: Polish
+  - copy /Y "%QTDIR%\translations\qt_pl.qm" %COPYDESTDIR%\translations\pl
+  - copy /Y "%QTDIR%\translations\qtbase_pl.qm" %COPYDESTDIR%\translations\pl
+  - copy /Y "%QTDIR%\translations\qtscript_pl.qm" %COPYDESTDIR%\translations\pl
+  - copy /Y "%QTDIR%\translations\qtmultimedia_pl.qm" %COPYDESTDIR%\translations\pl
+  - copy /Y "%QTDIR%\translations\qtxmlpatterns_pl.qm" %COPYDESTDIR%\translations\pl
+# Qt translation files: Russian
+  - copy /Y "%QTDIR%\translations\qt_ru.qm" %COPYDESTDIR%\translations\ru
+  - copy /Y "%QTDIR%\translations\qtbase_ru.qm" %COPYDESTDIR%\translations\ru
+  - copy /Y "%QTDIR%\translations\qtscript_ru.qm" %COPYDESTDIR%\translations\ru
+  - copy /Y "%QTDIR%\translations\qtmultimedia_ru.qm" %COPYDESTDIR%\translations\ru
+  - copy /Y "%QTDIR%\translations\qtxmlpatterns_ru.qm" %COPYDESTDIR%\translations\ru
+# Qt translation files: Ukrainian
+  - copy /Y "%QTDIR%\translations\qt_uk.qm" %COPYDESTDIR%\translations\uk
+  - copy /Y "%QTDIR%\translations\qtbase_uk.qm" %COPYDESTDIR%\translations\uk
+  - copy /Y "%QTDIR%\translations\qtscript_uk.qm" %COPYDESTDIR%\translations\uk
+  - copy /Y "%QTDIR%\translations\qtmultimedia_uk.qm" %COPYDESTDIR%\translations\uk
+  - copy /Y "%QTDIR%\translations\qtxmlpatterns_uk.qm" %COPYDESTDIR%\translations\uk
+
+test: off
+
+artifacts:
+- path: _output\vacuum
+  name: vacuum_%APPVEYOR_REPO_TAG_NAME%_win32-msvc2017_qt%QTVER%
+  type: zip
+
+deploy:
+- provider: GitHub
+  auth_token:
+    secure: k3zIzzwvrsNkisU3j9FgKEiY4ZO+BT1B0uIygbQvSweJnjOOcpmzHqr6bGbCGkAl
+  description: Automated %APPVEYOR_REPO_TAG_NAME% tag build by appveyor.
+  artifact: vacuum_%APPVEYOR_REPO_TAG_NAME%_win32-msvc2017_qt%QTVER%
+  draft: false
+  pre_release: true
