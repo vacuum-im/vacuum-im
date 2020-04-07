@@ -115,12 +115,3 @@ artifacts:
 - path: _output\vacuum
   name: vacuum_%APPVEYOR_REPO_TAG_NAME%_win32-msvc2017_qt%QTVER%
   type: zip
-
-deploy:
-- provider: GitHub
-  auth_token:
-    secure: k3zIzzwvrsNkisU3j9FgKEiY4ZO+BT1B0uIygbQvSweJnjOOcpmzHqr6bGbCGkAl
-  description: Automated %APPVEYOR_REPO_TAG_NAME% tag build by appveyor.
-  artifact: vacuum_%APPVEYOR_REPO_TAG_NAME%_win32-msvc2017_qt%QTVER%
-  draft: false
-  pre_release: true
