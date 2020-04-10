@@ -36,6 +36,7 @@
 RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
 {
 	FRostersModel = NULL;
+	FStartDragFailed = false;
 
 	FPressedPos = QPoint();
 	FPressedIndex = QModelIndex();

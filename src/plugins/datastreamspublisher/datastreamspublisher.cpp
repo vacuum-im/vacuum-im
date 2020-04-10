@@ -11,7 +11,7 @@
 
 DataStreamsPublisher::DataStreamsPublisher()
 {
-
+	FSHIStreamStart = 0;
 }
 
 DataStreamsPublisher::~DataStreamsPublisher()

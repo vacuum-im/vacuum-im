@@ -14,6 +14,9 @@
 DefaultConnection::DefaultConnection(IConnectionEngine *AEngine, QObject *AParent) : QObject(AParent)
 {
 	FEngine = AEngine;
+	FSSLError = false;
+	FUseLegacySSL = false;
+	FVerifyMode = CertificateVerifyMode::Disabled;
 	FDisconnecting = false;
 	
 	FDnsLookup.setType(QDnsLookup::SRV);

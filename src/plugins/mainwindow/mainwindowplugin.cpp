@@ -18,6 +18,7 @@ MainWindowPlugin::MainWindowPlugin()
 {
 	FPluginManager = NULL;
 	FTrayManager = NULL;
+	FOptionsManager = NULL;
 
 	FStartShowLoopCount = 0;
 
