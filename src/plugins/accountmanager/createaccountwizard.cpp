@@ -266,7 +266,7 @@ void WizardStartPage::setWizardMode(int AMode)
 AppendServicePage::AppendServicePage(QWidget *AParent) : QWizardPage(AParent)
 {
 	const struct { int type; QString name; } services[CreateAccountWizard::Service_Count] = {
-		{ CreateAccountWizard::ServiceJabber,        tr("Jabber/XMPP")        },
+		{ CreateAccountWizard::ServiceJabber,        tr("XMPP")        },
 		{ CreateAccountWizard::ServiceGoogle,        tr("Google Talk")        },
 		{ CreateAccountWizard::ServiceYandex,        tr("Yandex Online")      },
 		{ CreateAccountWizard::ServiceOdnoklassniki, tr("Odnoklassniki")      },

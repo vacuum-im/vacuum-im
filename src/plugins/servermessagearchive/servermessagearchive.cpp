@@ -255,7 +255,7 @@ QString ServerMessageArchive::engineName() const
 
 QString ServerMessageArchive::engineDescription() const
 {
-	return tr("History of conversations is stored on your jabber server");
+	return tr("History of conversations is stored on your XMPP server");
 }
 
 IOptionsDialogWidget *ServerMessageArchive::engineSettingsWidget(QWidget *AParent)

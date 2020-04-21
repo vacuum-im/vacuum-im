@@ -1,10 +1,10 @@
 [Desktop Entry]
 Encoding=UTF-8
 Name=Vacuum-IM
-GenericName=Jabber Client
-GenericName[ru]=Jabber клиент
-Comment=Communicate over the Jabber network
-Comment[ru]=Общение в сети Jabber
+GenericName=XMPP Client
+GenericName[ru]=XMPP клиент
+Comment=Communicate over the XMPP network
+Comment[ru]=Общение в сети XMPP
 Exec=vacuum
 Icon=vacuum
 StartupNotify=true

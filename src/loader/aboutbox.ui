@@ -146,7 +146,7 @@
      <item>
       <widget class="QLabel" name="lblSourcePage">
        <property name="text">
-        <string notr="true">&lt;a href='https://github.com/Vacuum-IM'&gt;GitHub&lt;/a&gt;</string>
+        <string notr="true">&lt;a href='https://github.com/vacuum-im'&gt;GitHub&lt;/a&gt;</string>
        </property>
        <property name="textFormat">
         <enum>Qt::RichText</enum>
