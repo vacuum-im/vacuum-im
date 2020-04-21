@@ -382,7 +382,7 @@ void ConsoleWidget::onTextSearchNextClicked()
 void ConsoleWidget::onTextSearchPreviousClicked()
 {
 	QMap<int,QTextEdit::ExtraSelection>::const_iterator it = FSearchResults.lowerBound(ui.tbrConsole->textCursor().position());
-	if (--it != FSearchResults.constEnd())
+	if (it != FSearchResults.constBegin() && --it != FSearchResults.constEnd())
 	{
 		ui.tbrConsole->setTextCursor(it->cursor);
 		ui.tbrConsole->ensureCursorVisible();
