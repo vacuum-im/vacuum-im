@@ -38,7 +38,7 @@ ConnectionManager::~ConnectionManager()
 void ConnectionManager::pluginInfo(IPluginInfo *APluginInfo)
 {
 	APluginInfo->name = tr("Connection Manager");
-	APluginInfo->description = tr("Allows to use different types of connections to a XMPP server");
+	APluginInfo->description = tr("Allows to use different types of connections to an XMPP server");
 	APluginInfo->version = "1.0";
 	APluginInfo->author = "Potapov S.A. aka Lion";
 	APluginInfo->homePage = "http://www.vacuum-im.org";

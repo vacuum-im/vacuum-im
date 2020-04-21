@@ -159,8 +159,8 @@
    <translation>Entity Capabilities</translation>
   </message>
   <message>
-   <source>Allows to receive information about Jabber entities</source>
-   <translation>Allows to receive information about Jabber entities</translation>
+   <source>Allows to receive information about XMPP entities</source>
+   <translation>Allows to receive information about XMPP entities</translation>
   </message>
   <message>
    <source>Supports the exchange of the discovery information and items</source>
@@ -195,8 +195,8 @@
    <translation>Supports the caching of the discovery information</translation>
   </message>
   <message>
-   <source>Supports the displaying of the jabber identifiers with disallowed characters</source>
-   <translation>Supports the displaying of the jabber identifiers with disallowed characters</translation>
+   <source>Supports the displaying of the Jabber ID with disallowed characters</source>
+   <translation>Supports the displaying of the Jabber ID with disallowed characters</translation>
   </message>
  </context>
 </TS>

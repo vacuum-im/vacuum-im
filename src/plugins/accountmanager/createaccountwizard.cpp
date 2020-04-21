@@ -199,7 +199,7 @@ void CreateAccountWizard::accept()
  ******************/
 WizardStartPage::WizardStartPage(QWidget *AParent) : QWizardPage(AParent)
 {
-	setTitle(tr("Add Jabber/XMPP Account"));
+	setTitle(tr("Add XMPP Account"));
 	setSubTitle(tr("This wizard will help you to add an existing account or register a new one"));
 
 	rbtAppendAccount = new QRadioButton(this);

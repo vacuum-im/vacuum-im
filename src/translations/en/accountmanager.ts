@@ -34,8 +34,8 @@
    <translation>Account Manager</translation>
   </message>
   <message>
-   <source>Allows to create and manage Jabber accounts</source>
-   <translation>Allows to create and manage Jabber accounts</translation>
+   <source>Allows to create and manage XMPP accounts</source>
+   <translation>Allows to create and manage XMPP accounts</translation>
   </message>
   <message>
    <source>Common account settings</source>
@@ -174,8 +174,8 @@
  <context>
   <name>AppendServicePage</name>
   <message>
-   <source>Jabber/XMPP</source>
-   <translation>Jabber/XMPP</translation>
+   <source>XMPP</source>
+   <translation>XMPP</translation>
   </message>
   <message>
    <source>Google Talk</source>
@@ -368,8 +368,8 @@
  <context>
   <name>WizardStartPage</name>
   <message>
-   <source>Add Jabber/XMPP Account</source>
-   <translation>Add Jabber/XMPP Account</translation>
+   <source>Add XMPP Account</source>
+   <translation>Add XMPP Account</translation>
   </message>
   <message>
    <source>This wizard will help you to add an existing account or register a new one</source>

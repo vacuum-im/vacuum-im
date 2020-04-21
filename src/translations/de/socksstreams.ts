@@ -2,11 +2,11 @@
 <context>
     <name>SocksOptionsWidgetClass</name>
     <message>
-        <source>Use jabber-proxy on your server</source>
+        <source>Use XMPP-proxy on your server</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Use additional jabber-proxy:</source>
+        <source>Use additional XMPP-proxy:</source>
         <translation type="unfinished"/>
     </message>
     <message>

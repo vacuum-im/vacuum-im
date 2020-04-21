@@ -32,8 +32,8 @@
         <translation>Gestor de cuentas</translation>
     </message>
     <message>
-        <source>Allows to create and manage Jabber accounts</source>
-        <translation>Permite crear y gestionar cuentas de Jabber</translation>
+        <source>Allows to create and manage XMPP accounts</source>
+        <translation>Permite crear y gestionar cuentas de XMPP</translation>
     </message>
     <message>
         <source>Common account settings</source>
@@ -172,8 +172,8 @@
 <context>
     <name>AppendServicePage</name>
     <message>
-        <source>Jabber/XMPP</source>
-        <translation>Jabber/XMPP</translation>
+        <source>XMPP</source>
+        <translation>XMPP</translation>
     </message>
     <message>
         <source>Google Talk</source>
@@ -212,7 +212,7 @@
     </message>
     <message>
         <source>Jabber ID:</source>
-        <translation>ID de Jabber:</translation>
+        <translation>Jabber ID:</translation>
     </message>
     <message>
         <source>Password:</source>
@@ -228,7 +228,7 @@
     </message>
     <message>
         <source>Account with Jabber ID &lt;b&gt;%1&lt;/b&gt; already exists.</source>
-        <translation>Ya existe una cuenta con ID de Jabber &lt;b&gt;%1&lt;/b&gt;.</translation>
+        <translation>Ya existe una cuenta con Jabber ID &lt;b&gt;%1&lt;/b&gt;.</translation>
     </message>
     <message>
         <source>Fill out the account credentials and connection settings</source>
@@ -366,8 +366,8 @@
 <context>
     <name>WizardStartPage</name>
     <message>
-        <source>Add Jabber/XMPP Account</source>
-        <translation>Añadir cuenta Jabber/XMPP</translation>
+        <source>Add XMPP Account</source>
+        <translation>Añadir cuenta XMPP</translation>
     </message>
     <message>
         <source>This wizard will help you to add an existing account or register a new one</source>

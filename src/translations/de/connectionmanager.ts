@@ -6,8 +6,8 @@
         <translation>Verbindungsmanager</translation>
     </message>
     <message>
-        <source>Allows to use different types of connections to a Jabber server</source>
-        <translation>Erlaubt das Benutzen verschiedener Verbindungsarten zu einem Jabber-Server</translation>
+        <source>Allows to use different types of connections to an XMPP server</source>
+        <translation>Erlaubt das Benutzen verschiedener Verbindungsarten zu einem XMPP-Server</translation>
     </message>
     <message>
         <source>&lt;No Proxy&gt;</source>

@@ -72,7 +72,7 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Allows to set a standard TCP connection to Jabber server</source>
+        <source>Allows to set a standard TCP connection to XMPP server</source>
         <translation type="unfinished"/>
     </message>
     <message>
