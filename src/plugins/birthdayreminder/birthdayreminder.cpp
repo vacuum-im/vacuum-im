@@ -287,7 +287,14 @@ void BirthdayReminder::onShowNotificationTimer()
 
 					QDate	birthday = contactBithday(contactJid);
 					int daysLeft = FUpcomingBirthdays.value(contactJid);
-					notify.data.insert(NDR_POPUP_TEXT,daysLeft>0 ? tr("Birthday in %n day(s),\n %1","",daysLeft).arg(birthday.toString(Qt::SystemLocaleLongDate)) : tr("Birthday today!"));
+					QString notifyMessage;
+					if (daysLeft > 1)
+						notifyMessage = tr("Birthday in %n day(s),\n %1","",daysLeft).arg(birthday.toString(Qt::SystemLocaleShortDate));
+					else if (daysLeft == 1)
+						notifyMessage = tr("Birthday tomorrow!");
+					else
+						notifyMessage = tr("Birthday today!");
+					notify.data.insert(NDR_POPUP_TEXT, notifyMessage);
 
 					if (daysLeft == 0)
 						notify.data.insert(NDR_POPUP_TIMEOUT,0);
