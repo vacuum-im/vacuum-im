@@ -551,7 +551,7 @@ bool MultiUserView::event(QEvent *AEvent)
 					if (key == RTTO_AVATAR_IMAGE)
 						avatar.append(toolTipsMap.value(key));
 					else if (key < RTTO_MAXIMUM)
-							text.append("<nobr>").append(toolTipsMap.value(key)).append("</nobr><p/><nbsp>");
+						text.append("<nobr>").append(toolTipsMap.value(key)).append("</nobr><p/><nbsp>");
 					else if (key == RTTO_MAXIMUM)
 						continue;
 				}
