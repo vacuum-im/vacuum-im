@@ -60,6 +60,8 @@ if (UNIX AND NOT APPLE AND NOT HAIKU)
 		DESTINATION "${INSTALL_RES_DIR}/pixmaps")
 	install(FILES "${CMAKE_SOURCE_DIR}/src/packages/linux/vacuum.desktop"
 		DESTINATION "${INSTALL_RES_DIR}/applications")
+    install(FILES "${CMAKE_SOURCE_DIR}/src/packages/linux/vacuum-im.appdata.xml"
+		DESTINATION "${INSTALL_RES_DIR}/appdata")
 endif (UNIX AND NOT APPLE AND NOT HAIKU)
 
 cpack_add_component(${VACUUM_LOADER_NAME}
