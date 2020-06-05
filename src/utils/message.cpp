@@ -234,7 +234,7 @@ QString Message::body(const QString &ALang) const
 Message &Message::setBody(const QString &ABody, const QString &ALang)
 {
 	d->FStanza.detach();
-	addChildByLang(d->FStanza.element(),"body",ALang,ABody);
+	addChildByLang(d->FStanza.element(),"body",ALang,ABody,STANZA_NS_CLIENT);
 	return *this;
 }
 
@@ -298,23 +298,23 @@ QStringList Message::availableLangs(const QDomElement &AParent, const QString &A
 	return langs;
 }
 
-QDomElement Message::findChidByLang(const QDomElement &AParent, const QString &ATagName, const QString &ALang) const
+QDomElement Message::findChidByLang(const QDomElement &AParent, const QString &ATagName, const QString &ALang, const QString &ANamespace) const
 {
 	QString dLang = defLang();
 	QString aLang = ALang.isEmpty() ? dLang : ALang;
 	QDomElement elem = AParent.firstChildElement(ATagName);
-	while (!elem.isNull() && elem.attribute("xml:lang",dLang)!=aLang)
+	while (!elem.isNull() && ((elem.attribute("xml:lang",dLang)!=aLang) || (!ANamespace.isEmpty() && elem.namespaceURI()!=ANamespace)))
 		elem = elem.nextSiblingElement(ATagName);
 	return elem;
 }
 
 // Be sure that d->FStanza.detach() is called before sending AParent element for this function
-QDomElement Message::addChildByLang(const QDomElement &AParent, const QString &ATagName, const QString &ALang, const QString &AText)
+QDomElement Message::addChildByLang(const QDomElement &AParent, const QString &ATagName, const QString &ALang, const QString &AText, const QString &ANamespace)
 {
-	QDomElement elem = findChidByLang(AParent,ATagName,ALang);
+	QDomElement elem = findChidByLang(AParent,ATagName,ALang,ANamespace);
 	if (elem.isNull() && !AText.isEmpty())
 	{
-		elem = d->FStanza.addElement(ATagName);
+		elem = d->FStanza.addElement(ATagName,ANamespace);
 		if (!ALang.isEmpty() && ALang!=defLang())
 			elem.setAttribute("xml:lang",ALang);
 	}
