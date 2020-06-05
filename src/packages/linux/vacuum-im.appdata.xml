@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>vacuum-im</id>
-  <pkgname>vacuum-im</pkgname>
+  <id>vacuum-im.desktop</id>
+  <package>vacuum-im</package>
   <metadata_license>CC0-1.0</metadata_license>
-  <project_license>GPLv3</project_license>
+  <project_license>GPL-3.0+</project_license>
   <name>Vacuum-IM</name>
   <summary>Cross-platform Jabber/XMPP client</summary>
   <description>
@@ -14,11 +14,16 @@
       interaction via interfaces.
     </p>
   </description>
-  <provides>
-    <binary>vacuum-im</binary>
-  </provides>
+  <content_rating type="oars-1.1">
+    <content_attribute id="social-chat">intense</content_attribute>
+  </content_rating>
   <icon type="remote" width="128" height="128">https://raw.githubusercontent.com/vacuum-im/vacuum-im/master/resources/menuicons/shared/vacuum.png</icon>
   <icon type="local" width="128" height="128">/usr/share/vacuum-im/resources/menuicons/shared/vacuum.png</icon>
+  <screenshots>
+  <screenshot type="default">
+    <image type="source">https://raw.githubusercontent.com/vacuum-im/vacuum-im/master/src/packages/linux/vacuum-im-fedora32-screenshot.png</image>
+  </screenshot>
+  </screenshots>
   <categories>
     <category>network</category>
     <category>chat</category>
@@ -26,9 +31,11 @@
   <mimetypes>
     <mimetype>x-scheme-handler/xmpp</mimetype>
   </mimetypes>
-  <launchable type="desktop-id">vacuum-im.desktop</launchable>
   <url type="homepage">http://www.vacuum-im.org</url>
-  <update_contact>vacuum@conference.jabber.ru</update_contact>
   <url type="bugtracker">https://github.com/Vacuum-IM/vacuum-im/issues</url>
   <url type="help">https://github.com/Vacuum-IM/vacuum-im/wiki/FAQ-(ru)</url>
+  <update_contact>vacuum@conference.jabber.ru</update_contact>
+  <releases>
+    <release version="1.3.0" date="2020-06-06" urgency="low" type="development" />
+  </releases>
 </component>
