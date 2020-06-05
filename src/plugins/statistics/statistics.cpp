@@ -69,7 +69,7 @@ QDataStream &operator<<(QDataStream &AStream, const IStatisticsHit &AHit)
 	AStream << AHit.profile;
 	AStream << AHit.screen;
 	AStream << AHit.timestamp;
-	
+
 	AStream << AHit.event.category;
 	AStream << AHit.event.action;
 	AStream << AHit.event.label;
@@ -484,7 +484,7 @@ QString Statistics::userAgent() const
 
 QString Statistics::windowsVersion() const
 {
-#if QT_VERSION > 0x050900 && defined Q_OS_WIN
+#if QT_VERSION >= 0x050900 && defined Q_OS_WIN
 	QOperatingSystemVersion currentWindows = QOperatingSystemVersion::current();
 	int majorVersion = currentWindows.majorVersion();
 	int minorVersion = currentWindows.minorVersion();
