@@ -9,7 +9,9 @@
 #include <QNetworkProxy>
 #include <QAuthenticator>
 #include <QNetworkRequest>
+#if QT_VERSION > 0x050900
 #include <QOperatingSystemVersion>
+#endif
 #include <definitions/version.h>
 #include <definitions/optionnodes.h>
 #include <definitions/optionvalues.h>
@@ -482,7 +484,7 @@ QString Statistics::userAgent() const
 
 QString Statistics::windowsVersion() const
 {
-#ifdef Q_OS_WIN
+#if QT_VERSION > 0x050900 && defined Q_OS_WIN
 	QOperatingSystemVersion currentWindows = QOperatingSystemVersion::current();
 	int majorVersion = currentWindows.majorVersion();
 	int minorVersion = currentWindows.minorVersion();
