@@ -1,5 +1,6 @@
 [Desktop Entry]
-Encoding=UTF-8
+Version=1.0
+Type=Application
 Name=Vacuum-IM
 GenericName=Jabber Client
 GenericName[ru]=Jabber клиент
@@ -7,7 +8,6 @@ Comment=Communicate over the Jabber network
 Comment[ru]=Общение в сети Jabber
 Exec=vacuum
 Icon=vacuum
-StartupNotify=true
-Type=Application
+StartupNotify=false
 Terminal=false
-Categories=Network;InstantMessaging;Qt;
+Categories=Network;Chat;
