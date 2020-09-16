@@ -396,7 +396,7 @@ void MainWindow::onCurrentCentralPageChanged()
 void MainWindow::onCentralPageAddedOrRemoved(IMainCentralPage *APage)
 {
 	Q_UNUSED(APage);
-	QTimer::singleShot(0,this,SLOT(onUpdateCentralWidgetVisible()));
+	onUpdateCentralWidgetVisible();
 }
 
 void MainWindow::onSplitterMoved(int APos, int AIndex)
