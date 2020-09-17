@@ -113,5 +113,5 @@ test: off
 
 artifacts:
 - path: _output\vacuum
-  name: vacuum_%APPVEYOR_REPO_TAG_NAME%_win32-msvc2017_qt%QTVER%
+  name: vacuum_%APPVEYOR_REPO_COMMIT%_win32-msvc2017_qt%QTVER%
   type: zip
