@@ -285,7 +285,7 @@ AppendServicePage::AppendServicePage(QWidget *AParent) : QWizardPage(AParent)
 		QRadioButton *button = new QRadioButton(this);
 		button->setText(services[i].name);
 
-		connect(button, &QRadioButton::clicked, [=]() { onServiceButtonClicked(services[i].type); });
+		connect(button, &QRadioButton::clicked, [this, services, i]() { onServiceButtonClicked(services[i].type); });
 
 		FTypeButton.insert(services[i].type, button);
 		layout->addWidget(button);

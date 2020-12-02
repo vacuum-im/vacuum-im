@@ -276,7 +276,7 @@ void TabWindow::createActions()
 		Action *action = new Action(this);
 		action->setShortcutId(QString(SCT_TABWINDOW_QUICKTAB).arg(tabNumber));
 		FMenuButton->addAction(action);
-		connect(action, &Action::triggered, [=]() { ui.twtTabs->setCurrentIndex(tabNumber-1); });
+		connect(action, &Action::triggered, [this, tabNumber]() { ui.twtTabs->setCurrentIndex(tabNumber-1); });
 	}
 
 	FNextTab = new Action(FWindowMenu);
