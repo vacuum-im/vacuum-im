@@ -1,8 +1,11 @@
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.5)
 
 project(vacuum-im)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 
 if(APPLE)
 	 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13")

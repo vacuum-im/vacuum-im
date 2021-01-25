@@ -45,7 +45,11 @@ static QByteArray deriveKeyPbkdf2(QCryptographicHash::Algorithm algorithm, const
 	{
 		hmac.reset();
 		hmac.addData(salt);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 7, 0))
 		qToBigEndian(loop, index.data());
+#else
+		qToBigEndian(loop, reinterpret_cast<unsigned char*>(index.data()));
+#endif
 		hmac.addData(index);
 
 		QByteArray u = hmac.result();

@@ -13,8 +13,8 @@ int main(int argc, char *argv[])
 	app.setQuitOnLastWindowClosed(false);
 	app.addLibraryPath(app.applicationDirPath());
 
-	QLibrary utils(app.applicationDirPath()+"/utils",&app);
-	utils.load();
+	//QLibrary utils(app.applicationDirPath()+"/utils",&app);
+	//utils.load();
 
 	PluginManager pm(&app);
 	pm.restart();
