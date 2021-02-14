@@ -247,7 +247,7 @@ QMultiMap<int, IOptionsDialogWidget *> Notifications::optionsDialogWidgets(const
 		spbPopupTimeout->setSuffix(tr(" seconds"));
 		widgets.insertMulti(OWO_NOTIFICATIONS_POPUPTIMEOUT,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_NOTIFICATIONS_POPUPTIMEOUT),tr("Time to display a pop-up window (0 - always visible):"),spbPopupTimeout,AParent));
 
-#if defined Q_OS_LINUX && 0 
+#if defined Q_OS_LINUX && NO_QTMULTIMEDIA
 		widgets.insertMulti(OWO_NOTIFICATIONS_SOUNDCOMMAND,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_NOTIFICATIONS_SOUNDCOMMAND),tr("System command to play sound:"),AParent));
 #endif
 
@@ -381,7 +381,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 			QString soundFile = FileStorage::staticStorage(RSR_STORAGE_SOUNDS)->fileFullName(soundName);
 			if (!soundFile.isEmpty())
 			{
-#ifdef Q_OS_LINUX
+#ifdef Q_OS_LINUX && NO_QTMULTIMEDIA
 				QProcess::startDetached(Options::node(OPV_NOTIFICATIONS_SOUNDCOMMAND).value().toString(),QStringList()<<soundFile);
 #else
 				delete FSound;

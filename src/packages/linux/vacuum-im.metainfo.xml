@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>org.vacuum_im.vacuum_im</id>
+  <id>org.jrudevels.vacuum_im</id>
   <name>Vacuum-IM</name>
   <summary>Cross-platform Jabber/XMPP client</summary>
   <metadata_license>CC0-1.0</metadata_license>
