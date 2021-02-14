@@ -9,6 +9,8 @@ include("${CMAKE_SOURCE_DIR}/src/plugins/plugins.cmake")
 
 if (IS_ENABLED)
 	if (NO_QTMULTIMEDIA)
+		add_definitions(-DNO_QTMULTIMEDIA)
+	else (NO_QTMULTIMEDIA)
 		find_package(Qt5Multimedia REQUIRED)
 		target_link_libraries(${PLUGIN_NAME} Qt5::Multimedia)
 	endif (NO_QTMULTIMEDIA)
