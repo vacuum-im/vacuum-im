@@ -1,7 +1,7 @@
 #ifndef SELECTICONMENU_H
 #define SELECTICONMENU_H
 
-#include <QVBoxLayout>
+#include <QScrollArea>
 #include "selecticonwidget.h"
 #include <utils/menu.h>
 
@@ -22,7 +22,7 @@ public:
 protected slots:
 	void onAboutToShow();
 private:
-	QVBoxLayout *FLayout;
+	QScrollArea *FScrollArea;
 	IconStorage *FStorage;
 };
 

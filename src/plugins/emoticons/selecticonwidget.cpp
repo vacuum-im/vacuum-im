@@ -25,11 +25,7 @@ void SelectIconWidget::createLabels()
 {
 	QList<QString> keys = FStorage->fileFirstKeys();
 
-	int columns = keys.count()/2 + 1;
-	while (columns>1 && columns*columns>keys.count())
-		columns--;
-
-	int row =0;
+	int row = 0;
 	int column = 0;
 	foreach(const QString &key, keys)
 	{
@@ -43,8 +39,9 @@ void SelectIconWidget::createLabels()
 		FStorage->insertAutoIcon(label,key,0,0,"pixmap");
 		FKeyByLabel.insert(label,key);
 		FLayout->addWidget(label,row,column);
-		column = (column+1) % columns;
-		row += column==0 ? 1 : 0;
+		if (column == 8)
+			row++;
+		column < 8 ? column++ : column = 0;
 	}
 }
 

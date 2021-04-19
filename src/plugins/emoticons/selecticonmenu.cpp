@@ -8,8 +8,9 @@ SelectIconMenu::SelectIconMenu(const QString &AIconset, QWidget *AParent) : Menu
 	FStorage = NULL;
 	setIconset(AIconset);
 
-	FLayout = new QVBoxLayout(this);
-	FLayout->setMargin(0);
+	FScrollArea = new QScrollArea(this);
+	FScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	FScrollArea->setWidgetResizable(true);
 	setAttribute(Qt::WA_AlwaysShowToolTips,true);
 	connect(this,SIGNAL(aboutToShow()),SLOT(onAboutToShow()));
 }
@@ -36,13 +37,14 @@ void SelectIconMenu::setIconset(const QString &ASubStorage)
 
 QSize SelectIconMenu::sizeHint() const
 {
-	return FLayout->sizeHint();
+	return FScrollArea->sizeHint();
 }
 
 void SelectIconMenu::onAboutToShow()
 {
-	QWidget *widget = new SelectIconWidget(FStorage,this);
-	FLayout->addWidget(widget);
+	QWidget *widget = new SelectIconWidget(FStorage,FScrollArea);
+	FScrollArea->setWidget(widget);
+
 	connect(this,SIGNAL(aboutToHide()),widget,SLOT(deleteLater()));
 	connect(widget,SIGNAL(iconSelected(const QString &, const QString &)),SIGNAL(iconSelected(const QString &, const QString &)));
 }
