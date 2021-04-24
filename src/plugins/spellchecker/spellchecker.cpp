@@ -363,16 +363,19 @@ void SpellChecker::onOptionsChanged(const OptionsNode &ANode)
 	}
 	else if (ANode.path() == OPV_MESSAGES_SPELL_LANG)
 	{
-		QString fullDict = ANode.value().toString();
-		QString partDict = fullDict.split('_').value(0);
-		QList<QString> availDicts = availDictionaries();
-		QString dict = availDicts.contains(fullDict) ? fullDict : partDict;
-		if (availDicts.contains(dict))
+		if (isSpellEnabled())
 		{
-			LOG_INFO(QString("Spell check language changed to=%1").arg(dict));
-			FSpellBackend->setLang(dict);
-			emit currentDictionaryChanged(currentDictionary());
-			rehightlightAll();
+			QString fullDict = ANode.value().toString();
+			QString partDict = fullDict.split('_').value(0);
+			QList<QString> availDicts = availDictionaries();
+			QString dict = availDicts.contains(fullDict) ? fullDict : partDict;
+			if (availDicts.contains(dict))
+			{
+				LOG_INFO(QString("Spell check language changed to=%1").arg(dict));
+				FSpellBackend->setLang(dict);
+				emit currentDictionaryChanged(currentDictionary());
+				rehightlightAll();
+			}
 		}
 	}
 }
