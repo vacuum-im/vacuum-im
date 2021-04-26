@@ -45,6 +45,7 @@ signals:
 	void wordAddedToPersonalDict(const QString &AWord);
 protected:
 	void rehightlightAll();
+	void loadDictionary(const QString &ADict);
 	QString dictionaryName(const QString &ADict) const;
 protected slots:
 	void onChangeSpellEnable();
@@ -66,6 +67,7 @@ private:
 	int FCurrentCursorPosition;
 	QHash<QString, bool> *FCachedWords;
 	QMap<QObject *, SpellHighlighter *> FSpellHighlighters;
+	QString FCurrectDict;
 };
 
 #endif // SPELLCHECKER_H

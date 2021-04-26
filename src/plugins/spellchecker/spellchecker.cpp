@@ -18,6 +18,8 @@
 #	include "aspellchecker.h"
 #elif defined(HAVE_HUNSPELL)
 #	include "hunspellchecker.h"
+#elif defined(HAVE_NUSPELL)
+#	include "nuspellchecker.h"
 #endif
 
 #define MAX_CACHEDWORDS     2000
@@ -82,6 +84,9 @@ bool SpellChecker::initObjects()
 #elif defined(HAVE_HUNSPELL)
 		FSpellBackend = new HunspellChecker();
 		Logger::writeLog(Logger::Info,"SpellBackend","Hunspell backend created");
+#elif defined(HAVE_NUSPELL)
+		FSpellBackend = new NuspellChecker();
+		Logger::writeLog(Logger::Info,"SpellBackend","Nuspell backend created");
 #else
 		FSpellBackend = new SpellBackend();
 		Logger::writeLog(Logger::Warning,"SpellBackend","Empty backend created");
@@ -353,29 +358,36 @@ void SpellChecker::onOptionsOpened()
 void SpellChecker::onOptionsChanged(const OptionsNode &ANode)
 {
 	FCachedWords->clear();
+
 	if (ANode.path() == OPV_MESSAGES_SPELL_ENABLED)
 	{
 		bool enabled = ANode.value().toBool();
 		LOG_INFO(QString("Spell check enable changed to=%1").arg(enabled));
+		loadDictionary(Options::node(OPV_MESSAGES_SPELL_LANG).value().toString());
+
 		foreach(SpellHighlighter *liter, FSpellHighlighters.values())
 			liter->setEnabled(enabled);
 		emit spellEnableChanged(enabled);
 	}
 	else if (ANode.path() == OPV_MESSAGES_SPELL_LANG)
 	{
-		if (isSpellEnabled())
+		loadDictionary(ANode.value().toString());
+	}
+}
+
+void SpellChecker::loadDictionary(const QString &ADict)
+{
+	if (isSpellEnabled())
+	{
+		QString dict = availDictionaries().contains(ADict) ? ADict : ADict.split('_').value(0);
+		if (dict == FSpellBackend->actuallLang())
+			return;
+		if (availDictionaries().contains(dict))
 		{
-			QString fullDict = ANode.value().toString();
-			QString partDict = fullDict.split('_').value(0);
-			QList<QString> availDicts = availDictionaries();
-			QString dict = availDicts.contains(fullDict) ? fullDict : partDict;
-			if (availDicts.contains(dict))
-			{
-				LOG_INFO(QString("Spell check language changed to=%1").arg(dict));
-				FSpellBackend->setLang(dict);
-				emit currentDictionaryChanged(currentDictionary());
-				rehightlightAll();
-			}
+			LOG_INFO(QString("Spell check language changed to=%1").arg(dict));
+			FSpellBackend->setLang(dict);
+			emit currentDictionaryChanged(currentDictionary());
+			rehightlightAll();
 		}
 	}
 }
