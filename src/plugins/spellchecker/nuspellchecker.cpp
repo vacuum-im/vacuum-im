@@ -12,7 +12,8 @@ NuspellChecker::NuspellChecker()
 	nuspell::search_default_dirs_for_dicts(dict_list);
 	foreach(auto dict, dict_list)
 	{
-		FDicts.append(dict.first.c_str());
+		FDicts.append(QString::fromStdString(dict.first));
+		FDicts.removeDuplicates();
 	}
 }
 
