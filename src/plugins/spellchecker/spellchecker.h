@@ -66,6 +66,7 @@ private:
 	QTextEdit *FCurrentTextEdit;
 	int FCurrentCursorPosition;
 	QHash<QString, bool> *FCachedWords;
+	QHash<QString, QList<QString>> *FCachedSuggs;
 	QMap<QObject *, SpellHighlighter *> FSpellHighlighters;
 	QString FCurrectDict;
 };

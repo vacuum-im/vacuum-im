@@ -23,6 +23,7 @@
 #endif
 
 #define MAX_CACHEDWORDS     2000
+#define MAX_CACHEDSUGGS     150
 #define MAX_SUGGESTIONS     15
 #define SPELLDICTS_DIR      "spelldicts"
 #define PERSONALDICTS_DIR   "personal"
@@ -34,6 +35,7 @@ SpellChecker::SpellChecker()
 	FCurrentTextEdit = NULL;
 	FCurrentCursorPosition = 0;
 	FCachedWords = new QHash<QString, bool>();
+	FCachedSuggs = new QHash<QString, QList<QString>>();
 }
 
 SpellChecker::~SpellChecker()
@@ -160,6 +162,7 @@ bool SpellChecker::isCorrectWord(const QString &AWord) const
 
 	if (FCachedWords->size() >= MAX_CACHEDWORDS)
 		FCachedWords->clear();
+
 	bool correct = FSpellBackend->isCorrect(AWord);
 	FCachedWords->insert(AWord, correct);
 	return correct;
@@ -167,7 +170,15 @@ bool SpellChecker::isCorrectWord(const QString &AWord) const
 
 QList<QString> SpellChecker::wordSuggestions(const QString &AWord) const
 {
-	return FSpellBackend->suggestions(AWord);
+	if (FCachedSuggs->contains(AWord))
+		return FCachedSuggs->value(AWord);
+
+	if (FCachedSuggs->size() >= MAX_CACHEDSUGGS)
+		FCachedSuggs->clear();
+
+	QList<QString> suggs = FSpellBackend->suggestions(AWord);
+	FCachedSuggs->insert(AWord, suggs);
+	return suggs;
 }
 
 bool SpellChecker::canAddWordToPersonalDict(const QString &AWord) const
@@ -180,6 +191,7 @@ void SpellChecker::addWordToPersonalDict(const QString &AWord)
 	if (FSpellBackend->add(AWord))
 	{
 		FCachedWords->remove(AWord);
+		FCachedSuggs->remove(AWord);
 		rehightlightAll();
 		emit wordAddedToPersonalDict(AWord);
 	}
@@ -358,6 +370,7 @@ void SpellChecker::onOptionsOpened()
 void SpellChecker::onOptionsChanged(const OptionsNode &ANode)
 {
 	FCachedWords->clear();
+	FCachedSuggs->clear();
 
 	if (ANode.path() == OPV_MESSAGES_SPELL_ENABLED)
 	{
