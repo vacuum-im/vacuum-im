@@ -32,7 +32,7 @@
         <translation>Менеджер облікових записів</translation>
     </message>
     <message>
-        <source>Allows to create and manage Jabber accounts</source>
+        <source>Allows to create and manage XMPP accounts</source>
         <translation>Дозволяє створювати та керувати обліковими записами</translation>
     </message>
     <message>
@@ -172,7 +172,7 @@
 <context>
     <name>AppendServicePage</name>
     <message>
-        <source>Jabber/XMPP</source>
+        <source>XMPP</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -212,7 +212,7 @@
     </message>
     <message>
         <source>Jabber ID:</source>
-        <translation type="unfinished"/>
+        <translation>Jabber ID:</translation>
     </message>
     <message>
         <source>Password:</source>
@@ -366,7 +366,7 @@
 <context>
     <name>WizardStartPage</name>
     <message>
-        <source>Add Jabber/XMPP Account</source>
+        <source>Add XMPP Account</source>
         <translation type="unfinished"/>
     </message>
     <message>

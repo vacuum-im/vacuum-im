@@ -118,8 +118,8 @@
    <translation>Telephone Number</translation>
   </message>
   <message>
-   <source>Allows to register on the Jabber servers and services</source>
-   <translation>Allows to register on the Jabber servers and services</translation>
+   <source>Allows to register on the XMPP servers and services</source>
+   <translation>Allows to register on the XMPP servers and services</translation>
   </message>
   <message>
    <source>Supports the registration</source>

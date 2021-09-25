@@ -90,8 +90,8 @@
         <translation>Переузгодити сесію?</translation>
     </message>
     <message>
-        <source>Jabber Session Manager</source>
-        <translation>Менеджер джаббер сесій</translation>
+        <source>XMPP Session Manager</source>
+        <translation>Менеджер XMPP сесій</translation>
     </message>
     <message>
         <source>Allows to set the session between two entities, which explains the rules of the exchange of XMPP stanzas</source>

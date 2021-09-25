@@ -8,8 +8,8 @@
    <translation>Query Authentication</translation>
   </message>
   <message>
-   <source>Allow you to log on the Jabber server without support SASL authentication</source>
-   <translation>Allow you to log on the Jabber server without support SASL authentication</translation>
+   <source>Allow you to log on the XMPP server without support SASL authentication</source>
+   <translation>Allow you to log on the XMPP server without support SASL authentication</translation>
   </message>
  </context>
 </TS>

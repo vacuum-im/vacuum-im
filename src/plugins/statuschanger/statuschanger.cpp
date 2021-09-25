@@ -58,7 +58,7 @@ StatusChanger::~StatusChanger()
 void StatusChanger::pluginInfo(IPluginInfo *APluginInfo)
 {
 	APluginInfo->name = tr("Status Manager");
-	APluginInfo->description = tr("Allows to change the status in Jabber network");
+	APluginInfo->description = tr("Allows to change the status in XMPP network");
 	APluginInfo->version = "1.0";
 	APluginInfo->author = "Potapov S.A. aka Lion";
 	APluginInfo->homePage = "http://www.vacuum-im.org";

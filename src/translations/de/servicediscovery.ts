@@ -157,8 +157,8 @@
         <translation>Entitätsfähigkeiten</translation>
     </message>
     <message>
-        <source>Allows to receive information about Jabber entities</source>
-        <translation>Erlaubt das Erhalten von Informationen über Jabber Existenzen</translation>
+        <source>Allows to receive information about XMPP entities</source>
+        <translation>Erlaubt das Erhalten von Informationen über XMPP Existenzen</translation>
     </message>
     <message>
         <source>Supports the exchange of the discovery information and items</source>
@@ -193,8 +193,8 @@
         <translation>Unterstützt das Zwischenspeichern von Ermittlungsinformationen</translation>
     </message>
     <message>
-        <source>Supports the displaying of the jabber identifiers with disallowed characters</source>
-        <translation>Ermöglicht das Anzeigen von Jabber Identifikatoren mit nicht erlaubten Zeichen</translation>
+        <source>Supports the displaying of the Jabber ID with disallowed characters</source>
+        <translation>Ermöglicht das Anzeigen von Jabber ID mit nicht erlaubten Zeichen</translation>
     </message>
 </context>
 </TS>

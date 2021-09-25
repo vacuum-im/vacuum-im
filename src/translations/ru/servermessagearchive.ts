@@ -16,8 +16,8 @@
         <translation>Стандартный архив на сервере</translation>
     </message>
     <message>
-        <source>History of conversations is stored on your jabber server</source>
-        <translation>История общения сохраняется на вашем jabber сервере</translation>
+        <source>History of conversations is stored on your XMPP server</source>
+        <translation>История общения сохраняется на вашем XMPP сервере</translation>
     </message>
 </context>
 </TS>

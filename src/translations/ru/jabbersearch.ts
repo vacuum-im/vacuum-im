@@ -4,8 +4,8 @@
 <context>
     <name>JabberSearch</name>
     <message>
-        <source>Jabber Search</source>
-        <translation>Jabber поиск</translation>
+        <source>XMPP Search</source>
+        <translation>XMPP поиск</translation>
     </message>
     <message>
         <source>Search</source>
@@ -28,8 +28,8 @@
         <translation>Адрес e-mail</translation>
     </message>
     <message>
-        <source>Allows to search in the Jabber network</source>
-        <translation>Позволяет выполнять поиск в джаббер сети</translation>
+        <source>Allows to search in the XMPP network</source>
+        <translation>Позволяет выполнять поиск в XMPP сети</translation>
     </message>
     <message>
         <source>Supports the searching of the information</source>

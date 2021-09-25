@@ -51,7 +51,7 @@
     </message>
     <message>
         <source>Can&apos;t add contact &apos;&lt;b&gt;%1&lt;/b&gt;&apos; because it is not a valid Jabber ID</source>
-        <translation>No se puede añadir el contacto &apos;&lt;b&gt;%1&lt;/b&gt;&apos; porque no es un ID de Jabber válido</translation>
+        <translation>No se puede añadir el contacto &apos;&lt;b&gt;%1&lt;/b&gt;&apos; porque no es un Jabber ID válido</translation>
     </message>
 </context>
 <context>

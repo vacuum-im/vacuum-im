@@ -21,7 +21,7 @@ SASLFeatureFactory::~SASLFeatureFactory()
 void SASLFeatureFactory::pluginInfo(IPluginInfo *APluginInfo)
 {
 	APluginInfo->name = tr("SASL Authentication");
-	APluginInfo->description = tr("Allows to log in to Jabber server using SASL authentication");
+	APluginInfo->description = tr("Allows to log in to XMPP server using SASL authentication");
 	APluginInfo->version = "1.0";
 	APluginInfo->author = "Potapov S.A. aka Lion";
 	APluginInfo->homePage = "http://www.vacuum-im.org";

@@ -8,8 +8,8 @@
    <translation>Bookmarks</translation>
   </message>
   <message>
-   <source>Allows to create bookmarks at the jabber conference and web pages</source>
-   <translation>Allows to create bookmarks at the jabber conference and web pages</translation>
+   <source>Allows to create bookmarks at the XMPP conference and web pages</source>
+   <translation>Allows to create bookmarks at the XMPP conference and web pages</translation>
   </message>
   <message>
    <source>Edit Bookmarks</source>

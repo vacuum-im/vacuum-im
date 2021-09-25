@@ -87,8 +87,8 @@
    <translation>Status Manager</translation>
   </message>
   <message>
-   <source>Allows to change the status in Jabber network</source>
-   <translation>Allows to change the status in Jabber network</translation>
+   <source>Allows to change the status in XMPP network</source>
+   <translation>Allows to change the status in XMPP network</translation>
   </message>
   <message>
    <source>Connecting...</source>

@@ -16,8 +16,8 @@
    <translation>Standard Server Side Archive</translation>
   </message>
   <message>
-   <source>History of conversations is stored on your jabber server</source>
-   <translation>History of conversations is stored on your jabber server</translation>
+   <source>History of conversations is stored on your XMPP server</source>
+   <translation>History of conversations is stored on your XMPP server</translation>
   </message>
  </context>
 </TS>

@@ -78,7 +78,7 @@ ServiceDiscovery::~ServiceDiscovery()
 void ServiceDiscovery::pluginInfo(IPluginInfo *APluginInfo)
 {
 	APluginInfo->name = tr("Service Discovery");
-	APluginInfo->description = tr("Allows to receive information about Jabber entities");
+	APluginInfo->description = tr("Allows to receive information about XMPP entities");
 	APluginInfo->version = "1.0";
 	APluginInfo->author = "Potapov S.A. aka Lion";
 	APluginInfo->homePage = "http://www.vacuum-im.org";
@@ -965,7 +965,7 @@ void ServiceDiscovery::registerFeatures()
 	dfeature.active = true;
 	dfeature.icon = QIcon();
 	dfeature.name = tr("JID Escaping");
-	dfeature.description = tr("Supports the displaying of the jabber identifiers with disallowed characters");
+	dfeature.description = tr("Supports the displaying of the Jabber ID with disallowed characters");
 	insertDiscoFeature(dfeature);
 }
 

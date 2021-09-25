@@ -2,8 +2,8 @@
 <context>
     <name>JabberSearch</name>
     <message>
-        <source>Jabber Search</source>
-        <translation>Jabber Suche</translation>
+        <source>XMPP Search</source>
+        <translation>XMPP Suche</translation>
     </message>
     <message>
         <source>Search</source>
@@ -26,8 +26,8 @@
         <translation>E-Mail Adresse</translation>
     </message>
     <message>
-        <source>Allows to search in the Jabber network</source>
-        <translation>Erlaubt die Suche im Jabber-Netzwerk</translation>
+        <source>Allows to search in the XMPP network</source>
+        <translation>Erlaubt die Suche im XMPP-Netzwerk</translation>
     </message>
     <message>
         <source>Supports the searching of the information</source>

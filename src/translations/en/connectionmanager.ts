@@ -8,8 +8,8 @@
    <translation>Connection Manager</translation>
   </message>
   <message>
-   <source>Allows to use different types of connections to a Jabber server</source>
-   <translation>Allows to use different types of connections to a Jabber server</translation>
+   <source>Allows to use different types of connections to an XMPP server</source>
+   <translation>Allows to use different types of connections to an XMPP server</translation>
   </message>
   <message>
    <source>&lt;No Proxy></source>

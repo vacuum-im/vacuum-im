@@ -69,7 +69,7 @@ MultiUserChatManager::~MultiUserChatManager()
 void MultiUserChatManager::pluginInfo(IPluginInfo *APluginInfo)
 {
 	APluginInfo->name = tr("Multi-User Conferences");
-	APluginInfo->description = tr("Allows to use Jabber multi-user conferences");
+	APluginInfo->description = tr("Allows to use XMPP multi-user conferences");
 	APluginInfo->version = "1.0";
 	APluginInfo->author = "Potapov S.A. aka Lion";
 	APluginInfo->homePage = "http://www.vacuum-im.org";
@@ -527,7 +527,7 @@ IDataFormLocale MultiUserChatManager::dataFormLocale(const QString &AFormType)
 		locale.fields["muc#roomconfig_whois"].label = tr("Affiliations that May Discover Real JIDs of Occupants");
 		locale.fields["muc#roomconfig_whois"].options["anyone"].label = tr("Anyone");
 		locale.fields["muc#roomconfig_whois"].options["moderators"].label = tr("Moderators only");
-		//EJabberd extension
+		//ejabberd extension
 		locale.fields["public_list"].label = tr("Make Participants List Public?");
 		locale.fields["members_by_default"].label = tr("Make all Occupants as Participants?");
 		locale.fields["allow_private_messages"].label = tr("Allow Occupants to Send Private Messages?");

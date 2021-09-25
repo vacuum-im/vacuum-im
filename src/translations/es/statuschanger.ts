@@ -85,8 +85,8 @@
         <translation>Administrador de estado</translation>
     </message>
     <message>
-        <source>Allows to change the status in Jabber network</source>
-        <translation>Permite el cambio de estado en una red jabber</translation>
+        <source>Allows to change the status in XMPP network</source>
+        <translation>Permite el cambio de estado en una red XMPP</translation>
     </message>
     <message>
         <source>Connecting...</source>

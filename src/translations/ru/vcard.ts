@@ -110,8 +110,8 @@
         <translation>Ник</translation>
     </message>
     <message>
-        <source>Jabber Id</source>
-        <translation>JID</translation>
+        <source>Jabber ID</source>
+        <translation>Jabber ID</translation>
     </message>
     <message>
         <source>Personal</source>

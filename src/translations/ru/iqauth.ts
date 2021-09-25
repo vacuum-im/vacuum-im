@@ -8,8 +8,8 @@
         <translation>Авторизация через запрос</translation>
     </message>
     <message>
-        <source>Allow you to log on the Jabber server without support SASL authentication</source>
-        <translation>Позволяет авторизоваться на джаббер сервере без поддержки SASL авторизации</translation>
+        <source>Allow you to log on the XMPP server without support SASL authentication</source>
+        <translation>Позволяет авторизоваться на XMPP сервере без поддержки SASL авторизации</translation>
     </message>
 </context>
 </TS>

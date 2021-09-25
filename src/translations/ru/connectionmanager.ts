@@ -8,8 +8,8 @@
         <translation>Диспетчер подключений</translation>
     </message>
     <message>
-        <source>Allows to use different types of connections to a Jabber server</source>
-        <translation>Позволяет использовать различные типы подключений к джаббер серверу</translation>
+        <source>Allows to use different types of connections to an XMPP server</source>
+        <translation>Позволяет использовать различные типы подключений к XMPP серверу</translation>
     </message>
     <message>
         <source>&lt;No Proxy&gt;</source>

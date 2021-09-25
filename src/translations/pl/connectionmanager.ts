@@ -6,8 +6,8 @@
         <translation>Menedżer połączenia</translation>
     </message>
     <message>
-        <source>Allows to use different types of connections to a Jabber server</source>
-        <translation>Pozwala na stosowanie różnych typów połączeń z serwerem Jabbera</translation>
+        <source>Allows to use different types of connections to an XMPP server</source>
+        <translation>Pozwala na stosowanie różnych typów połączeń z serwerem XMPP</translation>
     </message>
     <message>
         <source>&lt;No Proxy&gt;</source>

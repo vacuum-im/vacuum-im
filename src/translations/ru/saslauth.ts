@@ -8,7 +8,7 @@
         <translation>SASL авторизация</translation>
     </message>
     <message>
-        <source>Allows to log in to Jabber server using SASL authentication</source>
+        <source>Allows to log in to XMPP server using SASL authentication</source>
         <translation>Позволяет авторизоваться на сервере используя SASL авторизацию</translation>
     </message>
     <message>
