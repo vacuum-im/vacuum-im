@@ -18,6 +18,7 @@
 #define RTTO_ROSTERSVIEW_RESOURCE_MIDDLELINE        1099
 #define RTTO_ROSTERSVIEW_RESOURCE_BOTTOMLINE        1999
 #define RTTO_ANNOTATIONS                            10000
+#define RTTO_MAXIMUM                                20000
 
 //Privacy label
 #define RTTO_PRIVACYLISTS                           100

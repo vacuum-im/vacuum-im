@@ -1116,7 +1116,23 @@ bool RostersView::viewportEvent(QEvent *AEvent)
 				toolTipsForIndex(index,helpEvent,toolTipsMap);
 				if (!toolTipsMap.isEmpty())
 				{
-					QString tooltip = QString("<span>%1</span>").arg(QStringList(toolTipsMap.values()).join("<p/><nbsp>"));
+					QString avatar;
+					QString text;
+					foreach (int key, toolTipsMap.keys())
+					{
+						if (key == RTTO_AVATAR_IMAGE)
+							avatar.append(toolTipsMap.value(key));
+						else if (key < RTTO_MAXIMUM)
+							text.append("<nobr>").append(toolTipsMap.value(key)).append("</nobr><p/><nbsp>");
+						else if (key == RTTO_MAXIMUM)
+							continue;
+					}
+					if (text.endsWith("<p/><nbsp>"))
+						text.chop(10);
+					QString tooltip;
+					tooltip.append("<table style='white-space:pre' cellspacing=6><tr><td>").append(text);
+					tooltip.append("</td><td style='text-align:right'>").append(avatar);
+					tooltip.append("</td></tr></table>");
 					QToolTip::showText(helpEvent->globalPos(),tooltip,this);
 				}
 				return true;
