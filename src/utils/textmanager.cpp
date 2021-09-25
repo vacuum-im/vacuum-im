@@ -115,6 +115,7 @@ QString TextManager::getElidedString(const QString &AString, Qt::TextElideMode A
 		if (AMode == Qt::ElideRight)
 		{
 			string = AString.left(stringChars);
+			string.replace(QChar::LineFeed, QChar::Space);
 			string.append("...");
 		}
 		else if (AMode == Qt::ElideLeft)
