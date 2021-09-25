@@ -169,6 +169,7 @@ public:
 	virtual void setGroupSelection(const Jid &AStreamJid, const QString &AGroup, bool ASelected) =0;
 	virtual void setAddressSelection(const Jid &AStreamJid, const Jid &AContactJid, bool ASelected) =0;
 	virtual void clearSelection() =0;
+	virtual QVBoxLayout *getVBoxWidget() =0;
 protected:
 	virtual void availStreamsChanged() =0;
 	virtual void addressSelectionChanged() =0;
