@@ -461,6 +461,11 @@ void ReceiversWidget::clearSelection()
 			contactIt.value()->setCheckState(Qt::Unchecked);
 }
 
+QVBoxLayout *ReceiversWidget::getVBoxWidget()
+{
+	return ui.rwcVBox;
+}
+
 void ReceiversWidget::initialize()
 {
 }

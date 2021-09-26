@@ -72,8 +72,10 @@ NormalWindow::NormalWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJ
 	Menu *menu = new Menu(ui.tlbReceivers);
 	ui.tlbReceivers->setMenu(menu);
 	connect(menu,SIGNAL(aboutToShow()),SLOT(onSelectReceiversMenuAboutToShow()));
-
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(ui.tlbReceivers,MNI_MESSAGEWIDGETS_SELECT);
+
+	ui.sprReceivers->setCollapsible(ui.sprReceivers->indexOf(ui.layoutWidget), false);
+	FReceiversWidget->getVBoxWidget()->insertWidget(1, ui.hboxReceiversW);
 
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString, QWidget *)),SLOT(onShortcutActivated(const QString, QWidget *)));
 
