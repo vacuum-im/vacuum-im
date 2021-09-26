@@ -39,7 +39,10 @@
        <enum>Qt::Horizontal</enum>
       </property>
       <widget class="QWidget" name="layoutWidget">
-       <layout class="QVBoxLayout" name="verticalLayout">
+       <layout class="QVBoxLayout" name="vboxMessageBox">
+        <property name="rightMargin">
+         <number>2</number>
+        </property>
         <item>
          <widget class="SplitterWidget" name="spwMessageBox"/>
         </item>
@@ -48,7 +51,7 @@
       <widget class="QWidget" name="wdtReceivers" native="true">
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <property name="leftMargin">
-         <number>0</number>
+         <number>2</number>
         </property>
         <property name="topMargin">
          <number>0</number>
