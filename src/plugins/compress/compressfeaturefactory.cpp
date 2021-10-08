@@ -93,7 +93,7 @@ QMultiMap<int, IOptionsDialogWidget *> CompressFeatureFactory::optionsDialogWidg
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	if (FOptionsManager)
 	{
-		QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
+		QStringList nodeTree = ANodeId.split(".",Qt::SkipEmptyParts);
 		if (nodeTree.count()==3 && nodeTree.at(0)==OPN_ACCOUNTS && nodeTree.at(2)=="Additional")
 		{
 			OptionsNode options = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));

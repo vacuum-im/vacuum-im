@@ -7,7 +7,7 @@
 #include <utils/jid.h>
 #include <utils/action.h>
 
-#define NOTIFICATIONS_UUID  "{59887A91-A483-4a7c-A2DE-227A01D6BC5E}"
+#define NOTIFICATIONS_UUID  QUuid("{59887A91-A483-4a7c-A2DE-227A01D6BC5E}")
 
 struct INotification 
 {

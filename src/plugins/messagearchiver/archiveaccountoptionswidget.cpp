@@ -9,6 +9,7 @@
 #include <QTextDocument>
 #include <definitions/namespaces.h>
 #include <definitions/optionvalues.h>
+#include <utils/helpers.h>
 
 #define ONE_DAY           (24*60*60)
 #define ONE_MONTH         (ONE_DAY*31)
@@ -565,7 +566,7 @@ void ArchiveAccountOptionsWidget::onArchivePrefsChanged(const Jid &AStreamJid)
 		}
 		ui.cmbExpireTime->setCurrentIndex(expireIndex);
 
-		QSet<Jid> oldItems = FTableItems.keys().toSet();
+		QSet<Jid> oldItems = toQSet(FTableItems.keys());
 		foreach(const Jid &itemJid, prefs.itemPrefs.keys())
 		{
 			oldItems -= itemJid;

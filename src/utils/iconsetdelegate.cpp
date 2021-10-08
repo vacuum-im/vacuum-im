@@ -222,7 +222,7 @@ QRect IconsetDelegate::checkButtonRect(const QStyleOptionViewItem &AIndexOption,
 		buttonOption.rect = ABounding;
 
 		const QStyle *style = AIndexOption.widget ? AIndexOption.widget->style()->proxy() : QApplication::style()->proxy();
-		return style->subElementRect(QStyle::SE_ViewItemCheckIndicator, &buttonOption, AIndexOption.widget);
+		return style->subElementRect(QStyle::SE_ItemViewItemCheckIndicator, &buttonOption, AIndexOption.widget);
 	}
 	return QRect();
 }
@@ -249,7 +249,7 @@ void IconsetDelegate::drawCheckButton(QPainter *APainter, const QStyleOptionView
 		}
 
 		const QStyle *style = AIndexOption.widget ? AIndexOption.widget->style()->proxy() : QApplication::style()->proxy();
-		style->drawPrimitive(QStyle::PE_IndicatorViewItemCheck, &checkOption, APainter, AIndexOption.widget);
+		style->drawPrimitive(QStyle::PE_IndicatorItemViewItemCheck, &checkOption, APainter, AIndexOption.widget);
 	}
 }
 

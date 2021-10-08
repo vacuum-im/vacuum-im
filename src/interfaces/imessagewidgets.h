@@ -20,7 +20,7 @@
 #include <utils/statusbarchanger.h>
 #include <utils/advanceditemmodel.h>
 
-#define MESSAGEWIDGETS_UUID "{89de35ee-bd44-49fc-8495-edd2cfebb685}"
+#define MESSAGEWIDGETS_UUID QUuid("{89de35ee-bd44-49fc-8495-edd2cfebb685}")
 
 class IMessageWindow;
 

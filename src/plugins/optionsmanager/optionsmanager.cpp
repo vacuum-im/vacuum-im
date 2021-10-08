@@ -1,26 +1,28 @@
-#include "optionsmanager.h"
+﻿#include "optionsmanager.h"
 
+#include <QApplication>
+#include <QCryptographicHash>
+#include <QDateTime>
+#include <QDesktopServices>
+#include <QFileInfo>
 #include <QLocale>
 #include <QProcess>
+#include <QRandomGenerator>
 #include <QSettings>
-#include <QFileInfo>
-#include <QDateTime>
-#include <QApplication>
-#include <QDesktopServices>
-#include <QCryptographicHash>
+#include <QStandardPaths>
 #include <definitions/actiongroups.h>
 #include <definitions/commandline.h>
-#include <definitions/resources.h>
 #include <definitions/menuicons.h>
-#include <definitions/optionvalues.h>
-#include <definitions/optionnodes.h>
 #include <definitions/optionnodeorders.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionvalues.h>
 #include <definitions/optionwidgetorders.h>
+#include <definitions/resources.h>
 #include <definitions/version.h>
-#include <utils/widgetmanager.h>
-#include <utils/filestorage.h>
 #include <utils/action.h>
+#include <utils/filestorage.h>
 #include <utils/logger.h>
+#include <utils/widgetmanager.h>
 
 #define DIR_PROFILES                    "profiles"
 #define DIR_BINARY                      "binary"
@@ -52,7 +54,7 @@ static const struct { QStandardPaths::StandardLocation location; QString key; } 
 	{ QStandardPaths::PicturesLocation,       "%PicturesLocation%"     },
 	{ QStandardPaths::TempLocation,           "%TempLocation%"         },
 	{ QStandardPaths::HomeLocation,           "%HomeLocation%"         },
-	{ QStandardPaths::DataLocation,           "%DataLocation%"         },
+	{ QStandardPaths::AppLocalDataLocation,   "%DataLocation%"         },
 	{ QStandardPaths::CacheLocation,          "%CacheLocation%"        },
 };
 
@@ -67,7 +69,8 @@ OptionsManager::OptionsManager()
 	FAutoSaveTimer.setInterval(AUTO_SAVE_TIMEOUT);
 	connect(&FAutoSaveTimer, SIGNAL(timeout()),SLOT(onAutoSaveTimerTimeout()));
 
-	qsrand(QDateTime::currentDateTime().toTime_t());
+	//fixme not needed?
+	//qsrand(QDateTime::currentDateTime().toSecsSinceEpoch());
 }
 
 OptionsManager::~OptionsManager()
@@ -415,7 +418,7 @@ bool OptionsManager::changeProfilePassword(const QString &AProfile, const QStrin
 		{
 			keyValue.resize(16);
 			for (int i=0; i<keyValue.size(); i++)
-				keyValue[i] = qrand();
+				keyValue[i] = QRandomGenerator::global()->generate();
 		}
 		keyValue = Options::encrypt(keyValue, QCryptographicHash::hash(ANewPassword.toUtf8(),QCryptographicHash::Md5));
 		keyText.toText().setData(keyValue.toBase64());
@@ -449,7 +452,7 @@ bool OptionsManager::addProfile(const QString &AProfile, const QString &APasswor
 
 			QByteArray keyData(16,0);
 			for (int i=0; i<keyData.size(); i++)
-				keyData[i] = qrand();
+				keyData[i] = QRandomGenerator::global()->generate();
 			keyData = Options::encrypt(keyData, QCryptographicHash::hash(APassword.toUtf8(),QCryptographicHash::Md5));
 
 			QDomNode keyElem = profileDoc.documentElement().appendChild(profileDoc.createElement("key"));
@@ -737,7 +740,8 @@ QMap<QString, QVariant> OptionsManager::getOptionValues(const OptionsNode &ANode
 
 	foreach(const QString &childName, ANode.childNames())
 		foreach(const QString &childNs, ANode.childNSpaces(childName))
-			values.unite(getOptionValues(ANode.node(childName,childNs)));
+			//fixme
+			values.insert(getOptionValues(ANode.node(childName,childNs)));
 
 	return values;
 }
@@ -799,7 +803,8 @@ QMap<QString, QVariant> OptionsManager::loadAllOptionValues(const QString &AFile
 	foreach(const QString &resDir, FileStorage::resourcesDirs())
 	{
 		QDir dir(resDir);
-		options.unite(loadOptionValues(dir.absoluteFilePath(AFileName)));
+		//fixme
+		options.insert(loadOptionValues(dir.absoluteFilePath(AFileName)));
 	}
 	return options;
 }

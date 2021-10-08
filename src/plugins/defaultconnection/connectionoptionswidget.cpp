@@ -27,7 +27,7 @@ ConnectionOptionsWidget::ConnectionOptionsWidget(IConnectionManager *AManager, c
 	if (FProxySettings)
 	{
 		QVBoxLayout *layout = new QVBoxLayout(ui.wdtProxy);
-		layout->setMargin(0);
+		layout->setContentsMargins(0, 0, 0, 0);
 		layout->addWidget(FProxySettings->instance());
 		connect(FProxySettings->instance(),SIGNAL(modified()),SIGNAL(modified()));
 	}

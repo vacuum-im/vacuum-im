@@ -143,7 +143,10 @@ void SearchLineEdit::showEvent(QShowEvent *AEvent)
 void SearchLineEdit::updateTextMargins()
 {
 	int left, top, right, bottom;
-	getTextMargins(NULL,&top,NULL,&bottom);
+	//fixme
+	QMargins margins = textMargins();
+	top = margins.top();
+	bottom = margins.bottom();
 	layout()->getContentsMargins(&left,NULL,&right,NULL);
 	if (layoutDirection() == Qt::LeftToRight)
 	{

@@ -53,7 +53,7 @@ StyleSelectOptionsWidget::StyleSelectOptionsWidget(IMessageStyleManager *AMessag
 	connect(pbtEdit,SIGNAL(clicked()),SLOT(onEditStyleButtonClicked()));
 
 	QHBoxLayout *hblLayout = new QHBoxLayout(this);
-	hblLayout->setMargin(0);
+	hblLayout->setContentsMargins(0, 0, 0, 0);
 	hblLayout->addWidget(lblType,2);
 	hblLayout->addWidget(cmbStyle,10);
 	hblLayout->addWidget(pbtEdit,1);

@@ -1,12 +1,13 @@
 #ifndef IROSTERMANAGER_H
 #define IROSTERMANAGER_H
 
+#include <QObject>
 #include <QSet>
 #include <QList>
 #include <interfaces/ixmppstreammanager.h>
 #include <utils/jid.h>
 
-#define ROSTER_UUID "{5306971C-2488-40d9-BA8E-C83327B2EED5}"
+#define ROSTER_UUID QUuid("{5306971C-2488-40d9-BA8E-C83327B2EED5}")
 
 #define SUBSCRIPTION_BOTH             "both"
 #define SUBSCRIPTION_TO               "to"

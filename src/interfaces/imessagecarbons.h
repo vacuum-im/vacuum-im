@@ -6,7 +6,7 @@
 #include <utils/message.h>
 #include <utils/xmpperror.h>
 
-#define MESSAGECARBONS_UUID "{C1F8895F-9DF4-4e95-8780-C2D88A520808}"
+#define MESSAGECARBONS_UUID QUuid("{C1F8895F-9DF4-4e95-8780-C2D88A520808}")
 
 class IMessageCarbons
 {

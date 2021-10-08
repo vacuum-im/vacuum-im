@@ -4,7 +4,7 @@
 #include <QNetworkReply>
 #include <QNetworkAccessManager>
 
-#define URLPROCESSOR_UUID "{c2d1eba4-a18d-bf31-da24-bc61d33f3205}"
+#define URLPROCESSOR_UUID QUuid("{c2d1eba4-a18d-bf31-da24-bc61d33f3205}")
 
 class IUrlHandler
 {

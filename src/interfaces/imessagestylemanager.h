@@ -12,7 +12,7 @@
 #include <utils/jid.h>
 #include <utils/options.h>
 
-#define MESSAGESTYLES_UUID  "{e3ab1bc7-35a6-431a-9b91-c778451b1eb1}"
+#define MESSAGESTYLES_UUID  QUuid("{e3ab1bc7-35a6-431a-9b91-c778451b1eb1}")
 
 struct IMessageStyleOptions
 {

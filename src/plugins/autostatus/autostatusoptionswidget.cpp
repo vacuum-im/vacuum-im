@@ -33,7 +33,7 @@ AutoStatusOptionsWidget::AutoStatusOptionsWidget(IAutoStatus *AAutoStatus, IStat
 
 void AutoStatusOptionsWidget::apply()
 {
-	QUuid awayId = Options::node(OPV_AUTOSTARTUS_AWAYRULE).value().toString();
+	QUuid awayId = Options::node(OPV_AUTOSTARTUS_AWAYRULE).value().toUuid();
 	IAutoStatusRule awayRule = FAutoStatus->ruleValue(awayId);
 	awayRule.time = ui.spbAwayTime->value() * 60;
 	awayRule.show = ui.cmbAwayStatus->itemData(ui.cmbAwayStatus->currentIndex()).toInt();
@@ -41,7 +41,7 @@ void AutoStatusOptionsWidget::apply()
 	FAutoStatus->updateRule(awayId,awayRule);
 	FAutoStatus->setRuleEnabled(awayId,ui.chbAwayEnable->isChecked());
 
-	QUuid offlineId = Options::node(OPV_AUTOSTARTUS_OFFLINERULE).value().toString();
+	QUuid offlineId = Options::node(OPV_AUTOSTARTUS_OFFLINERULE).value().toUuid();
 	IAutoStatusRule offlineRule = FAutoStatus->ruleValue(offlineId);
 	offlineRule.time = ui.spbOfflineTime->value() * 60;
 	FAutoStatus->updateRule(offlineId,offlineRule);
@@ -59,7 +59,7 @@ void AutoStatusOptionsWidget::reset()
 
 	QList<QUuid> availRules = FAutoStatus->rules();
 
-	QUuid awayId = Options::node(OPV_AUTOSTARTUS_AWAYRULE).value().toString();
+	QUuid awayId = Options::node(OPV_AUTOSTARTUS_AWAYRULE).value().toUuid();
 	if (availRules.contains(awayId))
 	{
 		IAutoStatusRule rule = FAutoStatus->ruleValue(awayId);
@@ -81,7 +81,7 @@ void AutoStatusOptionsWidget::reset()
 	}
 	Options::node(OPV_AUTOSTARTUS_AWAYRULE).setValue(awayId.toString());
 
-	QUuid offlineId = Options::node(OPV_AUTOSTARTUS_OFFLINERULE).value().toString();
+	QUuid offlineId = Options::node(OPV_AUTOSTARTUS_OFFLINERULE).value().toUuid();
 	if (availRules.contains(offlineId))
 	{
 		IAutoStatusRule rule = FAutoStatus->ruleValue(offlineId);

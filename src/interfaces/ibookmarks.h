@@ -6,7 +6,7 @@
 #include <QDomElement>
 #include <utils/jid.h>
 
-#define BOOKMARKS_UUID "{16C96115-9BF6-4404-BD9A-383A0EF2B346}"
+#define BOOKMARKS_UUID QUuid("{16C96115-9BF6-4404-BD9A-383A0EF2B346}")
 
 struct IBookmark
 {

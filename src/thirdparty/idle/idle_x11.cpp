@@ -29,8 +29,6 @@ int IdlePlatform::secondsIdle() { return 0; }
 
 #else
 
-#include <QtX11Extras/QX11Info>
-
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/extensions/scrnsaver.h>
@@ -71,26 +69,27 @@ IdlePlatform::~IdlePlatform()
 
 bool IdlePlatform::init()
 {
-	if(d->ss_info)
-		return true;
+//	if(d->ss_info)
+//		return true;
 
-	old_handler = XSetErrorHandler(xerrhandler);
+//	old_handler = XSetErrorHandler(xerrhandler);
 
-	int event_base, error_base;
-	if(XScreenSaverQueryExtension(QX11Info::display(), &event_base, &error_base)) {
-		d->ss_info = XScreenSaverAllocInfo();
-		return true;
-	}
+//	int event_base, error_base;
+//	if(XScreenSaverQueryExtension(QX11Info::display(), &event_base, &error_base)) {
+//		d->ss_info = XScreenSaverAllocInfo();
+//		return true;
+//	}
 	return false;
 }
 
 int IdlePlatform::secondsIdle()
 {
-	if(!d->ss_info)
-		return 0;
-	if(!XScreenSaverQueryInfo(QX11Info::display(), QX11Info::appRootWindow(), d->ss_info))
-		return 0;
-	return d->ss_info->idle / 1000;
+//	if(!d->ss_info)
+//		return 0;
+//	if(!XScreenSaverQueryInfo(QX11Info::display(), QX11Info::appRootWindow(), d->ss_info))
+//		return 0;
+//	return d->ss_info->idle / 1000;
+	return 0;
 }
 
 #endif

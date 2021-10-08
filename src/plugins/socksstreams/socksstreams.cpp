@@ -120,7 +120,7 @@ bool SocksStreams::initSettings()
 	Options::setDefaultValue(OPV_DATASTREAMS_METHOD_USEUSERSTREAMPROXY,true);
 	Options::setDefaultValue(OPV_DATASTREAMS_METHOD_USERSTREAMPROXY,QString("proxy.jabbim.cz"));
 	Options::setDefaultValue(OPV_DATASTREAMS_METHOD_USEACCOUNTNETPROXY,true);
-	Options::setDefaultValue(OPV_DATASTREAMS_METHOD_USERNETWORKPROXY,QString(APPLICATION_PROXY_REF_UUID));
+	Options::setDefaultValue(OPV_DATASTREAMS_METHOD_USERNETWORKPROXY,QUuid(APPLICATION_PROXY_REF_UUID));
 	Options::setDefaultValue(OPV_DATASTREAMS_METHOD_CONNECTTIMEOUT,10000);
 	return true;
 }
@@ -190,7 +190,7 @@ void SocksStreams::loadMethodSettings(IDataStreamSocket *ASocket, const OptionsN
 		if (ANode.value("use-account-network-proxy").toBool())
 			stream->setNetworkProxy(accountNetworkProxy(stream->streamJid()));
 		else if (FConnectionManager)
-			stream->setNetworkProxy(FConnectionManager->proxyById(ANode.value("user-network-proxy").toString()).proxy);
+			stream->setNetworkProxy(FConnectionManager->proxyById(ANode.value("user-network-proxy").toUuid()).proxy);
 	}
 	else
 	{

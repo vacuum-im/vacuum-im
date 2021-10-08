@@ -7,7 +7,7 @@
 #include <utils/stanza.h>
 #include <utils/xmpperror.h>
 
-#define BITSOFBINARY_UUID "{44d5c538-2254-4ae3-a78d-0c20a76ef87b}"
+#define BITSOFBINARY_UUID QUuid("{44d5c538-2254-4ae3-a78d-0c20a76ef87b}")
 
 class IBitsOfBinary
 {

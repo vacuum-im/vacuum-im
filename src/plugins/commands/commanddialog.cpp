@@ -15,7 +15,7 @@ CommandDialog::CommandDialog(ICommands *ACommands, IDataForms *ADataForms, const
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_COMMANDS,0,0,"windowIcon");
 
 	ui.wdtForm->setLayout(new QVBoxLayout);
-	ui.wdtForm->layout()->setMargin(0);
+	ui.wdtForm->layout()->setContentsMargins(0, 0, 0, 0);
 
 	FCommands = ACommands;
 	FDataForms = ADataForms;

@@ -8,7 +8,7 @@
 #include <utils/jid.h>
 #include <utils/options.h>
 
-#define ACCOUNTMANAGER_UUID "{56F1AA4C-37A6-4007-ACFE-557EEBD86AF8}"
+#define ACCOUNTMANAGER_UUID QUuid("{56F1AA4C-37A6-4007-ACFE-557EEBD86AF8}")
 
 class IAccount
 {

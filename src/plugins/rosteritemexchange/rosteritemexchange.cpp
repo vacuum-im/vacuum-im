@@ -27,6 +27,7 @@
 #include <utils/iconstorage.h>
 #include <utils/message.h>
 #include <utils/options.h>
+#include <utils/helpers.h>
 #include <utils/logger.h>
 
 #define ADR_STREAM_JID         Action::DR_StreamJid
@@ -520,7 +521,7 @@ bool RosterItemExchange::insertDropActions(const Jid &AStreamJid, const Jid &ACo
 	{
 		itemsJids.append(it->itemJid.pBare());
 		itemsNames.append(it->name);
-		itemsGroups.append(it->groups.toList().value(0));
+		itemsGroups.append(toQList(it->groups).value(0));
 	}
 
 	if (!itemsJids.isEmpty())

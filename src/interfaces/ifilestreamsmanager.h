@@ -9,7 +9,7 @@
 #include <utils/options.h>
 #include <utils/xmpperror.h>
 
-#define FILESTREAMSMANAGER_UUID "{ea9ea27a-5ad7-40e3-82b3-db8ac3bdc288}"
+#define FILESTREAMSMANAGER_UUID QUuid("{ea9ea27a-5ad7-40e3-82b3-db8ac3bdc288}")
 
 class IFileStream
 {

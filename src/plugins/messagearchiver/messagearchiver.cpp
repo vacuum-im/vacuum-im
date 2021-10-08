@@ -1,5 +1,6 @@
 #include "messagearchiver.h"
 
+#include <QActionGroup>
 #include <QDir>
 #include <QFile>
 #include <definitions/resources.h>
@@ -25,6 +26,7 @@
 #include <utils/shortcuts.h>
 #include <utils/options.h>
 #include <utils/logger.h>
+#include <utils/helpers.h>
 
 #define ARCHIVE_DIR_NAME           "archive"
 #define PENDING_FILE_NAME          "pending.xml"
@@ -422,10 +424,10 @@ void MessageArchiver::stanzaRequestResult(const Jid &AStreamJid, const Stanza &A
 QMultiMap<int, IOptionsDialogWidget *> MessageArchiver::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
 	QMultiMap<int, IOptionsDialogWidget *>  widgets;
-	QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
+	QStringList nodeTree = ANodeId.split(".",Qt::SkipEmptyParts);
 	if (nodeTree.count()==3 && nodeTree.at(0)==OPN_ACCOUNTS && nodeTree.at(2)=="History")
 	{
-		IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountById(nodeTree.at(1)) : NULL;
+		IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountById(QUuid(nodeTree.at(1))) : NULL;
 		if (account!=NULL && isReady(account->streamJid()))
 		{
 			OptionsNode options = account->optionsNode();
@@ -1584,7 +1586,7 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
 			methodElem = methodElem.nextSiblingElement("method");
 		}
 
-		QSet<Jid> oldItemJids = prefs.itemPrefs.keys().toSet();
+		QSet<Jid> oldItemJids = toQSet(prefs.itemPrefs.keys());
 		QDomElement itemElem = AElem.firstChildElement("item");
 		while (!itemElem.isNull())
 		{
@@ -1605,7 +1607,7 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
 			itemElem = itemElem.nextSiblingElement("item");
 		}
 
-		QSet<QString> oldSessionIds = prefs.sessionPrefs.keys().toSet();
+		QSet<QString> oldSessionIds = toQSet(prefs.sessionPrefs.keys());
 		QDomElement sessionElem = AElem.firstChildElement("session");
 		while (!sessionElem.isNull())
 		{
@@ -1682,7 +1684,7 @@ void MessageArchiver::loadPendingMessages(const Jid &AStreamJid)
 						message.setTo(AStreamJid.full());
 					else
 						message.setFrom(AStreamJid.full());
-					messages.append(qMakePair<Message,bool>(message,directionIn));
+					messages.append(QPair<Message,bool>(message,directionIn));
 
 					messageElem = messageElem.nextSiblingElement("message");
 				}
@@ -1793,7 +1795,7 @@ bool MessageArchiver::processMessage(const Jid &AStreamJid, const Message &AMess
 	Jid itemJid = ADirectionIn ? (!AMessage.from().isEmpty() ? AMessage.from() : AStreamJid.domain()) : AMessage.to();
 	if (!isReady(AStreamJid))
 	{
-		FPendingMessages[AStreamJid].append(qMakePair<Message,bool>(AMessage,ADirectionIn));
+		FPendingMessages[AStreamJid].append(QPair<Message,bool>(AMessage,ADirectionIn));
 		return true;
 	}
 	return saveMessage(AStreamJid,itemJid,AMessage);
@@ -1833,9 +1835,9 @@ void MessageArchiver::processMessagesRequest(const QString &ALocalId, MessagesRe
 	else if (ARequest.headers.isEmpty() || (quint32)ARequest.body.messages.count()>ARequest.request.maxItems)
 	{
 		if (ARequest.request.order == Qt::AscendingOrder)
-			std::sort(ARequest.body.messages.begin(),ARequest.body.messages.end(),qLess<Message>());
+			std::sort(ARequest.body.messages.begin(),ARequest.body.messages.end(),std::less<Message>());
 		else
-			std::sort(ARequest.body.messages.begin(),ARequest.body.messages.end(),qGreater<Message>());
+			std::sort(ARequest.body.messages.begin(),ARequest.body.messages.end(),std::greater<Message>());
 
 		REPORT_TIMING(STMP_HISTORY_MESSAGES_LOAD,Logger::finishTiming(STMP_HISTORY_MESSAGES_LOAD,ALocalId));
 		LOG_DEBUG(QString("Messages successfully loaded, id=%1").arg(ALocalId));
@@ -1875,9 +1877,9 @@ void MessageArchiver::processHeadersRequest(const QString &ALocalId, HeadersRequ
 			}
 
 			if (ARequest.request.order == Qt::AscendingOrder)
-				std::sort(headers.begin(),headers.end(),qLess<IArchiveHeader>());
+				std::sort(headers.begin(),headers.end(),std::less<IArchiveHeader>());
 			else
-				std::sort(headers.begin(),headers.end(),qGreater<IArchiveHeader>());
+				std::sort(headers.begin(),headers.end(),std::greater<IArchiveHeader>());
 
 			if ((quint32)headers.count() > ARequest.request.maxItems)
 				headers = headers.mid(0,ARequest.request.maxItems);
@@ -2906,7 +2908,7 @@ void MessageArchiver::onOptionsChanged(const OptionsNode &ANode)
 {
 	if (ANode.cleanPath() == OPV_HISTORY_ENGINE_ENABLED)
 	{
-		QUuid id = ANode.parent().nspace();
+		QUuid id = QUuid(ANode.parent().nspace());
 		emit archiveEngineEnableChanged(id,ANode.value().toBool());
 		emit totalCapabilitiesChanged(Jid::null);
 	}

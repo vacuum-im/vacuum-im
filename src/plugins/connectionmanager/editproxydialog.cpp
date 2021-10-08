@@ -1,6 +1,7 @@
 #include "editproxydialog.h"
 
 #include <utils/logger.h>
+#include <utils/helpers.h>
 
 enum ProxyItemDataRoles {
 	PDR_UUID = Qt::UserRole,
@@ -121,11 +122,11 @@ void EditProxyDialog::onDialogButtonBoxAccepted()
 {
 	updateProxyItem(ui.ltwProxyList->currentItem());
 
-	QSet<QUuid> oldProxy = FManager->proxyList().toSet();
+	QSet<QUuid> oldProxy = toQSet(FManager->proxyList());
 	for (int row = 0; row < ui.ltwProxyList->count(); row++)
 	{
 		QListWidgetItem *proxyItem = ui.ltwProxyList->item(row);
-		QUuid id = proxyItem->data(PDR_UUID).toString();
+		QUuid id = proxyItem->data(PDR_UUID).toUuid();
 		if (!id.isNull())
 		{
 			IConnectionProxy proxy;

@@ -13,6 +13,7 @@
 #include <utils/xmpperror.h>
 #include <utils/stanza.h>
 #include <utils/logger.h>
+#include <utils/helpers.h>
 
 #define DIR_DATA                "bitsofbinary"
 #define LOAD_TIMEOUT            30000
@@ -120,7 +121,7 @@ bool BitsOfBinary::initSettings()
 			while (!reader.atEnd())
 			{
 				reader.readNext();
-				if (reader.isStartElement() && reader.qualifiedName() == "data")
+				if (reader.isStartElement() && reader.qualifiedName() == QLatin1String("data"))
 				{
 					maxAge = reader.attributes().value("max-age").toString().toLongLong();
 					break;
@@ -407,7 +408,7 @@ void BitsOfBinary::onXmppStreamCreated(IXmppStream *AXmppStream)
 
 void BitsOfBinary::onOfflineTimerTimeout()
 {
-	foreach(const QString &contentId, FOfflineRequests.toSet())
+	foreach(const QString &contentId, toQSet(FOfflineRequests))
 	{
 		QString type; QByteArray data; quint64 maxAge;
 		if (loadBinary(contentId,type,data,maxAge))

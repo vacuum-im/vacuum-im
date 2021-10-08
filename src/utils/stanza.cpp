@@ -1,5 +1,6 @@
 #include "stanza.h"
 
+#include <QIODevice>
 #include <QTextStream>
 #include "jid.h"
 

@@ -317,5 +317,5 @@ void OptionsDialogWidget::rigisterEditor(const OptionsNode &ANode, const QString
 	}
 
 	setLayout(hlayout);
-	layout()->setMargin(0);
+	layout()->setContentsMargins(0, 0, 0, 0);
 }

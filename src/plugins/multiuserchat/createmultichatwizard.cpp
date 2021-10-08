@@ -203,7 +203,7 @@ ModePage::ModePage(QWidget *AParent) : QWizardPage(AParent)
 	layout->addWidget(rbtJoinRoom);
 	layout->addWidget(rbtCreateRoom);
 	layout->addWidget(rbtManuallyRoom);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	QWidget::setTabOrder(rbtJoinRoom, rbtCreateRoom);
 
@@ -304,7 +304,7 @@ ServicePage::ServicePage(QWidget *AParent) : QWizardPage(AParent)
 	layout->addLayout(lytService);
 	layout->addSpacing(10);
 	layout->addWidget(lblInfo);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	QWidget::setTabOrder(cmbAccount,cmbServer);
 	QWidget::setTabOrder(cmbServer,tlbAddServer);
@@ -625,7 +625,7 @@ RoomPage::RoomPage(QWidget *AParent) : QWizardPage(AParent)
 	layout->addWidget(tbvRoomView);
 	layout->addLayout(nodeLayout);
 	layout->addWidget(lblInfo);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	QWidget::setTabOrder(lneRoomNode, sleSearch);
 	QWidget::setTabOrder(sleSearch, tbvRoomView);
@@ -902,7 +902,7 @@ ConfigPage::ConfigPage(QWidget *AParent) : QWizardPage(AParent)
 
 	wdtConfig = new QWidget(this);
 	wdtConfig->setLayout(new QVBoxLayout);
-	wdtConfig->layout()->setMargin(0);
+	wdtConfig->layout()->setContentsMargins(0, 0, 0, 0);
 
 	prbProgress = new QProgressBar(this);
 	prbProgress->setRange(0,0);
@@ -920,7 +920,7 @@ ConfigPage::ConfigPage(QWidget *AParent) : QWizardPage(AParent)
 	layout->addWidget(prbProgress);
 	layout->addWidget(lblInfo);
 	layout->addStretch();
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	registerField(WF_CONFIG_HINTS,this,"configHints");
 }
@@ -1087,7 +1087,7 @@ void ConfigPage::onMultiChatConfigLoaded(const QString &AId, const IDataForm &AF
 				delete FConfigFormWidget->instance();
 
 			FConfigFormWidget = dataForms->formWidget(dataForms->localizeForm(AForm), wdtConfig);
-			FConfigFormWidget->instance()->layout()->setMargin(0);
+			FConfigFormWidget->instance()->layout()->setContentsMargins(0, 0, 0, 0);
 			wdtConfig->layout()->addWidget(FConfigFormWidget->instance());
 
 			for (QMap<QString,QVariant>::const_iterator it=FConfigHints.constBegin(); it!=FConfigHints.constEnd(); ++it)
@@ -1204,7 +1204,7 @@ JoinPage::JoinPage(QWidget *AParent) : QWizardPage(AParent)
 	layout->addWidget(lblMucHidden);
 	layout->addSpacing(10);
 	layout->addWidget(lblInfo);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	QWidget::setTabOrder(lneNick,lblRegister);
 	QWidget::setTabOrder(lblRegister,lnePassword);
@@ -1574,7 +1574,7 @@ ManualPage::ManualPage(QWidget *AParent) : QWizardPage(AParent)
 	layout->addWidget(lneRoomPassword,3,1,1,2);
 	layout->addItem(new QSpacerItem(10,10),4,0);
 	layout->addWidget(lblInfo,5,0,1,3);
-	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 0);
 
 	QWidget::setTabOrder(cmbAccount, lneRoomJid);
 	QWidget::setTabOrder(lneRoomJid, lneRoomNick);

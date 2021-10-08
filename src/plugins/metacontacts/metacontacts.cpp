@@ -27,6 +27,7 @@
 #include <utils/widgetmanager.h>
 #include <utils/shortcuts.h>
 #include <utils/logger.h>
+#include <utils/helpers.h>
 
 #define UPDATE_META_TIMEOUT     0
 #define STORAGE_SAVE_TIMEOUT    100
@@ -591,12 +592,12 @@ AdvancedDelegateEditProxy *MetaContacts::rosterEditProxy(int AOrder, int ADataRo
 
 bool MetaContacts::recentItemValid(const IRecentItem &AItem) const
 {
-	return !AItem.reference.isEmpty() && (FMetaContacts.contains(AItem.streamJid) ? FMetaContacts.value(AItem.streamJid).contains(AItem.reference) : true);
+	return !AItem.reference.isEmpty() && (FMetaContacts.contains(AItem.streamJid) ? FMetaContacts.value(AItem.streamJid).contains(QUuid(AItem.reference)) : true);
 }
 
 bool MetaContacts::recentItemCanShow(const IRecentItem &AItem) const
 {
-	return FMetaContacts.value(AItem.streamJid).contains(AItem.reference);
+	return FMetaContacts.value(AItem.streamJid).contains(QUuid(AItem.reference));
 }
 
 QIcon MetaContacts::recentItemIcon(const IRecentItem &AItem) const
@@ -614,7 +615,7 @@ IRecentItem MetaContacts::recentItemForIndex(const IRosterIndex *AIndex) const
 {
 	IRecentItem item;
 	if (AIndex->kind() == RIK_METACONTACT)
-		item = FMetaRecentItems.value(getMetaIndexRoot(AIndex->data(RDR_STREAM_JID).toString())).value(AIndex->data(RDR_METACONTACT_ID).toString());
+		item = FMetaRecentItems.value(getMetaIndexRoot(AIndex->data(RDR_STREAM_JID).toString())).value(AIndex->data(RDR_METACONTACT_ID).toUuid());
 	return item;
 }
 
@@ -634,7 +635,7 @@ bool MetaContacts::setModelData(const AdvancedItemDelegate *ADelegate, QWidget *
 		QString oldName = AIndex.data(RDR_NAME).toString();
 		if (!newName.isEmpty() && newName!=oldName)
 		{
-			QUuid metaId = AIndex.data(RDR_METACONTACT_ID).toString();
+			QUuid metaId = AIndex.data(RDR_METACONTACT_ID).toUuid();
 			foreach(const Jid &streamJid, AIndex.data(RDR_STREAMS).toStringList())
 				setMetaContactName(streamJid,metaId,newName);
 		}
@@ -957,7 +958,7 @@ void MetaContacts::updateMetaIndexes(const Jid &AStreamJid, const QUuid &AMetaId
 				groupMetaIndexMap.insert(metaIndex->data(RDR_GROUP).toString(),metaIndex);
 
 			QSet<QString> metaGroups = !meta.groups.isEmpty() ? meta.groups : QSet<QString>()<<QString();
-			QSet<QString> curGroups = groupMetaIndexMap.keys().toSet();
+			QSet<QString> curGroups = toQSet(groupMetaIndexMap.keys());
 			QSet<QString> newGroups = metaGroups - curGroups;
 			QSet<QString> oldGroups = curGroups - metaGroups;
 
@@ -1048,7 +1049,8 @@ void MetaContacts::updateMetaIndexItems(IRosterIndex *AMetaIndex, const MetaMerg
 
 				FMetaItemProxyToIndex.remove(prevProxyIndex,itemIndex);
 				FMetaItemIndexToProxy.insert(itemIndex,proxyIndex);
-				FMetaItemProxyToIndex.insertMulti(proxyIndex,itemIndex);
+				//fixme
+				FMetaItemProxyToIndex.insert(proxyIndex,itemIndex);
 			}
 
 			if (itemIt.key()==AMergedContact.stream && itemIt.value()==AMergedContact.itemJid && FMetaIndexToProxy.value(AMetaIndex)!=itemIndex)
@@ -1190,7 +1192,7 @@ void MetaContacts::updateMetaRecentItems(const Jid &AStreamJid, const QUuid &AMe
 					}
 					else if (item.type == REIT_METACONTACT)
 					{
-						if (meta.id == item.reference)
+						if (meta.id == QUuid(item.reference))
 							recentMetas.append(item);
 					}
 				}
@@ -1231,7 +1233,7 @@ void MetaContacts::updateMetaRecentItems(const Jid &AStreamJid, const QUuid &AMe
 		}
 		else foreach(const IRecentItem &item, FRecentContacts->streamItems(AStreamJid))
 		{
-			if (item.type==REIT_METACONTACT && meta.id==item.reference)
+			if (item.type==REIT_METACONTACT && meta.id==QUuid(item.reference))
 			{
 				FUpdatingRecentItem = item;
 				FMetaRecentItems[sRoot].remove(AMetaId);
@@ -1300,7 +1302,7 @@ bool MetaContacts::updateMetaContact(const Jid &AStreamJid, const IMetaContact &
 
 		if (after != before)
 		{
-			QSet<Jid> oldMetaItems = before.items.toSet() - after.items.toSet();
+			QSet<Jid> oldMetaItems = toQSet(before.items) - toQSet(after.items);
 
 			foreach(const Jid &itemJid, oldMetaItems)
 				itemMetaIdRef.remove(itemJid);
@@ -1331,7 +1333,7 @@ bool MetaContacts::updateMetaContact(const Jid &AStreamJid, const IMetaContact &
 
 void MetaContacts::updateMetaContacts(const Jid &AStreamJid, const QList<IMetaContact> &AMetaContacts)
 {
-	QSet<QUuid> oldMetaId = FMetaContacts[AStreamJid].keys().toSet();
+	QSet<QUuid> oldMetaId = toQSet(FMetaContacts[AStreamJid].keys());
 
 	foreach(const IMetaContact &meta, AMetaContacts)
 	{
@@ -1416,8 +1418,8 @@ QList<IRosterIndex *> MetaContacts::indexesProxies(const QList<IRosterIndex *> &
 			proxies.append(index);
 		}
 	}
-	proxies.removeAll(NULL);
-	return proxies.toSet().toList();
+	proxies.removeAll(nullptr);
+	return toQList(toQSet(proxies));;
 }
 
 QMap<int, QStringList> MetaContacts::indexesRolesMap(const QList<IRosterIndex *> &AIndexes, const QList<int> &ARoles) const
@@ -1454,12 +1456,12 @@ void MetaContacts::renameMetaContact(const QStringList &AStreams, const QStringL
 {
 	if (isReadyStreams(AStreams) && !AStreams.isEmpty() && AStreams.count()==AMetas.count())
 	{
-		MetaMergedContact meta = getMergedContact(AStreams.value(0),AMetas.value(0));
+		MetaMergedContact meta = getMergedContact(AStreams.value(0),QUuid(AMetas.value(0)));
 		QString newName = QInputDialog::getText(NULL,tr("Rename Metacontact"),tr("Enter name:"),QLineEdit::Normal,meta.name);
 		if (!newName.isEmpty() && newName!=meta.name)
 		{
 			for (int i=0; i<AStreams.count(); i++)
-				setMetaContactName(AStreams.at(i),AMetas.at(i),newName);
+				setMetaContactName(AStreams.at(i),QUuid(AMetas.at(i)),newName);
 		}
 	}
 }
@@ -1562,7 +1564,7 @@ QList<IMetaContact> MetaContacts::loadMetaContactsFromXML(const QDomElement &AEl
 	while (!metaElem.isNull())
 	{
 		IMetaContact meta;
-		meta.id = metaElem.attribute("id");
+		meta.id = QUuid(metaElem.attribute("id"));
 		meta.name = metaElem.attribute("name");
 
 		QDomElement itemElem = metaElem.firstChildElement("item");
@@ -1844,7 +1846,7 @@ void MetaContacts::onRostersModelIndexDestroyed(IRosterIndex *AIndex)
 		QMap<const IRosterIndex *, QHash<QUuid, QList<IRosterIndex *> > >::iterator rootIt = FMetaIndexes.find(getMetaIndexRoot(AIndex->data(RDR_STREAM_JID).toString()));
 		if (rootIt != FMetaIndexes.end())
 		{
-			QHash<QUuid, QList<IRosterIndex *> >::iterator metaIt = rootIt->find(AIndex->data(RDR_METACONTACT_ID).toString());
+			QHash<QUuid, QList<IRosterIndex *> >::iterator metaIt = rootIt->find(AIndex->data(RDR_METACONTACT_ID).toUuid());
 			if (metaIt != rootIt->end())
 				metaIt->removeAll(AIndex);
 		}
@@ -1914,12 +1916,12 @@ void MetaContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AI
 
 			QList<QUuid> uniqueMetas;
 			QMultiMap<Jid, Jid> uniqueContacts;
-			QStringList uniqueKinds = rolesMap.value(RDR_KIND).toSet().toList();
+			QStringList uniqueKinds = toQList(toQSet(rolesMap.value(RDR_KIND)));
 			for(int i=0; i<rolesMap.value(RDR_STREAM_JID).count(); i++)
 			{
 				Jid streamJid = rolesMap.value(RDR_STREAM_JID).at(i);
 				Jid contactJid = rolesMap.value(RDR_PREP_BARE_JID).at(i);
-				QUuid metaId = rolesMap.value(RDR_METACONTACT_ID).at(i);
+				QUuid metaId = QUuid(rolesMap.value(RDR_METACONTACT_ID).at(i));
 
 				if (!metaId.isNull() && !uniqueMetas.contains(metaId))
 					uniqueMetas.append(metaId);
@@ -2184,10 +2186,10 @@ void MetaContacts::onRecentContactsOpened(const Jid &AStreamJid)
 				updatedMetas += metaId;
 			}
 		}
-		else if (item.type==REIT_METACONTACT && updatedMetas.contains(item.reference))
+		else if (item.type==REIT_METACONTACT && updatedMetas.contains(QUuid(item.reference)))
 		{
-			updateMetaRecentItems(AStreamJid,item.reference);
-			updatedMetas += item.reference;
+			updateMetaRecentItems(AStreamJid,QUuid(item.reference));
+			updatedMetas += QUuid(item.reference);
 		}
 	}
 }
@@ -2201,10 +2203,10 @@ void MetaContacts::onRecentItemChanged(const IRecentItem &AItem)
 			IRosterIndex *sRoot = getMetaIndexRoot(AItem.streamJid);
 
 			bool isFavorite = AItem.properties.value(REIP_FAVORITE).toBool();
-			IRecentItem prevItem = FMetaRecentItems.value(sRoot).value(AItem.reference);
+			IRecentItem prevItem = FMetaRecentItems.value(sRoot).value(QUuid(AItem.reference));
 			if (!prevItem.isNull() && prevItem.properties.value(REIP_FAVORITE)!=isFavorite)
 			{
-				foreach(const IRecentItem &item, findMetaRecentContacts(AItem.streamJid,AItem.reference))
+				foreach(const IRecentItem &item, findMetaRecentContacts(AItem.streamJid,QUuid(AItem.reference)))
 				{
 					if (FRecentContacts->isReady(item.streamJid))
 					{
@@ -2215,7 +2217,7 @@ void MetaContacts::onRecentItemChanged(const IRecentItem &AItem)
 				FUpdatingRecentItem = IRecentItem();
 			}
 
-			FMetaRecentItems[sRoot].insert(AItem.reference,AItem);
+			FMetaRecentItems[sRoot].insert(QUuid(AItem.reference),AItem);
 		}
 		else if (AItem.type == REIT_CONTACT)
 		{
@@ -2233,9 +2235,9 @@ void MetaContacts::onRecentItemRemoved(const IRecentItem &AItem)
 		if (AItem.type == REIT_METACONTACT)
 		{
 			IRosterIndex *sRoot = getMetaIndexRoot(AItem.streamJid);
-			FMetaRecentItems[sRoot].remove(AItem.reference);
+			FMetaRecentItems[sRoot].remove(QUuid(AItem.reference));
 
-			foreach(const IRecentItem &item, findMetaRecentContacts(AItem.streamJid,AItem.reference))
+			foreach(const IRecentItem &item, findMetaRecentContacts(AItem.streamJid,QUuid(AItem.reference)))
 			{
 				if (FRecentContacts->isReady(item.streamJid))
 				{
@@ -2278,7 +2280,7 @@ void MetaContacts::onRenameMetaContactByAction()
 		{
 			bool editInRoster = false;
 
-			QUuid metaId = action->data(ADR_METACONTACT_ID).toStringList().value(0);
+			QUuid metaId = QUuid(action->data(ADR_METACONTACT_ID).toStringList().value(0));
 			if (FRostersView && FRostersView->instance()->isActiveWindow() && FRostersView->rostersModel())
 			{
 				QString group = action->data(ADR_FROM_GROUP).toStringList().value(0);
@@ -2310,7 +2312,7 @@ void MetaContacts::onCopyMetaContactToGroupByAction()
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
-		QUuid metaId = action->data(ADR_METACONTACT_ID).toString();
+		QUuid metaId = action->data(ADR_METACONTACT_ID).toUuid();
 		foreach(const Jid &streamJid, action->data(ADR_STREAM_JID).toStringList())
 		{
 			IMetaContact meta = findMetaContact(streamJid,metaId);
@@ -2328,7 +2330,7 @@ void MetaContacts::onMoveMetaContactToGroupByAction()
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
-		QUuid metaId = action->data(ADR_METACONTACT_ID).toString();
+		QUuid metaId = action->data(ADR_METACONTACT_ID).toUuid();
 		foreach(const Jid &streamJid, action->data(ADR_STREAM_JID).toStringList())
 		{
 			IMetaContact meta = findMetaContact(streamJid,metaId);
@@ -2375,7 +2377,7 @@ void MetaContacts::onShortcutActivated(const QString &AId, QWidget *AWidget)
 		QMap<int, QStringList> rolesMap = indexesRolesMap(indexes,QList<int>()<<RDR_KIND<<RDR_STREAM_JID<<RDR_PREP_BARE_JID<<RDR_METACONTACT_ID);
 		if (isSelectionAccepted(indexes) && isReadyStreams(rolesMap.value(RDR_STREAM_JID)))
 		{
-			QStringList uniqueKinds = rolesMap.value(RDR_KIND).toSet().toList();
+			QStringList uniqueKinds = toQList(toQSet(rolesMap.value(RDR_KIND)));
 			if (AId==SCT_ROSTERVIEW_RENAME && indexes.count()==1)
 			{
 				IRosterIndex *index = indexes.first();

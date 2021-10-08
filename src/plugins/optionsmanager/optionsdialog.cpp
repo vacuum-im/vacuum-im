@@ -95,7 +95,7 @@ QWidget *OptionsDialog::createNodeWidget(const QString &ANodeId)
 
 	QWidget *nodeWidget = new QWidget(ui.scaScroll);
 	QVBoxLayout *nodeLayout = new QVBoxLayout(nodeWidget);
-	nodeLayout->setMargin(5);
+	nodeLayout->setContentsMargins(5, 5, 5, 5);
 
 	QMultiMap<int, IOptionsDialogWidget *> orderedWidgets;
 	foreach(IOptionsDialogHolder *optionsHolder, FOptionsManager->optionsDialogHolders())

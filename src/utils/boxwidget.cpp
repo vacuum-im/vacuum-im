@@ -4,7 +4,7 @@ BoxWidget::BoxWidget(QWidget *AParent, QBoxLayout::Direction ADirection) : QFram
 {
 	setFrameShape(QFrame::NoFrame);
 	FLayout = new QBoxLayout(ADirection,this);
-	FLayout->setMargin(0);
+	FLayout->setContentsMargins(0, 0, 0, 0);
 }
 
 BoxWidget::~BoxWidget()

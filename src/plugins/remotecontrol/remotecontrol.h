@@ -13,7 +13,7 @@
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/inotifications.h>
 
-#define REMOTECONTROL_UUID "{152A3172-9A38-11DF-A3E4-001CBF2EDCFC}"
+#define REMOTECONTROL_UUID QUuid("{152A3172-9A38-11DF-A3E4-001CBF2EDCFC}")
 
 class RemoteControl :
 	public QObject,

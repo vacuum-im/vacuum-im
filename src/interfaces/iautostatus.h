@@ -3,7 +3,7 @@
 
 #include <QUuid>
 
-#define AUTOSTATUS_UUID "{89687A92-B483-4d7a-B2CF-267A05D6CC5D}"
+#define AUTOSTATUS_UUID QUuid("{89687A92-B483-4d7a-B2CF-267A05D6CC5D}")
 
 struct IAutoStatusRule 
 {

@@ -1,6 +1,7 @@
 #include "aboutbox.h"
 
 #include <QDesktopServices>
+#include <QLocale>
 #include <utils/logger.h>
 
 AboutBox::AboutBox(IPluginManager *APluginManager, QWidget *AParent) : QDialog(AParent)
@@ -13,7 +14,8 @@ AboutBox::AboutBox(IPluginManager *APluginManager, QWidget *AParent) : QDialog(A
 
 	if (APluginManager->revisionDate().isValid())
 	{
-		QString revDate = APluginManager->revisionDate().date().toString(Qt::SystemLocaleShortDate);
+		//fixme
+		QString revDate = QLocale::system().toString(APluginManager->revisionDate().date(), QLocale::ShortFormat);
 		ui.lblVersion->setText(tr("Version: %1 %2 of %3").arg(APluginManager->version(),CLIENT_VERSION_SUFFIX,revDate));
 		ui.lblRevision->setText(tr("Revision: %1").arg(APluginManager->revision()));
 	}

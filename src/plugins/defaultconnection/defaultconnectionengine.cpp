@@ -71,7 +71,7 @@ bool DefaultConnectionEngine::initSettings()
 {
 	Options::setDefaultValue(OPV_ACCOUNT_CONNECTION_HOST,QString());
 	Options::setDefaultValue(OPV_ACCOUNT_CONNECTION_PORT,5222);
-	Options::setDefaultValue(OPV_ACCOUNT_CONNECTION_PROXY,QString(APPLICATION_PROXY_REF_UUID));
+	Options::setDefaultValue(OPV_ACCOUNT_CONNECTION_PROXY,QUuid(APPLICATION_PROXY_REF_UUID));
 	Options::setDefaultValue(OPV_ACCOUNT_CONNECTION_SSLPROTOCOL,QSsl::SecureProtocols);
 	Options::setDefaultValue(OPV_ACCOUNT_CONNECTION_USELEGACYSSL,false);
 	Options::setDefaultValue(OPV_ACCOUNT_CONNECTION_CERTVERIFYMODE,IDefaultConnection::Manual);

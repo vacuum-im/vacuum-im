@@ -36,7 +36,7 @@ InfoWidget::InfoWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow
 	toolBar->setMovable(false);
 	toolBar->setFloatable(false);
 	toolBar->setIconSize(QSize(16,16));
-	toolBar->layout()->setMargin(0);
+	toolBar->layout()->setContentsMargins(0, 0, 0, 0);
 	toolBar->setStyleSheet("QToolBar { border: none; }");
 	toolBar->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
 
@@ -47,7 +47,7 @@ InfoWidget::InfoWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow
 	connect(FInfoToolBar,SIGNAL(itemInserted(QAction *, QAction *, Action *, QWidget *, int)),SLOT(onUpdateInfoToolBarVisibility()));
 
 	ui.wdtInfoToolBar->setLayout(new QHBoxLayout);
-	ui.wdtInfoToolBar->layout()->setMargin(0);
+	ui.wdtInfoToolBar->layout()->setContentsMargins(0, 0, 0, 0);
 	ui.wdtInfoToolBar->layout()->addWidget(toolBar);
 
 	FAddressMenu = new Menu(this);

@@ -1,7 +1,7 @@
 #ifndef FILEMESSAGEARCHIVE_H
 #define FILEMESSAGEARCHIVE_H
 
-#include <QMutex>
+#include <QRecursiveMutex>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ifilemessagearchive.h>
 #include <interfaces/imessagearchiver.h>
@@ -115,7 +115,7 @@ private:
 	IServiceDiscovery *FDiscovery;
 	IAccountManager *FAccountManager;
 private:
-	mutable QMutex FMutex;
+	mutable QRecursiveMutex FMutex;
 	FileWorker *FFileWorker;
 	DatabaseWorker *FDatabaseWorker;
 	DatabaseSynchronizer *FDatabaseSyncWorker;

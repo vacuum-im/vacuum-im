@@ -3,7 +3,7 @@
 
 #include <utils/jid.h>
 
-#define CHATSTATES_UUID "{3f924c9c-3539-43f9-8c85-e410b792a946}"
+#define CHATSTATES_UUID QUuid("{3f924c9c-3539-43f9-8c85-e410b792a946}")
 
 class IChatStates
 {

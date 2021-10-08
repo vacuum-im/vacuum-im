@@ -214,7 +214,7 @@ AutoRulesOptionsDialog::AutoRulesOptionsDialog(IAutoStatus *AAutoStatus, IStatus
 	hblButtons->addWidget(dbbButtonBox);
 
 	QVBoxLayout *vblLayout = new QVBoxLayout(this);
-	vblLayout->setMargin(5);
+	vblLayout->setContentsMargins(5, 5, 5, 5);
 	vblLayout->addWidget(tbwRules);
 	vblLayout->addLayout(hblButtons);
 
@@ -301,7 +301,7 @@ void AutoRulesOptionsDialog::onDialogButtonBoxClicked(QAbstractButton *AButton)
 			rule.text = tbwRules->item(row,RTC_TEXT)->data(SDR_VALUE).toString();
 			rule.priority = tbwRules->item(row,RTC_PRIORITY)->data(SDR_VALUE).toInt();
 
-			QUuid ruleId = tbwRules->item(row,RTC_ENABLED)->data(SDR_VALUE).toString();
+			QUuid ruleId = tbwRules->item(row,RTC_ENABLED)->data(SDR_VALUE).toUuid();
 			if (!ruleId.isNull())
 			{
 				IAutoStatusRule oldRule = FAutoStatus->ruleValue(ruleId);

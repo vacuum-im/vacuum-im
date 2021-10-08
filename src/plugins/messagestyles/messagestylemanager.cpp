@@ -283,7 +283,7 @@ void MessageStyleManager::appendPendingChanges(int AMessageType, const QString &
 	if (FPendingChages.isEmpty())
 		QTimer::singleShot(0,this,SLOT(onApplyPendingChanges()));
 
-	QPair<int,QString> item = qMakePair<int,QString>(AMessageType,AContext);
+	QPair<int,QString> item = QPair<int,QString>(AMessageType,AContext);
 	if (!FPendingChages.contains(item))
 		FPendingChages.append(item);
 }

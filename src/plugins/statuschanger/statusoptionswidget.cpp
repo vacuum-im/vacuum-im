@@ -179,13 +179,13 @@ StatusOptionsWidget::StatusOptionsWidget(IStatusChanger *AStatusChanger, QWidget
 	tbwStatus->horizontalHeader()->setSectionResizeMode(STC_PRIORITY,QHeaderView::ResizeToContents);
 
 	QHBoxLayout *hltlayout = new QHBoxLayout;
-	hltlayout->setMargin(0);
+	hltlayout->setContentsMargins(0, 0, 0, 0);
 	hltlayout->addStretch();
 	hltlayout->addWidget(pbtAdd);
 	hltlayout->addWidget(pbtDelete);
 
 	QVBoxLayout *vltLayout = new QVBoxLayout(this);
-	vltLayout->setMargin(0);
+	vltLayout->setContentsMargins(0, 0, 0, 0);
 	vltLayout->addWidget(tbwStatus);
 	vltLayout->addLayout(hltlayout);
 

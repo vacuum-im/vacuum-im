@@ -5,7 +5,7 @@
 #include <utils/jid.h>
 #include <utils/stanza.h>
 
-#define PEPMANAGER_UUID "{36dbd5c1-a3cd-11df-87fc-001cbf2edcfc}"
+#define PEPMANAGER_UUID QUuid("{36dbd5c1-a3cd-11df-87fc-001cbf2edcfc}")
 
 class IPEPHandler
 {

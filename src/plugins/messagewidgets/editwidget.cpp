@@ -32,7 +32,7 @@ EditWidget::EditWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow
 	toolBar->setMovable(false);
 	toolBar->setFloatable(false);
 	toolBar->setIconSize(QSize(16,16));
-	toolBar->layout()->setMargin(0);
+	toolBar->layout()->setContentsMargins(0, 0, 0, 0);
 	toolBar->setStyleSheet("QToolBar { border: none; }");
 	toolBar->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
 
@@ -43,7 +43,7 @@ EditWidget::EditWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow
 	connect(FEditToolBar,SIGNAL(itemInserted(QAction *, QAction *, Action *, QWidget *, int)),SLOT(onUpdateEditToolBarVisibility()));
 
 	ui.wdtSendToolBar->setLayout(new QHBoxLayout);
-	ui.wdtSendToolBar->layout()->setMargin(0);
+	ui.wdtSendToolBar->layout()->setContentsMargins(0, 0, 0, 0);
 	ui.wdtSendToolBar->layout()->addWidget(toolBar);
 
 	FSendAction = new Action(toolBar);
@@ -107,9 +107,9 @@ bool EditWidget::sendMessage()
 	{
 		bool hooked = false;
 		QMultiMap<int, IMessageEditSendHandler *> handlers = FMessageWidgets->editSendHandlers();
-		for (QMap<int,IMessageEditSendHandler *>::const_iterator it = handlers.constBegin(); !hooked && it!=handlers.constEnd(); ++it)
+		for (QMultiMap<int,IMessageEditSendHandler *>::const_iterator it = handlers.constBegin(); !hooked && it!=handlers.constEnd(); ++it)
 			hooked = (*it)->messageEditSendPrepare(it.key(),this);
-		for (QMap<int,IMessageEditSendHandler *>::const_iterator it = handlers.constBegin(); !hooked && !sent && it!=handlers.constEnd(); ++it)
+		for (QMultiMap<int,IMessageEditSendHandler *>::const_iterator it = handlers.constBegin(); !hooked && !sent && it!=handlers.constEnd(); ++it)
 			sent = (*it)->messageEditSendProcesse(it.key(),this);
 
 		if (sent)
@@ -250,8 +250,8 @@ QTextDocumentFragment EditWidget::prepareTextFragment(const QTextDocumentFragmen
 		data.setHtml(AFragment.toHtml());
 
 		QTextDocument doc;
-		QMap<int,IMessageEditContentsHandler *> handlers = FMessageWidgets->editContentsHandlers();
-		for (QMap<int,IMessageEditContentsHandler *>::const_iterator it = handlers.constBegin(); it!=handlers.constEnd(); ++it)
+		QMultiMap<int,IMessageEditContentsHandler *> handlers = FMessageWidgets->editContentsHandlers();
+		for (QMultiMap<int,IMessageEditContentsHandler *>::const_iterator it = handlers.constBegin(); it!=handlers.constEnd(); ++it)
 			if (it.value()->messageEditContentsInsert(it.key(),this,&data,&doc))
 				break;
 
@@ -271,7 +271,8 @@ bool EditWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
 		if (AEvent->type() == QEvent::KeyPress)
 		{
 			QKeyEvent *keyEvent = static_cast<QKeyEvent *>(AEvent);
-			if (FSendShortcut[0] == keyEvent->key()+keyEvent->modifiers())
+			//fixme
+			if (FSendShortcut[0] == keyEvent->key() + keyEvent->nativeModifiers())
 			{
 				hooked = true;
 				onShortcutActivated(FSendShortcutId,ui.medEditor);
@@ -400,23 +401,23 @@ void EditWidget::onOptionsChanged(const OptionsNode &ANode)
 
 void EditWidget::onEditorCreateDataRequest(QMimeData *AData)
 {
-	QMap<int,IMessageEditContentsHandler *> handlers = FMessageWidgets->editContentsHandlers();
-	for (QMap<int,IMessageEditContentsHandler *>::const_iterator it = handlers.constBegin(); it!=handlers.constEnd(); ++it)
+	QMultiMap<int,IMessageEditContentsHandler *> handlers = FMessageWidgets->editContentsHandlers();
+	for (QMultiMap<int,IMessageEditContentsHandler *>::const_iterator it = handlers.constBegin(); it!=handlers.constEnd(); ++it)
 		if (it.value()->messageEditContentsCreate(it.key(),this,AData))
 			break;
 }
 
 void EditWidget::onEditorCanInsertDataRequest(const QMimeData *AData, bool &ACanInsert)
 {
-	QMap<int,IMessageEditContentsHandler *> handlers = FMessageWidgets->editContentsHandlers();
-	for (QMap<int,IMessageEditContentsHandler *>::const_iterator it = handlers.constBegin(); !ACanInsert && it!=handlers.constEnd(); ++it)
+	QMultiMap<int,IMessageEditContentsHandler *> handlers = FMessageWidgets->editContentsHandlers();
+	for (QMultiMap<int,IMessageEditContentsHandler *>::const_iterator it = handlers.constBegin(); !ACanInsert && it!=handlers.constEnd(); ++it)
 		ACanInsert = it.value()->messageEditContentsCanInsert(it.key(),this,AData);
 }
 
 void EditWidget::onEditorInsertDataRequest(const QMimeData *AData, QTextDocument *ADocument)
 {
-	QMap<int,IMessageEditContentsHandler *> handlers = FMessageWidgets->editContentsHandlers();
-	for (QMap<int,IMessageEditContentsHandler *>::const_iterator it = handlers.constBegin(); it!=handlers.constEnd(); ++it)
+	QMultiMap<int,IMessageEditContentsHandler *> handlers = FMessageWidgets->editContentsHandlers();
+	for (QMultiMap<int,IMessageEditContentsHandler *>::const_iterator it = handlers.constBegin(); it!=handlers.constEnd(); ++it)
 		if (it.value()->messageEditContentsInsert(it.key(),this,AData,ADocument))
 			break;
 }
@@ -424,8 +425,8 @@ void EditWidget::onEditorInsertDataRequest(const QMimeData *AData, QTextDocument
 void EditWidget::onEditorContentsChanged(int APosition, int ARemoved, int AAdded)
 {
 	document()->blockSignals(true);
-	QMap<int,IMessageEditContentsHandler *> handlers = FMessageWidgets->editContentsHandlers();
-	for (QMap<int,IMessageEditContentsHandler *>::const_iterator it = handlers.constBegin(); it!=handlers.constEnd(); ++it)
+	QMultiMap<int,IMessageEditContentsHandler *> handlers = FMessageWidgets->editContentsHandlers();
+	for (QMultiMap<int,IMessageEditContentsHandler *>::const_iterator it = handlers.constBegin(); it!=handlers.constEnd(); ++it)
 		if (it.value()->messageEditContentsChanged(it.key(),this,APosition,ARemoved,AAdded))
 			break;
 	document()->blockSignals(false);

@@ -28,6 +28,7 @@ public:
 class UTILS_EXPORT Jid
 {
 public:
+//	inline Jid(const Jid &other=Jid::null): d(other.d) {}
 	Jid(const char *AJidStr);
 	Jid(const QString &AJidStr=QString());
 	Jid(const QString &ANode, const QString &ADomain, const QString &AResource);

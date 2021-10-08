@@ -64,7 +64,9 @@ void Action::setData(const QHash<int,QVariant> &AData)
 {
 	if (AData != FData)
 	{
-		FData.unite(AData);
+//FIXME
+//		FData.unite(AData);
+		FData.insert(AData);
 		emit changed();
 	}
 }
@@ -79,7 +81,8 @@ void Action::setShortcutId(const QString &AId)
 	if (FShortcutId != AId)
 	{
 		FShortcutId = AId;
-		Shortcuts::bindObjectShortcut(AId, this);
+		//fixme
+		//Shortcuts::bindObjectShortcut(AId, this);
 		emit changed();
 	}
 }
@@ -188,7 +191,7 @@ void Action::onMenuDestroyed(Menu *AMenu)
 {
 	if (AMenu == FMenu)
 	{
-		FMenu = NULL;
-		QAction::setMenu(NULL);
+		FMenu = nullptr;
+		QAction::setMenu(nullptr);
 	}
 }

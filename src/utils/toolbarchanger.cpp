@@ -299,7 +299,8 @@ void ToolBarChanger::onUpdateVisibilityAndWidth()
 			{
 				visibleItemsCount++;
 				if (visibleItemsCount == 1)
-					maxWidth = widget->sizeHint().width() + FToolBar->layout()->margin()*2;
+					//FIXME
+					maxWidth = widget->sizeHint().width() + FToolBar->layout()->contentsMargins().left()*2;
 				else
 					break;
 			}

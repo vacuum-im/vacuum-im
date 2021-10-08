@@ -168,15 +168,17 @@ void ConsoleWidget::colorXml(QString &AXml) const
 
 	for (int i=0; i<changesCount; i++)
 	{
-		QRegExp regexp(changes[i].regexp);
-		regexp.setMinimal(changes[i].minimal);
+		//fixme
+		QRegularExpression regexp(changes[i].regexp);
+		if (changes[i].minimal)
+			regexp.setPatternOptions(QRegularExpression::InvertedGreedinessOption);
 		AXml.replace(regexp,changes[i].replace);
 	}
 }
 
 void ConsoleWidget::hidePasswords(QString &AXml) const
 {
-	static const QRegExp passRegExp("<password>.*</password>", Qt::CaseInsensitive);
+	static const QRegularExpression passRegExp("<password>.*</password>", QRegularExpression::CaseInsensitiveOption);
 	static const QString passNewStr = "<password>[password]</password>";
 	AXml.replace(passRegExp,passNewStr);
 }
@@ -271,7 +273,7 @@ void ConsoleWidget::onAddContextClicked()
 
 void ConsoleWidget::onRemoveContextClicked()
 {
-	QUuid oldId = ui.cmbContext->itemData(ui.cmbContext->currentIndex()).toString();
+	QUuid oldId = ui.cmbContext->itemData(ui.cmbContext->currentIndex()).toUuid();
 	if (!oldId.isNull())
 	{
 		ui.cmbContext->removeItem(ui.cmbContext->findData(oldId.toString()));
@@ -282,7 +284,7 @@ void ConsoleWidget::onRemoveContextClicked()
 void ConsoleWidget::onContextChanged(int AIndex)
 {
 	saveContext(FContext);
-	FContext = ui.cmbContext->itemData(AIndex).toString();
+	FContext = ui.cmbContext->itemData(AIndex).toUuid();
 	loadContext(FContext);
 }
 
@@ -319,7 +321,8 @@ void ConsoleWidget::onTextSearchStart()
 	{
 		QTextCursor cursor(ui.tbrConsole->document());
 		do {
-			cursor = ui.tbrConsole->document()->find(ui.lneTextSearch->text(),cursor,0);
+			//fixme
+			cursor = ui.tbrConsole->document()->find(ui.lneTextSearch->text(),cursor, {});
 			if (!cursor.isNull())
 			{
 				QTextEdit::ExtraSelection selection;

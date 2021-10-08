@@ -2,6 +2,7 @@
 
 #include <QTimer>
 #include <QToolButton>
+#include <QRandomGenerator>
 #include <definitions/actiongroups.h>
 #include <definitions/optionvalues.h>
 #include <definitions/optionnodes.h>
@@ -252,7 +253,7 @@ bool StatusChanger::startPlugin()
 QMultiMap<int, IOptionsDialogWidget *> StatusChanger::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
-	QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
+	QStringList nodeTree = ANodeId.split(".",Qt::SkipEmptyParts);
 	if (nodeTree.count()==3 && nodeTree.at(0)==OPN_ACCOUNTS && nodeTree.at(2)=="Additional")
 	{
 		OptionsNode options = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));
@@ -488,7 +489,7 @@ int StatusChanger::addStatusItem(const QString &AName, int AShow, const QString 
 	int statusId = statusByName(AName);
 	if (statusId==STATUS_NULL_ID && !AName.isEmpty())
 	{
-		statusId = qrand();
+		statusId = QRandomGenerator::global()->generate();
 		while(statusId<=STATUS_MAX_STANDART_ID || FStatusItems.contains(statusId))
 			statusId = (statusId > STATUS_MAX_STANDART_ID) ? statusId+1 : STATUS_MAX_STANDART_ID+1;
 

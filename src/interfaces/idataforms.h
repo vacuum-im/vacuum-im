@@ -1,6 +1,7 @@
 #ifndef IDATAFORMS_H
 #define IDATAFORMS_H
 
+#include <QRegExp>
 #include <QUrl>
 #include <QDialog>
 #include <QTableWidget>
@@ -9,7 +10,7 @@
 #include <utils/xmpperror.h>
 #include <utils/toolbarchanger.h>
 
-#define DATAFORMS_UUID "{2B8F89D0-EAA7-46eb-B2FD-AE30DF60E440}"
+#define DATAFORMS_UUID QUuid("{2B8F89D0-EAA7-46eb-B2FD-AE30DF60E440}")
 
 #define DATAVALIDATE_TYPE_STRING        "xs:string"
 #define DATAVALIDATE_TYPE_URI           "xs:anyURI"
@@ -64,7 +65,7 @@ struct IDataValidate
 	QString method;
 	QString min;
 	QString max;
-	QRegExp regexp;
+	QRegularExpression regexp;
 	QString listMin;
 	QString listMax;
 };

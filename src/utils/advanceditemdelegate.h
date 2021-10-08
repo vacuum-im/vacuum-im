@@ -94,7 +94,7 @@ struct UTILS_EXPORT AdvancedDelegateItem
 	ContextData *c;
 	ExplicitData *d;
 };
-typedef QMap<quint32, AdvancedDelegateItem> AdvancedDelegateItems;
+typedef QMultiMap<quint32, AdvancedDelegateItem> AdvancedDelegateItems;
 
 class AdvancedItemDelegate;
 class UTILS_EXPORT AdvancedDelegateEditProxy

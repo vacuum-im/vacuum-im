@@ -6,7 +6,7 @@
 #include <utils/jid.h>
 #include <utils/xmpperror.h>
 
-#define GATEWAYS_UUID "{BF34165C-DD9A-43eb-949B-926DD411E1A8}"
+#define GATEWAYS_UUID QUuid("{BF34165C-DD9A-43eb-949B-926DD411E1A8}")
 
 class IGateways
 {

@@ -2,6 +2,7 @@
 
 #include <QMouseEvent>
 #include <QApplication>
+#include <QActionGroup>
 #include <definitions/actiongroups.h>
 #include <definitions/toolbargroups.h>
 #include <definitions/resources.h>
@@ -566,7 +567,8 @@ void ChatMessageHandler::showHistory(IMessageChatWindow *AWindow)
 
 		QList<Message> pending = FPendingMessages.take(AWindow);
 		IArchiveCollectionBody history = FHistoryMessages.take(AWindow);
-		std::stable_sort(history.messages.begin(),history.messages.end(),qGreater<Message>());
+		//fixme
+		std::stable_sort(history.messages.begin(),history.messages.end(), std::greater<Message>());
 
 		// Remove extra history messages
 		if (history.messages.count() > HISTORY_MESSAGES)

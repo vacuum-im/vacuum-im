@@ -123,7 +123,7 @@ bool ConnectionManager::initSettings()
 QMultiMap<int, IOptionsDialogWidget *> ConnectionManager::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
-	QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
+	QStringList nodeTree = ANodeId.split(".",Qt::SkipEmptyParts);
 	if (nodeTree.count()==3 && nodeTree.at(0)==OPN_ACCOUNTS && nodeTree.at(2)=="Parameters")
 	{
 		widgets.insertMulti(OHO_ACCOUNTS_PARAMS_CONNECTION,FOptionsManager->newOptionsDialogHeader(tr("Connection"),AParent));
@@ -140,7 +140,7 @@ QList<QUuid> ConnectionManager::proxyList() const
 {
 	QList<QUuid> plist;
 	foreach(const QString &proxyId, Options::node(OPV_PROXY_ROOT).childNSpaces("proxy"))
-		plist.append(proxyId);
+		plist.append(QUuid(proxyId));
 	return plist;
 }
 
@@ -207,7 +207,7 @@ void ConnectionManager::removeProxy(const QUuid &AProxyId)
 
 QUuid ConnectionManager::defaultProxy() const
 {
-	return Options::node(OPV_PROXY_DEFAULT).value().toString();
+	return Options::node(OPV_PROXY_DEFAULT).value().toUuid();
 }
 
 void ConnectionManager::setDefaultProxy(const QUuid &AProxyId)
@@ -241,7 +241,7 @@ void ConnectionManager::saveProxySettings(IOptionsDialogWidget *AWidget, Options
 
 QUuid ConnectionManager::loadProxySettings(const OptionsNode &ANode) const
 {
-	return ANode.value().toString();
+	return ANode.value().toUuid();
 }
 
 QList<QSslCertificate> ConnectionManager::trustedCaCertificates(bool AWithUsers) const
@@ -431,7 +431,7 @@ void ConnectionManager::onOptionsChanged(const OptionsNode &ANode)
 {
 	if (ANode.path() == OPV_PROXY_DEFAULT)
 	{
-		QUuid proxyId = ANode.value().toString();
+		QUuid proxyId = ANode.value().toUuid();
 		QNetworkProxy::setApplicationProxy(proxyById(proxyId).proxy);
 		updateConnectionSettings();
 		emit defaultProxyChanged(proxyId);

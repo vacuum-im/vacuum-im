@@ -4,7 +4,7 @@
 #include <QSystemTrayIcon>
 #include <utils/menu.h>
 
-#define TRAYMANAGER_UUID "{DF738BB8-B22B-4307-9EF8-F5833D7D2204}"
+#define TRAYMANAGER_UUID QUuid("{DF738BB8-B22B-4307-9EF8-F5833D7D2204}")
 
 struct ITrayNotify 
 {

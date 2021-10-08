@@ -24,7 +24,7 @@ AccountsOptionsWidget::AccountsOptionsWidget(IAccountManager *AAccountManager, Q
 	FOptionsManager = PluginHelper::pluginInstance<IOptionsManager>();
 
 	FLayout = new QVBoxLayout(ui.wdtAccounts);
-	FLayout->setMargin(0);
+	FLayout->setContentsMargins(0, 0, 0, 0);
 
 	ui.lblAddAccount->setText(QString("<a href='add_account'>%1</a>").arg(tr("Add Account...")));
 	connect(ui.lblAddAccount,SIGNAL(linkActivated(const QString &)),SLOT(onAddAccountLinkActivated()));

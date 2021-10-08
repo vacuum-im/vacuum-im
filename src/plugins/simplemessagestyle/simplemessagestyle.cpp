@@ -341,7 +341,7 @@ void SimpleMessageStyle::loadSenderColors()
 {
 	QFile colors(FStylePath+"/Incoming/SenderColors.txt");
 	if (colors.open(QFile::ReadOnly))
-		FSenderColors = QString::fromUtf8(colors.readAll()).split(':',QString::SkipEmptyParts);
+		FSenderColors = QString::fromUtf8(colors.readAll()).split(':',Qt::SkipEmptyParts);
 }
 
 QString SimpleMessageStyle::loadFileData(const QString &AFileName, const QString &DefValue) const

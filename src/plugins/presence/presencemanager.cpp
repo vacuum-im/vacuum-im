@@ -1,6 +1,7 @@
 #include "presencemanager.h"
 
 #include <utils/logger.h>
+#include <utils/helpers.h>
 
 bool presenceItemLessThen(const IPresenceItem &AItem1, const IPresenceItem &AItem2)
 {
@@ -118,7 +119,7 @@ bool PresenceManager::isOnlineContact(const Jid &AContactJid) const
 
 QList<IPresence *> PresenceManager::contactPresences(const Jid &AContactJid) const
 {
-	return FContactPresences.value(AContactJid).toList();
+	return toQList(FContactPresences.value(AContactJid));
 }
 
 QList<IPresenceItem> PresenceManager::sortPresenceItems(const QList<IPresenceItem> &AItems) const

@@ -12,7 +12,7 @@
 #include <utils/options.h>
 #include <utils/xmpperror.h>
 
-#define DATASTREAMSMANAGER_UUID "{b293dfe1-d8c3-445f-8e7f-b94cc78ec51b}"
+#define DATASTREAMSMANAGER_UUID QUuid("{b293dfe1-d8c3-445f-8e7f-b94cc78ec51b}")
 
 struct IDataStream
 {

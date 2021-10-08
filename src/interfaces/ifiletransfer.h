@@ -7,7 +7,7 @@
 #include <utils/stanza.h>
 #include <utils/jid.h>
 
-#define FILETRANSFER_UUID "{6e1cc70e-5604-4857-b742-ba185323bb4b}"
+#define FILETRANSFER_UUID QUuid("{6e1cc70e-5604-4857-b742-ba185323bb4b}")
 
 struct IPublicFile {
 	QString id;

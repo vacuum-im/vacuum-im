@@ -355,11 +355,12 @@ void DataStreamsManger::removeProfile(IDataStreamProfile *AProfile)
 QList<QUuid> DataStreamsManger::settingsProfiles() const
 {
 	QList<QUuid> sprofiles;
-	sprofiles.append(QUuid().toString());
+	sprofiles.append(QUuid());
 
+	//fixme
 	foreach(const QString &sprofile, Options::node(OPV_DATASTREAMS_ROOT).childNSpaces("settings-profile"))
-		if (!sprofiles.contains(sprofile))
-			sprofiles.append(sprofile);
+		if (!sprofiles.contains(QUuid(sprofile)))
+			sprofiles.append(QUuid(sprofile));
 
 	return sprofiles;
 }
@@ -388,7 +389,7 @@ void DataStreamsManger::removeSettingsProfile(const QUuid &AProfileId)
 	if (!AProfileId.isNull())
 	{
 		Options::node(OPV_DATASTREAMS_ROOT).removeChilds("settings-profile",AProfileId.toString());
-		emit settingsProfileRemoved(AProfileId.toString());
+		emit settingsProfileRemoved(AProfileId);
 	}
 }
 

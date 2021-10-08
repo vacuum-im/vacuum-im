@@ -40,6 +40,7 @@
 #include <utils/xmpperror.h>
 #include <utils/options.h>
 #include <utils/logger.h>
+#include <utils/helpers.h>
 
 #define ADR_STREAM_JID              Action::DR_StreamJid
 #define ADR_ROOM_JID                Action::DR_Parametr1
@@ -135,7 +136,9 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatManager *AMultiChatManage
 
 	connect(this,SIGNAL(tabPageActivated()),SLOT(onMultiChatWindowActivated()));
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
-	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString, QWidget *)),SLOT(onShortcutActivated(const QString, QWidget *)));
+
+	//fixme
+	//connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString, QWidget *)),SLOT(onShortcutActivated(const QString, QWidget *)));
 
 	initialize();
 	createMessageWidgets();
@@ -534,21 +537,21 @@ bool MultiUserChatWindow::messageDisplay(const Message &AMessage, int ADirection
 		{
 			displayed = true;
 			if (!AMessage.isDelayed())
-				updateRecentItemActiveTime(NULL);
-			if (FHistoryRequests.values().contains(NULL))
-				FPendingMessages[NULL].append(AMessage);
+				updateRecentItemActiveTime(nullptr);
+			if (FHistoryRequests.values().contains(nullptr))
+				FPendingMessages[nullptr].append(AMessage);
 
 			if (AMessage.isDelayed() && AMessage.delayedFromJid()!=FMultiChat->roomJid() && AMessage.delayedFromJid().isValid())
 			{
 				IMultiUser *user = FMultiChat->findUser(userJid.resource());
-				if (user!=NULL && user->affiliation()==MUC_AFFIL_OWNER)
+				if (user!=nullptr && user->affiliation()==MUC_AFFIL_OWNER)
 				{
 					// Owner send history to conference converted from chat
 					Jid senderJid = AMessage.delayedFromJid();
 					IMultiUser *senderUser = FMultiChat->findUserByRealJid(senderJid);
 
 					QString senderNick = senderJid.uNode();
-					if (senderUser != NULL)
+					if (senderUser != nullptr)
 						senderNick = senderUser->nick();
 					else if (FNotifications)
 						senderNick = FNotifications->contactName(streamJid(),senderJid);
@@ -1585,7 +1588,7 @@ bool MultiUserChatWindow::isMentionMessage(const Message &AMessage) const
 		nick += 'z';
 	}
 
-	QRegExp mention(QString("\\b%1\\b").arg(QRegExp::escape(nick)));
+	QRegularExpression mention(QString("\\b%1\\b").arg(QRegularExpression::escape(nick)));
 	return message.indexOf(mention)>=0;
 }
 
@@ -1777,7 +1780,7 @@ void MultiUserChatWindow::showMultiChatUserMessage(const Message &AMessage, cons
 
 void MultiUserChatWindow::requestMultiChatHistory()
 {
-	if (FMessageArchiver && !FHistoryRequests.values().contains(NULL))
+	if (FMessageArchiver && !FHistoryRequests.values().contains(nullptr))
 	{
 		IArchiveRequest request;
 		request.with = FMultiChat->roomJid();
@@ -1791,7 +1794,7 @@ void MultiUserChatWindow::requestMultiChatHistory()
 		{
 			LOG_STRM_INFO(streamJid(),QString("Load multi chat history request sent, room=%1, id=%2").arg(request.with.bare(),reqId));
 			showMultiChatStatusMessage(tr("Loading history..."),IMessageStyleContentOptions::TypeEmpty,IMessageStyleContentOptions::StatusEmpty,true);
-			FHistoryRequests.insert(reqId,NULL);
+			FHistoryRequests.insert(reqId,nullptr);
 		}
 		else
 		{
@@ -2072,12 +2075,16 @@ void MultiUserChatWindow::showEvent(QShowEvent *AEvent)
 		if (!FShownDetached)
 			loadWindowGeometry();
 		FShownDetached = true;
-		Shortcuts::insertWidgetShortcut(SCT_MESSAGEWINDOWS_CLOSEWINDOW,this);
+
+		//fixme
+		//Shortcuts::insertWidgetShortcut(SCT_MESSAGEWINDOWS_CLOSEWINDOW,this);
 	}
 	else
 	{
 		FShownDetached = false;
-		Shortcuts::removeWidgetShortcut(SCT_MESSAGEWINDOWS_CLOSEWINDOW,this);
+
+		//fixme
+		//Shortcuts::removeWidgetShortcut(SCT_MESSAGEWINDOWS_CLOSEWINDOW,this);
 	}
 
 	QMainWindow::showEvent(AEvent);
@@ -2113,7 +2120,7 @@ bool MultiUserChatWindow::eventFilter(QObject *AObject, QEvent *AEvent)
 		if (AEvent->type()==QEvent::MouseButtonPress || AEvent->type()==QEvent::MouseButtonRelease)
 		{
 			QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(AEvent);
-			if (mouseEvent!=NULL && mouseEvent->button()==Qt::MidButton)
+			if (mouseEvent!=NULL && mouseEvent->button()==Qt::MiddleButton)
 			{
 				if (AEvent->type() == QEvent::MouseButtonPress)
 				{
@@ -2133,7 +2140,7 @@ bool MultiUserChatWindow::eventFilter(QObject *AObject, QEvent *AEvent)
 		if (AEvent->type()==QEvent::MouseButtonPress || AEvent->type()==QEvent::MouseButtonRelease)
 		{
 			QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(AEvent);
-			if (mouseEvent!=NULL && mouseEvent->button()==Qt::MidButton)
+			if (mouseEvent!=NULL && mouseEvent->button()==Qt::MiddleButton)
 			{
 				if (AEvent->type() == QEvent::MouseButtonPress)
 				{
@@ -2615,7 +2622,8 @@ void MultiUserChatWindow::onMultiChatNotifierActiveNotifyChanged(int ANotifyId)
 
 void MultiUserChatWindow::onMultiChatEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bool &AHooked)
 {
-	if (FMultiChat->isOpen() && AKeyEvent->modifiers()+AKeyEvent->key() == NICK_MENU_KEY)
+	//fixme
+	if (FMultiChat->isOpen() && AKeyEvent->nativeModifiers() + AKeyEvent->key() == NICK_MENU_KEY)
 	{
 		QTextEdit *textEdit = FEditWidget->textEdit();
 		QTextCursor cursor = textEdit->textCursor();
@@ -2737,12 +2745,13 @@ void MultiUserChatWindow::onMultiChatUserItemToolTips(QStandardItem *AItem, QMap
 void MultiUserChatWindow::onMultiChatContentAppended(const QString &AHtml, const IMessageStyleContentOptions &AOptions)
 {
 	IMessageViewWidget *widget = qobject_cast<IMessageViewWidget *>(sender());
-	if (widget==FViewWidget && FHistoryRequests.values().contains(NULL))
+	if (widget==FViewWidget && FHistoryRequests.values().contains(nullptr))
 	{
 		WindowContent content;
 		content.html = AHtml;
 		content.options = AOptions;
-		FPendingContent[NULL].append(content);
+		//fixme what?
+		FPendingContent[nullptr].append(content);
 		LOG_STRM_DEBUG(streamJid(),QString("Added pending content to multi chat window, room=%1").arg(contactJid().bare()));
 	}
 }
@@ -3040,7 +3049,7 @@ void MultiUserChatWindow::onChangeUserAffiliationActionTriggered(bool)
 
 void MultiUserChatWindow::onInviteUserMenuAccepted(const QMultiMap<Jid, Jid> &AAddresses)
 {
-	QList<Jid> contacts = AAddresses.values().toSet().toList();
+	QList<Jid> contacts = toQList(toQSet(AAddresses.values()));
 	if (!contacts.isEmpty())
 		FMultiChat->sendInvitation(contacts);
 }

@@ -1,6 +1,7 @@
 #include "autostatus.h"
 
 #include <QCursor>
+#include <QRegExp>
 #include <definitions/optionnodes.h>
 #include <definitions/optionvalues.h>
 #include <definitions/optionwidgetorders.h>
@@ -115,7 +116,7 @@ QList<QUuid> AutoStatus::rules() const
 {
 	QList<QUuid> rulesIdList;
 	foreach(const QString &ruleId, Options::node(OPV_AUTOSTARTUS_ROOT).childNSpaces("rule"))
-		rulesIdList.append(ruleId);
+		rulesIdList.append(QUuid(ruleId));
 	return rulesIdList;
 }
 
@@ -212,7 +213,8 @@ void AutoStatus::prepareRule(IAutoStatusRule &ARule)
 {
 	replaceDateTime(ARule.text,"\\%\\((.*)\\)",QDateTime::currentDateTime());
 	replaceDateTime(ARule.text,"\\$\\((.*)\\)",QDateTime::currentDateTime().addSecs(0-ARule.time));
-	replaceDateTime(ARule.text,"\\#\\((.*)\\)",QDateTime(QDate::currentDate()).addSecs(ARule.time));
+	//fixme
+	replaceDateTime(ARule.text,"\\#\\((.*)\\)",QDateTime(QDate::currentDate(), QTime(0, 0)).addSecs(ARule.time));
 }
 
 void AutoStatus::setActiveRule(const QUuid &ARuleId)

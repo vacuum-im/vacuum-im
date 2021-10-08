@@ -3,32 +3,33 @@
 #include <QDir>
 #include <QDrag>
 #include <QFile>
-#include <QStyle>
-#include <QPalette>
 #include <QMimeData>
 #include <QMouseEvent>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
+#include <QPalette>
+#include <QStyle>
 #include <definitions/actiongroups.h>
-#include <definitions/optionvalues.h>
+#include <definitions/menuicons.h>
 #include <definitions/optionnodes.h>
+#include <definitions/optionvalues.h>
 #include <definitions/optionwidgetorders.h>
-#include <definitions/shortcuts.h>
-#include <definitions/rosterlabels.h>
+#include <definitions/recentitemproperties.h>
+#include <definitions/recentitemtypes.h>
+#include <definitions/resources.h>
+#include <definitions/rosterclickhookerorders.h>
+#include <definitions/rosterdataholderorders.h>
+#include <definitions/rosterdragdropmimetypes.h>
+#include <definitions/rosterindexkindorders.h>
 #include <definitions/rosterindexkinds.h>
 #include <definitions/rosterindexroles.h>
-#include <definitions/rostertooltiporders.h>
-#include <definitions/rosterindexkindorders.h>
-#include <definitions/rosterdataholderorders.h>
-#include <definitions/rosterclickhookerorders.h>
 #include <definitions/rosterlabelholderorders.h>
-#include <definitions/rosterdragdropmimetypes.h>
-#include <definitions/recentitemtypes.h>
-#include <definitions/recentitemproperties.h>
-#include <utils/iconstorage.h>
-#include <utils/shortcuts.h>
+#include <definitions/rosterlabels.h>
+#include <definitions/rostertooltiporders.h>
+#include <definitions/shortcuts.h>
 #include <utils/datetime.h>
+#include <utils/helpers.h>
+#include <utils/iconstorage.h>
 #include <utils/logger.h>
+#include <utils/shortcuts.h>
 
 #define DIR_RECENT                   "recent"
 
@@ -271,7 +272,8 @@ QVariant RecentContacts::rosterData(int AOrder, const IRosterIndex *AIndex, int 
 				{
 				case Qt::ForegroundRole:
 					return palette.color(QPalette::Active, QPalette::BrightText);
-				case Qt::BackgroundColorRole:
+					//fixme
+				case Qt::BackgroundRole:
 					return palette.color(QPalette::Active, QPalette::Dark);
 				case RDR_FORCE_VISIBLE:
 					return 1;
@@ -747,8 +749,8 @@ void RecentContacts::updateVisibleItems()
 			}
 		}
 
-		QSet<IRecentItem> curVisible = FVisibleItems.keys().toSet();
-		QSet<IRecentItem> newVisible = common.mid(0,FMaxVisibleItems+favoriteCount).toSet();
+		QSet<IRecentItem> curVisible = toQSet(FVisibleItems.keys());
+		QSet<IRecentItem> newVisible = toQSet(common.mid(0,FMaxVisibleItems+favoriteCount));
 
 		QSet<IRecentItem> addItems = newVisible - curVisible;
 		QSet<IRecentItem> removeItems = curVisible - newVisible;
@@ -790,7 +792,7 @@ void RecentContacts::createItemIndex(const IRecentItem &AItem)
 
 void RecentContacts::updateItemIndex(const IRecentItem &AItem)
 {
-	static const QDateTime zero = QDateTime::fromTime_t(0);
+	static const QDateTime zero = QDateTime::fromSecsSinceEpoch(0);
 
 	IRosterIndex *index = FVisibleItems.value(AItem);
 	if (index)
@@ -932,7 +934,7 @@ void RecentContacts::mergeRecentItems(const Jid &AStreamJid, const QList<IRecent
 
 	if (AReplace)
 	{
-		removedItems += curItems.toSet()-newItems;
+		removedItems += toQSet(curItems)-newItems;
 		foreach(const IRecentItem &item, removedItems)
 		{
 			curItems.removeAll(item);
@@ -1168,7 +1170,7 @@ QList<IRosterIndex *> RecentContacts::indexesProxies(const QList<IRosterIndex *>
 		else if (ASelfProxy)
 			proxies.append(index);
 	}
-	proxies.removeAll(NULL);
+	proxies.removeAll(nullptr);
 	return proxies;
 }
 

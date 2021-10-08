@@ -17,7 +17,7 @@ SocksOptionsWidget::SocksOptionsWidget(ISocksStreams *ASocksStreams, IConnection
 	if (FProxySettings)
 	{
 		QVBoxLayout *layout = new QVBoxLayout(ui.wdtNetworkProxySettings);
-		layout->setMargin(0);
+		layout->setContentsMargins(0, 0, 0, 0);
 		layout->addWidget(FProxySettings->instance());
 		connect(FProxySettings->instance(),SIGNAL(modified()),SIGNAL(modified()));
 		connect(this,SIGNAL(childApply()),FProxySettings->instance(),SLOT(apply()));

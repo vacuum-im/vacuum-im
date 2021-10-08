@@ -119,9 +119,9 @@ void ServerMessageArchive::stanzaRequestResult(const Jid &AStreamJid, const Stan
 				LOG_STRM_WARNING(AStreamJid,QString("Received %1 headers not matching the request, id=%2").arg(skipHeadersCount).arg(AStanza.id()));
 
 			if (request.order == Qt::AscendingOrder)
-				std::sort(headers.begin(),headers.end(),qLess<IArchiveHeader>());
+				std::sort(headers.begin(),headers.end(),std::less<IArchiveHeader>());
 			else
-				std::sort(headers.begin(),headers.end(),qGreater<IArchiveHeader>());
+				std::sort(headers.begin(),headers.end(),std::greater<IArchiveHeader>());
 
 			if ((quint32)headers.count() > request.maxItems)
 				headers = headers.mid(0,request.maxItems);
@@ -470,7 +470,6 @@ QString ServerMessageArchive::saveServerCollection(const Jid &AStreamJid, const 
 
 		QByteArray uploadData;
 		QTextStream ts(&uploadData, QIODevice::WriteOnly);
-		ts.setCodec("UTF-8");
 		int maxUploadSize = Options::node(OPV_SERVERARCHIVE_MAXUPLOADSIZE).value().toInt();
 
 		QString nextRef;

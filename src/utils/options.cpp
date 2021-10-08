@@ -699,19 +699,19 @@ QVariant Options::stringToVariant(const QString &AValue, QVariant::Type AType)
 {
 	if (AType == QVariant::Rect)
 	{
-		QList<QString> parts = AValue.split(";",QString::SkipEmptyParts);
+		QList<QString> parts = AValue.split(";", Qt::SkipEmptyParts);
 		if (parts.count() == 4)
 			return QRect(parts.at(0).toInt(),parts.at(1).toInt(),parts.at(2).toInt(),parts.at(3).toInt());
 	}
 	else if (AType == QVariant::Point)
 	{
-		QList<QString> parts = AValue.split(";",QString::SkipEmptyParts);
+		QList<QString> parts = AValue.split(";", Qt::SkipEmptyParts);
 		if (parts.count() == 2)
 			return QPoint(parts.at(0).toInt(),parts.at(1).toInt());
 	}
 	else if (AType == QVariant::Size)
 	{
-		QList<QString> parts = AValue.split(";",QString::SkipEmptyParts);
+		QList<QString> parts = AValue.split(";", Qt::SkipEmptyParts);
 		if (parts.count() == 2)
 			return QSize(parts.at(0).toInt(),parts.at(1).toInt());
 	}

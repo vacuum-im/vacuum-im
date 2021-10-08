@@ -1,6 +1,7 @@
 #include "statewidget.h"
 
 #include <QDateTime>
+#include <QActionGroup>
 #include <definitions/menuicons.h>
 #include <definitions/resources.h>
 #include <utils/textmanager.h>

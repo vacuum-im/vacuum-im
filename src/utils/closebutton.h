@@ -13,7 +13,7 @@ public:
 	~CloseButton();
 	QSize sizeHint() const;
 protected:
-	void enterEvent(QEvent *AEvent);
+	void enterEvent(QEnterEvent *AEvent);
 	void leaveEvent(QEvent *AEvent);
 	void paintEvent(QPaintEvent *AEvent);
 };

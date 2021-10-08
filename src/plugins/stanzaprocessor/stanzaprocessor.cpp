@@ -237,7 +237,7 @@ bool StanzaProcessor::checkCondition(const QDomElement &AElem, const QString &AC
 				}
 			}
 			if (!attrName.isEmpty())
-				attributes.insertMulti(attrName,attrValue);
+				attributes.insert(attrName,attrValue);
 			pos++;
 		}
 		else 
@@ -308,7 +308,7 @@ bool StanzaProcessor::processStanza(const Jid &AStreamJid, Stanza &AStanza, int 
 	bool hooked = false;
 	bool accepted = false;
 
-	QMapIterator<int, int> it(FHandleIdByOrder);
+	QMultiMapIterator<int, int> it(FHandleIdByOrder);
 	while (!hooked && it.hasNext())
 	{
 		it.next();

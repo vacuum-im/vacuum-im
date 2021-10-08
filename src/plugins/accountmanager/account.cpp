@@ -20,7 +20,7 @@ Account::Account(IXmppStreamManager *AXmppStreamManager, const OptionsNode &AOpt
 
 QUuid Account::accountId() const
 {
-	return FOptionsNode.nspace();
+	return QUuid(FOptionsNode.nspace());
 }
 
 int Account::accountOrder() const

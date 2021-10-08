@@ -107,9 +107,9 @@ private:
 	QMap<IRosterDataHolder *, DataHolder *> FAdvancedDataHolders;
 private:
 	// streamRoot->bareJid->index
-	QHash<IRosterIndex *, QMultiHash<Jid, IRosterIndex *> > FContactsCache;
+	QMultiHash<IRosterIndex *, QMultiHash<Jid, IRosterIndex *> > FContactsCache;
 	// parent->name->index
-	QHash<IRosterIndex *, QMultiHash<QString, IRosterIndex *> > FGroupsCache;
+	QMultiHash<IRosterIndex *, QMultiHash<QString, IRosterIndex *> > FGroupsCache;
 };
 
 #endif // ROSTERSMODEL_H

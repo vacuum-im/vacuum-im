@@ -1,25 +1,24 @@
 #include "statistics.h"
 
-#include <QScreen>
 #include <QApplication>
-#include <QDir>
-#include <QUrlQuery>
-#include <QSslError>
-#include <QDataStream>
-#include <QNetworkProxy>
 #include <QAuthenticator>
+#include <QDataStream>
+#include <QDir>
+#include <QNetworkProxy>
 #include <QNetworkRequest>
-#if QT_VERSION >= 0x050900
 #include <QOperatingSystemVersion>
-#endif
-#include <definitions/version.h>
+#include <QRandomGenerator>
+#include <QScreen>
+#include <QSslError>
+#include <QUrlQuery>
 #include <definitions/optionnodes.h>
 #include <definitions/optionvalues.h>
 #include <definitions/optionwidgetorders.h>
 #include <definitions/statisticsparams.h>
+#include <definitions/version.h>
 #include <utils/filecookiejar.h>
-#include <utils/options.h>
 #include <utils/logger.h>
+#include <utils/options.h>
 
 #ifdef Q_OS_WIN32
 #	include <windows.h>
@@ -102,7 +101,7 @@ Statistics::Statistics()
 	FMultiChatManager = NULL;
 
 	FSendHits = true;
-	FDesktopWidget = new QDesktopWidget;
+	FDesktopWidget = new QWidget();
 
 	FNetworkManager = new QNetworkAccessManager(this);
 	connect(FNetworkManager,SIGNAL(proxyAuthenticationRequired(const QNetworkProxy &, QAuthenticator *)),
@@ -604,7 +603,7 @@ QUrl Statistics::buildHitUrl(const IStatisticsHit &AHit) const
 	}
 
 	// Cache Buster
-	query.append(qMakePair<QString,QString>("z",QUrl::toPercentEncoding(QString::number(qrand()))));
+	query.append(qMakePair<QString,QString>("z",QUrl::toPercentEncoding(QString::number(QRandomGenerator::global()->generate()))));
 
 	QUrlQuery urlQuery;
 	urlQuery.setQueryDelimiters('=','&');
@@ -730,7 +729,7 @@ void Statistics::onOptionsOpened()
 {
 	FSendHits = Options::node(OPV_COMMON_STATISTICTS_ENABLED).value().toBool();
 
-	FProfileId = Options::node(OPV_STATISTICS_PROFILEID).value().toString();
+	FProfileId = Options::node(OPV_STATISTICS_PROFILEID).value().toUuid();
 	if (FProfileId.isNull())
 	{
 		FProfileId = QUuid::createUuid();

@@ -53,7 +53,7 @@ NormalWindow::NormalWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJ
 	ui.spwMessageBox->insertWidget(MNWW_TOOLBARWIDGET,FToolBarWidget->instance());
 
 	ui.wdtReceiversTree->setLayout(new QVBoxLayout(ui.wdtReceiversTree));
-	ui.wdtReceiversTree->layout()->setMargin(0);
+	ui.wdtReceiversTree->layout()->setContentsMargins(0, 0, 0, 0);
 	FReceiversWidget = FMessageWidgets->newReceiversWidget(this,ui.wdtReceivers);
 	connect(FReceiversWidget->instance(),SIGNAL(addressSelectionChanged()),SLOT(onReceiverslAddressSelectionChanged()));
 	if (Options::node(OPV_ROSTER_SORTMODE).value().toInt() == IRostersView::SortByStatus)

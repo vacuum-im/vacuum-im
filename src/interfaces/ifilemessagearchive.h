@@ -3,7 +3,7 @@
 
 #include <interfaces/imessagearchiver.h>
 
-#define FILEMESSAGEARCHIVE_UUID "{2F1E540F-60D3-490f-8BE9-0EEA693B8B83}"
+#define FILEMESSAGEARCHIVE_UUID QUuid("{2F1E540F-60D3-490f-8BE9-0EEA693B8B83}")
 
 class IFileMessageArchive : 
 	public IArchiveEngine

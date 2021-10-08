@@ -5,7 +5,7 @@
 #include <utils/jid.h>
 #include <utils/xmpperror.h>
 
-#define JABBERSEARCH_UUID "{F66BCFC9-F6BB-43b2-8101-8CA41EF227AF}"
+#define JABBERSEARCH_UUID QUuid("{F66BCFC9-F6BB-43b2-8101-8CA41EF227AF}")
 
 struct ISearchItem 
 {

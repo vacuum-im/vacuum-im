@@ -7,7 +7,7 @@
 #include <utils/advanceditem.h>
 #include <utils/advanceditemmodel.h>
 
-#define ROSTERSMODEL_UUID "{C1A1BBAB-06AF-41c8-BFBE-959F1065D80D}"
+#define ROSTERSMODEL_UUID QUuid("{C1A1BBAB-06AF-41c8-BFBE-959F1065D80D}")
 
 class IRosterIndex;
 class IRosterDataHolder

@@ -7,7 +7,7 @@
 #include <interfaces/ipresencemanager.h>
 #include <utils/jid.h>
 
-#define METACONTACTS_UUID "{5E7FEFAD-FFD0-4782-8F3C-5B76907F8735}"
+#define METACONTACTS_UUID QUuid("{5E7FEFAD-FFD0-4782-8F3C-5B76907F8735}")
 
 struct IMetaContact {
 	QUuid id;

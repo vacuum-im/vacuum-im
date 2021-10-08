@@ -1,6 +1,7 @@
 #ifndef COMPRESSFEATURE_H
 #define COMPRESSFEATURE_H
 
+#include <QObject>
 #include <interfaces/ixmppstreammanager.h>
 
 #ifdef USE_SYSTEM_ZLIB

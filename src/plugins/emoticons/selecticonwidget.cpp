@@ -9,7 +9,7 @@ SelectIconWidget::SelectIconWidget(IconStorage *AStorage, QWidget *AParent) : QW
 	FStorage = AStorage;
 
 	FLayout = new QGridLayout(this);
-	FLayout->setMargin(2);
+	FLayout->setContentsMargins(2, 2, 2, 2);
 	FLayout->setHorizontalSpacing(3);
 	FLayout->setVerticalSpacing(3);
 

@@ -1,6 +1,7 @@
 #ifndef IQAUTHFEATURE_H
 #define IQAUTHFEATURE_H
 
+#include <QObject>
 #include <interfaces/ixmppstreammanager.h>
 #include <interfaces/iconnectionmanager.h>
 

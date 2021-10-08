@@ -37,6 +37,7 @@
 #include <utils/action.h>
 #include <utils/logger.h>
 #include <utils/jid.h>
+#include <utils/helpers.h>
 
 #define ADR_STREAM_JID                Action::DR_StreamJid
 #define ADR_CONTACT_JID               Action::DR_Parametr1
@@ -633,8 +634,8 @@ bool FileTransfer::fileStreamProcessRequest(int AOrder, const QString &AStreamId
 				{
 					LOG_STRM_INFO(ARequest.to(),QString("Receive file stream created, from=%1, sid=%2").arg(ARequest.from(),AStreamId));
 				}
-
-				QList<QString> methods = AMethods.toSet().intersect(Options::node(OPV_FILESTREAMS_ACCEPTABLEMETHODS).value().toStringList().toSet()).toList();
+				//fixme
+				QList<QString> methods = toQList(toQSet(AMethods).intersect(toQSet(Options::node(OPV_FILESTREAMS_ACCEPTABLEMETHODS).value().toStringList())));
 
 				QString dirName = Options::node(OPV_FILESTREAMS_DEFAULTDIR).value().toString();
 				if (Options::node(OPV_FILESTREAMS_GROUPBYSENDER).value().toBool())

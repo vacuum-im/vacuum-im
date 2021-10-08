@@ -9,7 +9,7 @@ ConnectionOptionsWidget::ConnectionOptionsWidget(IConnectionManager *AManager, c
 	FEngineSettings = NULL;
 
 	FEngineLayout = new QVBoxLayout(ui.wdtConnectionSettings);
-	FEngineLayout->setMargin(0);
+	FEngineLayout->setContentsMargins(0, 0, 0, 0);
 
 	foreach(const QString &engineId, FManager->connectionEngines())
 		ui.cmbConnections->addItem(FManager->findConnectionEngine(engineId)->engineName(),engineId);

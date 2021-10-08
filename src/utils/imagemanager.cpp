@@ -133,8 +133,8 @@ QImage ImageManager::colorized(const QImage &AImage, const QColor &AColor)
 		painter.setCompositionMode(QPainter::CompositionMode_Screen);
 		painter.fillRect(result.rect(), AColor);
 		painter.end();
-
-		result.setAlphaChannel(AImage.alphaChannel());
+//FIXME
+//		result.setAlphaChannel(AImage.alphaChannel());
 		return result;
 	}
 	return AImage;
@@ -151,8 +151,8 @@ QImage ImageManager::opacitized(const QImage &AImage, double AOpacity)
 		painter.setOpacity(AOpacity);
 		painter.drawImage(0, 0, AImage);
 		painter.end();
-
-		result.setAlphaChannel(AImage.alphaChannel());
+//FIXME
+//		result.setAlphaChannel(AImage.alphaChannel());
 		return result;
 	}
 	return AImage;
@@ -168,8 +168,8 @@ QImage ImageManager::addSpace(const QImage &AImage, int ALeft, int ATop, int ARi
 		QPainter painter(&result);
 		painter.drawImage(ALeft, ATop, AImage);
 		painter.end();
-
-		result.setAlphaChannel(AImage.alphaChannel());
+//FIXME
+//		result.setAlphaChannel(AImage.alphaChannel());
 		return result;
 	}
 	return AImage;

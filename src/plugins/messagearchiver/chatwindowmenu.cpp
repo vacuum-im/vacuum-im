@@ -1,5 +1,6 @@
 #include "chatwindowmenu.h"
 
+#include <QActionGroup>
 #include <definitions/namespaces.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>

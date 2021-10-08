@@ -21,7 +21,7 @@
 
 #define CATEGORY_GATEWAY      "gateway"
 
-FileMessageArchive::FileMessageArchive() : FMutex(QMutex::Recursive)
+FileMessageArchive::FileMessageArchive()
 {
 	FPluginManager = NULL;
 	FArchiver = NULL;
@@ -492,7 +492,7 @@ IArchiveHeader FileMessageArchive::loadFileHeader(const QString &AFilePath) cons
 				while (!reader.atEnd())
 				{
 					reader.readNext();
-					if (reader.isStartElement() && reader.qualifiedName()=="chat")
+					if (reader.isStartElement() && reader.qualifiedName()==QLatin1String("chat"))
 					{
 						header.engineId = engineId();
 						header.with = reader.attributes().value("with").toString();
@@ -631,7 +631,7 @@ QList<IArchiveHeader> FileMessageArchive::loadFileHeaders(const Jid &AStreamJid,
 			}
 		}
 
-		QMapIterator<QString,IArchiveHeader> fileIt(filesMap);
+		QMultiMapIterator<QString,IArchiveHeader> fileIt(filesMap);
 		if (ARequest.order == Qt::DescendingOrder)
 			fileIt.toBack();
 		while (ARequest.order==Qt::AscendingOrder ? fileIt.hasNext() : fileIt.hasPrevious())
@@ -839,9 +839,9 @@ QList<IArchiveHeader> FileMessageArchive::loadDatabaseHeaders(const Jid &AStream
 			if (headers.count() > dbHeadersCount)
 			{
 				if (ARequest.order == Qt::AscendingOrder)
-					std::sort(headers.begin(),headers.end(),qLess<IArchiveHeader>());
+					std::sort(headers.begin(),headers.end(),std::less<IArchiveHeader>());
 				else
-					std::sort(headers.begin(),headers.end(),qGreater<IArchiveHeader>());
+					std::sort(headers.begin(),headers.end(),std::greater<IArchiveHeader>());
 
 				if ((quint32)headers.count() > ARequest.maxItems)
 					headers = headers.mid(0,ARequest.maxItems);

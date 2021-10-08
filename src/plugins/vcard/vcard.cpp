@@ -62,7 +62,7 @@ QMultiHash<QString,QStringList> VCard::values(const QString &AName, const QStrin
 			foreach(const QString &tag, ATagList)
 				if (!parentElem.firstChildElement(tag).isNull())
 					tags.append(tag);
-			result.insertMulti(elem.text(),tags);
+			result.insert(elem.text(),tags);
 		}
 		elem = nextElementByName(AName, elem);
 	}
@@ -219,7 +219,7 @@ void VCard::loadVCardFile()
 
 QDomElement VCard::createElementByName(const QString &AName, const QStringList &ATags, const QStringList &ATagList)
 {
-	QStringList tagTree = AName.split('/',QString::SkipEmptyParts);
+	QStringList tagTree = AName.split('/',Qt::SkipEmptyParts);
 	QDomElement elem = vcardElem().firstChildElement(tagTree.at(0));
 
 	bool tagsFaild = !ATags.isEmpty() || !ATagList.isEmpty();
@@ -251,7 +251,7 @@ QDomElement VCard::firstElementByName(const QString &AName) const
 {
 	int index = 0;
 	QDomElement elem = vcardElem();
-	QStringList tagTree = AName.split('/',QString::SkipEmptyParts);
+	QStringList tagTree = AName.split('/',Qt::SkipEmptyParts);
 	while (!elem.isNull() && index < tagTree.count())
 		elem = elem.firstChildElement(tagTree.at(index++));
 	return elem;
@@ -260,7 +260,7 @@ QDomElement VCard::firstElementByName(const QString &AName) const
 QDomElement VCard::nextElementByName(const QString &AName, const QDomElement &APrevElem) const
 {
 	QDomElement elem = APrevElem;
-	QStringList tagTree = AName.split('/',QString::SkipEmptyParts);
+	QStringList tagTree = AName.split('/',Qt::SkipEmptyParts);
 	int index = tagTree.count();
 	while (index > 1)
 	{

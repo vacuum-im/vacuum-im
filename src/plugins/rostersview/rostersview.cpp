@@ -1,34 +1,36 @@
 #include "rostersview.h"
 
-#include <QDrag>
-#include <QCursor>
-#include <QToolTip>
-#include <QPainter>
-#include <QMimeData>
-#include <QDropEvent>
-#include <QHelpEvent>
-#include <QClipboard>
-#include <QHeaderView>
-#include <QResizeEvent>
 #include <QApplication>
-#include <QDragMoveEvent>
+#include <QClipboard>
+#include <QContextMenuEvent>
+#include <QCursor>
+#include <QDrag>
 #include <QDragEnterEvent>
 #include <QDragLeaveEvent>
-#include <QContextMenuEvent>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
+#include <QDragMoveEvent>
+#include <QDropEvent>
+#include <QHeaderView>
+#include <QHelpEvent>
+#include <QMimeData>
+#include <QPainter>
+#include <QRandomGenerator>
+#include <QResizeEvent>
+#include <QToolTip>
 #include <definitions/actiongroups.h>
+#include <definitions/menuicons.h>
 #include <definitions/optionvalues.h>
-#include <definitions/rosterlabels.h>
-#include <definitions/rostertooltiporders.h>
+#include <definitions/resources.h>
+#include <definitions/rosterdataholderorders.h>
+#include <definitions/rosterdragdropmimetypes.h>
 #include <definitions/rosterindexkinds.h>
 #include <definitions/rosterindexroles.h>
-#include <definitions/rosterdragdropmimetypes.h>
-#include <definitions/rosterdataholderorders.h>
 #include <definitions/rosterlabelholderorders.h>
+#include <definitions/rosterlabels.h>
+#include <definitions/rostertooltiporders.h>
+#include <utils/helpers.h>
 #include <utils/iconstorage.h>
-#include <utils/options.h>
 #include <utils/logger.h>
+#include <utils/options.h>
 
 #define BLINK_VISIBLE_TIME      750
 #define BLINK_INVISIBLE_TIME    250
@@ -99,7 +101,7 @@ QList<int> RostersView::rosterDataRoles(int AOrder) const
 	if (AOrder == RDHO_ROSTERSVIEW)
 		return QList<int>() << RDR_LABEL_ITEMS;
 	else if (AOrder == RDHO_ROSTERSVIEW_NOTIFY)
-		return QList<int>() << RDR_FORCE_VISIBLE << Qt::DecorationRole << Qt::BackgroundColorRole;
+		return QList<int>() << RDR_FORCE_VISIBLE << Qt::DecorationRole << Qt::BackgroundRole;
 	return QList<int>();
 }
 
@@ -146,7 +148,7 @@ QVariant RostersView::rosterData(int AOrder, const IRosterIndex *AIndex, int ARo
 			{
 				data = !notify.icon.isNull() ? notify.icon : data;
 			}
-			else if (ARole == Qt::BackgroundColorRole)
+			else if (ARole == Qt::BackgroundRole)
 			{
 				data = notify.background;
 			}
@@ -393,7 +395,7 @@ void RostersView::toolTipsForIndex(IRosterIndex *AIndex, const QHelpEvent *AEven
 		for (QMap<int, QString>::iterator it=AToolTips.begin(); it!=AToolTips.end(); toolTipsLast--)
 		{
 			QString &tooltip = it.value();
-			QStringList parts = tooltip.split(separator,QString::KeepEmptyParts,Qt::CaseInsensitive);
+			QStringList parts = tooltip.split(separator,Qt::KeepEmptyParts,Qt::CaseInsensitive);
 			if (parts.count() > 1)
 			{
 				if (it==AToolTips.begin() && parts.first().isEmpty())
@@ -504,9 +506,9 @@ bool RostersView::setSelectedRosterIndexes(const QList<IRosterIndex *> &AIndexes
 		bool accepted = APartial || isSelectionAcceptable(AIndexes);
 		if (accepted)
 		{
-			QSet<IRosterIndex *> curSelected = selectedRosterIndexes().toSet();
-			QSet<IRosterIndex *> newSelected = AIndexes.toSet() - curSelected;
-			QSet<IRosterIndex *> oldSelected = curSelected - AIndexes.toSet();
+			QSet<IRosterIndex *> curSelected = toQSet(selectedRosterIndexes());
+			QSet<IRosterIndex *> newSelected = toQSet(AIndexes) - curSelected;
+			QSet<IRosterIndex *> oldSelected = curSelected - toQSet(AIndexes);
 
 			foreach(IRosterIndex *index, oldSelected)
 			{
@@ -678,7 +680,7 @@ QModelIndex RostersView::mapToModel(const QModelIndex &AProxyIndex) const
 	QModelIndex index = AProxyIndex;
 	if (!FProxyModels.isEmpty())
 	{
-		QMap<int, QAbstractProxyModel *>::const_iterator it = FProxyModels.constEnd();
+		QMultiMap<int, QAbstractProxyModel *>::const_iterator it = FProxyModels.constEnd();
 		do
 		{
 			--it;
@@ -693,7 +695,7 @@ QModelIndex RostersView::mapFromModel(const QModelIndex &AModelIndex) const
 	QModelIndex index = AModelIndex;
 	if (!FProxyModels.isEmpty())
 	{
-		QMap<int, QAbstractProxyModel *>::const_iterator it = FProxyModels.constBegin();
+		QMultiMap<int, QAbstractProxyModel *>::const_iterator it = FProxyModels.constBegin();
 		while (it != FProxyModels.constEnd())
 		{
 			index = it.value()->mapFromSource(index);
@@ -708,7 +710,7 @@ QModelIndex RostersView::mapToProxy(QAbstractProxyModel *AProxyModel, const QMod
 	QModelIndex index = AModelIndex;
 	if (!FProxyModels.isEmpty())
 	{
-		QMap<int,QAbstractProxyModel *>::const_iterator it = FProxyModels.constBegin();
+		QMultiMap<int,QAbstractProxyModel *>::const_iterator it = FProxyModels.constBegin();
 		while (it!=FProxyModels.constEnd())
 		{
 			index = it.value()->mapFromSource(index);
@@ -726,7 +728,7 @@ QModelIndex RostersView::mapFromProxy(QAbstractProxyModel *AProxyModel, const QM
 	if (!FProxyModels.isEmpty())
 	{
 		bool doMap = false;
-		QMap<int, QAbstractProxyModel *>::const_iterator it = FProxyModels.constEnd();
+		QMultiMap<int, QAbstractProxyModel *>::const_iterator it = FProxyModels.constEnd();
 		do
 		{
 			--it;
@@ -788,12 +790,18 @@ void RostersView::removeLabel(quint32 ALabelId, IRosterIndex *AIndex)
 
 quint32 RostersView::labelAt(const QPoint &APoint, const QModelIndex &AIndex) const
 {
-	return FAdvancedItemDelegate->itemAt(APoint,indexOption(viewOptions(),AIndex),AIndex);
+	//fixme
+	QStyleOptionViewItem option;
+	initViewItemOption(&option);
+	return FAdvancedItemDelegate->itemAt(APoint,indexOption(option,AIndex),AIndex);
 }
 
 QRect RostersView::labelRect(quint32 ALabeld, const QModelIndex &AIndex) const
 {
-	return FAdvancedItemDelegate->itemRect(ALabeld,indexOption(viewOptions(),AIndex),AIndex);
+	//fixme
+	QStyleOptionViewItem option;
+	initViewItemOption(&option);
+	return FAdvancedItemDelegate->itemRect(ALabeld,indexOption(option,AIndex),AIndex);
 }
 
 int RostersView::activeNotify(IRosterIndex *AIndex) const
@@ -821,9 +829,10 @@ QList<IRosterIndex *> RostersView::notifyIndexes(int ANotifyId) const
 
 int RostersView::insertNotify(const IRostersNotify &ANotify, const QList<IRosterIndex *> &AIndexes)
 {
-	int notifyId = qrand();
+	//fixme
+	int notifyId = QRandomGenerator::global()->generate();
 	while(notifyId<=0 || FNotifyItems.contains(notifyId))
-		notifyId = qrand();
+		notifyId = QRandomGenerator::global()->generate();
 
 	foreach(IRosterIndex *index, AIndexes)
 	{
@@ -1137,7 +1146,7 @@ void RostersView::paintEvent(QPaintEvent *AEvent)
 	if (!FDropIndicatorRect.isNull())
 	{
 		QStyleOption option;
-		option.init(this);
+		option.initFrom(this);
 		option.rect = FDropIndicatorRect.adjusted(0,0,-1,-1);
 		QPainter painter(viewport());
 		style()->drawPrimitive(QStyle::PE_IndicatorItemViewItemDrop, &option, &painter, this);
@@ -1232,7 +1241,10 @@ void RostersView::mouseMoveEvent(QMouseEvent *AEvent)
 			QAbstractItemDelegate *itemDeletage = itemDelegate(FPressedIndex);
 			if (itemDeletage)
 			{
-				QStyleOptionViewItem option = indexOption(viewOptions(),FPressedIndex);
+				//fixme
+				QStyleOptionViewItem option;
+				initViewItemOption(&option);
+				indexOption(option,FPressedIndex);
 				QPoint indexPos = option.rect.topLeft();
 				option.state &= ~QStyle::State_Selected;
 				option.state &= ~QStyle::State_MouseOver;

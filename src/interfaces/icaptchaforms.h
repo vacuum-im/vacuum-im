@@ -5,7 +5,7 @@
 #include <interfaces/idataforms.h>
 #include <utils/xmpperror.h>
 
-#define CAPTCHAFORMS_UUID "{f733885c-2a25-438f-bfdb-dc7d139a222f}"
+#define CAPTCHAFORMS_UUID QUuid("{f733885c-2a25-438f-bfdb-dc7d139a222f}")
 
 class ICaptchaForms
 {

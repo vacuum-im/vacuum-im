@@ -28,7 +28,7 @@ QSize CloseButton::sizeHint() const
 	return icon().actualSize(iconSize());
 }
 
-void CloseButton::enterEvent(QEvent *AEvent)
+void CloseButton::enterEvent(QEnterEvent *AEvent)
 {
 	if (isEnabled())
 		update();
@@ -48,7 +48,7 @@ void CloseButton::paintEvent(QPaintEvent *AEvent)
 	if (icon().isNull())
 	{
 		QStyleOption opt;
-		opt.init(this);
+		opt.initFrom(this);
 		opt.state |= QStyle::State_AutoRaise;
 		if (isEnabled() && underMouse() && !isChecked() && !isDown())
 			opt.state |= QStyle::State_Raised;

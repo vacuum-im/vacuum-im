@@ -4,13 +4,14 @@
 #include <QAction>
 #include <QVariant>
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QWidget>
 
-#ifdef USE_SYSTEM_QXTGLOBALSHORTCUT
-#       include <qxtglobalshortcut/qxtglobalshortcut.h>
-#else
-#       include <thirdparty/qxtglobalshortcut/qxtglobalshortcut.h>
-#endif
+//fixme
+//#ifdef USE_SYSTEM_QXTGLOBALSHORTCUT
+//#       include <qxtglobalshortcut/qxtglobalshortcut.h>
+//#else
+//#       include <thirdparty/qxtglobalshortcut/qxtglobalshortcut.h>
+//#endif
 
 QKeySequence correctKeySequence(const QKeySequence &AKey)
 {
@@ -66,7 +67,7 @@ void Shortcuts::declareGroup(const QString &AId, const QString &ADescription, in
 {
 	if (!AId.isEmpty() && !ADescription.isEmpty())
 	{
-		instance()->d->groups.insert(AId,qMakePair<QString,int>(ADescription,AOrder));
+		instance()->d->groups.insert(AId,QPair<QString,int>(ADescription,AOrder));
 		emit instance()->groupDeclared(AId);
 	}
 }
@@ -189,28 +190,31 @@ QList<QString> Shortcuts::globalShortcuts()
 
 bool Shortcuts::isGlobalShortcutActive(const QString &AId)
 {
-	QxtGlobalShortcut *shortcut = instance()->d->globalShortcutsId.key(AId);
-	return shortcut!=NULL ? shortcut->isEnabled() : false;
+	//fixme
+//	QxtGlobalShortcut *shortcut = instance()->d->globalShortcutsId.key(AId);
+//	return shortcut!=NULL ? shortcut->isEnabled() : false;
+	return false;
 }
 
 void Shortcuts::setGlobalShortcut(const QString &AId, bool AEnabled)
 {
-	ShortcutsData *q = instance()->d;
-	QxtGlobalShortcut *shortcut = q->globalShortcutsId.key(AId);
-	if (AEnabled && shortcut==NULL)
-	{
-		shortcut = new QxtGlobalShortcut(instance());
-		q->globalShortcutsId.insert(shortcut,AId);
-		connect(shortcut,&QxtGlobalShortcut::activated,instance(),&Shortcuts::onGlobalShortcutActivated);
-		updateGlobal(shortcut);
-		emit instance()->shortcutEnabled(AId, AEnabled);
-	}
-	else if (!AEnabled && shortcut!=NULL)
-	{
-		q->globalShortcutsId.remove(shortcut);
-		delete shortcut;
-		emit instance()->shortcutEnabled(AId, AEnabled);
-	}
+	//fixme
+//	ShortcutsData *q = instance()->d;
+//	QxtGlobalShortcut *shortcut = q->globalShortcutsId.key(AId);
+//	if (AEnabled && shortcut==NULL)
+//	{
+//		shortcut = new QxtGlobalShortcut(instance());
+//		q->globalShortcutsId.insert(shortcut,AId);
+//		connect(shortcut,&QxtGlobalShortcut::activated,instance(),&Shortcuts::onGlobalShortcutActivated);
+//		updateGlobal(shortcut);
+//		emit instance()->shortcutEnabled(AId, AEnabled);
+//	}
+//	else if (!AEnabled && shortcut!=NULL)
+//	{
+//		q->globalShortcutsId.remove(shortcut);
+//		delete shortcut;
+//		emit instance()->shortcutEnabled(AId, AEnabled);
+//	}
 }
 
 void Shortcuts::activateShortcut(const QString &AId, QWidget *AWidget)
@@ -220,32 +224,34 @@ void Shortcuts::activateShortcut(const QString &AId, QWidget *AWidget)
 
 void Shortcuts::updateObject(QObject *AObject)
 {
-	static QDesktopWidget *deskWidget = QApplication::desktop();
+	//FIXME
+	//static QDesktopWidget *deskWidget = QApplication::desktop();
+	//static QScreen *deskWidget = QGuiApplication::primaryScreen();
 
-	QString id = instance()->d->objectShortcutsId.value(AObject);
-	if (!id.isEmpty())
-	{
-		const Descriptor &descriptor = instance()->d->shortcuts.value(id);
-		if (descriptor.context == ApplicationShortcut)
-		{
-			QAction *action = qobject_cast<QAction *>(AObject);
-			if (action && !deskWidget->actions().contains(action))
-				deskWidget->addAction(action);
-		}
-		AObject->setProperty("shortcut", correctKeySequence(descriptor.activeKey));
-		AObject->setProperty("shortcutContext", convertContext(descriptor.context));
-	}
-	else if (AObject)
-	{
-		if (AObject->property("shortcutContext").toInt() == Qt::ApplicationShortcut)
-		{
-			QAction *action = qobject_cast<QAction *>(AObject);
-			if (action)
-				deskWidget->removeAction(action);
-		}
-		AObject->setProperty("shortcut",QVariant());
-		AObject->setProperty("shortcutContext",QVariant());
-	}
+	//	QString id = instance()->d->objectShortcutsId.value(AObject);
+	//	if (!id.isEmpty())
+	//	{
+	//		const Descriptor &descriptor = instance()->d->shortcuts.value(id);
+	//		if (descriptor.context == ApplicationShortcut)
+	//		{
+	//			QAction *action = qobject_cast<QAction *>(AObject);
+	//			if (action && !deskWidget->actions().contains(action))
+	//				deskWidget->addAction(action);
+	//		}
+	//		AObject->setProperty("shortcut", correctKeySequence(descriptor.activeKey));
+	//		AObject->setProperty("shortcutContext", convertContext(descriptor.context));
+	//	}
+	//	else if (AObject)
+	//	{
+	//		if (AObject->property("shortcutContext").toInt() == Qt::ApplicationShortcut)
+	//		{
+	//			QAction *action = qobject_cast<QAction *>(AObject);
+	//			if (action)
+	//				deskWidget->removeAction(action);
+	//		}
+	//		AObject->setProperty("shortcut",QVariant());
+	//		AObject->setProperty("shortcutContext",QVariant());
+	//	}
 }
 
 void Shortcuts::updateWidget(QShortcut *AShortcut)
@@ -257,17 +263,18 @@ void Shortcuts::updateWidget(QShortcut *AShortcut)
 
 void Shortcuts::updateGlobal(QxtGlobalShortcut *AShortcut)
 {
-	Descriptor descriptor = instance()->d->shortcuts.value(instance()->d->globalShortcutsId.value(AShortcut));
-	if (!descriptor.activeKey.isEmpty())
-	{
-		bool registered = AShortcut->setShortcut(descriptor.activeKey);
-		AShortcut->setEnabled(registered);
-	}
-	else if (!AShortcut->shortcut().isEmpty())
-	{
-		AShortcut->setShortcut(QKeySequence());
-		AShortcut->setEnabled(false);
-	}
+	//fixme
+//	Descriptor descriptor = instance()->d->shortcuts.value(instance()->d->globalShortcutsId.value(AShortcut));
+//	if (!descriptor.activeKey.isEmpty())
+//	{
+//		bool registered = AShortcut->setShortcut(descriptor.activeKey);
+//		AShortcut->setEnabled(registered);
+//	}
+//	else if (!AShortcut->shortcut().isEmpty())
+//	{
+//		AShortcut->setShortcut(QKeySequence());
+//		AShortcut->setEnabled(false);
+//	}
 }
 
 Qt::ShortcutContext Shortcuts::convertContext(Context AContext)
@@ -299,9 +306,10 @@ void Shortcuts::onShortcutActivated()
 
 void Shortcuts::onGlobalShortcutActivated()
 {
-	QxtGlobalShortcut *shortcut = qobject_cast<QxtGlobalShortcut *>(sender());
-	if (shortcut)
-		emit instance()->shortcutActivated(d->globalShortcutsId.value(shortcut),NULL);
+	//fixme
+//	QxtGlobalShortcut *shortcut = qobject_cast<QxtGlobalShortcut *>(sender());
+//	if (shortcut)
+//		emit instance()->shortcutActivated(d->globalShortcutsId.value(shortcut),NULL);
 }
 
 void Shortcuts::onWidgetDestroyed(QObject *AObject)

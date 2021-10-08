@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QString>
 
-#define SPELLCHECKER_UUID "{0dc5fbd9-2dd4-4720-9c95-8c3393a577a5}"
+#define SPELLCHECKER_UUID QUuid("{0dc5fbd9-2dd4-4720-9c95-8c3393a577a5}")
 
 class ISpellChecker
 {

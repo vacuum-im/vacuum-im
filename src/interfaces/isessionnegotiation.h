@@ -6,7 +6,7 @@
 #include <utils/jid.h>
 #include <utils/xmpperror.h>
 
-#define SESSIONNEGOTIATION_UUID "{D4908366-6204-4199-AFB8-BA0CB4CAC91C}"
+#define SESSIONNEGOTIATION_UUID QUuid("{D4908366-6204-4199-AFB8-BA0CB4CAC91C}")
 
 #define SESSION_FIELD_ACCEPT          "accept"
 #define SESSION_FIELD_CONTINUE        "continue"

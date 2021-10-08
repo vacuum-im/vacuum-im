@@ -18,7 +18,7 @@ DataDialogWidget::DataDialogWidget(IDataForms *ADataForms, const IDataForm &AFor
 
 	FFormHolder = new QWidget(this);
 	FFormHolder->setLayout(new QVBoxLayout());
-	FFormHolder->layout()->setMargin(0);
+	FFormHolder->layout()->setContentsMargins(0, 0, 0, 0);
 
 	QFrame *hline = new QFrame(this);
 	hline->setFrameShape(QFrame::HLine);
@@ -28,7 +28,7 @@ DataDialogWidget::DataDialogWidget(IDataForms *ADataForms, const IDataForm &AFor
 	connect(FDialogButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonClicked(QAbstractButton *)));
 
 	QVBoxLayout *dialogLayout = new QVBoxLayout(this);
-	dialogLayout->setMargin(5);
+	dialogLayout->setContentsMargins(5, 5, 5, 5);
 	dialogLayout->setMenuBar(toolBar);
 	dialogLayout->addWidget(FFormHolder);
 	dialogLayout->addWidget(hline);

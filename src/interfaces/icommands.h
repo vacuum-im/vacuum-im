@@ -6,7 +6,7 @@
 #include <utils/jid.h>
 #include <utils/xmpperror.h>
 
-#define COMMANDS_UUID "{6453DC15-3D01-4b60-840F-0EDD75A7D9D2}"
+#define COMMANDS_UUID QUuid("{6453DC15-3D01-4b60-840F-0EDD75A7D9D2}")
 
 #define COMMAND_STATUS_EXECUTING        "executing"
 #define COMMAND_STATUS_COMPLETED        "completed"

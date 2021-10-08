@@ -1,34 +1,35 @@
 #include "rostersviewplugin.h"
 
-#include <QTimer>
-#include <QComboBox>
-#include <QClipboard>
-#include <QScrollBar>
 #include <QApplication>
+#include <QClipboard>
+#include <QComboBox>
+#include <QScrollBar>
 #include <QTextDocument>
-#include <definitions/optionvalues.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionnodeorders.h>
-#include <definitions/optionwidgetorders.h>
+#include <QTimer>
 #include <definitions/actiongroups.h>
-#include <definitions/toolbargroups.h>
 #include <definitions/mainwindowtabpages.h>
-#include <definitions/rosterlabels.h>
+#include <definitions/menuicons.h>
+#include <definitions/optionnodeorders.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/resources.h>
+#include <definitions/rosterdataholderorders.h>
 #include <definitions/rosterindexkinds.h>
 #include <definitions/rosterindexroles.h>
+#include <definitions/rosterlabelholderorders.h>
+#include <definitions/rosterlabels.h>
 #include <definitions/rosterproxyorders.h>
 #include <definitions/rostertooltiporders.h>
-#include <definitions/rosterdataholderorders.h>
-#include <definitions/rosterlabelholderorders.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/shortcuts.h>
 #include <definitions/shortcutgrouporders.h>
-#include <utils/textmanager.h>
-#include <utils/shortcuts.h>
-#include <utils/options.h>
+#include <definitions/shortcuts.h>
+#include <definitions/toolbargroups.h>
 #include <utils/action.h>
+#include <utils/helpers.h>
 #include <utils/logger.h>
+#include <utils/options.h>
+#include <utils/shortcuts.h>
+#include <utils/textmanager.h>
 
 #define ADR_CLIPBOARD_DATA      Action::DR_Parametr1
 
@@ -220,7 +221,7 @@ QMultiMap<int, IOptionsDialogWidget *> RostersViewPlugin::optionsDialogWidgets(c
 QList<int> RostersViewPlugin::rosterDataRoles(int AOrder) const
 {
 	if (AOrder == RDHO_ROSTERSVIEW)
-		return QList<int>() << Qt::DisplayRole << Qt::ForegroundRole << Qt::BackgroundColorRole << RDR_STATES_FORCE_ON << RDR_FORCE_VISIBLE;
+		return QList<int>() << Qt::DisplayRole << Qt::ForegroundRole << Qt::BackgroundRole << RDR_STATES_FORCE_ON << RDR_FORCE_VISIBLE;
 	return QList<int>();
 }
 
@@ -237,7 +238,7 @@ QVariant RostersViewPlugin::rosterData(int AOrder, const IRosterIndex *AIndex, i
 				return AIndex->data(RDR_NAME);
 			case Qt::ForegroundRole:
 				return FRostersView->palette().color(QPalette::Active, QPalette::BrightText);
-			case Qt::BackgroundColorRole:
+			case Qt::BackgroundRole:
 				return FRostersView->palette().color(QPalette::Active, QPalette::Dark);
 			case RDR_STATES_FORCE_ON:
 				return QStyle::State_Children;
@@ -570,7 +571,7 @@ void RostersViewPlugin::onRostersViewIndexContextMenuAboutToShow()
 	if (menu)
 	{
 		QSet<Action *> streamsActions = FStreamsContextMenuActions.take(menu);
-		QSet<Action *> rootActions = menu->actions().toSet() - streamsActions;
+		QSet<Action *> rootActions = toQSet(menu->actions()) - streamsActions;
 		foreach(Action *streamAction, streamsActions)
 		{
 			foreach(Action *rootAction, rootActions)
@@ -814,10 +815,10 @@ void RostersViewPlugin::onRostersViewIndexContextMenu(const QList<IRosterIndex *
 			}
 		}
 
-		QSet<Action *> curActions = AMenu->actions().toSet();
+		QSet<Action *> curActions = toQSet(AMenu->actions());
 		FRostersView->contextMenuForIndex(streamIndexes,NULL,AMenu);
 		connect(AMenu,SIGNAL(aboutToShow()),SLOT(onRostersViewIndexContextMenuAboutToShow()));
-		FStreamsContextMenuActions[AMenu] = AMenu->actions().toSet() - curActions;
+		FStreamsContextMenuActions[AMenu] = toQSet(AMenu->actions()) - curActions;
 	}
 }
 

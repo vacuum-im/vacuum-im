@@ -1,33 +1,34 @@
 #include "vcardmanager.h"
 
-#include <QFile>
-#include <QFileInfo>
+#include <QApplication>
 #include <QClipboard>
 #include <QDomDocument>
-#include <QApplication>
-#include <definitions/resources.h>
+#include <QFile>
+#include <QFileInfo>
+#include <definitions/actiongroups.h>
 #include <definitions/menuicons.h>
-#include <definitions/shortcuts.h>
+#include <definitions/multiuserdataroles.h>
 #include <definitions/namespaces.h>
 #include <definitions/optionnodes.h>
 #include <definitions/optionvalues.h>
 #include <definitions/optionwidgetorders.h>
-#include <definitions/actiongroups.h>
-#include <definitions/toolbargroups.h>
-#include <definitions/vcardvaluenames.h>
+#include <definitions/resources.h>
+#include <definitions/rosterdataholderorders.h>
 #include <definitions/rosterindexkinds.h>
 #include <definitions/rosterindexroles.h>
-#include <definitions/multiuserdataroles.h>
+#include <definitions/shortcuts.h>
+#include <definitions/toolbargroups.h>
+#include <definitions/vcardvaluenames.h>
 #include <definitions/xmppurihandlerorders.h>
-#include <definitions/rosterdataholderorders.h>
-#include <utils/widgetmanager.h>
-#include <utils/textmanager.h>
-#include <utils/xmpperror.h>
-#include <utils/shortcuts.h>
-#include <utils/options.h>
-#include <utils/stanza.h>
 #include <utils/action.h>
+#include <utils/helpers.h>
 #include <utils/logger.h>
+#include <utils/options.h>
+#include <utils/shortcuts.h>
+#include <utils/stanza.h>
+#include <utils/textmanager.h>
+#include <utils/widgetmanager.h>
+#include <utils/xmpperror.h>
 
 #define DIR_VCARDS                "vcards"
 #define VCARD_TIMEOUT             60000
@@ -666,10 +667,10 @@ void VCardManager::onRostersViewIndexClipboardMenu(const QList<IRosterIndex *> &
 				commonStrings += vcard->value(VVN_DESCRIPTION);
 
 				static const QStringList emailTagList = QStringList() << "HOME" << "WORK" << "INTERNET" << "X400";
-				QSet<QString> emailStrings = vcard->values(VVN_EMAIL,emailTagList).keys().toSet();
+				QSet<QString> emailStrings = toQSet(vcard->values(VVN_EMAIL,emailTagList).keys());
 
 				static const QStringList phoneTagList = QStringList() << "HOME" << "WORK" << "CELL" << "MODEM";
-				QSet<QString> phoneStrings = vcard->values(VVN_TELEPHONE,phoneTagList).keys().toSet();
+				QSet<QString> phoneStrings = toQSet(vcard->values(VVN_TELEPHONE,phoneTagList).keys());
 
 				foreach(Action *action, createClipboardActions(commonStrings,AMenu))
 					AMenu->addAction(action,AG_RVCBM_VCARD_COMMON,true);

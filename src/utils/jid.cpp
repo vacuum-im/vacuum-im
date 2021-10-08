@@ -8,21 +8,12 @@
 
 static const QChar CharDog = '@';
 static const QChar CharSlash = '/';
-static const QList<QChar> EscChars =     QList<QChar>()   << 0x5c << 0x20 << 0x22 << 0x26 << 0x27 << 0x2f << 0x3a << 0x3c << 0x3e << 0x40;
+static const QList<QChar> EscChars =     QList<QChar>()   << QChar{0x5c} << QChar{0x20} << QChar{0x22} << QChar{0x26} << QChar{0x27}
+														  << QChar{0x2f} << QChar{0x3a} << QChar{0x3c} << QChar{0x3e} << QChar{0x40};
 static const QList<QString> EscStrings = QList<QString>() <<"\\5c"<<"\\20"<<"\\22"<<"\\26"<<"\\27"<<"\\2f"<<"\\3a"<<"\\3c"<<"\\3e"<<"\\40";
 
 QHash<QString,Jid> Jid::FJidCache;
 const Jid Jid::null;
-
-static bool JidStreamOperatorsRegistered = false;
-inline void registerJidStreamOperators()
-{
-	if (!JidStreamOperatorsRegistered)
-	{
-		JidStreamOperatorsRegistered = true;
-		qRegisterMetaTypeStreamOperators<Jid>("Jid");
-	}
-}
 
 QString stringPrepare(const Stringprep_profile *AProfile, const QString &AString)
 {
@@ -67,23 +58,20 @@ JidData::JidData(const JidData &AOther) : QSharedData(AOther)
 
 Jid::Jid(const char *AJidStr)
 {
-	d = NULL;
+	d = nullptr;
 	parseFromString(AJidStr);
-	registerJidStreamOperators();
 }
 
 Jid::Jid(const QString &AJidStr)
 {
-	d = NULL;
+	d = nullptr;
 	parseFromString(AJidStr);
-	registerJidStreamOperators();
 }
 
 Jid::Jid(const QString &ANode, const QString &ADomain, const QString &AResource)
 {
-	d = NULL;
+	d = nullptr;
 	parseFromString(ANode+CharDog+ADomain+CharSlash+AResource);
-	registerJidStreamOperators();
 }
 
 Jid::~Jid()
@@ -281,7 +269,7 @@ QString Jid::escape(const QString &AUserNode)
 			else
 				escNode.append(AUserNode.at(i));
 		}
-		
+
 		escNode.squeeze();
 	}
 	return escNode;
@@ -332,9 +320,7 @@ QString Jid::encode(const QString &AJidStr)
 			}
 			else if (!AJidStr.at(i).isLetterOrNumber())
 			{
-				QString hex;
-				hex.sprintf("%%%02X", AJidStr.at(i).toLatin1());
-				encJid.append(hex);
+				encJid.append(QString("%%%02X").arg(AJidStr.at(i).toLatin1()));
 			}
 			else
 			{
@@ -400,7 +386,7 @@ Jid &Jid::parseFromString(const QString &AJidStr)
 {
 	if (!FJidCache.contains(AJidStr))
 	{
-		if (d == NULL)
+		if (d == nullptr)
 			d = new JidData;
 		JidData *dd = d.data();
 
@@ -549,7 +535,7 @@ Jid &Jid::parseFromString(const QString &AJidStr)
 	}
 	else
 	{
-		*this = FJidCache.value(AJidStr);
+		*this = FJidCache.value(AJidStr, Jid::null);
 	}
 	return *this;
 }

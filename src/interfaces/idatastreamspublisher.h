@@ -8,7 +8,7 @@
 #include <utils/xmpperror.h>
 #include <utils/jid.h>
 
-#define DATASTREAMSPUBLISHER_UUID "{8F79D9E3-380D-4026-9869-FF86A93B6A87}"
+#define DATASTREAMSPUBLISHER_UUID QUuid("{8F79D9E3-380D-4026-9869-FF86A93B6A87}")
 
 struct IPublicDataStream {
 	QString id;

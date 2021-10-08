@@ -1,4 +1,4 @@
-#include "advanceditemdelegate.h"
+﻿#include "advanceditemdelegate.h"
 
 #include <QStyle>
 #include <QPainter>
@@ -31,8 +31,9 @@ void registerAdvancedDelegateItemStreamOperators()
 	if (!typeStreamOperatorsRegistered)
 	{
 		typeStreamOperatorsRegistered = true;
-		qRegisterMetaTypeStreamOperators<AdvancedDelegateItem>("AdvancedDelegateItem");
-		qRegisterMetaTypeStreamOperators<AdvancedDelegateItems>("AdvancedDelegateItems");
+		//FIXME
+		//qRegisterMetaTypeStreamOperators<AdvancedDelegateItem>("AdvancedDelegateItem");
+		//qRegisterMetaTypeStreamOperators<AdvancedDelegateItems>("AdvancedDelegateItems");
 	}
 }
 
@@ -122,8 +123,9 @@ AdvancedDelegateItem::AdvancedDelegateItem(quint32 AId)
 	d->id = AId;
 	d->kind = Null;
 	d->flags = 0;
-	d->showStates = 0;
-	d->hideStates = 0;
+	//fixme
+	d->showStates = {};
+	d->hideStates = {};
 	d->widget = NULL;
 
 	c = new ContextData;
@@ -347,7 +349,7 @@ public:
 			case AdvancedDelegateItem::CheckBox:
 				{
 					QStyle *style = FOption.widget ? FOption.widget->style() : QApplication::style();
-					style->proxy()->drawPrimitive(QStyle::PE_IndicatorViewItemCheck, &FOption, APainter, FOption.widget);
+					style->proxy()->drawPrimitive(QStyle::PE_IndicatorItemViewItemCheck, &FOption, APainter, FOption.widget);
 					break;
 				}
 			case AdvancedDelegateItem::CustomWidget:
@@ -660,44 +662,52 @@ AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIn
 
 	if (FDefaultBranchEnabled && (AIndexOption.state & QStyle::State_Children)>0)
 	{
-		AdvancedDelegateItem &branchItem = items[AdvancedDelegateItem::BranchId];
+		//FIXME
+		AdvancedDelegateItem branchItem = items.value(AdvancedDelegateItem::BranchId);
 		if (branchItem.d->kind == AdvancedDelegateItem::Null)
 		{
 			branchItem.d->kind = AdvancedDelegateItem::Branch;
 			branchItem.d->id = AdvancedDelegateItem::BranchId;
+			items.replace(AdvancedDelegateItem::BranchId, branchItem);
 		}
 	}
 
 	if (AIndexOption.features & QStyleOptionViewItem::HasCheckIndicator)
 	{
-		AdvancedDelegateItem &checkItem = items[AdvancedDelegateItem::CheckStateId];
+		//FIXME
+		AdvancedDelegateItem checkItem = items.value(AdvancedDelegateItem::CheckStateId);
 		if (checkItem.d->kind == AdvancedDelegateItem::Null)
 		{
 			checkItem.d->kind = AdvancedDelegateItem::CheckBox;
 			checkItem.d->id = AdvancedDelegateItem::CheckStateId;
 			checkItem.d->data = AIndex.data(Qt::CheckStateRole);
+			items.replace(AdvancedDelegateItem::CheckStateId, checkItem);
 		}
 	}
 
 	if (AIndexOption.features & QStyleOptionViewItem::HasDecoration)
 	{
-		AdvancedDelegateItem &decorationItem = items[AdvancedDelegateItem::DecorationId];
+		//FIXME
+		AdvancedDelegateItem decorationItem = items.value(AdvancedDelegateItem::DecorationId);
 		if (decorationItem.d->kind == AdvancedDelegateItem::Null)
 		{
 			decorationItem.d->kind = AdvancedDelegateItem::Decoration;
 			decorationItem.d->id = AdvancedDelegateItem::DecorationId;
 			decorationItem.d->data = AIndex.data(Qt::DecorationRole);
+			items.replace(AdvancedDelegateItem::DecorationId, decorationItem);
 		}
 	}
 
 	if (AIndexOption.features & QStyleOptionViewItem::HasDisplay)
 	{
-		AdvancedDelegateItem &displayItem = items[AdvancedDelegateItem::DisplayId];
+		//FIXME
+		AdvancedDelegateItem displayItem = items.value(AdvancedDelegateItem::DisplayId);
 		if (displayItem.d->kind == AdvancedDelegateItem::Null)
 		{
 			displayItem.d->kind = AdvancedDelegateItem::Display;
 			displayItem.d->id = AdvancedDelegateItem::DisplayId;
 			displayItem.d->data = AIndex.data(Qt::DisplayRole);
+			items.replace(AdvancedDelegateItem::DisplayId, displayItem);
 		}
 	}
 
@@ -715,7 +725,7 @@ AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIn
 				AdvancedDelegateItem stretchItem(stretchId);
 				stretchItem.d->kind = AdvancedDelegateItem::Stretch;
 				stretchItem.d->sizePolicy = QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
-				stretches.insertMulti(stretchId,stretchItem);
+				stretches.insert(stretchId,stretchItem);
 			}
 		}
 
@@ -726,6 +736,7 @@ AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIn
 		
 		it->c->blinkOpacity = (itd->flags & AdvancedDelegateItem::Blink)>0 ? FBlinkOpacity : 1.0;
 	}
+	//FIXME no unite in QMap, QMultiMap instead?
 	items.unite(stretches);
 	
 	return items;
@@ -821,7 +832,8 @@ QStyleOptionViewItem AdvancedItemDelegate::itemStyleOption(const AdvancedDelegat
 
 		hint = AItem.d->hints.value(AdvancedDelegateItem::FontWeight);
 		if (!hint.isNull())
-			itemOption.font.setWeight(hint.toInt());
+			//fixme
+			itemOption.font.setWeight(QFont::Weight(hint.toInt()));
 
 		hint = AItem.d->hints.value(AdvancedDelegateItem::FontItalic);
 		if (!hint.isNull())
@@ -1166,7 +1178,7 @@ bool AdvancedItemDelegate::editorEvent(QEvent *AEvent, QAbstractItemModel *AMode
 	}
 
 	Qt::CheckState state;
-	if ((flags & Qt::ItemIsTristate) > 0)
+	if ((flags & Qt::ItemIsAutoTristate) > 0)
 		state = static_cast<Qt::CheckState>((value.toInt()+1) % 3);
 	else if (value.toInt() == Qt::Unchecked)
 		state = Qt::Checked;

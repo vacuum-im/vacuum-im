@@ -7,7 +7,7 @@
 #include <utils/jid.h>
 #include <utils/message.h>
 
-#define MESSAGEPROCESSOR_UUID "{1282bedb-f58f-48e8-96f6-62abb15dc6e1}"
+#define MESSAGEPROCESSOR_UUID QUuid("{1282bedb-f58f-48e8-96f6-62abb15dc6e1}")
 
 class IMessageHandler
 {

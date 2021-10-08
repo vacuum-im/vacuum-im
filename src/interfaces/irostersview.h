@@ -10,7 +10,7 @@
 #include <utils/menu.h>
 #include <utils/advanceditemdelegate.h>
 
-#define ROSTERSVIEW_UUID "{BDD12B32-9C88-4e3c-9B36-2DCB5075288F}"
+#define ROSTERSVIEW_UUID QUuid("{BDD12B32-9C88-4e3c-9B36-2DCB5075288F}")
 
 struct IRostersNotify
 {

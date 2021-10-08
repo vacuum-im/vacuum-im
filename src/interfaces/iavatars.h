@@ -1,10 +1,11 @@
 #ifndef IAVATARS_H
 #define IAVATARS_H
 
+#include <QObject>
 #include <QImage>
 #include <utils/jid.h>
 
-#define AVATARTS_UUID "{22F84EAF-683E-4a20-B5E5-1FE363FD206C}"
+#define AVATARTS_UUID QUuid("{22F84EAF-683E-4a20-B5E5-1FE363FD206C}")
 
 class IAvatars
 {

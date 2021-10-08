@@ -5,7 +5,7 @@
 #include <interfaces/ixmppstreammanager.h>
 #include "starttlsfeature.h"
 
-#define STARTTLS_UUID "{F554544C-0851-4e2a-9158-99191911E468}"
+#define STARTTLS_UUID QUuid("{F554544C-0851-4e2a-9158-99191911E468}")
 
 class StartTLSFeatureFactory :
 	public QObject,

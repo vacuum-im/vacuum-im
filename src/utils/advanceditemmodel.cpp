@@ -1,6 +1,7 @@
 #include "advanceditemmodel.h"
 
 #include <QTimer>
+#include <QRegularExpression>
 
 #define FIRST_VALID_ROLE 0
 
@@ -96,7 +97,9 @@ QList<QStandardItem *> AdvancedItemModel::findItems(const QMultiMap<int, QVarian
 	uint matchType = AFlags & 0x0F;
 	bool recursive = AFlags & Qt::MatchRecursive;
 	Qt::CaseSensitivity cs = AFlags & Qt::MatchCaseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive;
-
+	QRegularExpression::PatternOption po;
+	if (!cs)
+		po = QRegularExpression::CaseInsensitiveOption;
 	int row=0;
 	QStandardItem *rowItem;
 	const QStandardItem *parentItem = AParent==NULL ? invisibleRootItem() : AParent;
@@ -118,11 +121,12 @@ QList<QStandardItem *> AdvancedItemModel::findItems(const QMultiMap<int, QVarian
 					case Qt::MatchExactly:
 						accepted = (findValue==itemValue);
 						break;
-					case Qt::MatchRegExp:
-						accepted = QRegExp(findValue.toString(),cs).exactMatch(itemValue.toString());
+					case Qt::MatchRegularExpression:
+						accepted = QRegularExpression(findValue.toString(), po).match(itemValue.toString()).hasMatch();
 						break;
 					case Qt::MatchWildcard:
-						accepted = QRegExp(findValue.toString(), cs, QRegExp::Wildcard).exactMatch(itemValue.toString());
+						//accepted = QRegExp(findValue.toString(), cs, QRegExp::Wildcard).exactMatch(itemValue.toString());
+						accepted = QRegularExpression(findValue.toString(), po).match(itemValue.toString()).hasMatch();
 						break;
 					case Qt::MatchStartsWith:
 						accepted = itemValue.toString().startsWith(findValue.toString(), cs);
@@ -202,7 +206,7 @@ void AdvancedItemModel::removeItemDataHolder(int AOrder, AdvancedItemDataHolder 
 
 void AdvancedItemModel::insertChangedItem(QStandardItem *AItem, int ARole)
 {
-	QPair<QStandardItem *, int> item = qMakePair<QStandardItem *, int>(AItem,ARole);
+	QPair<QStandardItem *, int> item(AItem,ARole);
 	if (FChangedItems.isEmpty())
 	{
 		FChangedItems.append(item);

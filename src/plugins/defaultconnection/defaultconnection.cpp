@@ -1,5 +1,6 @@
 #include "defaultconnection.h"
 
+#include <QSslSocket>
 #include <QSslConfiguration>
 #include <QNetworkProxy>
 #include <QAuthenticator>
@@ -176,9 +177,11 @@ void DefaultConnection::ignoreSslErrors()
 	FSocket.ignoreSslErrors();
 }
 
+//fixme
 QList<QSslError> DefaultConnection::sslErrors() const
 {
-	return FSocket.sslErrors();
+	//fixme wtf
+	//return FSocket.sslErrors();
 }
 
 QSsl::SslProtocol DefaultConnection::protocol() const
@@ -222,7 +225,8 @@ void DefaultConnection::addCaSertificates(const QList<QSslCertificate> &ACertifi
 	foreach(const QSslCertificate &cert, ACertificates)
 	{
 		if (!cert.isNull() && !curSerts.contains(cert))
-			FSocket.addCaCertificate(cert);
+			//fixme
+			FSocket.sslConfiguration().addCaCertificate(cert);
 	}
 }
 

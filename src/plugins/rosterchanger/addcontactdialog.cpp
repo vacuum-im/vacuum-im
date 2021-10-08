@@ -8,6 +8,7 @@
 #include <definitions/menuicons.h>
 #include <utils/pluginhelper.h>
 #include <utils/action.h>
+#include <utils/helpers.h>
 #include <utils/logger.h>
 
 AddContactDialog::AddContactDialog(IRosterChanger *ARosterChanger, const Jid &AStreamJid, QWidget *AParent) : QDialog(AParent)
@@ -16,7 +17,7 @@ AddContactDialog::AddContactDialog(IRosterChanger *ARosterChanger, const Jid &AS
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	setWindowTitle(tr("Add contact - %1").arg(AStreamJid.uBare()));
-	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_RCHANGER_ADD_CONTACT,0,0,"windowIcon");
+	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_RCHANGER_ADD_CONTACT,0,0,QStringLiteral("windowIcon"));
 
 	FResolving = false;
 
@@ -107,7 +108,7 @@ void AddContactDialog::initialize()
 	FRoster = rosterManager!=NULL ? rosterManager->findRoster(FStreamJid) : NULL;
 	if (FRoster)
 	{
-		ui.cmbGroup->addItems(FRoster->groups().toList());
+		ui.cmbGroup->addItems(toQList(FRoster->groups()));
 		ui.cmbGroup->model()->sort(0,Qt::AscendingOrder);
 		ui.cmbGroup->setCurrentIndex(-1);
 		ui.lblGroupDelim->setText(tr("* nested group delimiter - '%1'").arg(ROSTER_GROUP_DELIMITER));

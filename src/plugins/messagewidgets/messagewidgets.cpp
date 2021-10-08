@@ -167,7 +167,7 @@ bool MessageWidgets::messageEditContentsCreate(int AOrder, IMessageEditWidget *A
 				writer.write(fragment);
 				buffer.close();
 				AData->setData("application/vnd.oasis.opendocument.text", buffer.data());
-				AData->setData("text/html", fragment.toHtml("utf-8").toUtf8());
+				AData->setData("text/html", fragment.toHtml().toUtf8());
 			}
 			AData->setText(fragment.toPlainText());
 		}
@@ -354,7 +354,7 @@ QList<QUuid> MessageWidgets::tabWindowList() const
 {
 	QList<QUuid> list;
 	foreach(const QString &tabWindowId, Options::node(OPV_MESSAGES_TABWINDOWS_ROOT).childNSpaces("window"))
-		list.append(tabWindowId);
+		list.append(QUuid(tabWindowId));
 	return list;
 }
 
@@ -382,7 +382,7 @@ QUuid MessageWidgets::appendTabWindow(const QString &AName)
 
 void MessageWidgets::deleteTabWindow(const QUuid &AWindowId)
 {
-	if (AWindowId!=Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString() && tabWindowList().contains(AWindowId))
+	if (AWindowId!=Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toUuid() && tabWindowList().contains(AWindowId))
 	{
 		IMessageTabWindow *window = findTabWindow(AWindowId);
 		if (window)
@@ -447,7 +447,7 @@ void MessageWidgets::assignTabWindowPage(IMessageTabPage *APage)
 
 	if (Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool())
 	{
-		IMessageTabWindow *window = getTabWindow(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString());
+		IMessageTabWindow *window = getTabWindow(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toUuid());
 		window->addTabPage(APage);
 	}
 	else if (Options::node(OPV_MESSAGES_TABWINDOWS_ENABLE).value().toBool())
@@ -456,7 +456,7 @@ void MessageWidgets::assignTabWindowPage(IMessageTabPage *APage)
 
 		QUuid windowId = FPageWindows.value(APage->tabPageId());
 		if (!availWindows.contains(windowId))
-			windowId = Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString();
+			windowId = Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toUuid();
 		if (!availWindows.contains(windowId))
 			windowId = availWindows.value(0);
 
@@ -706,7 +706,7 @@ void MessageWidgets::onTabWindowPageAdded(IMessageTabPage *APage)
 		IMessageTabWindow *window = qobject_cast<IMessageTabWindow *>(sender());
 		if (window)
 		{
-			if (window->windowId() != Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString())
+			if (window->windowId() != Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toUuid())
 				FPageWindows.insert(APage->tabPageId(), window->windowId());
 			else
 				FPageWindows.remove(APage->tabPageId());
@@ -719,7 +719,7 @@ void MessageWidgets::onTabWindowCurrentPageChanged(IMessageTabPage *APage)
 	if (Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool() && !Options::node(OPV_MESSAGES_TABWINDOWS_ENABLE).value().toBool())
 	{
 		IMessageTabWindow *window = qobject_cast<IMessageTabWindow *>(sender());
-		if (window && window->windowId()==Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString())
+		if (window && window->windowId()==Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toUuid())
 		{
 			for (int index=0; index<window->tabPageCount(); index++)
 			{
@@ -749,7 +749,7 @@ void MessageWidgets::onOptionsOpened()
 	if (tabWindowList().isEmpty())
 		appendTabWindow(tr("Main Tab Window"));
 
-	if (!tabWindowList().contains(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString()))
+	if (!tabWindowList().contains(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toUuid()))
 		Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).setValue(tabWindowList().value(0).toString());
 
 	QByteArray data = Options::fileValue("messages.tab-window-pages").toByteArray();
@@ -776,7 +776,7 @@ void MessageWidgets::onOptionsChanged(const OptionsNode &ANode)
 	{
 		if (Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool())
 		{
-			IMessageTabWindow *window = findTabWindow(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString());
+			IMessageTabWindow *window = findTabWindow(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toUuid());
 			if (window)
 				window->setTabBarVisible(ANode.value().toBool());
 		}
@@ -801,8 +801,8 @@ void MessageWidgets::onOptionsChanged(const OptionsNode &ANode)
 			assignTabWindowPage(page);
 
 		IMessageTabWindow *window = ANode.value().toBool()
-			? getTabWindow(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString())
-			: findTabWindow(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString());
+			? getTabWindow(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toUuid())
+			: findTabWindow(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toUuid());
 
 		if (window != NULL)
 		{

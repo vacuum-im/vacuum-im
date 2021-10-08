@@ -5,6 +5,8 @@
 #include <QDomDocument>
 #include <QApplication>
 
+#include <utils/helpers.h>
+
 QList<QString> FileStorage::FMimeTypes;
 QList<QString> FileStorage::FResourceDirs;
 QList<FileStorage *> FileStorage::FInstances;
@@ -239,8 +241,8 @@ void FileStorage::setResourcesDirs(const QList<QString> &ADirs)
 	if (FResourceDirs != cleanDirs)
 	{
 		QList<FileStorage *> updateStorages;
-		QSet<QString> oldDirs = FResourceDirs.toSet() - cleanDirs.toSet();
-		QSet<QString> newDirs = cleanDirs.toSet() - FResourceDirs.toSet();
+		QSet<QString> oldDirs = toQSet(FResourceDirs) - toQSet(cleanDirs);
+		QSet<QString> newDirs = toQSet(cleanDirs) - toQSet(FResourceDirs);
 
 		foreach(FileStorage *fileStorage, FInstances)
 		{

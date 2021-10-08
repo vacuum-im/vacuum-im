@@ -4,7 +4,7 @@
 #include <QClipboard>
 #include <QInputDialog>
 #include <QApplication>
-#include <QDesktopWidget>
+//#include <QDesktopWidget>
 #include <definitions/namespaces.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
@@ -137,15 +137,17 @@ bool MultiUserChatManager::initConnections(IPluginManager *APluginManager, int &
 			SLOT(onMessageArchiverCollectionLoaded(const QString &, const IArchiveCollection &)));
 	}
 
-	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
+	//fixme
+	//connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
 
 	return FXmppStreamManager!=NULL;
 }
 
 bool MultiUserChatManager::initObjects()
 {
-	Shortcuts::declareShortcut(SCT_APP_MULTIUSERCHAT_WIZARD, tr("Join conference"), tr("Ctrl+J","Join conference"), Shortcuts::ApplicationShortcut);
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SHOWMUCUSERS, tr("Show/Hide conference participants list"), tr("Ctrl+U","Show/Hide conference participants list"));
+	//fixme
+	//Shortcuts::declareShortcut(SCT_APP_MULTIUSERCHAT_WIZARD, tr("Join conference"), tr("Ctrl+J","Join conference"), Shortcuts::ApplicationShortcut);
+	//Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SHOWMUCUSERS, tr("Show/Hide conference participants list"), tr("Ctrl+U","Show/Hide conference participants list"));
 
 	if (FDataForms)
 	{

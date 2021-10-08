@@ -7,7 +7,7 @@
 SplitterWidget::SplitterWidget(QWidget *AParent, Qt::Orientation AOrientation) : QFrame(AParent)
 {
 	setLayout(new QVBoxLayout);
-	layout()->setMargin(0);
+	layout()->setContentsMargins(0, 0, 0, 0);
 
 	FLastSize = size();
 	FMovingWidgets = false;

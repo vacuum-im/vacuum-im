@@ -8,6 +8,7 @@
 #include <utils/versionparser.h>
 #include <utils/options.h>
 #include <utils/logger.h>
+#include <utils/helpers.h>
 
 XmppStream::XmppStream(IXmppStreamManager *AXmppStreamManager, const Jid &AStreamJid) : QObject(AXmppStreamManager->instance())
 {
@@ -467,7 +468,7 @@ void XmppStream::processFeatures()
 
 void XmppStream::clearActiveFeatures()
 {
-	foreach(IXmppFeature *feature, FActiveFeatures.toSet())
+	foreach(IXmppFeature *feature, toQSet(FActiveFeatures))
 		delete feature->instance();
 	FActiveFeatures.clear();
 }
@@ -507,7 +508,7 @@ bool XmppStream::startFeature(const QString &AFeatureNS, const QDomElement &AFea
 bool XmppStream::processDataHandlers(QByteArray &AData, bool ADataOut)
 {
 	bool hooked = false;
-	QMapIterator<int, IXmppDataHandler *> it(FDataHandlers);
+	QMultiMapIterator<int, IXmppDataHandler *> it(FDataHandlers);
 	if (!ADataOut)
 		it.toBack();
 	while (!hooked && (ADataOut ? it.hasNext() : it.hasPrevious()))
@@ -532,7 +533,7 @@ bool XmppStream::processStanzaHandlers(Stanza &AStanza, bool AStanzaOut)
 		LOG_STRM_TYPE(Logger::Stanza,streamJid(),QString("Stanza received:\n\n%1").arg(AStanza.toString(2)));
 
 	bool hooked = false;
-	QMapIterator<int, IXmppStanzaHadler *> it(FStanzaHandlers);
+	QMultiMapIterator<int, IXmppStanzaHadler *> it(FStanzaHandlers);
 	if (!AStanzaOut)
 	{
 		AStanza.setTo(FStreamJid.full());

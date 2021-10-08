@@ -36,12 +36,12 @@ StyleEditOptionsDialog::StyleEditOptionsDialog(IMessageStyleManager *AMessageSty
 		setWindowTitle(tr("Message Style - %1 - %2").arg(FStyleEngine->engineName(),soptions.styleId));
 
 		ui.wdtStyleSettings->setLayout(new QVBoxLayout);
-		ui.wdtStyleSettings->layout()->setMargin(0);
+		ui.wdtStyleSettings->layout()->setContentsMargins(0, 0, 0, 0);
 		ui.wdtStyleSettings->layout()->addWidget(FStyleSettings->instance());
 		connect(FStyleSettings->instance(),SIGNAL(modified()),SLOT(startStyleViewUpdate()));
 
 		ui.frmStyleView->setLayout(new QVBoxLayout);
-		ui.frmStyleView->layout()->setMargin(0);
+		ui.frmStyleView->layout()->setContentsMargins(0, 0, 0, 0);
 		ui.frmStyleView->layout()->addWidget(FStyleView);
 	}
 

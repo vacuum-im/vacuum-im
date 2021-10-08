@@ -47,6 +47,7 @@ set(HEADERS "action.h"
 			"iconstorage.h"
 			"imagemanager.h"
 			"jid.h"
+			"helpers.h"
 			"logger.h"
 			"menu.h"
 			"menubarchanger.h"
@@ -68,4 +69,4 @@ set(HEADERS "action.h"
 			"widgetmanager.h"
 			"xmpperror.h")
 
-qt5_wrap_cpp(MOC_SOURCES ${HEADERS})
+qt6_wrap_cpp(MOC_SOURCES ${HEADERS})

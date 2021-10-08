@@ -220,7 +220,7 @@ bool DatabaseTaskOpenDatabase::initializeDatabase(QSqlDatabase &ADatabase)
 		QSqlQuery createQuery(ADatabase);
 		for (int i=structureVersion; i<DATABASE_STRUCTURE_VERSION; i++)
 		{
-			QStringList commands = databaseUpdates[i].createQuery.split(';',QString::SkipEmptyParts);
+			QStringList commands = databaseUpdates[i].createQuery.split(';',Qt::SkipEmptyParts);
 			foreach(const QString &command, commands)
 			{
 				if (!createQuery.exec(command))

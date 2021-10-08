@@ -317,8 +317,8 @@ QString StatusIcons::iconsetByJid(const Jid &AContactJid) const
 	QString &substorage = FJid2Storage[AContactJid];
 	if (substorage.isEmpty())
 	{
-		QRegExp regExp;
-		regExp.setCaseSensitivity(Qt::CaseSensitive);
+		QRegularExpression regExp;
+		regExp.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
 
 		QString contactStr = AContactJid.pFull();
 

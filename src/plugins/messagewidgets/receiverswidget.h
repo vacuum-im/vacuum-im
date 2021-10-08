@@ -144,7 +144,7 @@ private:
 	QList<QStandardItem *> FDeleteDelayed;
 	QMap<Jid, QStandardItem *> FStreamItems;
 	QMap<Jid, QMap<QString, QStandardItem *> > FGroupItems;
-	QMap<Jid, QMultiHash<Jid, QStandardItem *> > FContactItems;
+	QMultiMap<Jid, QMultiHash<Jid, QStandardItem *> > FContactItems;
 };
 
 Q_DECLARE_METATYPE(QList<QStandardItem *>)

@@ -110,7 +110,7 @@ QString PluginManager::revision() const
 QDateTime PluginManager::revisionDate() const
 {
 #if defined GIT_DATE
-	static const QDateTime date = QDateTime::fromTime_t(QString(GIT_DATE).toInt());
+	static const QDateTime date = QDateTime::fromSecsSinceEpoch(QString(GIT_DATE).toInt());
 #else
 	static const QDateTime date = QDateTime();
 #endif
@@ -154,7 +154,7 @@ QList<IPlugin *> PluginManager::pluginInterface(const QString &AInterface) const
 	{
 		foreach(const PluginItem &pluginItem, FPluginItems)
 			if (AInterface.isEmpty() || pluginItem.plugin->instance()->inherits(AInterface.toLatin1().data()))
-				FPlugins.insertMulti(AInterface,pluginItem.plugin);
+				FPlugins.insert(AInterface,pluginItem.plugin);
 	}
 	return FPlugins.values(AInterface);
 }
@@ -740,7 +740,7 @@ QList<QUuid> PluginManager::getConflicts(const QUuid &AUuid) const
 			}
 		}
 	}
-	return plugins.toList();
+	return QList(plugins.constBegin(), plugins.constEnd());
 }
 
 void PluginManager::loadCoreTranslations(const QDir &ADir, const QString &ALocaleName)
@@ -891,8 +891,9 @@ void PluginManager::createMenuActions()
 
 void PluginManager::declareShortcuts()
 {
-	Shortcuts::declareGroup(SCTG_GLOBAL, tr("Global shortcuts"), SGO_GLOBAL);
-	Shortcuts::declareGroup(SCTG_APPLICATION, tr("Application shortcuts"), SGO_APPLICATION);
+//FIXME
+//	Shortcuts::declareGroup(SCTG_GLOBAL, tr("Global shortcuts"), SGO_GLOBAL);
+//	Shortcuts::declareGroup(SCTG_APPLICATION, tr("Application shortcuts"), SGO_APPLICATION);
 }
 
 void PluginManager::onApplicationAboutToQuit()

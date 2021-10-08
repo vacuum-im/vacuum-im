@@ -15,7 +15,7 @@ RegisterDialog::RegisterDialog(IRegistration *ARegistration, IDataForms *ADataFo
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_REGISTRATION,0,0,"windowIcon");
 
 	ui.spgDataForm->setLayout(new QVBoxLayout);
-	ui.spgDataForm->layout()->setMargin(0);
+	ui.spgDataForm->layout()->setContentsMargins(0, 0, 0, 0);
 
 	FRegistration = ARegistration;
 	FDataForms = ADataForms;

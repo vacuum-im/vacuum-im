@@ -28,16 +28,16 @@ bool SortFilterProxyModel::hasChildren( const QModelIndex &AParent ) const
 
 bool SortFilterProxyModel::filterAcceptsRow(int ARow, const QModelIndex &AParent) const
 {
-	bool accept = !AParent.isValid() || filterRegExp().isEmpty();
+	bool accept = !AParent.isValid() || filterRegularExpression().pattern().isEmpty();
 	if (!accept)
 	{
 		QModelIndex index = sourceModel()->index(ARow,0,AParent);
 		for (int row=0; !accept && row<sourceModel()->rowCount(index); row++)
 			accept = filterAcceptsRow(row,index);
 
-		accept = accept || index.data(DIDR_NAME).toString().contains(filterRegExp());
-		accept = accept || index.data(DIDR_JID).toString().contains(filterRegExp());
-		accept = accept || index.data(DIDR_NODE).toString().contains(filterRegExp());
+		accept = accept || index.data(DIDR_NAME).toString().contains(filterRegularExpression());
+		accept = accept || index.data(DIDR_JID).toString().contains(filterRegularExpression());
+		accept = accept || index.data(DIDR_NODE).toString().contains(filterRegularExpression());
 	}
 	return accept;
 }
@@ -73,7 +73,7 @@ DiscoItemsWindow::DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &ASt
 	FActionsBarChanger->toolBar()->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
 	ui.grbActions->setLayout(new QVBoxLayout);
-	ui.grbActions->layout()->setMargin(2);
+	ui.grbActions->layout()->setContentsMargins(2, 2, 2, 2);
 	ui.grbActions->layout()->addWidget(FActionsBarChanger->toolBar());
 
 	connect(ui.cmbJid->lineEdit(),SIGNAL(returnPressed()),SLOT(onComboReturnPressed()));
@@ -387,5 +387,5 @@ void DiscoItemsWindow::onComboReturnPressed()
 
 void DiscoItemsWindow::onSearchTimerTimeout()
 {
-	FProxy->setFilterRegExp(ui.lneSearch->text());
+	FProxy->setFilterRegularExpression(ui.lneSearch->text());
 }

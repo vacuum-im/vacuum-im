@@ -1,5 +1,6 @@
 #include "tabpagenotifier.h"
 
+#include <QRandomGenerator>
 #include <utils/logger.h>
 
 TabPageNotifier::TabPageNotifier(IMessageTabPage *ATabPage) : QObject(ATabPage->instance())
@@ -40,9 +41,9 @@ IMessageTabPageNotify TabPageNotifier::notifyById(int ANotifyId) const
 
 int TabPageNotifier::insertNotify(const IMessageTabPageNotify &ANotify)
 {
-	int notifyId = qrand();
+	int notifyId = QRandomGenerator().global()->generate();
 	while (notifyId<=0 || FNotifies.contains(notifyId))
-		notifyId = qrand();
+		notifyId = QRandomGenerator().global()->generate();
 
 	FNotifies.insert(notifyId,ANotify);
 	FNotifyIdByPriority.insertMulti(ANotify.priority,notifyId);

@@ -8,7 +8,7 @@
 #include "saslbindfeature.h"
 #include "saslsessionfeature.h"
 
-#define SASLAUTH_UUID "{E583F155-BE87-4919-8769-5C87088F0F57}"
+#define SASLAUTH_UUID QUuid("{E583F155-BE87-4919-8769-5C87088F0F57}")
 
 class SASLFeatureFactory :
 	public QObject,

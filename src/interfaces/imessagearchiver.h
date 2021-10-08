@@ -14,7 +14,7 @@
 #include <utils/menu.h>
 #include <utils/jid.h>
 
-#define MESSAGEARCHIVER_UUID "{66FEAE08-BE4D-4fd4-BCEA-494F3A70997A}"
+#define MESSAGEARCHIVER_UUID QUuid("{66FEAE08-BE4D-4fd4-BCEA-494F3A70997A}")
 
 #define ARCHIVE_SCOPE_GLOBAL    "global"    //the setting will remain for next streams
 #define ARCHIVE_SCOPE_STREAM    "stream"    //the setting is true only until the end of the stream. For next stream, server default value will be used
@@ -94,6 +94,10 @@ struct IArchiveHeader
 	QUuid engineId;
 	bool operator<(const IArchiveHeader &AOther) const {
 		return start==AOther.start ? with<AOther.with : start<AOther.start;
+	}
+	//fixme
+	bool operator>(const IArchiveHeader &AOther) const {
+		return start==AOther.start ? with>AOther.with : start>AOther.start;
 	}
 	bool operator==(const IArchiveHeader &AOther) const {
 		return with==AOther.with && start==AOther.start;

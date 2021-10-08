@@ -1,15 +1,15 @@
 #include "roster.h"
 
-#include <QSet>
 #include <QFile>
+#include <definitions/internalerrors.h>
 #include <definitions/namespaces.h>
 #include <definitions/optionvalues.h>
-#include <definitions/internalerrors.h>
 #include <definitions/stanzahandlerorders.h>
 #include <definitions/xmppstanzahandlerorders.h>
-#include <utils/xmpperror.h>
-#include <utils/options.h>
+#include <utils/helpers.h>
 #include <utils/logger.h>
+#include <utils/options.h>
+#include <utils/xmpperror.h>
 
 #define SHC_ROSTER            "/iq[@type='set']/query[@xmlns='" NS_JABBER_ROSTER "']"
 #define SHC_PRESENCE          "/presence[@type]"
@@ -289,7 +289,7 @@ void Roster::setItem(const Jid &AItemJid, const QString &AName, const QSet<QStri
 		}
 
 		if (FStanzaProcessor->sendStanzaOut(FXmppStream->streamJid(),request))
-			LOG_STRM_INFO(streamJid(),QString("Roster item update request sent, jid=%1, name=%2, groups=%3").arg(AItemJid.bare(),AName,QStringList(AGroups.toList()).join("; ")));
+			LOG_STRM_INFO(streamJid(),QString("Roster item update request sent, jid=%1, name=%2, groups=%3").arg(AItemJid.bare(),AName,toQList(AGroups).join("; ")));
 		else
 			LOG_STRM_WARNING(streamJid(),QString("Failed to send roster item update request, jid=%1").arg(AItemJid.bare()));
 	}
@@ -709,7 +709,7 @@ void Roster::processItemsElement(const QDomElement &AItemsElem, bool ACompleteRo
 	if (!AItemsElem.isNull())
 	{
 		FRosterVer = AItemsElem.attribute("ver");
-		QSet<Jid> oldItems = ACompleteRoster ? FItems.keys().toSet() : QSet<Jid>();
+		QSet<Jid> oldItems = ACompleteRoster ? toQSet(FItems.keys()) : QSet<Jid>();
 		QDomElement itemElem = AItemsElem.firstChildElement("item");
 		while (!itemElem.isNull())
 		{
@@ -741,7 +741,7 @@ void Roster::processItemsElement(const QDomElement &AItemsElem, bool ACompleteRo
 
 					if (ritem != before)
 					{
-						LOG_STRM_DEBUG(streamJid(),QString("Roster item updated, jid=%1, name=%2, groups=%3, subscr=%4").arg(ritem.itemJid.bare(),ritem.name,QStringList(ritem.groups.toList()).join("; "),ritem.subscription));
+						LOG_STRM_DEBUG(streamJid(),QString("Roster item updated, jid=%1, name=%2, groups=%3, subscr=%4").arg(ritem.itemJid.bare(),ritem.name,toQList(ritem.groups).join("; "),ritem.subscription));
 						emit itemReceived(ritem,before);
 					}
 				}
@@ -766,7 +766,7 @@ void Roster::processItemsElement(const QDomElement &AItemsElem, bool ACompleteRo
 
 QString Roster::replaceGroupDelimiter(const QString &AGroup, const QString &AFrom, const QString &ATo) const
 {
-	return AGroup.split(AFrom,QString::SkipEmptyParts).join(ATo);
+	return AGroup.split(AFrom,Qt::SkipEmptyParts).join(ATo);
 }
 
 void Roster::onXmppStreamOpened()

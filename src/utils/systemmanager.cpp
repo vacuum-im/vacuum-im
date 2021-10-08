@@ -133,7 +133,6 @@ QString SystemManager::osVersion()
 		if (QFile::exists(QLatin1String("/etc/os-release")))
 		{
 			QSettings s(QLatin1String("/etc/os-release"), QSettings::IniFormat);
-			s.setIniCodec("UTF-8");
 			QString pretty = s.value(QLatin1String("PRETTY_NAME")).toString();
 			QString name = s.value(QLatin1String("NAME")).toString();
 			QString version = s.value(QLatin1String("VERSION")).toString();

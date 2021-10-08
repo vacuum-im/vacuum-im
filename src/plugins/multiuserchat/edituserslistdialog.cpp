@@ -7,6 +7,7 @@
 #include <definitions/menuicons.h>
 #include <utils/iconstorage.h>
 #include <utils/logger.h>
+#include <utils/helpers.h>
 
 #define ADR_USER_JID           Action::DR_Parametr1
 #define ADR_USER_AFFILIATON    Action::DR_Parametr2
@@ -109,8 +110,8 @@ QList<IMultiUserListItem> EditUsersListDialog::deltaList() const
 {
 	QList<IMultiUserListItem> result;
 
-	QSet<Jid> listItems = FUserListItem.keys().toSet();
-	QSet<Jid> modelItems = FUserModelItem.keys().toSet();
+	QSet<Jid> listItems = toQSet(FUserListItem.keys());
+	QSet<Jid> modelItems = toQSet(FUserModelItem.keys());
 
 	QSet<Jid> newItems =  modelItems - listItems;
 	QSet<Jid> oldItems = listItems - modelItems;

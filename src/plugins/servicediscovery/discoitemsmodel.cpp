@@ -2,6 +2,7 @@
 
 #include <definitions/discoitemdataroles.h>
 #include <utils/pluginhelper.h>
+#include <utils/helpers.h>
 
 DiscoItemsModel::DiscoItemsModel(IServiceDiscovery *ADiscovery, const Jid &AStreamJid, QObject *AParent) : QAbstractItemModel(AParent)
 {
@@ -407,7 +408,7 @@ void DiscoItemsModel::onDiscoItemsReceived(const IDiscoItems &ADiscoItems)
 				}
 			}
 
-			QList<DiscoItemIndex *> removeList = (parentIndex->childs.toSet()-appendList.toSet()-updateList.toSet()).toList();
+			QList<DiscoItemIndex *> removeList = toQList(toQSet(parentIndex->childs)-toQSet(appendList)-toQSet(updateList));
 			removeChildren(parentIndex,removeList);
 
 			QList<DiscoItemIndex *> loadList;

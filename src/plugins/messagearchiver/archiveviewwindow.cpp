@@ -17,6 +17,7 @@
 #include <utils/textmanager.h>
 #include <utils/iconstorage.h>
 #include <utils/logger.h>
+#include <utils/helpers.h>
 
 #define ADR_HEADER_STREAM            Action::DR_StreamJid
 #define ADR_HEADER_WITH              Action::DR_Parametr1
@@ -142,7 +143,7 @@ ArchiveViewWindow::ArchiveViewWindow(IMessageArchiver *AArchiver, const QMultiMa
 	FHeadersEmptyLabel->setMargin(3);
 
 	QVBoxLayout *headersLayout = new QVBoxLayout(ui.trvHeaders);
-	headersLayout->setMargin(0);
+	headersLayout->setContentsMargins(0, 0, 0, 0);
 	headersLayout->addStretch();
 	headersLayout->addWidget(FHeadersEmptyLabel);
 	headersLayout->addStretch();
@@ -154,7 +155,7 @@ ArchiveViewWindow::ArchiveViewWindow(IMessageArchiver *AArchiver, const QMultiMa
 	FMessagesEmptyLabel->setMargin(3);
 
 	QVBoxLayout *messagesLayout = new QVBoxLayout(ui.tbrMessages);
-	messagesLayout->setMargin(0);
+	messagesLayout->setContentsMargins(0, 0, 0, 0);
 	messagesLayout->addStretch();
 	messagesLayout->addWidget(FMessagesEmptyLabel);
 	messagesLayout->addStretch();
@@ -255,7 +256,8 @@ void ArchiveViewWindow::setAddresses(const QMultiMap<Jid,Jid> &AAddresses)
 			if (!it.value().isEmpty())
 				namesList.append(contactName(it.key(),it.value(),isConferenceDomain(it.value())));
 		}
-		namesList = namesList.toSet().toList(); std::sort(namesList.begin(), namesList.end());
+		namesList = toQList(toQSet(namesList));
+		std::sort(namesList.begin(), namesList.end());
 		setWindowTitle(tr("Conversation History") + (!namesList.isEmpty() ? " - " + namesList.join(", ") : QString()));
 
 		FArchiveSearchEnabled = false;
@@ -386,7 +388,7 @@ ArchiveHeader ArchiveViewWindow::itemHeader(const QStandardItem *AItem) const
 		header.subject = AItem->data(HDR_HEADER_SUBJECT).toString();
 		header.threadId = AItem->data(HDR_HEADER_THREAD).toString();
 		header.version = AItem->data(HDR_HEADER_VERSION).toInt();
-		header.engineId = AItem->data(HDR_HEADER_ENGINE).toString();
+		header.engineId = AItem->data(HDR_HEADER_ENGINE).toUuid();
 	}
 	return header;
 }
@@ -1256,7 +1258,7 @@ void ArchiveViewWindow::onRemoveCollectionsByAction()
 			}
 		}
 
-		QStringList conversationList = conversationSet.toList();
+		QStringList conversationList = QStringList(conversationSet.constBegin(), conversationSet.constEnd());
 		if (conversationSet.count() > 15)
 		{
 			conversationList = conversationList.mid(0,10);
@@ -1312,15 +1314,17 @@ void ArchiveViewWindow::onHeaderContextMenuRequested(const QPoint &APos)
 				int itemType = item->data(HDR_TYPE).toInt();
 				if (itemType == HIT_MONTHGROUP)
 				{
+					//fixme
 					QDate date = item->data(HDR_MONTHGROUP_DATE).toDate();
-					headerStart.append(QDateTime(date));
-					headerEnd.append(QDateTime(date).addMonths(1));
+					headerStart.append(QDateTime(date, QTime(0, 0)));
+					headerEnd.append(QDateTime(date, QTime(0, 0)).addMonths(1));
 				}
 				else if (itemType == HIT_DATEGROUP)
 				{
+					//fixme
 					QDate date = item->data(HDR_MONTHGROUP_DATE).toDate();
-					headerStart.append(QDateTime(date));
-					headerEnd.append(QDateTime(date).addDays(1));
+					headerStart.append(QDateTime(date, QTime(0, 0)));
+					headerEnd.append(QDateTime(date, QTime(0, 0)).addDays(1));
 				}
 				else if (itemType == HIT_HEADER)
 				{
@@ -1415,7 +1419,7 @@ void ArchiveViewWindow::onPrintConversationsByAction()
 	dialog->setWindowTitle(tr("Print Conversation History"));
 
 	if (ui.tbrMessages->textCursor().hasSelection())
-		dialog->addEnabledOption(QAbstractPrintDialog::PrintSelection);
+		dialog->setOption(QAbstractPrintDialog::PrintSelection);
 
 	if (dialog->exec() == QDialog::Accepted)
 		ui.tbrMessages->print(&printer);
@@ -1485,12 +1489,14 @@ void ArchiveViewWindow::onHeadersRequestTimerTimeout()
 		IArchiveRequest request;
 		if (FHistoryTime > 0)
 		{
-			request.end = QDateTime(QDate::currentDate().addMonths(HistoryTime[FHistoryTime-1]));
+			//fixme
+			request.end = QDateTime(QDate::currentDate().addMonths(HistoryTime[FHistoryTime-1]), QTime::currentTime());
 			request.end = request.end.addDays(1-request.end.date().day());
 		}
 		if (FHistoryTime < HistoryTimeCount)
 		{
-			request.start = QDateTime(QDate::currentDate().addMonths(HistoryTime[FHistoryTime]));
+			//fixme
+			request.start = QDateTime(QDate::currentDate().addMonths(HistoryTime[FHistoryTime]), QTime::currentTime());
 			request.start = request.start.addDays(1-request.start.date().day());
 		}
 		request.order = Qt::DescendingOrder;
@@ -1686,6 +1692,7 @@ void ArchiveViewWindow::onRosterStreamJidChanged(IRoster *ARoster, const Jid &AB
 				++it;
 			}
 		}
-		FCollections.unite(collections);
+		//fixme
+		FCollections.insert(collections);
 	}
 }

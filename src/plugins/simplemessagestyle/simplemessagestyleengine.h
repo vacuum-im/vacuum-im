@@ -7,7 +7,7 @@
 #include "simplemessagestyle.h"
 #include "simpleoptionswidget.h"
 
-#define SIMPLEMESSAGESTYLE_UUID   "{cfad7d10-58d0-4638-9940-dda64c1dd509}"
+#define SIMPLEMESSAGESTYLE_UUID  QUuid("{cfad7d10-58d0-4638-9940-dda64c1dd509}")
 
 class SimpleMessageStyleEngine :
 	public QObject,

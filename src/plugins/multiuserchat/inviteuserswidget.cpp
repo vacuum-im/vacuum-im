@@ -68,7 +68,7 @@ InviteUsersWidget::InviteUsersWidget(IMessageWindow *AWindow, QWidget *AParent) 
 
 		ui.wdtReceivers->setLayout(new QVBoxLayout());
 		ui.wdtReceivers->layout()->addWidget(FReceiversWidget->instance());
-		ui.wdtReceivers->layout()->setMargin(0);
+		ui.wdtReceivers->layout()->setContentsMargins(0, 0, 0, 0);
 	}
 
 	connect(ui.dbbButtons,SIGNAL(accepted()),SLOT(onDialogButtonsAccepted()));

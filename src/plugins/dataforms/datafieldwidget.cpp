@@ -12,7 +12,7 @@ DataFieldWidget::DataFieldWidget(IDataForms *ADataForms, const IDataField &AFiel
 	FMediaWidget = NULL;
 
 	setLayout(new QVBoxLayout(this));
-	layout()->setMargin(0);
+	layout()->setContentsMargins(0, 0, 0, 0);
 
 	if (FDataForms->isMediaValid(AField.media))
 	{
@@ -189,7 +189,7 @@ QVariant DataFieldWidget::value() const
 	}
 	else if (FField.type == DATAFIELD_TYPE_JIDMULTI)
 	{
-		QStringList values = FTextEdit->toPlainText().split("\n", QString::SkipEmptyParts);
+		QStringList values = FTextEdit->toPlainText().split("\n", Qt::SkipEmptyParts);
 		for (int i = 0; i < values.count(); i++)
 			values[i] = Jid::fromUserInput(values.at(i)).full();
 		return values;
@@ -217,7 +217,7 @@ QVariant DataFieldWidget::value() const
 	{
 		QStringList values;
 		if (!FTextEdit->document()->isEmpty())
-			values = FTextEdit->toPlainText().split("\n", QString::KeepEmptyParts);
+			values = FTextEdit->toPlainText().split("\n", Qt::KeepEmptyParts);
 		return values;
 	}
 	else if (FField.validate.type == DATAVALIDATE_TYPE_DATE)

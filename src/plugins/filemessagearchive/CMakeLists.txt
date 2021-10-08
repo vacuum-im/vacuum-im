@@ -10,6 +10,6 @@ include("filemessagearchive.cmake")
 include("${CMAKE_SOURCE_DIR}/src/plugins/plugins.cmake")
 
 if (IS_ENABLED)
-	find_package(Qt5Sql REQUIRED)
-	target_link_libraries(${PLUGIN_NAME} Qt5::Sql)
+        find_package(Qt6Sql REQUIRED)
+        target_link_libraries(${PLUGIN_NAME} Qt6::Sql)
 endif (IS_ENABLED)

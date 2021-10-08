@@ -7,7 +7,7 @@
 #include <interfaces/imainwindow.h>
 #include "consolewidget.h"
 
-#define CONSOLE_UUID  "{2572D474-5F3E-8d24-B10A-BAA57C2BC693}"
+#define CONSOLE_UUID  QUuid("{2572D474-5F3E-8d24-B10A-BAA57C2BC693}")
 
 class ConsolePlugin :
 	public QObject,

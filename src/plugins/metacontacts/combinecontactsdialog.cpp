@@ -33,7 +33,7 @@ CombineContactsDialog::CombineContactsDialog(IMetaContacts *AMetaContacts, const
 
 		for (int i=0; i<AStreams.count(); i++)
 		{
-			QUuid metaId = AMetas.at(i);
+			QUuid metaId = QUuid(AMetas.at(i));
 			Jid streamJid = AStreams.at(i);
 			if (!metaId.isNull())
 			{

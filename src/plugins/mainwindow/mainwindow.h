@@ -13,7 +13,7 @@ class MainWindow :
 	Q_OBJECT;
 	Q_INTERFACES(IMainWindow);
 public:
-	MainWindow(QWidget *AParent = NULL, Qt::WindowFlags AFlags = 0);
+	MainWindow(QWidget *AParent = NULL, Qt::WindowFlags AFlags = Qt::Widget);
 	~MainWindow();
 	//IMainWindow
 	virtual QMainWindow *instance() { return this; }

@@ -2,6 +2,7 @@
 
 #include <QRegExp>
 #include <QTextBlock>
+#include <QRegularExpression>
 
 TextManager::TextManager()
 {
@@ -10,14 +11,16 @@ TextManager::TextManager()
 
 QString TextManager::getDocumentBody(const QTextDocument &ADocument)
 {
-	QRegExp body("<body.*>(.*)</body>");
-	body.setMinimal(false);
+	//FIXME
+//	QRegExp body("<body.*>(.*)</body>");
+//	body.setMinimal(false);
 
 	QString html = ADocument.toHtml();
-	html = html.indexOf(body)>=0 ? body.cap(1).trimmed() : html;
+	QRegularExpressionMatch match;
+	html = html.indexOf(QRegularExpression(R"(<body.*>(.*)</body>)"), 0, &match) >=0 ? match.captured(1).trimmed() : html;
 
 	// XXX Replace <P> inserted by QTextDocument with <SPAN>
-	if (html.leftRef(3).compare(QString("<p "), Qt::CaseInsensitive)==0 && html.rightRef(4).compare(QString("</p>"), Qt::CaseInsensitive)==0)
+	if (html.startsWith(QString("<p "), Qt::CaseInsensitive)==0 && html.endsWith(QString("</p>"), Qt::CaseInsensitive)==0)
 	{
 		html.replace(1, 1, "span");
 		html.replace(html.length() - 2, 1, "span");

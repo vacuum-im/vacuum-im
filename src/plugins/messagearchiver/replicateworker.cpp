@@ -360,10 +360,10 @@ void ReplicateTaskLoadModifications::run(QSqlDatabase &ADatabase)
 				modification.number = loadModificationsQuery.value(2).toULongLong();
 				qint64 version = loadModificationsQuery.value(3).toLongLong();
 				modification.action = version!=DELETED_HEADER_VERSION ? IArchiveModification::Changed : IArchiveModification::Removed;
-				foreach(const QString &engine, loadModificationsQuery.value(4).toString().split(",",QString::SkipEmptyParts))
-					modification.sources.append(engine);
-				foreach(const QString &engine, loadModificationsQuery.value(5).toString().split(",",QString::SkipEmptyParts))
-					modification.destinations.append(engine);
+				foreach(const QString &engine, loadModificationsQuery.value(4).toString().split(",",Qt::SkipEmptyParts))
+					modification.sources.append(QUuid(engine));
+				foreach(const QString &engine, loadModificationsQuery.value(5).toString().split(",",Qt::SkipEmptyParts))
+					modification.destinations.append(QUuid(engine));
 				FModifications.append(modification);
 			}
 		}
@@ -600,7 +600,7 @@ bool ReplicateWorker::initializeDatabase(QSqlDatabase &ADatabase)
 		QSqlQuery createQuery(ADatabase);
 		for (int i=structureVersion; i<DATABASE_STRUCTURE_VERSION; i++)
 		{
-			QStringList commands = databaseUpdates[i].createQuery.split(';',QString::SkipEmptyParts);
+			QStringList commands = databaseUpdates[i].createQuery.split(';',Qt::SkipEmptyParts);
 			foreach(const QString &command, commands)
 			{
 				if (!createQuery.exec(command))

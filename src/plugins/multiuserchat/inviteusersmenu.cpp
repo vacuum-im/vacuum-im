@@ -28,7 +28,7 @@ InviteUsersMenu::InviteUsersMenu(IMessageWindow *AWindow, QWidget *AParent) : Me
 	}
 
 	setLayout(new QVBoxLayout());
-	layout()->setMargin(0);
+	layout()->setContentsMargins(0, 0, 0, 0);
 
 	connect(this,SIGNAL(aboutToShow()),SLOT(onAboutToShow()));
 }

@@ -1,6 +1,6 @@
 #include "datetime.h"
 
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QStringList>
 
 DateTimeData::DateTimeData(const QDateTime &ADT, int ATZD)
@@ -145,10 +145,11 @@ QString DateTime::toX85Format(bool ADate, bool ATime, bool ATZD) const
 int DateTime::tzdFromX85(const QString &AX85DateTime)
 {
 	int tzd = 0;
-	QRegExp tzdRegExp("[+-](\\d{2}:\\d{2})");
-	if (tzdRegExp.indexIn(AX85DateTime) > -1)
+	QRegularExpression tzdRegExp("[+-](\\d{2}:\\d{2})");
+	QRegularExpressionMatch tzdMatch = tzdRegExp.match(AX85DateTime);
+	if (tzdMatch.hasMatch())
 	{
-		QTime time = QTime::fromString(tzdRegExp.cap(1),"hh:mm");
+		QTime time = QTime::fromString(tzdMatch.captured(1),"hh:mm");
 		tzd = AX85DateTime.contains('+') ? QTime(0,0,0,0).secsTo(time) : time.secsTo(QTime(0,0,0,0));
 	}
 	return tzd;
@@ -157,10 +158,11 @@ int DateTime::tzdFromX85(const QString &AX85DateTime)
 QDateTime DateTime::dtFromX85(const QString &AX85DateTime)
 {
 	QDateTime dt;
-	QRegExp dtRegExp("((\\d{4}-?\\d{2}-?\\d{2})?T?(\\d{2}:\\d{2}:\\d{2})?(\\.\\d{3})?)");
-	if (dtRegExp.indexIn(AX85DateTime) > -1)
+	QRegularExpression dtRegExp("((\\d{4}-?\\d{2}-?\\d{2})?T?(\\d{2}:\\d{2}:\\d{2})?(\\.\\d{3})?)");
+	QRegularExpressionMatch dtMatch = dtRegExp.match(AX85DateTime);
+	if (dtMatch.hasMatch())
 	{
-		QString dtStr = dtRegExp.cap(1);
+		QString dtStr = dtMatch.captured(1);
 		dt = QDateTime::fromString(dtStr,Qt::ISODate);
 		if (!dt.isValid())
 		{

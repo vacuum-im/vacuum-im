@@ -98,7 +98,7 @@ bool ReceiversProxyModel::filterAcceptsRow(int AModelRow, const QModelIndex &AMo
 				return true;
 		return false;
 	}
-	else if (!FOfflineVisible && filterRegExp().isEmpty() && index.data(RDR_SHOW).isValid())
+	else if (!FOfflineVisible && filterRegularExpression().pattern().isEmpty() && index.data(RDR_SHOW).isValid())
 	{
 		int show = index.data(RDR_SHOW).toInt();
 		if (show==IPresence::Offline || show==IPresence::Error)
@@ -417,7 +417,7 @@ void ReceiversWidget::setOfflineContactsVisible(bool AVisible)
 QMultiMap<Jid, Jid> ReceiversWidget::selectedAddresses() const
 {
 	QMultiMap<Jid, Jid> addresses;
-	for (QMap<Jid, QMultiHash<Jid, QStandardItem *> >::const_iterator streamIt=FContactItems.constBegin(); streamIt!=FContactItems.constEnd(); ++streamIt)
+	for (QMultiMap<Jid, QMultiHash<Jid, QStandardItem *> >::const_iterator streamIt=FContactItems.constBegin(); streamIt!=FContactItems.constEnd(); ++streamIt)
 	{
 		for (QMultiHash<Jid, QStandardItem *>::const_iterator contactIt=streamIt->constBegin(); contactIt!=streamIt->constEnd(); ++contactIt)
 		{
@@ -456,7 +456,7 @@ void ReceiversWidget::setAddressSelection(const Jid &AStreamJid, const Jid &ACon
 
 void ReceiversWidget::clearSelection()
 {
-	for (QMap<Jid, QMultiHash<Jid, QStandardItem *> >::const_iterator streamIt=FContactItems.constBegin(); streamIt!=FContactItems.constEnd(); ++streamIt)
+	for (QMultiMap<Jid, QMultiHash<Jid, QStandardItem *> >::const_iterator streamIt=FContactItems.constBegin(); streamIt!=FContactItems.constEnd(); ++streamIt)
 		for (QMultiHash<Jid, QStandardItem *>::const_iterator contactIt=streamIt->constBegin(); contactIt!=streamIt->constEnd(); ++contactIt)
 			contactIt.value()->setCheckState(Qt::Unchecked);
 }
@@ -894,7 +894,8 @@ void ReceiversWidget::onModelItemInserted(QStandardItem *AItem)
 		else if (itemKind == RIK_GROUP)
 			FGroupItems[streamJid].insert(AItem->data(RDR_GROUP).toString(),AItem);
 		else if (itemKind == RIK_CONTACT)
-			FContactItems[streamJid].insertMulti(AItem->data(RDR_PREP_BARE_JID).toString(),AItem);
+			//fixme
+			FContactItems.value(streamJid).insert(AItem->data(RDR_PREP_BARE_JID).toString(),AItem);
 	}
 	updateCheckState(AItem->parent());
 }
@@ -911,7 +912,7 @@ void ReceiversWidget::onModelItemRemoving(QStandardItem *AItem)
 		else if (itemKind == RIK_GROUP)
 			FGroupItems[streamJid].remove(AItem->data(RDR_GROUP).toString());
 		else if (itemKind == RIK_CONTACT)
-			FContactItems[streamJid].remove(AItem->data(RDR_PREP_BARE_JID).toString(),AItem);
+			FContactItems.value(streamJid).remove(AItem->data(RDR_PREP_BARE_JID).toString(),AItem);
 	}
 	updateCheckState(AItem->parent());
 
@@ -970,14 +971,14 @@ void ReceiversWidget::onModelItemDataChanged(QStandardItem *AItem, int ARole)
 void ReceiversWidget::onViewIndexExpanded(const QModelIndex &AIndex)
 {
 	QStandardItem *item = mapViewToModel(AIndex);
-	if (item!=NULL && FProxyModel->filterRegExp().isEmpty())
+	if (item!=NULL && FProxyModel->filterRegularExpression().pattern().isEmpty())
 		item->setData(false,RIDR_ITEM_COLLAPSED);
 }
 
 void ReceiversWidget::onViewIndexCollapsed(const QModelIndex &AIndex)
 {
 	QStandardItem *item = mapViewToModel(AIndex);
-	if (item!=NULL && FProxyModel->filterRegExp().isEmpty())
+	if (item!=NULL && FProxyModel->filterRegularExpression().pattern().isEmpty())
 		item->setData(true,RIDR_ITEM_COLLAPSED);
 }
 
@@ -1205,7 +1206,7 @@ void ReceiversWidget::onDeleteDelayedItems()
 void ReceiversWidget::onStartSearchContacts()
 {
 	FProxyModel->setFilterWildcard(ui.sleSearch->text());
-	if (!FProxyModel->filterRegExp().isEmpty())
+	if (!FProxyModel->filterRegularExpression().pattern().isEmpty())
 		ui.trvReceivers->expandAll();
 	else
 		restoreExpandState(FModel->invisibleRootItem());

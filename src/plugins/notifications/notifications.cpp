@@ -46,7 +46,7 @@ Notifications::Notifications()
 	FNetworkAccessManager = NULL;
 
 	FNotifyId = 0;
-	FSound = NULL;
+	FSoundEffect = nullptr;
 }
 
 Notifications::~Notifications()
@@ -54,7 +54,7 @@ Notifications::~Notifications()
 	delete FActivateLast;
 	delete FRemoveAll;
 	delete FNotifyMenu;
-	delete FSound;
+	delete FSoundEffect;
 }
 
 void Notifications::pluginInfo(IPluginInfo *APluginInfo)

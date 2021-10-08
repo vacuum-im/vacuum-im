@@ -3,8 +3,8 @@
 #include <QTimer>
 #include <QCloseEvent>
 #include <QResizeEvent>
+#include <QScreen>
 #include <QApplication>
-#include <QDesktopWidget>
 #include <definitions/version.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
@@ -255,10 +255,11 @@ QMenu *MainWindow::createPopupMenu()
 void MainWindow::correctWindowPosition()
 {
 	QRect windowRect = geometry();
-	QRect screenRect = qApp->desktop()->availableGeometry(this);
+	QRect screenRect = screen()->availableGeometry();
 	if (!screenRect.isEmpty() && !windowRect.isEmpty())
 	{
-		Qt::Alignment align = 0;
+		//fixme
+		Qt::Alignment align;
 		if (windowRect.right() <= screenRect.left())
 			align |= Qt::AlignLeft;
 		else if (windowRect.left() >= screenRect.right())

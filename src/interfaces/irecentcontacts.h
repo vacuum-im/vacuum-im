@@ -8,7 +8,7 @@
 #include <utils/jid.h>
 #include <utils/menu.h>
 
-#define RECENTCONTACTS_UUID "{8AD56476-F9FC-4967-B196-78B616DDFD21}"
+#define RECENTCONTACTS_UUID QUuid("{8AD56476-F9FC-4967-B196-78B616DDFD21}")
 
 struct IRecentItem
 {

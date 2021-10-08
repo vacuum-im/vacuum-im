@@ -6,7 +6,7 @@
 #include <utils/stanza.h>
 #include <utils/xmpperror.h>
 
-#define STANZAPROCESSOR_UUID "{1175D470-5D4A-4c29-A69E-EDA46C2BC387}"
+#define STANZAPROCESSOR_UUID QUuid("{1175D470-5D4A-4c29-A69E-EDA46C2BC387}")
 
 class IStanzaHandler
 {

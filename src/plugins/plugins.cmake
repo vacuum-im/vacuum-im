@@ -18,8 +18,8 @@ if (IS_ENABLED)
 		".")
 	add_definitions(-DQT_PLUGIN -DQT_SHARED)
 
-	qt5_wrap_cpp(MOC_SOURCES ${HEADERS})
-	qt5_wrap_ui(UI_HEADERS ${UIS})
+        qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
+        qt6_wrap_ui(UI_HEADERS ${UIS})
 
 	if (UNIX AND NOT APPLE)
 		set(CMAKE_INSTALL_RPATH "$ORIGIN/../..")
@@ -27,7 +27,7 @@ if (IS_ENABLED)
 
 	add_translations(TRANSLATIONS ${PLUGIN_NAME} ${HEADERS} ${SOURCES} ${UIS})
 	add_library(${PLUGIN_NAME} SHARED ${SOURCES} ${MOC_SOURCES} ${UI_HEADERS} ${TRANSLATIONS})
-	target_link_libraries(${PLUGIN_NAME} ${VACUUM_UTILS_NAME} ${ADD_LIBS} Qt5::Widgets Qt5::Xml Qt5::Network)
+        target_link_libraries(${PLUGIN_NAME} ${VACUUM_UTILS_NAME} ${ADD_LIBS} Qt6::Widgets Qt6::Xml Qt6::Network)
 	if (APPLE)
 		set_target_properties(${PLUGIN_NAME} PROPERTIES
 			LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${INSTALL_PLUGINS}"

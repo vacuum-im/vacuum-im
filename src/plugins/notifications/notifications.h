@@ -2,7 +2,7 @@
 #define NOTIFICATIONS_H
 
 #include <QTimer>
-#include <QSound>
+#include <QSoundEffect>
 #include <QPointer>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/inotifications.h>
@@ -133,7 +133,7 @@ private:
 	QList<int> FTrayNotifies;
 private:
 	int FNotifyId;
-	QSound *FSound;
+	QSoundEffect *FSoundEffect;
 	QList<int> FDelayedRemovals;
 	QList<int> FDelayedActivations;
 	QList<QWidget *> FDelayedShowMinimized;

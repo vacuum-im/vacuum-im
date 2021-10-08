@@ -1,4 +1,4 @@
-#include "rostersmodel.h"
+﻿#include "rostersmodel.h"
 
 #include <QTimer>
 #include <definitions/rosterindexkinds.h>
@@ -287,8 +287,8 @@ void RostersModel::setStreamsLayout(StreamsLayout ALayout)
 					insertRosterIndex(sindex,FRootIndex);
 			}
 
-			QHash<IRosterIndex *, QMultiHash<Jid, IRosterIndex *> > contacts = FContactsCache;
-			for (QHash<IRosterIndex *, QMultiHash<Jid, IRosterIndex *> >::const_iterator streamIt=contacts.constBegin(); streamIt!=contacts.constEnd(); ++streamIt)
+			QMultiHash<IRosterIndex *, QMultiHash<Jid, IRosterIndex *> > contacts = FContactsCache;
+			for (QMultiHash<IRosterIndex *, QMultiHash<Jid, IRosterIndex *> >::const_iterator streamIt=contacts.constBegin(); streamIt!=contacts.constEnd(); ++streamIt)
 			{
 				IRosterIndex *sroot = ALayout==LayoutMerged ? FContactsRoot : streamIt.key();
 				for (QMultiHash<Jid, IRosterIndex *>::const_iterator itemIt=streamIt->constBegin(); itemIt!=streamIt->constEnd(); ++itemIt)
@@ -646,14 +646,14 @@ void RostersModel::onAdvancedItemInserted(QStandardItem *AItem)
 		{
 			IRosterIndex *pindex = rindex->parentIndex();
 			if (pindex)
-				FGroupsCache[pindex].insertMulti(rindex->data(RDR_NAME).toString(),rindex);
+				FGroupsCache[pindex].insert(rindex->data(RDR_NAME).toString(),rindex);
 		}
 		else if (!streamJid.isEmpty() && ContactsCacheRosterKinds.contains(rindex->kind()))
 		{
 			QString bareJid = rindex->data(RDR_PREP_BARE_JID).toString();
 			IRosterIndex *sindex = !bareJid.isEmpty() ? streamIndex(streamJid) : NULL;
 			if (sindex && sindex!=rindex && isChildIndex(rindex,streamRoot(streamJid)))
-				FContactsCache[sindex].insertMulti(bareJid,rindex);
+				FContactsCache[sindex].insert(bareJid,rindex);
 		}
 		emit indexInserted(rindex);
 	}
