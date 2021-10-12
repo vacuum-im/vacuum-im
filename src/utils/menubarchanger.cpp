@@ -52,7 +52,7 @@ void MenuBarChanger::insertMenu(Menu *AMenu, int AGroup)
 	else
 		FMenuBar->addAction(AMenu->menuAction());
 
-	FMenu.insertMulti(AGroup,AMenu);
+	FMenu.insert(AGroup,AMenu);
 	connect(AMenu,SIGNAL(menuDestroyed(Menu *)),SLOT(onMenuDestroyed(Menu *)));
 	emit menuInserted(before,AMenu,AGroup);
 }

@@ -132,7 +132,7 @@ int PEPManager::insertNodeHandler(const QString &ANode, IPEPHandler *AHandle)
 		handleId = (handleId > 0) ? handleId+1 : 1;
 
 	FHandlersById.insert(handleId, AHandle);
-	FHandlersByNode.insertMulti(ANode, handleId);
+	FHandlersByNode.insert(ANode, handleId);
 	connect(AHandle->instance(),SIGNAL(destroyed(QObject *)),SLOT(onPEPHandlerDestroyed(QObject *)));
 
 	return handleId;

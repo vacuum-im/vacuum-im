@@ -45,7 +45,7 @@ bool UrlProcessor::registerUrlHandler(const QString &AScheme, IUrlHandler *AUrlH
 	if (!AScheme.isEmpty() && AUrlHandler!=NULL)
 	{
 		LOG_DEBUG(QString("Url handler registered, cheme=%1, address=%2").arg(AScheme).arg((quint64)AUrlHandler));
-		FHandlerList.insertMulti(AScheme, AUrlHandler);
+		FHandlerList.insert(AScheme, AUrlHandler);
 		return true;
 	}
 	return false;

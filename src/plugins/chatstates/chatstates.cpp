@@ -234,7 +234,7 @@ QMultiMap<int, IOptionsDialogWidget *> ChatStates::optionsDialogWidgets(const QS
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	if (FOptionsManager && ANodeId==OPN_MESSAGES)
 	{
-		widgets.insertMulti(OWO_MESSAGES_CHATSTATESENABLED, FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_CHATSTATESENABLED),tr("Send notifications of your chat activity"),AParent));
+		widgets.insert(OWO_MESSAGES_CHATSTATESENABLED, FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_CHATSTATESENABLED),tr("Send notifications of your chat activity"),AParent));
 	}
 	return widgets;
 }

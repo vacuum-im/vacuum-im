@@ -348,7 +348,7 @@ INotification NormalMessageHandler::messageNotify(INotifications *ANotifications
 					notify.data.insert(NDR_POPUP_TEXT,AMessage.body());
 				}
 
-				FNotifiedMessages.insertMulti(window,AMessage.data(MDR_MESSAGE_ID).toInt());
+				FNotifiedMessages.insert(window,AMessage.data(MDR_MESSAGE_ID).toInt());
 			}
 		}
 		else
@@ -370,7 +370,7 @@ IMessageWindow *NormalMessageHandler::messageShowNotified(int AMessageId)
 			IMessageNormalWindow *window = findWindow(message.to(),message.from());
 			if (window)
 			{
-				FNotifiedMessages.insertMulti(window,AMessageId);
+				FNotifiedMessages.insert(window,AMessageId);
 				window->showTabPage();
 				return window;
 			}
@@ -395,7 +395,7 @@ QMultiMap<int, IOptionsDialogWidget *> NormalMessageHandler::optionsDialogWidget
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	if (FOptionsManager && ANodeId==OPN_MESSAGES)
 	{
-		widgets.insertMulti(OWO_MESSAGES_UNNOTIFYALLNORMAL,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_UNNOTIFYALLNORMAL),tr("Consider all single contacts messages as read when read the first"),AParent));
+		widgets.insert(OWO_MESSAGES_UNNOTIFYALLNORMAL,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_UNNOTIFYALLNORMAL),tr("Consider all single contacts messages as read when read the first"),AParent));
 	}
 	return widgets;
 }

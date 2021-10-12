@@ -424,7 +424,7 @@ QMultiMap<Jid, Jid> ReceiversWidget::selectedAddresses() const
 			if (contactIt.value()->checkState() == Qt::Checked)
 			{
 				if (!addresses.contains(streamIt.key(),contactIt.key()))
-					addresses.insertMulti(streamIt.key(),contactIt.key());
+					addresses.insert(streamIt.key(),contactIt.key());
 			}
 		}
 	}

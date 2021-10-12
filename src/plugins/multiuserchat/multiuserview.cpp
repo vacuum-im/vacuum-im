@@ -240,12 +240,12 @@ void MultiUserView::insertItemLabel(const AdvancedDelegateItem &ALabel, QStandar
 	if (ALabel.d->id != AdvancedDelegateItem::NullId)
 	{
 		if (!FLabelItems.contains(ALabel.d->id,AItem))
-			FLabelItems.insertMulti(ALabel.d->id,AItem);
+			FLabelItems.insert(ALabel.d->id,AItem);
 
 		if ((ALabel.d->flags & AdvancedDelegateItem::Blink) == 0)
 			FBlinkItems.remove(ALabel.d->id,AItem);
 		else if (!FBlinkItems.contains(ALabel.d->id, AItem))
-			FBlinkItems.insertMulti(ALabel.d->id,AItem);
+			FBlinkItems.insert(ALabel.d->id,AItem);
 		updateBlinkTimer();
 
 		AdvancedDelegateItems labelItems = AItem->data(MUDR_LABEL_ITEMS).value<AdvancedDelegateItems>();
@@ -303,7 +303,7 @@ QList<int> MultiUserView::itemNotifies(QStandardItem *AItem) const
 {
 	QMultiMap<int, int> orderMap;
 	foreach(int notifyId, FItemNotifies.values(AItem))
-		orderMap.insertMulti(FNotifies.value(notifyId).order, notifyId);
+		orderMap.insert(FNotifies.value(notifyId).order, notifyId);
 	return orderMap.values();
 }
 
@@ -320,7 +320,7 @@ int MultiUserView::insertItemNotify(const IMultiUserViewNotify &ANotify, QStanda
 	LOG_STRM_DEBUG(FMultiChat->streamJid(),QString("Inserting item notify, notify=%1, order=%2, flags=%3, room=%4").arg(NotifyId).arg(ANotify.order).arg(ANotify.flags).arg(FMultiChat->roomJid().bare()));
 
 	FNotifies.insert(NotifyId,ANotify);
-	FItemNotifies.insertMulti(AItem,NotifyId);
+	FItemNotifies.insert(AItem,NotifyId);
 	updateItemNotify(AItem);
 
 	emit itemNotifyInserted(NotifyId);

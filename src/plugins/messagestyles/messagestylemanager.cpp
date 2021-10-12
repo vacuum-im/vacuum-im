@@ -100,18 +100,18 @@ QMultiMap<int, IOptionsDialogWidget *> MessageStyleManager::optionsDialogWidgets
 	{
 		static const QList<int> messageTypes = QList<int>() << Message::Chat << Message::GroupChat << Message::Normal << Message::Headline << Message::Error;
 
-		widgets.insertMulti(OHO_APPEARANCE_MESSAGESTYLE, FOptionsManager->newOptionsDialogHeader(tr("Messages styles"),AParent));
+		widgets.insert(OHO_APPEARANCE_MESSAGESTYLE, FOptionsManager->newOptionsDialogHeader(tr("Messages styles"),AParent));
 
 		int index = 0;
 		foreach(int messageType, messageTypes)
 		{
-			widgets.insertMulti(OWO_APPEARANCE_MESSAGETYPESTYLE + index, new StyleSelectOptionsWidget(this,messageType,AParent));
+			widgets.insert(OWO_APPEARANCE_MESSAGETYPESTYLE + index, new StyleSelectOptionsWidget(this,messageType,AParent));
 			index++;
 		}
 	}
 	else if (ANodeId == OPN_MESSAGES)
 	{
-		widgets.insertMulti(OWO_MESSAGES_SHOWDATESEPARATORS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_SHOWDATESEPARATORS),tr("Show date separators in message window"),AParent));
+		widgets.insert(OWO_MESSAGES_SHOWDATESEPARATORS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_SHOWDATESEPARATORS),tr("Show date separators in message window"),AParent));
 	}
 	return widgets;
 }

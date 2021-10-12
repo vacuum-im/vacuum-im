@@ -341,7 +341,7 @@ QMultiMap<int, IOptionsDialogWidget *> VCardManager::optionsDialogWidgets(const 
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	if (FOptionsManager && ANodeId==OPN_COMMON)
 	{
-		widgets.insertMulti(OWO_COMMON_VCARDIMAGE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_COMMON_RESTRICT_VCARD_IMAGES_SIZE),tr("Restrict maximum vCard images size"),AParent));
+		widgets.insert(OWO_COMMON_VCARDIMAGE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_COMMON_RESTRICT_VCARD_IMAGES_SIZE),tr("Restrict maximum vCard images size"),AParent));
 	}
 	return widgets;
 }
@@ -796,7 +796,7 @@ void VCardManager::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AIt
 		{
 			if (!FUpdateTimer.isActive())
 				FUpdateTimer.start();
-			FUpdateQueue.insertMulti(ARoster->streamJid(),AItem.itemJid);
+			FUpdateQueue.insert(ARoster->streamJid(),AItem.itemJid);
 		}
 	}
 }

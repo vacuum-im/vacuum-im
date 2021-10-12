@@ -203,12 +203,12 @@ QMultiMap<int, IOptionsDialogWidget *> Bookmarks::optionsDialogWidgets(const QSt
 		if (nodeTree.count()==3 && nodeTree.at(0)==OPN_ACCOUNTS && nodeTree.at(2)=="Additional")
 		{
 			OptionsNode options = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));
-			widgets.insertMulti(OHO_ACCOUNTS_ADDITIONAL_CONFERENCES, FOptionsManager->newOptionsDialogHeader(tr("Conferences"),AParent));
-			widgets.insertMulti(OWO_ACCOUNTS_ADDITIONAL_DISABLEAUTOJOIN, FOptionsManager->newOptionsDialogWidget(options.node("ignore-autojoin"),tr("Disable auto join to conferences on this computer"),AParent));
+			widgets.insert(OHO_ACCOUNTS_ADDITIONAL_CONFERENCES, FOptionsManager->newOptionsDialogHeader(tr("Conferences"),AParent));
+			widgets.insert(OWO_ACCOUNTS_ADDITIONAL_DISABLEAUTOJOIN, FOptionsManager->newOptionsDialogWidget(options.node("ignore-autojoin"),tr("Disable auto join to conferences on this computer"),AParent));
 		}
 		else if (ANodeId == OPN_CONFERENCES)
 		{
-			widgets.insertMulti(OWO_CONFERENCES_SHOWAUTOJOINED, FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_SHOWAUTOJOINED),tr("Show windows of auto joined conferences at startup"),AParent));
+			widgets.insert(OWO_CONFERENCES_SHOWAUTOJOINED, FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_SHOWAUTOJOINED),tr("Show windows of auto joined conferences at startup"),AParent));
 		}
 	}
 	return widgets;
@@ -289,7 +289,7 @@ bool Bookmarks::setModelData(const AdvancedItemDelegate *ADelegate, QWidget *AEd
 			IBookmark &bookmark = bookmarkList[index];
 
 			QVariant value = AEditor->property(ADVANCED_DELEGATE_EDITOR_VALUE_PROPERTY);
-			QByteArray name = ADelegate->editorFactory()->valuePropertyName(value.type());
+			QByteArray name = ADelegate->editorFactory()->valuePropertyName(value.typeId());
 			QString newName = AEditor->property(name).toString();
 
 			if (!newName.isEmpty() && bookmark.name!=newName)

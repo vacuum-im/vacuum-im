@@ -289,8 +289,8 @@ void Annotations::updateDataHolder(const Jid &AStreamJid, const QList<Jid> &ACon
 	{
 		QMultiMap<int,QVariant> findData;
 		foreach(const Jid &contactJid, AContactJids)
-			findData.insertMulti(RDR_PREP_BARE_JID,contactJid.pBare());
-		findData.insertMulti(RDR_STREAM_JID,AStreamJid.pFull());
+			findData.insert(RDR_PREP_BARE_JID,contactJid.pBare());
+		findData.insert(RDR_STREAM_JID,AStreamJid.pFull());
 
 		foreach (IRosterIndex *index, sroot->findChilds(findData,true))
 			emit rosterDataChanged(index,RDR_ANNOTATIONS);

@@ -238,8 +238,8 @@ bool BirthdayReminder::updateBirthdayState(const Jid &AContactJid)
 	{
 		QMultiMap<int, QVariant> findData;
 		foreach(int kind, BirthdayRosterKinds)
-			findData.insertMulti(RDR_KIND,kind);
-		findData.insertMulti(RDR_PREP_BARE_JID,AContactJid.pBare());
+			findData.insert(RDR_KIND,kind);
+		findData.insert(RDR_PREP_BARE_JID,AContactJid.pBare());
 		foreach (IRosterIndex *index, FRostersModel->rootIndex()->findChilds(findData,true))
 			FRostersViewPlugin->rostersView()->insertLabel(FBirthdayLabelId,index);
 	}

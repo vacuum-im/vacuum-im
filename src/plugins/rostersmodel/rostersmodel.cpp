@@ -566,7 +566,7 @@ void RostersModel::insertRosterDataHolder(int AOrder, IRosterDataHolder *AHolder
 {
 	if (AHolder && !FRosterDataHolders.contains(AOrder,AHolder))
 	{
-		FRosterDataHolders.insertMulti(AOrder,AHolder);
+		FRosterDataHolders.insert(AOrder,AHolder);
 		DataHolder *proxyHolder = FAdvancedDataHolders.value(AHolder);
 		if (proxyHolder == NULL)
 		{

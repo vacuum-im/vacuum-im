@@ -368,7 +368,7 @@ INotification ChatMessageHandler::messageNotify(INotifications *ANotifications, 
 					notify.data.insert(NDR_POPUP_TEXT,AMessage.body());
 				}
 
-				FNotifiedMessages.insertMulti(window, AMessage.data(MDR_MESSAGE_ID).toInt());
+				FNotifiedMessages.insert(window, AMessage.data(MDR_MESSAGE_ID).toInt());
 			}
 		}
 		else if (window == NULL)

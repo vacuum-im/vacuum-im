@@ -132,16 +132,16 @@ QMultiMap<int, IOptionsDialogWidget *> MessageWidgets::optionsDialogWidgets(cons
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	if (FOptionsManager && ANodeId==OPN_MESSAGES)
 	{
-		widgets.insertMulti(OHO_MESSAGES_VIEW,FOptionsManager->newOptionsDialogHeader(tr("Message window view"),AParent));
-		widgets.insertMulti(OWO_MESSAGES_LOADHISTORY,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_LOADHISTORY),tr("Load last messages from history"),AParent));
-		widgets.insertMulti(OWO_MESSAGES_COMBINEWITHROSTER,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_COMBINEWITHROSTER),tr("Show message windows together with contacts list"),AParent));
-		widgets.insertMulti(OWO_MESSAGES_TABWINDOWSENABLE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_TABWINDOWS_ENABLE),tr("Show message windows in tab window"),AParent));
-		widgets.insertMulti(OWO_MESSAGES_EDITORAUTORESIZE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_EDITORAUTORESIZE),tr("Automatically resize messages input field"),AParent));
-		widgets.insertMulti(OWO_MESSAGES_EDITORMINIMUMLINES,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_EDITORMINIMUMLINES),tr("Minimum number of lines in messages input field:"),AParent));
+		widgets.insert(OHO_MESSAGES_VIEW,FOptionsManager->newOptionsDialogHeader(tr("Message window view"),AParent));
+		widgets.insert(OWO_MESSAGES_LOADHISTORY,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_LOADHISTORY),tr("Load last messages from history"),AParent));
+		widgets.insert(OWO_MESSAGES_COMBINEWITHROSTER,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_COMBINEWITHROSTER),tr("Show message windows together with contacts list"),AParent));
+		widgets.insert(OWO_MESSAGES_TABWINDOWSENABLE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_TABWINDOWS_ENABLE),tr("Show message windows in tab window"),AParent));
+		widgets.insert(OWO_MESSAGES_EDITORAUTORESIZE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_EDITORAUTORESIZE),tr("Automatically resize messages input field"),AParent));
+		widgets.insert(OWO_MESSAGES_EDITORMINIMUMLINES,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_EDITORMINIMUMLINES),tr("Minimum number of lines in messages input field:"),AParent));
 
-		widgets.insertMulti(OHO_MESSAGES_BEHAVIOR,FOptionsManager->newOptionsDialogHeader(tr("Message window behavior"),AParent));
-		widgets.insertMulti(OWO_MESSAGES_SHOWSTATUS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_SHOWSTATUS),tr("Show contacts status changes"),AParent));
-		widgets.insertMulti(OWO_MESSAGES_ARCHIVESTATUS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_ARCHIVESTATUS),tr("Save contacts status messages in history"),AParent));
+		widgets.insert(OHO_MESSAGES_BEHAVIOR,FOptionsManager->newOptionsDialogHeader(tr("Message window behavior"),AParent));
+		widgets.insert(OWO_MESSAGES_SHOWSTATUS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_SHOWSTATUS),tr("Show contacts status changes"),AParent));
+		widgets.insert(OWO_MESSAGES_ARCHIVESTATUS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_ARCHIVESTATUS),tr("Save contacts status messages in history"),AParent));
 	}
 	return widgets;
 }
@@ -490,7 +490,7 @@ QMultiMap<int, IMessageViewUrlHandler *> MessageWidgets::viewUrlHandlers() const
 void MessageWidgets::insertViewUrlHandler(int AOrder, IMessageViewUrlHandler *AHandler)
 {
 	if (AHandler && !FViewUrlHandlers.contains(AOrder,AHandler))
-		FViewUrlHandlers.insertMulti(AOrder,AHandler);
+		FViewUrlHandlers.insert(AOrder,AHandler);
 }
 
 void MessageWidgets::removeViewUrlHandler(int AOrder, IMessageViewUrlHandler *AHandler)
@@ -507,7 +507,7 @@ QMultiMap<int, IMessageEditSendHandler *> MessageWidgets::editSendHandlers() con
 void MessageWidgets::insertEditSendHandler(int AOrder, IMessageEditSendHandler *AHandler)
 {
 	if (AHandler && !FEditSendHandlers.contains(AOrder,AHandler))
-		FEditSendHandlers.insertMulti(AOrder,AHandler);
+		FEditSendHandlers.insert(AOrder,AHandler);
 }
 
 void MessageWidgets::removeEditSendHandler(int AOrder, IMessageEditSendHandler *AHandler)
@@ -524,7 +524,7 @@ QMultiMap<int, IMessageEditContentsHandler *> MessageWidgets::editContentsHandle
 void MessageWidgets::insertEditContentsHandler(int AOrder, IMessageEditContentsHandler *AHandler)
 {
 	if (AHandler && !FEditContentsHandlers.contains(AOrder,AHandler))
-		FEditContentsHandlers.insertMulti(AOrder,AHandler);
+		FEditContentsHandlers.insert(AOrder,AHandler);
 }
 
 void MessageWidgets::removeEditContentsHandler(int AOrder, IMessageEditContentsHandler *AHandler)

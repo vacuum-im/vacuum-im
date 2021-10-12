@@ -766,7 +766,7 @@ void RostersView::insertLabel(quint32 ALabelId, IRosterIndex *AIndex)
 {
 	if (FLabelItems.contains(ALabelId) && !FIndexLabels.contains(AIndex,ALabelId))
 	{
-		FIndexLabels.insertMulti(AIndex,ALabelId);
+		FIndexLabels.insert(AIndex,ALabelId);
 		emit rosterDataChanged(AIndex,RDR_LABEL_ITEMS);
 		updateBlinkTimer();
 	}
@@ -813,7 +813,7 @@ QList<int> RostersView::notifyQueue(IRosterIndex *AIndex) const
 {
 	QMultiMap<int, int> queue;
 	foreach(int notifyId, FIndexNotifies.values(AIndex))
-		queue.insertMulti(FNotifyItems.value(notifyId).order, notifyId);
+		queue.insert(FNotifyItems.value(notifyId).order, notifyId);
 	return queue.values();
 }
 
@@ -837,7 +837,7 @@ int RostersView::insertNotify(const IRostersNotify &ANotify, const QList<IRoster
 	foreach(IRosterIndex *index, AIndexes)
 	{
 		FNotifyUpdates += index;
-		FIndexNotifies.insertMulti(index, notifyId);
+		FIndexNotifies.insert(index, notifyId);
 	}
 
 	if (ANotify.flags & IRostersNotify::Blink)
@@ -929,7 +929,7 @@ void RostersView::insertLabelHolder(int AOrder, IRostersLabelHolder *AHolder)
 	{
 		if (!FLabelHolders.values().contains(AHolder))
 			connect(AHolder->instance(),SIGNAL(rosterLabelChanged(quint32, IRosterIndex *)),SLOT(onRosterLabelChanged(quint32, IRosterIndex *)));
-		FLabelHolders.insertMulti(AOrder,AHolder);
+		FLabelHolders.insert(AOrder,AHolder);
 		LOG_DEBUG(QString("Roster label holder inserted, order=%1, class=%2").arg(AOrder).arg(AHolder->instance()->metaObject()->className()));
 	}
 }
@@ -954,7 +954,7 @@ void RostersView::insertClickHooker(int AOrder, IRostersClickHooker *AHooker)
 {
 	if (AHooker)
 	{
-		FClickHookers.insertMulti(AOrder,AHooker);
+		FClickHookers.insert(AOrder,AHooker);
 		LOG_DEBUG(QString("Roster click hooker inserted, order=%1, address=%2").arg(AOrder).arg((quint64)AHooker));
 	}
 }
@@ -977,7 +977,7 @@ void RostersView::insertKeyHooker(int AOrder, IRostersKeyHooker *AHooker)
 {
 	if (AHooker)
 	{
-		FKeyHookers.insertMulti(AOrder,AHooker);
+		FKeyHookers.insert(AOrder,AHooker);
 		LOG_DEBUG(QString("Roster key hooker inserted, order=%1, address=%2").arg(AOrder).arg((quint64)AHooker));
 	}
 }
@@ -1000,7 +1000,7 @@ void RostersView::insertEditHandler(int AOrder, IRostersEditHandler *AHandler)
 {
 	if (AHandler)
 	{
-		FEditHandlers.insertMulti(AOrder,AHandler);
+		FEditHandlers.insert(AOrder,AHandler);
 		LOG_DEBUG(QString("Roster edit handler inserted, address=%1").arg((quint64)AHandler));
 	}
 }

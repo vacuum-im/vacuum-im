@@ -67,7 +67,7 @@ public:
 	static QVariant decrypt(const QByteArray &AData, const QByteArray &AKey = cryptKey());
 public:
 	static QString variantToString(const QVariant &AValue);
-	static QVariant stringToVariant(const QString &AValue, QVariant::Type AType);
+	static QVariant stringToVariant(const QString &AValue, QMetaType::Type AType);
 	static void exportNode(const QString &APath, QDomElement &AToElem);
 	static void importNode(const QString &APath, const QDomElement &AFromElem);
 	static OptionsNode createNodeForElement(const QDomElement &AElement);

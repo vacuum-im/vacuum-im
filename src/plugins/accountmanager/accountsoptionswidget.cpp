@@ -203,7 +203,7 @@ void AccountsOptionsWidget::dragMoveEvent(QDragMoveEvent *AEvent)
 {
 	if (FDragItem!=NULL && AEvent->source()==this)
 	{
-		AccountItemWidget *item = accountItemWidgetAt(AEvent->pos());
+		AccountItemWidget *item = accountItemWidgetAt(AEvent->position().toPoint());
 		if (item!=NULL && item!=FDragItem)
 		{
 			FLayout->insertWidget(FLayout->indexOf(item),FDragItem);

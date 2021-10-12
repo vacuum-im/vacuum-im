@@ -183,14 +183,14 @@ QMultiMap<int, IOptionsDialogWidget *> OptionsManager::optionsDialogWidgets(cons
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	if (ANodeId == OPN_COMMON)
 	{
-		widgets.insertMulti(OHO_COMMON_SETTINGS, newOptionsDialogHeader(tr("Common settings"),AParent));
+		widgets.insert(OHO_COMMON_SETTINGS, newOptionsDialogHeader(tr("Common settings"),AParent));
 #ifdef Q_OS_WIN
-		widgets.insertMulti(OWO_COMMON_AUTOSTART, newOptionsDialogWidget(Options::node(OPV_COMMON_AUTOSTART), tr("Auto run application on system startup"), AParent));
+		widgets.insert(OWO_COMMON_AUTOSTART, newOptionsDialogWidget(Options::node(OPV_COMMON_AUTOSTART), tr("Auto run application on system startup"), AParent));
 #else
 		Q_UNUSED(AParent);
 #endif
 
-		widgets.insertMulti(OHO_COMMON_LOCALIZATION, newOptionsDialogHeader(tr("Localization"),AParent));
+		widgets.insert(OHO_COMMON_LOCALIZATION, newOptionsDialogHeader(tr("Localization"),AParent));
 
 		QDir localeDir(QApplication::applicationDirPath());
 		localeDir.cd(TRANSLATIONS_DIR);
@@ -217,7 +217,7 @@ QMultiMap<int, IOptionsDialogWidget *> OptionsManager::optionsDialogWidgets(cons
 		for(QMap<QString,QString>::const_iterator it=sortLangMap.constBegin(); it!=sortLangMap.constEnd(); ++it)
 			if (langCombox->findData(it.value()) < 0)
 				langCombox->addItem(it.key(),it.value());
-		widgets.insertMulti(OWO_COMMON_LANGUAGE,newOptionsDialogWidget(Options::node(OPV_COMMON_LANGUAGE),tr("Language:"),langCombox,AParent));
+		widgets.insert(OWO_COMMON_LANGUAGE,newOptionsDialogWidget(Options::node(OPV_COMMON_LANGUAGE),tr("Language:"),langCombox,AParent));
 	}
 	return widgets;
 }

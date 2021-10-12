@@ -141,8 +141,8 @@ QMultiMap<int, IOptionsDialogWidget *> DataStreamsManger::optionsDialogWidgets(c
 		int index = 0;
 		foreach(IDataStreamMethod *method, FMethods)
 		{
-			widgets.insertMulti(OHO_DATATRANSFER_METHODNAME + index, FOptionsManager->newOptionsDialogHeader(tr("Transfer method %1").arg(method->methodName()),AParent));
-			widgets.insertMulti(OWO_DATATRANSFER_METHODSETTINGS + index, method->methodSettingsWidget(settingsProfileNode(QUuid(),method->methodNS()),AParent));
+			widgets.insert(OHO_DATATRANSFER_METHODNAME + index, FOptionsManager->newOptionsDialogHeader(tr("Transfer method %1").arg(method->methodName()),AParent));
+			widgets.insert(OWO_DATATRANSFER_METHODSETTINGS + index, method->methodSettingsWidget(settingsProfileNode(QUuid(),method->methodNS()),AParent));
 			index += 10;
 		}
 	}

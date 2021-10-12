@@ -114,7 +114,7 @@ QMultiMap<int, IOptionsDialogWidget *> MainWindowPlugin::optionsDialogWidgets(co
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	if (ANodeId == OPN_ROSTERVIEW)
 	{
-		widgets.insertMulti(OWO_ROSTER_MINIMIZE_ON_CLOSE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_MINIMIZEONCLOSE),tr("Minimize roster window instead of closing it"),AParent));
+		widgets.insert(OWO_ROSTER_MINIMIZE_ON_CLOSE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_MINIMIZEONCLOSE),tr("Minimize roster window instead of closing it"),AParent));
 	}
 	return widgets;
 }

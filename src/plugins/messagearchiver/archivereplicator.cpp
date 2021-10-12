@@ -401,7 +401,7 @@ void ArchiveReplicator::onReplicateWorkerTaskFinished(ReplicateTask *ATask)
 						if (engineOrder > 0)
 						{
 							connectEngine(engine);
-							loadOrder.insertMulti(engineOrder,engine->engineId());
+							loadOrder.insert(engineOrder,engine->engineId());
 						}
 					}
 				}

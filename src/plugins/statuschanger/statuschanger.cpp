@@ -257,13 +257,13 @@ QMultiMap<int, IOptionsDialogWidget *> StatusChanger::optionsDialogWidgets(const
 	if (nodeTree.count()==3 && nodeTree.at(0)==OPN_ACCOUNTS && nodeTree.at(2)=="Additional")
 	{
 		OptionsNode options = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));
-		widgets.insertMulti(OWO_ACCOUNTS_ADDITIONAL_AUTOCONNECT,FOptionsManager->newOptionsDialogWidget(options.node("auto-connect"),tr("Connect to server on startup"),AParent));
-		widgets.insertMulti(OWO_ACCOUNTS_ADDITIONAL_AUTORECONNECT,FOptionsManager->newOptionsDialogWidget(options.node("auto-reconnect"),tr("Reconnect to server on connection errors"),AParent));
+		widgets.insert(OWO_ACCOUNTS_ADDITIONAL_AUTOCONNECT,FOptionsManager->newOptionsDialogWidget(options.node("auto-connect"),tr("Connect to server on startup"),AParent));
+		widgets.insert(OWO_ACCOUNTS_ADDITIONAL_AUTORECONNECT,FOptionsManager->newOptionsDialogWidget(options.node("auto-reconnect"),tr("Reconnect to server on connection errors"),AParent));
 	}
 	else if (ANodeId == OPN_STATUSITEMS)
 	{
-		widgets.insertMulti(OHO_STATUS_ITEMS, FOptionsManager->newOptionsDialogHeader(tr("Standard and users statuses"), AParent));
-		widgets.insertMulti(OWO_STATUS_ITEMS, new StatusOptionsWidget(this,AParent));
+		widgets.insert(OHO_STATUS_ITEMS, FOptionsManager->newOptionsDialogHeader(tr("Standard and users statuses"), AParent));
+		widgets.insert(OWO_STATUS_ITEMS, new StatusOptionsWidget(this,AParent));
 	}
 	return widgets;
 }

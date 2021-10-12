@@ -142,8 +142,8 @@ QMultiMap<int, IOptionsDialogWidget *> Emoticons::optionsDialogWidgets(const QSt
 			delete storage;
 		}
 
-		widgets.insertMulti(OHO_APPEARANCE_MESSAGES,FOptionsManager->newOptionsDialogHeader(tr("Message windows"),AParent));
-		widgets.insertMulti(OWO_APPEARANCE_EMOTICONS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_EMOTICONS_ICONSET),tr("Smileys:"),cmbEmoticons,AParent));
+		widgets.insert(OHO_APPEARANCE_MESSAGES,FOptionsManager->newOptionsDialogHeader(tr("Message windows"),AParent));
+		widgets.insert(OWO_APPEARANCE_EMOTICONS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_EMOTICONS_ICONSET),tr("Smileys:"),cmbEmoticons,AParent));
 	}
 	return widgets;
 }

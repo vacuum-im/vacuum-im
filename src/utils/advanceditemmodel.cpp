@@ -166,7 +166,7 @@ QMultiMap<int, AdvancedItemSortHandler *> AdvancedItemModel::itemSortHandlers() 
 void AdvancedItemModel::insertItemSortHandler(int AOrder, AdvancedItemSortHandler *AHandler)
 {
 	if (AHandler)
-		FItemSortHandlers.insertMulti(AOrder,AHandler);
+		FItemSortHandlers.insert(AOrder,AHandler);
 }
 
 void AdvancedItemModel::removeItemSortHandler(int AOrder, AdvancedItemSortHandler *AHandler)
@@ -188,8 +188,8 @@ void AdvancedItemModel::insertItemDataHolder(int AOrder, AdvancedItemDataHolder 
 	{
 		foreach(int role, AHolder->advancedItemDataRoles(AOrder))
 			if (role != AnyRole)
-				FItemDataHolders[role].insertMulti(AOrder,AHolder);
-		FItemDataHolders[AnyRole].insertMulti(AOrder,AHolder);
+				FItemDataHolders[role].insert(AOrder,AHolder);
+		FItemDataHolders[AnyRole].insert(AOrder,AHolder);
 	}
 }
 

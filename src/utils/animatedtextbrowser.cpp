@@ -98,14 +98,14 @@ QPixmap AnimatedTextBrowser::addAnimation(const QUrl &AName, const QVariant &AIm
 	QMovie *movie = FUrlMovies.value(AName);
 	if (movie == NULL)
 	{
-		switch (AImageData.type())
+		switch (AImageData.typeId())
 		{
-		case QVariant::String:
+		case QMetaType::QString:
 			{
 				movie = new QMovie(AImageData.toString(), QByteArray(), this);
 				break;
 			}
-		case QVariant::ByteArray:
+		case QMetaType::QByteArray:
 			{
 				QBuffer *buffer = new QBuffer();
 				buffer->setData(AImageData.toByteArray());

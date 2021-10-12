@@ -271,8 +271,8 @@ bool EditWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
 		if (AEvent->type() == QEvent::KeyPress)
 		{
 			QKeyEvent *keyEvent = static_cast<QKeyEvent *>(AEvent);
-			//fixme
-			if (FSendShortcut[0] == keyEvent->key() + keyEvent->nativeModifiers())
+			//fixme //still breaks local shortcuts
+			if (FSendShortcut == (keyEvent->key() | keyEvent->modifiers()))
 			{
 				hooked = true;
 				onShortcutActivated(FSendShortcutId,ui.medEditor);

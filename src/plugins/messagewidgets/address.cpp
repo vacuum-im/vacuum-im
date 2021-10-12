@@ -63,7 +63,7 @@ QMultiMap<Jid, Jid> Address::availAddresses(bool AUnique) const
 	{
 		QList<Jid> contacts = AUnique ? streamIt->uniqueKeys() : streamIt->values();
 		foreach(const Jid &contact, contacts)
-			addresses.insertMulti(streamIt.key(),contact);
+			addresses.insert(streamIt.key(),contact);
 	}
 	return addresses;
 }
@@ -89,7 +89,7 @@ void Address::appendAddress(const Jid &AStreamJid, const Jid &AContactJid)
 	{
 		if (AContactJid.hasResource() || !FAddresses.value(AStreamJid).contains(AContactJid))
 		{
-			FAddresses[AStreamJid].insertMulti(AContactJid.bare(),AContactJid);
+			FAddresses[AStreamJid].insert(AContactJid.bare(),AContactJid);
 			updateAutoAddresses(false);
 			emit availAddressesChanged();
 		}
@@ -146,7 +146,7 @@ bool Address::updateAutoAddresses(bool AEmit)
 					if (!oldAddresses.contains(contact))
 					{
 						changed = true;
-						streamIt->insertMulti(contact,contact);
+						streamIt->insert(contact,contact);
 					}
 					else
 					{
@@ -158,7 +158,7 @@ bool Address::updateAutoAddresses(bool AEmit)
 					if (!oldAddresses.contains(pitem.itemJid))
 					{
 						changed = true;
-						streamIt->insertMulti(contact,pitem.itemJid);
+						streamIt->insert(contact,pitem.itemJid);
 					}
 					else
 					{
@@ -206,7 +206,7 @@ void Address::onPresenceItemReceived(IPresence *APresence, const IPresenceItem &
 				if (AItem.itemJid.hasResource() && contacts.contains(AItem.itemJid))
 				{
 					if (contacts.count() == 1)
-						FAddresses[APresence->streamJid()].insertMulti(bareJid,bareJid);
+						FAddresses[APresence->streamJid()].insert(bareJid,bareJid);
 					FAddresses[APresence->streamJid()].remove(bareJid,AItem.itemJid);
 					emit availAddressesChanged();
 				}
@@ -215,7 +215,7 @@ void Address::onPresenceItemReceived(IPresence *APresence, const IPresenceItem &
 			{
 				if (contacts.contains(bareJid))
 					FAddresses[APresence->streamJid()].remove(bareJid,bareJid);
-				FAddresses[APresence->streamJid()].insertMulti(bareJid,AItem.itemJid);
+				FAddresses[APresence->streamJid()].insert(bareJid,AItem.itemJid);
 				emit availAddressesChanged();
 			}
 		}

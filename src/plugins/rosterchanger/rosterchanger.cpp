@@ -200,9 +200,9 @@ QMultiMap<int, IOptionsDialogWidget *> RosterChanger::optionsDialogWidgets(const
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	if (FOptionsManager && ANode == OPN_ROSTERVIEW)
 	{
-		widgets.insertMulti(OHO_ROSTER_MANAGEMENT,FOptionsManager->newOptionsDialogHeader(tr("Contacts list management"),AParent));
-		widgets.insertMulti(OWO_ROSTER_AUTOSUBSCRIBE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_AUTOSUBSCRIBE),tr("Automatically accept all subscription requests"),AParent));
-		widgets.insertMulti(OWO_ROSTER_AUTOUNSUBSCRIBE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_AUTOUNSUBSCRIBE),tr("Remove subscription when you was deleted from contacts list"),AParent));
+		widgets.insert(OHO_ROSTER_MANAGEMENT,FOptionsManager->newOptionsDialogHeader(tr("Contacts list management"),AParent));
+		widgets.insert(OWO_ROSTER_AUTOSUBSCRIBE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_AUTOSUBSCRIBE),tr("Automatically accept all subscription requests"),AParent));
+		widgets.insert(OWO_ROSTER_AUTOUNSUBSCRIBE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_AUTOUNSUBSCRIBE),tr("Remove subscription when you was deleted from contacts list"),AParent));
 	}
 	return widgets;
 }
@@ -1203,10 +1203,10 @@ void RosterChanger::removeContactsFromRoster(const QStringList &AStreams, const 
 				if (ritem.isNull())
 				{
 					QMultiMap<int, QVariant> findData;
-					findData.insertMulti(RDR_KIND,RIK_CONTACT);
-					findData.insertMulti(RDR_KIND,RIK_AGENT);
-					findData.insertMulti(RDR_STREAM_JID,AStreams.at(i));
-					findData.insertMulti(RDR_PREP_BARE_JID,AContacts.at(i));
+					findData.insert(RDR_KIND,RIK_CONTACT);
+					findData.insert(RDR_KIND,RIK_AGENT);
+					findData.insert(RDR_STREAM_JID,AStreams.at(i));
+					findData.insert(RDR_PREP_BARE_JID,AContacts.at(i));
 
 					IRosterIndex *sroot = FRostersModel!=NULL ? FRostersModel->streamRoot(AStreams.at(i)) : NULL;
 					IRosterIndex *group = sroot!=NULL ? FRostersModel->findGroupIndex(RIK_GROUP_NOT_IN_ROSTER,QString(),sroot) : NULL;

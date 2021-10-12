@@ -282,7 +282,7 @@ void Gateways::resolveNickName(const Jid &AStreamJid, const Jid &AContactJid)
 			LOG_STRM_INFO(AStreamJid,QString("Requesting contact vCard to resolve nick name, jid=%1").arg(AContactJid.bare()));
 			if (!FResolveNicks.contains(ritem.itemJid))
 				FVCardManager->requestVCard(AStreamJid,ritem.itemJid);
-			FResolveNicks.insertMulti(ritem.itemJid,AStreamJid);
+			FResolveNicks.insert(ritem.itemJid,AStreamJid);
 		}
 	}
 	else if (ritem.isNull())
@@ -314,7 +314,7 @@ void Gateways::setKeepConnection(const Jid &AStreamJid, const Jid &AServiceJid, 
 	if (presence)
 	{
 		if (AEnabled)
-			FKeepConnections.insertMulti(presence->streamJid(),AServiceJid);
+			FKeepConnections.insert(presence->streamJid(),AServiceJid);
 		else
 			FKeepConnections.remove(presence->streamJid(),AServiceJid);
 	}
@@ -442,7 +442,7 @@ bool Gateways::changeService(const Jid &AStreamJid, const Jid &AServiceFrom, con
 		if (ASubscribe)
 		{
 			FSubscribeServices.remove(AStreamJid,AServiceFrom.bare());
-			FSubscribeServices.insertMulti(AStreamJid,AServiceTo.bare());
+			FSubscribeServices.insert(AStreamJid,AServiceTo.bare());
 			savePrivateStorageSubscribe(AStreamJid);
 
 			curItems+=newItems;
@@ -972,7 +972,7 @@ void Gateways::onPrivateDataLoaded(const QString &AId, const Jid &AStreamJid, co
 		while (!elem.isNull())
 		{
 			Jid serviceJid = elem.text();
-			FSubscribeServices.insertMulti(AStreamJid,serviceJid);
+			FSubscribeServices.insert(AStreamJid,serviceJid);
 			QString id = FRegistration!=NULL ? FRegistration->sendRegisterRequest(AStreamJid,serviceJid) : QString();
 			if (!id.isEmpty())
 				FShowRegisterRequests.insert(id,AStreamJid);

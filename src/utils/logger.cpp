@@ -15,16 +15,18 @@ void qtMessagesHandler(QtMsgType AType, const QMessageLogContext &AContext, cons
 	switch (AType)
 	{
 	case QtDebugMsg:
-		Logger::writeLog(Logger::Debug,"Qt",AMessage);
+		Logger::writeLog(Logger::Debug,QStringLiteral("Qt"),AMessage);
 		break;
 	case QtWarningMsg:
-		Logger::writeLog(Logger::Warning,"Qt",AMessage);
+		Logger::writeLog(Logger::Warning,QStringLiteral("Qt"),AMessage);
 		break;
 	case QtCriticalMsg:
-		Logger::writeLog(Logger::Error,"Qt",AMessage);
+		Logger::writeLog(Logger::Error,QStringLiteral("Qt"),AMessage);
 		break;
 	case QtFatalMsg:
-		Logger::writeLog(Logger::Fatal,"Qt",AMessage);
+		Logger::writeLog(Logger::Fatal,QStringLiteral("Qt"),AMessage);
+		break;
+	case QtInfoMsg:
 		break;
 	}
 }

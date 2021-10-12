@@ -43,7 +43,7 @@ CombineContactsDialog::CombineContactsDialog(IMetaContacts *AMetaContacts, const
 
 					foreach(const Jid &itemJid, meta.items)
 						if (!FMetaItems.contains(metaStream,itemJid))
-							FMetaItems.insertMulti(metaStream,itemJid);
+							FMetaItems.insert(metaStream,itemJid);
 
 					if (!meta.name.isEmpty())
 						metaNames.append(meta.name);
@@ -52,7 +52,7 @@ CombineContactsDialog::CombineContactsDialog(IMetaContacts *AMetaContacts, const
 			}
 			else if (!FMetaItems.contains(streamJid,AContacts.at(i)))
 			{
-				FMetaItems.insertMulti(streamJid,AContacts.at(i));
+				FMetaItems.insert(streamJid,AContacts.at(i));
 			}
 		}
 		FMetaId = FMetaId.isNull() ? QUuid::createUuid() : FMetaId;

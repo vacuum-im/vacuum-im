@@ -622,7 +622,7 @@ QList<IArchiveHeader> FileMessageArchive::loadFileHeaders(const Jid &AStreamJid,
 						IArchiveHeader header;
 						if (checkRequestFile(fpath,ARequest,&header))
 						{
-							filesMap.insertMulti(fname,header);
+							filesMap.insert(fname,header);
 							if ((quint32)filesMap.count() > ARequest.maxItems)
 								filesMap.erase(ARequest.order==Qt::AscendingOrder ? --filesMap.end() : filesMap.begin());
 						}
@@ -665,7 +665,7 @@ IArchiveHeader FileMessageArchive::saveFileCollection(const Jid &AStreamJid, con
 			{
 				QMultiMap<int, QString> curMessages;
 				foreach(const Message &message, collection.body.messages)
-					curMessages.insertMulti(collection.header.start.secsTo(message.dateTime()),message.body());
+					curMessages.insert(collection.header.start.secsTo(message.dateTime()),message.body());
 
 				foreach(const Message &message, ACollection.body.messages)
 					if (!curMessages.contains(collection.header.start.secsTo(message.dateTime()),message.body()))
@@ -677,7 +677,7 @@ IArchiveHeader FileMessageArchive::saveFileCollection(const Jid &AStreamJid, con
 			{
 				for (QMultiMap<QDateTime, QString>::const_iterator it=ACollection.body.notes.constBegin(); it!=ACollection.body.notes.constEnd(); ++it)
 					if (!collection.body.notes.contains(it.key(),it.value()))
-						newBody.notes.insertMulti(it.key(),it.value());
+						newBody.notes.insert(it.key(),it.value());
 			}
 
 			collection = ACollection;

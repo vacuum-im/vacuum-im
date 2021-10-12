@@ -671,7 +671,7 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 				{
 					if (FDestroyTimers.contains(window))
 						delete FDestroyTimers.take(window);
-					FActiveChatMessages.insertMulti(window,messageId);
+					FActiveChatMessages.insert(window,messageId);
 
 					QStandardItem *userItem = FUsersView->findUserItem(FMultiChat->findUser(userJid.resource()));
 					if (userItem != NULL)
@@ -1284,7 +1284,7 @@ void MultiUserChatWindow::refreshCompleteNicks()
 	{
 		if (user != FMultiChat->mainUser())
 			if (FCompleteNickStarts.isEmpty() || user->nick().toLower().startsWith(FCompleteNickStarts))
-				sortedNicks.insertMulti(user->nick().toLower(), user->nick());
+				sortedNicks.insert(user->nick().toLower(), user->nick());
 	}
 	FCompleteNicks = sortedNicks.values();
 

@@ -390,7 +390,7 @@ QMultiMap<int, IMessageHandler *> MessageProcessor::messageHandlers() const
 void MessageProcessor::insertMessageHandler(int AOrder, IMessageHandler *AHandler)
 {
 	if (AHandler && !FMessageHandlers.contains(AOrder,AHandler))
-		FMessageHandlers.insertMulti(AOrder,AHandler);
+		FMessageHandlers.insert(AOrder,AHandler);
 }
 
 void MessageProcessor::removeMessageHandler(int AOrder, IMessageHandler *AHandler)
@@ -407,7 +407,7 @@ QMultiMap<int, IMessageWriter *> MessageProcessor::messageWriters() const
 void MessageProcessor::insertMessageWriter(int AOrder, IMessageWriter *AWriter)
 {
 	if (AWriter && !FMessageWriters.contains(AOrder,AWriter))
-		FMessageWriters.insertMulti(AOrder,AWriter);
+		FMessageWriters.insert(AOrder,AWriter);
 }
 
 void MessageProcessor::removeMessageWriter(int AOrder, IMessageWriter *AWriter)
@@ -424,7 +424,7 @@ QMultiMap<int, IMessageEditor *> MessageProcessor::messageEditors() const
 void MessageProcessor::insertMessageEditor(int AOrder, IMessageEditor *AEditor)
 {
 	if (AEditor && !FMessageEditors.contains(AOrder,AEditor))
-		FMessageEditors.insertMulti(AOrder,AEditor);
+		FMessageEditors.insert(AOrder,AEditor);
 }
 
 void MessageProcessor::removeMessageEditor(int AOrder, IMessageEditor *AEditor)

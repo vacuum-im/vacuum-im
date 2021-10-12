@@ -133,9 +133,9 @@ QMultiMap<int, IOptionsDialogWidget *> FileStreamsManager::optionsDialogWidgets(
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	if (FOptionsManager && ANodeId==OPN_DATATRANSFER)
 	{
-		widgets.insertMulti(OHO_DATATRANSFER_FILETRANSFER, FOptionsManager->newOptionsDialogHeader(tr("File transfer"),AParent));
-		widgets.insertMulti(OWO_DATATRANSFER_FILESTREAMS, new FileStreamsOptionsWidget(this,AParent));
-		widgets.insertMulti(OWO_DATATRANSFER_GROUPBYSENDER,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_FILESTREAMS_GROUPBYSENDER),tr("Create separate folder for each sender"),AParent));
+		widgets.insert(OHO_DATATRANSFER_FILETRANSFER, FOptionsManager->newOptionsDialogHeader(tr("File transfer"),AParent));
+		widgets.insert(OWO_DATATRANSFER_FILESTREAMS, new FileStreamsOptionsWidget(this,AParent));
+		widgets.insert(OWO_DATATRANSFER_GROUPBYSENDER,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_FILESTREAMS_GROUPBYSENDER),tr("Create separate folder for each sender"),AParent));
 
 		if (FDataManager)
 		{
@@ -145,7 +145,7 @@ QMultiMap<int, IOptionsDialogWidget *> FileStreamsManager::optionsDialogWidgets(
 				IDataStreamMethod *method = FDataManager->method(methodId);
 				cmbDefaultMethod->addItem(method->methodName(), method->methodNS());
 			}
-			widgets.insertMulti(OWO_DATATRANSFER_DEFAULTMETHOD,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_FILESTREAMS_DEFAULTMETHOD),tr("Default transfer method:"),cmbDefaultMethod,AParent));
+			widgets.insert(OWO_DATATRANSFER_DEFAULTMETHOD,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_FILESTREAMS_DEFAULTMETHOD),tr("Default transfer method:"),cmbDefaultMethod,AParent));
 		}
 	}
 	return widgets;
@@ -331,7 +331,7 @@ void FileStreamsManager::insertStreamsHandler(int AOrder, IFileStreamHandler *AH
 {
 	if (AHandler!=NULL && !FHandlers.contains(AOrder,AHandler))
 	{
-		FHandlers.insertMulti(AOrder,AHandler);
+		FHandlers.insert(AOrder,AHandler);
 		emit streamHandlerInserted(AOrder, AHandler);
 	}
 }

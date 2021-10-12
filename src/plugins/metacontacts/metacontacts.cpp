@@ -630,7 +630,7 @@ bool MetaContacts::setModelData(const AdvancedItemDelegate *ADelegate, QWidget *
 	if (ADelegate->editRole() == RDR_NAME)
 	{
 		QVariant value = AEditor->property(ADVANCED_DELEGATE_EDITOR_VALUE_PROPERTY);
-		QByteArray propertyName = ADelegate->editorFactory()->valuePropertyName(value.type());
+		QByteArray propertyName = ADelegate->editorFactory()->valuePropertyName(value.typeId());
 		QString newName = AEditor->property(propertyName).toString();
 		QString oldName = AIndex.data(RDR_NAME).toString();
 		if (!newName.isEmpty() && newName!=oldName)
@@ -903,9 +903,9 @@ MetaMergedContact MetaContacts::getMergedContact(const Jid &AStreamJid, const QU
 				meta.name = metaIt->name;
 				meta.groups += metaIt->groups;
 				foreach(const Jid &itemJid, metaIt->items)
-					meta.items.insertMulti(streamIt.key(),itemJid);
+					meta.items.insert(streamIt.key(),itemJid);
 				foreach(const IPresenceItem &pItem, metaIt->presences)
-					meta.presences.insertMulti(streamIt.key(),pItem);
+					meta.presences.insert(streamIt.key(),pItem);
 			}
 		}
 	}
@@ -1135,7 +1135,7 @@ void MetaContacts::updateMetaWindows(const Jid &AStreamJid, const QUuid &AMetaId
 					if (oldItems.contains(itemIt.key(),itemIt.value()))
 						oldItems.remove(itemIt.key(),itemIt.value());
 					else
-						newItems.insertMulti(itemIt.key(),itemIt.value());
+						newItems.insert(itemIt.key(),itemIt.value());
 				}
 
 				for (QMultiMap<Jid, Jid>::const_iterator itemIt=newItems.constBegin(); itemIt!=newItems.constEnd(); ++itemIt)
@@ -1926,7 +1926,7 @@ void MetaContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AI
 				if (!metaId.isNull() && !uniqueMetas.contains(metaId))
 					uniqueMetas.append(metaId);
 				else if (metaId.isNull() && !uniqueContacts.contains(streamJid,contactJid))
-					uniqueContacts.insertMulti(streamJid,contactJid);
+					uniqueContacts.insert(streamJid,contactJid);
 			}
 
 			if (isMultiSelection && uniqueMetas.count()+uniqueContacts.count()>1)

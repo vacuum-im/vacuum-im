@@ -179,8 +179,8 @@ QMultiMap<int, IOptionsDialogWidget *> StatusIcons::optionsDialogWidgets(const Q
 		}
 		cmbStatusIcons->model()->sort(0);
 
-		widgets.insertMulti(OHO_APPEARANCE_ROSTER, FOptionsManager->newOptionsDialogHeader(tr("Contacts list"),AParent));
-		widgets.insertMulti(OWO_APPEARANCE_STATUSICONS, FOptionsManager->newOptionsDialogWidget(Options::node(OPV_STATUSICONS_DEFAULT),tr("Status icons:"),cmbStatusIcons,AParent));
+		widgets.insert(OHO_APPEARANCE_ROSTER, FOptionsManager->newOptionsDialogHeader(tr("Contacts list"),AParent));
+		widgets.insert(OWO_APPEARANCE_STATUSICONS, FOptionsManager->newOptionsDialogWidget(Options::node(OPV_STATUSICONS_DEFAULT),tr("Status icons:"),cmbStatusIcons,AParent));
 	}
 	return widgets;
 }

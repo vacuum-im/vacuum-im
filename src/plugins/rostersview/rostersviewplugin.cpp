@@ -198,22 +198,22 @@ QMultiMap<int, IOptionsDialogWidget *> RostersViewPlugin::optionsDialogWidgets(c
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	if (FOptionsManager && ANodeId == OPN_ROSTERVIEW)
 	{
-		widgets.insertMulti(OHO_ROSTER_VIEW, FOptionsManager->newOptionsDialogHeader(tr("Contacts list"),AParent));
-		widgets.insertMulti(OWO_ROSTER_SHOWOFFLINE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_SHOWOFFLINE),tr("Show disconnected contacts"),AParent));
-		widgets.insertMulti(OWO_ROSTER_MERGESTREAMS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_MERGESTREAMS),tr("Show contacts of all accounts in common list"),AParent));
-		widgets.insertMulti(OWO_ROSTER_SHOWRESOURCE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_SHOWRESOURCE),tr("Show contact resource with highest priority"),AParent));
-		widgets.insertMulti(OWO_ROSTER_HIDESCROLLBAR,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_HIDESCROLLBAR),tr("Hide scroll bars in contact list window"),AParent));
+		widgets.insert(OHO_ROSTER_VIEW, FOptionsManager->newOptionsDialogHeader(tr("Contacts list"),AParent));
+		widgets.insert(OWO_ROSTER_SHOWOFFLINE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_SHOWOFFLINE),tr("Show disconnected contacts"),AParent));
+		widgets.insert(OWO_ROSTER_MERGESTREAMS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_MERGESTREAMS),tr("Show contacts of all accounts in common list"),AParent));
+		widgets.insert(OWO_ROSTER_SHOWRESOURCE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_SHOWRESOURCE),tr("Show contact resource with highest priority"),AParent));
+		widgets.insert(OWO_ROSTER_HIDESCROLLBAR,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_HIDESCROLLBAR),tr("Hide scroll bars in contact list window"),AParent));
 
 		QComboBox *cmbViewMode = new QComboBox(AParent);
 		cmbViewMode->addItem(tr("Full"), IRostersView::ViewFull);
 		cmbViewMode->addItem(tr("Simplified"), IRostersView::ViewSimple);
 		cmbViewMode->addItem(tr("Compact"), IRostersView::ViewCompact);
-		widgets.insertMulti(OWO_ROSTER_VIEWMODE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_VIEWMODE),tr("Contacts list view:"),cmbViewMode,AParent));
+		widgets.insert(OWO_ROSTER_VIEWMODE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_VIEWMODE),tr("Contacts list view:"),cmbViewMode,AParent));
 
 		QComboBox *cmbSortMode = new QComboBox(AParent);
 		cmbSortMode->addItem(tr("by status"), IRostersView::SortByStatus);
 		cmbSortMode->addItem(tr("alphabetically"), IRostersView::SortAlphabetically);
-		widgets.insertMulti(OWO_ROSTER_SORTMODE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_SORTMODE),tr("Sort contacts list:"),cmbSortMode,AParent));
+		widgets.insert(OWO_ROSTER_SORTMODE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_SORTMODE),tr("Sort contacts list:"),cmbSortMode,AParent));
 	}
 	return widgets;
 }

@@ -222,20 +222,20 @@ void InfoWidget::updateFieldView(int AField)
 			bool iconVisible = false;
 			QVariant icon = fieldValue(IMessageInfoWidget::StatusIcon);
 
-			switch (icon.type())
+			switch (icon.typeId())
 			{
-			case QVariant::Icon:
+			case QMetaType::QIcon:
 				{
 					iconVisible = true;
 					QIcon iconIcon = icon.value<QIcon>();
 					ui.lblIcon->setPixmap(iconIcon.pixmap(iconIcon.actualSize(ui.lblIcon->maximumSize())));
 					break;
 				}
-			case QVariant::Pixmap:
+			case QMetaType::QPixmap:
 				iconVisible = true;
 				ui.lblIcon->setPixmap(icon.value<QPixmap>());
 				break;
-			case QVariant::Image:
+			case QMetaType::QImage:
 				iconVisible = true;
 				ui.lblIcon->setPixmap(QPixmap::fromImage(icon.value<QImage>()));
 				break;

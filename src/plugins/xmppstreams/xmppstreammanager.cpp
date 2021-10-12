@@ -127,7 +127,7 @@ void XmppStreamManager::registerXmppFeature(int AOrder, const QString &AFeatureN
 	if (!AFeatureNS.isEmpty() && !FFeatureOrders.values().contains(AFeatureNS))
 	{
 		LOG_DEBUG(QString("XMPP feature registered, order=%1, feature=%2").arg(AOrder).arg(AFeatureNS));
-		FFeatureOrders.insertMulti(AOrder,AFeatureNS);
+		FFeatureOrders.insert(AOrder,AFeatureNS);
 		emit xmppFeatureRegistered(AOrder,AFeatureNS);
 	}
 }
@@ -142,7 +142,7 @@ void XmppStreamManager::registerXmppFeatureFactory(int AOrder, const QString &AF
 	if (AFactory && !AFeatureNS.isEmpty())
 	{
 		LOG_DEBUG(QString("XMPP feature factory registered, order=%1, feature=%2, factory=%3").arg(AOrder).arg(AFeatureNS,AFactory->instance()->metaObject()->className()));
-		FFeatureFactories[AFeatureNS].insertMulti(AOrder,AFactory);
+		FFeatureFactories[AFeatureNS].insert(AOrder,AFactory);
 		emit xmppFeatureFactoryRegistered(AOrder,AFeatureNS,AFactory);
 	}
 }

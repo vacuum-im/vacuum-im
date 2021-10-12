@@ -355,12 +355,12 @@ void DataForms::xmlField(const IDataField &AField, QDomElement &AFormElem, const
 	if (!AField.type.isEmpty())
 		fieldElem.setAttribute("type",AField.type);
 
-	if (AField.value.type()==QVariant::StringList && !AField.value.toStringList().isEmpty())
+	if (AField.value.typeId()==QMetaType::QStringList && !AField.value.toStringList().isEmpty())
 	{
 		foreach(const QString &value, AField.value.toStringList())
 			fieldElem.appendChild(doc.createElement("value")).appendChild(doc.createTextNode(value));
 	}
-	else if (AField.value.type() == QVariant::Bool)
+	else if (AField.value.typeId() == QMetaType::Bool)
 	{
 		fieldElem.appendChild(doc.createElement("value")).appendChild(doc.createTextNode(AField.value.toBool() ? "1" : "0"));
 	}
@@ -597,7 +597,7 @@ bool DataForms::isMediaValid(const IDataMedia &AMedia) const
 
 bool DataForms::isFieldEmpty(const IDataField &AField) const
 {
-	return AField.value.type()==QVariant::StringList ? AField.value.toStringList().isEmpty() : AField.value.toString().isEmpty();
+	return AField.value.typeId()==QMetaType::QStringList ? AField.value.toStringList().isEmpty() : AField.value.toString().isEmpty();
 }
 
 bool DataForms::isFieldValid(const IDataField &AField, const QString &AFormType) const
@@ -842,7 +842,7 @@ IDataForm DataForms::dataShowSubmit(const IDataForm &AForm, const IDataForm &ASu
 
 			foreach(const IDataOption &option, ffield.options)
 			{
-				if (sfield.value.type()==QVariant::StringList)
+				if (sfield.value.typeId()==QMetaType::QStringList)
 				{
 					QStringList values = sfield.value.toStringList();
 					for (int i=0; i<values.count(); i++)

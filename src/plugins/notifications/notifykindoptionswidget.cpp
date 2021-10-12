@@ -69,7 +69,7 @@ NotifyKindOptionsWidget::NotifyKindOptionsWidget(INotifications *ANotifications,
 		if (!notifyType.title.isEmpty() && (notifyType.kindMask & visibleKinds)>0)
 		{
 			notifyType.typeId = typeId;
-			orderedTypes.insertMulti(notifyType.order,notifyType);
+			orderedTypes.insert(notifyType.order,notifyType);
 		}
 	}
 

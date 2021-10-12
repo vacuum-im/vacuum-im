@@ -264,7 +264,7 @@ void DataStreamsPublisher::insertStreamHandler(int AOrder, IPublicDataStreamHand
 {
 	if (!FHandlers.contains(AOrder,AHandler))
 	{
-		FHandlers.insertMulti(AOrder,AHandler);
+		FHandlers.insert(AOrder,AHandler);
 		emit streamHandlerInserted(AOrder,AHandler);
 	}
 }

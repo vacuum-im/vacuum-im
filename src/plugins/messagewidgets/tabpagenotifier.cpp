@@ -46,7 +46,7 @@ int TabPageNotifier::insertNotify(const IMessageTabPageNotify &ANotify)
 		notifyId = QRandomGenerator().global()->generate();
 
 	FNotifies.insert(notifyId,ANotify);
-	FNotifyIdByPriority.insertMulti(ANotify.priority,notifyId);
+	FNotifyIdByPriority.insert(ANotify.priority,notifyId);
 
 	FUpdateTimer.start();
 

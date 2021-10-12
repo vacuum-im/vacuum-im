@@ -153,7 +153,7 @@ QAction *ToolBarChanger::insertWidget(QWidget *AWidget, int AGroup)
 		QAction *handle = before!=NULL ? FToolBar->insertWidget(before, AWidget) : FToolBar->addWidget(AWidget);
 		insertGroupSeparator(AGroup,handle);
 
-		FWidgets.insertMulti(AGroup,AWidget);
+		FWidgets.insert(AGroup,AWidget);
 		FHandles.insert(AWidget, handle);
 		connect(AWidget,SIGNAL(destroyed(QObject *)),SLOT(onWidgetDestroyed(QObject *)));
 

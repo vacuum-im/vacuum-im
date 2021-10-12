@@ -332,6 +332,11 @@ bool Message::operator<(const Message &AOther) const
 	return dateTime()<AOther.dateTime();
 }
 
+bool Message::operator>(const Message &AOther) const
+{
+	return dateTime()>AOther.dateTime();
+}
+
 QDomElement Message::setTextToElem(QDomElement &AElem, const QString &AText) const
 {
 	if (!AElem.isNull())

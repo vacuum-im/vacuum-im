@@ -414,7 +414,7 @@ QMultiMap<Jid,Jid> ArchiveViewWindow::itemAddresses(const QStandardItem *AItem) 
 			for (QMultiMap<Jid,Jid>::const_iterator it=itemAddress.constBegin(); it!=itemAddress.constEnd(); ++it)
 			{
 				if (!address.contains(it.key(),it.value()))
-					address.insertMulti(it.key(),it.value());
+					address.insert(it.key(),it.value());
 			}
 		}
 	}
@@ -422,7 +422,7 @@ QMultiMap<Jid,Jid> ArchiveViewWindow::itemAddresses(const QStandardItem *AItem) 
 	{
 		Jid streamJid = AItem->data(HDR_HEADER_STREAM).toString();
 		Jid contactJid = AItem->data(HDR_HEADER_WITH).toString();
-		address.insertMulti(streamJid,isConferenceDomain(contactJid) ? contactJid : contactJid.bare());
+		address.insert(streamJid,isConferenceDomain(contactJid) ? contactJid : contactJid.bare());
 	}
 	return address;
 }
@@ -1223,7 +1223,7 @@ void ArchiveViewWindow::onSetContactJidByAction()
 
 		QMultiMap<Jid,Jid> address;
 		for(int i=0; i<streams.count(); i++)
-			address.insertMulti(streams.at(i),contacts.at(i));
+			address.insert(streams.at(i),contacts.at(i));
 		setAddresses(address);
 	}
 }
@@ -1667,7 +1667,7 @@ void ArchiveViewWindow::onRosterStreamJidChanged(IRoster *ARoster, const Jid &AB
 	if (FAddresses.contains(ABefore))
 	{
 		foreach(const Jid &contactJid, FAddresses.values(ABefore))
-			FAddresses.insertMulti(ARoster->streamJid(),contactJid);
+			FAddresses.insert(ARoster->streamJid(),contactJid);
 		FAddresses.remove(ABefore);
 
 		foreach(QStandardItem *item, findStreamItems(ABefore))

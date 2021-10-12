@@ -256,21 +256,21 @@ QMultiMap<int, IOptionsDialogWidget *> MultiUserChatManager::optionsDialogWidget
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	if (FOptionsManager && ANodeId==OPN_CONFERENCES)
 	{
-		widgets.insertMulti(OHO_CONFERENCES_MESSAGES,FOptionsManager->newOptionsDialogHeader(tr("Messages"),AParent));
-		widgets.insertMulti(OWO_CONFERENCES_SHOWENTERS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_SHOWENTERS),tr("Show users connections and disconnections"),AParent));
-		widgets.insertMulti(OWO_CONFERENCES_SHOWSTATUS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_SHOWSTATUS),tr("Show users status changes"),AParent));
-		widgets.insertMulti(OWO_CONFERENCES_ARCHIVESTATUS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_ARCHIVESTATUS),tr("Save users status messages in history"),AParent));
-		widgets.insertMulti(OWO_CONFERENCES_QUITONWINDOWCLOSE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_QUITONWINDOWCLOSE),tr("Leave the conference when window closed"),AParent));
-		widgets.insertMulti(OWO_CONFERENCES_REJOINAFTERKICK,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_REJOINAFTERKICK),tr("Automatically rejoin to conference after kick"),AParent));
-		widgets.insertMulti(OWO_CONFERENCES_REFERENUMERATION,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_REFERENUMERATION),tr("Select a user to refer by enumeration in the input field"),AParent));
+		widgets.insert(OHO_CONFERENCES_MESSAGES,FOptionsManager->newOptionsDialogHeader(tr("Messages"),AParent));
+		widgets.insert(OWO_CONFERENCES_SHOWENTERS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_SHOWENTERS),tr("Show users connections and disconnections"),AParent));
+		widgets.insert(OWO_CONFERENCES_SHOWSTATUS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_SHOWSTATUS),tr("Show users status changes"),AParent));
+		widgets.insert(OWO_CONFERENCES_ARCHIVESTATUS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_ARCHIVESTATUS),tr("Save users status messages in history"),AParent));
+		widgets.insert(OWO_CONFERENCES_QUITONWINDOWCLOSE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_QUITONWINDOWCLOSE),tr("Leave the conference when window closed"),AParent));
+		widgets.insert(OWO_CONFERENCES_REJOINAFTERKICK,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_REJOINAFTERKICK),tr("Automatically rejoin to conference after kick"),AParent));
+		widgets.insert(OWO_CONFERENCES_REFERENUMERATION,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_REFERENUMERATION),tr("Select a user to refer by enumeration in the input field"),AParent));
 
-		widgets.insertMulti(OHO_CONFERENCES_USERVIEW,FOptionsManager->newOptionsDialogHeader(tr("Participants List"),AParent));
+		widgets.insert(OHO_CONFERENCES_USERVIEW,FOptionsManager->newOptionsDialogHeader(tr("Participants List"),AParent));
 
 		QComboBox *cmbViewMode = new QComboBox(AParent);
 		cmbViewMode->addItem(tr("Full"), IMultiUserView::ViewFull);
 		cmbViewMode->addItem(tr("Simplified"), IMultiUserView::ViewSimple);
 		cmbViewMode->addItem(tr("Compact"), IMultiUserView::ViewCompact);
-		widgets.insertMulti(OWO_CONFERENCES_USERVIEWMODE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_USERVIEWMODE),tr("Participants list view:"),cmbViewMode,AParent));
+		widgets.insert(OWO_CONFERENCES_USERVIEWMODE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_USERVIEWMODE),tr("Participants list view:"),cmbViewMode,AParent));
 	}
 	return widgets;
 }

@@ -303,7 +303,7 @@ bool Avatars::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &ASt
 				if (AStanza.type()==PRESENCE_TYPE_AVAILABLE && !FBlockingResources.contains(AStreamJid,contactJid))
 				{
 					LOG_STRM_INFO(AStreamJid,QString("Resource %1 is now blocking avatar update notify mechanism").arg(contactJid.resource()));
-					FBlockingResources.insertMulti(AStreamJid,contactJid);
+					FBlockingResources.insert(AStreamJid,contactJid);
 					if (FStreamAvatars.value(AStreamJid) != UNKNOWN_AVATAR_HASH)
 					{
 						FStreamAvatars[AStreamJid] = UNKNOWN_AVATAR_HASH;
@@ -715,7 +715,7 @@ void Avatars::updateDataHolder(const Jid &AContactJid)
 		if (!AContactJid.isEmpty())
 			findData.insert(RDR_PREP_BARE_JID,AContactJid.pBare());
 		foreach(int kind, AvatarRosterKinds)
-			findData.insertMulti(RDR_KIND,kind);
+			findData.insert(RDR_KIND,kind);
 
 		foreach(IRosterIndex *index, FRostersModel->rootIndex()->findChilds(findData,true))
 			emit rosterDataChanged(index,RDR_AVATAR_IMAGE);

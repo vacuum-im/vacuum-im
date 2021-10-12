@@ -331,12 +331,12 @@ QMultiMap<int, IOptionsDialogWidget *> RecentContacts::optionsDialogWidgets(cons
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	if (FOptionsManager && ANodeId==OPN_ROSTERVIEW)
 	{
-		widgets.insertMulti(OHO_ROSTER_RECENT,FOptionsManager->newOptionsDialogHeader(tr("Recent contacts"),AParent));
-		widgets.insertMulti(OWO_ROSTER_RECENT_HIDEINACTIVEITEMS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_RECENT_HIDEINACTIVEITEMS),tr("Hide inactive contacts"),AParent));
-		widgets.insertMulti(OWO_ROSTER_RECENT_SORTBYACTIVETIME,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_RECENT_SORTBYACTIVETIME),tr("Sort contacts by last activity"),AParent));
-		widgets.insertMulti(OWO_ROSTER_RECENT_ALWAYSSHOWOFFLINE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_RECENT_ALWAYSSHOWOFFLINE),tr("Always show offline contacts"),AParent));
-		widgets.insertMulti(OWO_ROSTER_RECENT_SHOWONLYFAVORITE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_RECENT_SHOWONLYFAVORITE),tr("Show only favorite contacts"),AParent));
-		widgets.insertMulti(OWO_ROSTER_RECENT_SIMPLEITEMSVIEW,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_RECENT_SIMPLEITEMSVIEW),tr("Simplify recent contacts view"),AParent));
+		widgets.insert(OHO_ROSTER_RECENT,FOptionsManager->newOptionsDialogHeader(tr("Recent contacts"),AParent));
+		widgets.insert(OWO_ROSTER_RECENT_HIDEINACTIVEITEMS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_RECENT_HIDEINACTIVEITEMS),tr("Hide inactive contacts"),AParent));
+		widgets.insert(OWO_ROSTER_RECENT_SORTBYACTIVETIME,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_RECENT_SORTBYACTIVETIME),tr("Sort contacts by last activity"),AParent));
+		widgets.insert(OWO_ROSTER_RECENT_ALWAYSSHOWOFFLINE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_RECENT_ALWAYSSHOWOFFLINE),tr("Always show offline contacts"),AParent));
+		widgets.insert(OWO_ROSTER_RECENT_SHOWONLYFAVORITE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_RECENT_SHOWONLYFAVORITE),tr("Show only favorite contacts"),AParent));
+		widgets.insert(OWO_ROSTER_RECENT_SIMPLEITEMSVIEW,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_RECENT_SIMPLEITEMSVIEW),tr("Simplify recent contacts view"),AParent));
 	}
 	return widgets;
 }
@@ -548,7 +548,7 @@ void RecentContacts::setItemProperty(const IRecentItem &AItem, const QString &AN
 			isItemChanged = true;
 		}
 
-		QVariant nullValue = QVariant(AValue.type());
+		QVariant nullValue = QVariant(AValue.typeId());
 		if (AValue != nullValue)
 		{
 			if (!item.properties.contains(AName))

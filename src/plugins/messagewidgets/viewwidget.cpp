@@ -191,7 +191,7 @@ void ViewWidget::dropEvent(QDropEvent *AEvent)
 
 	if (accepted && !dropMenu->isEmpty())
 	{
-		if (dropMenu->exec(mapToGlobal(AEvent->pos())))
+		if (dropMenu->exec(mapToGlobal(AEvent->position().toPoint())))
 			AEvent->acceptProposedAction();
 		else
 			AEvent->ignore();

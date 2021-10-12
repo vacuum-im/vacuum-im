@@ -78,7 +78,7 @@ static void exportOptionNode(const OptionsNode &ANode, QDomElement &AToElem)
 			text.setData(Options::variantToString(value));
 		else
 			AToElem.appendChild(AToElem.ownerDocument().createTextNode(Options::variantToString(value)));
-		AToElem.setAttribute("type",value.type());
+		AToElem.setAttribute("type",value.typeId());
 	}
 	else if (AToElem.hasAttribute("type"))
 	{
@@ -107,7 +107,7 @@ static void importOptionNode(OptionsNode &ANode, const QDomElement &AFromElem)
 	if (AFromElem.hasAttribute("type"))
 	{
 		QString stringValue = findChildText(AFromElem).data();
-		ANode.setValue(Options::stringToVariant(!stringValue.isNull() ? stringValue : QString(""), (QVariant::Type)AFromElem.attribute("type").toInt()));
+		ANode.setValue(Options::stringToVariant(!stringValue.isNull() ? stringValue : QString(""), (QMetaType::Type)AFromElem.attribute("type").toInt()));
 	}
 	else
 	{
@@ -398,7 +398,7 @@ QVariant OptionsNode::value(const QString &APath, const QString &ANSpace) const
 		if (d->node.hasAttribute("type"))
 		{
 			QString stringValue = findChildText(d->node).data();
-			return Options::stringToVariant(!stringValue.isNull() ? stringValue : QString(""), (QVariant::Type)d->node.attribute("type").toInt());
+			return Options::stringToVariant(!stringValue.isNull() ? stringValue : QString(""), (QMetaType::Type)d->node.attribute("type").toInt());
 		}
 		return Options::defaultValue(path());
 	}
@@ -420,7 +420,7 @@ void OptionsNode::setValue(const QVariant &AValue, const QString &APath, const Q
 						text.setData(Options::variantToString(AValue));
 					else
 						d->node.appendChild(d->node.ownerDocument().createTextNode(Options::variantToString(AValue)));
-					d->node.setAttribute("type",AValue.type());
+					d->node.setAttribute("type",AValue.typeId());
 					emit Options::instance()->optionsChanged(*this);
 				}
 				else if (d->node.hasAttribute("type"))
@@ -612,7 +612,7 @@ void Options::setDefaultValue(const QString &APath, const QVariant &ADefault)
 
 QByteArray Options::encrypt(const QVariant &AValue, const QByteArray &AKey)
 {
-	if (AValue.type()>QVariant::Invalid && AValue.type()<QVariant::UserType && !AKey.isEmpty())
+	if (AValue.typeId()>QMetaType::UnknownType && AValue.typeId()<QMetaType::User && !AKey.isEmpty())
 	{
 		QByteArray cryptData = variantToString(AValue).toUtf8();
 		if (cryptData.size() % 16)
@@ -630,7 +630,7 @@ QByteArray Options::encrypt(const QVariant &AValue, const QByteArray &AKey)
 		for (int i = 0; i<cryptData.size(); i+=16)
 			xtea2_encipher(XTEA_ITERATIONS,(quint32 *)(cryptData.data()+i),(const quint32 *)cryptKey.constData());
 
-		return QByteArray::number(AValue.type()) + QByteArray(1,';') + cryptData.toBase64();
+		return QByteArray::number(AValue.typeId()) + QByteArray(1,';') + cryptData.toBase64();
 	}
 	return QByteArray();
 }
@@ -640,7 +640,7 @@ QVariant Options::decrypt(const QByteArray &AData, const QByteArray &AKey)
 	if (!AData.isEmpty() && !AKey.isEmpty())
 	{
 		QList<QByteArray> parts = AData.split(';');
-		QVariant::Type valType = parts.count()>1 ? (QVariant::Type)parts.value(0).toInt() : QVariant::String;
+		QMetaType::Type valType = parts.count()>1 ? (QMetaType::Type)parts.value(0).toInt() : QMetaType::QString;
 
 		QByteArray cryptData = QByteArray::fromBase64(parts.value(parts.count()>1 ? 1 : 0));
 		if ((cryptData.size() % 16) == 0)
@@ -665,72 +665,72 @@ QVariant Options::decrypt(const QByteArray &AData, const QByteArray &AKey)
 
 QString Options::variantToString(const QVariant &AValue)
 {
-	if (AValue.type() == QVariant::Rect)
+	if (AValue.typeId() == QMetaType::QRect)
 	{
 		QRect rect = AValue.toRect();
 		return QString("%1;%2;%3;%4").arg(rect.left()).arg(rect.top()).arg(rect.width()).arg(rect.height());
 	}
-	else if (AValue.type() == QVariant::Point)
+	else if (AValue.typeId() == QMetaType::QPoint)
 	{
 		QPoint point = AValue.toPoint();
 		return QString("%1;%2").arg(point.x()).arg(point.y());
 	}
-	else if (AValue.type() == QVariant::Size)
+	else if (AValue.typeId() == QMetaType::QSize)
 	{
 		QSize size = AValue.toSize();
 		return QString("%1;%2").arg(size.width()).arg(size.height());
 	}
-	else if (AValue.type() == QVariant::ByteArray)
+	else if (AValue.typeId() == QMetaType::QByteArray)
 	{
 		return AValue.toByteArray().toBase64();
 	}
-	else if (AValue.type() == QVariant::StringList)
+	else if (AValue.typeId() == QMetaType::QStringList)
 	{
 		return AValue.toStringList().join(" ;; ");
 	}
-	else if (AValue.type() == QVariant::KeySequence)
+	else if (AValue.typeId() == QMetaType::QKeySequence)
 	{
 		return AValue.value<QKeySequence>().toString(QKeySequence::PortableText);
 	}
 	return AValue.toString();
 }
 
-QVariant Options::stringToVariant(const QString &AValue, QVariant::Type AType)
+QVariant Options::stringToVariant(const QString &AValue, QMetaType::Type AType)
 {
-	if (AType == QVariant::Rect)
+	if (AType == QMetaType::QRect)
 	{
 		QList<QString> parts = AValue.split(";", Qt::SkipEmptyParts);
 		if (parts.count() == 4)
 			return QRect(parts.at(0).toInt(),parts.at(1).toInt(),parts.at(2).toInt(),parts.at(3).toInt());
 	}
-	else if (AType == QVariant::Point)
+	else if (AType == QMetaType::QPoint)
 	{
 		QList<QString> parts = AValue.split(";", Qt::SkipEmptyParts);
 		if (parts.count() == 2)
 			return QPoint(parts.at(0).toInt(),parts.at(1).toInt());
 	}
-	else if (AType == QVariant::Size)
+	else if (AType == QMetaType::QSize)
 	{
 		QList<QString> parts = AValue.split(";", Qt::SkipEmptyParts);
 		if (parts.count() == 2)
 			return QSize(parts.at(0).toInt(),parts.at(1).toInt());
 	}
-	else if (AType == QVariant::ByteArray)
+	else if (AType == QMetaType::QByteArray)
 	{
 		return QByteArray::fromBase64(AValue.toLatin1());
 	}
-	else if (AType == QVariant::StringList)
+	else if (AType == QMetaType::QStringList)
 	{
 		return !AValue.isEmpty() ? AValue.split(" ;; ") : QStringList();
 	}
-	else if(AType == QVariant::KeySequence)
+	else if(AType == QMetaType::QKeySequence)
 	{
 		return QKeySequence::fromString(AValue,QKeySequence::PortableText);
 	}
 	else
 	{
 		QVariant var = QVariant(AValue);
-		if (var.convert(AType))
+		if (var.convert(QMetaType(AType)))
 			return var;
 	}
 	return QVariant();

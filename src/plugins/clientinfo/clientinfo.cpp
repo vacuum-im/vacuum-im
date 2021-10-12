@@ -216,7 +216,7 @@ QMultiMap<int, IOptionsDialogWidget *> ClientInfo::optionsDialogWidgets(const QS
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	if (FOptionsManager && ANodeId == OPN_COMMON)
 	{
-		widgets.insertMulti(OWO_COMMON_SENDCLIENTINFO, FOptionsManager->newOptionsDialogWidget(Options::node(OPV_COMMON_SHAREOSVERSION),tr("Share information about your OS version"),AParent));
+		widgets.insert(OWO_COMMON_SENDCLIENTINFO, FOptionsManager->newOptionsDialogWidget(Options::node(OPV_COMMON_SHAREOSVERSION),tr("Share information about your OS version"),AParent));
 	}
 	return widgets;
 }

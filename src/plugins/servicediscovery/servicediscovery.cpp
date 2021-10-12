@@ -619,7 +619,7 @@ void ServiceDiscovery::insertFeatureHandler(const QString &AFeature, IDiscoFeatu
 	if (!FFeatureHandlers.value(AFeature).values().contains(AHandler))
 	{
 		LOG_DEBUG(QString("Feature handler inserted, order=%1, feature=%2, address=%3").arg(AOrder).arg(AFeature).arg((quint64)AHandler));
-		FFeatureHandlers[AFeature].insertMulti(AOrder,AHandler);
+		FFeatureHandlers[AFeature].insert(AOrder,AHandler);
 		emit featureHandlerInserted(AFeature,AHandler);
 	}
 }
@@ -1117,7 +1117,7 @@ QString ServiceDiscovery::calcCapsHash(const IDiscoInfo &AInfo, const QString &A
 		{
 			QMultiMap<QString, int> sortForms;
 			for (int index=0; index<AInfo.extensions.count();index++)
-				sortForms.insertMulti(FDataForms->fieldValue("FORM_TYPE",AInfo.extensions.at(index).fields).toString(),index);
+				sortForms.insert(FDataForms->fieldValue("FORM_TYPE",AInfo.extensions.at(index).fields).toString(),index);
 
 			QMultiMap<QString, int>::const_iterator iforms = sortForms.constBegin();
 			while (iforms != sortForms.constEnd())
@@ -1136,7 +1136,7 @@ QString ServiceDiscovery::calcCapsHash(const IDiscoInfo &AInfo, const QString &A
 						else
 							values += field.value.toString();
 						std::sort(values.begin(), values.end());
-						sortFields.insertMulti(field.var,values);
+						sortFields.insert(field.var,values);
 					}
 				}
 				QMultiMap<QString,QStringList>::const_iterator ifields = sortFields.constBegin();

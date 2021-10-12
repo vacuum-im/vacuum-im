@@ -491,7 +491,7 @@ bool PluginManager::initPlugins()
 		IPlugin *plugin = it.value().plugin;
 		if (plugin->initConnections(this,initOrder))
 		{
-			pluginOrder.insertMulti(initOrder,plugin);
+			pluginOrder.insert(initOrder,plugin);
 			++it;
 		}
 		else
@@ -747,7 +747,7 @@ void PluginManager::loadCoreTranslations(const QDir &ADir, const QString &ALocal
 {
 	if (FQtTranslator->load("qt_"+ALocaleName,ADir.absoluteFilePath(ALocaleName)) || FQtTranslator->load("qt_"+ALocaleName,ADir.absoluteFilePath(ALocaleName.left(2))))
 		qApp->installTranslator(FQtTranslator);
-	else if (FQtTranslator->load("qt_"+QLocale().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
+	else if (FQtTranslator->load("qt_"+QLocale().name(), QLibraryInfo::path(QLibraryInfo::TranslationsPath)))
 		qApp->installTranslator(FQtTranslator);
 	else
 		LOG_DEBUG("Translation for 'Qt' not found");

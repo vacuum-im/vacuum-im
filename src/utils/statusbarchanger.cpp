@@ -83,7 +83,7 @@ void StatusBarChanger::insertWidget(QWidget *AWidget, int AGroup, bool APermanen
 				FStatusBar->addWidget(AWidget,AStretch);
 		}
 
-		FWidgets.insertMulti(AGroup,AWidget);
+		FWidgets.insert(AGroup,AWidget);
 		connect(AWidget,SIGNAL(destroyed(QObject *)),SLOT(onWidgetDestroyed(QObject *)));
 		emit widgetInserted(before,AWidget,AGroup,APermanent,AStretch);
 		updateVisible();

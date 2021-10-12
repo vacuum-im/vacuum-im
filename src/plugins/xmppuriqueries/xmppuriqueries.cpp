@@ -81,7 +81,7 @@ bool XmppUriQueries::parseXmppUri(const QUrl &AUrl, Jid &AContactJid, QString &A
 			if (AContactJid.isValid() && !AAction.isEmpty())
 			{
 				for (int i=0; i<keyValues.count(); i++)
-					AParams.insertMulti(keyValues.at(i).first, keyValues.at(i).second);
+					AParams.insert(keyValues.at(i).first, keyValues.at(i).second);
 				return true;
 			}
 		}
@@ -117,7 +117,7 @@ void XmppUriQueries::insertUriHandler(int AOrder, IXmppUriHandler *AHandler)
 	if (!FHandlers.contains(AOrder, AHandler))
 	{
 		LOG_DEBUG(QString("URI handler inserted, order=%1, address=%2").arg(AOrder).arg((quint64)AHandler));
-		FHandlers.insertMulti(AOrder, AHandler);
+		FHandlers.insert(AOrder, AHandler);
 		emit uriHandlerInserted(AOrder, AHandler);
 	}
 }
