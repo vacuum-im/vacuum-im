@@ -320,7 +320,8 @@ QString Jid::encode(const QString &AJidStr)
 			}
 			else if (!AJidStr.at(i).isLetterOrNumber())
 			{
-				encJid.append(QString("%%%02X").arg(AJidStr.at(i).toLatin1()));
+				//fixme verify
+				encJid.append(QString("%%1").arg(AJidStr.at(i).toLatin1(), 2, 16, QLatin1Char('0')).toUpper());
 			}
 			else
 			{
