@@ -29,7 +29,7 @@ DefaultConnection::DefaultConnection(IConnectionEngine *AEngine, QObject *AParen
 	connect(&FSocket, SIGNAL(connected()), SLOT(onSocketConnected()));
 	connect(&FSocket, SIGNAL(encrypted()), SLOT(onSocketEncrypted()));
 	connect(&FSocket, SIGNAL(readyRead()), SLOT(onSocketReadyRead()));
-	connect(&FSocket, SIGNAL(error(QAbstractSocket::SocketError)), SLOT(onSocketError(QAbstractSocket::SocketError)));
+	connect(&FSocket, SIGNAL(errorOccurred(QAbstractSocket::SocketError)), SLOT(onSocketError(QAbstractSocket::SocketError)));
 	connect(&FSocket, SIGNAL(sslErrors(const QList<QSslError> &)), SLOT(onSocketSSLErrors(const QList<QSslError> &)));
 	connect(&FSocket, SIGNAL(disconnected()), SLOT(onSocketDisconnected()));
 
@@ -177,11 +177,9 @@ void DefaultConnection::ignoreSslErrors()
 	FSocket.ignoreSslErrors();
 }
 
-//fixme
 QList<QSslError> DefaultConnection::sslErrors() const
 {
-	//fixme wtf
-	//return FSocket.sslErrors();
+	return FSocket.sslHandshakeErrors();
 }
 
 QSsl::SslProtocol DefaultConnection::protocol() const

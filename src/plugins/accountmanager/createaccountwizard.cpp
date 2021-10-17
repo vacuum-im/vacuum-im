@@ -347,8 +347,8 @@ AppendSettingsPage::AppendSettingsPage(QWidget *AParent) : QWizardPage(AParent)
 	lblDog->setText("@");
 
 	cmbDomain = new QComboBox(this);
-	connect(cmbDomain,SIGNAL(editTextChanged(const QString &)),SIGNAL(completeChanged()));
-	connect(cmbDomain,SIGNAL(currentIndexChanged(const QString &)),SIGNAL(completeChanged()));
+	connect(cmbDomain, SIGNAL(editTextChanged(const QString &)), SIGNAL(completeChanged()));
+	connect(cmbDomain, SIGNAL(currentIndexChanged(int)), SIGNAL(completeChanged()));
 
 	QLabel *lblPassword = new QLabel(this);
 	lblPassword->setText(tr("Password:"));
@@ -702,8 +702,8 @@ RegisterServerPage::RegisterServerPage(QWidget *AParent) : QWizardPage(AParent)
 
 	cmbServer = new QComboBox(this);
 	cmbServer->setEditable(true);
-	connect(cmbServer,SIGNAL(editTextChanged(const QString &)),SIGNAL(completeChanged()));
-	connect(cmbServer,SIGNAL(currentIndexChanged(const QString &)),SIGNAL(completeChanged()));
+	connect(cmbServer, SIGNAL(editTextChanged(const QString &)), SIGNAL(completeChanged()));
+	connect(cmbServer, SIGNAL(currentIndexChanged(int)), SIGNAL(completeChanged()));
 
 	QCompleter *serverCompleter = new QCompleter(this);
 	serverCompleter->setModel(cmbServer->model());
