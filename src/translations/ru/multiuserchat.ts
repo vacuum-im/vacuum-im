@@ -819,7 +819,7 @@
     </message>
     <message>
         <source>Allow visitors to send private messages to</source>
-        <translation>Разрежить гостям отправлять приватные сообщения</translation>
+        <translation>Разрешить гостям отправлять приватные сообщения</translation>
     </message>
     <message>
         <source>Nobody</source>
