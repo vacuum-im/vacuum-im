@@ -18,7 +18,7 @@ IqAuthFeatureFactory::~IqAuthFeatureFactory()
 void IqAuthFeatureFactory::pluginInfo(IPluginInfo *APluginInfo)
 {
 	APluginInfo->name = tr("Query Authentication");
-	APluginInfo->description = tr("Allow you to log on the Jabber server without support SASL authentication");
+	APluginInfo->description = tr("Allow you to log on the XMPP server without support SASL authentication");
 	APluginInfo->version = "1.0";
 	APluginInfo->author = "Potapov S.A. aka Lion";
 	APluginInfo->homePage = "http://www.vacuum-im.org";

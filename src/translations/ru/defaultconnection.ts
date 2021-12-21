@@ -70,7 +70,7 @@
         <translation>Стандартное подключение</translation>
     </message>
     <message>
-        <source>Allows to set a standard TCP connection to Jabber server</source>
+        <source>Allows to set a standard TCP connection to XMPP server</source>
         <translation>Позволяет установить стандартное TCP подключение к серверу</translation>
     </message>
     <message>

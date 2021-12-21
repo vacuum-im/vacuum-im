@@ -15,7 +15,7 @@
     </message>
     <message>
         <source>Jabber ID for %1 is %2</source>
-        <translation>ID de Jabber para %1 es %2</translation>
+        <translation>Jabber ID para %1 es %2</translation>
     </message>
     <message>
         <source>Requested operation failed: %1</source>

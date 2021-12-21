@@ -6,8 +6,8 @@
         <translation>Gestor de conexión</translation>
     </message>
     <message>
-        <source>Allows to use different types of connections to a Jabber server</source>
-        <translation>Permite usar diferentes tipos de conexiones a un servidor Jabber</translation>
+        <source>Allows to use different types of connections to an XMPP server</source>
+        <translation>Permite usar diferentes tipos de conexiones a un servidor XMPP</translation>
     </message>
     <message>
         <source>&lt;No Proxy&gt;</source>

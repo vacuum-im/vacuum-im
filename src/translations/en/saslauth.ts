@@ -8,8 +8,8 @@
    <translation>SASL Authentication</translation>
   </message>
   <message>
-   <source>Allows to log in to Jabber server using SASL authentication</source>
-   <translation>Allows to log in to Jabber server using SASL authentication</translation>
+   <source>Allows to log in to XMPP server using SASL authentication</source>
+   <translation>Allows to log in to XMPP server using SASL authentication</translation>
   </message>
   <message>
    <source>Wrong SASL authentication response</source>

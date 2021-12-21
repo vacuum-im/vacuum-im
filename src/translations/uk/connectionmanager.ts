@@ -6,7 +6,7 @@
         <translation>Диспетчер з&apos;єднань</translation>
     </message>
     <message>
-        <source>Allows to use different types of connections to a Jabber server</source>
+        <source>Allows to use different types of connections to an XMPP server</source>
         <translation>Дозволяє використовувати різні типи з&apos;єднань</translation>
     </message>
     <message>

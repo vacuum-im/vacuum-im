@@ -116,8 +116,8 @@
         <translation>Телефон</translation>
     </message>
     <message>
-        <source>Allows to register on the Jabber servers and services</source>
-        <translation>Дозволяє реєструватись на джаббер-серверах та сервісах</translation>
+        <source>Allows to register on the XMPP servers and services</source>
+        <translation>Дозволяє реєструватись на XMPP-серверах та сервісах</translation>
     </message>
     <message>
         <source>Supports the registration</source>

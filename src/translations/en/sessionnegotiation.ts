@@ -92,8 +92,8 @@
    <translation>Renegotiate this session?</translation>
   </message>
   <message>
-   <source>Jabber Session Manager</source>
-   <translation>Jabber Session Manager</translation>
+   <source>XMPP Session Manager</source>
+   <translation>XMPP Session Manager</translation>
   </message>
   <message>
    <source>Allows to set the session between two entities, which explains the rules of the exchange of XMPP stanzas</source>
