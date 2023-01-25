@@ -9,9 +9,21 @@
 #include <utils/options.h>
 #include <utils/logger.h>
 
-#include "spellbackend.h"
 #include "spellchecker.h"
+#if defined(HAVE_MACSPELL)
+#	include "macspellchecker.h"
+#elif defined(HAVE_ENCHANT)
+#	include "enchantchecker.h"
+#elif defined(HAVE_ASPELL)
+#	include "aspellchecker.h"
+#elif defined(HAVE_HUNSPELL)
+#	include "hunspellchecker.h"
+#elif defined(HAVE_NUSPELL)
+#	include "nuspellchecker.h"
+#endif
 
+#define MAX_CACHEDWORDS     2000
+#define MAX_CACHEDSUGGS     150
 #define MAX_SUGGESTIONS     15
 #define SPELLDICTS_DIR      "spelldicts"
 #define PERSONALDICTS_DIR   "personal"
@@ -20,14 +32,15 @@ SpellChecker::SpellChecker()
 {
 	FPluginManager = NULL;
 	FMessageWidgets = NULL;
-
 	FCurrentTextEdit = NULL;
 	FCurrentCursorPosition = 0;
+	FCachedWords = new QHash<QString, bool>();
+	FCachedSuggs = new QHash<QString, QList<QString>>();
 }
 
 SpellChecker::~SpellChecker()
 {
-	SpellBackend::destroyInstance();
+
 }
 
 void SpellChecker::pluginInfo(IPluginInfo *APluginInfo)
@@ -61,17 +74,37 @@ bool SpellChecker::initConnections(IPluginManager *APluginManager, int &AInitOrd
 
 bool SpellChecker::initObjects()
 {
+#if defined(HAVE_MACSPELL)
+		FSpellBackend = new MacSpellChecker();
+		Logger::writeLog(Logger::Info,"SpellBackend","MacSpell backend created");
+#elif defined (HAVE_ENCHANT)
+		FSpellBackend = new EnchantChecker();
+		Logger::writeLog(Logger::Info,"SpellBackend","Enchant backend created");
+#elif defined(HAVE_ASPELL)
+		FSpellBackend = new ASpellChecker();
+		Logger::writeLog(Logger::Info,"SpellBackend","Aspell backend created");
+#elif defined(HAVE_HUNSPELL)
+		FSpellBackend = new HunspellChecker();
+		Logger::writeLog(Logger::Info,"SpellBackend","Hunspell backend created");
+#elif defined(HAVE_NUSPELL)
+		FSpellBackend = new NuspellChecker();
+		Logger::writeLog(Logger::Info,"SpellBackend","Nuspell backend created");
+#else
+		FSpellBackend = new SpellBackend();
+		Logger::writeLog(Logger::Warning,"SpellBackend","Empty backend created");
+#endif
+
 	QDir dictsDir(FPluginManager->homePath());
 	if (!dictsDir.exists(SPELLDICTS_DIR))
 		dictsDir.mkdir(SPELLDICTS_DIR);
 	dictsDir.cd(SPELLDICTS_DIR);
-	SpellBackend::instance()->setCustomDictPath(dictsDir.absolutePath());
+	FSpellBackend->setCustomDictPath(dictsDir.absolutePath());
 	LOG_DEBUG(QString("Custom dictionary path set to=%1").arg(dictsDir.absolutePath()));
 
 	if (!dictsDir.exists(PERSONALDICTS_DIR))
 		dictsDir.mkdir(PERSONALDICTS_DIR);
 	dictsDir.cd(PERSONALDICTS_DIR);
-	SpellBackend::instance()->setPersonalDictPath(dictsDir.absolutePath());
+	FSpellBackend->setPersonalDictPath(dictsDir.absolutePath());
 	LOG_DEBUG(QString("Personal dictionary path set to=%1").arg(dictsDir.absolutePath()));
 
 	return true;
@@ -101,17 +134,17 @@ void SpellChecker::setSpellEnabled(bool AEnabled)
 
 bool SpellChecker::isSpellAvailable() const
 {
-	return SpellBackend::instance()->available();
+	return FSpellBackend->available();
 }
 
 QList<QString> SpellChecker::availDictionaries() const
 {
-	return SpellBackend::instance()->dictionaries();
+	return FSpellBackend->dictionaries();
 }
 
 QString SpellChecker::currentDictionary() const
 {
-	return SpellBackend::instance()->actuallLang();
+	return FSpellBackend->actuallLang();
 }
 
 void SpellChecker::setCurrentDictionary(const QString &ADict)
@@ -121,23 +154,44 @@ void SpellChecker::setCurrentDictionary(const QString &ADict)
 
 bool SpellChecker::isCorrectWord(const QString &AWord) const
 {
-	return AWord.trimmed().isEmpty() || SpellBackend::instance()->isCorrect(AWord);
+	if (AWord.trimmed().isEmpty())
+		return true;
+
+	if (FCachedWords->contains(AWord))
+		return FCachedWords->value(AWord);
+
+	if (FCachedWords->size() >= MAX_CACHEDWORDS)
+		FCachedWords->clear();
+
+	bool correct = FSpellBackend->isCorrect(AWord);
+	FCachedWords->insert(AWord, correct);
+	return correct;
 }
 
 QList<QString> SpellChecker::wordSuggestions(const QString &AWord) const
 {
-	return SpellBackend::instance()->suggestions(AWord);
+	if (FCachedSuggs->contains(AWord))
+		return FCachedSuggs->value(AWord);
+
+	if (FCachedSuggs->size() >= MAX_CACHEDSUGGS)
+		FCachedSuggs->clear();
+
+	QList<QString> suggs = FSpellBackend->suggestions(AWord);
+	FCachedSuggs->insert(AWord, suggs);
+	return suggs;
 }
 
 bool SpellChecker::canAddWordToPersonalDict(const QString &AWord) const
 {
-	return SpellBackend::instance()->writable() && SpellBackend::instance()->canAdd(AWord);
+	return FSpellBackend->writable() && FSpellBackend->canAdd(AWord);
 }
 
 void SpellChecker::addWordToPersonalDict(const QString &AWord)
 {
-	if (SpellBackend::instance()->add(AWord))
+	if (FSpellBackend->add(AWord))
 	{
+		FCachedWords->remove(AWord);
+		FCachedSuggs->remove(AWord);
 		rehightlightAll();
 		emit wordAddedToPersonalDict(AWord);
 	}
@@ -145,7 +199,7 @@ void SpellChecker::addWordToPersonalDict(const QString &AWord)
 
 void SpellChecker::rehightlightAll()
 {
-	foreach(SpellHighlighter *hiliter, FSpellHighlighters.values())
+	foreach(SpellHighlighter *hiliter, FSpellHighlighters)
 		hiliter->rehighlight();
 }
 
@@ -229,7 +283,7 @@ void SpellChecker::onEditWidgetCreated(IMessageEditWidget *AWidget)
 		mucWindow = qobject_cast<IMultiUserChatWindow *>(parent);
 		parent = parent->parentWidget();
 	}
-	SpellHighlighter *liter = new SpellHighlighter(AWidget->document(), mucWindow!=NULL ? mucWindow->multiUserChat() : NULL);
+	SpellHighlighter *liter = new SpellHighlighter(this, AWidget->document(), mucWindow!=NULL ? mucWindow->multiUserChat() : NULL);
 	liter->setEnabled(isSpellEnabled() && isSpellAvailable());
 	FSpellHighlighters.insert(textEdit, liter);
 }
@@ -315,24 +369,36 @@ void SpellChecker::onOptionsOpened()
 
 void SpellChecker::onOptionsChanged(const OptionsNode &ANode)
 {
+	FCachedWords->clear();
+	FCachedSuggs->clear();
+
 	if (ANode.path() == OPV_MESSAGES_SPELL_ENABLED)
 	{
 		bool enabled = ANode.value().toBool();
 		LOG_INFO(QString("Spell check enable changed to=%1").arg(enabled));
+		loadDictionary(Options::node(OPV_MESSAGES_SPELL_LANG).value().toString());
+
 		foreach(SpellHighlighter *liter, FSpellHighlighters.values())
 			liter->setEnabled(enabled);
 		emit spellEnableChanged(enabled);
 	}
 	else if (ANode.path() == OPV_MESSAGES_SPELL_LANG)
 	{
-		QString fullDict = ANode.value().toString();
-		QString partDict = fullDict.split('_').value(0);
-		QList<QString> availDicts = availDictionaries();
-		QString dict = availDicts.contains(fullDict) ? fullDict : partDict;
-		if (availDicts.contains(dict))
+		loadDictionary(ANode.value().toString());
+	}
+}
+
+void SpellChecker::loadDictionary(const QString &ADict)
+{
+	if (isSpellEnabled())
+	{
+		QString dict = availDictionaries().contains(ADict) ? ADict : ADict.split('_').value(0);
+		if (dict == FSpellBackend->actuallLang())
+			return;
+		if (availDictionaries().contains(dict))
 		{
 			LOG_INFO(QString("Spell check language changed to=%1").arg(dict));
-			SpellBackend::instance()->setLang(dict);
+			FSpellBackend->setLang(dict);
 			emit currentDictionaryChanged(currentDictionary());
 			rehightlightAll();
 		}

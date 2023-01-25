@@ -1,14 +1,15 @@
 #include "spellhighlighter.h"
 
-#include "spellchecker.h"
-#include "spellbackend.h"
-
-SpellHighlighter::SpellHighlighter(QTextDocument *ADocument, IMultiUserChat *AMultiUserChat) : QSyntaxHighlighter(ADocument)
+SpellHighlighter::SpellHighlighter(ISpellChecker *ASpellChecker, QTextDocument *ADocument, IMultiUserChat *AMultiUserChat) : QSyntaxHighlighter(ADocument)
 {
 	FEnabled = true;
+	FSpellChecker = ASpellChecker;
 	FMultiUserChat = AMultiUserChat;
 	FCharFormat.setUnderlineColor(Qt::red);
 	FCharFormat.setUnderlineStyle(QTextCharFormat::SpellCheckUnderline);
+	// R"(\b[^\s\d]+\b)"
+	// R"([^\W\d][\w]+)"
+	FWordsExpr = QRegularExpression(R"(\b(?!\W)[^\W\d][\w]+)", QRegularExpression::UseUnicodePropertiesOption);
 }
 
 void SpellHighlighter::setEnabled(bool AEnabled)
@@ -24,19 +25,12 @@ void SpellHighlighter::highlightBlock(const QString &AText)
 {
 	if (FEnabled)
 	{
-		// Match words (minimally) excluding digits within a word
-		static const QRegExp expression("\\b[^\\s\\d]+\\b");
-
-		int index = 0;
-		while ((index = expression.indexIn(AText, index)) != -1)
+		QRegularExpressionMatchIterator iter = FWordsExpr.globalMatch(AText);
+		while(iter.hasNext())
 		{
-			int length = expression.matchedLength();
-			if (!isUserNickName(expression.cap()))
-			{
-				if (!SpellBackend::instance()->isCorrect(expression.cap()))
-					setFormat(index, length, FCharFormat);
-			}
-			index += length;
+			const QRegularExpressionMatch match = iter.next();
+			if (!FSpellChecker->isCorrectWord(match.captured()))
+				setFormat(match.capturedStart(), match.capturedLength(), FCharFormat);
 		}
 	}
 }

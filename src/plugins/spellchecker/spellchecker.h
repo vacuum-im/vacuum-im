@@ -1,11 +1,14 @@
 #ifndef SPELLCHECKER_H
 #define SPELLCHECKER_H
 
+#include <QHash>
+
 #include <interfaces/ispellchecker.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/imultiuserchat.h>
 #include "spellhighlighter.h"
+#include "spellbackend.h"
 
 class SpellChecker : 
 	public QObject,
@@ -42,6 +45,7 @@ signals:
 	void wordAddedToPersonalDict(const QString &AWord);
 protected:
 	void rehightlightAll();
+	void loadDictionary(const QString &ADict);
 	QString dictionaryName(const QString &ADict) const;
 protected slots:
 	void onChangeSpellEnable();
@@ -58,9 +62,13 @@ private:
 	IPluginManager *FPluginManager;
 	IMessageWidgets *FMessageWidgets;
 private:
+	SpellBackend *FSpellBackend;
 	QTextEdit *FCurrentTextEdit;
 	int FCurrentCursorPosition;
+	QHash<QString, bool> *FCachedWords;
+	QHash<QString, QList<QString>> *FCachedSuggs;
 	QMap<QObject *, SpellHighlighter *> FSpellHighlighters;
+	QString FCurrectDict;
 };
 
 #endif // SPELLCHECKER_H
