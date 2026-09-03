@@ -139,7 +139,6 @@ bool MainWindowPlugin::eventFilter(QObject *AWatched, QEvent *AEvent)
 
 void MainWindowPlugin::onOptionsOpened()
 {
-	FMainWindow->loadWindowGeometryAndState();
 	QTimer::singleShot(0,this,SLOT(onShowMainWindowOnStart()));
 }
 

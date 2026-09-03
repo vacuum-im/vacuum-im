@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(A
 	setAttribute(Qt::WA_DeleteOnClose,false);
 	setIconSize(QSize(16,16));
 
+	FGeometryLoaded = false;
 	FAligned = false;
 	FCentralVisible = false;
 	FLeftWidgetWidth = 0;
@@ -112,6 +113,15 @@ void MainWindow::showWindow(bool AMinimized)
 			WidgetManager::showActivateRaiseWindow(this);
 		else if (!isVisible())
 			showMinimized();
+
+		if (!FGeometryLoaded)
+		{
+			const bool shouldBeVisible = !FCentralWidget->centralPages().isEmpty();
+			if (shouldBeVisible != FCentralVisible)
+				setCentralWidgetVisible(shouldBeVisible);
+			else
+				loadWindowGeometryAndState();
+		}
 
 		if (!FAligned)
 		{
@@ -216,6 +226,7 @@ void MainWindow::saveWindowGeometryAndState()
 
 void MainWindow::loadWindowGeometryAndState()
 {
+	FGeometryLoaded = true;
 	FAligned = false;
 	QString ns = isCentralWidgetVisible() ? ONE_WINDOW_MODE_OPTIONS_NS : "";
 	if (!restoreGeometry(Options::fileValue("mainwindow.geometry",ns).toByteArray()))
@@ -297,9 +308,12 @@ void MainWindow::setCentralWidgetVisible(bool AVisible)
 	if (AVisible != FCentralVisible)
 	{
 		bool windowVisible = isVisible();
-		saveWindowGeometryAndState();
+		if (FGeometryLoaded)
+			saveWindowGeometryAndState();
 		closeWindow();
 
+		FAligned = false;
+		FGeometryLoaded = false;
 		FCentralVisible = AVisible;
 		if (AVisible)
 		{
@@ -319,7 +333,6 @@ void MainWindow::setCentralWidgetVisible(bool AVisible)
 		updateWindow();
 		setMinimumSize(0,0);
 		restoreAcceptDrops(this);
-		loadWindowGeometryAndState();
 
 		if (windowVisible)
 			showWindow();

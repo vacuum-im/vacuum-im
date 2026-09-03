@@ -67,6 +67,7 @@ private:
 	BoxWidget *FLeftWidget;
 	MenuBarChanger *FMainMenuBar;
 private:
+	bool FGeometryLoaded;
 	bool FAligned;
 	bool FCentralVisible;
 	int FLeftWidgetWidth;
