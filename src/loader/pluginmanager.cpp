@@ -903,7 +903,7 @@ void PluginManager::onApplicationAboutToQuit()
 
 void PluginManager::onApplicationCommitDataRequested(QSessionManager &AManager)
 {
-	Q_UNUSED(AManager);
+	AManager.release();
 	LOG_INFO("Application session about to close");
 	closeAndQuit();
 }
