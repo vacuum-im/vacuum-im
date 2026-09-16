@@ -3,20 +3,25 @@
 
 #include <QString>
 #include <QSyntaxHighlighter>
+#include <QRegularExpression>
 #include <interfaces/imultiuserchat.h>
+#include <interfaces/ispellchecker.h>
 
-class SpellHighlighter : 
-	public QSyntaxHighlighter
+class SpellHighlighter : public QSyntaxHighlighter
 {
+	Q_OBJECT
 public:
-	SpellHighlighter(QTextDocument *ADocument, IMultiUserChat *AMultiUserChat);
+	SpellHighlighter(ISpellChecker *ASpellChecker, QTextDocument *ADocument, IMultiUserChat *AMultiUserChat);
 	void setEnabled(bool AEnabled);
-	virtual void highlightBlock(const QString &AText);
 protected:
+	void highlightBlock(const QString &text) override;
 	inline bool isUserNickName(const QString &AText);
+
 private:
 	bool FEnabled;
+	QRegularExpression FWordsExpr;
 	IMultiUserChat *FMultiUserChat;
+	ISpellChecker *FSpellChecker;
 	QTextCharFormat FCharFormat;
 };
 
