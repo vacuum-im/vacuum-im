@@ -9,6 +9,7 @@
 #include <definitions/multiuseritemlabels.h>
 #include <definitions/multiuserdataholderorders.h>
 #include <definitions/multiusersorthandlerorders.h>
+#include <definitions/rostertooltiporders.h>
 #include <utils/logger.h>
 
 MultiUserView::MultiUserView(IMultiUserChat *AMultiChat, QWidget *AParent) : QTreeView(AParent)
@@ -538,12 +539,28 @@ bool MultiUserView::event(QEvent *AEvent)
 		QStandardItem *userItem = itemFromIndex(indexAt(helpEvent->pos()));
 		if (userItem)
 		{
-			QMap<int,QString> toolTips;
-			toolTipsForItem(userItem,toolTips);
+			QMap<int,QString> toolTipsMap;
+			toolTipsForItem(userItem,toolTipsMap);
 			
-			if (!toolTips.isEmpty())
+			if (!toolTipsMap.isEmpty())
 			{
-				QString tooltip = QString("<span>%1</span>").arg(QStringList(toolTips.values()).join("<p/><nbsp>"));
+				QString avatar;
+				QString text;
+				foreach (int key, toolTipsMap.keys())
+				{
+					if (key == RTTO_AVATAR_IMAGE)
+						avatar.append(toolTipsMap.value(key));
+					else if (key < RTTO_MAXIMUM)
+						text.append("<nobr>").append(toolTipsMap.value(key)).append("</nobr><p/><nbsp>");
+					else if (key == RTTO_MAXIMUM)
+						continue;
+				}
+				if (text.endsWith("<p/><nbsp>"))
+					text.chop(10);
+				QString tooltip;
+				tooltip.append("<table style='white-space:pre' cellspacing=6><tr><td>").append(text);
+				tooltip.append("</td><td style='text-align:right'>").append(avatar);
+				tooltip.append("</td></tr></table>");
 				QToolTip::showText(helpEvent->globalPos(),tooltip,this);
 			}
 		}
