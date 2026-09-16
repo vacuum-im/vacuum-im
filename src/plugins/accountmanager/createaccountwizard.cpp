@@ -199,7 +199,7 @@ void CreateAccountWizard::accept()
  ******************/
 WizardStartPage::WizardStartPage(QWidget *AParent) : QWizardPage(AParent)
 {
-	setTitle(tr("Add Jabber/XMPP Account"));
+	setTitle(tr("Add XMPP Account"));
 	setSubTitle(tr("This wizard will help you to add an existing account or register a new one"));
 
 	rbtAppendAccount = new QRadioButton(this);
@@ -266,7 +266,7 @@ void WizardStartPage::setWizardMode(int AMode)
 AppendServicePage::AppendServicePage(QWidget *AParent) : QWizardPage(AParent)
 {
 	const struct { int type; QString name; } services[CreateAccountWizard::Service_Count] = {
-		{ CreateAccountWizard::ServiceJabber,        tr("Jabber/XMPP")        },
+		{ CreateAccountWizard::ServiceJabber,        tr("XMPP")        },
 		{ CreateAccountWizard::ServiceGoogle,        tr("Google Talk")        },
 		{ CreateAccountWizard::ServiceYandex,        tr("Yandex Online")      },
 		{ CreateAccountWizard::ServiceOdnoklassniki, tr("Odnoklassniki")      },

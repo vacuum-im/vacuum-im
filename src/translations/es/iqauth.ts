@@ -6,8 +6,8 @@
         <translation>Autenticación por consulta</translation>
     </message>
     <message>
-        <source>Allow you to log on the Jabber server without support SASL authentication</source>
-        <translation>Te permite autenticar en el servidor de Jabber sin soportar autenticación SASL</translation>
+        <source>Allow you to log on the XMPP server without support SASL authentication</source>
+        <translation>Te permite autenticar en el servidor de XMPP sin soportar autenticación SASL</translation>
     </message>
 </context>
 </TS>

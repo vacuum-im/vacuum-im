@@ -387,7 +387,7 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Allows to use Jabber multi-user conferences</source>
+        <source>Allows to use XMPP multi-user conferences</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -1582,11 +1582,11 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>You can join to the conference located at almost any Jabber-server, select one from the list or add your own</source>
+        <source>You can join to the conference located at almost any XMPP-server, select one from the list or add your own</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Each Jabber-server can have multiple conference services, select one of the available</source>
+        <source>Each XMPP-server can have multiple conference services, select one of the available</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -1598,7 +1598,7 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>You can create a conference at almost any Jabber-server, select one from the list or add your own</source>
+        <source>You can create a conference at almost any XMPP-server, select one from the list or add your own</source>
         <translation type="unfinished"/>
     </message>
     <message>

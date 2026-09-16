@@ -34,8 +34,8 @@
         <translation>Диспетчер аккаунтов</translation>
     </message>
     <message>
-        <source>Allows to create and manage Jabber accounts</source>
-        <translation>Позволяет создавать и управлять джаббер аккаунтами</translation>
+        <source>Allows to create and manage XMPP accounts</source>
+        <translation>Позволяет создавать и управлять XMPP аккаунтами</translation>
     </message>
     <message>
         <source>Common account settings</source>
@@ -174,8 +174,8 @@
 <context>
     <name>AppendServicePage</name>
     <message>
-        <source>Jabber/XMPP</source>
-        <translation>Jabber/XMPP</translation>
+        <source>XMPP</source>
+        <translation>XMPP</translation>
     </message>
     <message>
         <source>Google Talk</source>
@@ -327,7 +327,7 @@
     <message>
         <source>jabbim.com</source>
         <comment>Most stable and reliable server for your country which supports in-band account registration</comment>
-        <translation>jabber.ru</translation>
+        <translation>jabbim.com</translation>
     </message>
 </context>
 <context>
@@ -368,8 +368,8 @@
 <context>
     <name>WizardStartPage</name>
     <message>
-        <source>Add Jabber/XMPP Account</source>
-        <translation>Добавить Jabber/XMPP аккаунт</translation>
+        <source>Add XMPP Account</source>
+        <translation>Добавить XMPP аккаунт</translation>
     </message>
     <message>
         <source>This wizard will help you to add an existing account or register a new one</source>

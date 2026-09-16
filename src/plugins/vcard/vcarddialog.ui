@@ -113,7 +113,7 @@
        <item row="5" column="0">
         <widget class="QLabel" name="lblJabberId">
          <property name="text">
-          <string>Jabber Id</string>
+          <string>Jabber ID</string>
          </property>
          <property name="textFormat">
           <enum>Qt::PlainText</enum>

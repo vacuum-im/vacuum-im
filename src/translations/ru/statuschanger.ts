@@ -87,8 +87,8 @@
         <translation>Диспетчер статусов</translation>
     </message>
     <message>
-        <source>Allows to change the status in Jabber network</source>
-        <translation>Позволяет изменять статус в джаббер сети</translation>
+        <source>Allows to change the status in XMPP network</source>
+        <translation>Позволяет изменять статус в XMPP сети</translation>
     </message>
     <message>
         <source>Connecting...</source>

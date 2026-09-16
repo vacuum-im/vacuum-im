@@ -16,7 +16,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>History of conversations is stored on your jabber server</source>
+        <source>History of conversations is stored on your XMPP server</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

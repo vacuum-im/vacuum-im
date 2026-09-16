@@ -397,8 +397,8 @@
         <translation>Многопользовательские конференции</translation>
     </message>
     <message>
-        <source>Allows to use Jabber multi-user conferences</source>
-        <translation>Позволяет использовать многопользовательские джаббер конференции</translation>
+        <source>Allows to use XMPP multi-user conferences</source>
+        <translation>Позволяет использовать многопользовательские XMPP конференции</translation>
     </message>
     <message>
         <source>Join conference</source>
@@ -1604,12 +1604,12 @@
         <translation>Выберите аккаунт для входа в конференцию</translation>
     </message>
     <message>
-        <source>You can join to the conference located at almost any Jabber-server, select one from the list or add your own</source>
-        <translation>Вы можете войти в конференцию находящююся практически на любом Jabber-сервере, выберите один из списка или укажите свой</translation>
+        <source>You can join to the conference located at almost any XMPP-server, select one from the list or add your own</source>
+        <translation>Вы можете войти в конференцию находящююся практически на любом XMPP-сервере, выберите один из списка или укажите свой</translation>
     </message>
     <message>
-        <source>Each Jabber-server can have multiple conference services, select one of the available</source>
-        <translation>На каждом Jabber-сервере может быть несколько сервисов с конференциями, выберите один из имеющихся</translation>
+        <source>Each XMPP-server can have multiple conference services, select one of the available</source>
+        <translation>На каждом XMPP-сервере может быть несколько сервисов с конференциями, выберите один из имеющихся</translation>
     </message>
     <message>
         <source>Select account, server, and service to create the conference</source>
@@ -1620,8 +1620,8 @@
         <translation>Выберите аккаунт для создания конференции</translation>
     </message>
     <message>
-        <source>You can create a conference at almost any Jabber-server, select one from the list or add your own</source>
-        <translation>Вы можете создать конференцию практически на любом Jabber-сервере, выберите один из списка или укажите свой</translation>
+        <source>You can create a conference at almost any XMPP-server, select one from the list or add your own</source>
+        <translation>Вы можете создать конференцию практически на любом XMPP-сервере, выберите один из списка или укажите свой</translation>
     </message>
     <message>
         <source>Searching for conference services (%1)...</source>

@@ -157,8 +157,8 @@
         <translation>Можливості об&apos;єкту</translation>
     </message>
     <message>
-        <source>Allows to receive information about Jabber entities</source>
-        <translation>Дозволяє отримувати інформацію про джаббер сутності</translation>
+        <source>Allows to receive information about XMPP entities</source>
+        <translation>Дозволяє отримувати інформацію про XMPP сутності</translation>
     </message>
     <message>
         <source>Supports the exchange of the discovery information and items</source>
@@ -193,8 +193,8 @@
         <translation>Підтримує кешування оглядової інформації</translation>
     </message>
     <message>
-        <source>Supports the displaying of the jabber identifiers with disallowed characters</source>
-        <translation>Підтримує перегляд джаббер ідентифікаторів з забороненими символами</translation>
+        <source>Supports the displaying of the Jabber ID with disallowed characters</source>
+        <translation>Підтримує перегляд Jabber ID з забороненими символами</translation>
     </message>
 </context>
 </TS>

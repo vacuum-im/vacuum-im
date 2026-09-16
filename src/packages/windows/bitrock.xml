@@ -23,7 +23,7 @@
             <show>1</show>
             <desktopShortcutList>
                 <shortcut>
-                    <comment>Crossplatform Jabber Client</comment>
+                    <comment>Cross-platform XMPP Client</comment>
                     <exec></exec>
                     <icon></icon>
                     <name>${product_fullname}</name>
@@ -160,7 +160,7 @@
                     <windowsPath>${installdir}</windowsPath>
                 </startMenuShortcut>
                 <startMenuShortcut>
-                    <comment>Crossplatform Jabber Client</comment>
+                    <comment>Cross-platform XMPP Client</comment>
                     <name>${product_fullname}</name>
                     <runInTerminal>0</runInTerminal>
                     <windowsExec>${installdir}/vacuum.exe</windowsExec>

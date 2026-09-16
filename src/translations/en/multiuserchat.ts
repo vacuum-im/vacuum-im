@@ -397,8 +397,8 @@
    <translation>Multi-User Conferences</translation>
   </message>
   <message>
-   <source>Allows to use Jabber multi-user conferences</source>
-   <translation>Allows to use Jabber multi-user conferences</translation>
+   <source>Allows to use XMPP multi-user conferences</source>
+   <translation>Allows to use XMPP multi-user conferences</translation>
   </message>
   <message>
    <source>Join conference</source>
@@ -1604,12 +1604,12 @@
    <translation>Select the account to join to the conference</translation>
   </message>
   <message>
-   <source>You can join to the conference located at almost any Jabber-server, select one from the list or add your own</source>
-   <translation>You can join to the conference located at almost any Jabber-server, select one from the list or add your own</translation>
+   <source>You can join to the conference located at almost any XMPP-server, select one from the list or add your own</source>
+   <translation>You can join to the conference located at almost any XMPP-server, select one from the list or add your own</translation>
   </message>
   <message>
-   <source>Each Jabber-server can have multiple conference services, select one of the available</source>
-   <translation>Each Jabber-server can have multiple conference services, select one of the available</translation>
+   <source>Each XMPP-server can have multiple conference services, select one of the available</source>
+   <translation>Each XMPP-server can have multiple conference services, select one of the available</translation>
   </message>
   <message>
    <source>Select account, server, and service to create the conference</source>
@@ -1620,8 +1620,8 @@
    <translation>Select the account to create a conference</translation>
   </message>
   <message>
-   <source>You can create a conference at almost any Jabber-server, select one from the list or add your own</source>
-   <translation>You can create a conference at almost any Jabber-server, select one from the list or add your own</translation>
+   <source>You can create a conference at almost any XMPP-server, select one from the list or add your own</source>
+   <translation>You can create a conference at almost any XMPP-server, select one from the list or add your own</translation>
   </message>
   <message>
    <source>Searching for conference services (%1)...</source>

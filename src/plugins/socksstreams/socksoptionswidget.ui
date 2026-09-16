@@ -17,7 +17,7 @@
    <item>
     <widget class="QCheckBox" name="chbUseAccountStreamProxy">
      <property name="text">
-      <string>Use jabber-proxy on your server</string>
+      <string>Use XMPP-proxy on your server</string>
      </property>
      <property name="checked">
       <bool>true</bool>
@@ -29,7 +29,7 @@
      <item>
       <widget class="QCheckBox" name="chbUseUserStreamProxy">
        <property name="text">
-        <string>Use additional jabber-proxy:</string>
+        <string>Use additional XMPP-proxy:</string>
        </property>
        <property name="checked">
         <bool>true</bool>

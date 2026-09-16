@@ -6,7 +6,7 @@
         <translation>Закладки</translation>
     </message>
     <message>
-        <source>Allows to create bookmarks at the jabber conference and web pages</source>
+        <source>Allows to create bookmarks at the XMPP conference and web pages</source>
         <translation>Дозволяє створювати закладки для конференцій та веб-сторінок</translation>
     </message>
     <message>

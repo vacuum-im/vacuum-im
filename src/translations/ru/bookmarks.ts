@@ -8,8 +8,8 @@
         <translation>Закладки</translation>
     </message>
     <message>
-        <source>Allows to create bookmarks at the jabber conference and web pages</source>
-        <translation>Позволяет создавать закладки на джаббер конференции и веб-страницы</translation>
+        <source>Allows to create bookmarks at the XMPP conference and web pages</source>
+        <translation>Позволяет создавать закладки на XMPP конференции и веб-страницы</translation>
     </message>
     <message>
         <source>Edit Bookmarks</source>

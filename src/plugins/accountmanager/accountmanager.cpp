@@ -35,7 +35,7 @@ AccountManager::~AccountManager()
 void AccountManager::pluginInfo(IPluginInfo *APluginInfo)
 {
 	APluginInfo->name = tr("Account Manager");
-	APluginInfo->description = tr("Allows to create and manage Jabber accounts");
+	APluginInfo->description = tr("Allows to create and manage XMPP accounts");
 	APluginInfo->version = "1.0";
 	APluginInfo->author = "Potapov S.A. aka Lion";
 	APluginInfo->homePage = "http://www.vacuum-im.org";
