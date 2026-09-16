@@ -118,16 +118,14 @@ void MainWindow::showWindow(bool AMinimized)
 		{
 			const bool shouldBeVisible = !FCentralWidget->centralPages().isEmpty();
 			if (shouldBeVisible != FCentralVisible)
+			{
 				setCentralWidgetVisible(shouldBeVisible);
+				return;
+			}
 			else
+			{
 				loadWindowGeometryAndState();
-		}
-
-		if (!FAligned)
-		{
-			FAligned = true;
-			QString ns = isCentralWidgetVisible() ? ONE_WINDOW_MODE_OPTIONS_NS : "";
-			WidgetManager::alignWindow(this,(Qt::Alignment)Options::fileValue("mainwindow.align",ns).toInt());
+			}
 		}
 
 		correctWindowPosition();
@@ -233,7 +231,9 @@ void MainWindow::loadWindowGeometryAndState()
 	{
 		if (isCentralWidgetVisible())
 		{
-			FLeftWidgetWidth = 200;
+			FLeftWidgetWidth = Options::fileValue("mainwindow.left-frame-width",ns).toInt();
+			if (FLeftWidgetWidth <= 0)
+				FLeftWidgetWidth = 200;
 			Options::setFileValue(0,"mainwindow.align",ns);
 			setGeometry(WidgetManager::alignGeometry(QSize(800,600),this,Qt::AlignCenter));
 		}
@@ -265,6 +265,16 @@ QMenu *MainWindow::createPopupMenu()
 
 void MainWindow::correctWindowPosition()
 {
+	if (!FGeometryLoaded)
+		loadWindowGeometryAndState();
+
+	if (!FAligned)
+	{
+		FAligned = true;
+		QString ns = isCentralWidgetVisible() ? ONE_WINDOW_MODE_OPTIONS_NS : "";
+		WidgetManager::alignWindow(this,(Qt::Alignment)Options::fileValue("mainwindow.align",ns).toInt());
+	}
+
 	QRect windowRect = geometry();
 	QRect screenRect = qApp->desktop()->availableGeometry(this);
 	if (!screenRect.isEmpty() && !windowRect.isEmpty())
@@ -310,7 +320,7 @@ void MainWindow::setCentralWidgetVisible(bool AVisible)
 		bool windowVisible = isVisible();
 		if (FGeometryLoaded)
 			saveWindowGeometryAndState();
-		closeWindow();
+		hide();
 
 		FAligned = false;
 		FGeometryLoaded = false;
@@ -335,7 +345,10 @@ void MainWindow::setCentralWidgetVisible(bool AVisible)
 		restoreAcceptDrops(this);
 
 		if (windowVisible)
-			showWindow();
+		{
+			WidgetManager::showActivateRaiseWindow(this);
+			correctWindowPosition();
+		}
 
 		emit centralWidgetVisibleChanged(AVisible);
 	}
