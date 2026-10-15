@@ -261,8 +261,13 @@ void AdvancedItemModel::emitItemChanged(QStandardItem *AItem)
 	}
 	else
 	{
-		QModelIndex index = indexFromItem(AItem);
-		emit dataChanged(index,index);
+		QStandardItem *currentItem = AItem->model()->item(AItem->row(), AItem->column());
+		if (currentItem == AItem)
+		{
+			QModelIndex index = indexFromItem(AItem);
+			if (index.isValid() && index.row() >= 0 && index.column() >= 0)
+				emit dataChanged(index,index);
+		}
 	}
 }
 
@@ -301,10 +306,13 @@ void AdvancedItemModel::onEmitDelayedDataChangedSignals()
 	while (!FChangedItems.isEmpty())
 	{
 		QPair<QStandardItem *, int> item = FChangedItems.takeFirst();
-		if (lastItem != item.first)
-			emitItemChanged(item.first);
-		if (item.second >= FIRST_VALID_ROLE)
-			emit itemDataChanged(item.first,item.second);
+		if (item.first && item.first->model())
+		{
+			if (lastItem != item.first)
+				emitItemChanged(item.first);
+			if (item.second >= FIRST_VALID_ROLE)
+				emit itemDataChanged(item.first,item.second);
+		}
 		lastItem = item.first;
 	}
 }
