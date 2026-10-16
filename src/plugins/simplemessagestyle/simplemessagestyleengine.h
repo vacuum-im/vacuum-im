@@ -54,6 +54,7 @@ protected slots:
 private:
 	IUrlProcessor *FUrlProcessor;
 	IMessageStyleManager *FMessageStyleManager;
+	IMessageWidgets *FMessageWidgets;
 private:
 	QMap<QString, QString> FStylePaths;
 	QMap<QString, SimpleMessageStyle *> FStyles;

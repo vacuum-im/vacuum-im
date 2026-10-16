@@ -73,3 +73,4 @@ SUBDIRS += recentcontacts
 SUBDIRS += metacontacts 
 SUBDIRS += statistics
 SUBDIRS += datastreamspublisher 
+SUBDIRS += imageviewer

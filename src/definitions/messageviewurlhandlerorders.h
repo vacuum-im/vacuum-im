@@ -2,6 +2,7 @@
 #define DEF_MESSAGEVIEWURLHANDLERORDERS_H
 
 #define MVUHO_FILETRANSFER                     300
+#define MVUHO_IMAGEVIEWER                      200
 #define MVUHO_MULTIUSERCHAT                    500
 #define MVUHO_XMPPURIQUERIES                   500
 #define MVUHO_MESSAGEWIDGETS_DEFAULT           1000

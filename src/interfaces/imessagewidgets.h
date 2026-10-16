@@ -412,6 +412,9 @@ public:
 	virtual QMultiMap<int, IMessageEditContentsHandler *> editContentsHandlers() const =0;
 	virtual void insertEditContentsHandler(int AOrder, IMessageEditContentsHandler *AHandler) =0;
 	virtual void removeEditContentsHandler( int AOrder, IMessageEditContentsHandler *AHandler) =0;
+	virtual QMultiMap<int, IMessageStyleHandler *> styleHandlers() const =0;
+	virtual void insertStyleHandler(int AOrder, IMessageStyleHandler *AHandler) =0;
+	virtual void removeStyleHandler(int AOrder, IMessageStyleHandler *AHandler) =0;
 protected:
 	virtual void addressCreated(IMessageAddress *AAddress) =0;
 	virtual void infoWidgetCreated(IMessageInfoWidget *AInfoWidget) =0;
@@ -426,6 +429,8 @@ protected:
 	virtual void normalWindowDestroyed(IMessageNormalWindow *AWindow) =0;
 	virtual void chatWindowCreated(IMessageChatWindow *AWindow) =0;
 	virtual void chatWindowDestroyed(IMessageChatWindow *AWindow) =0;
+	virtual void styleHandlerCreated(IMessageStyleHandler *AHandler) =0;
+	virtual void styleHandlerDestroyed(IMessageStyleHandler *AHandler) =0;
 	virtual void tabWindowAppended(const QUuid &AWindowId, const QString &AName) =0;
 	virtual void tabWindowNameChanged(const QUuid &AWindowId, const QString &AName) =0;
 	virtual void tabWindowDeleted(const QUuid &AWindowId) =0;

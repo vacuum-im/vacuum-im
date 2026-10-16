@@ -1,8 +1,10 @@
 #include "simplemessagestyleengine.h"
 
 #include <QDir>
-#include <QTimer>
-#include <QCoreApplication>
+#include <QFile>
+#include <QDomDocument>
+#include <utils/options.h>
+#include <utils/pluginhelper.h>
 #include <definitions/resources.h>
 #include <definitions/optionvalues.h>
 #include <utils/filestorage.h>
@@ -45,6 +47,12 @@ bool SimpleMessageStyleEngine::initConnections(IPluginManager *APluginManager, i
 	if (plugin)
 	{
 		FUrlProcessor = qobject_cast<IUrlProcessor *>(plugin->instance());
+	}
+
+	plugin = APluginManager->pluginInterface("IMessageWidgets").value(0);
+	if (plugin)
+	{
+		FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
 	}
 
 	return true;
@@ -93,6 +101,8 @@ IMessageStyle *SimpleMessageStyleEngine::styleForOptions(const IMessageStyleOpti
 		if (!stylePath.isEmpty())
 		{
 			SimpleMessageStyle *style = new SimpleMessageStyle(stylePath, FNetworkAccessManager, this);
+			if (FMessageWidgets)
+				style->setIMessageWidgets(FMessageWidgets);
 			if (style->isValid())
 			{
 				LOG_INFO(QString("Simple style created, id=%1").arg(style->styleId()));
