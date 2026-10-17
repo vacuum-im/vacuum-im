@@ -1,8 +1,7 @@
 #include "styleviewer.h"
 
-#include <QTextBlock>
+#include <QDesktopServices>
 #include <QMouseEvent>
-#include <QTextDocumentFragment>
 
 StyleViewer::StyleViewer(QWidget *AParent) : AnimatedTextBrowser(AParent)
 {
@@ -13,11 +12,22 @@ StyleViewer::StyleViewer(QWidget *AParent) : AnimatedTextBrowser(AParent)
 	setOpenExternalLinks(false);
 	setFrameShape(QFrame::NoFrame);
 	setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(this, &StyleViewer::anchorClicked, this, &StyleViewer::onLinkActivated);
 }
 
 StyleViewer::~StyleViewer()
 {
 
+}
+
+void StyleViewer::onLinkActivated(const QUrl &AUrl)
+{
+	QDesktopServices::openUrl(AUrl);
+}
+
+void StyleViewer::mousePressEvent(QMouseEvent *AEvent)
+{
+	QTextBrowser::mousePressEvent(AEvent);
 }
 
 QSize StyleViewer::sizeHint() const

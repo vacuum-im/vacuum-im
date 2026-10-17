@@ -5,6 +5,7 @@
 #include <QTimer>
 #include <QNetworkAccessManager>
 #include <interfaces/imessagestylemanager.h>
+#include <interfaces/imessagewidgets.h>
 #include "styleviewer.h"
 
 //Message Style Info Values
@@ -79,6 +80,7 @@ public:
 public:
 	SimpleMessageStyle(const QString &AStylePath, QNetworkAccessManager *ANetworkAccessManager, QObject *AParent);
 	~SimpleMessageStyle();
+	void setIMessageWidgets(IMessageWidgets *AWidgets);
 	//IMessageStyle
 	virtual QObject *instance() { return this; }
 	virtual bool isValid() const;
@@ -120,9 +122,9 @@ protected:
 protected:
 	bool eventFilter(QObject *AWatched, QEvent *AEvent);
 protected slots:
-	void onScrollAfterResize();
-	void onStyleWidgetLinkClicked(const QUrl &AUrl);
-	void onStyleWidgetDestroyed(QObject *AObject);
+ 	void onScrollAfterResize();
+  	void onStyleWidgetLinkClicked(const QUrl &AUrl);
+  	void onStyleWidgetDestroyed(QObject *AObject);
 	void onStyleWidgetAdded(IMessageStyle *AStyle, QWidget *AWidget);
 private:
 	QTimer FScrollTimer;
@@ -136,13 +138,16 @@ private:
 	QString FIn_NextContentHTML;
 	QString FOut_ContentHTML;
 	QString FOut_NextContentHTML;
-private:
+	private:
+	QString processStyleContent(QWidget *AWidget, const QString &AHtml, const IMessageStyleContentOptions &AOptions);
+	private:
 	QString FStylePath;
 	QList<QString> FVariants;
 	QList<QString> FSenderColors;
 	QMap<QString, QVariant> FInfo;
 	QMap<QWidget *, WidgetStatus> FWidgetStatus;
 	QNetworkAccessManager *FNetworkAccessManager;
+	IMessageWidgets *FMessageWidgets;
 private:
 	static QString FSharedPath;
 };

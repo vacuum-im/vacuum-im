@@ -211,3 +211,7 @@ $RECYCLE.BIN/
 .vscode
 .vs
 CMakeSettings.json
+
+*moc_predefs.h
+.vacuum
+.qtcreator

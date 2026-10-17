@@ -88,6 +88,9 @@ public:
 	virtual QMultiMap<int, IMessageEditContentsHandler *> editContentsHandlers() const;
 	virtual void insertEditContentsHandler(int AOrder, IMessageEditContentsHandler *AHandler);
 	virtual void removeEditContentsHandler(int AOrder, IMessageEditContentsHandler *AHandler);
+	virtual QMultiMap<int, IMessageStyleHandler *> styleHandlers() const;
+	virtual void insertStyleHandler(int AOrder, IMessageStyleHandler *AHandler);
+	virtual void removeStyleHandler(int AOrder, IMessageStyleHandler *AHandler);
 signals:
 	void addressCreated(IMessageAddress *AAddress);
 	void infoWidgetCreated(IMessageInfoWidget *AInfoWidget);
@@ -107,6 +110,8 @@ signals:
 	void tabWindowDeleted(const QUuid &AWindowId);
 	void tabWindowCreated(IMessageTabWindow *AWindow);
 	void tabWindowDestroyed(IMessageTabWindow *AWindow);
+	void styleHandlerCreated(IMessageStyleHandler *AHandler);
+	void styleHandlerDestroyed(IMessageStyleHandler *AHandler);
 protected:
 	void deleteTabWindows();
 	void insertToolBarQuoteAction(IMessageToolBarWidget *AWidget);
@@ -142,6 +147,7 @@ private:
 	QMultiMap<int,IMessageViewUrlHandler *> FViewUrlHandlers;
 	QMultiMap<int,IMessageEditSendHandler *> FEditSendHandlers;
 	QMultiMap<int,IMessageEditContentsHandler *> FEditContentsHandlers;
+	QMultiMap<int,IMessageStyleHandler *> FStyleHandlers;
 };
 
 #endif // MESSAGEWIDGETS_H

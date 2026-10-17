@@ -533,6 +533,29 @@ void MessageWidgets::removeEditContentsHandler(int AOrder, IMessageEditContentsH
 		FEditContentsHandlers.remove(AOrder,AHandler);
 }
 
+QMultiMap<int, IMessageStyleHandler *> MessageWidgets::styleHandlers() const
+{
+	return FStyleHandlers;
+}
+
+void MessageWidgets::insertStyleHandler(int AOrder, IMessageStyleHandler *AHandler)
+{
+	if (AHandler && !FStyleHandlers.contains(AOrder,AHandler))
+	{
+		FStyleHandlers.insertMulti(AOrder,AHandler);
+		styleHandlerCreated(AHandler);
+	}
+}
+
+void MessageWidgets::removeStyleHandler(int AOrder, IMessageStyleHandler *AHandler)
+{
+	if (FStyleHandlers.contains(AOrder,AHandler))
+	{
+		FStyleHandlers.remove(AOrder,AHandler);
+		styleHandlerDestroyed(AHandler);
+	}
+}
+
 void MessageWidgets::deleteTabWindows()
 {
 	foreach(IMessageTabWindow *window, tabWindows())
