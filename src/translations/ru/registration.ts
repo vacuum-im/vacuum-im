@@ -118,8 +118,8 @@
         <translation>Телефон</translation>
     </message>
     <message>
-        <source>Allows to register on the Jabber servers and services</source>
-        <translation>Позволяет регистрироваться на джаббер серверах и сервисах</translation>
+        <source>Allows to register on the XMPP servers and services</source>
+        <translation>Позволяет регистрироваться на XMPP серверах и сервисах</translation>
     </message>
     <message>
         <source>Supports the registration</source>

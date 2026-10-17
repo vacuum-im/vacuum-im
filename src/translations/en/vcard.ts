@@ -110,8 +110,8 @@
    <translation>Nick name</translation>
   </message>
   <message>
-   <source>Jabber Id</source>
-   <translation>Jabber Id</translation>
+   <source>Jabber ID</source>
+   <translation>Jabber ID</translation>
   </message>
   <message>
    <source>Personal</source>

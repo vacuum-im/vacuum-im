@@ -157,8 +157,8 @@
         <translation>Cechy obiektu</translation>
     </message>
     <message>
-        <source>Allows to receive information about Jabber entities</source>
-        <translation>Pozwala na otrzymywanie informacji na temat elementów Jabbera</translation>
+        <source>Allows to receive information about XMPP entities</source>
+        <translation>Pozwala na otrzymywanie informacji na temat elementów XMPP</translation>
     </message>
     <message>
         <source>Supports the exchange of the discovery information and items</source>
@@ -193,8 +193,8 @@
         <translation>Obsługa buforowania wykrytych informacji</translation>
     </message>
     <message>
-        <source>Supports the displaying of the jabber identifiers with disallowed characters</source>
-        <translation>Umożliwia wyświetlanie znaków zabronionych w identyfikatorach Jabber</translation>
+        <source>Supports the displaying of the Jabber ID with disallowed characters</source>
+        <translation>Umożliwia wyświetlanie znaków zabronionych w Jabber ID</translation>
     </message>
 </context>
 </TS>

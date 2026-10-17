@@ -26,7 +26,7 @@
     </message>
     <message>
         <source>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</source>
-        <translation>&lt;b&gt;ID de Jabber:&lt;/b&gt; %1</translation>
+        <translation>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</translation>
     </message>
     <message>
         <source>Absent</source>

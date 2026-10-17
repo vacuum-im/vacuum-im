@@ -23,7 +23,7 @@
     </message>
     <message>
         <source>Jabber ID</source>
-        <translation>ID de Jabber</translation>
+        <translation>Jabber ID</translation>
     </message>
     <message>
         <source>Allows to search for contacts in the roster</source>

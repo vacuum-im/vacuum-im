@@ -38,7 +38,7 @@ Registration::~Registration()
 void Registration::pluginInfo(IPluginInfo *APluginInfo)
 {
 	APluginInfo->name = tr("Registration");
-	APluginInfo->description = tr("Allows to register on the Jabber servers and services");
+	APluginInfo->description = tr("Allows to register on the XMPP servers and services");
 	APluginInfo->version = "1.0";
 	APluginInfo->author = "Potapov S.A. aka Lion";
 	APluginInfo->homePage = "http://www.vacuum-im.org";

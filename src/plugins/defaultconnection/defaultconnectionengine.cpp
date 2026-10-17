@@ -23,7 +23,7 @@ DefaultConnectionEngine::~DefaultConnectionEngine()
 void DefaultConnectionEngine::pluginInfo(IPluginInfo *APluginInfo)
 {
 	APluginInfo->name = tr("Default Connection");
-	APluginInfo->description = tr("Allows to set a standard TCP connection to Jabber server");
+	APluginInfo->description = tr("Allows to set a standard TCP connection to XMPP server");
 	APluginInfo->author = "Potapov S.A. aka Lion";
 	APluginInfo->version = "1.0";
 	APluginInfo->homePage = "http://www.vacuum-im.org";

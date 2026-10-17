@@ -85,8 +85,8 @@
         <translation>Менеджер статусів</translation>
     </message>
     <message>
-        <source>Allows to change the status in Jabber network</source>
-        <translation>Дозволяє змінювати статус у джаббер-мережі</translation>
+        <source>Allows to change the status in XMPP network</source>
+        <translation>Дозволяє змінювати статус у XMPP-мережі</translation>
     </message>
     <message>
         <source>Connecting...</source>

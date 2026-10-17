@@ -74,8 +74,8 @@
    <translation>Default Connection</translation>
   </message>
   <message>
-   <source>Allows to set a standard TCP connection to Jabber server</source>
-   <translation>Allows to set a standard TCP connection to Jabber server</translation>
+   <source>Allows to set a standard TCP connection to XMPP server</source>
+   <translation>Allows to set a standard TCP connection to XMPP server</translation>
   </message>
   <message>
    <source>Host certificate is not in trusted list</source>

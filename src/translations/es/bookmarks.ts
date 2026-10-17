@@ -6,7 +6,7 @@
         <translation>Marcadores</translation>
     </message>
     <message>
-        <source>Allows to create bookmarks at the jabber conference and web pages</source>
+        <source>Allows to create bookmarks at the XMPP conference and web pages</source>
         <translation>Permite la creación de marcadores para salas de conferencia y páginas web</translation>
     </message>
     <message>

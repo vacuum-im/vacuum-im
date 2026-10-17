@@ -6,7 +6,7 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Allows to create bookmarks at the jabber conference and web pages</source>
+        <source>Allows to create bookmarks at the XMPP conference and web pages</source>
         <translation type="unfinished"/>
     </message>
     <message>

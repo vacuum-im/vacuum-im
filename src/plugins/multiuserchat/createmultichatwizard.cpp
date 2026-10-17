@@ -365,15 +365,15 @@ void ServicePage::initializePage()
 	{
 		setSubTitle(tr("Select account, server and service to join to the conference"));
 		lblAccount->setText(tr("Select the account to join to the conference"));
-		lblServer->setText(tr("You can join to the conference located at almost any Jabber-server, select one from the list or add your own"));
-		lblService->setText(tr("Each Jabber-server can have multiple conference services, select one of the available"));
+		lblServer->setText(tr("You can join to the conference located at almost any XMPP-server, select one from the list or add your own"));
+		lblService->setText(tr("Each XMPP-server can have multiple conference services, select one of the available"));
 	}
 	else if (wizardMode() == CreateMultiChatWizard::ModeCreate)
 	{
 		setSubTitle(tr("Select account, server, and service to create the conference"));
 		lblAccount->setText(tr("Select the account to create a conference"));
-		lblServer->setText(tr("You can create a conference at almost any Jabber-server, select one from the list or add your own"));
-		lblService->setText(tr("Each Jabber-server can have multiple conference services, select one of the available"));
+		lblServer->setText(tr("You can create a conference at almost any XMPP-server, select one from the list or add your own"));
+		lblService->setText(tr("Each XMPP-server can have multiple conference services, select one of the available"));
 	}
 
 	onCurrentAccountChanged();

@@ -6,7 +6,7 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <source>Allows to log in to Jabber server using SASL authentication</source>
+        <source>Allows to log in to XMPP server using SASL authentication</source>
         <translation type="unfinished"/>
     </message>
     <message>

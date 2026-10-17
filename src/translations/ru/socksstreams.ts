@@ -4,12 +4,12 @@
 <context>
     <name>SocksOptionsWidgetClass</name>
     <message>
-        <source>Use jabber-proxy on your server</source>
-        <translation>Использовать jabber-прокси на вашем сервере</translation>
+        <source>Use XMPP-proxy on your server</source>
+        <translation>Использовать XMPP-прокси на вашем сервере</translation>
     </message>
     <message>
-        <source>Use additional jabber-proxy:</source>
-        <translation>Использовать дополнительный jabber-прокси:</translation>
+        <source>Use additional XMPP-proxy:</source>
+        <translation>Использовать дополнительный XMPP-прокси:</translation>
     </message>
     <message>
         <source>Allow direct incoming connections on port:</source>

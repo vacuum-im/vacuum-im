@@ -59,7 +59,7 @@ Bookmarks::~Bookmarks()
 void Bookmarks::pluginInfo(IPluginInfo *APluginInfo)
 {
 	APluginInfo->name = tr("Bookmarks");
-	APluginInfo->description = tr("Allows to create bookmarks at the jabber conference and web pages");
+	APluginInfo->description = tr("Allows to create bookmarks at the XMPP conference and web pages");
 	APluginInfo->version = "1.0";
 	APluginInfo->author = "Potapov S.A. aka Lion";
 	APluginInfo->homePage = "http://www.vacuum-im.org";

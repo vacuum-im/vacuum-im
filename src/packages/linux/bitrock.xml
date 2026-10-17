@@ -40,7 +40,7 @@
             <show>1</show>
             <desktopShortcutList>
                 <shortcut>
-                    <comment>Crossplatform Jabber Client</comment>
+                    <comment>Cross-platform XMPP Client</comment>
                     <exec>${installdir}/bin/vacuum</exec>
                     <icon>${installdir}/share/vacuum/vacuum.ico</icon>
                     <name>${product_fullname}</name>
