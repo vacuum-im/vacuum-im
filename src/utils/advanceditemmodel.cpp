@@ -51,6 +51,7 @@ AdvancedItemModel::AdvancedItemModel(QObject *AParent) : QStandardItemModel(APar
 	connect(this,SIGNAL(columnsAboutToBeRemoved(const QModelIndex &, int, int)),SLOT(onColumnsAboutToBeRemoved(const QModelIndex &, int, int)));
 	connect(this,SIGNAL(rowsRemoved(const QModelIndex &, int, int)),SLOT(onRowsOrColumnsRemoved(const QModelIndex &, int, int)));
 	connect(this,SIGNAL(columnsRemoved(const QModelIndex &, int, int)),SLOT(onRowsOrColumnsRemoved(const QModelIndex &, int, int)));
+	connect(this,SIGNAL(modelReset()),SLOT(onModelReset()));
 }
 
 QMap<int, QVariant> AdvancedItemModel::itemData(const QModelIndex &AIndex) const
@@ -261,13 +262,9 @@ void AdvancedItemModel::emitItemChanged(QStandardItem *AItem)
 	}
 	else
 	{
-		QStandardItem *currentItem = AItem->model()->item(AItem->row(), AItem->column());
-		if (currentItem == AItem)
-		{
-			QModelIndex index = indexFromItem(AItem);
-			if (index.isValid() && index.row() >= 0 && index.column() >= 0)
-				emit dataChanged(index,index);
-		}
+		QModelIndex index = indexFromItem(AItem);
+		if (index.isValid() && index.row() >= 0 && index.column() >= 0)
+			emit dataChanged(index,index);
 	}
 }
 
@@ -312,8 +309,8 @@ void AdvancedItemModel::onEmitDelayedDataChangedSignals()
 				emitItemChanged(item.first);
 			if (item.second >= FIRST_VALID_ROLE)
 				emit itemDataChanged(item.first,item.second);
+			lastItem = item.first;
 		}
-		lastItem = item.first;
 	}
 }
 
@@ -363,4 +360,10 @@ void AdvancedItemModel::onRowsOrColumnsRemoved(const QModelIndex &AParent, int A
 	}
 	FRemovingItems.clear();
 	emitRecursiveParentDataChanged(itemFromIndex(AParent));
+}
+
+void AdvancedItemModel::onModelReset()
+{
+	FChangedItems.clear();
+	FRemovingItems.clear();
 }

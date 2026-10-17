@@ -76,6 +76,7 @@ protected:
 	void emitRecursiveParentDataChanged(QStandardItem *AParent);
 protected slots:
 	void onEmitDelayedDataChangedSignals();
+	void onModelReset();
 	void onRowsInserted(const QModelIndex &AParent, int AStart, int AEnd);
 	void onColumnsInserted(const QModelIndex &AParent, int AStart, int AEnd);
 	void onRowsAboutToBeRemoved(const QModelIndex &AParent, int AStart, int AEnd);
