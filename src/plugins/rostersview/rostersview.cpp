@@ -274,8 +274,17 @@ bool RostersView::repaintRosterIndex(IRosterIndex *AIndex)
 
 void RostersView::expandIndexParents(IRosterIndex *AIndex)
 {
+	if (!AIndex || !FRostersModel)
+		return;
+
 	QModelIndex index = FRostersModel->modelIndexFromRosterIndex(AIndex);
+	if (!index.isValid() || index.row() < 0 || index.column() < 0)
+		return;
+
 	index = mapFromModel(index);
+	if (!index.isValid() || index.row() < 0 || index.column() < 0)
+		return;
+
 	expandIndexParents(index);
 }
 
@@ -1424,6 +1433,13 @@ void RostersView::onUpdateIndexNotifyTimeout()
 {
 	foreach(IRosterIndex *index, FNotifyUpdates)
 	{
+		if (!index || !FRostersModel)
+			continue;
+
+		QModelIndex modelIndex = FRostersModel->modelIndexFromRosterIndex(index);
+		if (!modelIndex.isValid() || modelIndex.row() < 0 || modelIndex.column() < 0)
+			continue;
+
 		int curNotify = activeNotify(index);
 		int newNotify = notifyQueue(index).value(0,-1);
 		if (curNotify != newNotify)
