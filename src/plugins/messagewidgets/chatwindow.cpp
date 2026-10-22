@@ -1,6 +1,7 @@
 #include "chatwindow.h"
 
 #include <QKeyEvent>
+#include <QScrollBar>
 #include <QCoreApplication>
 #include <definitions/actiongroups.h>
 #include <definitions/resources.h>
@@ -37,6 +38,10 @@ ChatWindow::ChatWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 
 	FEditWidget = FMessageWidgets->newEditWidget(this,ui.spwMessageBox);
 	FEditWidget->setSendShortcutId(SCT_MESSAGEWINDOWS_SENDCHATMESSAGE);
+	Shortcuts::insertWidgetShortcut(SCT_MESSAGEWINDOWS_SCROLLUP,FEditWidget->textEdit());
+	Shortcuts::insertWidgetShortcut(SCT_MESSAGEWINDOWS_SCROLLDOWN,FEditWidget->textEdit());
+	Shortcuts::insertWidgetShortcut(SCT_MESSAGEWINDOWS_SCROLLPREVMESSAGE,FEditWidget->textEdit());
+	Shortcuts::insertWidgetShortcut(SCT_MESSAGEWINDOWS_SCROLLNEXTMESSAGE,FEditWidget->textEdit());
 	ui.spwMessageBox->insertWidget(MCWW_EDITWIDGET,FEditWidget->instance());
 	
 	FToolBarWidget = FMessageWidgets->newToolBarWidget(this,ui.spwMessageBox);
@@ -280,4 +285,20 @@ void ChatWindow::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
 	if (AId==SCT_MESSAGEWINDOWS_CLOSEWINDOW && AWidget==this)
 		closeTabPage();
+	else if (FViewWidget && FEditWidget && AWidget==FEditWidget->textEdit() && (AId==SCT_MESSAGEWINDOWS_SCROLLUP || AId==SCT_MESSAGEWINDOWS_SCROLLDOWN))
+	{
+		QAbstractScrollArea *viewer = qobject_cast<QAbstractScrollArea *>(FViewWidget->styleWidget());
+		if (viewer)
+		{
+			QScrollBar *scrollBar = viewer->verticalScrollBar();
+			if (AId==SCT_MESSAGEWINDOWS_SCROLLUP)
+				scrollBar->triggerAction(QScrollBar::SliderPageStepSub);
+			else
+				scrollBar->triggerAction(QScrollBar::SliderPageStepAdd);
+		}
+	}
+	else if (FViewWidget && FEditWidget && AWidget==FEditWidget->textEdit() && (AId==SCT_MESSAGEWINDOWS_SCROLLPREVMESSAGE || AId==SCT_MESSAGEWINDOWS_SCROLLNEXTMESSAGE))
+	{
+		WidgetManager::scrollDocumentByItems(qobject_cast<QAbstractScrollArea *>(FViewWidget->styleWidget()), AId==SCT_MESSAGEWINDOWS_SCROLLPREVMESSAGE);
+	}
 }

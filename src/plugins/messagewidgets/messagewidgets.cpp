@@ -91,6 +91,10 @@ bool MessageWidgets::initObjects()
 	Shortcuts::declareGroup(SCTG_MESSAGEWINDOWS, tr("Message windows"), SGO_MESSAGEWINDOWS);
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_CLOSEWINDOW, QString(), tr("Esc","Close message window"));
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_QUOTE, tr("Quote selected text"), tr("Ctrl+Q","Quote selected text"));
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SCROLLUP, tr("Scroll messages up"), tr("PgUp","Scroll messages up"), Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SCROLLDOWN, tr("Scroll messages down"), tr("PgDown","Scroll messages down"), Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SCROLLPREVMESSAGE, tr("Scroll to previous message"), tr("Alt+Up","Scroll to previous message"), Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SCROLLNEXTMESSAGE, tr("Scroll to next message"), tr("Alt+Down","Scroll to next message"), Shortcuts::WidgetShortcut);
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_EDITNEXTMESSAGE, tr("Edit next message"), tr("Ctrl+Down","Edit next message"), Shortcuts::WidgetShortcut);
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_EDITPREVMESSAGE, tr("Edit previous message"), tr("Ctrl+Up","Edit previous message"), Shortcuts::WidgetShortcut);
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SENDCHATMESSAGE, tr("Send chat message"), tr("Return","Send chat message"), Shortcuts::WidgetShortcut);

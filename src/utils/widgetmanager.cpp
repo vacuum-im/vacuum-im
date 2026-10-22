@@ -4,6 +4,11 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QScreen>
+#include <QTextEdit>
+#include <QScrollBar>
+#include <QTextCursor>
+#include <QTextFrame>
+#include <QTextDocument>
 
 #ifdef Q_OS_LINUX
 	#include <QtX11Extras/QX11Info>
@@ -294,4 +299,42 @@ QRect WidgetManager::alignGeometry(const QSize &ASize, const QWidget *AWidget, Q
 	QRect availRect = AWidget!=NULL ? QApplication::desktop()->availableGeometry(AWidget) : QApplication::desktop()->availableGeometry();
 #endif
 	return QStyle::alignedRect(Qt::LeftToRight,AAlign,ASize.boundedTo(availRect.size()),availRect);
+}
+
+void WidgetManager::scrollDocumentByItems(QAbstractScrollArea *AView, bool APrevious)
+{
+	QTextEdit *view = qobject_cast<QTextEdit *>(AView);
+	if (view && view->document()!=NULL)
+	{
+		QScrollBar *scrollBar = view->verticalScrollBar();
+		int topPosition = scrollBar->value();
+		int targetPosition = -1;
+		const int epsilon = 5;
+
+		QTextFrame *rootFrame = view->document()->rootFrame();
+		for (QTextFrame::iterator it=rootFrame->begin(); !it.atEnd(); ++it)
+		{
+			QTextFrame *childFrame = it.currentFrame();
+			if (childFrame)
+			{
+				QTextCursor cursor = childFrame->firstCursorPosition();
+				int childPosition = view->cursorRect(cursor).y() + topPosition;
+				if (APrevious)
+				{
+					if (childPosition < topPosition-epsilon && childPosition > targetPosition)
+						targetPosition = childPosition;
+				}
+				else
+				{
+					if (childPosition > topPosition+epsilon && (targetPosition<0 || childPosition < targetPosition))
+						targetPosition = childPosition;
+				}
+			}
+		}
+
+		if (targetPosition >= 0)
+			scrollBar->setSliderPosition(targetPosition);
+		else if (!APrevious)
+			scrollBar->setSliderPosition(scrollBar->maximum());
+	}
 }
