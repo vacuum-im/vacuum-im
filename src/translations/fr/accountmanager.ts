@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -39,7 +39,7 @@
     </message>
     <message>
         <source>Default resource:</source>
-        <translation>Ressource par défaut :</translation>
+        <translation>Ressource par défaut :</translation>
     </message>
     <message>
         <source>Account</source>
@@ -47,15 +47,15 @@
     </message>
     <message>
         <source>Name:</source>
-        <translation>Nom :</translation>
+        <translation>Nom :</translation>
     </message>
     <message>
         <source>Password:</source>
-        <translation>Mot de passe :</translation>
+        <translation>Mot de passe :</translation>
     </message>
     <message>
         <source>Resource:</source>
-        <translation>Ressource :</translation>
+        <translation>Ressource :</translation>
     </message>
     <message>
         <source>Additional settings</source>
@@ -125,7 +125,7 @@
     </message>
     <message>
         <source>You are assured that wish to remove an account &lt;b&gt;%1&lt;/b&gt;?&lt;br&gt;All settings will be lost.</source>
-        <translation>Êtes-vous sûr de vouloir supprimer le compte &lt;b&gt;%1&lt;/b&gt; ?&lt;br&gt;Tous les paramètres seront perdus.</translation>
+        <translation>Êtes-vous sûr de vouloir supprimer le compte &lt;b&gt;%1&lt;/b&gt; ?&lt;br&gt;Tous les paramètres seront perdus.</translation>
     </message>
 </context>
 <context>
@@ -155,16 +155,16 @@
         <translation>Erreur interne</translation>
     </message>
     <message>
-        <source>Click &apos;Back&apos; button to change the account credentials or the &apos;Finish&apos; button to add the account as is.</source>
-        <translation>Cliquez sur le bouton « Précédent » pour modifier les identifiants du compte ou sur le bouton « Terminer » pour ajouter le compte tel quel.</translation>
+        <source>Click 'Back' button to change the account credentials or the 'Finish' button to add the account as is.</source>
+        <translation>Cliquez sur le bouton « Précédent » pour modifier les identifiants du compte ou sur le bouton « Terminer » pour ajouter le compte tel quel.</translation>
     </message>
     <message>
         <source>You have successfully connected!</source>
-        <translation>Vous vous êtes connecté avec succès !</translation>
+        <translation>Vous vous êtes connecté avec succès !</translation>
     </message>
     <message>
-        <source>Account credentials successfully checked, click &apos;Finish&apos; button to add the account.</source>
-        <translation>Les identifiants du compte ont été vérifiés avec succès, cliquez sur le bouton « Terminer » pour ajouter le compte.</translation>
+        <source>Account credentials successfully checked, click 'Finish' button to add the account.</source>
+        <translation>Les identifiants du compte ont été vérifiés avec succès, cliquez sur le bouton « Terminer » pour ajouter le compte.</translation>
     </message>
     <message>
         <source>Failed to connect :(</source>
@@ -218,11 +218,11 @@
     </message>
     <message>
         <source>Jabber ID:</source>
-        <translation>ID Jabber :</translation>
+        <translation>ID Jabber :</translation>
     </message>
     <message>
         <source>Password:</source>
-        <translation>Mot de passe :</translation>
+        <translation>Mot de passe :</translation>
     </message>
     <message>
         <source>Save password</source>
@@ -314,7 +314,7 @@
     </message>
     <message>
         <source>Server:</source>
-        <translation>Serveur :</translation>
+        <translation>Serveur :</translation>
     </message>
     <message>
         <source>Some public servers</source>
@@ -322,7 +322,7 @@
     </message>
     <message>
         <source>* Not all servers support within the client registration, in some cases, you can only register on the servers web site.</source>
-        <translation>* Tous les serveurs ne prennent pas en charge l'enregistrement depuis le client ; dans certains cas, vous ne pouvez vous enregistrer que sur le site web du serveur.</translation>
+        <translation>* Tous les serveurs ne prennent pas en charge l'enregistrement depuis le client ; dans certains cas, vous ne pouvez vous enregistrer que sur le site web du serveur.</translation>
     </message>
     <message>
         <source>jabbim.com</source>
@@ -350,11 +350,11 @@
     </message>
     <message>
         <source>You have successfully registered!</source>
-        <translation>Vous vous êtes enregistré avec succès !</translation>
+        <translation>Vous vous êtes enregistré avec succès !</translation>
     </message>
     <message>
-        <source>Account %1 successfully registered, click &apos;Finish&apos; button to add the account.</source>
-        <translation>Le compte %1 a été enregistré avec succès, cliquez sur le bouton « Terminer » pour ajouter le compte.</translation>
+        <source>Account %1 successfully registered, click 'Finish' button to add the account.</source>
+        <translation>Le compte %1 a été enregistré avec succès, cliquez sur le bouton « Terminer » pour ajouter le compte.</translation>
     </message>
     <message>
         <source>Failed to register :(</source>

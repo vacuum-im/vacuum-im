@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -82,11 +82,11 @@
     <name>AdiumOptionsWidgetClass</name>
     <message>
         <source>Variant:</source>
-        <translation>Variante :</translation>
+        <translation>Variante :</translation>
     </message>
     <message>
         <source>Font:</source>
-        <translation>Police :</translation>
+        <translation>Police :</translation>
     </message>
     <message>
         <source>Change...</source>
@@ -98,11 +98,11 @@
     </message>
     <message>
         <source>Color:</source>
-        <translation>Couleur :</translation>
+        <translation>Couleur :</translation>
     </message>
     <message>
         <source>Image:</source>
-        <translation>Image :</translation>
+        <translation>Image :</translation>
     </message>
     <message>
         <source>not set</source>
@@ -110,7 +110,7 @@
     </message>
     <message>
         <source>Layout:</source>
-        <translation>Disposition :</translation>
+        <translation>Disposition :</translation>
     </message>
 </context>
 </TS>

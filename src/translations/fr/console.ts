@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -71,11 +71,11 @@
     </message>
     <message>
         <source>Stream:</source>
-        <translation>Flux :</translation>
+        <translation>Flux :</translation>
     </message>
     <message>
         <source>Condition:</source>
-        <translation>Condition :</translation>
+        <translation>Condition :</translation>
     </message>
     <message>
         <source>Add</source>
@@ -91,7 +91,7 @@
     </message>
     <message>
         <source>Available context:</source>
-        <translation>Contextes disponibles :</translation>
+        <translation>Contextes disponibles :</translation>
     </message>
     <message>
         <source>Console</source>

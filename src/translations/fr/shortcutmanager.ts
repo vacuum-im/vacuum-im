@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -21,11 +21,11 @@
     </message>
     <message>
         <source>Enter profile password:</source>
-        <translation>Saisissez le mot de passe du profil :</translation>
+        <translation>Saisissez le mot de passe du profil :</translation>
     </message>
     <message>
         <source>Wrong profile password!</source>
-        <translation>Mot de passe du profil incorrect !</translation>
+        <translation>Mot de passe du profil incorrect !</translation>
     </message>
 </context>
 <context>

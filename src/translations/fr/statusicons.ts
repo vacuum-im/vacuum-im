@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -25,7 +25,7 @@
     </message>
     <message>
         <source>Status icons:</source>
-        <translation>Icônes d'état :</translation>
+        <translation>Icônes d'état :</translation>
     </message>
 </context>
 </TS>

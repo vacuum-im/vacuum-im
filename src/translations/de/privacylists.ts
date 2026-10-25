@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="de" sourcelanguage="en">
 <context>
@@ -12,20 +12,20 @@
         <translation>Privatsphärenlisten Fehler</translation>
     </message>
     <message>
-        <source>Privacy list &apos;%1&apos; could not be active: %2</source>
-        <translation>Privatsphärenliste &apos;%1&apos; konnte nicht aktiviert werden: %2</translation>
+        <source>Privacy list '%1' could not be active: %2</source>
+        <translation>Privatsphärenliste '%1' konnte nicht aktiviert werden: %2</translation>
     </message>
     <message>
-        <source>Privacy list &apos;%1&apos; could not be default: %2</source>
-        <translation>Privatsphärenliste &apos;%1&apos; konnte nicht auf Standard gesetzt werden: %2</translation>
+        <source>Privacy list '%1' could not be default: %2</source>
+        <translation>Privatsphärenliste '%1' konnte nicht auf Standard gesetzt werden: %2</translation>
     </message>
     <message>
-        <source>Privacy list &apos;%1&apos; could not be saved: %2</source>
-        <translation>Privatsphärenliste &apos;%1&apos; konnte nicht gespeichert werden: %2</translation>
+        <source>Privacy list '%1' could not be saved: %2</source>
+        <translation>Privatsphärenliste '%1' konnte nicht gespeichert werden: %2</translation>
     </message>
     <message>
-        <source>Privacy list &apos;%1&apos; could not be removed: %2</source>
-        <translation>Privatsphärenliste &apos;%1&apos; konnte nicht entfernt werden: %2</translation>
+        <source>Privacy list '%1' could not be removed: %2</source>
+        <translation>Privatsphärenliste '%1' konnte nicht entfernt werden: %2</translation>
     </message>
     <message>
         <source>New Privacy List</source>
@@ -40,8 +40,8 @@
         <translation>Privatsphärenliste entfernen</translation>
     </message>
     <message>
-        <source>Are you really want to delete privacy list &apos;%1&apos; with rules?</source>
-        <translation>Wollen Sie wirklich die Privatsphärenliste &apos;%1&apos; mit allen Regeln löschen?</translation>
+        <source>Are you really want to delete privacy list '%1' with rules?</source>
+        <translation>Wollen Sie wirklich die Privatsphärenliste '%1' mit allen Regeln löschen?</translation>
     </message>
     <message>
         <source>&lt;always&gt;</source>
@@ -93,7 +93,7 @@
     </message>
     <message>
         <source>&lt;any stanza&gt;</source>
-        <translation>Alle Stanzas</translation>
+        <translation>Beliebige Stanza</translation>
     </message>
     <message>
         <source>none</source>
@@ -116,8 +116,8 @@
         <translation>beide</translation>
     </message>
     <message>
-        <source>%1: if %2 = &apos;%3&apos; then %4 [%5 ]</source>
-        <translation>%1: Wenn %2 = &apos;%3&apos; dann %4 [%5 ]</translation>
+        <source>%1: if %2 = '%3' then %4 [%5 ]</source>
+        <translation>%1: Wenn %2 = '%3' dann %4 [%5 ]</translation>
     </message>
     <message>
         <source>%1: always %2 [%3 ]</source>

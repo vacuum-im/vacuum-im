@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -84,19 +84,19 @@
     </message>
     <message>
         <source>Name:</source>
-        <translation>Nom :</translation>
+        <translation>Nom :</translation>
     </message>
     <message>
         <source>Version:</source>
-        <translation>Version :</translation>
+        <translation>Version :</translation>
     </message>
     <message>
         <source>OS:</source>
-        <translation>Système d'exploitation :</translation>
+        <translation>Système d'exploitation :</translation>
     </message>
     <message>
         <source>Error:</source>
-        <translation>Erreur :</translation>
+        <translation>Erreur :</translation>
     </message>
     <message>
         <source>Waiting response...</source>
@@ -116,19 +116,19 @@
     </message>
     <message>
         <source>Uptime:</source>
-        <translation>Temps de fonctionnement :</translation>
+        <translation>Temps de fonctionnement :</translation>
     </message>
     <message>
         <source>Inactive:</source>
-        <translation>Inactif depuis :</translation>
+        <translation>Inactif depuis :</translation>
     </message>
     <message>
         <source>Status:</source>
-        <translation>Statut :</translation>
+        <translation>Statut :</translation>
     </message>
     <message>
         <source>Idle:</source>
-        <translation>Inactivité :</translation>
+        <translation>Inactivité :</translation>
     </message>
     <message>
         <source>Entity Time</source>
@@ -136,15 +136,15 @@
     </message>
     <message>
         <source>Time:</source>
-        <translation>Heure :</translation>
+        <translation>Heure :</translation>
     </message>
     <message>
         <source>Delta:</source>
-        <translation>Décalage :</translation>
+        <translation>Décalage :</translation>
     </message>
     <message>
         <source>Ping, msec:</source>
-        <translation>Ping (ms) :</translation>
+        <translation>Ping (ms) :</translation>
     </message>
     <message>
         <source>Not available</source>

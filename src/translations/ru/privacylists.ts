@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="ru" sourcelanguage="en">
 <context>
@@ -12,20 +12,20 @@
         <translation>Ошибка в списке приватности</translation>
     </message>
     <message>
-        <source>Privacy list &apos;%1&apos; could not be active: %2</source>
-        <translation>Список приватности &apos;%1&apos; не может быть активным: %2</translation>
+        <source>Privacy list '%1' could not be active: %2</source>
+        <translation>Список приватности '%1' не может быть активным: %2</translation>
     </message>
     <message>
-        <source>Privacy list &apos;%1&apos; could not be default: %2</source>
-        <translation>Список приватности &apos;%1&apos; не может быть по умолчанию: %2</translation>
+        <source>Privacy list '%1' could not be default: %2</source>
+        <translation>Список приватности '%1' не может быть по умолчанию: %2</translation>
     </message>
     <message>
-        <source>Privacy list &apos;%1&apos; could not be saved: %2</source>
-        <translation>Список приватности &apos;%1&apos; не может быть сохранен: %2</translation>
+        <source>Privacy list '%1' could not be saved: %2</source>
+        <translation>Список приватности '%1' не может быть сохранен: %2</translation>
     </message>
     <message>
-        <source>Privacy list &apos;%1&apos; could not be removed: %2</source>
-        <translation>Список приватности &apos;%1&apos; не может быть удалён: %2</translation>
+        <source>Privacy list '%1' could not be removed: %2</source>
+        <translation>Список приватности '%1' не может быть удалён: %2</translation>
     </message>
     <message>
         <source>New Privacy List</source>
@@ -40,8 +40,8 @@
         <translation>Удалить список приватности</translation>
     </message>
     <message>
-        <source>Are you really want to delete privacy list &apos;%1&apos; with rules?</source>
-        <translation>Вы действительно хотите удалить список приватности &apos;%1&apos; с правилами?</translation>
+        <source>Are you really want to delete privacy list '%1' with rules?</source>
+        <translation>Вы действительно хотите удалить список приватности '%1' с правилами?</translation>
     </message>
     <message>
         <source>&lt;always&gt;</source>
@@ -93,7 +93,7 @@
     </message>
     <message>
         <source>&lt;any stanza&gt;</source>
-        <translation>любой станз</translation>
+        <translation>любой XMPP-элемент</translation>
     </message>
     <message>
         <source>none</source>
@@ -116,8 +116,8 @@
         <translation>полная</translation>
     </message>
     <message>
-        <source>%1: if %2 = &apos;%3&apos; then %4 [%5 ]</source>
-        <translation>%1: если %2 = &apos;%3&apos; тогда %4 [%5 ]</translation>
+        <source>%1: if %2 = '%3' then %4 [%5 ]</source>
+        <translation>%1: если %2 = '%3' тогда %4 [%5 ]</translation>
     </message>
     <message>
         <source>%1: always %2 [%3 ]</source>

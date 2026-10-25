@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="de" sourcelanguage="en">
 <context>
@@ -13,11 +13,11 @@
     </message>
     <message>
         <source>Allows other modules to receive or send a small amount of binary data in XMPP stanza</source>
-        <translation>Erlaubt anderen Modulen das Empfangen und Versenden von kleinen Mengen an Binärdaten über XMPP Packete</translation>
+        <translation>Erlaubt anderen Modulen, kleine Mengen an Binärdaten in XMPP-Stanzas zu empfangen oder zu senden</translation>
     </message>
     <message>
         <source>Supports the exchange of a small amount of binary data in XMPP stanza</source>
-        <translation>Unterstützt den Austausch kleiner Mengen an Binärdaten über XMPP Packete</translation>
+        <translation>Unterstützt den Austausch kleiner Mengen an Binärdaten in XMPP-Stanzas</translation>
     </message>
     <message>
         <source>Failed to load data</source>

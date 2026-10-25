@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -73,7 +73,7 @@
     </message>
     <message>
         <source>Default transfer method:</source>
-        <translation>Méthode de transfert par défaut :</translation>
+        <translation>Méthode de transfert par défaut :</translation>
     </message>
 </context>
 <context>
@@ -87,7 +87,7 @@
     <name>FileStreamsOptionsWidgetClass</name>
     <message>
         <source>Default directory:</source>
-        <translation>Répertoire par défaut :</translation>
+        <translation>Répertoire par défaut :</translation>
     </message>
 </context>
 <context>
@@ -174,15 +174,15 @@
     </message>
     <message>
         <source>Active: %1/%2</source>
-        <translation>Actifs : %1/%2</translation>
+        <translation>Actifs : %1/%2</translation>
     </message>
     <message>
         <source>Downloads: %1 at %2</source>
-        <translation>Téléchargements : %1 à %2</translation>
+        <translation>Téléchargements : %1 à %2</translation>
     </message>
     <message>
         <source>Uploads: %1 at %2</source>
-        <translation>Envois : %1 à %2</translation>
+        <translation>Envois : %1 à %2</translation>
     </message>
 </context>
 </TS>

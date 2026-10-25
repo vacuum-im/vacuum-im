@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="pl" sourcelanguage="en">
 <context>
@@ -32,7 +32,7 @@
     </message>
     <message>
         <source>Start sending user stanza...</source>
-        <translation>Zacznij wysyłaś dane...</translation>
+        <translation>Rozpoczęto wysyłanie bloku XML użytkownika...</translation>
     </message>
     <message>
         <source>Stanza is not well formed.</source>

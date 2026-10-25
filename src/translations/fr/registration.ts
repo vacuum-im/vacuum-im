@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -12,12 +12,12 @@
         <translation>En attente de la réponse de l'hôte...</translation>
     </message>
     <message>
-        <source>Error: Can&apos;t send request to host.</source>
-        <translation>Erreur : impossible d'envoyer la requête à l'hôte.</translation>
+        <source>Error: Can't send request to host.</source>
+        <translation>Erreur : impossible d'envoyer la requête à l'hôte.</translation>
     </message>
     <message>
         <source>Do you really want to remove registration from %1?</source>
-        <translation>Voulez-vous vraiment supprimer l'inscription sur %1 ?</translation>
+        <translation>Voulez-vous vraiment supprimer l'inscription sur %1 ?</translation>
     </message>
     <message>
         <source>Enter your username and new password.</source>
@@ -37,22 +37,22 @@
     </message>
     <message>
         <source>Requested operation failed: %1</source>
-        <translation>L'opération demandée a échoué : %1</translation>
+        <translation>L'opération demandée a échoué : %1</translation>
     </message>
 </context>
 <context>
     <name>RegisterDialogClass</name>
     <message>
         <source>Username:</source>
-        <translation>Nom d'utilisateur :</translation>
+        <translation>Nom d'utilisateur :</translation>
     </message>
     <message>
         <source>Password:</source>
-        <translation>Mot de passe :</translation>
+        <translation>Mot de passe :</translation>
     </message>
     <message>
         <source>Email:</source>
-        <translation>E-mail :</translation>
+        <translation>E-mail :</translation>
     </message>
 </context>
 <context>

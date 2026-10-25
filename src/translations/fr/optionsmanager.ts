@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>Enter profile name:</source>
-        <translation>Saisissez le nom du profil :</translation>
+        <translation>Saisissez le nom du profil :</translation>
     </message>
     <message>
         <source>Profile Password</source>
@@ -17,7 +17,7 @@
     </message>
     <message>
         <source>Enter profile password:</source>
-        <translation>Saisissez le mot de passe du profil :</translation>
+        <translation>Saisissez le mot de passe du profil :</translation>
     </message>
     <message>
         <source>Confirm Password</source>
@@ -25,7 +25,7 @@
     </message>
     <message>
         <source>Reenter password:</source>
-        <translation>Ressaisissez le mot de passe :</translation>
+        <translation>Ressaisissez le mot de passe :</translation>
     </message>
     <message>
         <source>Error</source>
@@ -33,7 +33,7 @@
     </message>
     <message>
         <source>Could not create profile, maybe this profile already exists</source>
-        <translation>Impossible de créer le profil ; il existe peut-être déjà</translation>
+        <translation>Impossible de créer le profil ; il existe peut-être déjà</translation>
     </message>
     <message>
         <source>Passwords did not match</source>
@@ -41,11 +41,11 @@
     </message>
     <message>
         <source>Enter current profile password:</source>
-        <translation>Saisissez le mot de passe actuel du profil :</translation>
+        <translation>Saisissez le mot de passe actuel du profil :</translation>
     </message>
     <message>
         <source>Enter new profile password:</source>
-        <translation>Saisissez le nouveau mot de passe du profil :</translation>
+        <translation>Saisissez le nouveau mot de passe du profil :</translation>
     </message>
     <message>
         <source>Failed to change profile password</source>
@@ -61,7 +61,7 @@
     </message>
     <message>
         <source>Enter new name for profile:</source>
-        <translation>Saisissez le nouveau nom du profil :</translation>
+        <translation>Saisissez le nouveau nom du profil :</translation>
     </message>
     <message>
         <source>Failed to rename profile</source>
@@ -72,8 +72,8 @@
         <translation>Supprimer le profil</translation>
     </message>
     <message>
-        <source>Are you sure you want to delete profile &apos;&lt;b&gt;%1&lt;/b&gt;&apos;?</source>
-        <translation>Êtes-vous sûr de vouloir supprimer le profil &lt;b&gt;%1&lt;/b&gt; ?</translation>
+        <source>Are you sure you want to delete profile '&lt;b&gt;%1&lt;/b&gt;'?</source>
+        <translation>Êtes-vous sûr de vouloir supprimer le profil &lt;b&gt;%1&lt;/b&gt; ?</translation>
     </message>
     <message>
         <source>Failed to remove profile</source>
@@ -134,11 +134,11 @@
     </message>
     <message>
         <source>Profile:</source>
-        <translation>Profil :</translation>
+        <translation>Profil :</translation>
     </message>
     <message>
         <source>Password:</source>
-        <translation>Mot de passe :</translation>
+        <translation>Mot de passe :</translation>
     </message>
     <message>
         <source>Settings...</source>
@@ -200,7 +200,7 @@
     </message>
     <message>
         <source>Language:</source>
-        <translation>Langue :</translation>
+        <translation>Langue :</translation>
     </message>
 </context>
 </TS>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -9,15 +9,15 @@
     </message>
     <message>
         <source>Use additional jabber-proxy:</source>
-        <translation>Utiliser un jabber-proxy supplémentaire :</translation>
+        <translation>Utiliser un jabber-proxy supplémentaire :</translation>
     </message>
     <message>
         <source>Allow direct incoming connections on port:</source>
-        <translation>Autoriser les connexions entrantes directes sur le port :</translation>
+        <translation>Autoriser les connexions entrantes directes sur le port :</translation>
     </message>
     <message>
         <source>Forward direct incoming connections to host:</source>
-        <translation>Transférer les connexions entrantes directes vers l'hôte :</translation>
+        <translation>Transférer les connexions entrantes directes vers l'hôte :</translation>
     </message>
     <message>
         <source>host:port</source>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -101,7 +101,7 @@
     </message>
     <message>
         <source>Pong!</source>
-        <translation>Pong !</translation>
+        <translation>Pong !</translation>
     </message>
     <message>
         <source>Main status</source>
@@ -132,8 +132,8 @@
         <translation>Transferts de fichiers en attente</translation>
     </message>
     <message>
-        <source>%1 (%2 bytes) from &apos;%3&apos;</source>
-        <translation>%1 (%2 octets) de « %3 »</translation>
+        <source>%1 (%2 bytes) from '%3'</source>
+        <translation>%1 (%2 octets) de « %3 »</translation>
     </message>
     <message>
         <source>There are no pending file transfers</source>
@@ -144,10 +144,10 @@
         <translation>Liste des messages non lus</translation>
     </message>
     <message numerus="yes">
-        <source>%n message(s) from &apos;%1&apos;</source>
+        <source>%n message(s) from '%1'</source>
         <translation>
-            <numerusform>%n message de « %1 »</numerusform>
-            <numerusform>%n messages de « %1 »</numerusform>
+            <numerusform>%n message de « %1 »</numerusform>
+            <numerusform>%n messages de « %1 »</numerusform>
         </translation>
     </message>
     <message>

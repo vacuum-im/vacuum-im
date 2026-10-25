@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -19,7 +19,7 @@
         <translation>Vue de la liste de contacts</translation>
     </message>
     <message>
-        <source>Displays a hierarchical roster&apos;s model</source>
+        <source>Displays a hierarchical roster's model</source>
         <translation>Affiche un modèle hiérarchique de la liste de contacts</translation>
     </message>
     <message>
@@ -68,7 +68,7 @@
     </message>
     <message>
         <source>Contacts list view:</source>
-        <translation>Vue de la liste de contacts :</translation>
+        <translation>Vue de la liste de contacts :</translation>
     </message>
     <message>
         <source>by status</source>
@@ -80,15 +80,15 @@
     </message>
     <message>
         <source>Sort contacts list:</source>
-        <translation>Trier la liste de contacts :</translation>
+        <translation>Trier la liste de contacts :</translation>
     </message>
     <message>
         <source>&lt;b&gt;Account:&lt;/b&gt; %1</source>
-        <translation>&lt;b&gt;Compte :&lt;/b&gt; %1</translation>
+        <translation>&lt;b&gt;Compte :&lt;/b&gt; %1</translation>
     </message>
     <message>
         <source>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</source>
-        <translation>&lt;b&gt;ID Jabber :&lt;/b&gt; %1</translation>
+        <translation>&lt;b&gt;ID Jabber :&lt;/b&gt; %1</translation>
     </message>
     <message>
         <source>Absent</source>
@@ -108,11 +108,11 @@
     </message>
     <message>
         <source>&lt;b&gt;Subscription:&lt;/b&gt; %1, request sent</source>
-        <translation>&lt;b&gt;Abonnement :&lt;/b&gt; %1, demande envoyée</translation>
+        <translation>&lt;b&gt;Abonnement :&lt;/b&gt; %1, demande envoyée</translation>
     </message>
     <message>
         <source>&lt;b&gt;Subscription:&lt;/b&gt; %1</source>
-        <translation>&lt;b&gt;Abonnement :&lt;/b&gt; %1</translation>
+        <translation>&lt;b&gt;Abonnement :&lt;/b&gt; %1</translation>
     </message>
 </context>
 </TS>

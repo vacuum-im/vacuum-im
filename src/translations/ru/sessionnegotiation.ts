@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="ru" sourcelanguage="en">
 <context>
@@ -97,11 +97,11 @@
     </message>
     <message>
         <source>Allows to set the session between two entities, which explains the rules of the exchange of XMPP stanzas</source>
-        <translation>Позволяет устанавливать сессию между двумя сущностями, которая определяет правила обмена XMPP строфами</translation>
+        <translation>Позволяет устанавливать сессию между двумя сущностями XMPP, определяющую правила обмена XMPP-станзами</translation>
     </message>
     <message>
         <source>Supports the negotiating of the stanza session between two XMPP entities</source>
-        <translation>Поддерживает инициализацию сессии строф между двумя XMPP сущностями</translation>
+        <translation>Поддерживает согласование сеанса обмена XMPP-станзами между двумя сущностями XMPP</translation>
     </message>
     <message>
         <source>When receiving session negotiation request</source>

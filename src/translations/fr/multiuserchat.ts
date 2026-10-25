@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -53,7 +53,7 @@
     </message>
     <message>
         <source>Failed to create conference: %1</source>
-        <translation>Échec de la création de la conférence : %1</translation>
+        <translation>Échec de la création de la conférence : %1</translation>
     </message>
     <message>
         <source>Failed to change default conference settings</source>
@@ -61,11 +61,11 @@
     </message>
     <message>
         <source>Failed to load conference settings: %1</source>
-        <translation>Échec du chargement des paramètres de la conférence : %1</translation>
+        <translation>Échec du chargement des paramètres de la conférence : %1</translation>
     </message>
     <message>
         <source>Failed to update conference settings: %1</source>
-        <translation>Échec de la mise à jour des paramètres de la conférence : %1</translation>
+        <translation>Échec de la mise à jour des paramètres de la conférence : %1</translation>
     </message>
 </context>
 <context>
@@ -76,11 +76,11 @@
     </message>
     <message>
         <source>Failed to join to the conference: Conference windows is not created</source>
-        <translation>Impossible de rejoindre la conférence : la fenêtre de conférence n'a pas été créée</translation>
+        <translation>Impossible de rejoindre la conférence : la fenêtre de conférence n'a pas été créée</translation>
     </message>
     <message>
         <source>Failed to join to the conference: Not all required parameters is specified</source>
-        <translation>Impossible de rejoindre la conférence : tous les paramètres requis ne sont pas spécifiés</translation>
+        <translation>Impossible de rejoindre la conférence : tous les paramètres requis ne sont pas spécifiés</translation>
     </message>
     <message>
         <source>Create Conference Wizard</source>
@@ -119,33 +119,33 @@
     </message>
     <message>
         <source>Enter user Jabber ID:</source>
-        <translation>Saisissez l'ID Jabber de l'utilisateur :</translation>
+        <translation>Saisissez l'ID Jabber de l'utilisateur :</translation>
     </message>
     <message>
         <source>Enter note:</source>
-        <translation>Saisissez une note :</translation>
+        <translation>Saisissez une note :</translation>
     </message>
     <message>
         <source>Warning</source>
         <translation>Avertissement</translation>
     </message>
     <message>
-        <source>User %1 already present in list of &apos;%2&apos;</source>
-        <translation>L'utilisateur %1 est déjà présent dans la liste « %2 »</translation>
+        <source>User %1 already present in list of '%2'</source>
+        <translation>L'utilisateur %1 est déjà présent dans la liste « %2 »</translation>
     </message>
     <message>
-        <source>Failed to load list of &apos;%1&apos;</source>
-        <translation>Échec du chargement de la liste « %1 »</translation>
+        <source>Failed to load list of '%1'</source>
+        <translation>Échec du chargement de la liste « %1 »</translation>
     </message>
     <message>
         <source>Failed to update users affiliation lists</source>
         <translation>Échec de la mise à jour des listes d'affiliation des utilisateurs</translation>
     </message>
     <message numerus="yes">
-        <source>Move %n user(s) to &apos;%1&apos;</source>
+        <source>Move %n user(s) to '%1'</source>
         <translation>
-            <numerusform>Déplacer %n utilisateur vers « %1 »</numerusform>
-            <numerusform>Déplacer %n utilisateurs vers « %1 »</numerusform>
+            <numerusform>Déplacer %n utilisateur vers « %1 »</numerusform>
+            <numerusform>Déplacer %n utilisateurs vers « %1 »</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -156,12 +156,12 @@
         </translation>
     </message>
     <message>
-        <source>Failed to load list of &apos;%1&apos;: %2</source>
-        <translation>Échec du chargement de la liste « %1 » : %2</translation>
+        <source>Failed to load list of '%1': %2</source>
+        <translation>Échec du chargement de la liste « %1 » : %2</translation>
     </message>
     <message>
         <source>Failed to update users affiliation lists: %1</source>
-        <translation>Échec de la mise à jour des listes d'affiliation des utilisateurs : %1</translation>
+        <translation>Échec de la mise à jour des listes d'affiliation des utilisateurs : %1</translation>
     </message>
 </context>
 <context>
@@ -203,7 +203,7 @@
     </message>
     <message>
         <source>Join with nick:</source>
-        <translation>Rejoindre avec le pseudonyme :</translation>
+        <translation>Rejoindre avec le pseudonyme :</translation>
     </message>
     <message>
         <source>Loading conference description...</source>
@@ -259,7 +259,7 @@
     </message>
     <message>
         <source>Failed to load conference description: %1</source>
-        <translation>Échec du chargement de la description de la conférence : %1</translation>
+        <translation>Échec du chargement de la description de la conférence : %1</translation>
     </message>
     <message>
         <source>Conference description is not available or invalid</source>
@@ -293,8 +293,8 @@
         <translation>Saisissez les paramètres pour rejoindre ou créer la conférence</translation>
     </message>
     <message>
-        <source>Conference as &apos;name@service.server.com&apos;</source>
-        <translation>Conférence sous la forme « name@service.server.com »</translation>
+        <source>Conference as 'name@service.server.com'</source>
+        <translation>Conférence sous la forme « name@service.server.com »</translation>
     </message>
     <message>
         <source>Your nickname in conference</source>
@@ -306,19 +306,19 @@
     </message>
     <message>
         <source>Account:</source>
-        <translation>Compte :</translation>
+        <translation>Compte :</translation>
     </message>
     <message>
         <source>Conference:</source>
-        <translation>Conférence :</translation>
+        <translation>Conférence :</translation>
     </message>
     <message>
         <source>Nick:</source>
-        <translation>Pseudonyme :</translation>
+        <translation>Pseudonyme :</translation>
     </message>
     <message>
         <source>Password:</source>
-        <translation>Mot de passe :</translation>
+        <translation>Mot de passe :</translation>
     </message>
     <message>
         <source>Register</source>
@@ -357,12 +357,12 @@
         <translation>Cette conférence n'existe pas et sera créée automatiquement à la connexion</translation>
     </message>
     <message>
-        <source>Conference service &apos;%1&apos; is not available or does not exists</source>
-        <translation>Le service de conférence « %1 » est indisponible ou n'existe pas</translation>
+        <source>Conference service '%1' is not available or does not exists</source>
+        <translation>Le service de conférence « %1 » est indisponible ou n'existe pas</translation>
     </message>
     <message>
         <source>Failed to check conference existence: %1</source>
-        <translation>Échec de la vérification de l'existence de la conférence : %1</translation>
+        <translation>Échec de la vérification de l'existence de la conférence : %1</translation>
     </message>
 </context>
 <context>
@@ -482,7 +482,7 @@
     </message>
     <message>
         <source>Participants list view:</source>
-        <translation>Vue de la liste des participants :</translation>
+        <translation>Vue de la liste des participants :</translation>
     </message>
     <message>
         <source>You are invited to the conference %1</source>
@@ -498,7 +498,7 @@
     </message>
     <message>
         <source>Allow this person to register with the room?</source>
-        <translation>Autoriser cette personne à s'enregistrer dans la salle ?</translation>
+        <translation>Autoriser cette personne à s'enregistrer dans la salle ?</translation>
     </message>
     <message>
         <source>EMail Address</source>
@@ -542,7 +542,7 @@
     </message>
     <message>
         <source>Grant Voice?</source>
-        <translation>Accorder la parole ?</translation>
+        <translation>Accorder la parole ?</translation>
     </message>
     <message>
         <source>Configure conference</source>
@@ -554,19 +554,19 @@
     </message>
     <message>
         <source>Allow Occupants to Send Private Messages?</source>
-        <translation>Autoriser les occupants à envoyer des messages privés ?</translation>
+        <translation>Autoriser les occupants à envoyer des messages privés ?</translation>
     </message>
     <message>
         <source>Allow Occupants to Invite Others?</source>
-        <translation>Autoriser les occupants à inviter d'autres personnes ?</translation>
+        <translation>Autoriser les occupants à inviter d'autres personnes ?</translation>
     </message>
     <message>
         <source>Allow Occupants to Change Subject?</source>
-        <translation>Autoriser les occupants à modifier le sujet ?</translation>
+        <translation>Autoriser les occupants à modifier le sujet ?</translation>
     </message>
     <message>
         <source>Enable Logging of Room Conversations?</source>
-        <translation>Activer la journalisation des conversations de la salle ?</translation>
+        <translation>Activer la journalisation des conversations de la salle ?</translation>
     </message>
     <message>
         <source>Affiliations that May Retrieve Member List</source>
@@ -586,19 +586,19 @@
     </message>
     <message>
         <source>Make Room Members-Only?</source>
-        <translation>Rendre la salle réservée aux membres ?</translation>
+        <translation>Rendre la salle réservée aux membres ?</translation>
     </message>
     <message>
         <source>Make Room Moderated?</source>
-        <translation>Rendre la salle modérée ?</translation>
+        <translation>Rendre la salle modérée ?</translation>
     </message>
     <message>
         <source>Password is Required to Enter?</source>
-        <translation>Un mot de passe est-il requis pour entrer ?</translation>
+        <translation>Un mot de passe est-il requis pour entrer ?</translation>
     </message>
     <message>
         <source>Make Room Persistent?</source>
-        <translation>Rendre la salle persistante ?</translation>
+        <translation>Rendre la salle persistante ?</translation>
     </message>
     <message>
         <source>Roles for which Presence is Broadcasted</source>
@@ -606,7 +606,7 @@
     </message>
     <message>
         <source>Allow Public Searching for Room?</source>
-        <translation>Autoriser la recherche publique de la salle ?</translation>
+        <translation>Autoriser la recherche publique de la salle ?</translation>
     </message>
     <message>
         <source>Full List of Room Administrators</source>
@@ -642,11 +642,11 @@
     </message>
     <message>
         <source>Make Participants List Public?</source>
-        <translation>Rendre la liste des participants publique ?</translation>
+        <translation>Rendre la liste des participants publique ?</translation>
     </message>
     <message>
         <source>Make all Occupants as Participants?</source>
-        <translation>Définir tous les occupants comme participants ?</translation>
+        <translation>Définir tous les occupants comme participants ?</translation>
     </message>
     <message>
         <source>Allow visitors to send private messages to</source>
@@ -658,19 +658,19 @@
     </message>
     <message>
         <source>Allow Occupants to Query Other Occupants?</source>
-        <translation>Autoriser les occupants à interroger les autres occupants ?</translation>
+        <translation>Autoriser les occupants à interroger les autres occupants ?</translation>
     </message>
     <message>
         <source>Allow Visitors to Send Status Text in Presence Updates?</source>
-        <translation>Autoriser les visiteurs à envoyer un texte de statut dans les mises à jour de présence ?</translation>
+        <translation>Autoriser les visiteurs à envoyer un texte de statut dans les mises à jour de présence ?</translation>
     </message>
     <message>
         <source>Allow visitors to change nickname?</source>
-        <translation>Autoriser les visiteurs à changer de pseudonyme ?</translation>
+        <translation>Autoriser les visiteurs à changer de pseudonyme ?</translation>
     </message>
     <message>
         <source>Allow visitors to send voice requests?</source>
-        <translation>Autoriser les visiteurs à envoyer des demandes de parole ?</translation>
+        <translation>Autoriser les visiteurs à envoyer des demandes de parole ?</translation>
     </message>
     <message>
         <source>Minimum interval between voice requests (in seconds)</source>
@@ -678,7 +678,7 @@
     </message>
     <message>
         <source>Make this Room CAPTCHA Protected?</source>
-        <translation>Protéger cette salle par CAPTCHA ?</translation>
+        <translation>Protéger cette salle par CAPTCHA ?</translation>
     </message>
     <message>
         <source>Do not Request CAPTCHA for Followed Jabber ID</source>
@@ -686,15 +686,15 @@
     </message>
     <message>
         <source>Allow Login Only With Registered Nickname?</source>
-        <translation>Autoriser la connexion uniquement avec un pseudonyme enregistré ?</translation>
+        <translation>Autoriser la connexion uniquement avec un pseudonyme enregistré ?</translation>
     </message>
     <message>
         <source>Allow Occupants to Change Nicknames?</source>
-        <translation>Autoriser les occupants à changer de pseudonyme ?</translation>
+        <translation>Autoriser les occupants à changer de pseudonyme ?</translation>
     </message>
     <message>
         <source>Allow Users to Register with the Room?</source>
-        <translation>Autoriser les utilisateurs à s'enregistrer dans la salle ?</translation>
+        <translation>Autoriser les utilisateurs à s'enregistrer dans la salle ?</translation>
     </message>
     <message>
         <source>Conference information</source>
@@ -726,7 +726,7 @@
     </message>
     <message>
         <source>The Room Subject Can be Modified by Participants?</source>
-        <translation>Le sujet de la salle peut-il être modifié par les participants ?</translation>
+        <translation>Le sujet de la salle peut-il être modifié par les participants ?</translation>
     </message>
     <message>
         <source>Supports the multi-user conferences</source>
@@ -785,7 +785,7 @@
         <translation>Salle modérée</translation>
     </message>
     <message>
-        <source>A room in which only those with &apos;voice&apos; may send messages to all occupants</source>
+        <source>A room in which only those with 'voice' may send messages to all occupants</source>
         <translation>Une salle dans laquelle seuls ceux qui ont la parole peuvent envoyer des messages à tous les occupants</translation>
     </message>
     <message>
@@ -793,7 +793,7 @@
         <translation>Salle non anonyme</translation>
     </message>
     <message>
-        <source>A room in which an occupant&apos;s full JID is exposed to all other occupants</source>
+        <source>A room in which an occupant's full JID is exposed to all other occupants</source>
         <translation>Une salle dans laquelle le JID complet d'un occupant est exposé à tous les autres occupants</translation>
     </message>
     <message>
@@ -801,7 +801,7 @@
         <translation>Salle semi-anonyme</translation>
     </message>
     <message>
-        <source>A room in which an occupant&apos;s full JID can be discovered by room admins only</source>
+        <source>A room in which an occupant's full JID can be discovered by room admins only</source>
         <translation>Une salle dans laquelle le JID complet d'un occupant n'est visible que par les administrateurs de la salle</translation>
     </message>
     <message>
@@ -878,7 +878,7 @@
     </message>
     <message>
         <source>&lt;b&gt;Conference:&lt;/b&gt; %1</source>
-        <translation>&lt;b&gt;Conférence :&lt;/b&gt; %1</translation>
+        <translation>&lt;b&gt;Conférence :&lt;/b&gt; %1</translation>
     </message>
     <message>
         <source>You are invited to the conference &lt;b&gt;%1&lt;/b&gt; by user &lt;b&gt;%2&lt;/b&gt;.</source>
@@ -886,7 +886,7 @@
     </message>
     <message>
         <source>Do you want to join to the conference?</source>
-        <translation>Voulez-vous rejoindre la conférence ?</translation>
+        <translation>Voulez-vous rejoindre la conférence ?</translation>
     </message>
     <message>
         <source>Invitation to Conference</source>
@@ -932,7 +932,7 @@
     </message>
     <message>
         <source>Enter new nickname:</source>
-        <translation>Saisissez le nouveau pseudonyme :</translation>
+        <translation>Saisissez le nouveau pseudonyme :</translation>
     </message>
     <message>
         <source>Error</source>
@@ -948,7 +948,7 @@
     </message>
     <message>
         <source>Enter password:</source>
-        <translation>Saisissez le mot de passe :</translation>
+        <translation>Saisissez le mot de passe :</translation>
     </message>
     <message>
         <source>User %1 requests a voice in the conference, %2</source>
@@ -984,7 +984,7 @@
     </message>
     <message>
         <source>Mention message in conference: %1</source>
-        <translation>Message de mention dans la conférence : %1</translation>
+        <translation>Message de mention dans la conférence : %1</translation>
     </message>
     <message>
         <source>Mention in conference</source>
@@ -992,7 +992,7 @@
     </message>
     <message>
         <source>New message in conference: %1</source>
-        <translation>Nouveau message dans la conférence : %1</translation>
+        <translation>Nouveau message dans la conférence : %1</translation>
     </message>
     <message>
         <source>Conference message</source>
@@ -1052,19 +1052,19 @@
     </message>
     <message>
         <source>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</source>
-        <translation>&lt;b&gt;Jabber ID :&lt;/b&gt; %1</translation>
+        <translation>&lt;b&gt;Jabber ID :&lt;/b&gt; %1</translation>
     </message>
     <message>
         <source>&lt;b&gt;Role:&lt;/b&gt; %1</source>
-        <translation>&lt;b&gt;Rôle :&lt;/b&gt; %1</translation>
+        <translation>&lt;b&gt;Rôle :&lt;/b&gt; %1</translation>
     </message>
     <message>
         <source>&lt;b&gt;Affiliation:&lt;/b&gt; %1</source>
-        <translation>&lt;b&gt;Affiliation :&lt;/b&gt; %1</translation>
+        <translation>&lt;b&gt;Affiliation :&lt;/b&gt; %1</translation>
     </message>
     <message>
         <source>&lt;b&gt;Status:&lt;/b&gt; %1</source>
-        <translation>&lt;b&gt;Statut :&lt;/b&gt; %1</translation>
+        <translation>&lt;b&gt;Statut :&lt;/b&gt; %1</translation>
     </message>
     <message>
         <source>Leaving conference...</source>
@@ -1196,7 +1196,7 @@
  /nick &lt;newnick&gt; 
  /leave [comment] 
  /topic &lt;foo&gt;</source>
-        <translation>Liste des commandes prises en charge : 
+        <translation>Liste des commandes prises en charge : 
  /ban &lt;roomnick&gt; [comment] 
  /invite &lt;jid&gt; [comment] 
  /join &lt;roomname&gt; [pass] 
@@ -1208,7 +1208,7 @@
     </message>
     <message>
         <source>Subject: %1</source>
-        <translation>Sujet : %1</translation>
+        <translation>Sujet : %1</translation>
     </message>
     <message>
         <source>This conference is non-anonymous</source>
@@ -1308,11 +1308,11 @@
     </message>
     <message>
         <source>You have left the conference: %1</source>
-        <translation>Vous avez quitté la conférence : %1</translation>
+        <translation>Vous avez quitté la conférence : %1</translation>
     </message>
     <message>
-        <source>Nickname &apos;%1&apos; is in use or registered by another user, you may %2 or %3</source>
-        <translation>Le pseudonyme « %1 » est utilisé ou enregistré par un autre utilisateur, vous pouvez %2 ou %3</translation>
+        <source>Nickname '%1' is in use or registered by another user, you may %2 or %3</source>
+        <translation>Le pseudonyme « %1 » est utilisé ou enregistré par un autre utilisateur, vous pouvez %2 ou %3</translation>
     </message>
     <message>
         <source>change nick</source>
@@ -1348,27 +1348,27 @@
     </message>
     <message>
         <source>You have left the conference due to error: %1</source>
-        <translation>Vous avez quitté la conférence en raison d'une erreur : %1</translation>
+        <translation>Vous avez quitté la conférence en raison d'une erreur : %1</translation>
     </message>
     <message>
         <source>Failed to change user role: %1</source>
-        <translation>Échec du changement de rôle de l'utilisateur : %1</translation>
+        <translation>Échec du changement de rôle de l'utilisateur : %1</translation>
     </message>
     <message>
         <source>Failed to change user affiliation: %1</source>
-        <translation>Échec du changement d'affiliation de l'utilisateur : %1</translation>
+        <translation>Échec du changement d'affiliation de l'utilisateur : %1</translation>
     </message>
     <message>
         <source>Failed to load conference configuration: %1</source>
-        <translation>Échec du chargement de la configuration de la conférence : %1</translation>
+        <translation>Échec du chargement de la configuration de la conférence : %1</translation>
     </message>
     <message>
         <source>Failed to update conference configuration: %1</source>
-        <translation>Échec de la mise à jour de la configuration de la conférence : %1</translation>
+        <translation>Échec de la mise à jour de la configuration de la conférence : %1</translation>
     </message>
     <message>
         <source>Failed to destroy this conference: %1</source>
-        <translation>Échec de la destruction de cette conférence : %1</translation>
+        <translation>Échec de la destruction de cette conférence : %1</translation>
     </message>
     <message>
         <source>Your nickname changed to %1</source>
@@ -1376,7 +1376,7 @@
     </message>
     <message>
         <source>Failed to change your nickname to %1: %2</source>
-        <translation>Échec du changement de votre pseudonyme en %1 : %2</translation>
+        <translation>Échec du changement de votre pseudonyme en %1 : %2</translation>
     </message>
     <message numerus="yes">
         <source>You invited %1 and %n other contact(s) to this conference. %2</source>
@@ -1396,13 +1396,13 @@
     <message numerus="yes">
         <source>Failed to invite %1 and %n other contact(s) to this conference: %2</source>
         <translation>
-            <numerusform>Échec de l'invitation de %1 et %n autre contact à cette conférence : %2</numerusform>
-            <numerusform>Échec de l'invitation de %1 et %n autres contacts à cette conférence : %2</numerusform>
+            <numerusform>Échec de l'invitation de %1 et %n autre contact à cette conférence : %2</numerusform>
+            <numerusform>Échec de l'invitation de %1 et %n autres contacts à cette conférence : %2</numerusform>
         </translation>
     </message>
     <message>
         <source>Failed to invite %1 to this conference: %2</source>
-        <translation>Échec de l'invitation de %1 à cette conférence : %2</translation>
+        <translation>Échec de l'invitation de %1 à cette conférence : %2</translation>
     </message>
     <message>
         <source>%1 &lt;%2&gt; has joined</source>
@@ -1458,7 +1458,7 @@
     </message>
     <message>
         <source>Enter new topic:</source>
-        <translation>Saisissez le nouveau sujet :</translation>
+        <translation>Saisissez le nouveau sujet :</translation>
     </message>
     <message>
         <source>You already have a voice in the conference</source>
@@ -1474,7 +1474,7 @@
     </message>
     <message>
         <source>Enter a message:</source>
-        <translation>Saisissez un message :</translation>
+        <translation>Saisissez un message :</translation>
     </message>
     <message>
         <source>Kick User - %1</source>
@@ -1486,7 +1486,7 @@
     </message>
     <message>
         <source>Failed to load history: %1</source>
-        <translation>Échec du chargement de l'historique : %1</translation>
+        <translation>Échec du chargement de l'historique : %1</translation>
     </message>
 </context>
 <context>
@@ -1505,7 +1505,7 @@
     </message>
     <message>
         <source>Join to the conference:</source>
-        <translation>Rejoindre la conférence :</translation>
+        <translation>Rejoindre la conférence :</translation>
     </message>
     <message>
         <source>Select a conference from the list or explicitly specify the name of the hidden one</source>
@@ -1521,7 +1521,7 @@
     </message>
     <message>
         <source>Create the conference:</source>
-        <translation>Créer la conférence :</translation>
+        <translation>Créer la conférence :</translation>
     </message>
     <message>
         <source>Enter unique name for the new conference</source>
@@ -1553,19 +1553,19 @@
     </message>
     <message>
         <source>Failed to load conference description: %1</source>
-        <translation>Échec du chargement de la description de la conférence : %1</translation>
+        <translation>Échec du chargement de la description de la conférence : %1</translation>
     </message>
     <message>
-        <source>Conference &apos;%1@%2&apos; already exists, choose another name</source>
-        <translation>La conférence « %1@%2 » existe déjà, choisissez un autre nom</translation>
+        <source>Conference '%1@%2' already exists, choose another name</source>
+        <translation>La conférence « %1@%2 » existe déjà, choisissez un autre nom</translation>
     </message>
     <message>
         <source>Failed to check conference existence: %1</source>
-        <translation>Échec de la vérification de l'existence de la conférence : %1</translation>
+        <translation>Échec de la vérification de l'existence de la conférence : %1</translation>
     </message>
     <message>
         <source>Failed to load list of conferences: %1</source>
-        <translation>Échec du chargement de la liste des conférences : %1</translation>
+        <translation>Échec du chargement de la liste des conférences : %1</translation>
     </message>
 </context>
 <context>
@@ -1580,15 +1580,15 @@
     </message>
     <message>
         <source>Account:</source>
-        <translation>Compte :</translation>
+        <translation>Compte :</translation>
     </message>
     <message>
         <source>Server:</source>
-        <translation>Serveur :</translation>
+        <translation>Serveur :</translation>
     </message>
     <message>
         <source>Service:</source>
-        <translation>Service :</translation>
+        <translation>Service :</translation>
     </message>
     <message>
         <source>Select account, server and service to join to the conference</source>
@@ -1600,11 +1600,11 @@
     </message>
     <message>
         <source>You can join to the conference located at almost any Jabber-server, select one from the list or add your own</source>
-        <translation>Vous pouvez rejoindre une conférence hébergée sur presque n'importe quel serveur Jabber ; sélectionnez-en un dans la liste ou ajoutez le vôtre</translation>
+        <translation>Vous pouvez rejoindre une conférence hébergée sur presque n'importe quel serveur Jabber ; sélectionnez-en un dans la liste ou ajoutez le vôtre</translation>
     </message>
     <message>
         <source>Each Jabber-server can have multiple conference services, select one of the available</source>
-        <translation>Chaque serveur Jabber peut proposer plusieurs services de conférence ; sélectionnez l'un des services disponibles</translation>
+        <translation>Chaque serveur Jabber peut proposer plusieurs services de conférence ; sélectionnez l'un des services disponibles</translation>
     </message>
     <message>
         <source>Select account, server, and service to create the conference</source>
@@ -1616,7 +1616,7 @@
     </message>
     <message>
         <source>You can create a conference at almost any Jabber-server, select one from the list or add your own</source>
-        <translation>Vous pouvez créer une conférence sur presque n'importe quel serveur Jabber ; sélectionnez-en un dans la liste ou ajoutez le vôtre</translation>
+        <translation>Vous pouvez créer une conférence sur presque n'importe quel serveur Jabber ; sélectionnez-en un dans la liste ou ajoutez le vôtre</translation>
     </message>
     <message>
         <source>Searching for conference services (%1)...</source>
@@ -1644,11 +1644,11 @@
     </message>
     <message>
         <source>Enter server domain:</source>
-        <translation>Saisissez le domaine du serveur :</translation>
+        <translation>Saisissez le domaine du serveur :</translation>
     </message>
     <message>
         <source>Failed to load a list of services: %1</source>
-        <translation>Échec du chargement de la liste des services : %1</translation>
+        <translation>Échec du chargement de la liste des services : %1</translation>
     </message>
 </context>
 </TS>

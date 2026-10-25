@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -44,19 +44,19 @@
     <name>ConnectionOptionsWidgetClass</name>
     <message>
         <source>Host:</source>
-        <translation>Hôte :</translation>
+        <translation>Hôte :</translation>
     </message>
     <message>
         <source>Port:</source>
-        <translation>Port :</translation>
+        <translation>Port :</translation>
     </message>
     <message>
         <source>SSL Protocol:</source>
-        <translation>Protocole SSL :</translation>
+        <translation>Protocole SSL :</translation>
     </message>
     <message>
         <source>Certificate:</source>
-        <translation>Certificat :</translation>
+        <translation>Certificat :</translation>
     </message>
     <message>
         <source>Use legacy SSL connection</source>
@@ -79,51 +79,51 @@
     </message>
     <message>
         <source>Name: %1</source>
-        <translation>Nom : %1</translation>
+        <translation>Nom : %1</translation>
     </message>
     <message>
         <source>Organization: %1</source>
-        <translation>Organisation : %1</translation>
+        <translation>Organisation : %1</translation>
     </message>
     <message>
         <source>Subunit: %1</source>
-        <translation>Sous-unité : %1</translation>
+        <translation>Sous-unité : %1</translation>
     </message>
     <message>
         <source>Country: %1</source>
-        <translation>Pays : %1</translation>
+        <translation>Pays : %1</translation>
     </message>
     <message>
         <source>Locality: %1</source>
-        <translation>Localité : %1</translation>
+        <translation>Localité : %1</translation>
     </message>
     <message>
         <source>State/Province: %1</source>
-        <translation>État/Région : %1</translation>
+        <translation>État/Région : %1</translation>
     </message>
     <message>
         <source>Certificate holder:</source>
-        <translation>Titulaire du certificat :</translation>
+        <translation>Titulaire du certificat :</translation>
     </message>
     <message>
         <source>Certificate issuer:</source>
-        <translation>Émetteur du certificat :</translation>
+        <translation>Émetteur du certificat :</translation>
     </message>
     <message>
         <source>Certificate details:</source>
-        <translation>Détails du certificat :</translation>
+        <translation>Détails du certificat :</translation>
     </message>
     <message>
         <source>Effective from: %1</source>
-        <translation>Valide à partir du : %1</translation>
+        <translation>Valide à partir du : %1</translation>
     </message>
     <message>
         <source>Expired at: %1</source>
-        <translation>Expire le : %1</translation>
+        <translation>Expire le : %1</translation>
     </message>
     <message>
         <source>Serial number: %1</source>
-        <translation>Numéro de série : %1</translation>
+        <translation>Numéro de série : %1</translation>
     </message>
     <message>
         <source>SSL Authentication Error</source>
@@ -131,7 +131,7 @@
     </message>
     <message>
         <source>Connection to &lt;b&gt;%1&lt;/b&gt; can not be considered completely safe due to errors in servers certificate check:</source>
-        <translation>La connexion à &lt;b&gt;%1&lt;/b&gt; ne peut pas être considérée comme totalement sûre en raison d'erreurs lors de la vérification du certificat du serveur :</translation>
+        <translation>La connexion à &lt;b&gt;%1&lt;/b&gt; ne peut pas être considérée comme totalement sûre en raison d'erreurs lors de la vérification du certificat du serveur :</translation>
     </message>
     <message>
         <source>Disconnect</source>

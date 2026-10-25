@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="uk" sourcelanguage="en">
 <context>
@@ -29,7 +29,7 @@
     </message>
     <message>
         <source>Allows to initiate a custom stream of data between two XMPP entities</source>
-        <translation>Дозволяє ініціювати довільній потік даних між двома XMPP сутностями</translation>
+        <translation>Дозволяє ініціювати довільний потік даних між двома сутностями XMPP</translation>
     </message>
     <message>
         <source>Supports the initiating of the custom stream of data between two XMPP entities</source>

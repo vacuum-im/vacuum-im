@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -56,8 +56,8 @@
         <translation>&lt;toute stanza&gt;</translation>
     </message>
     <message>
-        <source>%1: if %2 = &apos;%3&apos; then %4 [%5 ]</source>
-        <translation>%1 : si %2 = « %3 » alors %4 [%5 ]</translation>
+        <source>%1: if %2 = '%3' then %4 [%5 ]</source>
+        <translation>%1 : si %2 = « %3 » alors %4 [%5 ]</translation>
     </message>
     <message>
         <source>&lt;action&gt;</source>
@@ -65,27 +65,27 @@
     </message>
     <message>
         <source>%1: always %2 [%3 ]</source>
-        <translation>%1 : toujours %2 [%3 ]</translation>
+        <translation>%1 : toujours %2 [%3 ]</translation>
     </message>
     <message>
         <source>Privacy List Error</source>
         <translation>Erreur de liste de confidentialité</translation>
     </message>
     <message>
-        <source>Privacy list &apos;%1&apos; could not be active: %2</source>
-        <translation>Échec de l'activation de la liste de confidentialité « %1 » : %2</translation>
+        <source>Privacy list '%1' could not be active: %2</source>
+        <translation>Échec de l'activation de la liste de confidentialité « %1 » : %2</translation>
     </message>
     <message>
-        <source>Privacy list &apos;%1&apos; could not be default: %2</source>
-        <translation>Échec de la définition de la liste de confidentialité « %1 » comme liste par défaut : %2</translation>
+        <source>Privacy list '%1' could not be default: %2</source>
+        <translation>Échec de la définition de la liste de confidentialité « %1 » comme liste par défaut : %2</translation>
     </message>
     <message>
-        <source>Privacy list &apos;%1&apos; could not be saved: %2</source>
-        <translation>Échec de l'enregistrement de la liste de confidentialité « %1 » : %2</translation>
+        <source>Privacy list '%1' could not be saved: %2</source>
+        <translation>Échec de l'enregistrement de la liste de confidentialité « %1 » : %2</translation>
     </message>
     <message>
-        <source>Privacy list &apos;%1&apos; could not be removed: %2</source>
-        <translation>Échec de la suppression de la liste de confidentialité « %1 » : %2</translation>
+        <source>Privacy list '%1' could not be removed: %2</source>
+        <translation>Échec de la suppression de la liste de confidentialité « %1 » : %2</translation>
     </message>
     <message>
         <source>New Privacy List</source>
@@ -93,15 +93,15 @@
     </message>
     <message>
         <source>Enter list name:</source>
-        <translation>Saisissez le nom de la liste :</translation>
+        <translation>Saisissez le nom de la liste :</translation>
     </message>
     <message>
         <source>Remove Privacy List</source>
         <translation>Supprimer la liste de confidentialité</translation>
     </message>
     <message>
-        <source>Are you really want to delete privacy list &apos;%1&apos; with rules?</source>
-        <translation>Voulez-vous vraiment supprimer la liste de confidentialité « %1 » et ses règles ?</translation>
+        <source>Are you really want to delete privacy list '%1' with rules?</source>
+        <translation>Voulez-vous vraiment supprimer la liste de confidentialité « %1 » et ses règles ?</translation>
     </message>
     <message>
         <source>none</source>
@@ -132,11 +132,11 @@
     </message>
     <message>
         <source>Default:</source>
-        <translation>Par défaut :</translation>
+        <translation>Par défaut :</translation>
     </message>
     <message>
         <source>Active:</source>
-        <translation>Active :</translation>
+        <translation>Active :</translation>
     </message>
     <message>
         <source>Edit lists</source>
@@ -271,11 +271,11 @@
     </message>
     <message>
         <source>&lt;b&gt;Privacy settings:&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Paramètres de confidentialité :&lt;/b&gt;</translation>
+        <translation>&lt;b&gt;Paramètres de confidentialité :&lt;/b&gt;</translation>
     </message>
     <message>
         <source>- queries: %1</source>
-        <translation>- requêtes : %1</translation>
+        <translation>- requêtes : %1</translation>
     </message>
     <message>
         <source>&lt;b&gt;denied&lt;/b&gt;</source>
@@ -287,15 +287,15 @@
     </message>
     <message>
         <source>- messages: %1</source>
-        <translation>- messages : %1</translation>
+        <translation>- messages : %1</translation>
     </message>
     <message>
         <source>- presences in: %1</source>
-        <translation>- présences entrantes : %1</translation>
+        <translation>- présences entrantes : %1</translation>
     </message>
     <message>
         <source>- presences out: %1</source>
-        <translation>- présences sortantes : %1</translation>
+        <translation>- présences sortantes : %1</translation>
     </message>
 </context>
 </TS>

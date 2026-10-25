@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -69,7 +69,7 @@
     </message>
     <message>
         <source>Failed to save archive preferences: %1</source>
-        <translation>Échec de l'enregistrement des préférences d'archive : %1</translation>
+        <translation>Échec de l'enregistrement des préférences d'archive : %1</translation>
     </message>
     <message>
         <source>Preferences accepted</source>
@@ -81,15 +81,15 @@
     </message>
     <message>
         <source>Enter item JID:</source>
-        <translation>Saisissez le JID de l'élément :</translation>
+        <translation>Saisissez le JID de l'élément :</translation>
     </message>
     <message>
         <source>Unacceptable item JID</source>
         <translation>JID d'élément inacceptable</translation>
     </message>
     <message>
-        <source>&apos;%1&apos; is not valid JID or already exists</source>
-        <translation>« %1 » n'est pas un JID valide ou existe déjà</translation>
+        <source>'%1' is not valid JID or already exists</source>
+        <translation>« %1 » n'est pas un JID valide ou existe déjà</translation>
     </message>
 </context>
 <context>
@@ -108,15 +108,15 @@
     </message>
     <message>
         <source>Save history in a local archive?</source>
-        <translation>Enregistrer l'historique dans une archive locale ?</translation>
+        <translation>Enregistrer l'historique dans une archive locale ?</translation>
     </message>
     <message>
         <source>Save history on server?</source>
-        <translation>Enregistrer l'historique sur le serveur ?</translation>
+        <translation>Enregistrer l'historique sur le serveur ?</translation>
     </message>
     <message>
         <source>Copy local archive to the server?</source>
-        <translation>Copier l'archive locale vers le serveur ?</translation>
+        <translation>Copier l'archive locale vers le serveur ?</translation>
     </message>
     <message>
         <source>Default archiving preferences</source>
@@ -124,15 +124,15 @@
     </message>
     <message>
         <source>Message archiving:</source>
-        <translation>Archivage des messages :</translation>
+        <translation>Archivage des messages :</translation>
     </message>
     <message>
         <source>Off-The-Record sessions:</source>
-        <translation>Sessions Off-The-Record :</translation>
+        <translation>Sessions Off-The-Record :</translation>
     </message>
     <message>
         <source>Remove messages after, days:</source>
-        <translation>Supprimer les messages après (jours) :</translation>
+        <translation>Supprimer les messages après (jours) :</translation>
     </message>
     <message>
         <source>(0 - do not remove)</source>
@@ -326,7 +326,7 @@
     </message>
     <message>
         <source>Failed to load conversation headers: %1</source>
-        <translation>Échec du chargement des en-têtes de conversation : %1</translation>
+        <translation>Échec du chargement des en-têtes de conversation : %1</translation>
     </message>
     <message>
         <source>Select conversation to show</source>
@@ -349,7 +349,7 @@
     </message>
     <message>
         <source>Failed to load conversations: %1</source>
-        <translation>Échec du chargement des conversations : %1</translation>
+        <translation>Échec du chargement des conversations : %1</translation>
     </message>
     <message>
         <source>Archive is not accessible</source>
@@ -380,15 +380,15 @@
     </message>
     <message>
         <source>with &lt;b&gt;%1&lt;/b&gt; for &lt;b&gt;%2 %3&lt;/b&gt;?</source>
-        <translation>avec &lt;b&gt;%1&lt;/b&gt; pour &lt;b&gt;%2 %3&lt;/b&gt; ?</translation>
+        <translation>avec &lt;b&gt;%1&lt;/b&gt; pour &lt;b&gt;%2 %3&lt;/b&gt; ?</translation>
     </message>
     <message>
         <source>with &lt;b&gt;%1&lt;/b&gt; started at &lt;b&gt;%2&lt;/b&gt;?</source>
-        <translation>avec &lt;b&gt;%1&lt;/b&gt; commencée le &lt;b&gt;%2&lt;/b&gt; ?</translation>
+        <translation>avec &lt;b&gt;%1&lt;/b&gt; commencée le &lt;b&gt;%2&lt;/b&gt; ?</translation>
     </message>
     <message>
         <source>with &lt;b&gt;%1&lt;/b&gt; for all time?</source>
-        <translation>avec &lt;b&gt;%1&lt;/b&gt; pour toute la période ?</translation>
+        <translation>avec &lt;b&gt;%1&lt;/b&gt; pour toute la période ?</translation>
     </message>
     <message numerus="yes">
         <source>And %n other conversation(s)</source>
@@ -403,7 +403,7 @@
     </message>
     <message>
         <source>Do you want to remove the following conversations?</source>
-        <translation>Voulez-vous supprimer les conversations suivantes ?</translation>
+        <translation>Voulez-vous supprimer les conversations suivantes ?</translation>
     </message>
     <message>
         <source>Removing conversations...</source>
@@ -411,7 +411,7 @@
     </message>
     <message>
         <source>Failed to remove conversations: %1</source>
-        <translation>Échec de la suppression des conversations : %1</translation>
+        <translation>Échec de la suppression des conversations : %1</translation>
     </message>
     <message>
         <source>Remove Selected Conversations</source>
@@ -486,7 +486,7 @@
     </message>
     <message>
         <source>Failed to change archive preferences: %1</source>
-        <translation>Échec de la modification des préférences d'archive : %1</translation>
+        <translation>Échec de la modification des préférences d'archive : %1</translation>
     </message>
 </context>
 <context>
@@ -650,7 +650,7 @@
     </message>
     <message>
         <source>Session negotiated: message logging %1</source>
-        <translation>Session négociée : journalisation des messages %1</translation>
+        <translation>Session négociée : journalisation des messages %1</translation>
     </message>
     <message>
         <source>disallowed</source>
@@ -666,7 +666,7 @@
     </message>
     <message>
         <source>Session failed: %1</source>
-        <translation>Échec de la session : %1</translation>
+        <translation>Échec de la session : %1</translation>
     </message>
 </context>
 </TS>

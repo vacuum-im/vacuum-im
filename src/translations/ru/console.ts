@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="ru" sourcelanguage="en">
 <context>
@@ -36,7 +36,7 @@
     </message>
     <message>
         <source>Stanza is not well formed.</source>
-        <translation>Станза не верно сформирована.</translation>
+        <translation>Станза сформирована некорректно.</translation>
     </message>
     <message>
         <source>XML is not well formed.</source>

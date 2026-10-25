@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -29,7 +29,7 @@
     </message>
     <message>
         <source>Accept the Invitation?</source>
-        <translation>Accepter l'invitation ?</translation>
+        <translation>Accepter l'invitation ?</translation>
     </message>
     <message>
         <source>Another Resource</source>
@@ -41,11 +41,11 @@
     </message>
     <message>
         <source>Enable Chat State Notifications?</source>
-        <translation>Activer les notifications d'état de conversation ?</translation>
+        <translation>Activer les notifications d'état de conversation ?</translation>
     </message>
     <message>
         <source>Enable XHTML-IM formatting?</source>
-        <translation>Activer le formatage XHTML-IM ?</translation>
+        <translation>Activer le formatage XHTML-IM ?</translation>
     </message>
     <message>
         <source>Primary Written Language of the Chat</source>
@@ -53,11 +53,11 @@
     </message>
     <message>
         <source>Enable Message Loggings?</source>
-        <translation>Activer la journalisation des messages ?</translation>
+        <translation>Activer la journalisation des messages ?</translation>
     </message>
     <message>
         <source>Renegotiate the Session?</source>
-        <translation>Renégocier la session ?</translation>
+        <translation>Renégocier la session ?</translation>
     </message>
     <message>
         <source>Minimum Security Level</source>
@@ -65,15 +65,15 @@
     </message>
     <message>
         <source>Terminate the Session?</source>
-        <translation>Terminer la session ?</translation>
+        <translation>Terminer la session ?</translation>
     </message>
     <message>
         <source>Enable Message Receipts?</source>
-        <translation>Activer les accusés de réception des messages ?</translation>
+        <translation>Activer les accusés de réception des messages ?</translation>
     </message>
     <message>
         <source>Allow multiple sessions?</source>
-        <translation>Autoriser plusieurs sessions ?</translation>
+        <translation>Autoriser plusieurs sessions ?</translation>
     </message>
     <message>
         <source>Session renegotiation</source>
@@ -93,15 +93,15 @@
     </message>
     <message>
         <source>Do you accept this session settings?</source>
-        <translation>Acceptez-vous ces paramètres de session ?</translation>
+        <translation>Acceptez-vous ces paramètres de session ?</translation>
     </message>
     <message>
         <source>Accept this session?</source>
-        <translation>Accepter cette session ?</translation>
+        <translation>Accepter cette session ?</translation>
     </message>
     <message>
         <source>Renegotiate this session?</source>
-        <translation>Renégocier cette session ?</translation>
+        <translation>Renégocier cette session ?</translation>
     </message>
     <message>
         <source>Supports the negotiating of the stanza session between two XMPP entities</source>

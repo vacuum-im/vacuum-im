@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="de" sourcelanguage="en">
 <context>
@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>Allows other modules to send and receive XMPP stanzas</source>
-        <translation>Erlaubt anderen Modulen das senden und empfangen von XMPP Stanzas</translation>
+        <translation>Ermöglicht anderen Modulen, XMPP-Stanzas zu senden und zu empfangen</translation>
     </message>
 </context>
 </TS>

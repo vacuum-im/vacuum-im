@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -83,7 +83,7 @@
     </message>
     <message>
         <source>You can insert date and time into auto status text:</source>
-        <translation>Vous pouvez insérer la date et l'heure dans le texte du statut automatique :</translation>
+        <translation>Vous pouvez insérer la date et l'heure dans le texte du statut automatique :</translation>
     </message>
     <message>
         <source>   %(&lt;format&gt;) - current date and time</source>
@@ -99,7 +99,7 @@
     </message>
     <message>
         <source>Date Format:</source>
-        <translation>Format de date :</translation>
+        <translation>Format de date :</translation>
     </message>
     <message>
         <source>   d - the day as number without a leading zero (1 to 31)</source>
@@ -110,12 +110,12 @@
         <translation>   dd - le jour comme nombre avec zéro initial (01 à 31)</translation>
     </message>
     <message>
-        <source>   ddd - the abbreviated localized day name (e.g. &apos;Mon&apos; to &apos;Sun&apos;)</source>
-        <translation>   ddd - le nom abrégé du jour localisé (p. ex. « lun » à « dim »)</translation>
+        <source>   ddd - the abbreviated localized day name (e.g. 'Mon' to 'Sun')</source>
+        <translation>   ddd - le nom abrégé du jour localisé (p. ex. « lun » à « dim »)</translation>
     </message>
     <message>
-        <source>   dddd - the long localized day name (e.g. &apos;Monday&apos; to &apos;Sunday&apos;)</source>
-        <translation>   dddd - le nom complet du jour localisé (p. ex. « lundi » à « dimanche »)</translation>
+        <source>   dddd - the long localized day name (e.g. 'Monday' to 'Sunday')</source>
+        <translation>   dddd - le nom complet du jour localisé (p. ex. « lundi » à « dimanche »)</translation>
     </message>
     <message>
         <source>   M - the month as number without a leading zero (1-12)</source>
@@ -126,12 +126,12 @@
         <translation>   MM - le mois comme nombre avec zéro initial (01-12)</translation>
     </message>
     <message>
-        <source>   MMM - the abbreviated localized month name (e.g. &apos;Jan&apos; to &apos;Dec&apos;)</source>
-        <translation>   MMM - le nom abrégé du mois localisé (p. ex. « janv. » à « déc. »)</translation>
+        <source>   MMM - the abbreviated localized month name (e.g. 'Jan' to 'Dec')</source>
+        <translation>   MMM - le nom abrégé du mois localisé (p. ex. « janv. » à « déc. »)</translation>
     </message>
     <message>
-        <source>   MMMM - the long localized month name (e.g. &apos;January&apos; to &apos;December&apos;)</source>
-        <translation>   MMMM - le nom complet du mois localisé (p. ex. « janvier » à « décembre »)</translation>
+        <source>   MMMM - the long localized month name (e.g. 'January' to 'December')</source>
+        <translation>   MMMM - le nom complet du mois localisé (p. ex. « janvier » à « décembre »)</translation>
     </message>
     <message>
         <source>   yy - the year as two digit number (00-99)</source>
@@ -143,7 +143,7 @@
     </message>
     <message>
         <source>Time Format:</source>
-        <translation>Format d'heure :</translation>
+        <translation>Format d'heure :</translation>
     </message>
     <message>
         <source>   h - the hour without a leading zero (0 to 23 or 1 to 12 if AM/PM display)</source>
@@ -186,20 +186,20 @@
         <translation>   zzz - les millisecondes avec zéros initiaux (000 à 999)</translation>
     </message>
     <message>
-        <source>   AP or A - interpret as an AM/PM time. AP must be either &apos;AM&apos; or &apos;PM&apos;</source>
-        <translation>   AP ou A - interpréter comme une heure AM/PM. AP doit être « AM » ou « PM »</translation>
+        <source>   AP or A - interpret as an AM/PM time. AP must be either 'AM' or 'PM'</source>
+        <translation>   AP ou A - interpréter comme une heure AM/PM. AP doit être « AM » ou « PM »</translation>
     </message>
     <message>
-        <source>   ap or a - interpret as an AM/PM time. ap must be either &apos;am&apos; or &apos;pm&apos;</source>
-        <translation>   ap ou a - interpréter comme une heure AM/PM. ap doit être « am » ou « pm »</translation>
+        <source>   ap or a - interpret as an AM/PM time. ap must be either 'am' or 'pm'</source>
+        <translation>   ap ou a - interpréter comme une heure AM/PM. ap doit être « am » ou « pm »</translation>
     </message>
     <message>
         <source>Example:</source>
-        <translation>Exemple :</translation>
+        <translation>Exemple :</translation>
     </message>
     <message>
-        <source>   Status is set to &apos;away&apos; at %(hh:mm:ss), because of idle from $(hh:mm:ss) for #(mm) minutes and #(ss) seconds</source>
-        <translation>   Le statut est défini sur « absent » à %(hh:mm:ss), en raison d'une inactivité depuis $(hh:mm:ss) pendant #(mm) minutes et #(ss) secondes</translation>
+        <source>   Status is set to 'away' at %(hh:mm:ss), because of idle from $(hh:mm:ss) for #(mm) minutes and #(ss) seconds</source>
+        <translation>   Le statut est défini sur « absent » à %(hh:mm:ss), en raison d'une inactivité depuis $(hh:mm:ss) pendant #(mm) minutes et #(ss) secondes</translation>
     </message>
 </context>
 <context>
@@ -218,7 +218,7 @@
     </message>
     <message>
         <source>of inactivity with message:</source>
-        <translation>d'inactivité avec le message :</translation>
+        <translation>d'inactivité avec le message :</translation>
     </message>
     <message>
         <source>Automatically disconnect after</source>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="uk" sourcelanguage="en">
 <context>
@@ -28,7 +28,7 @@
     </message>
     <message>
         <source>Name</source>
-        <translation>Ім&apos;я</translation>
+        <translation>Ім'я</translation>
     </message>
     <message>
         <source>Features:</source>
@@ -51,7 +51,7 @@
     <name>DiscoItemsModel</name>
     <message>
         <source>Name</source>
-        <translation>Ім&apos;я</translation>
+        <translation>Ім'я</translation>
     </message>
     <message>
         <source>Jid</source>
@@ -66,8 +66,8 @@
         <translation>&lt;li&gt;&lt;b&gt;Елемент:&lt;/b&gt;&lt;/li&gt;</translation>
     </message>
     <message>
-        <source>&lt;li&gt;%1 (Category: &apos;%2&apos;; Type: &apos;%3&apos;)&lt;/li&gt;</source>
-        <translation>&lt;li&gt;%1 (Категорія: &apos;%2&apos;; Тип: &apos;%3&apos;)&lt;/li&gt;</translation>
+        <source>&lt;li&gt;%1 (Category: '%2'; Type: '%3')&lt;/li&gt;</source>
+        <translation>&lt;li&gt;%1 (Категорія: '%2'; Тип: '%3')&lt;/li&gt;</translation>
     </message>
     <message>
         <source>&lt;li&gt;&lt;b&gt;Features:&lt;/b&gt;&lt;/li&gt;</source>
@@ -156,11 +156,11 @@
     </message>
     <message>
         <source>Entity Capabilities</source>
-        <translation>Можливості об&apos;єкту</translation>
+        <translation>Можливості об'єкту</translation>
     </message>
     <message>
         <source>Allows to receive information about Jabber entities</source>
-        <translation>Дозволяє отримувати інформацію про джаббер сутності</translation>
+        <translation>Дозволяє отримувати інформацію про сутності Jabber</translation>
     </message>
     <message>
         <source>Supports the exchange of the discovery information and items</source>

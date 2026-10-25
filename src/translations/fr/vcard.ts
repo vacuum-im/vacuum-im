@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -36,7 +36,7 @@
     </message>
     <message>
         <source>Size: %1 Kb</source>
-        <translation>Taille : %1 Ko</translation>
+        <translation>Taille : %1 Ko</translation>
     </message>
     <message>
         <source>Error</source>
@@ -44,11 +44,11 @@
     </message>
     <message>
         <source>Failed to publish your profile: %1</source>
-        <translation>Échec de la publication de votre profil : %1</translation>
+        <translation>Échec de la publication de votre profil : %1</translation>
     </message>
     <message>
         <source>Failed to load profile: %1</source>
-        <translation>Échec du chargement du profil : %1</translation>
+        <translation>Échec du chargement du profil : %1</translation>
     </message>
     <message>
         <source>Save image</source>
@@ -68,11 +68,11 @@
     </message>
     <message>
         <source>EMail:</source>
-        <translation>E-mail :</translation>
+        <translation>E-mail :</translation>
     </message>
     <message>
         <source>Phone:</source>
-        <translation>Téléphone :</translation>
+        <translation>Téléphone :</translation>
     </message>
     <message>
         <source>Failed to publish your profile.</source>

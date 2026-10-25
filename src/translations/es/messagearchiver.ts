@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="es" sourcelanguage="en">
 <context>
@@ -84,8 +84,8 @@
         <translation>JID incorrecto</translation>
     </message>
     <message>
-        <source>&apos;%1&apos; is not valid JID or already exists</source>
-        <translation>&apos;%1&apos; es un JID inválido o ya existe</translation>
+        <source>'%1' is not valid JID or already exists</source>
+        <translation>'%1' es un JID inválido o ya existe</translation>
     </message>
     <message>
         <source>Preferences accepted</source>
@@ -275,11 +275,11 @@
     </message>
     <message>
         <source>Loading conversation headers...</source>
-        <translation>Cargando titulares de conversación...</translation>
+        <translation>Cargando encabezados de conversación...</translation>
     </message>
     <message>
         <source>Failed to load conversation headers: %1</source>
-        <translation>Error al cargar los titulares de conversación: %1</translation>
+        <translation>Error al cargar los encabezados de conversación: %1</translation>
     </message>
     <message>
         <source>Loading conversations...</source>
@@ -350,7 +350,7 @@
     </message>
     <message>
         <source>Conversation headers are not found</source>
-        <translation>No se encuentran las cabeceras de conversaciones</translation>
+        <translation>No se encuentran los encabezados de conversación</translation>
     </message>
     <message>
         <source>Retry</source>
@@ -370,7 +370,7 @@
     </message>
     <message>
         <source>&lt;b&gt;%1&lt;/b&gt; with %2 in %3</source>
-        <translation>b&gt;%1&lt;/b&gt; con %2 en %3</translation>
+        <translation>&lt;b&gt;%1&lt;/b&gt; con %2 en %3</translation>
     </message>
     <message>
         <source>&lt;b&gt;%1&lt;/b&gt; in %2</source>
@@ -383,8 +383,8 @@
     <message numerus="yes">
         <source>%n conversation header(s) found</source>
         <translation>
-            <numerusform>Se encontró %n cabecera de conversación</numerusform>
-            <numerusform>Se encontraron %n cabeceras de conversación</numerusform>
+            <numerusform>Se encontró %n encabezado de conversación</numerusform>
+            <numerusform>Se encontraron %n encabezados de conversación</numerusform>
         </translation>
     </message>
     <message>
@@ -408,7 +408,7 @@
     </message>
     <message>
         <source>with &lt;b&gt;%1&lt;/b&gt; started at &lt;b&gt;%2&lt;/b&gt;?</source>
-        <translation>¿con &lt;b&gt;%1&lt;/b&gt; iniciada en &lt;b&gt;%2 %3&lt;/b&gt;?</translation>
+        <translation>¿con &lt;b&gt;%1&lt;/b&gt; iniciada en &lt;b&gt;%2&lt;/b&gt;?</translation>
     </message>
     <message>
         <source>with &lt;b&gt;%1&lt;/b&gt; for all time?</source>
@@ -436,7 +436,7 @@
     </message>
     <message>
         <source>Save Conversations to File</source>
-        <translation>Guardas las conversaciones a un archivo</translation>
+        <translation>Guardar las conversaciones en un archivo</translation>
     </message>
     <message>
         <source>Print...</source>

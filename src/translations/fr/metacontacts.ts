@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -10,8 +10,8 @@
     <message numerus="yes">
         <source>The following &lt;b&gt;%n contact(s)&lt;/b&gt; will be merged into metacontact:</source>
         <translation>
-            <numerusform>Le &lt;b&gt;%n contact&lt;/b&gt; suivant sera fusionné en un métacontact :</numerusform>
-            <numerusform>Les &lt;b&gt;%n contacts&lt;/b&gt; suivants seront fusionnés en un métacontact :</numerusform>
+            <numerusform>Le &lt;b&gt;%n contact&lt;/b&gt; suivant sera fusionné en un métacontact :</numerusform>
+            <numerusform>Les &lt;b&gt;%n contacts&lt;/b&gt; suivants seront fusionnés en un métacontact :</numerusform>
         </translation>
     </message>
 </context>
@@ -64,7 +64,7 @@
     </message>
     <message>
         <source>Enter name:</source>
-        <translation>Saisissez le nom :</translation>
+        <translation>Saisissez le nom :</translation>
     </message>
     <message>
         <source>Detach from Metacontact</source>

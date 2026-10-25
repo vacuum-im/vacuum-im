@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -12,8 +12,8 @@
         <translation>Veuillez m'autoriser à recevoir votre présence.</translation>
     </message>
     <message>
-        <source>* nested group delimiter - &apos;%1&apos;</source>
-        <translation>* délimiteur de groupes imbriqués - « %1 »</translation>
+        <source>* nested group delimiter - '%1'</source>
+        <translation>* délimiteur de groupes imbriqués - « %1 »</translation>
     </message>
     <message>
         <source>Chat</source>
@@ -52,23 +52,23 @@
         <translation>Le contact &lt;b&gt;%1&lt;/b&gt; existe déjà.</translation>
     </message>
     <message>
-        <source>Can&apos;t add contact &apos;&lt;b&gt;%1&lt;/b&gt;&apos; because it is not a valid Jabber ID</source>
-        <translation>Impossible d'ajouter le contact « &lt;b&gt;%1&lt;/b&gt; » car ce n'est pas un identifiant Jabber valide</translation>
+        <source>Can't add contact '&lt;b&gt;%1&lt;/b&gt;' because it is not a valid Jabber ID</source>
+        <translation>Impossible d'ajouter le contact « &lt;b&gt;%1&lt;/b&gt; » car ce n'est pas un identifiant Jabber valide</translation>
     </message>
 </context>
 <context>
     <name>AddContactDialogClass</name>
     <message>
         <source>Contact:</source>
-        <translation>Contact :</translation>
+        <translation>Contact :</translation>
     </message>
     <message>
         <source>Nick:</source>
-        <translation>Pseudonyme :</translation>
+        <translation>Pseudonyme :</translation>
     </message>
     <message>
         <source>Group:</source>
-        <translation>Groupe :</translation>
+        <translation>Groupe :</translation>
     </message>
     <message>
         <source>Subscription</source>
@@ -174,7 +174,7 @@
     </message>
     <message>
         <source>Are you sure you wish to remove a contact &lt;b&gt;%1&lt;/b&gt; from the roster?</source>
-        <translation>Êtes-vous sûr de vouloir supprimer le contact &lt;b&gt;%1&lt;/b&gt; de la liste de contacts ?</translation>
+        <translation>Êtes-vous sûr de vouloir supprimer le contact &lt;b&gt;%1&lt;/b&gt; de la liste de contacts ?</translation>
     </message>
     <message>
         <source>Subscribe for contact presence</source>
@@ -182,7 +182,7 @@
     </message>
     <message>
         <source>Are you sure you wish to subscribe for a contact &lt;b&gt;%1&lt;/b&gt; presence?</source>
-        <translation>Êtes-vous sûr de vouloir vous abonner à la présence du contact &lt;b&gt;%1&lt;/b&gt; ?</translation>
+        <translation>Êtes-vous sûr de vouloir vous abonner à la présence du contact &lt;b&gt;%1&lt;/b&gt; ?</translation>
     </message>
     <message>
         <source>Unsubscribe from contact presence</source>
@@ -190,7 +190,7 @@
     </message>
     <message>
         <source>Are you sure you wish to unsubscribe from a contact &lt;b&gt;%1&lt;/b&gt; presence?</source>
-        <translation>Êtes-vous sûr de vouloir vous désabonner de la présence du contact &lt;b&gt;%1&lt;/b&gt; ?</translation>
+        <translation>Êtes-vous sûr de vouloir vous désabonner de la présence du contact &lt;b&gt;%1&lt;/b&gt; ?</translation>
     </message>
     <message>
         <source>%1 wants to subscribe to your presence.</source>
@@ -230,7 +230,7 @@
     </message>
     <message>
         <source>Enter name for: &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation>Saisissez le nom pour : &lt;b&gt;%1&lt;/b&gt;</translation>
+        <translation>Saisissez le nom pour : &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
         <source>Create Group</source>
@@ -238,7 +238,7 @@
     </message>
     <message>
         <source>Enter group name:</source>
-        <translation>Saisissez le nom du groupe :</translation>
+        <translation>Saisissez le nom du groupe :</translation>
     </message>
     <message>
         <source>Remove Contact</source>
@@ -251,8 +251,8 @@
     <message numerus="yes">
         <source>Are you sure you wish to remove &lt;b&gt;%n contact(s)&lt;/b&gt; from the roster?</source>
         <translation>
-            <numerusform>Êtes-vous sûr de vouloir supprimer &lt;b&gt;%n contact&lt;/b&gt; de la liste de contacts ?</numerusform>
-            <numerusform>Êtes-vous sûr de vouloir supprimer &lt;b&gt;%n contacts&lt;/b&gt; de la liste de contacts ?</numerusform>
+            <numerusform>Êtes-vous sûr de vouloir supprimer &lt;b&gt;%n contact&lt;/b&gt; de la liste de contacts ?</numerusform>
+            <numerusform>Êtes-vous sûr de vouloir supprimer &lt;b&gt;%n contacts&lt;/b&gt; de la liste de contacts ?</numerusform>
         </translation>
     </message>
     <message>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -31,11 +31,11 @@
     </message>
     <message>
         <source>Birthday tomorrow!</source>
-        <translation>Anniversaire demain !</translation>
+        <translation>Anniversaire demain !</translation>
     </message>
     <message>
         <source>Birthday today!</source>
-        <translation>Anniversaire aujourd'hui !</translation>
+        <translation>Anniversaire aujourd'hui !</translation>
     </message>
     <message numerus="yes">
         <source>%1 turns %n</source>
@@ -47,8 +47,8 @@
     <message numerus="yes">
         <source>Birthday in %n day(s)!</source>
         <translation>
-            <numerusform>Anniversaire dans %n jour !</numerusform>
-            <numerusform>Anniversaire dans %n jours !</numerusform>
+            <numerusform>Anniversaire dans %n jour !</numerusform>
+            <numerusform>Anniversaire dans %n jours !</numerusform>
         </translation>
     </message>
 </context>

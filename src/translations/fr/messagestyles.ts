@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -148,7 +148,7 @@
     </message>
     <message>
         <source>Subject: Message subject</source>
-        <translation>Objet : Sujet du message</translation>
+        <translation>Objet : Sujet du message</translation>
     </message>
     <message>
         <source>Message body line 1</source>
@@ -215,27 +215,27 @@
     <name>StyleSelectOptionsWidget</name>
     <message>
         <source>Chat:</source>
-        <translation>Discussion :</translation>
+        <translation>Discussion :</translation>
     </message>
     <message>
         <source>Conference:</source>
-        <translation>Conférence :</translation>
+        <translation>Conférence :</translation>
     </message>
     <message>
         <source>Message:</source>
-        <translation>Message :</translation>
+        <translation>Message :</translation>
     </message>
     <message>
         <source>Headline:</source>
-        <translation>Annonce :</translation>
+        <translation>Annonce :</translation>
     </message>
     <message>
         <source>Error:</source>
-        <translation>Erreur :</translation>
+        <translation>Erreur :</translation>
     </message>
     <message>
         <source>Unknown:</source>
-        <translation>Inconnu :</translation>
+        <translation>Inconnu :</translation>
     </message>
     <message>
         <source>Settings...</source>

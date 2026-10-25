@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -36,12 +36,12 @@
         <translation>Notifications</translation>
     </message>
     <message>
-        <source>Disable sounds and popup windows if status is &apos;Away&apos;</source>
-        <translation>Désactiver les sons et les fenêtres contextuelles si le statut est « Absent »</translation>
+        <source>Disable sounds and popup windows if status is 'Away'</source>
+        <translation>Désactiver les sons et les fenêtres contextuelles si le statut est « Absent »</translation>
     </message>
     <message>
-        <source>Disable sounds and popup windows if status is &apos;Do not disturb&apos;</source>
-        <translation>Désactiver les sons et les fenêtres contextuelles si le statut est « Ne pas déranger »</translation>
+        <source>Disable sounds and popup windows if status is 'Do not disturb'</source>
+        <translation>Désactiver les sons et les fenêtres contextuelles si le statut est « Ne pas déranger »</translation>
     </message>
     <message>
         <source>Play notification sound when received a message in the active window</source>
@@ -65,11 +65,11 @@
     </message>
     <message>
         <source>Time to display a pop-up window (0 - always visible):</source>
-        <translation>Durée d'affichage d'une fenêtre contextuelle (0 - toujours visible) :</translation>
+        <translation>Durée d'affichage d'une fenêtre contextuelle (0 - toujours visible) :</translation>
     </message>
     <message>
         <source>System command to play sound:</source>
-        <translation>Commande système pour jouer le son :</translation>
+        <translation>Commande système pour jouer le son :</translation>
     </message>
     <message>
         <source>Notification kinds</source>

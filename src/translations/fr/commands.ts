@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -25,19 +25,19 @@
     </message>
     <message>
         <source>Requested operation failed: %1</source>
-        <translation>Échec de l'opération demandée : %1</translation>
+        <translation>Échec de l'opération demandée : %1</translation>
     </message>
     <message>
-        <source>Executing command &apos;%1&apos; at %2</source>
-        <translation>Exécution de la commande « %1 » sur %2</translation>
+        <source>Executing command '%1' at %2</source>
+        <translation>Exécution de la commande « %1 » sur %2</translation>
     </message>
     <message>
         <source>Waiting for host response ...</source>
         <translation>En attente de la réponse du serveur...</translation>
     </message>
     <message>
-        <source>Error: Can&apos;t send request to host.</source>
-        <translation>Erreur : impossible d'envoyer la requête au serveur.</translation>
+        <source>Error: Can't send request to host.</source>
+        <translation>Erreur : impossible d'envoyer la requête au serveur.</translation>
     </message>
 </context>
 <context>

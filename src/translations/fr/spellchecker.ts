@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -12,8 +12,8 @@
         <translation>Surligne les mots susceptibles d'être mal orthographiés</translation>
     </message>
     <message>
-        <source>Add &apos;%1&apos; to Dictionary</source>
-        <translation>Ajouter « %1 » au dictionnaire</translation>
+        <source>Add '%1' to Dictionary</source>
+        <translation>Ajouter « %1 » au dictionnaire</translation>
     </message>
     <message>
         <source>Spell Check</source>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="de" sourcelanguage="en">
 <context>
@@ -66,8 +66,8 @@
         <translation>&lt;li&gt;&lt;b&gt;Identität:&lt;/b&gt;&lt;/li&gt;</translation>
     </message>
     <message>
-        <source>&lt;li&gt;%1 (Category: &apos;%2&apos;; Type: &apos;%3&apos;)&lt;/li&gt;</source>
-        <translation>&lt;li&gt;%1 (Kategorie: &apos;%2&apos;; Typ: &apos;%3&apos;)&lt;/li&gt;</translation>
+        <source>&lt;li&gt;%1 (Category: '%2'; Type: '%3')&lt;/li&gt;</source>
+        <translation>&lt;li&gt;%1 (Kategorie: '%2'; Typ: '%3')&lt;/li&gt;</translation>
     </message>
     <message>
         <source>&lt;li&gt;&lt;b&gt;Features:&lt;/b&gt;&lt;/li&gt;</source>
@@ -160,7 +160,7 @@
     </message>
     <message>
         <source>Allows to receive information about Jabber entities</source>
-        <translation>Erlaubt das Erhalten von Informationen über Jabber Existenzen</translation>
+        <translation>Ermöglicht das Abrufen von Informationen über Jabber-Entitäten</translation>
     </message>
     <message>
         <source>Supports the exchange of the discovery information and items</source>

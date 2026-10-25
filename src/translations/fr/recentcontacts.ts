@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -57,7 +57,7 @@
     </message>
     <message>
         <source>&lt;b&gt;Account:&lt;/b&gt; %1</source>
-        <translation>&lt;b&gt;Compte :&lt;/b&gt; %1</translation>
+        <translation>&lt;b&gt;Compte :&lt;/b&gt; %1</translation>
     </message>
 </context>
 </TS>

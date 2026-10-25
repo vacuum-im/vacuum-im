@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -95,7 +95,7 @@
         <translation>Libre pour discuter</translation>
     </message>
     <message>
-        <source>I&apos;m away from my desk</source>
+        <source>I'm away from my desk</source>
         <translation>Je suis loin de mon bureau</translation>
     </message>
     <message>
@@ -120,7 +120,7 @@
     </message>
     <message>
         <source>Left %1</source>
-        <translation>A quitté : %1</translation>
+        <translation>A quitté : %1</translation>
     </message>
 </context>
 <context>
@@ -150,7 +150,7 @@
         <translation>Priorité</translation>
     </message>
     <message>
-        <source>Can&apos;t delete status</source>
+        <source>Can't delete status</source>
         <translation>Impossible de supprimer le statut</translation>
     </message>
     <message>

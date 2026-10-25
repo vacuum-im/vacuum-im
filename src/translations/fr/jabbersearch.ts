@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -47,8 +47,8 @@
         <translation>En attente de la réponse du serveur...</translation>
     </message>
     <message>
-        <source>Error: Can&apos;t send request to host.</source>
-        <translation>Erreur : impossible d'envoyer la requête au serveur.</translation>
+        <source>Error: Can't send request to host.</source>
+        <translation>Erreur : impossible d'envoyer la requête au serveur.</translation>
     </message>
     <message>
         <source>Disco info</source>
@@ -64,26 +64,26 @@
     </message>
     <message>
         <source>Requested operation failed: %1</source>
-        <translation>Échec de l'opération demandée : %1</translation>
+        <translation>Échec de l'opération demandée : %1</translation>
     </message>
 </context>
 <context>
     <name>SearchDialogClass</name>
     <message>
         <source>First:</source>
-        <translation>Prénom :</translation>
+        <translation>Prénom :</translation>
     </message>
     <message>
         <source>Last:</source>
-        <translation>Nom :</translation>
+        <translation>Nom :</translation>
     </message>
     <message>
         <source>Nick:</source>
-        <translation>Pseudonyme :</translation>
+        <translation>Pseudonyme :</translation>
     </message>
     <message>
         <source>Email:</source>
-        <translation>E-mail :</translation>
+        <translation>E-mail :</translation>
     </message>
     <message>
         <source>JID</source>

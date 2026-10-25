@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="de" sourcelanguage="en">
 <context>
@@ -32,11 +32,11 @@
     </message>
     <message>
         <source>Start sending user stanza...</source>
-        <translation>Starte das senden des Anwender Packetes ...</translation>
+        <translation>Beginne mit dem Senden der Benutzer-Stanza …</translation>
     </message>
     <message>
         <source>Stanza is not well formed.</source>
-        <translation>Packet ist nicht richtig formatiert.</translation>
+        <translation>Die Stanza ist nicht korrekt formatiert.</translation>
     </message>
     <message>
         <source>XML is not well formed.</source>
@@ -52,7 +52,7 @@
     </message>
     <message>
         <source>User stanza sent.</source>
-        <translation>Anwender Packet gesendet.</translation>
+        <translation>Benutzer-Stanza gesendet.</translation>
     </message>
     <message>
         <source>Search</source>

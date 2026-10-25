@@ -1,15 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="uk" sourcelanguage="en">
 <context>
     <name>StanzaProcessor</name>
     <message>
         <source>Stanza Manager</source>
-        <translation>Менеджер XMPP-строф</translation>
+        <translation>Менеджер XMPP-станз</translation>
     </message>
     <message>
         <source>Allows other modules to send and receive XMPP stanzas</source>
-        <translation>Дозволяє іншим модулям відправляти і отримувати XMPP-строфи</translation>
+        <translation>Дозволяє іншим модулям надсилати й отримувати XMPP-станзи</translation>
     </message>
 </context>
 </TS>

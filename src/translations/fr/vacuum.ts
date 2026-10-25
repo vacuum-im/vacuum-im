@@ -1,19 +1,19 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
     <name>AboutBox</name>
     <message>
         <source>Version: %1 %2 of %3</source>
-        <translation>Version : %1 %2 du %3</translation>
+        <translation>Version : %1 %2 du %3</translation>
     </message>
     <message>
         <source>Revision: %1</source>
-        <translation>Révision : %1</translation>
+        <translation>Révision : %1</translation>
     </message>
     <message>
         <source>Version: %1 %2</source>
-        <translation>Version : %1 %2</translation>
+        <translation>Version : %1 %2</translation>
     </message>
 </context>
 <context>
@@ -99,7 +99,7 @@
         <translation>Un autre greffon dépend de ce greffon.</translation>
     </message>
     <message>
-        <source>Other plugins don&apos;t depend on this plugin.</source>
+        <source>Other plugins don't depend on this plugin.</source>
         <translation>Les autres greffons ne dépendent pas de ce greffon.</translation>
     </message>
     <message numerus="yes">
@@ -115,7 +115,7 @@
     </message>
     <message>
         <source>Settings saved. Do you want to restart application?</source>
-        <translation>Paramètres enregistrés. Voulez-vous redémarrer l'application ?</translation>
+        <translation>Paramètres enregistrés. Voulez-vous redémarrer l'application ?</translation>
     </message>
 </context>
 <context>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -9,14 +9,14 @@
     </message>
     <message>
         <source>Error: %1</source>
-        <translation>Erreur : %1</translation>
+        <translation>Erreur : %1</translation>
     </message>
 </context>
 <context>
     <name>DiscoInfoWindowClass</name>
     <message>
         <source>Identities:</source>
-        <translation>Identités :</translation>
+        <translation>Identités :</translation>
     </message>
     <message>
         <source>Category</source>
@@ -32,11 +32,11 @@
     </message>
     <message>
         <source>Features:</source>
-        <translation>Fonctionnalités :</translation>
+        <translation>Fonctionnalités :</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation>Description :</translation>
+        <translation>Description :</translation>
     </message>
     <message>
         <source>Extensions</source>
@@ -63,15 +63,15 @@
     </message>
     <message>
         <source>&lt;li&gt;&lt;b&gt;Identity:&lt;/b&gt;&lt;/li&gt;</source>
-        <translation>&lt;li&gt;&lt;b&gt;Identité :&lt;/b&gt;&lt;/li&gt;</translation>
+        <translation>&lt;li&gt;&lt;b&gt;Identité :&lt;/b&gt;&lt;/li&gt;</translation>
     </message>
     <message>
-        <source>&lt;li&gt;%1 (Category: &apos;%2&apos;; Type: &apos;%3&apos;)&lt;/li&gt;</source>
-        <translation>&lt;li&gt;%1 (Catégorie : « %2 » ; Type : « %3 »)&lt;/li&gt;</translation>
+        <source>&lt;li&gt;%1 (Category: '%2'; Type: '%3')&lt;/li&gt;</source>
+        <translation>&lt;li&gt;%1 (Catégorie : « %2 » ; Type : « %3 »)&lt;/li&gt;</translation>
     </message>
     <message>
         <source>&lt;li&gt;&lt;b&gt;Features:&lt;/b&gt;&lt;/li&gt;</source>
-        <translation>&lt;li&gt;&lt;b&gt;Fonctionnalités :&lt;/b&gt;&lt;/li&gt;</translation>
+        <translation>&lt;li&gt;&lt;b&gt;Fonctionnalités :&lt;/b&gt;&lt;/li&gt;</translation>
     </message>
     <message>
         <source>true</source>
@@ -83,7 +83,7 @@
     </message>
     <message>
         <source>Error: %1</source>
-        <translation>Erreur : %1</translation>
+        <translation>Erreur : %1</translation>
     </message>
 </context>
 <context>
@@ -125,15 +125,15 @@
     <name>DiscoItemsWindowClass</name>
     <message>
         <source>Item:</source>
-        <translation>Élément :</translation>
+        <translation>Élément :</translation>
     </message>
     <message>
         <source>Node:</source>
-        <translation>Nœud :</translation>
+        <translation>Nœud :</translation>
     </message>
     <message>
         <source>Search:</source>
-        <translation>Rechercher :</translation>
+        <translation>Rechercher :</translation>
     </message>
     <message>
         <source>Actions</source>

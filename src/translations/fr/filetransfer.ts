@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -49,14 +49,14 @@
         <translation>Envoyer un fichier</translation>
     </message>
     <message>
-        <source>Failed to send request for file &apos;%1&apos;</source>
-        <translation>Échec de l'envoi de la demande pour le fichier « %1 »</translation>
+        <source>Failed to send request for file '%1'</source>
+        <translation>Échec de l'envoi de la demande pour le fichier « %1 »</translation>
     </message>
     <message numerus="yes">
         <source>/me share %n file(s): %1</source>
         <translation>
-            <numerusform>/me partage %n fichier : %1</numerusform>
-            <numerusform>/me partage %n fichiers : %1</numerusform>
+            <numerusform>/me partage %n fichier : %1</numerusform>
+            <numerusform>/me partage %n fichiers : %1</numerusform>
         </translation>
     </message>
     <message>
@@ -68,40 +68,40 @@
         <translation>Demande de transfert de fichiers de %1</translation>
     </message>
     <message>
-        <source>%1 wants to send you a file &apos;%2&apos;</source>
-        <translation>%1 souhaite vous envoyer un fichier « %2 »</translation>
+        <source>%1 wants to send you a file '%2'</source>
+        <translation>%1 souhaite vous envoyer un fichier « %2 »</translation>
     </message>
     <message>
-        <source>Sending file &apos;%1&apos; to %2 started automatically</source>
-        <translation>L'envoi du fichier « %1 » à %2 a démarré automatiquement</translation>
+        <source>Sending file '%1' to %2 started automatically</source>
+        <translation>L'envoi du fichier « %1 » à %2 a démarré automatiquement</translation>
     </message>
     <message>
-        <source>Receiving file &apos;%1&apos; from %2 started automatically</source>
-        <translation>La réception du fichier « %1 » de %2 a démarré automatiquement</translation>
+        <source>Receiving file '%1' from %2 started automatically</source>
+        <translation>La réception du fichier « %1 » de %2 a démarré automatiquement</translation>
     </message>
     <message>
         <source>File transfer completed</source>
         <translation>Transfert de fichiers terminé</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; successfully sent to %2</source>
-        <translation>Fichier « %1 » envoyé avec succès à %2</translation>
+        <source>File '%1' successfully sent to %2</source>
+        <translation>Fichier « %1 » envoyé avec succès à %2</translation>
     </message>
     <message>
-        <source>File &apos;%1&apos; successfully received from %2</source>
-        <translation>Fichier « %1 » reçu avec succès de %2</translation>
+        <source>File '%1' successfully received from %2</source>
+        <translation>Fichier « %1 » reçu avec succès de %2</translation>
     </message>
     <message>
         <source>File transfer failed</source>
         <translation>Échec du transfert de fichiers</translation>
     </message>
     <message>
-        <source>Failed to send file &apos;%1&apos; to %2: %3</source>
-        <translation>Échec de l'envoi du fichier « %1 » à %2 : %3</translation>
+        <source>Failed to send file '%1' to %2: %3</source>
+        <translation>Échec de l'envoi du fichier « %1 » à %2 : %3</translation>
     </message>
     <message>
-        <source>Failed to receive file &apos;%1&apos; from %2: %3</source>
-        <translation>Échec de la réception du fichier « %1 » de %2 : %3</translation>
+        <source>Failed to receive file '%1' from %2: %3</source>
+        <translation>Échec de la réception du fichier « %1 » de %2 : %3</translation>
     </message>
     <message>
         <source>Select File</source>
@@ -113,7 +113,7 @@
     </message>
     <message>
         <source>File request rejected: %1</source>
-        <translation>Demande de fichier rejetée : %1</translation>
+        <translation>Demande de fichier rejetée : %1</translation>
     </message>
 </context>
 <context>
@@ -124,7 +124,7 @@
     </message>
     <message>
         <source>To:</source>
-        <translation>À :</translation>
+        <translation>À :</translation>
     </message>
     <message>
         <source>Receive File - %1</source>
@@ -132,7 +132,7 @@
     </message>
     <message>
         <source>From:</source>
-        <translation>De :</translation>
+        <translation>De :</translation>
     </message>
     <message>
         <source>Continue file transfer</source>
@@ -143,16 +143,16 @@
         <translation>Un fichier portant ce nom, mais de taille inférieure, existe déjà.</translation>
     </message>
     <message>
-        <source>If you want to download the rest of file press &apos;Yes&apos;</source>
-        <translation>Pour télécharger la suite du fichier, cliquez sur « Oui »</translation>
+        <source>If you want to download the rest of file press 'Yes'</source>
+        <translation>Pour télécharger la suite du fichier, cliquez sur « Oui »</translation>
     </message>
     <message>
-        <source>If you want to start download from the beginning press &apos;Retry&apos;</source>
-        <translation>Pour reprendre le téléchargement depuis le début, cliquez sur « Réessayer »</translation>
+        <source>If you want to start download from the beginning press 'Retry'</source>
+        <translation>Pour reprendre le téléchargement depuis le début, cliquez sur « Réessayer »</translation>
     </message>
     <message>
-        <source>If you want to change file name press &apos;Cancel&apos;</source>
-        <translation>Pour changer le nom du fichier, cliquez sur « Annuler »</translation>
+        <source>If you want to change file name press 'Cancel'</source>
+        <translation>Pour changer le nom du fichier, cliquez sur « Annuler »</translation>
     </message>
     <message>
         <source>Warning</source>
@@ -168,7 +168,7 @@
     </message>
     <message>
         <source>A file with this name already exists. Do you want to remove existing file?</source>
-        <translation>Un fichier portant ce nom existe déjà. Voulez-vous supprimer le fichier existant ?</translation>
+        <translation>Un fichier portant ce nom existe déjà. Voulez-vous supprimer le fichier existant ?</translation>
     </message>
     <message>
         <source>Selected file does not exists</source>
@@ -216,11 +216,11 @@
     </message>
     <message>
         <source>Unable to send request for file transfer, check settings and try again!</source>
-        <translation>Impossible d'envoyer la demande de transfert de fichiers ; vérifiez les paramètres et réessayez !</translation>
+        <translation>Impossible d'envoyer la demande de transfert de fichiers ; vérifiez les paramètres et réessayez !</translation>
     </message>
     <message>
         <source>Unable to start the file transfer, check settings and try again!</source>
-        <translation>Impossible de démarrer le transfert de fichiers ; vérifiez les paramètres et réessayez !</translation>
+        <translation>Impossible de démarrer le transfert de fichiers ; vérifiez les paramètres et réessayez !</translation>
     </message>
     <message>
         <source>Selected data stream is not available</source>
@@ -236,18 +236,18 @@
     </message>
     <message>
         <source>Are you sure you want to cancel a file transfer?</source>
-        <translation>Êtes-vous sûr de vouloir annuler le transfert de fichiers ?</translation>
+        <translation>Êtes-vous sûr de vouloir annuler le transfert de fichiers ?</translation>
     </message>
 </context>
 <context>
     <name>StreamDialogClass</name>
     <message>
         <source>To/From:</source>
-        <translation>À/De :</translation>
+        <translation>À/De :</translation>
     </message>
     <message>
         <source>File:</source>
-        <translation>Fichier :</translation>
+        <translation>Fichier :</translation>
     </message>
     <message>
         <source>...</source>
@@ -255,19 +255,19 @@
     </message>
     <message>
         <source>Description:</source>
-        <translation>Description :</translation>
+        <translation>Description :</translation>
     </message>
     <message>
         <source>Progress:</source>
-        <translation>Progression :</translation>
+        <translation>Progression :</translation>
     </message>
     <message>
         <source>Status:</source>
-        <translation>Statut :</translation>
+        <translation>Statut :</translation>
     </message>
     <message>
         <source>Method:</source>
-        <translation>Méthode :</translation>
+        <translation>Méthode :</translation>
     </message>
 </context>
 </TS>

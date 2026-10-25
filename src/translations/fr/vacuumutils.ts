@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
     <name>PasswordDialog</name>
     <message>
         <source>Enter password:</source>
-        <translation>Saisissez le mot de passe :</translation>
+        <translation>Saisissez le mot de passe :</translation>
     </message>
     <message>
         <source>Save password</source>

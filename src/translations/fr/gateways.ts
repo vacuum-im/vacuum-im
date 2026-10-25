@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -12,12 +12,12 @@
         <translation>En attente de la réponse du serveur...</translation>
     </message>
     <message>
-        <source>Error: Can&apos;t send request to host.</source>
-        <translation>Erreur : impossible d'envoyer la requête au serveur.</translation>
+        <source>Error: Can't send request to host.</source>
+        <translation>Erreur : impossible d'envoyer la requête au serveur.</translation>
     </message>
     <message>
         <source>Contact ID:</source>
-        <translation>ID du contact :</translation>
+        <translation>ID du contact :</translation>
     </message>
     <message>
         <source>Jabber ID for %1 is %2</source>
@@ -25,14 +25,14 @@
     </message>
     <message>
         <source>Requested operation failed: %1</source>
-        <translation>Échec de l'opération demandée : %1</translation>
+        <translation>Échec de l'opération demandée : %1</translation>
     </message>
 </context>
 <context>
     <name>AddLegacyContactDialogClass</name>
     <message>
         <source>Contact ID:</source>
-        <translation>ID du contact :</translation>
+        <translation>ID du contact :</translation>
     </message>
 </context>
 <context>
@@ -62,10 +62,10 @@
         <translation>Supprimer le transport et ses contacts</translation>
     </message>
     <message numerus="yes">
-        <source>Are you sure you wish to remove transport &apos;&lt;b&gt;%1&lt;/b&gt;&apos; and its &lt;b&gt;%n contact(s)&lt;/b&gt; from the roster?</source>
+        <source>Are you sure you wish to remove transport '&lt;b&gt;%1&lt;/b&gt;' and its &lt;b&gt;%n contact(s)&lt;/b&gt; from the roster?</source>
         <translation>
-            <numerusform>Voulez-vous vraiment supprimer le transport « &lt;b&gt;%1&lt;/b&gt; » et son &lt;b&gt;%n contact&lt;/b&gt; de la liste de contacts ?</numerusform>
-            <numerusform>Voulez-vous vraiment supprimer le transport « &lt;b&gt;%1&lt;/b&gt; » et ses &lt;b&gt;%n contacts&lt;/b&gt; de la liste de contacts ?</numerusform>
+            <numerusform>Voulez-vous vraiment supprimer le transport « &lt;b&gt;%1&lt;/b&gt; » et son &lt;b&gt;%n contact&lt;/b&gt; de la liste de contacts ?</numerusform>
+            <numerusform>Voulez-vous vraiment supprimer le transport « &lt;b&gt;%1&lt;/b&gt; » et ses &lt;b&gt;%n contacts&lt;/b&gt; de la liste de contacts ?</numerusform>
         </translation>
     </message>
     <message>
@@ -75,8 +75,8 @@
     <message numerus="yes">
         <source>Are you sure you wish to remove &lt;b&gt;%n transport(s)&lt;/b&gt; and their contacts from the roster?</source>
         <translation>
-            <numerusform>Voulez-vous vraiment supprimer &lt;b&gt;%n transport&lt;/b&gt; et ses contacts de la liste de contacts ?</numerusform>
-            <numerusform>Voulez-vous vraiment supprimer &lt;b&gt;%n transports&lt;/b&gt; et leurs contacts de la liste de contacts ?</numerusform>
+            <numerusform>Voulez-vous vraiment supprimer &lt;b&gt;%n transport&lt;/b&gt; et ses contacts de la liste de contacts ?</numerusform>
+            <numerusform>Voulez-vous vraiment supprimer &lt;b&gt;%n transports&lt;/b&gt; et leurs contacts de la liste de contacts ?</numerusform>
         </translation>
     </message>
     <message>

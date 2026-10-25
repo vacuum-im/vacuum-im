@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -21,7 +21,7 @@
     </message>
     <message>
         <source>Smileys:</source>
-        <translation>Smileys :</translation>
+        <translation>Smileys :</translation>
     </message>
 </context>
 </TS>

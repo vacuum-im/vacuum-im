@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -9,11 +9,11 @@
     </message>
     <message>
         <source>The are %1 field(s) with invalid values:&lt;br&gt;</source>
-        <translation>Il y a %1 champ(s) avec des valeurs non valides :&lt;br&gt;</translation>
+        <translation>Il y a %1 champ(s) avec des valeurs non valides :&lt;br&gt;</translation>
     </message>
     <message>
         <source>Do you want to continue with invalid values?</source>
-        <translation>Voulez-vous continuer avec des valeurs non valides ?</translation>
+        <translation>Voulez-vous continuer avec des valeurs non valides ?</translation>
     </message>
 </context>
 <context>

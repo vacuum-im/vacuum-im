@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -17,7 +17,7 @@
     </message>
     <message>
         <source>&lt;b&gt;Annotation:&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Annotation :&lt;/b&gt;</translation>
+        <translation>&lt;b&gt;Annotation :&lt;/b&gt;</translation>
     </message>
 </context>
 <context>
@@ -31,11 +31,11 @@
     <name>EditNoteDialogClass</name>
     <message>
         <source>Created:</source>
-        <translation>Créée :</translation>
+        <translation>Créée :</translation>
     </message>
     <message>
         <source>Modified:</source>
-        <translation>Modifiée :</translation>
+        <translation>Modifiée :</translation>
     </message>
 </context>
 </TS>

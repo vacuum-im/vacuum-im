@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -74,7 +74,7 @@
     </message>
     <message>
         <source>Subject: %1</source>
-        <translation>Objet : %1</translation>
+        <translation>Objet : %1</translation>
     </message>
     <message>
         <source>&lt;no subject&gt;</source>
@@ -82,11 +82,11 @@
     </message>
     <message>
         <source>Re: %1</source>
-        <translation>Re : %1</translation>
+        <translation>Re : %1</translation>
     </message>
     <message>
         <source>Fw: %1</source>
-        <translation>Fw : %1</translation>
+        <translation>Fw : %1</translation>
     </message>
     <message>
         <source>Send Message</source>

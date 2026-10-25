@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -41,7 +41,7 @@
     </message>
     <message>
         <source>Enter bookmark name:</source>
-        <translation>Saisissez le nom du signet :</translation>
+        <translation>Saisissez le nom du signet :</translation>
     </message>
     <message>
         <source>Edit Bookmarks</source>
@@ -59,16 +59,16 @@
         <translation>Erreur</translation>
     </message>
     <message>
-        <source>In conference bookmark field &apos;Room&apos; should not be empty</source>
-        <translation>Dans le signet de conférence, le champ « Salle » ne doit pas être vide</translation>
+        <source>In conference bookmark field 'Room' should not be empty</source>
+        <translation>Dans le signet de conférence, le champ « Salle » ne doit pas être vide</translation>
     </message>
     <message>
-        <source>In URL bookmark field &apos;URL&apos; should not be empty</source>
-        <translation>Dans le signet d'URL, le champ « URL » ne doit pas être vide</translation>
+        <source>In URL bookmark field 'URL' should not be empty</source>
+        <translation>Dans le signet d'URL, le champ « URL » ne doit pas être vide</translation>
     </message>
     <message>
-        <source>Field &apos;Name&apos; should not be empty</source>
-        <translation>Le champ « Nom » ne doit pas être vide</translation>
+        <source>Field 'Name' should not be empty</source>
+        <translation>Le champ « Nom » ne doit pas être vide</translation>
     </message>
 </context>
 <context>
@@ -79,7 +79,7 @@
     </message>
     <message>
         <source>Name:</source>
-        <translation>Nom :</translation>
+        <translation>Nom :</translation>
     </message>
     <message>
         <source>Bookmark name</source>
@@ -91,15 +91,15 @@
     </message>
     <message>
         <source>Conference:</source>
-        <translation>Conférence :</translation>
+        <translation>Conférence :</translation>
     </message>
     <message>
-        <source>Conference as &apos;name@service.server.com&apos;</source>
-        <translation>Conférence sous la forme « nom@service.server.com »</translation>
+        <source>Conference as 'name@service.server.com'</source>
+        <translation>Conférence sous la forme « nom@service.server.com »</translation>
     </message>
     <message>
         <source>Nickname:</source>
-        <translation>Pseudonyme :</translation>
+        <translation>Pseudonyme :</translation>
     </message>
     <message>
         <source>Your nickname in conference</source>
@@ -107,7 +107,7 @@
     </message>
     <message>
         <source>Password:</source>
-        <translation>Mot de passe :</translation>
+        <translation>Mot de passe :</translation>
     </message>
     <message>
         <source>Conference password if required</source>
@@ -123,7 +123,7 @@
     </message>
     <message>
         <source>Link:</source>
-        <translation>Lien :</translation>
+        <translation>Lien :</translation>
     </message>
     <message>
         <source>Any valid link</source>

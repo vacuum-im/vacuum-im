@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>Automatically displays images referenced by URLs in messages. Only the simple message style is supported: the Adium style is based on QtWebKit, which is going to be dropped, and is not supported.</source>
-        <translation>Affiche automatiquement les images référencées par les URL dans les messages. Seul le style de message simple est pris en charge : le style Adium est basé sur QtWebKit, qui va être abandonné, et n'est pas pris en charge.</translation>
+        <translation>Affiche automatiquement les images référencées par les URL dans les messages. Seul le style de message simple est pris en charge : le style Adium est basé sur QtWebKit, qui va être abandonné, et n'est pas pris en charge.</translation>
     </message>
     <message>
         <source>Images</source>
@@ -30,15 +30,15 @@
     </message>
     <message>
         <source>Maximum download size per image:</source>
-        <translation>Taille maximale de téléchargement par image :</translation>
+        <translation>Taille maximale de téléchargement par image :</translation>
     </message>
     <message>
         <source>Maximum decoded image dimension:</source>
-        <translation>Dimension maximale de l'image décodée :</translation>
+        <translation>Dimension maximale de l'image décodée :</translation>
     </message>
     <message>
         <source>Preview image size (longest side):</source>
-        <translation>Taille de l'aperçu de l'image (côté le plus long) :</translation>
+        <translation>Taille de l'aperçu de l'image (côté le plus long) :</translation>
     </message>
 </context>
 </TS>

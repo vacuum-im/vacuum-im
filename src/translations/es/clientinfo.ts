@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="es" sourcelanguage="en">
 <context>
@@ -164,7 +164,7 @@
     <message>
         <source>%1m</source>
         <comment>minutes</comment>
-        <translation>1m</translation>
+        <translation>%1m</translation>
     </message>
     <message>
         <source>%1s</source>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
 <context>
@@ -146,7 +146,7 @@
     </message>
     <message>
         <source>Minimum number of lines in messages input field:</source>
-        <translation>Nombre minimum de lignes dans le champ de saisie des messages :</translation>
+        <translation>Nombre minimum de lignes dans le champ de saisie des messages :</translation>
     </message>
     <message>
         <source>Message window behavior</source>
@@ -185,8 +185,8 @@
         <translation>Copier</translation>
     </message>
     <message>
-        <source>Search on Google &apos;%1&apos;</source>
-        <translation>Rechercher « %1 » sur Google</translation>
+        <source>Search on Google '%1'</source>
+        <translation>Rechercher « %1 » sur Google</translation>
     </message>
     <message>
         <source>google.com</source>
@@ -287,11 +287,11 @@
     </message>
     <message>
         <source>Failed to read file: %1</source>
-        <translation>Échec de la lecture du fichier : %1</translation>
+        <translation>Échec de la lecture du fichier : %1</translation>
     </message>
     <message>
         <source>Failed to open file: %1</source>
-        <translation>Échec de l'ouverture du fichier : %1</translation>
+        <translation>Échec de l'ouverture du fichier : %1</translation>
     </message>
     <message>
         <source>Failed to Save Contacts</source>
@@ -299,7 +299,7 @@
     </message>
     <message>
         <source>Failed to create file: %1</source>
-        <translation>Échec de la création du fichier : %1</translation>
+        <translation>Échec de la création du fichier : %1</translation>
     </message>
     <message>
         <source>Agents</source>
@@ -389,11 +389,11 @@
     </message>
     <message>
         <source>Tab window name:</source>
-        <translation>Nom de la fenêtre à onglets :</translation>
+        <translation>Nom de la fenêtre à onglets :</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this tab window?</source>
-        <translation>Êtes-vous sûr de vouloir supprimer cette fenêtre à onglets ?</translation>
+        <translation>Êtes-vous sûr de vouloir supprimer cette fenêtre à onglets ?</translation>
     </message>
 </context>
 <context>
