@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="de" sourcelanguage="en">
 <context>
     <name>AdiumMessageStyle</name>
     <message>
@@ -11,22 +13,22 @@
     </message>
     <message>
         <source>Failed to load message style. Press clear window button to retry.</source>
-        <translation type="unfinished"/>
+        <translation>Nachrichtenstil konnte nicht geladen werden. Klicken Sie auf 'Fenster leeren', um es erneut zu versuchen.</translation>
     </message>
 </context>
 <context>
     <name>AdiumMessageStyleEngine</name>
     <message>
         <source>Adium Message Style</source>
-        <translation type="unfinished"/>
+        <translation>Adium Nachrichtenstil</translation>
     </message>
     <message>
         <source>Allows to use a Adium style in message design</source>
-        <translation type="unfinished"/>
+        <translation>Erlaubt die Verwendung von Adium Stilen für das Nachrichten Design</translation>
     </message>
     <message>
         <source>Adium</source>
-        <translation type="unfinished"/>
+        <translation>Adium</translation>
     </message>
 </context>
 <context>
@@ -69,11 +71,11 @@
     </message>
     <message>
         <source>Parameters</source>
-        <translation type="unfinished"/>
+        <translation>Parameter</translation>
     </message>
     <message>
         <source>Background</source>
-        <translation type="unfinished"/>
+        <translation>Hintergrund</translation>
     </message>
 </context>
 <context>
@@ -92,23 +94,23 @@
     </message>
     <message>
         <source>Font:</source>
-        <translation type="unfinished"/>
+        <translation>Schrift:</translation>
     </message>
     <message>
         <source>Change...</source>
-        <translation type="unfinished"/>
+        <translation>Ändern...</translation>
     </message>
     <message>
         <source>Reset</source>
-        <translation type="unfinished"/>
+        <translation>Zurücksetzen</translation>
     </message>
     <message>
         <source>Image:</source>
-        <translation type="unfinished"/>
+        <translation>Bild:</translation>
     </message>
     <message>
         <source>not set</source>
-        <translation type="unfinished"/>
+        <translation>nicht festgelegt</translation>
     </message>
 </context>
 </TS>

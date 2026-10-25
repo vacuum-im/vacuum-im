@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="de" sourcelanguage="en">
 <context>
     <name>SimpleMessageStyle</name>
     <message>
@@ -14,15 +16,15 @@
     <name>SimpleMessageStyleEngine</name>
     <message>
         <source>Simple Message Style</source>
-        <translation type="unfinished"/>
+        <translation>Einfacher Nachrichtenstil</translation>
     </message>
     <message>
         <source>Allows to use a simplified style in message design</source>
-        <translation type="unfinished"/>
+        <translation>Erlaubt die Verwendung eines vereinfachten Stils für das Nachrichten Design</translation>
     </message>
     <message>
         <source>Simple</source>
-        <translation type="unfinished"/>
+        <translation>Einfach</translation>
     </message>
 </context>
 <context>
@@ -45,11 +47,11 @@
     </message>
     <message>
         <source>Parameters</source>
-        <translation type="unfinished"/>
+        <translation>Parameter</translation>
     </message>
     <message>
         <source>Background</source>
-        <translation type="unfinished"/>
+        <translation>Hintergrund</translation>
     </message>
 </context>
 <context>
@@ -64,23 +66,23 @@
     </message>
     <message>
         <source>Font:</source>
-        <translation type="unfinished"/>
+        <translation>Schrift:</translation>
     </message>
     <message>
         <source>Change...</source>
-        <translation type="unfinished"/>
+        <translation>Ändern...</translation>
     </message>
     <message>
         <source>Reset</source>
-        <translation type="unfinished"/>
+        <translation>Zurücksetzen</translation>
     </message>
     <message>
         <source>Image:</source>
-        <translation type="unfinished"/>
+        <translation>Bild:</translation>
     </message>
     <message>
         <source>not set</source>
-        <translation type="unfinished"/>
+        <translation>nicht festgelegt</translation>
     </message>
 </context>
 </TS>

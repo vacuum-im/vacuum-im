@@ -1,53 +1,55 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="de" sourcelanguage="en">
 <context>
     <name>Bookmarks</name>
     <message>
         <source>Bookmarks</source>
-        <translation type="unfinished"/>
+        <translation>Lesezeichen</translation>
     </message>
     <message>
         <source>Allows to create bookmarks at the jabber conference and web pages</source>
-        <translation type="unfinished"/>
+        <translation>Erlaubt das Erstellen von Lesezeichen für Jabber Konferenzen und Webseiten</translation>
     </message>
     <message>
         <source>Edit Bookmarks</source>
-        <translation type="unfinished"/>
+        <translation>Lesezeichen bearbeiten</translation>
     </message>
     <message>
         <source>Add to Bookmarks</source>
-        <translation type="unfinished"/>
+        <translation>Zu Lesezeichen hinzufügen</translation>
     </message>
     <message>
         <source>Remove from Bookmarks</source>
-        <translation type="unfinished"/>
+        <translation>Aus Lesezeichen entfernen</translation>
     </message>
     <message>
         <source>Edit Bookmark</source>
-        <translation type="unfinished"/>
+        <translation>Lesezeichen bearbeiten</translation>
     </message>
     <message>
         <source>Rename Bookmark</source>
-        <translation type="unfinished"/>
+        <translation>Lesezeichen umbenennen</translation>
     </message>
     <message>
         <source>Enter bookmark name:</source>
-        <translation type="unfinished"/>
+        <translation>Lesezeichenname eingeben:</translation>
     </message>
     <message>
         <source>Join to Conference at Startup</source>
-        <translation type="unfinished"/>
+        <translation>Konferenz beim Start beitreten</translation>
     </message>
     <message>
         <source>Conferences</source>
-        <translation type="unfinished"/>
+        <translation>Konferenzen</translation>
     </message>
     <message>
         <source>Disable auto join to conferences on this computer</source>
-        <translation type="unfinished"/>
+        <translation>Automatisches Beitreten zu Konferenzen auf diesem Rechner deaktivieren</translation>
     </message>
     <message>
         <source>Show windows of auto joined conferences at startup</source>
-        <translation type="unfinished"/>
+        <translation>Fenster automatisch betretener Konferenzen beim Start anzeigen</translation>
     </message>
 </context>
 <context>
@@ -66,7 +68,7 @@
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Fehler</translation>
     </message>
 </context>
 <context>
@@ -85,23 +87,23 @@
     </message>
     <message>
         <source>Conference:</source>
-        <translation type="unfinished"/>
+        <translation>Konferenz:</translation>
     </message>
     <message>
         <source>Conference as &apos;name@service.server.com&apos;</source>
-        <translation type="unfinished"/>
+        <translation>Konferenz als 'name@service.server.com'</translation>
     </message>
     <message>
         <source>Nickname:</source>
-        <translation type="unfinished"/>
+        <translation>Spitzname:</translation>
     </message>
     <message>
         <source>Your nickname in conference</source>
-        <translation type="unfinished"/>
+        <translation>Ihr Spitzname in der Konferenz</translation>
     </message>
     <message>
         <source>Conference password if required</source>
-        <translation type="unfinished"/>
+        <translation>Konferenz Passwort, falls erforderlich</translation>
     </message>
     <message>
         <source>Name:</source>
@@ -109,23 +111,23 @@
     </message>
     <message>
         <source>Bookmark to Conference</source>
-        <translation type="unfinished"/>
+        <translation>Lesezeichen für Konferenz</translation>
     </message>
     <message>
         <source>Bookmark to Link</source>
-        <translation type="unfinished"/>
+        <translation>Lesezeichen für Link</translation>
     </message>
     <message>
         <source>Link:</source>
-        <translation type="unfinished"/>
+        <translation>Link:</translation>
     </message>
     <message>
         <source>Any valid link</source>
-        <translation type="unfinished"/>
+        <translation>Beliebiger gültiger Link</translation>
     </message>
     <message>
         <source>Bookmark name</source>
-        <translation type="unfinished"/>
+        <translation>Lesezeichenname</translation>
     </message>
 </context>
 <context>
@@ -140,7 +142,7 @@
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Fehler</translation>
     </message>
 </context>
 <context>

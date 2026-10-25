@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="de" sourcelanguage="en">
 <context>
     <name>ClientInfo</name>
     <message>
@@ -67,7 +69,7 @@
     </message>
     <message>
         <source>Share information about your OS version</source>
-        <translation type="unfinished"/>
+        <translation>Informationen über Ihre OS Version weitergeben</translation>
     </message>
 </context>
 <context>

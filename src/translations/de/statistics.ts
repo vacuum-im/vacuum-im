@@ -5,15 +5,15 @@
     <name>Statistics</name>
     <message>
         <source>Statistics</source>
-        <translation type="unfinished"></translation>
+        <translation>Statistik</translation>
     </message>
     <message>
         <source>Allows to collect application statistics</source>
-        <translation type="unfinished"></translation>
+        <translation>Erlaubt das Sammeln von Anwendungsstatistiken</translation>
     </message>
     <message>
         <source>Send anonymous statistics to developer</source>
-        <translation type="unfinished"></translation>
+        <translation>Anonyme Statistiken an den Entwickler senden</translation>
     </message>
 </context>
 </TS>

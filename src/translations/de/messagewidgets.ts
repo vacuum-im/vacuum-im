@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="de" sourcelanguage="en">
 <context>
     <name>EditWidget</name>
     <message>
@@ -130,88 +132,91 @@
     <message>
         <source>google.com</source>
         <comment>Your google domain</comment>
-        <translation type="unfinished"/>
+        <translation>google.de</translation>
     </message>
     <message>
         <source>Quote Selected Text</source>
-        <translation type="unfinished"/>
+        <translation>Selektierten Text zitieren</translation>
     </message>
     <message>
         <source>Message window view</source>
-        <translation type="unfinished"/>
+        <translation>Nachrichten Fenster Ansicht</translation>
     </message>
     <message>
         <source>Load last messages from history</source>
-        <translation type="unfinished"/>
+        <translation>Letzte Nachrichten aus dem Verlauf laden</translation>
     </message>
     <message>
         <source>Show message windows together with contacts list</source>
-        <translation type="unfinished"/>
+        <translation>Nachrichten Fenster zusammen mit der Kontaktliste anzeigen</translation>
     </message>
     <message>
         <source>Show message windows in tab window</source>
-        <translation type="unfinished"/>
+        <translation>Nachrichten Fenster im Tab Fenster anzeigen</translation>
     </message>
     <message>
         <source>Automatically resize messages input field</source>
-        <translation type="unfinished"/>
+        <translation>Eingabefeld für Nachrichten automatisch der Größe anpassen</translation>
     </message>
     <message>
         <source>Minimum number of lines in messages input field:</source>
-        <translation type="unfinished"/>
+        <translation>Minimale Anzahl an Zeilen im Nachrichten Eingabefeld:</translation>
     </message>
     <message>
         <source>Message window behavior</source>
-        <translation type="unfinished"/>
+        <translation>Nachrichten Fenster Verhalten</translation>
     </message>
     <message>
         <source>Show contacts status changes</source>
-        <translation type="unfinished"/>
+        <translation>Statusänderungen der Kontakte anzeigen</translation>
     </message>
     <message>
         <source>Save contacts status messages in history</source>
-        <translation type="unfinished"/>
+        <translation>Statusmeldungen der Kontakte im Verlauf speichern</translation>
     </message>
     <message>
         <source>Ctrl+Q</source>
         <comment>Quote selected text</comment>
-        <translation type="unfinished"/>
+        <translation>Strg+Q</translation>
     </message>
     <message>
         <source>Send chat message</source>
-        <translation type="unfinished"/>
+        <translation>Chat Nachricht senden</translation>
     </message>
     <message>
         <source>Return</source>
         <comment>Send chat message</comment>
-        <translation type="unfinished"/>
+        <translation>Return</translation>
     </message>
     <message>
         <source>Send single message</source>
-        <translation type="unfinished"/>
+        <translation>Einzelne Nachricht senden</translation>
     </message>
     <message>
         <source>Ctrl+Return</source>
         <comment>Send single message</comment>
-        <translation type="unfinished"/>
+        <translation>Strg+Return</translation>
     </message>
 </context>
 <context>
     <name>NormalWindow</name>
     <message numerus="yes">
         <source>Selected %n contact(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>%n Kontakt ausgewählt</numerusform>
+            <numerusform>%n Kontakte ausgewählt</numerusform>
+        </translation>
     </message>
     <message>
         <source>Subject</source>
-        <translation type="unfinished"/>
+        <translation>Betreff</translation>
     </message>
 </context>
 <context>
     <name>NormalWindowClass</name>
     <message>
         <source>Fast choice</source>
-        <translation type="unfinished"/>
+        <translation>Schnellauswahl</translation>
     </message>
 </context>
 <context>
@@ -234,86 +239,86 @@
     </message>
     <message>
         <source>Select All Contacts</source>
-        <translation type="unfinished"/>
+        <translation>Alle Kontakte auswählen</translation>
     </message>
     <message>
         <source>Select Online Contact</source>
-        <translation type="unfinished"/>
+        <translation>Online Kontakte auswählen</translation>
     </message>
     <message>
         <source>Select Available Contacts</source>
-        <translation type="unfinished"/>
+        <translation>Verfügbare Kontakte auswählen</translation>
     </message>
     <message>
         <source>Clear Selection</source>
-        <translation type="unfinished"/>
+        <translation>Auswahl aufheben</translation>
     </message>
     <message>
         <source>Load Selection</source>
-        <translation type="unfinished"/>
+        <translation>Auswahl laden</translation>
     </message>
     <message>
         <source>Save Selection</source>
-        <translation type="unfinished"/>
+        <translation>Auswahl speichern</translation>
     </message>
     <message>
         <source>Load Contacts from File</source>
-        <translation type="unfinished"/>
+        <translation>Kontakte aus Datei laden</translation>
     </message>
     <message>
         <source>Failed to Load Contacts</source>
-        <translation type="unfinished"/>
+        <translation>Kontakte konnten nicht geladen werden</translation>
     </message>
     <message>
         <source>Incorrect file format</source>
-        <translation type="unfinished"/>
+        <translation>Falsches Dateiformat</translation>
     </message>
     <message>
         <source>Failed to read file: %1</source>
-        <translation type="unfinished"/>
+        <translation>Datei konnte nicht gelesen werden: %1</translation>
     </message>
     <message>
         <source>Failed to open file: %1</source>
-        <translation type="unfinished"/>
+        <translation>Datei konnte nicht geöffnet werden: %1</translation>
     </message>
     <message>
         <source>Save Contacts to File</source>
-        <translation type="unfinished"/>
+        <translation>Kontakte in Datei speichern</translation>
     </message>
     <message>
         <source>Failed to Save Contacts</source>
-        <translation type="unfinished"/>
+        <translation>Kontakte konnten nicht gespeichert werden</translation>
     </message>
     <message>
         <source>Failed to create file: %1</source>
-        <translation type="unfinished"/>
+        <translation>Datei konnte nicht erstellt werden: %1</translation>
     </message>
     <message>
         <source>Load Last Selection</source>
-        <translation type="unfinished"/>
+        <translation>Letzte Auswahl laden</translation>
     </message>
     <message>
         <source>Expand All Groups</source>
-        <translation type="unfinished"/>
+        <translation>Alle Gruppen ausklappen</translation>
     </message>
     <message>
         <source>Collapse All Groups</source>
-        <translation type="unfinished"/>
+        <translation>Alle Gruppen einklappen</translation>
     </message>
     <message>
         <source>Hide Offline Contacts</source>
-        <translation type="unfinished"/>
+        <translation>Offline Kontakte verbergen</translation>
     </message>
     <message>
         <source>Sort Contacts by Status</source>
-        <translation type="unfinished"/>
+        <translation>Kontakte nach Status sortieren</translation>
     </message>
 </context>
 <context>
     <name>ReceiversWidgetClass</name>
     <message>
         <source>Search Contacts</source>
-        <translation type="unfinished"/>
+        <translation>Kontakte suchen</translation>
     </message>
 </context>
 <context>

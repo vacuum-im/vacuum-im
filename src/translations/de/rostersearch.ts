@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="de" sourcelanguage="en">
 <context>
     <name>RosterSearch</name>
     <message>
@@ -35,7 +37,7 @@
     </message>
     <message>
         <source>Search for Contacts</source>
-        <translation type="unfinished"/>
+        <translation>Suche nach Kontakten</translation>
     </message>
 </context>
 </TS>

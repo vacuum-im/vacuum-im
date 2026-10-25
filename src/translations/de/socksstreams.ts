@@ -1,29 +1,31 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="de" sourcelanguage="en">
 <context>
     <name>SocksOptionsWidgetClass</name>
     <message>
         <source>Use jabber-proxy on your server</source>
-        <translation type="unfinished"/>
+        <translation>Jabber Proxy auf Ihrem Server verwenden</translation>
     </message>
     <message>
         <source>Use additional jabber-proxy:</source>
-        <translation type="unfinished"/>
+        <translation>Zusätzlichen Jabber Proxy verwenden:</translation>
     </message>
     <message>
         <source>Allow direct incoming connections on port:</source>
-        <translation type="unfinished"/>
+        <translation>Direkte eingehende Verbindungen auf Port erlauben:</translation>
     </message>
     <message>
         <source>Forward direct incoming connections to host:</source>
-        <translation type="unfinished"/>
+        <translation>Direkte eingehende Verbindungen weiterleiten an Host:</translation>
     </message>
     <message>
         <source>Use account proxy settings for outgoing connections</source>
-        <translation type="unfinished"/>
+        <translation>Proxy Einstellungen des Kontos für ausgehende Verbindungen verwenden</translation>
     </message>
     <message>
         <source>host:port</source>
-        <translation type="unfinished"/>
+        <translation>Host:Port</translation>
     </message>
 </context>
 <context>
@@ -70,7 +72,7 @@
     </message>
     <message>
         <source>Failed to send data to socket</source>
-        <translation type="unfinished"/>
+        <translation>Daten konnten nicht an den Socket gesendet werden</translation>
     </message>
     <message>
         <source>Direct connection not established</source>
@@ -82,7 +84,7 @@
     </message>
     <message>
         <source>Invalid host address</source>
-        <translation type="unfinished"/>
+        <translation>Ungültige Hostadresse</translation>
     </message>
     <message>
         <source>Failed to connect to host</source>
@@ -90,7 +92,7 @@
     </message>
     <message>
         <source>Host disconnected</source>
-        <translation type="unfinished"/>
+        <translation>Host hat Verbindung getrennt</translation>
     </message>
 </context>
 </TS>

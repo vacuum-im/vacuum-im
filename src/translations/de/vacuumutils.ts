@@ -1,246 +1,248 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="de" sourcelanguage="en">
 <context>
     <name>PasswordDialog</name>
     <message>
         <source>Enter password:</source>
-        <translation type="unfinished"/>
+        <translation>Passwort eingeben:</translation>
     </message>
     <message>
         <source>Save password</source>
-        <translation type="unfinished"/>
+        <translation>Passwort speichern</translation>
     </message>
 </context>
 <context>
     <name>SearchLineEdit</name>
     <message>
         <source>Search options</source>
-        <translation type="unfinished"/>
+        <translation>Suchoptionen</translation>
     </message>
     <message>
         <source>Clear text</source>
-        <translation type="unfinished"/>
+        <translation>Text löschen</translation>
     </message>
 </context>
 <context>
     <name>XmppSaslError</name>
     <message>
         <source>Authorization aborted</source>
-        <translation type="unfinished"/>
+        <translation>Autorisierung abgebrochen</translation>
     </message>
     <message>
         <source>Account disabled</source>
-        <translation type="unfinished"/>
+        <translation>Konto deaktiviert</translation>
     </message>
     <message>
         <source>Credentials expired</source>
-        <translation type="unfinished"/>
+        <translation>Zugangsdaten abgelaufen</translation>
     </message>
     <message>
         <source>Encryption required</source>
-        <translation type="unfinished"/>
+        <translation>Verschlüsselung erforderlich</translation>
     </message>
     <message>
         <source>Incorrect encoding</source>
-        <translation type="unfinished"/>
+        <translation>Falsche Kodierung</translation>
     </message>
     <message>
         <source>Invalid authorization id</source>
-        <translation type="unfinished"/>
+        <translation>Ungültige Autorisierungs-ID</translation>
     </message>
     <message>
         <source>Invalid mechanism</source>
-        <translation type="unfinished"/>
+        <translation>Ungültiger Mechanismus</translation>
     </message>
     <message>
         <source>Malformed request</source>
-        <translation type="unfinished"/>
+        <translation>Fehlerhafte Anfrage</translation>
     </message>
     <message>
         <source>Mechanism is too weak</source>
-        <translation type="unfinished"/>
+        <translation>Mechanismus ist zu schwach</translation>
     </message>
     <message>
         <source>Not authorized</source>
-        <translation type="unfinished"/>
+        <translation>Nicht autorisiert</translation>
     </message>
     <message>
         <source>Temporary authentication failure</source>
-        <translation type="unfinished"/>
+        <translation>Temporärer Authentifizierungsfehler</translation>
     </message>
 </context>
 <context>
     <name>XmppStreamError</name>
     <message>
         <source>Undefined error condition</source>
-        <translation type="unfinished"/>
+        <translation>Undefinierter Fehlerzustand</translation>
     </message>
     <message>
         <source>Bad request format</source>
-        <translation type="unfinished"/>
+        <translation>Falsches Anfrageformat</translation>
     </message>
     <message>
         <source>Bad namespace prefix</source>
-        <translation type="unfinished"/>
+        <translation>Ungültiges Namespace-Präfix</translation>
     </message>
     <message>
         <source>Conflict</source>
-        <translation type="unfinished"/>
+        <translation>Konflikt</translation>
     </message>
     <message>
         <source>Connection timeout</source>
-        <translation type="unfinished"/>
+        <translation>Verbindungszeitüberschreitung</translation>
     </message>
     <message>
         <source>Host is not serviced</source>
-        <translation type="unfinished"/>
+        <translation>Host wird nicht mehr bereitgestellt</translation>
     </message>
     <message>
         <source>Unknown host</source>
-        <translation type="unfinished"/>
+        <translation>Unbekannter Host</translation>
     </message>
     <message>
         <source>Improper addressing</source>
-        <translation type="unfinished"/>
+        <translation>Fehlerhafte Adressierung</translation>
     </message>
     <message>
         <source>Internal server error</source>
-        <translation type="unfinished"/>
+        <translation>Interner Serverfehler</translation>
     </message>
     <message>
         <source>Invalid from address</source>
-        <translation type="unfinished"/>
+        <translation>Ungültige Absenderadresse</translation>
     </message>
     <message>
         <source>Invalid namespace</source>
-        <translation type="unfinished"/>
+        <translation>Ungültiger Namespace</translation>
     </message>
     <message>
         <source>Invalid XML</source>
-        <translation type="unfinished"/>
+        <translation>Ungültiges XML</translation>
     </message>
     <message>
         <source>Not authorized</source>
-        <translation type="unfinished"/>
+        <translation>Nicht autorisiert</translation>
     </message>
     <message>
         <source>XML not well formed</source>
-        <translation type="unfinished"/>
+        <translation>XML nicht wohlgeformt</translation>
     </message>
     <message>
         <source>Policy violation</source>
-        <translation type="unfinished"/>
+        <translation>Richtlinienverstoß</translation>
     </message>
     <message>
         <source>Remote connection failed</source>
-        <translation type="unfinished"/>
+        <translation>Entfernte Verbindung fehlgeschlagen</translation>
     </message>
     <message>
         <source>Stream need to be reseted</source>
-        <translation type="unfinished"/>
+        <translation>Stream muss zurückgesetzt werden</translation>
     </message>
     <message>
         <source>Resource constraint</source>
-        <translation type="unfinished"/>
+        <translation>Ressourcenbeschränkung</translation>
     </message>
     <message>
         <source>Restricted XML</source>
-        <translation type="unfinished"/>
+        <translation>Eingeschränktes XML</translation>
     </message>
     <message>
         <source>See other host</source>
-        <translation type="unfinished"/>
+        <translation>Siehe anderen Host</translation>
     </message>
     <message>
         <source>System shutdown</source>
-        <translation type="unfinished"/>
+        <translation>Herunterfahren des Systems</translation>
     </message>
     <message>
         <source>Unsupported encoding</source>
-        <translation type="unfinished"/>
+        <translation>Nicht unterstützte Kodierung</translation>
     </message>
     <message>
         <source>Unsupported feature</source>
-        <translation type="unfinished"/>
+        <translation>Nicht unterstützte Funktion</translation>
     </message>
     <message>
         <source>Unsupported stanza type</source>
-        <translation type="unfinished"/>
+        <translation>Nicht unterstützter Stanza-Typ</translation>
     </message>
     <message>
         <source>Unsupported version</source>
-        <translation type="unfinished"/>
+        <translation>Nicht unterstützte Version</translation>
     </message>
     <message>
         <source>Feature not implemented</source>
-        <translation type="unfinished"/>
+        <translation>Funktion nicht implementiert</translation>
     </message>
     <message>
         <source>Insufficient permissions</source>
-        <translation type="unfinished"/>
+        <translation>Unzureichende Berechtigungen</translation>
     </message>
     <message>
         <source>Recipient changed address</source>
-        <translation type="unfinished"/>
+        <translation>Empfänger hat die Adresse geändert</translation>
     </message>
     <message>
         <source>Requested item not found</source>
-        <translation type="unfinished"/>
+        <translation>Angefordertes Element nicht gefunden</translation>
     </message>
     <message>
         <source>Malformed XMPP address</source>
-        <translation type="unfinished"/>
+        <translation>Fehlerhafte XMPP-Adresse</translation>
     </message>
     <message>
         <source>Not accepted by the recipient</source>
-        <translation type="unfinished"/>
+        <translation>Vom Empfänger nicht akzeptiert</translation>
     </message>
     <message>
         <source>Not allowed by the recipient</source>
-        <translation type="unfinished"/>
+        <translation>Vom Empfänger nicht erlaubt</translation>
     </message>
     <message>
         <source>Recipient unavailable</source>
-        <translation type="unfinished"/>
+        <translation>Empfänger nicht verfügbar</translation>
     </message>
     <message>
         <source>Redirect to another address</source>
-        <translation type="unfinished"/>
+        <translation>Umleitung an andere Adresse</translation>
     </message>
     <message>
         <source>Registration required</source>
-        <translation type="unfinished"/>
+        <translation>Registrierung erforderlich</translation>
     </message>
     <message>
         <source>Remote server not found</source>
-        <translation type="unfinished"/>
+        <translation>Entfernter Server nicht gefunden</translation>
     </message>
     <message>
         <source>Remote server timeout</source>
-        <translation type="unfinished"/>
+        <translation>Zeitüberschreitung des entfernten Servers</translation>
     </message>
     <message>
         <source>Service unavailable</source>
-        <translation type="unfinished"/>
+        <translation>Dienst nicht verfügbar</translation>
     </message>
     <message>
         <source>Subscription required</source>
-        <translation type="unfinished"/>
+        <translation>Abonnement erforderlich</translation>
     </message>
     <message>
         <source>Unexpected request</source>
-        <translation type="unfinished"/>
+        <translation>Unerwartete Anfrage</translation>
     </message>
     <message>
         <source>Resource limit exceeded</source>
-        <translation type="unfinished"/>
+        <translation>Ressourcenlimit überschritten</translation>
     </message>
     <message>
         <source>Stanza is too big</source>
-        <translation type="unfinished"/>
+        <translation>Stanza ist zu groß</translation>
     </message>
     <message>
         <source>Too many stanzas</source>
-        <translation type="unfinished"/>
+        <translation>Zu viele Stanzas</translation>
     </message>
 </context>
 </TS>

@@ -1,21 +1,23 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="de" sourcelanguage="en">
 <context>
     <name>SASLFeatureFactory</name>
     <message>
         <source>SASL Authentication</source>
-        <translation type="unfinished"/>
+        <translation>SASL Authentifizierung</translation>
     </message>
     <message>
         <source>Allows to log in to Jabber server using SASL authentication</source>
-        <translation type="unfinished"/>
+        <translation>Erlaubt das Anmelden am Jabber Server mit SASL Authentifizierung</translation>
     </message>
     <message>
         <source>Wrong SASL authentication response</source>
-        <translation type="unfinished"/>
+        <translation>Falsche Antwort auf SASL Authentifizierung</translation>
     </message>
     <message>
         <source>Invalid XMPP stream JID in SASL bind response</source>
-        <translation type="unfinished"/>
+        <translation>Ungültige XMPP Datenstrom JID in SASL Bind Antwort</translation>
     </message>
 </context>
 </TS>

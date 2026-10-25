@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="de" sourcelanguage="en">
 <context>
     <name>ChatMessageHandler</name>
     <message>
@@ -44,19 +46,19 @@
     </message>
     <message>
         <source>Loading history...</source>
-        <translation type="unfinished"/>
+        <translation>Lade Verlauf...</translation>
     </message>
     <message>
         <source>Failed to load history: %1</source>
-        <translation type="unfinished"/>
+        <translation>Verlauf konnte nicht geladen werden: %1</translation>
     </message>
     <message>
         <source>Contact resource</source>
-        <translation type="unfinished"/>
+        <translation>Resource des Kontakts</translation>
     </message>
     <message>
         <source>&lt;Absent&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;Abwesend&gt;</translation>
     </message>
 </context>
 </TS>

@@ -1,99 +1,110 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="de" sourcelanguage="en">
 <context>
     <name>ExchangeApproveDialog</name>
     <message>
         <source>Contact &apos;%1&apos; offers you to make the following changes in your contact list:</source>
-        <translation type="unfinished"/>
+        <translation>Der Kontakt '%1' schlägt Ihnen die folgenden Änderungen an Ihrer Kontaktliste vor:</translation>
     </message>
     <message>
         <source>Add new contact &apos;%1 &lt;%2&gt;&apos;</source>
-        <translation type="unfinished"/>
+        <translation>Neuen Kontakt '%1 &lt;%2&gt;' hinzufügen</translation>
     </message>
     <message>
         <source>Remove contact &apos;%1&apos; from contact list</source>
-        <translation type="unfinished"/>
+        <translation>Kontakt '%1' aus der Kontaktliste entfernen</translation>
     </message>
     <message>
         <source>Rename contact &apos;%1&apos; to &apos;%2&apos;</source>
-        <translation type="unfinished"/>
+        <translation>Kontakt '%1' in '%2' umbenennen</translation>
     </message>
     <message>
         <source>Roster Modification - %1</source>
-        <translation type="unfinished"/>
+        <translation>Roster Änderung - %1</translation>
     </message>
     <message>
         <source>Modification</source>
-        <translation type="unfinished"/>
+        <translation>Änderung</translation>
     </message>
     <message>
         <source>Add new contact &apos;%1 &lt;%2&gt;&apos; to the group: %3</source>
-        <translation type="unfinished"/>
+        <translation>Neuen Kontakt '%1 &lt;%2&gt;' zur Gruppe hinzufügen: %3</translation>
     </message>
     <message>
         <source>Copy contact &apos;%1&apos; to the group: %2</source>
-        <translation type="unfinished"/>
+        <translation>Kontakt '%1' in die Gruppe kopieren: %2</translation>
     </message>
     <message>
         <source>Remove contact &apos;%1&apos; from the group: %2</source>
-        <translation type="unfinished"/>
+        <translation>Kontakt '%1' aus der Gruppe entfernen: %2</translation>
     </message>
 </context>
 <context>
     <name>ExchangeApproveDialogClass</name>
     <message>
         <source>Send authorization request to new contacts</source>
-        <translation type="unfinished"/>
+        <translation>Autorisierungsanfrage an neue Kontakte senden</translation>
     </message>
 </context>
 <context>
     <name>RosterItemExchange</name>
     <message>
         <source>Roster Item Exchange</source>
-        <translation type="unfinished"/>
+        <translation>Roster Einträge Austausch</translation>
     </message>
     <message>
         <source>Allows to exchange contact list items</source>
-        <translation type="unfinished"/>
+        <translation>Erlaubt den Austausch von Kontaktlisten Einträgen</translation>
     </message>
     <message>
         <source>Supports the exchanging of contact list items</source>
-        <translation type="unfinished"/>
+        <translation>Unterstützt den Austausch von Kontaktlisten Einträgen</translation>
     </message>
     <message>
         <source>When receiving roster modification request</source>
-        <translation type="unfinished"/>
+        <translation>Beim Empfang einer Roster Änderungsanfrage</translation>
     </message>
     <message numerus="yes">
         <source>Send %n Contact(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>%n Kontakt senden</numerusform>
+            <numerusform>%n Kontakte senden</numerusform>
+        </translation>
     </message>
     <message>
         <source>Roster modification request from %1</source>
-        <translation type="unfinished"/>
+        <translation>Roster Änderungsanfrage von %1</translation>
     </message>
     <message>
         <source>Roster modification</source>
-        <translation type="unfinished"/>
+        <translation>Roster Änderung</translation>
     </message>
     <message>
         <source>%1 offers you to make some changes in your contact list.</source>
-        <translation type="unfinished"/>
+        <translation>%1 schlägt Ihnen einige Änderungen an Ihrer Kontaktliste vor.</translation>
     </message>
     <message numerus="yes">
         <source>Failed to send %n contact(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>%n Kontakt konnte nicht gesendet werden</numerusform>
+            <numerusform>%n Kontakte konnten nicht gesendet werden</numerusform>
+        </translation>
     </message>
     <message>
         <source>Contacts list management</source>
-        <translation type="unfinished"/>
+        <translation>Verwaltung der Kontaktliste</translation>
     </message>
     <message>
         <source>Allow gateways and group services manage your contacts list</source>
-        <translation type="unfinished"/>
+        <translation>Gateways und Gruppendiensten erlauben, Ihre Kontaktliste zu verwalten</translation>
     </message>
     <message numerus="yes">
         <source>%n contact(s) sent</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>%n Kontakt gesendet</numerusform>
+            <numerusform>%n Kontakte gesendet</numerusform>
+        </translation>
     </message>
 </context>
 </TS>

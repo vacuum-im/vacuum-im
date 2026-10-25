@@ -1,469 +1,492 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="de" sourcelanguage="en">
 <context>
     <name>ArchiveAccountOptionsWidget</name>
     <message>
         <source>Yes, if supported by server</source>
-        <translation type="unfinished"/>
+        <translation>Ja, wenn vom Server unterstützt</translation>
     </message>
     <message>
         <source>Yes, if other archive is not available</source>
-        <translation type="unfinished"/>
+        <translation>Ja, wenn kein anderes Archiv verfügbar ist</translation>
     </message>
     <message>
         <source>No, do not save history on server</source>
-        <translation type="unfinished"/>
+        <translation>Nein, Verlauf nicht auf dem Server speichern</translation>
     </message>
     <message>
         <source>Yes, if local archive is available</source>
-        <translation type="unfinished"/>
+        <translation>Ja, wenn lokales Archiv verfügbar ist</translation>
     </message>
     <message>
         <source>No, do not save history in local archive</source>
-        <translation type="unfinished"/>
+        <translation>Nein, Verlauf nicht im lokalen Archiv speichern</translation>
     </message>
     <message>
         <source>Yes, if available</source>
-        <translation type="unfinished"/>
+        <translation>Ja, wenn verfügbar</translation>
     </message>
     <message>
         <source>Yes, if other replication method is not used</source>
-        <translation type="unfinished"/>
+        <translation>Ja, wenn keine andere Replikationsmethode verwendet wird</translation>
     </message>
     <message>
         <source>No, do not copy local archive to the server</source>
-        <translation type="unfinished"/>
+        <translation>Nein, lokales Archiv nicht auf den Server kopieren</translation>
     </message>
     <message>
         <source>Save messages with formatting</source>
-        <translation type="unfinished"/>
+        <translation>Nachrichten mit Formatierung speichern</translation>
     </message>
     <message>
         <source>Save only messages text</source>
-        <translation type="unfinished"/>
+        <translation>Nur Nachrichtentext speichern</translation>
     </message>
     <message>
         <source>Do not save messages</source>
-        <translation type="unfinished"/>
+        <translation>Nachrichten nicht speichern</translation>
     </message>
     <message>
         <source>Allow Off-The-Record sessions</source>
-        <translation type="unfinished"/>
+        <translation>Off-The-Record-Sitzungen erlauben</translation>
     </message>
     <message>
         <source>Forbid Off-The-Record sessions</source>
-        <translation type="unfinished"/>
+        <translation>Off-The-Record-Sitzungen verbieten</translation>
     </message>
     <message>
         <source>Manually approve Off-The-Record sessions</source>
-        <translation type="unfinished"/>
+        <translation>Off-The-Record-Sitzungen manuell genehmigen</translation>
     </message>
     <message>
         <source>Waiting for host response...</source>
-        <translation type="unfinished"/>
+        <translation>Warte auf Antwort des Servers...</translation>
     </message>
     <message>
         <source>History preferences is not available</source>
-        <translation type="unfinished"/>
+        <translation>Verlauf Einstellungen sind nicht verfügbar</translation>
     </message>
     <message>
         <source>Failed to save archive preferences: %1</source>
-        <translation type="unfinished"/>
+        <translation>Archiv Einstellungen konnten nicht gespeichert werden: %1</translation>
     </message>
     <message>
         <source>New item preferences</source>
-        <translation type="unfinished"/>
+        <translation>Einstellungen für neuen Eintrag</translation>
     </message>
     <message>
         <source>Enter item JID:</source>
-        <translation type="unfinished"/>
+        <translation>JID des Eintrags eingeben:</translation>
     </message>
     <message>
         <source>Unacceptable item JID</source>
-        <translation type="unfinished"/>
+        <translation>Unzulässige JID des Eintrags</translation>
     </message>
     <message>
         <source>&apos;%1&apos; is not valid JID or already exists</source>
-        <translation type="unfinished"/>
+        <translation>&apos;%1&apos; ist keine gültige JID oder existiert bereits</translation>
     </message>
     <message>
         <source>Preferences accepted</source>
-        <translation type="unfinished"/>
+        <translation>Einstellungen übernommen</translation>
     </message>
 </context>
 <context>
     <name>ArchiveAccountOptionsWidgetClass</name>
     <message>
         <source>Auto archiving preferences</source>
-        <translation type="unfinished"/>
+        <translation>Automatische Archivierungs Einstellungen</translation>
     </message>
     <message>
         <source>Enable automatic archiving of messages on the server</source>
-        <translation type="unfinished"/>
+        <translation>Automatische Archivierung der Nachrichten auf dem Server aktivieren</translation>
     </message>
     <message>
         <source>Archiving policy</source>
-        <translation type="unfinished"/>
+        <translation>Archivierungsrichtlinie</translation>
     </message>
     <message>
         <source>Save history in a local archive?</source>
-        <translation type="unfinished"/>
+        <translation>Verlauf in lokalem Archiv speichern?</translation>
     </message>
     <message>
         <source>Save history on server?</source>
-        <translation type="unfinished"/>
+        <translation>Verlauf auf dem Server speichern?</translation>
     </message>
     <message>
         <source>Copy local archive to the server?</source>
-        <translation type="unfinished"/>
+        <translation>Lokales Archiv auf den Server kopieren?</translation>
     </message>
     <message>
         <source>Default archiving preferences</source>
-        <translation type="unfinished"/>
+        <translation>Standard Archivierungs Einstellungen</translation>
     </message>
     <message>
         <source>Message archiving:</source>
-        <translation type="unfinished"/>
+        <translation>Nachrichten Archivierung:</translation>
     </message>
     <message>
         <source>Off-The-Record sessions:</source>
-        <translation type="unfinished"/>
+        <translation>Off-The-Record-Sitzungen:</translation>
     </message>
     <message>
         <source>Remove messages after, days:</source>
-        <translation type="unfinished"/>
+        <translation>Nachrichten löschen nach (Tagen):</translation>
     </message>
     <message>
         <source>(0 - do not remove)</source>
-        <translation type="unfinished"/>
+        <translation>(0 - nicht löschen)</translation>
     </message>
     <message>
         <source>Individual archiving preferences</source>
-        <translation type="unfinished"/>
+        <translation>Individuelle Archivierungs Einstellungen</translation>
     </message>
     <message>
         <source>JID</source>
-        <translation type="unfinished"/>
+        <translation>JID</translation>
     </message>
     <message>
         <source>Contact identifier</source>
-        <translation type="unfinished"/>
+        <translation>Kennung des Kontakts</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation type="unfinished"/>
+        <translation>Speichern</translation>
     </message>
     <message>
         <source>Message archiving</source>
-        <translation type="unfinished"/>
+        <translation>Nachrichten Archivierung</translation>
     </message>
     <message>
         <source>OTR</source>
-        <translation type="unfinished"/>
+        <translation>OTR</translation>
     </message>
     <message>
         <source>Off-The-Record sessions </source>
-        <translation type="unfinished"/>
+        <translation>Off-The-Record-Sitzungen </translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation type="unfinished"/>
+        <translation>Entfernen</translation>
     </message>
     <message>
         <source>Remove messages after, days</source>
-        <translation type="unfinished"/>
+        <translation>Nachrichten löschen nach (Tagen)</translation>
     </message>
     <message>
         <source>Exact</source>
-        <translation type="unfinished"/>
+        <translation>Exakt</translation>
     </message>
     <message>
         <source>Settings are applied to contact which JID is exactly matches</source>
-        <translation type="unfinished"/>
+        <translation>Einstellungen gelten für Kontakte, deren JID exakt übereinstimmt</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished"/>
+        <translation>Hinzufügen</translation>
     </message>
 </context>
 <context>
     <name>ArchiveDelegate</name>
     <message numerus="yes">
         <source>%n year(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>%n Jahr</numerusform>
+            <numerusform>%n Jahre</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>%n month(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>%n Monat</numerusform>
+            <numerusform>%n Monate</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>%n day(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>%n Tag</numerusform>
+            <numerusform>%n Tage</numerusform>
+        </translation>
     </message>
     <message>
         <source>Never</source>
-        <translation type="unfinished"/>
+        <translation>Nie</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished"/>
+        <translation>Ja</translation>
     </message>
     <message>
         <source>No</source>
-        <translation type="unfinished"/>
+        <translation>Nein</translation>
     </message>
     <message>
         <source>Prefer</source>
-        <translation type="unfinished"/>
+        <translation>Bevorzugen</translation>
     </message>
     <message>
         <source>Allow</source>
-        <translation type="unfinished"/>
+        <translation>Erlauben</translation>
     </message>
     <message>
         <source>Forbid</source>
-        <translation type="unfinished"/>
+        <translation>Verbieten</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"/>
+        <translation>Unbekannt</translation>
     </message>
     <message>
         <source>Approve</source>
-        <translation type="unfinished"/>
+        <translation>Genehmigen</translation>
     </message>
     <message>
         <source>Oppose</source>
-        <translation type="unfinished"/>
+        <translation>Ablehnen</translation>
     </message>
     <message>
         <source>Require</source>
-        <translation type="unfinished"/>
+        <translation>Erfordern</translation>
     </message>
     <message>
         <source>Nothing</source>
-        <translation type="unfinished"/>
+        <translation>Nichts</translation>
     </message>
     <message>
         <source>Body</source>
-        <translation type="unfinished"/>
+        <translation>Textkörper</translation>
     </message>
     <message>
         <source>Message</source>
-        <translation type="unfinished"/>
+        <translation>Nachricht</translation>
     </message>
     <message>
         <source>Stream</source>
-        <translation type="unfinished"/>
+        <translation>Stream</translation>
     </message>
 </context>
 <context>
     <name>ArchiveViewWindow</name>
     <message>
         <source>Search in history</source>
-        <translation type="unfinished"/>
+        <translation>Im Verlauf suchen</translation>
     </message>
     <message>
         <source>Loading conversation headers...</source>
-        <translation type="unfinished"/>
+        <translation>Lade Unterhaltungsüberschriften...</translation>
     </message>
     <message>
         <source>Failed to load conversation headers: %1</source>
-        <translation type="unfinished"/>
+        <translation>Unterhaltungsüberschriften konnten nicht geladen werden: %1</translation>
     </message>
     <message>
         <source>Loading conversations...</source>
-        <translation type="unfinished"/>
+        <translation>Lade Unterhaltungen...</translation>
     </message>
     <message>
         <source>Failed to load conversations: %1</source>
-        <translation type="unfinished"/>
+        <translation>Unterhaltungen konnten nicht geladen werden: %1</translation>
     </message>
     <message>
         <source>Archive is not accessible</source>
-        <translation type="unfinished"/>
+        <translation>Archiv ist nicht zugänglich</translation>
     </message>
     <message numerus="yes">
         <source>Found %n occurrence(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>%n Treffer gefunden</numerusform>
+            <numerusform>%n Treffer gefunden</numerusform>
+        </translation>
     </message>
     <message>
         <source>Remove conversation history</source>
-        <translation type="unfinished"/>
+        <translation>Unterhaltungsverlauf entfernen</translation>
     </message>
     <message>
         <source>Removing conversations...</source>
-        <translation type="unfinished"/>
+        <translation>Entferne Unterhaltungen...</translation>
     </message>
     <message>
         <source>Failed to remove conversations: %1</source>
-        <translation type="unfinished"/>
+        <translation>Unterhaltungen konnten nicht entfernt werden: %1</translation>
     </message>
     <message>
         <source>Remove this Conversation</source>
-        <translation type="unfinished"/>
+        <translation>Diese Unterhaltung entfernen</translation>
     </message>
     <message>
         <source>Conversation history removed successfully</source>
-        <translation type="unfinished"/>
+        <translation>Unterhaltungsverlauf erfolgreich entfernt</translation>
     </message>
     <message>
         <source>Search in text</source>
-        <translation type="unfinished"/>
+        <translation>Im Text suchen</translation>
     </message>
     <message>
         <source>Conversation History</source>
-        <translation type="unfinished"/>
+        <translation>Unterhaltungsverlauf</translation>
     </message>
     <message>
         <source>Conversations are not found</source>
-        <translation type="unfinished"/>
+        <translation>Keine Unterhaltungen gefunden</translation>
     </message>
     <message>
         <source>Conversation is not selected</source>
-        <translation type="unfinished"/>
+        <translation>Keine Unterhaltung ausgewählt</translation>
     </message>
     <message>
         <source>Search is not supported</source>
-        <translation type="unfinished"/>
+        <translation>Suche wird nicht unterstützt</translation>
     </message>
     <message>
         <source>Load more conversations</source>
-        <translation type="unfinished"/>
+        <translation>Weitere Unterhaltungen laden</translation>
     </message>
     <message>
         <source>All conversations loaded</source>
-        <translation type="unfinished"/>
+        <translation>Alle Unterhaltungen geladen</translation>
     </message>
     <message>
         <source>Conversation headers are not found</source>
-        <translation type="unfinished"/>
+        <translation>Keine Unterhaltungsüberschriften gefunden</translation>
     </message>
     <message>
         <source>Retry</source>
-        <translation type="unfinished"/>
+        <translation>Wiederholen</translation>
     </message>
     <message>
         <source>Show Contact History</source>
-        <translation type="unfinished"/>
+        <translation>Zeige Kontaktverlauf</translation>
     </message>
     <message>
         <source>Remove all History with %1</source>
-        <translation type="unfinished"/>
+        <translation>Gesamten Verlauf mit %1 entfernen</translation>
     </message>
     <message>
         <source>Remove History for %1</source>
-        <translation type="unfinished"/>
+        <translation>Verlauf für %1 entfernen</translation>
     </message>
     <message>
         <source>&lt;b&gt;%1&lt;/b&gt; with %2 in %3</source>
-        <translation type="unfinished"/>
+        <translation>&lt;b&gt;%1&lt;/b&gt; mit %2 in %3</translation>
     </message>
     <message>
         <source>&lt;b&gt;%1&lt;/b&gt; in %2</source>
-        <translation type="unfinished"/>
+        <translation>&lt;b&gt;%1&lt;/b&gt; in %2</translation>
     </message>
     <message>
         <source>&lt;b&gt;%1&lt;/b&gt; with %2</source>
-        <translation type="unfinished"/>
+        <translation>&lt;b&gt;%1&lt;/b&gt; mit %2</translation>
     </message>
     <message numerus="yes">
         <source>%n conversation header(s) found</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>%n Unterhaltungsüberschrift gefunden</numerusform>
+            <numerusform>%n Unterhaltungsüberschriften gefunden</numerusform>
+        </translation>
     </message>
     <message>
         <source>Select conversation to show</source>
-        <translation type="unfinished"/>
+        <translation>Anzuzeigende Unterhaltung auswählen</translation>
     </message>
     <message numerus="yes">
         <source>%n conversation(s) shown</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>%n Unterhaltung angezeigt</numerusform>
+            <numerusform>%n Unterhaltungen angezeigt</numerusform>
+        </translation>
     </message>
     <message>
         <source>Shown %1 of %2 conversations...</source>
-        <translation type="unfinished"/>
+        <translation>%1 von %2 Unterhaltungen angezeigt...</translation>
     </message>
     <message>
         <source>with &lt;b&gt;%1&lt;/b&gt; for &lt;b&gt;%2 %3&lt;/b&gt;?</source>
-        <translation type="unfinished"/>
+        <translation>mit &lt;b&gt;%1&lt;/b&gt; für &lt;b&gt;%2 %3&lt;/b&gt;?</translation>
     </message>
     <message>
         <source>with &lt;b&gt;%1&lt;/b&gt; started at &lt;b&gt;%2&lt;/b&gt;?</source>
-        <translation type="unfinished"/>
+        <translation>mit &lt;b&gt;%1&lt;/b&gt; gestartet am &lt;b&gt;%2&lt;/b&gt;?</translation>
     </message>
     <message>
         <source>with &lt;b&gt;%1&lt;/b&gt; for all time?</source>
-        <translation type="unfinished"/>
+        <translation>mit &lt;b&gt;%1&lt;/b&gt; für den gesamten Zeitraum?</translation>
     </message>
     <message>
         <source>Do you want to remove the following conversations?</source>
-        <translation type="unfinished"/>
+        <translation>Möchten Sie die folgenden Unterhaltungen entfernen?</translation>
     </message>
     <message>
         <source>Remove Selected Conversations</source>
-        <translation type="unfinished"/>
+        <translation>Ausgewählte Unterhaltungen entfernen</translation>
     </message>
     <message>
         <source>Print Conversation History</source>
-        <translation type="unfinished"/>
+        <translation>Unterhaltungsverlauf drucken</translation>
     </message>
     <message>
         <source>HTML file (*.html)</source>
-        <translation type="unfinished"/>
+        <translation>HTML-Datei (*.html)</translation>
     </message>
     <message>
         <source>Text file (*.txt)</source>
-        <translation type="unfinished"/>
+        <translation>Textdatei (*.txt)</translation>
     </message>
     <message>
         <source>Save Conversations to File</source>
-        <translation type="unfinished"/>
+        <translation>Unterhaltungen in Datei speichern</translation>
     </message>
     <message>
         <source>Print...</source>
-        <translation type="unfinished"/>
+        <translation>Drucken...</translation>
     </message>
     <message>
         <source>Save as HTML</source>
-        <translation type="unfinished"/>
+        <translation>Als HTML speichern</translation>
     </message>
     <message>
         <source>Save as Text</source>
-        <translation type="unfinished"/>
+        <translation>Als Text speichern</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"/>
+        <translation>Exportieren</translation>
     </message>
     <message>
         <source>Phrase not found</source>
-        <translation type="unfinished"/>
+        <translation>Ausdruck nicht gefunden</translation>
     </message>
     <message numerus="yes">
         <source>And %n other conversation(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>Und %n weitere Unterhaltung</numerusform>
+            <numerusform>Und %n weitere Unterhaltungen</numerusform>
+        </translation>
     </message>
 </context>
 <context>
     <name>ChatWindowMenu</name>
     <message>
         <source>Enable Message Archiving</source>
-        <translation type="unfinished"/>
+        <translation>Nachrichten Archivierung aktivieren</translation>
     </message>
     <message>
         <source>Disable Message Archiving</source>
-        <translation type="unfinished"/>
+        <translation>Nachrichten Archivierung deaktivieren</translation>
     </message>
     <message>
         <source>Start Off-The-Record Session</source>
-        <translation type="unfinished"/>
+        <translation>Off-The-Record-Sitzung starten</translation>
     </message>
     <message>
         <source>Terminate Off-The-Record Session</source>
-        <translation type="unfinished"/>
+        <translation>Off-The-Record-Sitzung terminieren</translation>
     </message>
     <message>
         <source>Failed to change archive preferences: %1</source>
-        <translation type="unfinished"/>
+        <translation>Archiv Einstellungen konnten nicht geändert werden: %1</translation>
     </message>
 </context>
 <context>
@@ -563,87 +586,87 @@
     </message>
     <message>
         <source>Allows to save the history of communications</source>
-        <translation type="unfinished"/>
+        <translation>Ermöglicht das Speichern des Kommunikationsverlaufs</translation>
     </message>
     <message>
         <source>Automatic Archiving</source>
-        <translation type="unfinished"/>
+        <translation>Automatische Archivierung</translation>
     </message>
     <message>
         <source>Do not Save Messages</source>
-        <translation type="unfinished"/>
+        <translation>Nachrichten nicht speichern</translation>
     </message>
     <message>
         <source>Allow Off-The-Record Sessions</source>
-        <translation type="unfinished"/>
+        <translation>Off-The-Record-Sitzungen erlauben</translation>
     </message>
     <message>
         <source>Forbid Off-The-Record Sessions</source>
-        <translation type="unfinished"/>
+        <translation>Off-The-Record-Sitzungen verbieten</translation>
     </message>
     <message>
         <source>Manually Approve Off-The-Record Sessions</source>
-        <translation type="unfinished"/>
+        <translation>Off-The-Record-Sitzungen manuell genehmigen</translation>
     </message>
     <message>
         <source>Use Default Options</source>
-        <translation type="unfinished"/>
+        <translation>Standardoptionen verwenden</translation>
     </message>
     <message>
         <source>Off-The-Record session not ready, please wait...</source>
-        <translation type="unfinished"/>
+        <translation>Off-The-Record-Sitzung nicht bereit, bitte warten...</translation>
     </message>
     <message>
         <source>Negotiating Off-The-Record session...</source>
-        <translation type="unfinished"/>
+        <translation>Off-The-Record-Sitzung wird ausgehandelt...</translation>
     </message>
     <message>
         <source>Failed to load conversation</source>
-        <translation type="unfinished"/>
+        <translation>Unterhaltung konnte nicht geladen werden</translation>
     </message>
     <message>
         <source>Save Messages with Formatting</source>
-        <translation type="unfinished"/>
+        <translation>Nachrichten mit Formatierung speichern</translation>
     </message>
     <message>
         <source>Save Only Messages Text</source>
-        <translation type="unfinished"/>
+        <translation>Nur Nachrichtentext speichern</translation>
     </message>
     <message>
         <source>Failed to load conversation headers</source>
-        <translation type="unfinished"/>
+        <translation>Unterhaltungsüberschriften konnten nicht geladen werden</translation>
     </message>
     <message>
         <source>Failed to save conversation</source>
-        <translation type="unfinished"/>
+        <translation>Unterhaltung konnte nicht gespeichert werden</translation>
     </message>
     <message>
         <source>Failed to remove conversation</source>
-        <translation type="unfinished"/>
+        <translation>Unterhaltung konnte nicht entfernt werden</translation>
     </message>
     <message>
         <source>Failed to load archive modifications</source>
-        <translation type="unfinished"/>
+        <translation>Archivänderungen konnten nicht geladen werden</translation>
     </message>
     <message>
         <source>Archive preferences</source>
-        <translation type="unfinished"/>
+        <translation>Archiv Einstellungen</translation>
     </message>
     <message>
         <source>Archive synchronization</source>
-        <translation type="unfinished"/>
+        <translation>Archivsynchronisation</translation>
     </message>
     <message>
         <source>Synchronize history between archives</source>
-        <translation type="unfinished"/>
+        <translation>Verlauf zwischen Archiven synchronisieren</translation>
     </message>
     <message>
         <source>Duplicate messages in local archive (not recommended)</source>
-        <translation type="unfinished"/>
+        <translation>Nachrichten im lokalen Archiv duplizieren (nicht empfohlen)</translation>
     </message>
     <message>
         <source>Used history archives</source>
-        <translation type="unfinished"/>
+        <translation>Verwendete Verlaufsarchive</translation>
     </message>
 </context>
 </TS>

@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="de" sourcelanguage="en">
 <context>
     <name>AddContactDialog</name>
     <message>
@@ -183,144 +185,147 @@
     </message>
     <message>
         <source>Add Contact</source>
-        <translation type="unfinished"/>
+        <translation>Kontakt hinzufügen</translation>
     </message>
     <message>
         <source>Add Group with Contacts</source>
-        <translation type="unfinished"/>
+        <translation>Gruppe mit Kontakten hinzufügen</translation>
     </message>
     <message>
         <source>Copy Group to Root</source>
-        <translation type="unfinished"/>
+        <translation>Gruppe in oberste Ebene kopieren</translation>
     </message>
     <message>
         <source>Move Group to Root</source>
-        <translation type="unfinished"/>
+        <translation>Gruppe in oberste Ebene verschieben</translation>
     </message>
     <message>
         <source>Copy Contact to Group</source>
-        <translation type="unfinished"/>
+        <translation>Kontakt in Gruppe kopieren</translation>
     </message>
     <message>
         <source>Move Contact to Group</source>
-        <translation type="unfinished"/>
+        <translation>Kontakt in Gruppe verschieben</translation>
     </message>
     <message>
         <source>Copy Group to Group</source>
-        <translation type="unfinished"/>
+        <translation>Gruppe in Gruppe kopieren</translation>
     </message>
     <message>
         <source>Move Group to Group</source>
-        <translation type="unfinished"/>
+        <translation>Gruppe in Gruppe verschieben</translation>
     </message>
     <message>
         <source>Create New...</source>
-        <translation type="unfinished"/>
+        <translation>Neu erstellen...</translation>
     </message>
     <message>
         <source>To Root</source>
-        <translation type="unfinished"/>
+        <translation>In oberste Ebene</translation>
     </message>
     <message>
         <source>Without Groups</source>
-        <translation type="unfinished"/>
+        <translation>Ohne Gruppen</translation>
     </message>
     <message>
         <source>Add Contact...</source>
-        <translation type="unfinished"/>
+        <translation>Kontakt hinzufügen...</translation>
     </message>
     <message>
         <source>Subscribe Contact</source>
-        <translation type="unfinished"/>
+        <translation>Kontakt abonnieren</translation>
     </message>
     <message>
         <source>Unsubscribe Contact</source>
-        <translation type="unfinished"/>
+        <translation>Kontakt abbestellen</translation>
     </message>
     <message>
         <source>Rename</source>
-        <translation type="unfinished"/>
+        <translation>Umbenennen</translation>
     </message>
     <message>
         <source>Add to Roster...</source>
-        <translation type="unfinished"/>
+        <translation>Zum Roster hinzufügen...</translation>
     </message>
     <message>
         <source>Copy to Group</source>
-        <translation type="unfinished"/>
+        <translation>In Gruppe kopieren</translation>
     </message>
     <message>
         <source>Move to Group</source>
-        <translation type="unfinished"/>
+        <translation>In Gruppe verschieben</translation>
     </message>
     <message>
         <source>Remove from Group</source>
-        <translation type="unfinished"/>
+        <translation>Aus Gruppe entfernen</translation>
     </message>
     <message>
         <source>Remove from Roster</source>
-        <translation type="unfinished"/>
+        <translation>Aus Roster entfernen</translation>
     </message>
     <message>
         <source>Remove Group</source>
-        <translation type="unfinished"/>
+        <translation>Gruppe entfernen</translation>
     </message>
     <message>
         <source>Remove Contacts</source>
-        <translation type="unfinished"/>
+        <translation>Kontakte entfernen</translation>
     </message>
     <message>
         <source>Rename Contact</source>
-        <translation type="unfinished"/>
+        <translation>Kontakt umbenennen</translation>
     </message>
     <message>
         <source>Create Group</source>
-        <translation type="unfinished"/>
+        <translation>Gruppe erstellen</translation>
     </message>
     <message>
         <source>Remove Contact</source>
-        <translation type="unfinished"/>
+        <translation>Kontakt entfernen</translation>
     </message>
     <message>
         <source>Rename Group</source>
-        <translation type="unfinished"/>
+        <translation>Gruppe umbenennen</translation>
     </message>
     <message>
         <source>Contacts list management</source>
-        <translation type="unfinished"/>
+        <translation>Verwaltung der Kontaktliste</translation>
     </message>
     <message>
         <source>Automatically accept all subscription requests</source>
-        <translation type="unfinished"/>
+        <translation>Alle Abonnement Anfragen automatisch annehmen</translation>
     </message>
     <message>
         <source>Remove subscription when you was deleted from contacts list</source>
-        <translation type="unfinished"/>
+        <translation>Abonnement entfernen, wenn Sie aus der Kontaktliste gelöscht wurden</translation>
     </message>
     <message>
         <source>Del</source>
         <comment>Remove contact/group from roster</comment>
-        <translation type="unfinished"/>
+        <translation>Entf</translation>
     </message>
     <message>
         <source>Into this Group</source>
-        <translation type="unfinished"/>
+        <translation>In diese Gruppe</translation>
     </message>
     <message>
         <source>Are you sure you wish to remove a contact &lt;b&gt;%1&lt;/b&gt; from the roster?</source>
-        <translation type="unfinished"/>
+        <translation>Sind Sie sicher, dass Sie den Kontakt &lt;b&gt;%1&lt;/b&gt; aus dem Roster entfernen wollen?</translation>
     </message>
     <message>
         <source>Are you sure you wish to subscribe for a contact &lt;b&gt;%1&lt;/b&gt; presence?</source>
-        <translation type="unfinished"/>
+        <translation>Sind Sie sicher, dass Sie die Präsenz des Kontakts &lt;b&gt;%1&lt;/b&gt; abonnieren wollen?</translation>
     </message>
     <message>
         <source>Are you sure you wish to unsubscribe from a contact &lt;b&gt;%1&lt;/b&gt; presence?</source>
-        <translation type="unfinished"/>
+        <translation>Sind Sie sicher, dass Sie das Abonnement der Präsenz des Kontakts &lt;b&gt;%1&lt;/b&gt; beenden wollen?</translation>
     </message>
     <message numerus="yes">
         <source>Are you sure you wish to remove &lt;b&gt;%n contact(s)&lt;/b&gt; from the roster?</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>Sind Sie sicher, dass Sie &lt;b&gt;%n Kontakt&lt;/b&gt; aus dem Roster entfernen wollen?</numerusform>
+            <numerusform>Sind Sie sicher, dass Sie &lt;b&gt;%n Kontakte&lt;/b&gt; aus dem Roster entfernen wollen?</numerusform>
+        </translation>
     </message>
 </context>
 <context>

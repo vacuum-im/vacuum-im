@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="de" sourcelanguage="en">
 <context>
     <name>RostersView</name>
     <message>
@@ -7,7 +9,7 @@
     </message>
     <message>
         <source>Contacts</source>
-        <translation type="unfinished"/>
+        <translation>Kontakte</translation>
     </message>
 </context>
 <context>
@@ -22,95 +24,95 @@
     </message>
     <message>
         <source>Show/Hide disconnected contacts</source>
-        <translation type="unfinished"/>
+        <translation>Offline Kontakte anzeigen/ausblenden</translation>
     </message>
     <message>
         <source>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</source>
-        <translation type="unfinished"/>
+        <translation>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</translation>
     </message>
     <message>
         <source>Absent</source>
-        <translation type="unfinished"/>
+        <translation>Fehlend</translation>
     </message>
     <message>
         <source>Mutual</source>
-        <translation type="unfinished"/>
+        <translation>Gegenseitig</translation>
     </message>
     <message>
         <source>Provided to you</source>
-        <translation type="unfinished"/>
+        <translation>Ihnen zur Verfügung gestellt</translation>
     </message>
     <message>
         <source>Provided from you</source>
-        <translation type="unfinished"/>
+        <translation>Von Ihnen zur Verfügung gestellt</translation>
     </message>
     <message>
         <source>&lt;b&gt;Subscription:&lt;/b&gt; %1, request sent</source>
-        <translation type="unfinished"/>
+        <translation>&lt;b&gt;Abonnement:&lt;/b&gt; %1, Anfrage gesendet</translation>
     </message>
     <message>
         <source>&lt;b&gt;Subscription:&lt;/b&gt; %1</source>
-        <translation type="unfinished"/>
+        <translation>&lt;b&gt;Abonnement:&lt;/b&gt; %1</translation>
     </message>
     <message>
         <source>&lt;b&gt;Account:&lt;/b&gt; %1</source>
-        <translation type="unfinished"/>
+        <translation>&lt;b&gt;Konto:&lt;/b&gt; %1</translation>
     </message>
     <message>
         <source>Contacts List</source>
-        <translation type="unfinished"/>
+        <translation>Kontaktliste</translation>
     </message>
     <message>
         <source>Contacts list</source>
-        <translation type="unfinished"/>
+        <translation>Kontaktliste</translation>
     </message>
     <message>
         <source>Show contact resource with highest priority</source>
-        <translation type="unfinished"/>
+        <translation>Ressource des Kontakts mit höchster Priorität anzeigen</translation>
     </message>
     <message>
         <source>Hide scroll bars in contact list window</source>
-        <translation type="unfinished"/>
+        <translation>Bildlaufleisten im Fenster der Kontaktliste ausblenden</translation>
     </message>
     <message>
         <source>Simplified</source>
-        <translation type="unfinished"/>
+        <translation>Vereinfacht</translation>
     </message>
     <message>
         <source>Compact</source>
-        <translation type="unfinished"/>
+        <translation>Kompakt</translation>
     </message>
     <message>
         <source>Contacts list view:</source>
-        <translation type="unfinished"/>
+        <translation>Ansicht der Kontaktliste:</translation>
     </message>
     <message>
         <source>Sort contacts list:</source>
-        <translation type="unfinished"/>
+        <translation>Kontaktliste sortieren:</translation>
     </message>
     <message>
         <source>alphabetically</source>
-        <translation type="unfinished"/>
+        <translation>alphabetisch</translation>
     </message>
     <message>
         <source>by status</source>
-        <translation type="unfinished"/>
+        <translation>nach Status</translation>
     </message>
     <message>
         <source>Full</source>
-        <translation type="unfinished"/>
+        <translation>Vollständig</translation>
     </message>
     <message>
         <source>Contact-List</source>
-        <translation type="unfinished"/>
+        <translation>Kontaktliste</translation>
     </message>
     <message>
         <source>Show disconnected contacts</source>
-        <translation type="unfinished"/>
+        <translation>Offline Kontakte anzeigen</translation>
     </message>
     <message>
         <source>Show contacts of all accounts in common list</source>
-        <translation type="unfinished"/>
+        <translation>Kontakte aller Konten in gemeinsamer Liste anzeigen</translation>
     </message>
 </context>
 </TS>

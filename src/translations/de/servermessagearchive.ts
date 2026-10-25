@@ -5,19 +5,19 @@
     <name>ServerMessageArchive</name>
     <message>
         <source>Server Message Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Server Nachrichtenarchiv</translation>
     </message>
     <message>
         <source>Allows to save the history of communications on the server</source>
-        <translation type="unfinished"></translation>
+        <translation>Erlaubt das Speichern des Kommunikationsverlaufs auf dem Server</translation>
     </message>
     <message>
         <source>Standard Server Side Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard Serverseitiges Archiv</translation>
     </message>
     <message>
         <source>History of conversations is stored on your jabber server</source>
-        <translation type="unfinished"></translation>
+        <translation>Der Gesprächsverlauf wird auf Ihrem Jabber Server gespeichert</translation>
     </message>
 </context>
 </TS>

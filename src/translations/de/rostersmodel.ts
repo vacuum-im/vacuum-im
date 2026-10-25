@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="de" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="de" sourcelanguage="en">
 <context>
     <name>RostersModel</name>
     <message>
@@ -27,11 +29,11 @@
     </message>
     <message>
         <source>Accounts</source>
-        <translation type="unfinished"/>
+        <translation>Konten</translation>
     </message>
     <message>
         <source>All Contacts</source>
-        <translation type="unfinished"/>
+        <translation>Alle Kontakte</translation>
     </message>
 </context>
 </TS>
