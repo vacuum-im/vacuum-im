@@ -5,19 +5,19 @@
     <name>ExchangeApproveDialog</name>
     <message>
         <source>Contact &apos;%1&apos; offers you to make the following changes in your contact list:</source>
-        <translation>Der Kontakt '%1' schlägt Ihnen die folgenden Änderungen an Ihrer Kontaktliste vor:</translation>
+        <translation>Der Kontakt &apos;%1&apos; schlägt Ihnen die folgenden Änderungen an Ihrer Kontaktliste vor:</translation>
     </message>
     <message>
         <source>Add new contact &apos;%1 &lt;%2&gt;&apos;</source>
-        <translation>Neuen Kontakt '%1 &lt;%2&gt;' hinzufügen</translation>
+        <translation>Neuen Kontakt &apos;%1 &lt;%2&gt;&apos; hinzufügen</translation>
     </message>
     <message>
         <source>Remove contact &apos;%1&apos; from contact list</source>
-        <translation>Kontakt '%1' aus der Kontaktliste entfernen</translation>
+        <translation>Kontakt &apos;%1&apos; aus der Kontaktliste entfernen</translation>
     </message>
     <message>
         <source>Rename contact &apos;%1&apos; to &apos;%2&apos;</source>
-        <translation>Kontakt '%1' in '%2' umbenennen</translation>
+        <translation>Kontakt &apos;%1&apos; in &apos;%2&apos; umbenennen</translation>
     </message>
     <message>
         <source>Roster Modification - %1</source>
@@ -29,15 +29,15 @@
     </message>
     <message>
         <source>Add new contact &apos;%1 &lt;%2&gt;&apos; to the group: %3</source>
-        <translation>Neuen Kontakt '%1 &lt;%2&gt;' zur Gruppe hinzufügen: %3</translation>
+        <translation>Neuen Kontakt &apos;%1 &lt;%2&gt;&apos; zur Gruppe hinzufügen: %3</translation>
     </message>
     <message>
         <source>Copy contact &apos;%1&apos; to the group: %2</source>
-        <translation>Kontakt '%1' in die Gruppe kopieren: %2</translation>
+        <translation>Kontakt &apos;%1&apos; in die Gruppe kopieren: %2</translation>
     </message>
     <message>
         <source>Remove contact &apos;%1&apos; from the group: %2</source>
-        <translation>Kontakt '%1' aus der Gruppe entfernen: %2</translation>
+        <translation>Kontakt &apos;%1&apos; aus der Gruppe entfernen: %2</translation>
     </message>
 </context>
 <context>

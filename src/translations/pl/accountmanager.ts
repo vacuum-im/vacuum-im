@@ -160,7 +160,7 @@
     </message>
     <message>
         <source>Account credentials successfully checked, click &apos;Finish&apos; button to add the account.</source>
-        <translation>Dane konta zostały pomyślnie sprawdzone; kliknij przycisk 'Zakończ', aby dodać konto.</translation>
+        <translation>Dane konta zostały pomyślnie sprawdzone; kliknij przycisk &apos;Zakończ&apos;, aby dodać konto.</translation>
     </message>
     <message>
         <source>Failed to connect :(</source>
@@ -168,7 +168,7 @@
     </message>
     <message>
         <source>Click &apos;Back&apos; button to change the account credentials or the &apos;Finish&apos; button to add the account as is.</source>
-        <translation>Kliknij przycisk 'Wstecz', aby zmienić dane konta, albo przycisk 'Zakończ', aby dodać konto w obecnej postaci.</translation>
+        <translation>Kliknij przycisk &apos;Wstecz&apos;, aby zmienić dane konta, albo przycisk &apos;Zakończ&apos;, aby dodać konto w obecnej postaci.</translation>
     </message>
 </context>
 <context>
@@ -362,7 +362,7 @@
     </message>
     <message>
         <source>Account %1 successfully registered, click &apos;Finish&apos; button to add the account.</source>
-        <translation>Konto %1 zostało pomyślnie zarejestrowane; kliknij przycisk 'Zakończ', aby dodać konto.</translation>
+        <translation>Konto %1 zostało pomyślnie zarejestrowane; kliknij przycisk &apos;Zakończ&apos;, aby dodać konto.</translation>
     </message>
 </context>
 <context>

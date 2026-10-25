@@ -91,7 +91,7 @@
     </message>
     <message>
         <source>Conference as &apos;name@service.server.com&apos;</source>
-        <translation>Konferencja w postaci 'name@service.server.com'</translation>
+        <translation>Konferencja w postaci &apos;name@service.server.com&apos;</translation>
     </message>
     <message>
         <source>Nickname:</source>

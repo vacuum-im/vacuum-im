@@ -13,7 +13,7 @@
     </message>
     <message>
         <source>Failed to load message style. Press clear window button to retry.</source>
-        <translation>Nachrichtenstil konnte nicht geladen werden. Klicken Sie auf 'Fenster leeren', um es erneut zu versuchen.</translation>
+        <translation>Nachrichtenstil konnte nicht geladen werden. Klicken Sie auf &apos;Fenster leeren&apos;, um es erneut zu versuchen.</translation>
     </message>
 </context>
 <context>

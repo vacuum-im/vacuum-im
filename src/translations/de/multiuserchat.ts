@@ -127,11 +127,11 @@
     </message>
     <message>
         <source>User %1 already present in list of &apos;%2&apos;</source>
-        <translation>Benutzer %1 ist bereits in der Liste '%2' vorhanden</translation>
+        <translation>Benutzer %1 ist bereits in der Liste &apos;%2&apos; vorhanden</translation>
     </message>
     <message>
         <source>Failed to load list of &apos;%1&apos;</source>
-        <translation>Liste '%1' konnte nicht geladen werden</translation>
+        <translation>Liste &apos;%1&apos; konnte nicht geladen werden</translation>
     </message>
     <message>
         <source>Failed to update users affiliation lists</source>
@@ -139,7 +139,7 @@
     </message>
     <message>
         <source>Failed to load list of &apos;%1&apos;: %2</source>
-        <translation>Liste '%1' konnte nicht geladen werden: %2</translation>
+        <translation>Liste &apos;%1&apos; konnte nicht geladen werden: %2</translation>
     </message>
     <message>
         <source>Failed to update users affiliation lists: %1</source>
@@ -148,8 +148,8 @@
     <message numerus="yes">
         <source>Move %n user(s) to &apos;%1&apos;</source>
         <translation>
-            <numerusform>%n Benutzer in '%1' verschieben</numerusform>
-            <numerusform>%n Benutzer in '%1' verschieben</numerusform>
+            <numerusform>%n Benutzer in &apos;%1&apos; verschieben</numerusform>
+            <numerusform>%n Benutzer in &apos;%1&apos; verschieben</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -294,7 +294,7 @@
     </message>
     <message>
         <source>Conference as &apos;name@service.server.com&apos;</source>
-        <translation>Konferenz als 'name@service.server.com'</translation>
+        <translation>Konferenz als &apos;name@service.server.com&apos;</translation>
     </message>
     <message>
         <source>Your nickname in conference</source>
@@ -358,7 +358,7 @@
     </message>
     <message>
         <source>Conference service &apos;%1&apos; is not available or does not exists</source>
-        <translation>Konferenz Dienst '%1' ist nicht verfügbar oder existiert nicht</translation>
+        <translation>Konferenz Dienst &apos;%1&apos; ist nicht verfügbar oder existiert nicht</translation>
     </message>
     <message>
         <source>Failed to check conference existence: %1</source>
@@ -693,7 +693,7 @@
     </message>
     <message>
         <source>A room in which only those with &apos;voice&apos; may send messages to all occupants</source>
-        <translation>Ein Raum, in dem nur Benutzer mit 'Stimme' Nachrichten an alle Anwesenden senden dürfen</translation>
+        <translation>Ein Raum, in dem nur Benutzer mit &apos;Stimme&apos; Nachrichten an alle Anwesenden senden dürfen</translation>
     </message>
     <message>
         <source>Non-anonymous room</source>
@@ -1372,7 +1372,7 @@
     </message>
     <message>
         <source>Nickname &apos;%1&apos; is in use or registered by another user, you may %2 or %3</source>
-        <translation>Der Spitzname '%1' wird bereits verwendet oder ist von einem anderen Benutzer registriert, Sie können %2 oder %3</translation>
+        <translation>Der Spitzname &apos;%1&apos; wird bereits verwendet oder ist von einem anderen Benutzer registriert, Sie können %2 oder %3</translation>
     </message>
     <message>
         <source>change nick</source>
@@ -1557,7 +1557,7 @@
     </message>
     <message>
         <source>Conference &apos;%1@%2&apos; already exists, choose another name</source>
-        <translation>Konferenz '%1@%2' existiert bereits, wählen Sie einen anderen Namen</translation>
+        <translation>Konferenz &apos;%1@%2&apos; existiert bereits, wählen Sie einen anderen Namen</translation>
     </message>
     <message>
         <source>Failed to load list of conferences: %1</source>

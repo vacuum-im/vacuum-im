@@ -107,11 +107,11 @@
     </message>
     <message>
         <source>   ddd - the abbreviated localized day name (e.g. &apos;Mon&apos; to &apos;Sun&apos;)</source>
-        <translation>   ddd - skrócona zlokalizowana nazwa dnia (np. 'pon' do 'nd')</translation>
+        <translation>   ddd - skrócona zlokalizowana nazwa dnia (np. &apos;pon&apos; do &apos;nd&apos;)</translation>
     </message>
     <message>
         <source>   dddd - the long localized day name (e.g. &apos;Monday&apos; to &apos;Sunday&apos;)</source>
-        <translation>   dddd - pełna zlokalizowana nazwa dnia (np. 'poniedziałek' do 'niedziela')</translation>
+        <translation>   dddd - pełna zlokalizowana nazwa dnia (np. &apos;poniedziałek&apos; do &apos;niedziela&apos;)</translation>
     </message>
     <message>
         <source>   M - the month as number without a leading zero (1-12)</source>
@@ -123,11 +123,11 @@
     </message>
     <message>
         <source>   MMM - the abbreviated localized month name (e.g. &apos;Jan&apos; to &apos;Dec&apos;)</source>
-        <translation>   MMM - skrócona zlokalizowana nazwa miesiąca (np. 'sty' do 'gru')</translation>
+        <translation>   MMM - skrócona zlokalizowana nazwa miesiąca (np. &apos;sty&apos; do &apos;gru&apos;)</translation>
     </message>
     <message>
         <source>   MMMM - the long localized month name (e.g. &apos;January&apos; to &apos;December&apos;)</source>
-        <translation>   MMMM - pełna zlokalizowana nazwa miesiąca (np. 'styczeń' do 'grudzień')</translation>
+        <translation>   MMMM - pełna zlokalizowana nazwa miesiąca (np. &apos;styczeń&apos; do &apos;grudzień&apos;)</translation>
     </message>
     <message>
         <source>   yy - the year as two digit number (00-99)</source>
@@ -183,11 +183,11 @@
     </message>
     <message>
         <source>   AP or A - interpret as an AM/PM time. AP must be either &apos;AM&apos; or &apos;PM&apos;</source>
-        <translation>   AP lub A - interpretacja jako czas AM/PM. AP musi mieć wartość 'AM' lub 'PM'</translation>
+        <translation>   AP lub A - interpretacja jako czas AM/PM. AP musi mieć wartość &apos;AM&apos; lub &apos;PM&apos;</translation>
     </message>
     <message>
         <source>   ap or a - interpret as an AM/PM time. ap must be either &apos;am&apos; or &apos;pm&apos;</source>
-        <translation>   ap lub a - interpretacja jako czas AM/PM. ap musi mieć wartość 'am' lub 'pm'</translation>
+        <translation>   ap lub a - interpretacja jako czas AM/PM. ap musi mieć wartość &apos;am&apos; lub &apos;pm&apos;</translation>
     </message>
     <message>
         <source>Example:</source>
@@ -195,7 +195,7 @@
     </message>
     <message>
         <source>   Status is set to &apos;away&apos; at %(hh:mm:ss), because of idle from $(hh:mm:ss) for #(mm) minutes and #(ss) seconds</source>
-        <translation>   Status ustawiany na 'Odszedłem' o %(hh:mm:ss) z powodu bezczynności od $(hh:mm:ss) trwającej #(mm) minut i #(ss) sekund</translation>
+        <translation>   Status ustawiany na &apos;Odszedłem&apos; o %(hh:mm:ss) z powodu bezczynności od $(hh:mm:ss) trwającej #(mm) minut i #(ss) sekund</translation>
     </message>
     <message>
         <source>Show all rules for the automatic change of status...</source>

@@ -85,7 +85,7 @@
     </message>
     <message>
         <source>&apos;%1&apos; is not valid JID or already exists</source>
-        <translation>'%1' nie jest prawidłowym JID lub już istnieje</translation>
+        <translation>&apos;%1&apos; nie jest prawidłowym JID lub już istnieje</translation>
     </message>
     <message>
         <source>Preferences accepted</source>

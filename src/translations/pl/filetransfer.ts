@@ -66,7 +66,7 @@
     </message>
     <message>
         <source>Failed to send request for file &apos;%1&apos;</source>
-        <translation>Nie udało się wysłać żądania przesłania pliku '%1'</translation>
+        <translation>Nie udało się wysłać żądania przesłania pliku &apos;%1&apos;</translation>
     </message>
     <message>
         <source>File transfer</source>
@@ -78,23 +78,23 @@
     </message>
     <message>
         <source>%1 wants to send you a file &apos;%2&apos;</source>
-        <translation>%1 chce wysłać ci plik '%2'</translation>
+        <translation>%1 chce wysłać ci plik &apos;%2&apos;</translation>
     </message>
     <message>
         <source>Sending file &apos;%1&apos; to %2 started automatically</source>
-        <translation>Automatycznie rozpoczęto wysyłanie pliku '%1' do %2</translation>
+        <translation>Automatycznie rozpoczęto wysyłanie pliku &apos;%1&apos; do %2</translation>
     </message>
     <message>
         <source>Receiving file &apos;%1&apos; from %2 started automatically</source>
-        <translation>Automatycznie rozpoczęto pobieranie pliku '%1' od %2</translation>
+        <translation>Automatycznie rozpoczęto pobieranie pliku &apos;%1&apos; od %2</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; successfully sent to %2</source>
-        <translation>Plik '%1' pomyślnie wysłano do %2</translation>
+        <translation>Plik &apos;%1&apos; pomyślnie wysłano do %2</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; successfully received from %2</source>
-        <translation>Plik '%1' pomyślnie odebrano od %2</translation>
+        <translation>Plik &apos;%1&apos; pomyślnie odebrano od %2</translation>
     </message>
     <message>
         <source>File transfer failed</source>
@@ -102,11 +102,11 @@
     </message>
     <message>
         <source>Failed to send file &apos;%1&apos; to %2: %3</source>
-        <translation>Nie udało się wysłać pliku '%1' do %2: %3</translation>
+        <translation>Nie udało się wysłać pliku &apos;%1&apos; do %2: %3</translation>
     </message>
     <message>
         <source>Failed to receive file &apos;%1&apos; from %2: %3</source>
-        <translation>Nie udało się odebrać pliku '%1' od %2: %3</translation>
+        <translation>Nie udało się odebrać pliku &apos;%1&apos; od %2: %3</translation>
     </message>
     <message>
         <source>Select File</source>

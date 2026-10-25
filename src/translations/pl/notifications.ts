@@ -41,11 +41,11 @@
     </message>
     <message>
         <source>Disable sounds and popup windows if status is &apos;Away&apos;</source>
-        <translation>Wyłącz dźwięki i okna popup, jeśli status to 'Odszedłem'</translation>
+        <translation>Wyłącz dźwięki i okna popup, jeśli status to &apos;Odszedłem&apos;</translation>
     </message>
     <message>
         <source>Disable sounds and popup windows if status is &apos;Do not disturb&apos;</source>
-        <translation>Wyłącz dźwięki i okna popup, jeśli status to 'Nie przeszkadzaj'</translation>
+        <translation>Wyłącz dźwięki i okna popup, jeśli status to &apos;Nie przeszkadzaj&apos;</translation>
     </message>
     <message>
         <source>Play notification sound when received a message in the active window</source>
