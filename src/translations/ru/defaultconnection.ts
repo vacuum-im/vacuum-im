@@ -37,7 +37,7 @@
     </message>
     <message>
         <source>TLSv1.3</source>
-        <translation type="unfinished">TLSv1.3</translation>
+        <translation>TLSv1.3</translation>
     </message>
 </context>
 <context>
