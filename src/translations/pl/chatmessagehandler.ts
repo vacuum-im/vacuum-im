@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="pl" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="pl" sourcelanguage="en">
 <context>
     <name>ChatMessageHandler</name>
     <message>
@@ -52,11 +54,11 @@
     </message>
     <message>
         <source>Contact resource</source>
-        <translation type="unfinished"/>
+        <translation>Zasób kontaktu</translation>
     </message>
     <message>
         <source>&lt;Absent&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;Nieobecny&gt;</translation>
     </message>
 </context>
 </TS>

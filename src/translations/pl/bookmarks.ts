@@ -1,53 +1,55 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="pl" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="pl" sourcelanguage="en">
 <context>
     <name>Bookmarks</name>
     <message>
         <source>Bookmarks</source>
-        <translation type="unfinished"/>
+        <translation>Zakładki</translation>
     </message>
     <message>
         <source>Allows to create bookmarks at the jabber conference and web pages</source>
-        <translation type="unfinished"/>
+        <translation>Pozwala tworzyć zakładki do konferencji Jabbera i stron internetowych</translation>
     </message>
     <message>
         <source>Edit Bookmarks</source>
-        <translation type="unfinished"/>
+        <translation>Edytuj zakładki</translation>
     </message>
     <message>
         <source>Add to Bookmarks</source>
-        <translation type="unfinished"/>
+        <translation>Dodaj do zakładek</translation>
     </message>
     <message>
         <source>Remove from Bookmarks</source>
-        <translation type="unfinished"/>
+        <translation>Usuń z zakładek</translation>
     </message>
     <message>
         <source>Edit Bookmark</source>
-        <translation type="unfinished"/>
+        <translation>Edytuj zakładkę</translation>
     </message>
     <message>
         <source>Rename Bookmark</source>
-        <translation type="unfinished"/>
+        <translation>Zmień nazwę zakładki</translation>
     </message>
     <message>
         <source>Enter bookmark name:</source>
-        <translation type="unfinished"/>
+        <translation>Wpisz nazwę zakładki:</translation>
     </message>
     <message>
         <source>Join to Conference at Startup</source>
-        <translation type="unfinished"/>
+        <translation>Dołączaj do konferencji przy uruchamianiu</translation>
     </message>
     <message>
         <source>Conferences</source>
-        <translation type="unfinished"/>
+        <translation>Konferencje</translation>
     </message>
     <message>
         <source>Disable auto join to conferences on this computer</source>
-        <translation type="unfinished"/>
+        <translation>Wyłącz automatyczne dołączanie do konferencji na tym komputerze</translation>
     </message>
     <message>
         <source>Show windows of auto joined conferences at startup</source>
-        <translation type="unfinished"/>
+        <translation>Pokazuj okna automatycznie dołączonych konferencji przy uruchamianiu</translation>
     </message>
 </context>
 <context>
@@ -66,7 +68,7 @@
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Błąd</translation>
     </message>
 </context>
 <context>
@@ -85,23 +87,23 @@
     </message>
     <message>
         <source>Conference:</source>
-        <translation type="unfinished"/>
+        <translation>Konferencja:</translation>
     </message>
     <message>
         <source>Conference as &apos;name@service.server.com&apos;</source>
-        <translation type="unfinished"/>
+        <translation>Konferencja w postaci 'name@service.server.com'</translation>
     </message>
     <message>
         <source>Nickname:</source>
-        <translation type="unfinished"/>
+        <translation>Nick:</translation>
     </message>
     <message>
         <source>Your nickname in conference</source>
-        <translation type="unfinished"/>
+        <translation>Twój nick w konferencji</translation>
     </message>
     <message>
         <source>Conference password if required</source>
-        <translation type="unfinished"/>
+        <translation>Hasło konferencji, jeśli wymagane</translation>
     </message>
     <message>
         <source>Name:</source>
@@ -109,23 +111,23 @@
     </message>
     <message>
         <source>Bookmark to Conference</source>
-        <translation type="unfinished"/>
+        <translation>Zakładka do konferencji</translation>
     </message>
     <message>
         <source>Bookmark to Link</source>
-        <translation type="unfinished"/>
+        <translation>Zakładka do linku</translation>
     </message>
     <message>
         <source>Link:</source>
-        <translation type="unfinished"/>
+        <translation>Link:</translation>
     </message>
     <message>
         <source>Any valid link</source>
-        <translation type="unfinished"/>
+        <translation>Dowolny poprawny link</translation>
     </message>
     <message>
         <source>Bookmark name</source>
-        <translation type="unfinished"/>
+        <translation>Nazwa zakładki</translation>
     </message>
 </context>
 <context>
@@ -140,7 +142,7 @@
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Błąd</translation>
     </message>
 </context>
 <context>

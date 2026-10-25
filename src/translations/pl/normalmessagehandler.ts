@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="pl" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="pl" sourcelanguage="en">
 <context>
     <name>NormalMessageHandler</name>
     <message>
@@ -60,35 +62,35 @@
     </message>
     <message>
         <source>Send</source>
-        <translation type="unfinished"/>
+        <translation>Wyślij</translation>
     </message>
     <message>
         <source>Reply</source>
-        <translation type="unfinished"/>
+        <translation>Odpowiedz</translation>
     </message>
     <message>
         <source>Forward</source>
-        <translation type="unfinished"/>
+        <translation>Przekaż</translation>
     </message>
     <message>
         <source>Show Chat Dialog</source>
-        <translation type="unfinished"/>
+        <translation>Pokaż okno czatu</translation>
     </message>
     <message>
         <source>Send Message</source>
-        <translation type="unfinished"/>
+        <translation>Wyślij wiadomość</translation>
     </message>
     <message>
         <source>Show Next (%1)</source>
-        <translation type="unfinished"/>
+        <translation>Pokaż następny (%1)</translation>
     </message>
     <message>
         <source>Send as Chat Message</source>
-        <translation type="unfinished"/>
+        <translation>Wyślij jako wiadomość czatu</translation>
     </message>
     <message>
         <source>Consider all single contacts messages as read when read the first</source>
-        <translation type="unfinished"/>
+        <translation>Oznaczaj wszystkie wiadomości pojedynczych kontaktów jako przeczytane po przeczytaniu pierwszej</translation>
     </message>
 </context>
 </TS>

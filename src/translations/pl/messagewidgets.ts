@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="pl" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="pl" sourcelanguage="en">
 <context>
     <name>EditWidget</name>
     <message>
@@ -134,84 +136,88 @@
     </message>
     <message>
         <source>Quote Selected Text</source>
-        <translation type="unfinished"/>
+        <translation>Cytuj zaznaczony tekst</translation>
     </message>
     <message>
         <source>Message window view</source>
-        <translation type="unfinished"/>
+        <translation>Widok okna wiadomości</translation>
     </message>
     <message>
         <source>Load last messages from history</source>
-        <translation type="unfinished"/>
+        <translation>Wczytaj ostatnie wiadomości z historii</translation>
     </message>
     <message>
         <source>Show message windows together with contacts list</source>
-        <translation type="unfinished"/>
+        <translation>Pokazuj okna wiadomości razem z listą kontaktów</translation>
     </message>
     <message>
         <source>Show message windows in tab window</source>
-        <translation type="unfinished"/>
+        <translation>Pokazuj okna wiadomości w oknie z zakładkami</translation>
     </message>
     <message>
         <source>Automatically resize messages input field</source>
-        <translation type="unfinished"/>
+        <translation>Automatycznie zmieniaj rozmiar pola wpisywania wiadomości</translation>
     </message>
     <message>
         <source>Minimum number of lines in messages input field:</source>
-        <translation type="unfinished"/>
+        <translation>Minimalna liczba linii w polu wpisywania wiadomości:</translation>
     </message>
     <message>
         <source>Message window behavior</source>
-        <translation type="unfinished"/>
+        <translation>Zachowanie okna wiadomości</translation>
     </message>
     <message>
         <source>Show contacts status changes</source>
-        <translation type="unfinished"/>
+        <translation>Pokazuj zmiany statusów kontaktów</translation>
     </message>
     <message>
         <source>Save contacts status messages in history</source>
-        <translation type="unfinished"/>
+        <translation>Zapisuj komunikaty statusów kontaktów w historii</translation>
     </message>
     <message>
         <source>Ctrl+Q</source>
         <comment>Quote selected text</comment>
-        <translation type="unfinished"/>
+        <translation>Ctrl+Q</translation>
     </message>
     <message>
         <source>Send chat message</source>
-        <translation type="unfinished"/>
+        <translation>Wyślij wiadomość czatu</translation>
     </message>
     <message>
         <source>Return</source>
         <comment>Send chat message</comment>
-        <translation type="unfinished"/>
+        <translation>Return</translation>
     </message>
     <message>
         <source>Send single message</source>
-        <translation type="unfinished"/>
+        <translation>Wyślij pojedynczą wiadomość</translation>
     </message>
     <message>
         <source>Ctrl+Return</source>
         <comment>Send single message</comment>
-        <translation type="unfinished"/>
+        <translation>Ctrl+Return</translation>
     </message>
 </context>
 <context>
     <name>NormalWindow</name>
     <message numerus="yes">
         <source>Selected %n contact(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>Zaznaczono %n kontakt</numerusform>
+            <numerusform>Zaznaczono %n kontakty</numerusform>
+            <numerusform>Zaznaczono %n kontaktów</numerusform>
+        </translation>
     </message>
     <message>
         <source>Subject</source>
-        <translation type="unfinished"/>
+        <translation>Temat</translation>
     </message>
 </context>
 <context>
     <name>NormalWindowClass</name>
     <message>
         <source>Fast choice</source>
-        <translation type="unfinished"/>
+        <translation>Szybki wybór</translation>
     </message>
 </context>
 <context>
@@ -234,86 +240,86 @@
     </message>
     <message>
         <source>Select All Contacts</source>
-        <translation type="unfinished"/>
+        <translation>Zaznacz wszystkie kontakty</translation>
     </message>
     <message>
         <source>Select Online Contact</source>
-        <translation type="unfinished"/>
+        <translation>Zaznacz kontakty w sieci</translation>
     </message>
     <message>
         <source>Select Available Contacts</source>
-        <translation type="unfinished"/>
+        <translation>Zaznacz dostępne kontakty</translation>
     </message>
     <message>
         <source>Clear Selection</source>
-        <translation type="unfinished"/>
+        <translation>Wyczyść zaznaczenie</translation>
     </message>
     <message>
         <source>Load Selection</source>
-        <translation type="unfinished"/>
+        <translation>Wczytaj zaznaczenie</translation>
     </message>
     <message>
         <source>Save Selection</source>
-        <translation type="unfinished"/>
+        <translation>Zapisz zaznaczenie</translation>
     </message>
     <message>
         <source>Load Contacts from File</source>
-        <translation type="unfinished"/>
+        <translation>Wczytaj kontakty z pliku</translation>
     </message>
     <message>
         <source>Failed to Load Contacts</source>
-        <translation type="unfinished"/>
+        <translation>Nie udało się wczytać kontaktów</translation>
     </message>
     <message>
         <source>Incorrect file format</source>
-        <translation type="unfinished"/>
+        <translation>Nieprawidłowy format pliku</translation>
     </message>
     <message>
         <source>Failed to read file: %1</source>
-        <translation type="unfinished"/>
+        <translation>Nie udało się odczytać pliku: %1</translation>
     </message>
     <message>
         <source>Failed to open file: %1</source>
-        <translation type="unfinished"/>
+        <translation>Nie udało się otworzyć pliku: %1</translation>
     </message>
     <message>
         <source>Save Contacts to File</source>
-        <translation type="unfinished"/>
+        <translation>Zapisz kontakty do pliku</translation>
     </message>
     <message>
         <source>Failed to Save Contacts</source>
-        <translation type="unfinished"/>
+        <translation>Nie udało się zapisać kontaktów</translation>
     </message>
     <message>
         <source>Failed to create file: %1</source>
-        <translation type="unfinished"/>
+        <translation>Nie udało się utworzyć pliku: %1</translation>
     </message>
     <message>
         <source>Load Last Selection</source>
-        <translation type="unfinished"/>
+        <translation>Wczytaj ostatnie zaznaczenie</translation>
     </message>
     <message>
         <source>Expand All Groups</source>
-        <translation type="unfinished"/>
+        <translation>Rozwiń wszystkie grupy</translation>
     </message>
     <message>
         <source>Collapse All Groups</source>
-        <translation type="unfinished"/>
+        <translation>Zwiń wszystkie grupy</translation>
     </message>
     <message>
         <source>Hide Offline Contacts</source>
-        <translation type="unfinished"/>
+        <translation>Ukryj kontakty offline</translation>
     </message>
     <message>
         <source>Sort Contacts by Status</source>
-        <translation type="unfinished"/>
+        <translation>Sortuj kontakty według statusu</translation>
     </message>
 </context>
 <context>
     <name>ReceiversWidgetClass</name>
     <message>
         <source>Search Contacts</source>
-        <translation type="unfinished"/>
+        <translation>Szukaj kontaktów</translation>
     </message>
 </context>
 <context>

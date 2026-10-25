@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="pl" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="pl" sourcelanguage="en">
 <context>
     <name>DataStreamsManger</name>
     <message>
@@ -39,15 +41,15 @@
     </message>
     <message>
         <source>Data Transfer</source>
-        <translation type="unfinished"/>
+        <translation>Przesyłanie danych</translation>
     </message>
     <message>
         <source>Transfer method %1</source>
-        <translation type="unfinished"/>
+        <translation>Metoda przesyłania %1</translation>
     </message>
     <message>
         <source>Unsupported stream initiation request</source>
-        <translation type="unfinished"/>
+        <translation>Nieobsługiwane żądanie nawiązania strumienia</translation>
     </message>
 </context>
 </TS>

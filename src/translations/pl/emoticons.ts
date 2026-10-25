@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="pl" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="pl" sourcelanguage="en">
 <context>
     <name>Emoticons</name>
     <message>
@@ -11,15 +13,15 @@
     </message>
     <message>
         <source>Message windows</source>
-        <translation type="unfinished"/>
+        <translation>Okna wiadomości</translation>
     </message>
     <message>
         <source>Do not convert text smileys to images</source>
-        <translation type="unfinished"/>
+        <translation>Nie zamieniaj emotek tekstowych na obrazki</translation>
     </message>
     <message>
         <source>Smileys:</source>
-        <translation type="unfinished"/>
+        <translation>Emotki:</translation>
     </message>
 </context>
 </TS>

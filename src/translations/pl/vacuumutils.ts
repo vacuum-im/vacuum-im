@@ -1,71 +1,73 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="pl" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="pl" sourcelanguage="en">
 <context>
     <name>PasswordDialog</name>
     <message>
         <source>Enter password:</source>
-        <translation type="unfinished"/>
+        <translation>Wpisz hasło:</translation>
     </message>
     <message>
         <source>Save password</source>
-        <translation type="unfinished"/>
+        <translation>Zapisz hasło</translation>
     </message>
 </context>
 <context>
     <name>SearchLineEdit</name>
     <message>
         <source>Search options</source>
-        <translation type="unfinished"/>
+        <translation>Szukaj opcji</translation>
     </message>
     <message>
         <source>Clear text</source>
-        <translation type="unfinished"/>
+        <translation>Wyczyść tekst</translation>
     </message>
 </context>
 <context>
     <name>XmppSaslError</name>
     <message>
         <source>Authorization aborted</source>
-        <translation type="unfinished"/>
+        <translation>Uwierzytelnianie przerwane</translation>
     </message>
     <message>
         <source>Account disabled</source>
-        <translation type="unfinished"/>
+        <translation>Konto wyłączone</translation>
     </message>
     <message>
         <source>Credentials expired</source>
-        <translation type="unfinished"/>
+        <translation>Dane uwierzytelniające wygasły</translation>
     </message>
     <message>
         <source>Encryption required</source>
-        <translation type="unfinished"/>
+        <translation>Wymagane szyfrowanie</translation>
     </message>
     <message>
         <source>Incorrect encoding</source>
-        <translation type="unfinished"/>
+        <translation>Nieprawidłowe kodowanie</translation>
     </message>
     <message>
         <source>Invalid authorization id</source>
-        <translation type="unfinished"/>
+        <translation>Nieprawidłowy identyfikator autoryzacji</translation>
     </message>
     <message>
         <source>Invalid mechanism</source>
-        <translation type="unfinished"/>
+        <translation>Nieprawidłowy mechanizm</translation>
     </message>
     <message>
         <source>Malformed request</source>
-        <translation type="unfinished"/>
+        <translation>Źle sformułowane żądanie</translation>
     </message>
     <message>
         <source>Mechanism is too weak</source>
-        <translation type="unfinished"/>
+        <translation>Mechanizm jest zbyt słaby</translation>
     </message>
     <message>
         <source>Not authorized</source>
-        <translation type="unfinished"/>
+        <translation>Brak autoryzacji</translation>
     </message>
     <message>
         <source>Temporary authentication failure</source>
-        <translation type="unfinished"/>
+        <translation>Tymczasowa awaria uwierzytelniania</translation>
     </message>
 </context>
 <context>

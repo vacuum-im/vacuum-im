@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="pl" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="pl" sourcelanguage="en">
 <context>
     <name>ConnectionManager</name>
     <message>
@@ -19,59 +21,59 @@
     </message>
     <message>
         <source>Connection error</source>
-        <translation type="unfinished"/>
+        <translation>Błąd połączenia</translation>
     </message>
     <message>
         <source>Name: %1</source>
-        <translation type="unfinished"/>
+        <translation>Nazwa: %1</translation>
     </message>
     <message>
         <source>Organization: %1</source>
-        <translation type="unfinished"/>
+        <translation>Organizacja: %1</translation>
     </message>
     <message>
         <source>Subunit: %1</source>
-        <translation type="unfinished"/>
+        <translation>Jednostka podrzędna: %1</translation>
     </message>
     <message>
         <source>Country: %1</source>
-        <translation type="unfinished"/>
+        <translation>Kraj: %1</translation>
     </message>
     <message>
         <source>Locality: %1</source>
-        <translation type="unfinished"/>
+        <translation>Miejscowość: %1</translation>
     </message>
     <message>
         <source>State/Province: %1</source>
-        <translation type="unfinished"/>
+        <translation>Województwo/Prowincja: %1</translation>
     </message>
     <message>
         <source>&lt;b&gt;Certificate holder:&lt;/b&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;b&gt;Posiadacz certyfikatu:&lt;/b&gt;</translation>
     </message>
     <message>
         <source>&lt;b&gt;Certificate issuer:&lt;/b&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;b&gt;Wystawca certyfikatu:&lt;/b&gt;</translation>
     </message>
     <message>
         <source>&lt;b&gt;Certificate details:&lt;/b&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;b&gt;Szczegóły certyfikatu:&lt;/b&gt;</translation>
     </message>
     <message>
         <source>Effective from: %1</source>
-        <translation type="unfinished"/>
+        <translation>Ważny od: %1</translation>
     </message>
     <message>
         <source>Expired at: %1</source>
-        <translation type="unfinished"/>
+        <translation>Wygasa: %1</translation>
     </message>
     <message>
         <source>Serial number: %1</source>
-        <translation type="unfinished"/>
+        <translation>Numer seryjny: %1</translation>
     </message>
     <message>
         <source>Connection</source>
-        <translation type="unfinished"/>
+        <translation>Połączenie</translation>
     </message>
 </context>
 <context>
@@ -143,7 +145,7 @@
     </message>
     <message>
         <source>Default proxy:</source>
-        <translation type="unfinished"/>
+        <translation>Domyślne proxy:</translation>
     </message>
 </context>
 <context>

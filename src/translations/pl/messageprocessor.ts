@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="pl" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="pl" sourcelanguage="en">
 <context>
     <name>MessageProcessor</name>
     <message>
@@ -11,11 +13,11 @@
     </message>
     <message>
         <source>Out of Band Data</source>
-        <translation type="unfinished"/>
+        <translation>Dane poza kanałem</translation>
     </message>
     <message>
         <source>Supports to communicate a URI to another user or application</source>
-        <translation type="unfinished"/>
+        <translation>Obsługa przekazywania URI innym użytkownikom lub aplikacjom</translation>
     </message>
 </context>
 </TS>

@@ -5,53 +5,53 @@
     <name>FileArchiveOptionsClass</name>
     <message>
         <source>Synchronize archive database at startup</source>
-        <translation type="unfinished"></translation>
+        <translation>Synchronizuj bazę archiwum przy uruchamianiu</translation>
     </message>
     <message>
         <source>Move history to:</source>
-        <translation type="unfinished"></translation>
+        <translation>Przenieś historię do:</translation>
     </message>
 </context>
 <context>
     <name>FileArchiveOptionsWidget</name>
     <message>
         <source>Select the location for the file archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz położenie archiwum plików</translation>
     </message>
 </context>
 <context>
     <name>FileMessageArchive</name>
     <message>
         <source>File Message Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Archiwum wiadomości w plikach</translation>
     </message>
     <message>
         <source>Local File Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Lokalne archiwum plików</translation>
     </message>
     <message>
         <source>Allows to save the history of conversations in to local files</source>
-        <translation type="unfinished"></translation>
+        <translation>Pozwala zapisywać historię rozmów do lokalnych plików</translation>
     </message>
     <message>
         <source>History of conversations is stored in local files</source>
-        <translation type="unfinished"></translation>
+        <translation>Historia rozmów jest przechowywana w lokalnych plikach</translation>
     </message>
     <message>
         <source>Failed to create database</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie udało się utworzyć bazy danych</translation>
     </message>
     <message>
         <source>Failed to open database</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie udało się otworzyć bazy danych</translation>
     </message>
     <message>
         <source>Database format is not compatible</source>
-        <translation type="unfinished"></translation>
+        <translation>Format bazy danych jest niekompatybilny</translation>
     </message>
     <message>
         <source>Failed to to execute SQL query</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie udało się wykonać zapytania SQL</translation>
     </message>
 </context>
 </TS>

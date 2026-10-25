@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="pl" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="pl" sourcelanguage="en">
 <context>
     <name>EditItemDialogClass</name>
     <message>
@@ -58,27 +60,27 @@
     </message>
     <message>
         <source>Profile - %1</source>
-        <translation type="unfinished"/>
+        <translation>Profil - %1</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Błąd</translation>
     </message>
     <message>
         <source>Failed to publish your profile: %1</source>
-        <translation type="unfinished"/>
+        <translation>Nie udało się opublikować twojego profilu: %1</translation>
     </message>
     <message>
         <source>Failed to publish your profile.</source>
-        <translation type="unfinished"/>
+        <translation>Nie udało się opublikować twojego profilu.</translation>
     </message>
     <message>
         <source>Failed to load profile.</source>
-        <translation type="unfinished"/>
+        <translation>Nie udało się wczytać profilu.</translation>
     </message>
     <message>
         <source>Failed to load profile: %1</source>
-        <translation type="unfinished"/>
+        <translation>Nie udało się wczytać profilu: %1</translation>
     </message>
 </context>
 <context>
@@ -232,44 +234,44 @@
     <name>VCardManager</name>
     <message>
         <source>Visit Card Manager</source>
-        <translation type="unfinished"/>
+        <translation>Menedżer wizytówek</translation>
     </message>
     <message>
         <source>Allows to obtain personal contact information</source>
-        <translation type="unfinished"/>
+        <translation>Pozwala uzyskiwać dane osobowe kontaktu</translation>
     </message>
     <message>
         <source>Show contact profile</source>
-        <translation type="unfinished"/>
+        <translation>Pokaż profil kontaktu</translation>
     </message>
     <message>
         <source>Ctrl+I</source>
         <comment>Show contact profile</comment>
-        <translation type="unfinished"/>
+        <translation>Ctrl+I</translation>
     </message>
     <message>
         <source>User Profile</source>
-        <translation type="unfinished"/>
+        <translation>Profil użytkownika</translation>
     </message>
     <message>
         <source>Restrict maximum vCard images size</source>
-        <translation type="unfinished"/>
+        <translation>Ograniczaj maksymalny rozmiar obrazów vCard</translation>
     </message>
     <message>
         <source>Contact Profile</source>
-        <translation type="unfinished"/>
+        <translation>Profil kontaktu</translation>
     </message>
     <message>
         <source>Supports the requesting of the personal contact information</source>
-        <translation type="unfinished"/>
+        <translation>Obsługuje pobieranie danych osobowych kontaktu</translation>
     </message>
     <message>
         <source>Show Profile</source>
-        <translation type="unfinished"/>
+        <translation>Pokaż profil</translation>
     </message>
     <message>
         <source>Edit Profile</source>
-        <translation type="unfinished"/>
+        <translation>Edytuj profil</translation>
     </message>
 </context>
 </TS>

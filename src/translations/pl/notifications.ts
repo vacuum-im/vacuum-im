@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="pl" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="pl" sourcelanguage="en">
 <context>
     <name>Notifications</name>
     <message>
@@ -39,73 +41,73 @@
     </message>
     <message>
         <source>Disable sounds and popup windows if status is &apos;Away&apos;</source>
-        <translation type="unfinished"/>
+        <translation>Wyłącz dźwięki i okna popup, jeśli status to 'Odszedłem'</translation>
     </message>
     <message>
         <source>Disable sounds and popup windows if status is &apos;Do not disturb&apos;</source>
-        <translation type="unfinished"/>
+        <translation>Wyłącz dźwięki i okna popup, jeśli status to 'Nie przeszkadzaj'</translation>
     </message>
     <message>
         <source>Play notification sound when received a message in the active window</source>
-        <translation type="unfinished"/>
+        <translation>Odtwarzaj dźwięk powiadomienia po odebraniu wiadomości w aktywnym oknie</translation>
     </message>
     <message>
         <source>Do not show the message body in the popup window</source>
-        <translation type="unfinished"/>
+        <translation>Nie pokazuj treści wiadomości w oknie popup</translation>
     </message>
     <message>
         <source> seconds</source>
-        <translation type="unfinished"/>
+        <translation> sekund</translation>
     </message>
     <message>
         <source>Time to display a pop-up window (0 - always visible):</source>
-        <translation type="unfinished"/>
+        <translation>Czas wyświetlania okna popup (0 - zawsze widoczne):</translation>
     </message>
     <message>
         <source>System command to play sound:</source>
-        <translation type="unfinished"/>
+        <translation>Polecenie systemowe do odtwarzania dźwięku:</translation>
     </message>
     <message>
         <source>Notification kinds</source>
-        <translation type="unfinished"/>
+        <translation>Rodzaje powiadomień</translation>
     </message>
     <message>
         <source>Highlight the corresponding window in the taskbar</source>
-        <translation type="unfinished"/>
+        <translation>Wyróżnij odpowiednie okno na pasku zadań</translation>
     </message>
     <message>
         <source>Use native popup notifications</source>
-        <translation type="unfinished"/>
+        <translation>Używaj natywnych powiadomień popup</translation>
     </message>
 </context>
 <context>
     <name>NotifyKindOptionsWidget</name>
     <message>
         <source>Event</source>
-        <translation type="unfinished"/>
+        <translation>Zdarzenie</translation>
     </message>
     <message>
         <source>Play sound at the notification</source>
-        <translation type="unfinished"/>
+        <translation>Odtwarzaj dźwięk przy powiadomieniu</translation>
     </message>
     <message>
         <source>Display a notification in popup window</source>
-        <translation type="unfinished"/>
+        <translation>Wyświetlaj powiadomienie w oknie popup</translation>
     </message>
     <message>
         <source>Show the corresponding window minimized in the taskbar</source>
-        <translation type="unfinished"/>
+        <translation>Pokazuj odpowiednie okno zminimalizowane na pasku zadań</translation>
     </message>
     <message>
         <source>Display a notification icon in the system tray</source>
-        <translation type="unfinished"/>
+        <translation>Wyświetlaj ikonę powiadomienia w zasobniku systemowym</translation>
     </message>
 </context>
 <context>
     <name>NotifyWidget</name>
     <message>
         <source>Message is empty or hidden</source>
-        <translation type="unfinished"/>
+        <translation>Wiadomość jest pusta lub ukryta</translation>
     </message>
 </context>
 </TS>

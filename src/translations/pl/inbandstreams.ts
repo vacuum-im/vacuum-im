@@ -1,17 +1,19 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="pl" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="pl" sourcelanguage="en">
 <context>
     <name>InBandOptionsWidgetClass</name>
     <message>
         <source>Size of data in packet:</source>
-        <translation type="unfinished"/>
+        <translation>Rozmiar danych w pakiecie:</translation>
     </message>
     <message>
         <source> Bytes</source>
-        <translation type="unfinished"/>
+        <translation> bajtów</translation>
     </message>
     <message>
         <source>Send data without waiting for acknowledgment of receipt</source>
-        <translation type="unfinished"/>
+        <translation>Wysyłaj dane bez czekania na potwierdzenie odbioru</translation>
     </message>
 </context>
 <context>

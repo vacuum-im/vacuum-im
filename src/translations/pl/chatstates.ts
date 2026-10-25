@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="pl" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="pl" sourcelanguage="en">
 <context>
     <name>ChatStates</name>
     <message>
@@ -31,7 +33,7 @@
     </message>
     <message>
         <source>Send notifications of your chat activity</source>
-        <translation type="unfinished"/>
+        <translation>Wysyłaj powiadomienia o twojej aktywności w rozmowie</translation>
     </message>
 </context>
 <context>
@@ -62,23 +64,23 @@
     </message>
     <message>
         <source>User activity in chat</source>
-        <translation type="unfinished"/>
+        <translation>Aktywność użytkownika w rozmowie</translation>
     </message>
     <message>
         <source>and %1 other</source>
-        <translation type="unfinished"/>
+        <translation>i %1 innych</translation>
     </message>
     <message>
         <source>Always send my chat activity</source>
-        <translation type="unfinished"/>
+        <translation>Zawsze wysyłaj powiadomienia o mojej aktywności</translation>
     </message>
     <message>
         <source>Never send my chat activity</source>
-        <translation type="unfinished"/>
+        <translation>Nigdy nie wysyłaj powiadomień o mojej aktywności</translation>
     </message>
     <message>
         <source>Participants activity in conference</source>
-        <translation type="unfinished"/>
+        <translation>Aktywność uczestników w konferencji</translation>
     </message>
 </context>
 </TS>

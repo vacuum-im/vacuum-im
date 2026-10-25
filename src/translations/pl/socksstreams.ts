@@ -1,29 +1,31 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="pl" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="pl" sourcelanguage="en">
 <context>
     <name>SocksOptionsWidgetClass</name>
     <message>
         <source>Use jabber-proxy on your server</source>
-        <translation type="unfinished"/>
+        <translation>Używaj jabber-proxy na twoim serwerze</translation>
     </message>
     <message>
         <source>Use additional jabber-proxy:</source>
-        <translation type="unfinished"/>
+        <translation>Używaj dodatkowego jabber-proxy:</translation>
     </message>
     <message>
         <source>Allow direct incoming connections on port:</source>
-        <translation type="unfinished"/>
+        <translation>Zezwalaj na bezpośrednie połączenia przychodzące na porcie:</translation>
     </message>
     <message>
         <source>Forward direct incoming connections to host:</source>
-        <translation type="unfinished"/>
+        <translation>Przekierowuj bezpośrednie połączenia przychodzące do hosta:</translation>
     </message>
     <message>
         <source>Use account proxy settings for outgoing connections</source>
-        <translation type="unfinished"/>
+        <translation>Używaj ustawień proxy konta dla połączeń wychodzących</translation>
     </message>
     <message>
         <source>host:port</source>
-        <translation type="unfinished"/>
+        <translation>host:port</translation>
     </message>
 </context>
 <context>
@@ -70,7 +72,7 @@
     </message>
     <message>
         <source>Failed to send data to socket</source>
-        <translation type="unfinished"/>
+        <translation>Nie udało się wysłać danych do gniazda</translation>
     </message>
     <message>
         <source>Direct connection not established</source>
@@ -82,7 +84,7 @@
     </message>
     <message>
         <source>Invalid host address</source>
-        <translation type="unfinished"/>
+        <translation>Nieprawidłowy adres hosta</translation>
     </message>
     <message>
         <source>Failed to connect to host</source>
@@ -90,7 +92,7 @@
     </message>
     <message>
         <source>Host disconnected</source>
-        <translation type="unfinished"/>
+        <translation>Host rozłączony</translation>
     </message>
 </context>
 </TS>

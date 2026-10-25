@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="pl" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="pl" sourcelanguage="en">
 <context>
     <name>EditListsDialog</name>
     <message>
@@ -253,47 +255,47 @@
     </message>
     <message>
         <source>Disable Privacy Lists</source>
-        <translation type="unfinished"/>
+        <translation>Wyłącz listy prywatności</translation>
     </message>
     <message>
         <source>Block Contacts Without Subscription</source>
-        <translation type="unfinished"/>
+        <translation>Blokuj kontakty bez subskrypcji</translation>
     </message>
     <message>
         <source>Default Rule</source>
-        <translation type="unfinished"/>
+        <translation>Reguła domyślna</translation>
     </message>
     <message>
         <source>Visible to Contact</source>
-        <translation type="unfinished"/>
+        <translation>Widoczny dla kontaktu</translation>
     </message>
     <message>
         <source>Invisible to Contact</source>
-        <translation type="unfinished"/>
+        <translation>Niewidoczny dla kontaktu</translation>
     </message>
     <message>
         <source>Ignore Contact</source>
-        <translation type="unfinished"/>
+        <translation>Ignoruj kontakt</translation>
     </message>
     <message>
         <source>Visible to Group</source>
-        <translation type="unfinished"/>
+        <translation>Widoczny dla grupy</translation>
     </message>
     <message>
         <source>Invisible to Group</source>
-        <translation type="unfinished"/>
+        <translation>Niewidoczny dla grupy</translation>
     </message>
     <message>
         <source>Ignore Group</source>
-        <translation type="unfinished"/>
+        <translation>Ignoruj grupę</translation>
     </message>
     <message>
         <source>Set Active List</source>
-        <translation type="unfinished"/>
+        <translation>Ustaw aktywną listę</translation>
     </message>
     <message>
         <source>Set Default List</source>
-        <translation type="unfinished"/>
+        <translation>Ustaw domyślną listę</translation>
     </message>
 </context>
 </TS>

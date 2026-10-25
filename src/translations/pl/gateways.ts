@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="pl" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="pl" sourcelanguage="en">
 <context>
     <name>AddLegacyContactDialog</name>
     <message>
@@ -89,11 +91,19 @@
     </message>
     <message numerus="yes">
         <source>Are you sure you wish to remove transport &apos;&lt;b&gt;%1&lt;/b&gt;&apos; and its &lt;b&gt;%n contact(s)&lt;/b&gt; from the roster?</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>Czy na pewno chcesz usunąć transport &apos;&lt;b&gt;%1&lt;/b&gt;&apos; oraz jego &lt;b&gt;%n kontakt&lt;/b&gt; z listy kontaktów?</numerusform>
+            <numerusform>Czy na pewno chcesz usunąć transport &apos;&lt;b&gt;%1&lt;/b&gt;&apos; oraz jego &lt;b&gt;%n kontakty&lt;/b&gt; z listy kontaktów?</numerusform>
+            <numerusform>Czy na pewno chcesz usunąć transport &apos;&lt;b&gt;%1&lt;/b&gt;&apos; oraz jego &lt;b&gt;%n kontaktów&lt;/b&gt; z listy kontaktów?</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Are you sure you wish to remove &lt;b&gt;%n transport(s)&lt;/b&gt; and their contacts from the roster?</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>Czy na pewno chcesz usunąć &lt;b&gt;%n transport&lt;/b&gt; oraz jego kontakty z listy kontaktów?</numerusform>
+            <numerusform>Czy na pewno chcesz usunąć &lt;b&gt;%n transporty&lt;/b&gt; oraz ich kontakty z listy kontaktów?</numerusform>
+            <numerusform>Czy na pewno chcesz usunąć &lt;b&gt;%n transportów&lt;/b&gt; oraz ich kontakty z listy kontaktów?</numerusform>
+        </translation>
     </message>
 </context>
 </TS>

@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="pl" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="pl" sourcelanguage="en">
 <context>
     <name>EditProfilesDialog</name>
     <message>
@@ -86,23 +88,23 @@
     </message>
     <message>
         <source>Add Profile</source>
-        <translation type="unfinished"/>
+        <translation>Dodaj profil</translation>
     </message>
     <message>
         <source>Change Password</source>
-        <translation type="unfinished"/>
+        <translation>Zmień hasło</translation>
     </message>
     <message>
         <source>Rename Profile</source>
-        <translation type="unfinished"/>
+        <translation>Zmień nazwę profilu</translation>
     </message>
     <message>
         <source>Delete Profile</source>
-        <translation type="unfinished"/>
+        <translation>Usuń profil</translation>
     </message>
     <message>
         <source>Profiles Settings</source>
-        <translation type="unfinished"/>
+        <translation>Ustawienia profili</translation>
     </message>
 </context>
 <context>
@@ -140,7 +142,7 @@
     </message>
     <message>
         <source>Settings...</source>
-        <translation type="unfinished"/>
+        <translation>Ustawienia...</translation>
     </message>
 </context>
 <context>
@@ -174,31 +176,31 @@
     </message>
     <message>
         <source>Common settings</source>
-        <translation type="unfinished"/>
+        <translation>Ustawienia ogólne</translation>
     </message>
     <message>
         <source>Auto run application on system startup</source>
-        <translation type="unfinished"/>
+        <translation>Automatycznie uruchamiaj aplikację przy starcie systemu</translation>
     </message>
     <message>
         <source>Localization</source>
-        <translation type="unfinished"/>
+        <translation>Lokalizacja</translation>
     </message>
     <message>
         <source>&lt;System Language&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;Język systemowy&gt;</translation>
     </message>
     <message>
         <source>Language:</source>
-        <translation type="unfinished"/>
+        <translation>Język:</translation>
     </message>
     <message>
         <source>Common</source>
-        <translation type="unfinished"/>
+        <translation>Ogólne</translation>
     </message>
     <message>
         <source>Appearance</source>
-        <translation type="unfinished"/>
+        <translation>Wygląd</translation>
     </message>
 </context>
 </TS>

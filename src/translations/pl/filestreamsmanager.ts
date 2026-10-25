@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="pl" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="pl" sourcelanguage="en">
 <context>
     <name>FileStream</name>
     <message>
@@ -42,7 +44,7 @@
     </message>
     <message>
         <source>File input/output error</source>
-        <translation type="unfinished"/>
+        <translation>Błąd wejścia/wyjścia pliku</translation>
     </message>
     <message>
         <source>File size unexpectedly changed</source>
@@ -59,33 +61,33 @@
     <message>
         <source>Ctrl+T</source>
         <comment>Show file transfers</comment>
-        <translation type="unfinished"/>
+        <translation>Ctrl+T</translation>
     </message>
     <message>
         <source>File transfer</source>
-        <translation type="unfinished"/>
+        <translation>Transfer pliku</translation>
     </message>
     <message>
         <source>Create separate folder for each sender</source>
-        <translation type="unfinished"/>
+        <translation>Twórz oddzielny folder dla każdego nadawcy</translation>
     </message>
     <message>
         <source>Default transfer method:</source>
-        <translation type="unfinished"/>
+        <translation>Domyślna metoda transferu:</translation>
     </message>
 </context>
 <context>
     <name>FileStreamsOptionsWidget</name>
     <message>
         <source>Select default directory</source>
-        <translation type="unfinished"/>
+        <translation>Wybierz katalog domyślny</translation>
     </message>
 </context>
 <context>
     <name>FileStreamsOptionsWidgetClass</name>
     <message>
         <source>Default directory:</source>
-        <translation type="unfinished"/>
+        <translation>Katalog domyślny:</translation>
     </message>
 </context>
 <context>

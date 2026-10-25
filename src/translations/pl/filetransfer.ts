@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="pl" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="pl" sourcelanguage="en">
 <context>
     <name>FileTransfer</name>
     <message>
@@ -40,75 +42,79 @@
     <message>
         <source>Ctrl+S</source>
         <comment>Send file</comment>
-        <translation type="unfinished"/>
+        <translation>Ctrl+S</translation>
     </message>
     <message>
         <source>Automatically receive files from authorized contacts</source>
-        <translation type="unfinished"/>
+        <translation>Automatycznie odbieraj pliki od autoryzowanych kontaktów</translation>
     </message>
     <message>
         <source>Hide file transfer dialog after transfer started</source>
-        <translation type="unfinished"/>
+        <translation>Ukryj okno transferu po rozpoczęciu przesyłania</translation>
     </message>
     <message numerus="yes">
         <source>/me share %n file(s): %1</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>/me udostępnia %n plik: %1</numerusform>
+            <numerusform>/me udostępnia %n pliki: %1</numerusform>
+            <numerusform>/me udostępnia %n plików: %1</numerusform>
+        </translation>
     </message>
     <message>
         <source>Select Files</source>
-        <translation type="unfinished"/>
+        <translation>Wybierz pliki</translation>
     </message>
     <message>
         <source>Failed to send request for file &apos;%1&apos;</source>
-        <translation type="unfinished"/>
+        <translation>Nie udało się wysłać żądania przesłania pliku '%1'</translation>
     </message>
     <message>
         <source>File transfer</source>
-        <translation type="unfinished"/>
+        <translation>Transfer pliku</translation>
     </message>
     <message>
         <source>File transfer request from %1</source>
-        <translation type="unfinished"/>
+        <translation>Żądanie transferu pliku od %1</translation>
     </message>
     <message>
         <source>%1 wants to send you a file &apos;%2&apos;</source>
-        <translation type="unfinished"/>
+        <translation>%1 chce wysłać ci plik '%2'</translation>
     </message>
     <message>
         <source>Sending file &apos;%1&apos; to %2 started automatically</source>
-        <translation type="unfinished"/>
+        <translation>Automatycznie rozpoczęto wysyłanie pliku '%1' do %2</translation>
     </message>
     <message>
         <source>Receiving file &apos;%1&apos; from %2 started automatically</source>
-        <translation type="unfinished"/>
+        <translation>Automatycznie rozpoczęto pobieranie pliku '%1' od %2</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; successfully sent to %2</source>
-        <translation type="unfinished"/>
+        <translation>Plik '%1' pomyślnie wysłano do %2</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; successfully received from %2</source>
-        <translation type="unfinished"/>
+        <translation>Plik '%1' pomyślnie odebrano od %2</translation>
     </message>
     <message>
         <source>File transfer failed</source>
-        <translation type="unfinished"/>
+        <translation>Transfer pliku nie powiódł się</translation>
     </message>
     <message>
         <source>Failed to send file &apos;%1&apos; to %2: %3</source>
-        <translation type="unfinished"/>
+        <translation>Nie udało się wysłać pliku '%1' do %2: %3</translation>
     </message>
     <message>
         <source>Failed to receive file &apos;%1&apos; from %2: %3</source>
-        <translation type="unfinished"/>
+        <translation>Nie udało się odebrać pliku '%1' od %2: %3</translation>
     </message>
     <message>
         <source>Select File</source>
-        <translation type="unfinished"/>
+        <translation>Wybierz plik</translation>
     </message>
     <message>
         <source>File request rejected: %1</source>
-        <translation type="unfinished"/>
+        <translation>Żądanie pliku odrzucone: %1</translation>
     </message>
 </context>
 <context>
@@ -262,7 +268,7 @@
     </message>
     <message>
         <source>Method:</source>
-        <translation type="unfinished"/>
+        <translation>Metoda:</translation>
     </message>
 </context>
 </TS>
