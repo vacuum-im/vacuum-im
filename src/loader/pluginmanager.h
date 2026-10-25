@@ -43,6 +43,7 @@ public:
 	virtual QDateTime revisionDate() const;
 	virtual bool isShutingDown() const;
 	virtual QString homePath() const;
+	virtual QString cachePath() const;
 	virtual void setHomePath(const QString &APath);
 	virtual void setLocale(QLocale::Language ALanguage, QLocale::Country ACountry);
 	virtual IPlugin* pluginInstance(const QUuid &AUuid) const;
@@ -105,6 +106,7 @@ private:
 	QTimer FShutdownTimer;
 private:
 	QString FDataPath;
+	QString FCachePath;
 	QDomDocument FPluginsSetup;
 	QTranslator *FQtTranslator;
 	QTranslator *FUtilsTranslator;

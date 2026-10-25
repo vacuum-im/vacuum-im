@@ -41,6 +41,7 @@
 #endif
 
 #define DIR_LOGS                    "logs"
+#define DIR_CACHE                   "cache"
 #if defined(Q_OS_WIN)
 #  define ENV_APP_DATA              "APPDATA"
 #  define DIR_APP_DATA              APPLICATION_NAME
@@ -125,6 +126,11 @@ bool PluginManager::isShutingDown() const
 QString PluginManager::homePath() const
 {
 	return FDataPath;
+}
+
+QString PluginManager::cachePath() const
+{
+	return FCachePath;
 }
 
 void PluginManager::setHomePath(const QString &APath)
@@ -319,6 +325,20 @@ void PluginManager::loadSettings()
 		}
 	}
 	LOG_INFO(QString("%1: %2.%3, Qt: %4/%5, OS: %6, Locale: %7").arg(CLIENT_NAME,CLIENT_VERSION,revision(),QT_VERSION_STR,qVersion(),SystemManager::osVersion(),QLocale().name()));
+
+	QDir cacheDir(FDataPath);
+	if (cacheDir.exists() && (cacheDir.exists(DIR_CACHE) || cacheDir.mkpath(DIR_CACHE)) && cacheDir.cd(DIR_CACHE))
+	{
+		FCachePath = cacheDir.absolutePath();
+		LOG_INFO(QString("Using cache directory at = %1").arg(FCachePath));
+	}
+	else
+	{
+		// The cache is optional: the plugins that need it (e.g. ImageViewer)
+		// disable themselves when the path is empty, the client keeps running.
+		FCachePath = QString();
+		LOG_WARNING(QString("Cache directory cannot be created or accessed. Permissions issue. Path = %1").arg(cacheDir.absolutePath()));
+	}
 
 	FPluginsSetup.clear();
 	QDir homeDir(FDataPath);

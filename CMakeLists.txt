@@ -16,6 +16,7 @@ find_package (Qt5Svg)
 find_package (Qt5Widgets REQUIRED)
 find_package (Qt5Network REQUIRED)
 find_package (Qt5Xml REQUIRED)
+find_package (Qt5Concurrent REQUIRED)
 find_package (Qt5LinguistTools REQUIRED)
 
 add_custom_target(updatets)

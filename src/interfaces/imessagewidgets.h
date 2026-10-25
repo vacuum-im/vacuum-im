@@ -372,6 +372,8 @@ public:
 	virtual bool messageEditContentsChanged(int AOrder, IMessageEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded) =0;
 };
 
+class IMessageStyleHandler;
+
 class IMessageWidgets
 {
 public:
@@ -412,6 +414,9 @@ public:
 	virtual QMultiMap<int, IMessageEditContentsHandler *> editContentsHandlers() const =0;
 	virtual void insertEditContentsHandler(int AOrder, IMessageEditContentsHandler *AHandler) =0;
 	virtual void removeEditContentsHandler( int AOrder, IMessageEditContentsHandler *AHandler) =0;
+	virtual QMultiMap<int, IMessageStyleHandler *> styleHandlers() const =0;
+	virtual void insertStyleHandler(int AOrder, IMessageStyleHandler *AHandler) =0;
+	virtual void removeStyleHandler(int AOrder, IMessageStyleHandler *AHandler) =0;
 protected:
 	virtual void addressCreated(IMessageAddress *AAddress) =0;
 	virtual void infoWidgetCreated(IMessageInfoWidget *AInfoWidget) =0;
@@ -426,6 +431,8 @@ protected:
 	virtual void normalWindowDestroyed(IMessageNormalWindow *AWindow) =0;
 	virtual void chatWindowCreated(IMessageChatWindow *AWindow) =0;
 	virtual void chatWindowDestroyed(IMessageChatWindow *AWindow) =0;
+	virtual void styleHandlerCreated(IMessageStyleHandler *AHandler) =0;
+	virtual void styleHandlerDestroyed(IMessageStyleHandler *AHandler) =0;
 	virtual void tabWindowAppended(const QUuid &AWindowId, const QString &AName) =0;
 	virtual void tabWindowNameChanged(const QUuid &AWindowId, const QString &AName) =0;
 	virtual void tabWindowDeleted(const QUuid &AWindowId) =0;
@@ -452,6 +459,6 @@ Q_DECLARE_INTERFACE(IMessageViewDropHandler,"Vacuum.Plugin.IMessageViewDropHandl
 Q_DECLARE_INTERFACE(IMessageViewUrlHandler,"Vacuum.Plugin.IMessageViewUrlHandler/1.2")
 Q_DECLARE_INTERFACE(IMessageEditSendHandler,"QIP.Plugin.IMessageEditSendHandler/1.0")
 Q_DECLARE_INTERFACE(IMessageEditContentsHandler,"Vacuum.Plugin.IMessageEditContentsHandler/1.3")
-Q_DECLARE_INTERFACE(IMessageWidgets,"Vacuum.Plugin.IMessageWidgets/1.13")
+Q_DECLARE_INTERFACE(IMessageWidgets,"Vacuum.Plugin.IMessageWidgets/1.14")
 
 #endif // IMESSAGEWIDGETS_H

@@ -33,6 +33,7 @@ MessageWidgets::MessageWidgets()
 {
 	FOptionsManager = NULL;
 	FMainWindow = NULL;
+	FNextMessageContextId = 1;
 }
 
 MessageWidgets::~MessageWidgets()
@@ -208,6 +209,153 @@ bool MessageWidgets::messageEditContentsChanged(int AOrder, IMessageEditWidget *
 {
 	Q_UNUSED(AOrder); Q_UNUSED(AWidget); Q_UNUSED(APosition); Q_UNUSED(ARemoved); Q_UNUSED(AAdded);
 	return false;
+}
+
+int MessageWidgets::documentContextIndex(QTextDocument *ADocument) const
+{
+	if (!ADocument)
+		return -1;
+	for (int i = 0; i < FDocumentMessageContexts.count(); ++i)
+		if (FDocumentMessageContexts.at(i).document == ADocument)
+			return i;
+	return -1;
+}
+
+bool MessageWidgets::beginMessageContext(QTextDocument *ADocument, MessageDocumentContext &AContext)
+{
+	if (!ADocument)
+		return false;
+
+	// Reclaim contexts for documents which have already been destroyed.
+	for (int i = FDocumentMessageContexts.count() - 1; i >= 0; --i)
+		if (!FDocumentMessageContexts.at(i).document)
+			FDocumentMessageContexts.removeAt(i);
+
+	int index = documentContextIndex(ADocument);
+	if (index < 0)
+	{
+		DocumentMessageContexts contexts;
+		contexts.document = ADocument;
+		FDocumentMessageContexts.append(contexts);
+		index = FDocumentMessageContexts.count() - 1;
+		connect(ADocument, &QObject::destroyed, this, &MessageWidgets::onMessageDocumentDestroyed);
+	}
+
+	QTextCursor marker(ADocument);
+	marker.movePosition(QTextCursor::End);
+	const bool atStart = marker.position() == 0;
+	if (!atStart)
+		marker.setPosition(marker.position() - 1);
+
+	quint64 id = FNextMessageContextId++;
+	if (id == 0)
+		id = FNextMessageContextId++;
+	if (FNextMessageContextId == 0)
+		FNextMessageContextId = 1;
+
+	DocumentMessageContexts &contexts = FDocumentMessageContexts[index];
+	MessageMarker messageMarker;
+	messageMarker.id = id;
+	messageMarker.cursor = marker;
+	messageMarker.atStart = atStart;
+	contexts.markers.append(messageMarker);
+
+	AContext.document = ADocument;
+	AContext.marker = marker;
+	AContext.generation = contexts.generation;
+	AContext.id = id;
+	AContext.atStart = atStart;
+	return true;
+}
+
+bool MessageWidgets::isMessageContextValid(const MessageDocumentContext &AContext) const
+{
+	if (!AContext.document || AContext.id == 0)
+		return false;
+
+	const int index = documentContextIndex(AContext.document.data());
+	if (index < 0)
+		return false;
+
+	const DocumentMessageContexts &contexts = FDocumentMessageContexts.at(index);
+	if (contexts.generation != AContext.generation)
+		return false;
+
+	for (const MessageMarker &marker : contexts.markers)
+		if (marker.id == AContext.id)
+			return true;
+	return false;
+}
+
+int MessageWidgets::nextMessagePosition(const MessageDocumentContext &AContext) const
+{
+	if (!isMessageContextValid(AContext))
+		return -1;
+
+	const int index = documentContextIndex(AContext.document.data());
+	if (index < 0)
+		return -1;
+
+	const QList<MessageMarker> &markers = FDocumentMessageContexts.at(index).markers;
+	for (int i = 0; i < markers.count(); ++i)
+	{
+		if (markers.at(i).id == AContext.id)
+		{
+			if (i + 1 >= markers.count())
+				return -1;
+			// The marker sits on the last character of this message, so the next
+			// message starts right after it. Returning the marker position itself
+			// would cut the last character off this message's range.
+			const MessageMarker &next = markers.at(i + 1);
+			return next.atStart ? 0 : next.cursor.position() + 1;
+		}
+	}
+	return -1;
+}
+
+void MessageWidgets::resetMessageContexts(QTextDocument *ADocument)
+{
+	const int index = documentContextIndex(ADocument);
+	if (index < 0)
+		return;
+
+	DocumentMessageContexts &contexts = FDocumentMessageContexts[index];
+	contexts.markers.clear();
+	++contexts.generation;
+	if (contexts.generation == 0)
+		contexts.generation = 1;
+}
+
+void MessageWidgets::removeMessageContextsInRange(QTextDocument *ADocument, int APosition, int ALength)
+{
+	if (!ADocument || APosition < 0 || ALength <= 0)
+		return;
+
+	const int index = documentContextIndex(ADocument);
+	if (index < 0)
+		return;
+
+	const qint64 rangeEnd = qint64(APosition) + ALength;
+	QList<MessageMarker> &markers = FDocumentMessageContexts[index].markers;
+	for (int i = markers.count() - 1; i >= 0; --i)
+	{
+		const MessageMarker &marker = markers.at(i);
+		// The marker sits just before the message content; use its logical start.
+		// This method is called before whole messages are removed.
+		const int messageStart = marker.atStart ? 0 : marker.cursor.position() + 1;
+		if (messageStart >= APosition && qint64(messageStart) < rangeEnd)
+			markers.removeAt(i);
+	}
+}
+
+void MessageWidgets::onMessageDocumentDestroyed()
+{
+	QObject *object = sender();
+	for (int i = FDocumentMessageContexts.count() - 1; i >= 0; --i)
+	{
+		if (!FDocumentMessageContexts.at(i).document || FDocumentMessageContexts.at(i).document.data() == object)
+			FDocumentMessageContexts.removeAt(i);
+	}
 }
 
 IMessageAddress *MessageWidgets::newAddress(const Jid &AStreamJid, const Jid &AContactJid, QObject *AParent)
@@ -533,6 +681,29 @@ void MessageWidgets::removeEditContentsHandler(int AOrder, IMessageEditContentsH
 		FEditContentsHandlers.remove(AOrder,AHandler);
 }
 
+QMultiMap<int, IMessageStyleHandler *> MessageWidgets::styleHandlers() const
+{
+	return FStyleHandlers;
+}
+
+void MessageWidgets::insertStyleHandler(int AOrder, IMessageStyleHandler *AHandler)
+{
+	if (AHandler && !FStyleHandlers.contains(AOrder,AHandler))
+	{
+		FStyleHandlers.insertMulti(AOrder,AHandler);
+		styleHandlerCreated(AHandler);
+	}
+}
+
+void MessageWidgets::removeStyleHandler(int AOrder, IMessageStyleHandler *AHandler)
+{
+	if (FStyleHandlers.contains(AOrder,AHandler))
+	{
+		FStyleHandlers.remove(AOrder,AHandler);
+		styleHandlerDestroyed(AHandler);
+	}
+}
+
 void MessageWidgets::deleteTabWindows()
 {
 	foreach(IMessageTabWindow *window, tabWindows())
@@ -573,7 +744,13 @@ void MessageWidgets::onViewWidgetContextMenu(const QPoint &APosition, Menu *AMen
 
 	QTextDocumentFragment textSelection = widget!=NULL ? widget->selection() : QTextDocumentFragment();
 	QTextDocumentFragment textFragment = widget!=NULL ? widget->textFragmentAt(APosition) : QTextDocumentFragment();
-	QString href  = TextManager::getTextFragmentHref(textFragment.isEmpty() ? textSelection : textFragment);
+	
+	QString href;
+	if (widget)
+		href = widget->textFormatAt(APosition).property(TMI_IMAGE_LINK_URL).toString();
+
+	if (href.isEmpty())
+		href = TextManager::getTextFragmentHref(textFragment.isEmpty() ? textSelection : textFragment);
 
 	QUrl link = href;
 	if (link.isValid())
@@ -589,7 +766,12 @@ void MessageWidgets::onViewWidgetContextMenu(const QPoint &APosition, Menu *AMen
 
 		Action *copyHrefAction = new Action(AMenu);
 		copyHrefAction->setText(tr("Copy address"));
-		copyHrefAction->setData(ADR_CONTEXT_DATA,isMailto ? link.path() : href);
+		// The same {html, text} payload as the copy action below, the shared
+		// handler of both actions reads the address or the selection from it.
+		QVariantMap copyHrefData;
+		copyHrefData["text"] = isMailto ? link.path() : href;
+		copyHrefData["html"] = copyHrefData.value("text").toString().toHtmlEscaped();
+		copyHrefAction->setData(ADR_CONTEXT_DATA,copyHrefData);
 		connect(copyHrefAction,SIGNAL(triggered(bool)),SLOT(onViewContextCopyActionTriggered(bool)));
 		AMenu->addAction(copyHrefAction,AG_MWVWCM_MESSAGEWIDGETS_COPY,true);
 	}
@@ -599,7 +781,12 @@ void MessageWidgets::onViewWidgetContextMenu(const QPoint &APosition, Menu *AMen
 		Action *copyAction = new Action(AMenu);
 		copyAction->setText(tr("Copy"));
 		copyAction->setShortcut(QKeySequence::Copy);
-		copyAction->setData(ADR_CONTEXT_DATA,textSelection.toHtml());
+		// The text of the links of the images is shortened for the display, the
+		// full urls are copied to the clipboard instead of them.
+		QVariantMap copyData;
+		copyData["html"] = textSelection.toHtml();
+		copyData["text"] = TextManager::getCopyableText(textSelection);
+		copyAction->setData(ADR_CONTEXT_DATA,copyData);
 		connect(copyAction,SIGNAL(triggered(bool)),SLOT(onViewContextCopyActionTriggered(bool)));
 		AMenu->addAction(copyAction,AG_MWVWCM_MESSAGEWIDGETS_COPY,true);
 
@@ -621,10 +808,10 @@ void MessageWidgets::onViewContextCopyActionTriggered(bool)
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
-		QString html = action->data(ADR_CONTEXT_DATA).toString();
+		const QVariantMap copyData = action->data(ADR_CONTEXT_DATA).toMap();
 		QMimeData *data = new QMimeData;
-		data->setHtml(html);
-		data->setText(QTextDocumentFragment::fromHtml(html).toPlainText());
+		data->setHtml(copyData.value("html").toString());
+		data->setText(copyData.value("text").toString());
 		QApplication::clipboard()->setMimeData(data);
 	}
 }

@@ -1,8 +1,10 @@
 #include "simplemessagestyleengine.h"
 
 #include <QDir>
-#include <QTimer>
-#include <QCoreApplication>
+#include <QFile>
+#include <QDomDocument>
+#include <utils/options.h>
+#include <utils/pluginhelper.h>
 #include <definitions/resources.h>
 #include <definitions/optionvalues.h>
 #include <utils/filestorage.h>
@@ -14,6 +16,7 @@ SimpleMessageStyleEngine::SimpleMessageStyleEngine(): FNetworkAccessManager(NULL
 {
 	FUrlProcessor = NULL;
 	FMessageStyleManager = NULL;
+	FMessageWidgets = NULL;
 	FNetworkAccessManager = NULL;
 }
 
@@ -29,6 +32,7 @@ void SimpleMessageStyleEngine::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->version = "1.0";
 	APluginInfo->author = "Potapov S.A. aka Lion";
 	APluginInfo->homePage = "http://www.vacuum-im.org";
+	APluginInfo->dependences.append(MESSAGEWIDGETS_UUID);
 }
 
 bool SimpleMessageStyleEngine::initConnections(IPluginManager *APluginManager, int &AInitOrder)
@@ -45,6 +49,12 @@ bool SimpleMessageStyleEngine::initConnections(IPluginManager *APluginManager, i
 	if (plugin)
 	{
 		FUrlProcessor = qobject_cast<IUrlProcessor *>(plugin->instance());
+	}
+
+	plugin = APluginManager->pluginInterface("IMessageWidgets").value(0);
+	if (plugin)
+	{
+		FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
 	}
 
 	return true;
@@ -93,6 +103,8 @@ IMessageStyle *SimpleMessageStyleEngine::styleForOptions(const IMessageStyleOpti
 		if (!stylePath.isEmpty())
 		{
 			SimpleMessageStyle *style = new SimpleMessageStyle(stylePath, FNetworkAccessManager, this);
+			if (FMessageWidgets)
+				style->setIMessageWidgets(FMessageWidgets);
 			if (style->isValid())
 			{
 				LOG_INFO(QString("Simple style created, id=%1").arg(style->styleId()));

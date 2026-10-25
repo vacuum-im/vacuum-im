@@ -2,13 +2,15 @@
 
 #include <QDir>
 #include <QFile>
-#include <QScrollBar>
-#include <QTextFrame>
-#include <QTextCursor>
 #include <QDomDocument>
-#include <QCoreApplication>
-#include <QTextDocumentFragment>
+#include <QTextBlock>
+#include <QScrollBar>
+#include <interfaces/imessagedocumentcontext.h>
+#include <utils/options.h>
+#include <utils/pluginhelper.h>
+#include <definitions/messageviewurlhandlerorders.h>
 #include <definitions/resources.h>
+#include <QDesktopServices>
 #include <definitions/optionvalues.h>
 #include <utils/filestorage.h>
 #include <utils/textmanager.h>
@@ -36,6 +38,7 @@ static int SenderColorsCount = sizeof(SenderColors)/sizeof(SenderColors[0]);
 QString SimpleMessageStyle::FSharedPath = QString();
 
 SimpleMessageStyle::SimpleMessageStyle(const QString &AStylePath, QNetworkAccessManager *ANetworkAccessManager, QObject *AParent) : QObject(AParent)
+	, FMessageWidgets(nullptr)
 {
 	if (FSharedPath.isEmpty())
 	{
@@ -64,6 +67,11 @@ SimpleMessageStyle::SimpleMessageStyle(const QString &AStylePath, QNetworkAccess
 SimpleMessageStyle::~SimpleMessageStyle()
 {
 
+}
+
+void SimpleMessageStyle::setIMessageWidgets(IMessageWidgets *AWidgets)
+{
+	FMessageWidgets = AWidgets;
 }
 
 bool SimpleMessageStyle::isValid() const
@@ -206,6 +214,17 @@ bool SimpleMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, c
 			while(wstatus.content.count() > maxMessages)
 				removeSize += wstatus.content.takeFirst().size;
 
+			// MessageWidgets owns the boundary metadata for feature plugins.
+			// Invalidate contexts for the whole messages being trimmed before the
+			// QTextDocument adjusts their QTextCursor positions.
+			if (FMessageWidgets)
+			{
+				IMessageDocumentContextManager *contextManager =
+					qobject_cast<IMessageDocumentContextManager *>(FMessageWidgets->instance());
+				if (contextManager)
+					contextManager->removeMessageContextsInRange(view->document(), wstatus.contentStartPosition, removeSize);
+			}
+
 			cursor.setPosition(wstatus.contentStartPosition);
 			cursor.setPosition(wstatus.contentStartPosition+removeSize,QTextCursor::KeepAnchor);
 			cursor.removeSelectedText();
@@ -220,7 +239,9 @@ bool SimpleMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, c
 
 		QString content = makeContentTemplate(AOptions,wstatus);
 		fillContentKeywords(content,AOptions,wstatus);
-		content.replace("%message%",prepareMessage(AHtml,AOptions));
+		QString messageHtml = prepareMessage(AHtml,AOptions);
+		messageHtml = processStyleContent(AWidget, messageHtml, AOptions);
+		content.replace("%message%",messageHtml);
 
 		ContentItem item;
 		int startPos = cursor.position();
@@ -536,6 +557,23 @@ void SimpleMessageStyle::fillContentKeywords(QString &AHtml, const IMessageStyle
 	AHtml.replace("%sender%",AOptions.senderName);
 	AHtml.replace("%senderScreenName%", QString());
 	AHtml.replace("%textbackgroundcolor%",!AOptions.textBGColor.isEmpty() ? AOptions.textBGColor : "inherit");
+}
+
+QString SimpleMessageStyle::processStyleContent(QWidget *AWidget, const QString &AHtml, const IMessageStyleContentOptions &AOptions)
+{
+	if (!FMessageWidgets)
+		return AHtml;
+
+	QString modifiedHtml = AHtml;
+	QMultiMap<int, IMessageStyleHandler *> handlers = FMessageWidgets->styleHandlers();
+	for (QMultiMap<int, IMessageStyleHandler *>::const_iterator it = handlers.constBegin(); it != handlers.constEnd(); ++it)
+	{
+		QString handlerInput = modifiedHtml;
+		QString handlerOutput = handlerInput;
+		if (it.value()->messageStyleContentInsert(it.key(), AWidget, handlerInput, handlerOutput, AOptions))
+			modifiedHtml = handlerOutput;
+	}
+	return modifiedHtml;
 }
 
 QString SimpleMessageStyle::prepareMessage(const QString &AHtml, const IMessageStyleContentOptions &AOptions) const

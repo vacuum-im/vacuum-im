@@ -42,6 +42,7 @@ signals:
 	void messageStyleChanged(IMessageStyle *ABefore, const IMessageStyleOptions &AOptions);
 protected:
 	void initialize();
+	void resetMessageDocumentContexts(QWidget *AStyleWidget);
 protected:
 	void dropEvent(QDropEvent *AEvent);
 	void dragEnterEvent(QDragEnterEvent *AEvent);

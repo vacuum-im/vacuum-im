@@ -44,6 +44,7 @@ public:
 	virtual bool isShutingDown() const =0;
 	virtual QString homePath() const =0;
 	virtual void setHomePath(const QString &APath) =0;
+	virtual QString cachePath() const = 0;
 	virtual void setLocale(QLocale::Language ALanguage, QLocale::Country ACountry) =0;
 	virtual IPlugin *pluginInstance(const QUuid &AUuid) const =0;
 	virtual QList<IPlugin *> pluginInterface(const QString &AInterface = QString()) const =0;
@@ -61,6 +62,6 @@ protected:
 };
 
 Q_DECLARE_INTERFACE(IPlugin,"Vacuum.Core.IPlugin/1.0")
-Q_DECLARE_INTERFACE(IPluginManager,"Vacuum.Core.IPluginManager/1.2")
+Q_DECLARE_INTERFACE(IPluginManager,"Vacuum.Core.IPluginManager/1.3")
 
 #endif

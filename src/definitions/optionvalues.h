@@ -114,6 +114,15 @@
 // MessageStyles
 #define OPV_MESSAGES_SHOWDATESEPARATORS                 "messages.show-date-separators"
 #define OPV_MESSAGES_MAXMESSAGESINWINDOW                "messages.max-messages-in-window"
+// ImageViewer
+#define OPV_MESSAGES_IMAGES_AUTOLOAD                    "images.autoload"
+#define OPV_MESSAGES_IMAGES_BLOCKPRIVATEIPS             "images.block-private-ips"
+#define OPV_MESSAGES_IMAGES_MAXDOWNLOADMB                "images.max-download-mb"
+#define OPV_MESSAGES_IMAGES_MAXDIMENSION                "images.max-dimension"
+#define OPV_MESSAGES_IMAGES_PREVIEWDIMENSION           "images.preview-dimension"
+#define OPV_MESSAGES_IMAGES_CACHE_MAXBYTES              "images.cache-max-bytes"
+#define OPV_MESSAGES_IMAGES_CACHE_MAXAGE_DAYS           "images.cache-max-age-days"
+#define OPV_MESSAGES_IMAGES_CACHE_MAXCOUNT              "images.cache-max-count"
 // SpellChecker
 #define OPV_MESSAGES_SPELL_LANG                         "messages.spell.lang"
 #define OPV_MESSAGES_SPELL_ENABLED                      "messages.spell.enabled"

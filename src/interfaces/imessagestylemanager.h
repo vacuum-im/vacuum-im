@@ -142,8 +142,15 @@ protected:
 	virtual void styleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext) const =0;
 };
 
+class IMessageStyleHandler
+{
+public:
+	virtual bool messageStyleContentInsert(int AOrder, QWidget *AWidget, const QString &AHtml, QString &AModifiedHtml, const IMessageStyleContentOptions &AOptions) =0;
+};
+
 Q_DECLARE_INTERFACE(IMessageStyle,"Vacuum.Plugin.IMessageStyle/1.4")
 Q_DECLARE_INTERFACE(IMessageStyleEngine,"Vacuum.Plugin.IMessageStyleEngine/1.2")
 Q_DECLARE_INTERFACE(IMessageStyleManager,"Vacuum.Plugin.IMessageStyleManager/1.5")
+Q_DECLARE_INTERFACE(IMessageStyleHandler,"Vacuum.Plugin.IMessageStyleHandler/1.0")
 
 #endif // IMESSAGESTYLEMANAGER_H

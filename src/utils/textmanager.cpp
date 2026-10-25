@@ -2,6 +2,9 @@
 
 #include <QRegExp>
 #include <QTextBlock>
+#include <QTextCursor>
+
+#include <algorithm>
 
 TextManager::TextManager()
 {
@@ -28,27 +31,38 @@ QString TextManager::getDocumentBody(const QTextDocument &ADocument)
 
 QString TextManager::getTextFragmentHref(const QTextDocumentFragment &AFragment)
 {
+	if (AFragment.isEmpty())
+		return QString();
+
 	QString href;
 
 	QTextDocument doc;
-	doc.setHtml(AFragment.toHtml());
+	QTextCursor cursor(&doc);
+	cursor.insertFragment(AFragment);
 
 	QTextBlock block = doc.firstBlock();
 	while (block.isValid())
 	{
 		for (QTextBlock::iterator it = block.begin(); !it.atEnd(); ++it)
 		{
-			if (it.fragment().charFormat().isAnchor())
+			const QTextCharFormat format = it.fragment().charFormat();
+
+			// ImageViewer stores the original (non-shortened) URL in a custom
+			// format property so that copying the link retrieves the full URL
+			// instead of the shortened visible text.
+			QString fragmentHref = format.property(TMI_IMAGE_LINK_URL).toString();
+			if (fragmentHref.isEmpty())
 			{
-				if (href.isNull())
-					href = it.fragment().charFormat().anchorHref();
-				else if (href != it.fragment().charFormat().anchorHref())
+				if (!format.isAnchor())
 					return QString();
+
+				fragmentHref = format.anchorHref();
 			}
-			else
-			{
+
+			if (href.isNull())
+				href = fragmentHref;
+			else if (href != fragmentHref)
 				return QString();
-			}
 		}
 		block = block.next();
 	}
@@ -103,6 +117,48 @@ QTextDocumentFragment TextManager::getTrimmedTextFragment(const QTextDocumentFra
 
 	cursor.select(QTextCursor::Document);
 	return cursor.selection();
+}
+
+QString TextManager::getCopyableText(const QTextDocumentFragment &AFragment)
+{
+	if (AFragment.isEmpty())
+		return QString();
+
+	QTextDocument doc;
+	QTextCursor cursor(&doc);
+	cursor.insertFragment(AFragment);
+
+	// The text of the links of the images is shortened for the display, the full
+	// urls are copied instead of them.
+	QHash<int, QPair<int, QString> > links;
+	for (QTextBlock block = doc.begin(); block.isValid(); block = block.next())
+	{
+		for (QTextBlock::Iterator it = block.begin(); !it.atEnd(); ++it)
+		{
+			const QTextFragment fragment = it.fragment();
+			const QTextCharFormat format = fragment.charFormat();
+			if (format.hasProperty(TMI_IMAGE_LINK_URL))
+				links.insert(fragment.position(), qMakePair(fragment.length(), format.stringProperty(TMI_IMAGE_LINK_URL)));
+		}
+	}
+
+	// The links are replaced from the last one, so that the positions of the
+	// others stay valid.
+	QList<int> positions = links.keys();
+	std::sort(positions.begin(), positions.end(), qGreater<int>());
+	for (int position : positions)
+	{
+		const int length = links.value(position).first;
+		const QString url = links.value(position).second;
+		if (url.isEmpty() || length <= 0)
+			continue;
+		QTextCursor replace(&doc);
+		replace.setPosition(position);
+		replace.setPosition(position + length, QTextCursor::KeepAnchor);
+		replace.insertText(url);
+	}
+
+	return doc.toPlainText();
 }
 
 QString TextManager::getElidedString(const QString &AString, Qt::TextElideMode AMode, int AMaxChars)
