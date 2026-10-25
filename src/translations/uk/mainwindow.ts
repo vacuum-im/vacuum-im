@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="uk" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="uk" sourcelanguage="en">
 <context>
     <name>MainWindowPlugin</name>
     <message>
@@ -20,7 +22,11 @@
     <message>
         <source>Esc</source>
         <comment>Close main window</comment>
-        <translation type="unfinished"/>
+        <translation>Esc</translation>
+    </message>
+    <message>
+        <source>Minimize roster window instead of closing it</source>
+        <translation>Згортати вікно ростеру замість закриття</translation>
     </message>
 </context>
 </TS>

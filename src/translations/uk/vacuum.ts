@@ -1,17 +1,19 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="uk" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="uk" sourcelanguage="en">
 <context>
     <name>AboutBox</name>
     <message>
         <source>Version: %1 %2 of %3</source>
-        <translation type="unfinished"/>
+        <translation>Версія: %1 %2 від %3</translation>
     </message>
     <message>
         <source>Revision: %1</source>
-        <translation type="unfinished"/>
+        <translation>Ревізія: %1</translation>
     </message>
     <message>
         <source>Version: %1 %2</source>
-        <translation type="unfinished"/>
+        <translation>Версія: %1 %2</translation>
     </message>
 </context>
 <context>
@@ -53,15 +55,15 @@
     </message>
     <message>
         <source>Global shortcuts</source>
-        <translation type="unfinished"/>
+        <translation>Глобальні комбінації клавіш</translation>
     </message>
     <message>
         <source>Application shortcuts</source>
-        <translation type="unfinished"/>
+        <translation>Комбінації клавіш програми</translation>
     </message>
     <message>
         <source>Dependencies not found</source>
-        <translation type="unfinished"/>
+        <translation>Залежності не знайдено</translation>
     </message>
 </context>
 <context>
@@ -76,35 +78,47 @@
     </message>
     <message>
         <source>Disabled (%1)</source>
-        <translation type="unfinished"/>
+        <translation>Вимкнено (%1)</translation>
     </message>
     <message>
         <source>With errors (%1)</source>
-        <translation type="unfinished"/>
+        <translation>З помилками (%1)</translation>
     </message>
     <message>
         <source>This plugin does not depend on other plugins.</source>
-        <translation type="unfinished"/>
+        <translation>Цей плагін не залежить від інших плагінів.</translation>
     </message>
     <message>
         <source>Other plugins don&apos;t depend on this plugin.</source>
-        <translation type="unfinished"/>
+        <translation>Інші плагіни не залежать від цього плагіна.</translation>
     </message>
     <message numerus="yes">
         <source>This plugin depends on %n other plugin(s).</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>Цей плагін залежить від %n іншого плагіна.</numerusform>
+            <numerusform>Цей плагін залежить від %n інших плагінів.</numerusform>
+            <numerusform>Цей плагін залежить від %n інших плагінів.</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Other %n plugin(s) depend on this plugin.</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>Від цього плагіна залежить %n інший плагін.</numerusform>
+            <numerusform>Від цього плагіна залежать %n інші плагіни.</numerusform>
+            <numerusform>Від цього плагіна залежать %n інших плагінів.</numerusform>
+        </translation>
     </message>
     <message>
         <source>Another plugin depends on this plugin.</source>
-        <translation type="unfinished"/>
+        <translation>Від цього плагіна залежить інший плагін.</translation>
     </message>
     <message numerus="yes">
         <source>%n dependency(ies) not found.</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>Не знайдено %n залежність.</numerusform>
+            <numerusform>Не знайдено %n залежності.</numerusform>
+            <numerusform>Не знайдено %n залежностей.</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -115,11 +129,11 @@
     </message>
     <message>
         <source>Search plugin</source>
-        <translation type="unfinished"/>
+        <translation>Пошук плагіна</translation>
     </message>
     <message>
         <source>Plugin Information</source>
-        <translation type="unfinished"/>
+        <translation>Інформація про плагін</translation>
     </message>
 </context>
 </TS>

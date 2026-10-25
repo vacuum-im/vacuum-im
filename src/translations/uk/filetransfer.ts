@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="uk" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="uk" sourcelanguage="en">
 <context>
     <name>FileTransfer</name>
     <message>
@@ -40,75 +42,79 @@
     <message>
         <source>Ctrl+S</source>
         <comment>Send file</comment>
-        <translation type="unfinished"/>
+        <translation>Ctrl+S</translation>
     </message>
     <message>
         <source>Automatically receive files from authorized contacts</source>
-        <translation type="unfinished"/>
+        <translation>Автоматично приймати файли від авторизованих контактів</translation>
     </message>
     <message>
         <source>Hide file transfer dialog after transfer started</source>
-        <translation type="unfinished"/>
+        <translation>Приховувати вікно передачі файлів після початку передачі</translation>
     </message>
     <message numerus="yes">
         <source>/me share %n file(s): %1</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>/me ділюся %n файлом: %1</numerusform>
+            <numerusform>/me ділюся %n файлами: %1</numerusform>
+            <numerusform>/me ділюся %n файлами: %1</numerusform>
+        </translation>
     </message>
     <message>
         <source>Select Files</source>
-        <translation type="unfinished"/>
+        <translation>Виберіть файли</translation>
     </message>
     <message>
         <source>Failed to send request for file &apos;%1&apos;</source>
-        <translation type="unfinished"/>
+        <translation>Не вдалося відправити запит на файл &apos;%1&apos;</translation>
     </message>
     <message>
         <source>File transfer</source>
-        <translation type="unfinished"/>
+        <translation>Передача файлу</translation>
     </message>
     <message>
         <source>File transfer request from %1</source>
-        <translation type="unfinished"/>
+        <translation>Запит передачі файлу від %1</translation>
     </message>
     <message>
         <source>%1 wants to send you a file &apos;%2&apos;</source>
-        <translation type="unfinished"/>
+        <translation>%1 хоче надіслати вам файл &apos;%2&apos;</translation>
     </message>
     <message>
         <source>Sending file &apos;%1&apos; to %2 started automatically</source>
-        <translation type="unfinished"/>
+        <translation>Надсилання файлу &apos;%1&apos; до %2 почалося автоматично</translation>
     </message>
     <message>
         <source>Receiving file &apos;%1&apos; from %2 started automatically</source>
-        <translation type="unfinished"/>
+        <translation>Отримання файлу &apos;%1&apos; від %2 почалося автоматично</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; successfully sent to %2</source>
-        <translation type="unfinished"/>
+        <translation>Файл &apos;%1&apos; успішно надіслано до %2</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; successfully received from %2</source>
-        <translation type="unfinished"/>
+        <translation>Файл &apos;%1&apos; успішно отримано від %2</translation>
     </message>
     <message>
         <source>File transfer failed</source>
-        <translation type="unfinished"/>
+        <translation>Передача файлу не вдалася</translation>
     </message>
     <message>
         <source>Failed to send file &apos;%1&apos; to %2: %3</source>
-        <translation type="unfinished"/>
+        <translation>Не вдалося надіслати файл &apos;%1&apos; до %2: %3</translation>
     </message>
     <message>
         <source>Failed to receive file &apos;%1&apos; from %2: %3</source>
-        <translation type="unfinished"/>
+        <translation>Не вдалося отримати файл &apos;%1&apos; від %2: %3</translation>
     </message>
     <message>
         <source>Select File</source>
-        <translation type="unfinished"/>
+        <translation>Виберіть файл</translation>
     </message>
     <message>
         <source>File request rejected: %1</source>
-        <translation type="unfinished"/>
+        <translation>Запит файлу відхилено: %1</translation>
     </message>
 </context>
 <context>
@@ -262,7 +268,7 @@
     </message>
     <message>
         <source>Method:</source>
-        <translation type="unfinished"/>
+        <translation>Метод:</translation>
     </message>
 </context>
 </TS>

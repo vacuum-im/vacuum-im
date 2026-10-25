@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="uk" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="uk" sourcelanguage="en">
 <context>
     <name>ExchangeApproveDialog</name>
     <message>
@@ -65,7 +67,11 @@
     </message>
     <message numerus="yes">
         <source>Send %n Contact(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>Надіслати %n контакт</numerusform>
+            <numerusform>Надіслати %n контакти</numerusform>
+            <numerusform>Надіслати %n контактів</numerusform>
+        </translation>
     </message>
     <message>
         <source>Roster modification request from %1</source>
@@ -81,19 +87,27 @@
     </message>
     <message numerus="yes">
         <source>Failed to send %n contact(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>Не вдалося надіслати %n контакт</numerusform>
+            <numerusform>Не вдалося надіслати %n контакти</numerusform>
+            <numerusform>Не вдалося надіслати %n контактів</numerusform>
+        </translation>
     </message>
     <message>
         <source>Contacts list management</source>
-        <translation type="unfinished"/>
+        <translation>Керування списком контактів</translation>
     </message>
     <message>
         <source>Allow gateways and group services manage your contacts list</source>
-        <translation type="unfinished"/>
+        <translation>Дозволити транспортам та груповим сервісам керувати вашим списком контактів</translation>
     </message>
     <message numerus="yes">
         <source>%n contact(s) sent</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>Надіслано %n контакт</numerusform>
+            <numerusform>Надіслано %n контакти</numerusform>
+            <numerusform>Надіслано %n контактів</numerusform>
+        </translation>
     </message>
 </context>
 </TS>

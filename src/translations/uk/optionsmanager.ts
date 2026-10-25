@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="uk" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="uk" sourcelanguage="en">
 <context>
     <name>EditProfilesDialog</name>
     <message>
@@ -86,23 +88,23 @@
     </message>
     <message>
         <source>Add Profile</source>
-        <translation type="unfinished"/>
+        <translation>Додати профіль</translation>
     </message>
     <message>
         <source>Change Password</source>
-        <translation type="unfinished"/>
+        <translation>Змінити пароль</translation>
     </message>
     <message>
         <source>Rename Profile</source>
-        <translation type="unfinished"/>
+        <translation>Перейменувати профіль</translation>
     </message>
     <message>
         <source>Delete Profile</source>
-        <translation type="unfinished"/>
+        <translation>Видалити профіль</translation>
     </message>
     <message>
         <source>Profiles Settings</source>
-        <translation type="unfinished"/>
+        <translation>Налаштування профілів</translation>
     </message>
 </context>
 <context>
@@ -140,7 +142,7 @@
     </message>
     <message>
         <source>Settings...</source>
-        <translation type="unfinished"/>
+        <translation>Налаштування...</translation>
     </message>
 </context>
 <context>
@@ -174,31 +176,31 @@
     </message>
     <message>
         <source>Common settings</source>
-        <translation type="unfinished"/>
+        <translation>Загальні налаштування</translation>
     </message>
     <message>
         <source>Auto run application on system startup</source>
-        <translation type="unfinished"/>
+        <translation>Запускати програму при старті системи</translation>
     </message>
     <message>
         <source>Localization</source>
-        <translation type="unfinished"/>
+        <translation>Локалізація</translation>
     </message>
     <message>
         <source>&lt;System Language&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;Мова системи&gt;</translation>
     </message>
     <message>
         <source>Language:</source>
-        <translation type="unfinished"/>
+        <translation>Мова:</translation>
     </message>
     <message>
         <source>Common</source>
-        <translation type="unfinished"/>
+        <translation>Загальні</translation>
     </message>
     <message>
         <source>Appearance</source>
-        <translation type="unfinished"/>
+        <translation>Вигляд</translation>
     </message>
 </context>
 </TS>

@@ -5,53 +5,53 @@
     <name>FileArchiveOptionsClass</name>
     <message>
         <source>Synchronize archive database at startup</source>
-        <translation type="unfinished"></translation>
+        <translation>Синхронізувати базу даних архіву при запуску</translation>
     </message>
     <message>
         <source>Move history to:</source>
-        <translation type="unfinished"></translation>
+        <translation>Перемістити історію до:</translation>
     </message>
 </context>
 <context>
     <name>FileArchiveOptionsWidget</name>
     <message>
         <source>Select the location for the file archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Виберіть розташування для файлового архіву</translation>
     </message>
 </context>
 <context>
     <name>FileMessageArchive</name>
     <message>
         <source>File Message Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Файловий архів повідомлень</translation>
     </message>
     <message>
         <source>Local File Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Локальний файловий архів</translation>
     </message>
     <message>
         <source>Allows to save the history of conversations in to local files</source>
-        <translation type="unfinished"></translation>
+        <translation>Дозволяє зберігати історію розмов у локальні файли</translation>
     </message>
     <message>
         <source>History of conversations is stored in local files</source>
-        <translation type="unfinished"></translation>
+        <translation>Історія розмов зберігається в локальних файлах</translation>
     </message>
     <message>
         <source>Failed to create database</source>
-        <translation type="unfinished"></translation>
+        <translation>Не вдалося створити базу даних</translation>
     </message>
     <message>
         <source>Failed to open database</source>
-        <translation type="unfinished"></translation>
+        <translation>Не вдалося відкрити базу даних</translation>
     </message>
     <message>
         <source>Database format is not compatible</source>
-        <translation type="unfinished"></translation>
+        <translation>Формат бази даних несумісний</translation>
     </message>
     <message>
         <source>Failed to to execute SQL query</source>
-        <translation type="unfinished"></translation>
+        <translation>Не вдалося виконати SQL-запит</translation>
     </message>
 </context>
 </TS>

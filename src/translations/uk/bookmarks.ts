@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="uk" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="uk" sourcelanguage="en">
 <context>
     <name>Bookmarks</name>
     <message>
@@ -39,15 +41,15 @@
     </message>
     <message>
         <source>Conferences</source>
-        <translation type="unfinished"/>
+        <translation>Конференції</translation>
     </message>
     <message>
         <source>Disable auto join to conferences on this computer</source>
-        <translation type="unfinished"/>
+        <translation>Вимкнути автоматичний вхід до конференцій на цьому комп&apos;ютері</translation>
     </message>
     <message>
         <source>Show windows of auto joined conferences at startup</source>
-        <translation type="unfinished"/>
+        <translation>Показувати вікна конференцій з автоматичним входом під час запуску</translation>
     </message>
 </context>
 <context>
@@ -66,7 +68,7 @@
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Помилка</translation>
     </message>
 </context>
 <context>
@@ -85,23 +87,23 @@
     </message>
     <message>
         <source>Conference:</source>
-        <translation type="unfinished"/>
+        <translation>Конференція:</translation>
     </message>
     <message>
         <source>Conference as &apos;name@service.server.com&apos;</source>
-        <translation type="unfinished"/>
+        <translation>Конференція у вигляді &apos;name@service.server.com&apos;</translation>
     </message>
     <message>
         <source>Nickname:</source>
-        <translation type="unfinished"/>
+        <translation>Прізвисько:</translation>
     </message>
     <message>
         <source>Your nickname in conference</source>
-        <translation type="unfinished"/>
+        <translation>Ваше прізвисько в конференції</translation>
     </message>
     <message>
         <source>Conference password if required</source>
-        <translation type="unfinished"/>
+        <translation>Пароль конференції, якщо потрібно</translation>
     </message>
     <message>
         <source>Name:</source>
@@ -109,23 +111,23 @@
     </message>
     <message>
         <source>Bookmark to Conference</source>
-        <translation type="unfinished"/>
+        <translation>Закладка на конференцію</translation>
     </message>
     <message>
         <source>Bookmark to Link</source>
-        <translation type="unfinished"/>
+        <translation>Закладка на посилання</translation>
     </message>
     <message>
         <source>Link:</source>
-        <translation type="unfinished"/>
+        <translation>Посилання:</translation>
     </message>
     <message>
         <source>Any valid link</source>
-        <translation type="unfinished"/>
+        <translation>Будь-яке дійсне посилання</translation>
     </message>
     <message>
         <source>Bookmark name</source>
-        <translation type="unfinished"/>
+        <translation>Ім&apos;я закладки</translation>
     </message>
 </context>
 <context>
@@ -140,7 +142,7 @@
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Помилка</translation>
     </message>
 </context>
 <context>

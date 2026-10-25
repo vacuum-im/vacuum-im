@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="uk" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="uk" sourcelanguage="en">
 <context>
     <name>FileStream</name>
     <message>
@@ -59,33 +61,33 @@
     <message>
         <source>Ctrl+T</source>
         <comment>Show file transfers</comment>
-        <translation type="unfinished"/>
+        <translation>Ctrl+T</translation>
     </message>
     <message>
         <source>File transfer</source>
-        <translation type="unfinished"/>
+        <translation>Передача файлу</translation>
     </message>
     <message>
         <source>Create separate folder for each sender</source>
-        <translation type="unfinished"/>
+        <translation>Створювати окрему папку для кожного відправника</translation>
     </message>
     <message>
         <source>Default transfer method:</source>
-        <translation type="unfinished"/>
+        <translation>Метод передачі за замовчуванням:</translation>
     </message>
 </context>
 <context>
     <name>FileStreamsOptionsWidget</name>
     <message>
         <source>Select default directory</source>
-        <translation type="unfinished"/>
+        <translation>Виберіть каталог за замовчуванням</translation>
     </message>
 </context>
 <context>
     <name>FileStreamsOptionsWidgetClass</name>
     <message>
         <source>Default directory:</source>
-        <translation type="unfinished"/>
+        <translation>Каталог за замовчуванням:</translation>
     </message>
 </context>
 <context>

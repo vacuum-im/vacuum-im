@@ -1,29 +1,31 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="uk" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="uk" sourcelanguage="en">
 <context>
     <name>SocksOptionsWidgetClass</name>
     <message>
         <source>Use jabber-proxy on your server</source>
-        <translation type="unfinished"/>
+        <translation>Використовувати jabber-proxy на вашому сервері</translation>
     </message>
     <message>
         <source>Use additional jabber-proxy:</source>
-        <translation type="unfinished"/>
+        <translation>Використовувати додатковий jabber-proxy:</translation>
     </message>
     <message>
         <source>Allow direct incoming connections on port:</source>
-        <translation type="unfinished"/>
+        <translation>Дозволити прямі вхідні з&apos;єднання на порту:</translation>
     </message>
     <message>
         <source>Forward direct incoming connections to host:</source>
-        <translation type="unfinished"/>
+        <translation>Перенаправляти прямі вхідні з&apos;єднання на хост:</translation>
     </message>
     <message>
         <source>Use account proxy settings for outgoing connections</source>
-        <translation type="unfinished"/>
+        <translation>Використовувати налаштування проксі акаунта для вихідних з&apos;єднань</translation>
     </message>
     <message>
         <source>host:port</source>
-        <translation type="unfinished"/>
+        <translation>хост:порт</translation>
     </message>
 </context>
 <context>

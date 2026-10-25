@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="uk" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="uk" sourcelanguage="en">
 <context>
     <name>AddContactDialog</name>
     <message>
@@ -287,40 +289,44 @@
     </message>
     <message>
         <source>Contacts list management</source>
-        <translation type="unfinished"/>
+        <translation>Керування списком контактів</translation>
     </message>
     <message>
         <source>Automatically accept all subscription requests</source>
-        <translation type="unfinished"/>
+        <translation>Автоматично приймати всі запити на авторизацію</translation>
     </message>
     <message>
         <source>Remove subscription when you was deleted from contacts list</source>
-        <translation type="unfinished"/>
+        <translation>Видаляти авторизацію при видаленні вас зі списку контактів</translation>
     </message>
     <message>
         <source>Del</source>
         <comment>Remove contact/group from roster</comment>
-        <translation type="unfinished"/>
+        <translation>Del</translation>
     </message>
     <message>
         <source>Into this Group</source>
-        <translation type="unfinished"/>
+        <translation>До цієї групи</translation>
     </message>
     <message>
         <source>Are you sure you wish to remove a contact &lt;b&gt;%1&lt;/b&gt; from the roster?</source>
-        <translation type="unfinished"/>
+        <translation>Ви впевнені, що хочете видалити контакт &lt;b&gt;%1&lt;/b&gt; з ростеру?</translation>
     </message>
     <message>
         <source>Are you sure you wish to subscribe for a contact &lt;b&gt;%1&lt;/b&gt; presence?</source>
-        <translation type="unfinished"/>
+        <translation>Ви впевнені, що хочете підписатися на отримання статусу контакту &lt;b&gt;%1&lt;/b&gt;?</translation>
     </message>
     <message>
         <source>Are you sure you wish to unsubscribe from a contact &lt;b&gt;%1&lt;/b&gt; presence?</source>
-        <translation type="unfinished"/>
+        <translation>Ви впевнені, що хочете відписатися від отримання статусу контакту &lt;b&gt;%1&lt;/b&gt;?</translation>
     </message>
     <message numerus="yes">
         <source>Are you sure you wish to remove &lt;b&gt;%n contact(s)&lt;/b&gt; from the roster?</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>Ви впевнені, що хочете видалити &lt;b&gt;%n контакт&lt;/b&gt; з ростеру?</numerusform>
+            <numerusform>Ви впевнені, що хочете видалити &lt;b&gt;%n контакти&lt;/b&gt; з ростеру?</numerusform>
+            <numerusform>Ви впевнені, що хочете видалити &lt;b&gt;%n контактів&lt;/b&gt; з ростеру?</numerusform>
+        </translation>
     </message>
 </context>
 <context>

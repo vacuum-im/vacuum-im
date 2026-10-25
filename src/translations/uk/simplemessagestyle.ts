@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="uk" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="uk" sourcelanguage="en">
 <context>
     <name>SimpleMessageStyle</name>
     <message>
@@ -14,15 +16,15 @@
     <name>SimpleMessageStyleEngine</name>
     <message>
         <source>Simple Message Style</source>
-        <translation type="unfinished"/>
+        <translation>Простий стиль повідомлень</translation>
     </message>
     <message>
         <source>Allows to use a simplified style in message design</source>
-        <translation type="unfinished"/>
+        <translation>Дозволяє використовувати спрощений стиль для оформлення повідомлень</translation>
     </message>
     <message>
         <source>Simple</source>
-        <translation type="unfinished"/>
+        <translation>Простий</translation>
     </message>
 </context>
 <context>
@@ -45,11 +47,11 @@
     </message>
     <message>
         <source>Parameters</source>
-        <translation type="unfinished"/>
+        <translation>Параметри</translation>
     </message>
     <message>
         <source>Background</source>
-        <translation type="unfinished"/>
+        <translation>Фон</translation>
     </message>
 </context>
 <context>
@@ -64,23 +66,23 @@
     </message>
     <message>
         <source>Font:</source>
-        <translation type="unfinished"/>
+        <translation>Шрифт:</translation>
     </message>
     <message>
         <source>Change...</source>
-        <translation type="unfinished"/>
+        <translation>Змінити...</translation>
     </message>
     <message>
         <source>Reset</source>
-        <translation type="unfinished"/>
+        <translation>Скинути</translation>
     </message>
     <message>
         <source>Image:</source>
-        <translation type="unfinished"/>
+        <translation>Зображення:</translation>
     </message>
     <message>
         <source>not set</source>
-        <translation type="unfinished"/>
+        <translation>не задано</translation>
     </message>
 </context>
 </TS>

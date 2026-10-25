@@ -1,203 +1,217 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="uk" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="uk" sourcelanguage="en">
 <context>
     <name>ArchiveAccountOptionsWidget</name>
     <message>
         <source>Yes, if supported by server</source>
-        <translation type="unfinished"/>
+        <translation>Так, якщо підтримується сервером</translation>
     </message>
     <message>
         <source>Yes, if other archive is not available</source>
-        <translation type="unfinished"/>
+        <translation>Так, якщо інший архів недоступний</translation>
     </message>
     <message>
         <source>No, do not save history on server</source>
-        <translation type="unfinished"/>
+        <translation>Ні, не зберігати історію на сервері</translation>
     </message>
     <message>
         <source>Yes, if local archive is available</source>
-        <translation type="unfinished"/>
+        <translation>Так, якщо локальний архів доступний</translation>
     </message>
     <message>
         <source>No, do not save history in local archive</source>
-        <translation type="unfinished"/>
+        <translation>Ні, не зберігати історію в локальному архіві</translation>
     </message>
     <message>
         <source>Yes, if available</source>
-        <translation type="unfinished"/>
+        <translation>Так, якщо доступно</translation>
     </message>
     <message>
         <source>Yes, if other replication method is not used</source>
-        <translation type="unfinished"/>
+        <translation>Так, якщо не використовується інший спосіб реплікації</translation>
     </message>
     <message>
         <source>No, do not copy local archive to the server</source>
-        <translation type="unfinished"/>
+        <translation>Ні, не копіювати локальний архів на сервер</translation>
     </message>
     <message>
         <source>Save messages with formatting</source>
-        <translation type="unfinished"/>
+        <translation>Зберігати повідомлення з форматуванням</translation>
     </message>
     <message>
         <source>Save only messages text</source>
-        <translation type="unfinished"/>
+        <translation>Зберігати тільки текст повідомлень</translation>
     </message>
     <message>
         <source>Do not save messages</source>
-        <translation type="unfinished"/>
+        <translation>Не зберігати повідомлення</translation>
     </message>
     <message>
         <source>Allow Off-The-Record sessions</source>
-        <translation type="unfinished"/>
+        <translation>Дозволити сесії ЗЗІ</translation>
     </message>
     <message>
         <source>Forbid Off-The-Record sessions</source>
-        <translation type="unfinished"/>
+        <translation>Заборонити сесії ЗЗІ</translation>
     </message>
     <message>
         <source>Manually approve Off-The-Record sessions</source>
-        <translation type="unfinished"/>
+        <translation>Підтверджувати сесії ЗЗІ вручну</translation>
     </message>
     <message>
         <source>Waiting for host response...</source>
-        <translation type="unfinished"/>
+        <translation>Очікування відповіді сервера...</translation>
     </message>
     <message>
         <source>History preferences is not available</source>
-        <translation type="unfinished"/>
+        <translation>Налаштування історії недоступні</translation>
     </message>
     <message>
         <source>Failed to save archive preferences: %1</source>
-        <translation type="unfinished"/>
+        <translation>Не вдалося зберегти налаштування архіву: %1</translation>
     </message>
     <message>
         <source>New item preferences</source>
-        <translation type="unfinished"/>
+        <translation>Налаштування нового елемента</translation>
     </message>
     <message>
         <source>Enter item JID:</source>
-        <translation type="unfinished"/>
+        <translation>Введіть JID елемента:</translation>
     </message>
     <message>
         <source>Unacceptable item JID</source>
-        <translation type="unfinished"/>
+        <translation>Неприпустимий JID елемента</translation>
     </message>
     <message>
         <source>&apos;%1&apos; is not valid JID or already exists</source>
-        <translation type="unfinished"/>
+        <translation>«%1» не є коректним JID або вже існує</translation>
     </message>
     <message>
         <source>Preferences accepted</source>
-        <translation type="unfinished"/>
+        <translation>Налаштування прийнято</translation>
     </message>
 </context>
 <context>
     <name>ArchiveAccountOptionsWidgetClass</name>
     <message>
         <source>Auto archiving preferences</source>
-        <translation type="unfinished"/>
+        <translation>Налаштування автоматичного архівування</translation>
     </message>
     <message>
         <source>Enable automatic archiving of messages on the server</source>
-        <translation type="unfinished"/>
+        <translation>Увімкнути автоматичне архівування повідомлень на сервері</translation>
     </message>
     <message>
         <source>Archiving policy</source>
-        <translation type="unfinished"/>
+        <translation>Політика архівування</translation>
     </message>
     <message>
         <source>Save history in a local archive?</source>
-        <translation type="unfinished"/>
+        <translation>Зберігати історію в локальному архіві?</translation>
     </message>
     <message>
         <source>Save history on server?</source>
-        <translation type="unfinished"/>
+        <translation>Зберігати історію на сервері?</translation>
     </message>
     <message>
         <source>Copy local archive to the server?</source>
-        <translation type="unfinished"/>
+        <translation>Копіювати локальний архів на сервер?</translation>
     </message>
     <message>
         <source>Default archiving preferences</source>
-        <translation type="unfinished"/>
+        <translation>Налаштування архівування по замовчуванню</translation>
     </message>
     <message>
         <source>Message archiving:</source>
-        <translation type="unfinished"/>
+        <translation>Архівування повідомлень:</translation>
     </message>
     <message>
         <source>Off-The-Record sessions:</source>
-        <translation type="unfinished"/>
+        <translation>Сесії ЗЗІ:</translation>
     </message>
     <message>
         <source>Remove messages after, days:</source>
-        <translation type="unfinished"/>
+        <translation>Видаляти повідомлення через, днів:</translation>
     </message>
     <message>
         <source>(0 - do not remove)</source>
-        <translation type="unfinished"/>
+        <translation>(0 - не видаляти)</translation>
     </message>
     <message>
         <source>Individual archiving preferences</source>
-        <translation type="unfinished"/>
+        <translation>Індивідуальні налаштування архівування</translation>
     </message>
     <message>
         <source>JID</source>
-        <translation type="unfinished"/>
+        <translation>JID</translation>
     </message>
     <message>
         <source>Contact identifier</source>
-        <translation type="unfinished"/>
+        <translation>Ідентифікатор контакту</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation type="unfinished"/>
+        <translation>Зберегти</translation>
     </message>
     <message>
         <source>Message archiving</source>
-        <translation type="unfinished"/>
+        <translation>Архівування повідомлень</translation>
     </message>
     <message>
         <source>OTR</source>
-        <translation type="unfinished"/>
+        <translation>OTR</translation>
     </message>
     <message>
         <source>Off-The-Record sessions </source>
-        <translation type="unfinished"/>
+        <translation>Сесії ЗЗІ </translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation type="unfinished"/>
+        <translation>Видалити</translation>
     </message>
     <message>
         <source>Remove messages after, days</source>
-        <translation type="unfinished"/>
+        <translation>Видаляти повідомлення через, днів</translation>
     </message>
     <message>
         <source>Exact</source>
-        <translation type="unfinished"/>
+        <translation>Точний</translation>
     </message>
     <message>
         <source>Settings are applied to contact which JID is exactly matches</source>
-        <translation type="unfinished"/>
+        <translation>Налаштування застосовуються до контакту, JID якого точно збігається</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished"/>
+        <translation>Додати</translation>
     </message>
 </context>
 <context>
     <name>ArchiveDelegate</name>
     <message numerus="yes">
         <source>%n year(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>%n рік</numerusform>
+            <numerusform>%n роки</numerusform>
+            <numerusform>%n років</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>%n month(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>%n місяць</numerusform>
+            <numerusform>%n місяці</numerusform>
+            <numerusform>%n місяців</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>%n day(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>%n день</numerusform>
+            <numerusform>%n дні</numerusform>
+            <numerusform>%n днів</numerusform>
+        </translation>
     </message>
     <message>
         <source>Never</source>
@@ -284,7 +298,11 @@
     </message>
     <message numerus="yes">
         <source>Found %n occurrence(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>Знайдено %n збіг</numerusform>
+            <numerusform>Знайдено %n збіги</numerusform>
+            <numerusform>Знайдено %n збігів</numerusform>
+        </translation>
     </message>
     <message>
         <source>Remove conversation history</source>
@@ -312,135 +330,147 @@
     </message>
     <message>
         <source>Conversation History</source>
-        <translation type="unfinished"/>
+        <translation>Історія розмов</translation>
     </message>
     <message>
         <source>Conversations are not found</source>
-        <translation type="unfinished"/>
+        <translation>Розмови не знайдено</translation>
     </message>
     <message>
         <source>Conversation is not selected</source>
-        <translation type="unfinished"/>
+        <translation>Розмову не вибрано</translation>
     </message>
     <message>
         <source>Search is not supported</source>
-        <translation type="unfinished"/>
+        <translation>Пошук не підтримується</translation>
     </message>
     <message>
         <source>Load more conversations</source>
-        <translation type="unfinished"/>
+        <translation>Завантажити більше розмов</translation>
     </message>
     <message>
         <source>All conversations loaded</source>
-        <translation type="unfinished"/>
+        <translation>Усі розмови завантажено</translation>
     </message>
     <message>
         <source>Conversation headers are not found</source>
-        <translation type="unfinished"/>
+        <translation>Заголовки розмов не знайдено</translation>
     </message>
     <message>
         <source>Retry</source>
-        <translation type="unfinished"/>
+        <translation>Повторити</translation>
     </message>
     <message>
         <source>Show Contact History</source>
-        <translation type="unfinished"/>
+        <translation>Показати історію контакту</translation>
     </message>
     <message>
         <source>Remove all History with %1</source>
-        <translation type="unfinished"/>
+        <translation>Видалити всю історію з %1</translation>
     </message>
     <message>
         <source>Remove History for %1</source>
-        <translation type="unfinished"/>
+        <translation>Видалити історію з %1</translation>
     </message>
     <message>
         <source>&lt;b&gt;%1&lt;/b&gt; with %2 in %3</source>
-        <translation type="unfinished"/>
+        <translation>&lt;b&gt;%1&lt;/b&gt; з %2 у %3</translation>
     </message>
     <message>
         <source>&lt;b&gt;%1&lt;/b&gt; in %2</source>
-        <translation type="unfinished"/>
+        <translation>&lt;b&gt;%1&lt;/b&gt; у %2</translation>
     </message>
     <message>
         <source>&lt;b&gt;%1&lt;/b&gt; with %2</source>
-        <translation type="unfinished"/>
+        <translation>&lt;b&gt;%1&lt;/b&gt; з %2</translation>
     </message>
     <message numerus="yes">
         <source>%n conversation header(s) found</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>Знайдено %n заголовок розмови</numerusform>
+            <numerusform>Знайдено %n заголовки розмов</numerusform>
+            <numerusform>Знайдено %n заголовків розмов</numerusform>
+        </translation>
     </message>
     <message>
         <source>Select conversation to show</source>
-        <translation type="unfinished"/>
+        <translation>Виберіть розмову для перегляду</translation>
     </message>
     <message numerus="yes">
         <source>%n conversation(s) shown</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>Показано %n розмову</numerusform>
+            <numerusform>Показано %n розмови</numerusform>
+            <numerusform>Показано %n розмов</numerusform>
+        </translation>
     </message>
     <message>
         <source>Shown %1 of %2 conversations...</source>
-        <translation type="unfinished"/>
+        <translation>Показано %1 з %2 розмов...</translation>
     </message>
     <message>
         <source>with &lt;b&gt;%1&lt;/b&gt; for &lt;b&gt;%2 %3&lt;/b&gt;?</source>
-        <translation type="unfinished"/>
+        <translation>з &lt;b&gt;%1&lt;/b&gt; за &lt;b&gt;%2 %3&lt;/b&gt;?</translation>
     </message>
     <message>
         <source>with &lt;b&gt;%1&lt;/b&gt; started at &lt;b&gt;%2&lt;/b&gt;?</source>
-        <translation type="unfinished"/>
+        <translation>з &lt;b&gt;%1&lt;/b&gt;, розпочатої &lt;b&gt;%2&lt;/b&gt;?</translation>
     </message>
     <message>
         <source>with &lt;b&gt;%1&lt;/b&gt; for all time?</source>
-        <translation type="unfinished"/>
+        <translation>з &lt;b&gt;%1&lt;/b&gt; за весь час?</translation>
     </message>
     <message>
         <source>Do you want to remove the following conversations?</source>
-        <translation type="unfinished"/>
+        <translation>Бажаєте видалити наступні розмови?</translation>
     </message>
     <message>
         <source>Remove Selected Conversations</source>
-        <translation type="unfinished"/>
+        <translation>Видалити вибрані розмови</translation>
     </message>
     <message>
         <source>Print Conversation History</source>
-        <translation type="unfinished"/>
+        <translation>Друк історії розмов</translation>
     </message>
     <message>
         <source>HTML file (*.html)</source>
-        <translation type="unfinished"/>
+        <translation>HTML-файл (*.html)</translation>
     </message>
     <message>
         <source>Text file (*.txt)</source>
-        <translation type="unfinished"/>
+        <translation>Текстовий файл (*.txt)</translation>
     </message>
     <message>
         <source>Save Conversations to File</source>
-        <translation type="unfinished"/>
+        <translation>Зберегти розмови у файл</translation>
     </message>
     <message>
         <source>Print...</source>
-        <translation type="unfinished"/>
+        <translation>Друк...</translation>
     </message>
     <message>
         <source>Save as HTML</source>
-        <translation type="unfinished"/>
+        <translation>Зберегти як HTML</translation>
     </message>
     <message>
         <source>Save as Text</source>
-        <translation type="unfinished"/>
+        <translation>Зберегти як текст</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"/>
+        <translation>Експорт</translation>
     </message>
     <message>
         <source>Phrase not found</source>
-        <translation type="unfinished"/>
+        <translation>Фразу не знайдено</translation>
     </message>
     <message numerus="yes">
         <source>And %n other conversation(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>І ще %n розмова</numerusform>
+            <numerusform>І ще %n розмови</numerusform>
+            <numerusform>І ще %n розмов</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -627,23 +657,23 @@
     </message>
     <message>
         <source>Archive preferences</source>
-        <translation type="unfinished"/>
+        <translation>Налаштування архіву</translation>
     </message>
     <message>
         <source>Archive synchronization</source>
-        <translation type="unfinished"/>
+        <translation>Синхронізація архіву</translation>
     </message>
     <message>
         <source>Synchronize history between archives</source>
-        <translation type="unfinished"/>
+        <translation>Синхронізувати історію між архівами</translation>
     </message>
     <message>
         <source>Duplicate messages in local archive (not recommended)</source>
-        <translation type="unfinished"/>
+        <translation>Дублювати повідомлення в локальному архіві (не рекомендується)</translation>
     </message>
     <message>
         <source>Used history archives</source>
-        <translation type="unfinished"/>
+        <translation>Використовувані архіви історії</translation>
     </message>
 </context>
 </TS>

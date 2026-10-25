@@ -5,19 +5,19 @@
     <name>ServerMessageArchive</name>
     <message>
         <source>Server Message Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Серверний архів повідомлень</translation>
     </message>
     <message>
         <source>Allows to save the history of communications on the server</source>
-        <translation type="unfinished"></translation>
+        <translation>Дозволяє зберігати історію спілкування на сервері</translation>
     </message>
     <message>
         <source>Standard Server Side Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Стандартний серверний архів</translation>
     </message>
     <message>
         <source>History of conversations is stored on your jabber server</source>
-        <translation type="unfinished"></translation>
+        <translation>Історія розмов зберігається на вашому джаббер-сервері</translation>
     </message>
 </context>
 </TS>

@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="uk" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="uk" sourcelanguage="en">
 <context>
     <name>NormalMessageHandler</name>
     <message>
@@ -88,7 +90,7 @@
     </message>
     <message>
         <source>Consider all single contacts messages as read when read the first</source>
-        <translation type="unfinished"/>
+        <translation>Вважати всі окремі повідомлення контакту прочитаними після прочитання першого</translation>
     </message>
 </context>
 </TS>

@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="uk" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="uk" sourcelanguage="en">
 <context>
     <name>AdiumMessageStyle</name>
     <message>
@@ -11,22 +13,22 @@
     </message>
     <message>
         <source>Failed to load message style. Press clear window button to retry.</source>
-        <translation type="unfinished"/>
+        <translation>Не вдалося завантажити стиль повідомлень. Натисніть кнопку очищення вікна, щоб повторити спробу.</translation>
     </message>
 </context>
 <context>
     <name>AdiumMessageStyleEngine</name>
     <message>
         <source>Adium Message Style</source>
-        <translation type="unfinished"/>
+        <translation>Стиль повідомлень Adium</translation>
     </message>
     <message>
         <source>Allows to use a Adium style in message design</source>
-        <translation type="unfinished"/>
+        <translation>Дозволяє використовувати стиль Adium для оформлення повідомлень</translation>
     </message>
     <message>
         <source>Adium</source>
-        <translation type="unfinished"/>
+        <translation>Adium</translation>
     </message>
 </context>
 <context>
@@ -69,11 +71,11 @@
     </message>
     <message>
         <source>Parameters</source>
-        <translation type="unfinished"/>
+        <translation>Параметри</translation>
     </message>
     <message>
         <source>Background</source>
-        <translation type="unfinished"/>
+        <translation>Фон</translation>
     </message>
 </context>
 <context>
@@ -92,23 +94,23 @@
     </message>
     <message>
         <source>Font:</source>
-        <translation type="unfinished"/>
+        <translation>Шрифт:</translation>
     </message>
     <message>
         <source>Change...</source>
-        <translation type="unfinished"/>
+        <translation>Змінити...</translation>
     </message>
     <message>
         <source>Reset</source>
-        <translation type="unfinished"/>
+        <translation>Скинути</translation>
     </message>
     <message>
         <source>Image:</source>
-        <translation type="unfinished"/>
+        <translation>Зображення:</translation>
     </message>
     <message>
         <source>not set</source>
-        <translation type="unfinished"/>
+        <translation>не задано</translation>
     </message>
 </context>
 </TS>

@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="uk" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="uk" sourcelanguage="en">
 <context>
     <name>ConnectionOptionsWidget</name>
     <message>
@@ -18,28 +20,24 @@
         <translation>Дозволяти тільки довірені</translation>
     </message>
     <message>
-        <source>SSLv3</source>
-        <translation>SSLv3</translation>
-    </message>
-    <message>
-        <source>SSLv2</source>
-        <translation>SSLv2</translation>
-    </message>
-    <message>
         <source>Auto</source>
-        <translation type="unfinished"/>
+        <translation>Авто</translation>
     </message>
     <message>
         <source>TLSv1.0</source>
-        <translation type="unfinished"/>
+        <translation>TLSv1.0</translation>
     </message>
     <message>
         <source>TLSv1.1</source>
-        <translation type="unfinished"/>
+        <translation>TLSv1.1</translation>
     </message>
     <message>
         <source>TLSv1.2</source>
-        <translation type="unfinished"/>
+        <translation>TLSv1.2</translation>
+    </message>
+    <message>
+        <source>TLSv1.3</source>
+        <translation>TLSv1.3</translation>
     </message>
 </context>
 <context>
@@ -62,90 +60,90 @@
     </message>
     <message>
         <source>Certificate:</source>
-        <translation type="unfinished"/>
+        <translation>Сертифікат:</translation>
     </message>
 </context>
 <context>
     <name>DefaultConnectionEngine</name>
     <message>
         <source>Default Connection</source>
-        <translation type="unfinished"/>
+        <translation>З&apos;єднання по замовчуванню</translation>
     </message>
     <message>
         <source>Allows to set a standard TCP connection to Jabber server</source>
-        <translation type="unfinished"/>
+        <translation>Дозволяє встановити стандартне TCP-з&apos;єднання з Jabber-сервером</translation>
     </message>
     <message>
         <source>Host certificate is not in trusted list</source>
-        <translation type="unfinished"/>
+        <translation>Сертифікат хоста відсутній у списку довірених</translation>
     </message>
     <message>
         <source>Name: %1</source>
-        <translation type="unfinished"/>
+        <translation>Ім&apos;я: %1</translation>
     </message>
     <message>
         <source>Organization: %1</source>
-        <translation type="unfinished"/>
+        <translation>Організація: %1</translation>
     </message>
     <message>
         <source>Subunit: %1</source>
-        <translation type="unfinished"/>
+        <translation>Підрозділ: %1</translation>
     </message>
     <message>
         <source>Country: %1</source>
-        <translation type="unfinished"/>
+        <translation>Країна: %1</translation>
     </message>
     <message>
         <source>Locality: %1</source>
-        <translation type="unfinished"/>
+        <translation>Місто: %1</translation>
     </message>
     <message>
         <source>State/Province: %1</source>
-        <translation type="unfinished"/>
+        <translation>Штат/Область: %1</translation>
     </message>
     <message>
         <source>Certificate holder:</source>
-        <translation type="unfinished"/>
+        <translation>Власник сертифіката:</translation>
     </message>
     <message>
         <source>Certificate issuer:</source>
-        <translation type="unfinished"/>
+        <translation>Видавець сертифіката:</translation>
     </message>
     <message>
         <source>Certificate details:</source>
-        <translation type="unfinished"/>
+        <translation>Деталі сертифіката:</translation>
     </message>
     <message>
         <source>Effective from: %1</source>
-        <translation type="unfinished"/>
+        <translation>Діє з: %1</translation>
     </message>
     <message>
         <source>Expired at: %1</source>
-        <translation type="unfinished"/>
+        <translation>Діє до: %1</translation>
     </message>
     <message>
         <source>Serial number: %1</source>
-        <translation type="unfinished"/>
+        <translation>Серійний номер: %1</translation>
     </message>
     <message>
         <source>SSL Authentication Error</source>
-        <translation type="unfinished"/>
+        <translation>Помилка автентифікації SSL</translation>
     </message>
     <message>
         <source>Connection to &lt;b&gt;%1&lt;/b&gt; can not be considered completely safe due to errors in servers certificate check:</source>
-        <translation type="unfinished"/>
+        <translation>З&apos;єднання з &lt;b&gt;%1&lt;/b&gt; не можна вважати повністю безпечним через помилки під час перевірки сертифіката сервера:</translation>
     </message>
     <message>
         <source>Disconnect</source>
-        <translation type="unfinished"/>
+        <translation>Відключитися</translation>
     </message>
     <message>
         <source>Connect Once</source>
-        <translation type="unfinished"/>
+        <translation>З&apos;єднатися один раз</translation>
     </message>
     <message>
         <source>Connect Always</source>
-        <translation type="unfinished"/>
+        <translation>З&apos;єднатися завжди</translation>
     </message>
 </context>
 </TS>

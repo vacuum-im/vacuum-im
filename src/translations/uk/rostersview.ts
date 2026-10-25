@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="uk" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="uk" sourcelanguage="en">
 <context>
     <name>RostersView</name>
     <message>
@@ -58,59 +60,59 @@
     </message>
     <message>
         <source>Contacts List</source>
-        <translation type="unfinished"/>
+        <translation>Список контактів</translation>
     </message>
     <message>
         <source>Contacts list</source>
-        <translation type="unfinished"/>
+        <translation>Список контактів</translation>
     </message>
     <message>
         <source>Show contact resource with highest priority</source>
-        <translation type="unfinished"/>
+        <translation>Показувати ресурс контакту з найвищим пріоритетом</translation>
     </message>
     <message>
         <source>Hide scroll bars in contact list window</source>
-        <translation type="unfinished"/>
+        <translation>Приховувати смуги прокручування у вікні списку контактів</translation>
     </message>
     <message>
         <source>Simplified</source>
-        <translation type="unfinished"/>
+        <translation>Спрощений</translation>
     </message>
     <message>
         <source>Compact</source>
-        <translation type="unfinished"/>
+        <translation>Компактний</translation>
     </message>
     <message>
         <source>Contacts list view:</source>
-        <translation type="unfinished"/>
+        <translation>Вигляд списку контактів:</translation>
     </message>
     <message>
         <source>Sort contacts list:</source>
-        <translation type="unfinished"/>
+        <translation>Сортування списку контактів:</translation>
     </message>
     <message>
         <source>alphabetically</source>
-        <translation type="unfinished"/>
+        <translation>за алфавітом</translation>
     </message>
     <message>
         <source>by status</source>
-        <translation type="unfinished"/>
+        <translation>за статусом</translation>
     </message>
     <message>
         <source>Full</source>
-        <translation type="unfinished"/>
+        <translation>Повний</translation>
     </message>
     <message>
         <source>Contact-List</source>
-        <translation type="unfinished"/>
+        <translation>Список контактів</translation>
     </message>
     <message>
         <source>Show disconnected contacts</source>
-        <translation type="unfinished"/>
+        <translation>Показувати відключені контакти</translation>
     </message>
     <message>
         <source>Show contacts of all accounts in common list</source>
-        <translation type="unfinished"/>
+        <translation>Показувати контакти всіх акаунтів у спільному списку</translation>
     </message>
 </context>
 </TS>
