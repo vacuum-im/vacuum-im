@@ -1,9 +1,11 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="es" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="es" sourcelanguage="en">
 <context>
     <name>AutoRulesOptionsDialog</name>
     <message>
         <source>Auto Status Rules</source>
-        <translation type="unfinished"/>
+        <translation>Reglas de estado automático</translation>
     </message>
     <message>
         <source>Time</source>

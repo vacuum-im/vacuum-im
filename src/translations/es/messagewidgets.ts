@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="es" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="es" sourcelanguage="en">
 <context>
     <name>EditWidget</name>
     <message>
@@ -188,19 +190,22 @@
     </message>
     <message>
         <source>Send single message</source>
-        <translation type="unfinished"/>
+        <translation>Enviar mensaje individual</translation>
     </message>
     <message>
         <source>Ctrl+Return</source>
         <comment>Send single message</comment>
-        <translation type="unfinished"/>
+        <translation>Ctrl+Return</translation>
     </message>
 </context>
 <context>
     <name>NormalWindow</name>
     <message numerus="yes">
         <source>Selected %n contact(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>Seleccionado %n contacto</numerusform>
+            <numerusform>Seleccionados %n contactos</numerusform>
+        </translation>
     </message>
     <message>
         <source>Subject</source>
@@ -306,7 +311,7 @@
     </message>
     <message>
         <source>Sort Contacts by Status</source>
-        <translation type="unfinished"/>
+        <translation>Ordenar los contactos por estado</translation>
     </message>
 </context>
 <context>

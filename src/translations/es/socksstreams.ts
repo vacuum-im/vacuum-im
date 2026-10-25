@@ -1,29 +1,31 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="es" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="es" sourcelanguage="en">
 <context>
     <name>SocksOptionsWidgetClass</name>
     <message>
         <source>Use jabber-proxy on your server</source>
-        <translation type="unfinished"/>
+        <translation>Usar el proxy jabber de tu servidor</translation>
     </message>
     <message>
         <source>Use additional jabber-proxy:</source>
-        <translation type="unfinished"/>
+        <translation>Usar un proxy jabber adicional:</translation>
     </message>
     <message>
         <source>Allow direct incoming connections on port:</source>
-        <translation type="unfinished"/>
+        <translation>Permitir conexiones entrantes directas en el puerto:</translation>
     </message>
     <message>
         <source>Forward direct incoming connections to host:</source>
-        <translation type="unfinished"/>
+        <translation>Redirigir las conexiones entrantes directas al host:</translation>
     </message>
     <message>
         <source>Use account proxy settings for outgoing connections</source>
-        <translation type="unfinished"/>
+        <translation>Usar la configuración de proxy de la cuenta para las conexiones salientes</translation>
     </message>
     <message>
         <source>host:port</source>
-        <translation type="unfinished"/>
+        <translation>host:puerto</translation>
     </message>
 </context>
 <context>

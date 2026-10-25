@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="es" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="es" sourcelanguage="en">
 <context>
     <name>MessageStyleManager</name>
     <message>
@@ -126,7 +128,7 @@
     </message>
     <message>
         <source>Message Style - %1 - %2</source>
-        <translation type="unfinished"/>
+        <translation>Estilo de mensajes - %1 - %2</translation>
     </message>
     <message>
         <source>The message with a error code %1 is received</source>
@@ -198,15 +200,15 @@
     </message>
     <message>
         <source>Contact</source>
-        <translation type="unfinished"/>
+        <translation>Contacto</translation>
     </message>
     <message>
         <source>You</source>
-        <translation type="unfinished"/>
+        <translation>Tú</translation>
     </message>
     <message>
         <source>speaks of himself in the third person</source>
-        <translation type="unfinished"/>
+        <translation>habla de sí mismo en tercera persona</translation>
     </message>
 </context>
 <context>

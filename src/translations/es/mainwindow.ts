@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="es" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="es" sourcelanguage="en">
 <context>
     <name>MainWindowPlugin</name>
     <message>
@@ -21,6 +23,10 @@
         <source>Esc</source>
         <comment>Close main window</comment>
         <translation>Esc</translation>
+    </message>
+    <message>
+        <source>Minimize roster window instead of closing it</source>
+        <translation>Minimizar la ventana de la lista de contactos en lugar de cerrarla</translation>
     </message>
 </context>
 </TS>

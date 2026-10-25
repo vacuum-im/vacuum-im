@@ -1,17 +1,19 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="es" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="es" sourcelanguage="en">
 <context>
     <name>AboutBox</name>
     <message>
         <source>Version: %1 %2 of %3</source>
-        <translation type="unfinished"/>
+        <translation>Versión: %1 %2 de %3</translation>
     </message>
     <message>
         <source>Revision: %1</source>
-        <translation type="unfinished"/>
+        <translation>Revisión: %1</translation>
     </message>
     <message>
         <source>Version: %1 %2</source>
-        <translation type="unfinished"/>
+        <translation>Versión: %1 %2</translation>
     </message>
 </context>
 <context>
@@ -61,7 +63,7 @@
     </message>
     <message>
         <source>Dependencies not found</source>
-        <translation type="unfinished"/>
+        <translation>Dependencias no encontradas</translation>
     </message>
 </context>
 <context>
@@ -92,19 +94,28 @@
     </message>
     <message numerus="yes">
         <source>This plugin depends on %n other plugin(s).</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>Este complemento depende de %n complemento más.</numerusform>
+            <numerusform>Este complemento depende de %n complementos más.</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Other %n plugin(s) depend on this plugin.</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>Hay %n complemento más que depende de este.</numerusform>
+            <numerusform>Hay %n complementos más que dependen de este.</numerusform>
+        </translation>
     </message>
     <message>
         <source>Another plugin depends on this plugin.</source>
-        <translation type="unfinished"/>
+        <translation>Otro complemento depende de este.</translation>
     </message>
     <message numerus="yes">
         <source>%n dependency(ies) not found.</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>No se ha encontrado %n dependencia.</numerusform>
+            <numerusform>No se han encontrado %n dependencias.</numerusform>
+        </translation>
     </message>
 </context>
 <context>

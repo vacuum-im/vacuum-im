@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="es" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="es" sourcelanguage="en">
 <context>
     <name>StatusIcons</name>
     <message>
@@ -19,11 +21,11 @@
     </message>
     <message>
         <source>Contacts list</source>
-        <translation type="unfinished"/>
+        <translation>Lista de contactos</translation>
     </message>
     <message>
         <source>Status icons:</source>
-        <translation type="unfinished"/>
+        <translation>Iconos de estado:</translation>
     </message>
 </context>
 </TS>

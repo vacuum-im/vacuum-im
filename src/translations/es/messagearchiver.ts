@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="es" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="es" sourcelanguage="en">
 <context>
     <name>ArchiveAccountOptionsWidget</name>
     <message>
@@ -189,15 +191,24 @@
     <name>ArchiveDelegate</name>
     <message numerus="yes">
         <source>%n year(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>%n año</numerusform>
+            <numerusform>%n años</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>%n month(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>%n mes</numerusform>
+            <numerusform>%n meses</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>%n day(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>%n día</numerusform>
+            <numerusform>%n días</numerusform>
+        </translation>
     </message>
     <message>
         <source>Never</source>
@@ -284,7 +295,10 @@
     </message>
     <message numerus="yes">
         <source>Found %n occurrence(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>Se encontró %n coincidencia</numerusform>
+            <numerusform>Se encontraron %n coincidencias</numerusform>
+        </translation>
     </message>
     <message>
         <source>Remove conversation history</source>
@@ -368,7 +382,10 @@
     </message>
     <message numerus="yes">
         <source>%n conversation header(s) found</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>Se encontró %n cabecera de conversación</numerusform>
+            <numerusform>Se encontraron %n cabeceras de conversación</numerusform>
+        </translation>
     </message>
     <message>
         <source>Select conversation to show</source>
@@ -376,7 +393,10 @@
     </message>
     <message numerus="yes">
         <source>%n conversation(s) shown</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>Mostrada %n conversación</numerusform>
+            <numerusform>Mostradas %n conversaciones</numerusform>
+        </translation>
     </message>
     <message>
         <source>Shown %1 of %2 conversations...</source>
@@ -436,11 +456,14 @@
     </message>
     <message>
         <source>Phrase not found</source>
-        <translation type="unfinished"/>
+        <translation>Frase no encontrada</translation>
     </message>
     <message numerus="yes">
         <source>And %n other conversation(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>Y %n otra conversación</numerusform>
+            <numerusform>Y %n otras conversaciones</numerusform>
+        </translation>
     </message>
 </context>
 <context>

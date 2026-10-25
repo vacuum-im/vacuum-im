@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="es" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="es" sourcelanguage="en">
 <context>
     <name>SimpleMessageStyle</name>
     <message>
@@ -14,15 +16,15 @@
     <name>SimpleMessageStyleEngine</name>
     <message>
         <source>Simple Message Style</source>
-        <translation type="unfinished"/>
+        <translation>Estilo de mensajes simple</translation>
     </message>
     <message>
         <source>Allows to use a simplified style in message design</source>
-        <translation type="unfinished"/>
+        <translation>Permite usar un estilo simplificado en el diseño de los mensajes</translation>
     </message>
     <message>
         <source>Simple</source>
-        <translation type="unfinished"/>
+        <translation>Simple</translation>
     </message>
 </context>
 <context>
@@ -45,11 +47,11 @@
     </message>
     <message>
         <source>Parameters</source>
-        <translation type="unfinished"/>
+        <translation>Parámetros</translation>
     </message>
     <message>
         <source>Background</source>
-        <translation type="unfinished"/>
+        <translation>Fondo</translation>
     </message>
 </context>
 <context>
@@ -64,23 +66,23 @@
     </message>
     <message>
         <source>Font:</source>
-        <translation type="unfinished"/>
+        <translation>Fuente:</translation>
     </message>
     <message>
         <source>Change...</source>
-        <translation type="unfinished"/>
+        <translation>Editar...</translation>
     </message>
     <message>
         <source>Reset</source>
-        <translation type="unfinished"/>
+        <translation>Restablecer</translation>
     </message>
     <message>
         <source>Image:</source>
-        <translation type="unfinished"/>
+        <translation>Imagen:</translation>
     </message>
     <message>
         <source>not set</source>
-        <translation type="unfinished"/>
+        <translation>sin establecer</translation>
     </message>
 </context>
 </TS>

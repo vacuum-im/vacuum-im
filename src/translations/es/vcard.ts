@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="es" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="es" sourcelanguage="en">
 <context>
     <name>EditItemDialogClass</name>
     <message>
@@ -232,44 +234,44 @@
     <name>VCardManager</name>
     <message>
         <source>Visit Card Manager</source>
-        <translation type="unfinished"/>
+        <translation>Administrador de VCard</translation>
     </message>
     <message>
         <source>Allows to obtain personal contact information</source>
-        <translation type="unfinished"/>
+        <translation>Permite obtener la información de contacto personal</translation>
     </message>
     <message>
         <source>Show contact profile</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar el perfil del contacto</translation>
     </message>
     <message>
         <source>Ctrl+I</source>
         <comment>Show contact profile</comment>
-        <translation type="unfinished"/>
+        <translation>Ctrl+I</translation>
     </message>
     <message>
         <source>User Profile</source>
-        <translation type="unfinished"/>
+        <translation>Perfil del usuario</translation>
     </message>
     <message>
         <source>Restrict maximum vCard images size</source>
-        <translation type="unfinished"/>
+        <translation>Restringir el tamaño máximo de las imágenes de la VCard</translation>
     </message>
     <message>
         <source>Contact Profile</source>
-        <translation type="unfinished"/>
+        <translation>Perfil del contacto</translation>
     </message>
     <message>
         <source>Supports the requesting of the personal contact information</source>
-        <translation type="unfinished"/>
+        <translation>Soporta la solicitud de información de contacto personal</translation>
     </message>
     <message>
         <source>Show Profile</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar perfil</translation>
     </message>
     <message>
         <source>Edit Profile</source>
-        <translation type="unfinished"/>
+        <translation>Editar perfil</translation>
     </message>
 </context>
 </TS>

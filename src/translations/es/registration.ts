@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="es" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="es" sourcelanguage="en">
 <context>
     <name>RegisterDialog</name>
     <message>
@@ -141,11 +143,11 @@
     </message>
     <message>
         <source>Registration is not supported</source>
-        <translation type="unfinished"/>
+        <translation>El registro no está soportado</translation>
     </message>
     <message>
         <source>Invalid registration fields</source>
-        <translation type="unfinished"/>
+        <translation>Campos de registro inválidos</translation>
     </message>
 </context>
 </TS>

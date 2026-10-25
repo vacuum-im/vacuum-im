@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="es" sourcelanguage="en">
+<TS version="2.1" language="es" sourcelanguage="en">
 <context>
     <name>ServerMessageArchive</name>
     <message>
         <source>Server Message Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Archivo de mensajes del servidor</translation>
     </message>
     <message>
         <source>Allows to save the history of communications on the server</source>
-        <translation type="unfinished"></translation>
+        <translation>Permite guardar el historial de la comunicación en el servidor</translation>
     </message>
     <message>
         <source>Standard Server Side Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Archivo estándar del lado del servidor</translation>
     </message>
     <message>
         <source>History of conversations is stored on your jabber server</source>
-        <translation type="unfinished"></translation>
+        <translation>El historial de conversaciones se guarda en tu servidor jabber</translation>
     </message>
 </context>
 </TS>

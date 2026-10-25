@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="es" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="es" sourcelanguage="en">
 <context>
     <name>ExchangeApproveDialog</name>
     <message>
@@ -65,7 +67,10 @@
     </message>
     <message numerus="yes">
         <source>Send %n Contact(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>Enviar %n contacto</numerusform>
+            <numerusform>Enviar %n contactos</numerusform>
+        </translation>
     </message>
     <message>
         <source>Roster modification request from %1</source>
@@ -81,7 +86,10 @@
     </message>
     <message numerus="yes">
         <source>Failed to send %n contact(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>Error al enviar %n contacto</numerusform>
+            <numerusform>Error al enviar %n contactos</numerusform>
+        </translation>
     </message>
     <message>
         <source>Contacts list management</source>
@@ -93,7 +101,10 @@
     </message>
     <message numerus="yes">
         <source>%n contact(s) sent</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>Se envió %n contacto</numerusform>
+            <numerusform>Se enviaron %n contactos</numerusform>
+        </translation>
     </message>
 </context>
 </TS>

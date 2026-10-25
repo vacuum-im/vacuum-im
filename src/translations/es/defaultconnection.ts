@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="es" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="es" sourcelanguage="en">
 <context>
     <name>ConnectionOptionsWidget</name>
     <message>
@@ -18,28 +20,24 @@
         <translation>Permitir solo de confianza</translation>
     </message>
     <message>
-        <source>SSLv3</source>
-        <translation>SSLv3</translation>
-    </message>
-    <message>
-        <source>SSLv2</source>
-        <translation>SSLv2</translation>
-    </message>
-    <message>
         <source>Auto</source>
         <translation>Automático</translation>
     </message>
     <message>
         <source>TLSv1.0</source>
-        <translation type="unfinished"/>
+        <translation>TLSv1.0</translation>
     </message>
     <message>
         <source>TLSv1.1</source>
-        <translation type="unfinished"/>
+        <translation>TLSv1.1</translation>
     </message>
     <message>
         <source>TLSv1.2</source>
-        <translation type="unfinished"/>
+        <translation>TLSv1.2</translation>
+    </message>
+    <message>
+        <source>TLSv1.3</source>
+        <translation>TLSv1.3</translation>
     </message>
 </context>
 <context>

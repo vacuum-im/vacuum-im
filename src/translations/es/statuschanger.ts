@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="es" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="es" sourcelanguage="en">
 <context>
     <name>ModifyStatusDialogClass</name>
     <message>
@@ -118,7 +120,7 @@
     </message>
     <message>
         <source>Standard and users statuses</source>
-        <translation type="unfinished"/>
+        <translation>Estados estándares y de usuario</translation>
     </message>
 </context>
 <context>

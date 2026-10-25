@@ -1,4 +1,6 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="es" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="es" sourcelanguage="en">
 <context>
     <name>AdiumMessageStyle</name>
     <message>
@@ -11,7 +13,7 @@
     </message>
     <message>
         <source>Failed to load message style. Press clear window button to retry.</source>
-        <translation type="unfinished"/>
+        <translation>Error al cargar el estilo de mensajes. Pulsa el botón de limpiar la ventana para reintentar.</translation>
     </message>
 </context>
 <context>

@@ -1,159 +1,167 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="es" sourcelanguage="en" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="es" sourcelanguage="en">
 <context>
     <name>ConfigPage</name>
     <message>
         <source>Conference settings</source>
-        <translation type="unfinished"/>
+        <translation>Configuración de la sala</translation>
     </message>
     <message>
         <source>Enter the desired parameters of the new conference</source>
-        <translation type="unfinished"/>
+        <translation>Introduzca los parámetros deseados de la nueva sala</translation>
     </message>
     <message>
         <source>Creating conference...</source>
-        <translation type="unfinished"/>
+        <translation>Creando la sala...</translation>
     </message>
     <message>
         <source>Failed to create conference</source>
-        <translation type="unfinished"/>
+        <translation>Error al crear la sala</translation>
     </message>
     <message>
         <source>Failed to create conference instance</source>
-        <translation type="unfinished"/>
+        <translation>Error al crear la instancia de la sala</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Error</translation>
     </message>
     <message>
         <source>Conference is not created :(</source>
-        <translation type="unfinished"/>
+        <translation>La sala no se ha creado :(</translation>
     </message>
     <message>
         <source>Conference is not configured :(</source>
-        <translation type="unfinished"/>
+        <translation>La sala no está configurada :(</translation>
     </message>
     <message>
         <source>Failed to create conference: %1</source>
-        <translation type="unfinished"/>
+        <translation>Error al crear la sala: %1</translation>
     </message>
     <message>
         <source>Saving conference settings...</source>
-        <translation type="unfinished"/>
+        <translation>Guardando la configuración de la sala...</translation>
     </message>
     <message>
         <source>Failed to send conference settings</source>
-        <translation type="unfinished"/>
+        <translation>Error al enviar la configuración de la sala</translation>
     </message>
     <message>
         <source>Loading settings...</source>
-        <translation type="unfinished"/>
+        <translation>Cargando la configuración...</translation>
     </message>
     <message>
         <source>Failed to load conference settings</source>
-        <translation type="unfinished"/>
+        <translation>Error al cargar la configuración de la sala</translation>
     </message>
     <message>
         <source>Failed to change default conference settings</source>
-        <translation type="unfinished"/>
+        <translation>Error al cambiar la configuración predeterminada de la sala</translation>
     </message>
     <message>
         <source>Failed to load conference settings: %1</source>
-        <translation type="unfinished"/>
+        <translation>Error al cargar la configuración de la sala: %1</translation>
     </message>
     <message>
         <source>Failed to update conference settings: %1</source>
-        <translation type="unfinished"/>
+        <translation>Error al actualizar la configuración de la sala: %1</translation>
     </message>
 </context>
 <context>
     <name>CreateMultiChatWizard</name>
     <message>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Error</translation>
     </message>
     <message>
         <source>Failed to join to the conference: Conference windows is not created</source>
-        <translation type="unfinished"/>
+        <translation>Error al entrar a la sala: la ventana de la sala no se ha creado</translation>
     </message>
     <message>
         <source>Create Conference Wizard</source>
-        <translation type="unfinished"/>
+        <translation>Asistente para crear salas</translation>
     </message>
     <message>
         <source>Failed to join to the conference: Not all required parameters is specified</source>
-        <translation type="unfinished"/>
+        <translation>Error al entrar a la sala: no se han especificado todos los parámetros necesarios</translation>
     </message>
 </context>
 <context>
     <name>EditUsersListDialog</name>
     <message>
         <source>Owners</source>
-        <translation type="unfinished"/>
+        <translation>Propietarios</translation>
     </message>
     <message>
         <source>Administrators</source>
-        <translation type="unfinished"/>
+        <translation>Administradores</translation>
     </message>
     <message>
         <source>Members</source>
-        <translation type="unfinished"/>
+        <translation>Miembros</translation>
     </message>
     <message>
         <source>Outcasts</source>
-        <translation type="unfinished"/>
+        <translation>Marginados</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"/>
+        <translation>Ninguna</translation>
     </message>
     <message>
         <source>Add User</source>
-        <translation type="unfinished"/>
+        <translation>Añadir usuario</translation>
     </message>
     <message>
         <source>Enter user Jabber ID:</source>
-        <translation type="unfinished"/>
+        <translation>Introduzca el ID de Jabber del usuario:</translation>
     </message>
     <message>
         <source>Enter note:</source>
-        <translation type="unfinished"/>
+        <translation>Introduzca una nota:</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation type="unfinished"/>
+        <translation>Advertencia</translation>
     </message>
     <message>
         <source>User %1 already present in list of &apos;%2&apos;</source>
-        <translation type="unfinished"/>
+        <translation>El usuario %1 ya está presente en la lista de &apos;%2&apos;</translation>
     </message>
     <message>
         <source>Failed to load list of &apos;%1&apos;</source>
-        <translation type="unfinished"/>
+        <translation>Error al cargar la lista de &apos;%1&apos;</translation>
     </message>
     <message>
         <source>Failed to update users affiliation lists</source>
-        <translation type="unfinished"/>
+        <translation>Error al actualizar las listas de membresía de los usuarios</translation>
     </message>
     <message>
         <source>Failed to load list of &apos;%1&apos;: %2</source>
-        <translation type="unfinished"/>
+        <translation>Error al cargar la lista de &apos;%1&apos;: %2</translation>
     </message>
     <message>
         <source>Failed to update users affiliation lists: %1</source>
-        <translation type="unfinished"/>
+        <translation>Error al actualizar las listas de membresía de los usuarios: %1</translation>
     </message>
     <message numerus="yes">
         <source>Move %n user(s) to &apos;%1&apos;</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>Mover %n usuario a &apos;%1&apos;</numerusform>
+            <numerusform>Mover %n usuarios a &apos;%1&apos;</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Delete %n user(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>Eliminar %n usuario</numerusform>
+            <numerusform>Eliminar %n usuarios</numerusform>
+        </translation>
     </message>
     <message>
         <source>Users Lists - %1</source>
-        <translation type="unfinished"/>
+        <translation>Listas de usuarios - %1</translation>
     </message>
 </context>
 <context>
@@ -168,216 +176,216 @@
     </message>
     <message>
         <source>Search users</source>
-        <translation type="unfinished"/>
+        <translation>Buscar usuarios</translation>
     </message>
 </context>
 <context>
     <name>JoinPage</name>
     <message>
         <source>Join</source>
-        <translation type="unfinished"/>
+        <translation>Entrar</translation>
     </message>
     <message>
         <source>Enter parameters to join to the conference</source>
-        <translation type="unfinished"/>
+        <translation>Introduzca los parámetros para entrar a la sala</translation>
     </message>
     <message>
         <source>Nick</source>
-        <translation type="unfinished"/>
+        <translation>Apodo</translation>
     </message>
     <message>
         <source>Join with nick:</source>
-        <translation type="unfinished"/>
+        <translation>Entrar con el apodo:</translation>
     </message>
     <message>
         <source>Loading conference description...</source>
-        <translation type="unfinished"/>
+        <translation>Cargando la descripción de la sala...</translation>
     </message>
     <message>
         <source>This conference is password protected</source>
-        <translation type="unfinished"/>
+        <translation>Esta sala está protegida por contraseña</translation>
     </message>
     <message>
         <source>This conference is not password protected</source>
-        <translation type="unfinished"/>
+        <translation>Esta sala no está protegida por contraseña</translation>
     </message>
     <message>
         <source>This conference is members only</source>
-        <translation type="unfinished"/>
+        <translation>Esta sala es solo para miembros</translation>
     </message>
     <message>
         <source>This conference is public</source>
-        <translation type="unfinished"/>
+        <translation>Esta sala es pública</translation>
     </message>
     <message>
         <source>This conference is semi anonymous</source>
-        <translation type="unfinished"/>
+        <translation>Esta sala es semianónima</translation>
     </message>
     <message>
         <source>This conference is not anonymous</source>
-        <translation type="unfinished"/>
+        <translation>Esta sala no es anónima</translation>
     </message>
     <message>
         <source>This conference is moderated</source>
-        <translation type="unfinished"/>
+        <translation>Esta sala es moderada</translation>
     </message>
     <message>
         <source>This conference is not moderated</source>
-        <translation type="unfinished"/>
+        <translation>Esta sala no es moderada</translation>
     </message>
     <message>
         <source>This conference is temporary</source>
-        <translation type="unfinished"/>
+        <translation>Esta sala es temporal</translation>
     </message>
     <message>
         <source>This conference is persistent</source>
-        <translation type="unfinished"/>
+        <translation>Esta sala es persistente</translation>
     </message>
     <message>
         <source>This conference is hidden</source>
-        <translation type="unfinished"/>
+        <translation>Esta sala es oculta</translation>
     </message>
     <message>
         <source>This conference is visible for all</source>
-        <translation type="unfinished"/>
+        <translation>Esta sala es visible para todos</translation>
     </message>
     <message>
         <source>Failed to load conference description: %1</source>
-        <translation type="unfinished"/>
+        <translation>Error al cargar la descripción de la sala: %1</translation>
     </message>
     <message>
         <source>Conference description is not available or invalid</source>
-        <translation type="unfinished"/>
+        <translation>La descripción de la sala no está disponible o no es válida</translation>
     </message>
     <message>
         <source>Register</source>
-        <translation type="unfinished"/>
+        <translation>Inscribirse</translation>
     </message>
     <message>
         <source>Registered</source>
-        <translation type="unfinished"/>
+        <translation>Inscrito</translation>
     </message>
     <message>
         <source>Loading...</source>
-        <translation type="unfinished"/>
+        <translation>Cargando...</translation>
     </message>
     <message>
         <source>Join conference</source>
-        <translation type="unfinished"/>
+        <translation>Entrar a la sala</translation>
     </message>
     <message>
         <source>Password is required</source>
-        <translation type="unfinished"/>
+        <translation>Se requiere contraseña</translation>
     </message>
 </context>
 <context>
     <name>ManualPage</name>
     <message>
         <source>Join</source>
-        <translation type="unfinished"/>
+        <translation>Entrar</translation>
     </message>
     <message>
         <source>Conference parameters</source>
-        <translation type="unfinished"/>
+        <translation>Parámetros de la sala</translation>
     </message>
     <message>
         <source>Enter parameters to join or create the conference</source>
-        <translation type="unfinished"/>
+        <translation>Introduzca los parámetros para entrar o crear la sala</translation>
     </message>
     <message>
         <source>Conference as &apos;name@service.server.com&apos;</source>
-        <translation type="unfinished"/>
+        <translation>Sala en la forma &apos;name@service.server.com&apos;</translation>
     </message>
     <message>
         <source>Your nickname in conference</source>
-        <translation type="unfinished"/>
+        <translation>Su apodo en la sala</translation>
     </message>
     <message>
         <source>Conference password if required</source>
-        <translation type="unfinished"/>
+        <translation>Contraseña de la sala si se requiere</translation>
     </message>
     <message>
         <source>Account:</source>
-        <translation type="unfinished"/>
+        <translation>Cuenta:</translation>
     </message>
     <message>
         <source>Conference:</source>
-        <translation type="unfinished"/>
+        <translation>Sala:</translation>
     </message>
     <message>
         <source>Nick:</source>
-        <translation type="unfinished"/>
+        <translation>Apodo:</translation>
     </message>
     <message>
         <source>Password:</source>
-        <translation type="unfinished"/>
+        <translation>Contraseña:</translation>
     </message>
     <message>
         <source>Register</source>
-        <translation type="unfinished"/>
+        <translation>Inscribirse</translation>
     </message>
     <message>
         <source>Registered</source>
-        <translation type="unfinished"/>
+        <translation>Inscrito</translation>
     </message>
     <message>
         <source>Loading conference description...</source>
-        <translation type="unfinished"/>
+        <translation>Cargando la descripción de la sala...</translation>
     </message>
     <message>
         <source>Failed to load conference description</source>
-        <translation type="unfinished"/>
+        <translation>Error al cargar la descripción de la sala</translation>
     </message>
     <message>
         <source>Invalid conference ID</source>
-        <translation type="unfinished"/>
+        <translation>ID de sala no válido</translation>
     </message>
     <message>
         <source>Loading...</source>
-        <translation type="unfinished"/>
+        <translation>Cargando...</translation>
     </message>
     <message>
         <source>This conference is password protected</source>
-        <translation type="unfinished"/>
+        <translation>Esta sala está protegida por contraseña</translation>
     </message>
     <message>
         <source>Conference description is not available or invalid</source>
-        <translation type="unfinished"/>
+        <translation>La descripción de la sala no está disponible o no es válida</translation>
     </message>
     <message>
         <source>This conference does not exists and will be automatically created on join</source>
-        <translation type="unfinished"/>
+        <translation>Esta sala no existe y se creará automáticamente al entrar</translation>
     </message>
     <message>
         <source>Conference service &apos;%1&apos; is not available or does not exists</source>
-        <translation type="unfinished"/>
+        <translation>El servicio de salas &apos;%1&apos; no está disponible o no existe</translation>
     </message>
     <message>
         <source>Failed to check conference existence: %1</source>
-        <translation type="unfinished"/>
+        <translation>Error al comprobar la existencia de la sala: %1</translation>
     </message>
 </context>
 <context>
     <name>ModePage</name>
     <message>
         <source>Join to the conference or create a new one</source>
-        <translation type="unfinished"/>
+        <translation>Entrar a una sala o crear una nueva</translation>
     </message>
     <message>
         <source>This wizard will help you to join to existing conference or create a new one</source>
-        <translation type="unfinished"/>
+        <translation>Este asistente le ayudará a entrar a una sala existente o a crear una nueva</translation>
     </message>
     <message>
         <source>I want to join to the existing conference</source>
-        <translation type="unfinished"/>
+        <translation>Quiero entrar a una sala existente</translation>
     </message>
     <message>
         <source>I want to create a new conference</source>
-        <translation type="unfinished"/>
+        <translation>Quiero crear una nueva sala</translation>
     </message>
     <message>
         <source>I want manually specify all parameters to join or create the conference</source>
-        <translation type="unfinished"/>
+        <translation>Quiero especificar manualmente todos los parámetros para entrar o crear la sala</translation>
     </message>
 </context>
 <context>
@@ -441,7 +449,7 @@
     </message>
     <message>
         <source>Select a user to refer by enumeration in the input field</source>
-        <translation type="unfinished"/>
+        <translation>Seleccionar un usuario para referirse a él por enumeración en el campo de entrada</translation>
     </message>
     <message>
         <source>Register in conference</source>
@@ -525,7 +533,7 @@
     </message>
     <message>
         <source>XMPP URI of Associated Publish-Subscribe Node</source>
-        <translation type="unfinished"/>
+        <translation>URI XMPP del nodo Publish-Subscribe asociado</translation>
     </message>
     <message>
         <source>Natural Language for Room Discussions</source>
@@ -557,7 +565,7 @@
     </message>
     <message>
         <source>Allow Public Searching for Room?</source>
-        <translation type="unfinished"/>
+        <translation>¿Permitir la búsqueda pública de la sala?</translation>
     </message>
     <message>
         <source>Full List of Room Administrators</source>
@@ -569,7 +577,7 @@
     </message>
     <message>
         <source>Natural-Language Room Name</source>
-        <translation type="unfinished"/>
+        <translation>Nombre de la sala en lenguaje natural</translation>
     </message>
     <message>
         <source>Full List of Room Owners</source>
@@ -605,7 +613,7 @@
     </message>
     <message>
         <source>Do not Request CAPTCHA for Followed Jabber ID</source>
-        <translation type="unfinished"/>
+        <translation>No solicitar CAPTCHA para el ID de Jabber seguido</translation>
     </message>
     <message>
         <source>Allow Login Only With Registered Nickname?</source>
@@ -637,7 +645,7 @@
     </message>
     <message>
         <source>URL for Archived Discussion Logs</source>
-        <translation type="unfinished"/>
+        <translation>URL de los registros archivados de las conversaciones</translation>
     </message>
     <message>
         <source>Current Number of Occupants in Room</source>
@@ -769,132 +777,135 @@
     </message>
     <message>
         <source>&lt;b&gt;Conference:&lt;/b&gt; %1</source>
-        <translation type="unfinished"/>
+        <translation>&lt;b&gt;Sala:&lt;/b&gt; %1</translation>
     </message>
     <message>
         <source>&lt;big&gt;&lt;b&gt;[%1]&lt;/b&gt;&lt;/big&gt; in [%2]</source>
-        <translation type="unfinished"/>
+        <translation>&lt;big&gt;&lt;b&gt;[%1]&lt;/b&gt;&lt;/big&gt; en [%2]</translation>
     </message>
     <message>
         <source>Messages</source>
-        <translation type="unfinished"/>
+        <translation>Mensajes</translation>
     </message>
     <message>
         <source>Participants List</source>
-        <translation type="unfinished"/>
+        <translation>Lista de participantes</translation>
     </message>
     <message>
         <source>Full</source>
-        <translation type="unfinished"/>
+        <translation>Completa</translation>
     </message>
     <message>
         <source>Simplified</source>
-        <translation type="unfinished"/>
+        <translation>Simplificada</translation>
     </message>
     <message>
         <source>Compact</source>
-        <translation type="unfinished"/>
+        <translation>Compacta</translation>
     </message>
     <message>
         <source>Participants list view:</source>
-        <translation type="unfinished"/>
+        <translation>Vista de la lista de participantes:</translation>
     </message>
     <message>
         <source>Anyone</source>
-        <translation type="unfinished"/>
+        <translation>Cualquiera</translation>
     </message>
     <message>
         <source>Moderators only</source>
-        <translation type="unfinished"/>
+        <translation>Solo moderadores</translation>
     </message>
     <message>
         <source>Allow visitors to send private messages to</source>
-        <translation type="unfinished"/>
+        <translation>Permitir a los visitantes enviar mensajes privados a</translation>
     </message>
     <message>
         <source>Nobody</source>
-        <translation type="unfinished"/>
+        <translation>Nadie</translation>
     </message>
     <message>
         <source>Allow visitors to change nickname?</source>
-        <translation type="unfinished"/>
+        <translation>¿Permitir a los visitantes cambiar de apodo?</translation>
     </message>
     <message>
         <source>Allow visitors to send voice requests?</source>
-        <translation type="unfinished"/>
+        <translation>¿Permitir a los visitantes enviar solicitudes de voz?</translation>
     </message>
     <message>
         <source>Minimum interval between voice requests (in seconds)</source>
-        <translation type="unfinished"/>
+        <translation>Intervalo mínimo entre solicitudes de voz (en segundos)</translation>
     </message>
     <message>
         <source>Join Conference</source>
-        <translation type="unfinished"/>
+        <translation>Entrar a la sala</translation>
     </message>
     <message>
         <source>List of rooms</source>
-        <translation type="unfinished"/>
+        <translation>Lista de salas</translation>
     </message>
     <message>
         <source>Contains the list of multi-user chat rooms</source>
-        <translation type="unfinished"/>
+        <translation>Contiene la lista de salas multiusuario</translation>
     </message>
     <message>
         <source>Join Conference...</source>
-        <translation type="unfinished"/>
+        <translation>Entrar a la sala...</translation>
     </message>
     <message>
         <source>Join to Conference</source>
-        <translation type="unfinished"/>
+        <translation>Entrar a la sala</translation>
     </message>
     <message>
         <source>Exit from Conference</source>
-        <translation type="unfinished"/>
+        <translation>Salir de la sala</translation>
     </message>
     <message>
         <source>Enter to Conference</source>
-        <translation type="unfinished"/>
+        <translation>Entrar a la sala</translation>
     </message>
     <message>
         <source>You are invited to the conference &lt;b&gt;%1&lt;/b&gt; by user &lt;b&gt;%2&lt;/b&gt;.</source>
-        <translation type="unfinished"/>
+        <translation>Has sido invitado a la sala &lt;b&gt;%1&lt;/b&gt; por el usuario &lt;b&gt;%2&lt;/b&gt;.</translation>
     </message>
     <message>
         <source>Do you want to join to the conference?</source>
-        <translation type="unfinished"/>
+        <translation>¿Deseas entrar a la sala?</translation>
     </message>
     <message>
         <source>Invitation to Conference</source>
-        <translation type="unfinished"/>
+        <translation>Invitación a la sala</translation>
     </message>
     <message>
         <source>Direct Invitations to Conferences</source>
-        <translation type="unfinished"/>
+        <translation>Invitaciones directas a salas</translation>
     </message>
     <message>
         <source>Supports the direct invitations to conferences</source>
-        <translation type="unfinished"/>
+        <translation>Soporta las invitaciones directas a salas</translation>
     </message>
     <message>
         <source>Show/Hide conference participants list</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar/Ocultar la lista de participantes de la sala</translation>
     </message>
     <message>
         <source>Ctrl+U</source>
         <comment>Show/Hide conference participants list</comment>
-        <translation type="unfinished"/>
+        <translation>Ctrl+U</translation>
     </message>
     <message>
         <source>Invite to Conversation</source>
-        <translation type="unfinished"/>
+        <translation>Invitar a la conversación</translation>
     </message>
     <message numerus="yes">
         <source>Conference with %1 and %n other contact(s)</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>Sala con %1 y %n contacto más</numerusform>
+            <numerusform>Sala con %1 y %n contactos más</numerusform>
+        </translation>
     </message>
     <message>
         <source>Conference with %1</source>
-        <translation type="unfinished"/>
+        <translation>Sala con %1</translation>
     </message>
 </context>
 <context>
@@ -913,7 +924,7 @@
     </message>
     <message>
         <source>Change Role</source>
-        <translation type="unfinished"/>
+        <translation>Cambiar rol</translation>
     </message>
     <message>
         <source>Visitor</source>
@@ -1025,7 +1036,7 @@
     </message>
     <message>
         <source>&lt;b&gt;Role:&lt;/b&gt; %1</source>
-        <translation type="unfinished"/>
+        <translation>&lt;b&gt;Rol:&lt;/b&gt; %1</translation>
     </message>
     <message>
         <source>&lt;b&gt;Affiliation:&lt;/b&gt; %1</source>
@@ -1037,601 +1048,607 @@
     </message>
     <message>
         <source>[%1] in [%2]</source>
-        <translation type="unfinished"/>
+        <translation>[%1] en [%2]</translation>
     </message>
     <message>
         <source>User %1 was not found in the conference</source>
-        <translation type="unfinished"/>
+        <translation>No se ha encontrado al usuario %1 en la sala</translation>
     </message>
     <message>
         <source>User %1 already has a voice in the conference</source>
-        <translation type="unfinished"/>
+        <translation>El usuario %1 ya tiene voz en la sala</translation>
     </message>
     <message>
         <source>Unable to grant a voice to the user %1</source>
-        <translation type="unfinished"/>
+        <translation>No se puede conceder la voz al usuario %1</translation>
     </message>
     <message>
         <source>You granted the voice to the user %1</source>
-        <translation type="unfinished"/>
+        <translation>Has concedido la voz al usuario %1</translation>
     </message>
     <message>
         <source>User %1 requests a voice in the conference, %2</source>
-        <translation type="unfinished"/>
+        <translation>El usuario %1 solicita voz en la sala, %2</translation>
     </message>
     <message>
         <source>Grant Voice</source>
-        <translation type="unfinished"/>
+        <translation>Conceder voz</translation>
     </message>
     <message>
         <source>Voice request received</source>
-        <translation type="unfinished"/>
+        <translation>Solicitud de voz recibida</translation>
     </message>
     <message>
         <source>User %1 requests a voice in the conference</source>
-        <translation type="unfinished"/>
+        <translation>El usuario %1 solicita voz en la sala</translation>
     </message>
     <message>
         <source>Clear window</source>
-        <translation type="unfinished"/>
+        <translation>Limpiar la ventana</translation>
     </message>
     <message>
         <source>Kick user %1 request was sent</source>
-        <translation type="unfinished"/>
+        <translation>La solicitud de expulsión del usuario %1 se ha enviado</translation>
     </message>
     <message>
         <source>Failed to send kick user %1 request</source>
-        <translation type="unfinished"/>
+        <translation>Error al enviar la solicitud de expulsión del usuario %1</translation>
     </message>
     <message>
         <source>Ban user %1 request was sent</source>
-        <translation type="unfinished"/>
+        <translation>La solicitud de veto del usuario %1 se ha enviado</translation>
     </message>
     <message>
         <source>Failed to send ban user %1 request</source>
-        <translation type="unfinished"/>
+        <translation>Error al enviar la solicitud de veto del usuario %1</translation>
     </message>
     <message>
         <source>Private message was sent to user %1</source>
-        <translation type="unfinished"/>
+        <translation>El mensaje privado se ha enviado al usuario %1</translation>
     </message>
     <message>
         <source>Failed to send private message to user %1</source>
-        <translation type="unfinished"/>
+        <translation>Error al enviar el mensaje privado al usuario %1</translation>
     </message>
     <message>
         <source>Failed to change your nickname to %1</source>
-        <translation type="unfinished"/>
+        <translation>Error al cambiar tu apodo a %1</translation>
     </message>
     <message>
         <source>Change subject request was sent</source>
-        <translation type="unfinished"/>
+        <translation>La solicitud de cambio de tema se ha enviado</translation>
     </message>
     <message>
         <source>Failed to send change subject request</source>
-        <translation type="unfinished"/>
+        <translation>Error al enviar la solicitud de cambio de tema</translation>
     </message>
     <message>
         <source>This conference is non-anonymous</source>
-        <translation type="unfinished"/>
+        <translation>Esta sala no es anónima</translation>
     </message>
     <message>
         <source>User %1 affiliation changed while not in the conference</source>
-        <translation type="unfinished"/>
+        <translation>La membresía del usuario %1 cambió mientras no estaba en la sala</translation>
     </message>
     <message>
         <source>Conference now shows unavailable members</source>
-        <translation type="unfinished"/>
+        <translation>La sala ahora muestra a los miembros no disponibles</translation>
     </message>
     <message>
         <source>Conference now does not show unavailable members</source>
-        <translation type="unfinished"/>
+        <translation>La sala ahora no muestra a los miembros no disponibles</translation>
     </message>
     <message>
         <source>Conference configuration change has occurred</source>
-        <translation type="unfinished"/>
+        <translation>Se ha producido un cambio en la configuración de la sala</translation>
     </message>
     <message>
         <source>Conference logging is now enabled</source>
-        <translation type="unfinished"/>
+        <translation>El registro de la sala ahora está habilitado</translation>
     </message>
     <message>
         <source>Conference logging is now disabled</source>
-        <translation type="unfinished"/>
+        <translation>El registro de la sala ahora está deshabilitado</translation>
     </message>
     <message>
         <source>The conference is now non-anonymous</source>
-        <translation type="unfinished"/>
+        <translation>La sala ahora no es anónima</translation>
     </message>
     <message>
         <source>The conference is now semi-anonymous</source>
-        <translation type="unfinished"/>
+        <translation>La sala ahora es semianónima</translation>
     </message>
     <message>
         <source>A new conference has been created</source>
-        <translation type="unfinished"/>
+        <translation>Se ha creado una nueva sala</translation>
     </message>
     <message>
         <source>User %1 has been removed from the conference because of an affiliation change</source>
-        <translation type="unfinished"/>
+        <translation>El usuario %1 se ha eliminado de la sala debido a un cambio de membresía</translation>
     </message>
     <message>
         <source>User %1 has been removed from the conference because the conference has been changed to members-only</source>
-        <translation type="unfinished"/>
+        <translation>El usuario %1 se ha eliminado de la sala porque esta se ha cambiado a solo para miembros</translation>
     </message>
     <message>
         <source>User %1 is being removed from the conference because of a system shutdown</source>
-        <translation type="unfinished"/>
+        <translation>El usuario %1 está siendo eliminado de la sala debido al apagado del sistema</translation>
     </message>
     <message>
         <source>%1 - Private Chat</source>
-        <translation type="unfinished"/>
+        <translation>%1 - Conversación privada</translation>
     </message>
     <message>
         <source>You have joined the conference</source>
-        <translation type="unfinished"/>
+        <translation>Has entrado a la sala</translation>
     </message>
     <message>
         <source>You have no voice in this conference, %1</source>
-        <translation type="unfinished"/>
+        <translation>No tienes voz en esta sala, %1</translation>
     </message>
     <message>
         <source>You have left the conference</source>
-        <translation type="unfinished"/>
+        <translation>Has salido de la sala</translation>
     </message>
     <message>
         <source>Failed to change user role: %1</source>
-        <translation type="unfinished"/>
+        <translation>Error al cambiar el rol del usuario: %1</translation>
     </message>
     <message>
         <source>Failed to change user affiliation: %1</source>
-        <translation type="unfinished"/>
+        <translation>Error al cambiar la membresía del usuario: %1</translation>
     </message>
     <message>
         <source>Failed to load conference configuration: %1</source>
-        <translation type="unfinished"/>
+        <translation>Error al cargar la configuración de la sala: %1</translation>
     </message>
     <message>
         <source>Failed to update conference configuration: %1</source>
-        <translation type="unfinished"/>
+        <translation>Error al actualizar la configuración de la sala: %1</translation>
     </message>
     <message>
         <source>Failed to destroy this conference: %1</source>
-        <translation type="unfinished"/>
+        <translation>Error al destruir esta sala: %1</translation>
     </message>
     <message>
         <source>User %1 has declined your invite to this conference. %2</source>
-        <translation type="unfinished"/>
+        <translation>El usuario %1 ha rechazado tu invitación a esta sala. %2</translation>
     </message>
     <message>
         <source>%1 &lt;%2&gt; has joined</source>
-        <translation type="unfinished"/>
+        <translation>%1 &lt;%2&gt; ha entrado</translation>
     </message>
     <message>
         <source>%1 has joined</source>
-        <translation type="unfinished"/>
+        <translation>%1 ha entrado</translation>
     </message>
     <message>
         <source>%1 &lt;%2&gt; has left</source>
-        <translation type="unfinished"/>
+        <translation>%1 &lt;%2&gt; ha salido</translation>
     </message>
     <message>
         <source>%1 has left</source>
-        <translation type="unfinished"/>
+        <translation>%1 ha salido</translation>
     </message>
     <message>
         <source>%1 changed role from %2 to %3</source>
-        <translation type="unfinished"/>
+        <translation>%1 cambió su rol de %2 a %3</translation>
     </message>
     <message>
         <source>%1 changed affiliation from %2 to %3</source>
-        <translation type="unfinished"/>
+        <translation>%1 cambió su membresía de %2 a %3</translation>
     </message>
     <message>
         <source>User %1 has been kicked from the conference%2 %3</source>
-        <translation type="unfinished"/>
+        <translation>El usuario %1 ha sido expulsado de la sala%2 %3</translation>
     </message>
     <message>
         <source>User %1 has been banned in the conference%2 %3</source>
-        <translation type="unfinished"/>
+        <translation>El usuario %1 ha sido vetado en la sala%2 %3</translation>
     </message>
     <message>
         <source>Conference configuration accepted</source>
-        <translation type="unfinished"/>
+        <translation>Configuración de la sala aceptada</translation>
     </message>
     <message>
         <source>Enter new topic:</source>
-        <translation type="unfinished"/>
+        <translation>Introduzca el nuevo tema:</translation>
     </message>
     <message>
         <source>Enter a message:</source>
-        <translation type="unfinished"/>
+        <translation>Introduzca un mensaje:</translation>
     </message>
     <message>
         <source>You already have a voice in the conference</source>
-        <translation type="unfinished"/>
+        <translation>Ya tienes voz en la sala</translation>
     </message>
     <message>
         <source>Failed to send a request for voice in the conference</source>
-        <translation type="unfinished"/>
+        <translation>Error al enviar la solicitud de voz en la sala</translation>
     </message>
     <message>
         <source>Request for voice in the conference was sent</source>
-        <translation type="unfinished"/>
+        <translation>La solicitud de voz en la sala se ha enviado</translation>
     </message>
     <message>
         <source>Kick User - %1</source>
-        <translation type="unfinished"/>
+        <translation>Expulsar usuario - %1</translation>
     </message>
     <message>
         <source>Ban User - %1</source>
-        <translation type="unfinished"/>
+        <translation>Vetar usuario - %1</translation>
     </message>
     <message>
         <source>Voice request from [%1]</source>
-        <translation type="unfinished"/>
+        <translation>Solicitud de voz de [%1]</translation>
     </message>
     <message>
         <source>Private message from [%1]</source>
-        <translation type="unfinished"/>
+        <translation>Mensaje privado de [%1]</translation>
     </message>
     <message>
         <source>Invitation was sent to user %1</source>
-        <translation type="unfinished"/>
+        <translation>La invitación se ha enviado al usuario %1</translation>
     </message>
     <message>
         <source>Failed to send invitation to user %1</source>
-        <translation type="unfinished"/>
+        <translation>Error al enviar la invitación al usuario %1</translation>
     </message>
     <message>
         <source>Kick</source>
-        <translation type="unfinished"/>
+        <translation>Expulsar</translation>
     </message>
     <message>
         <source>Ban</source>
-        <translation type="unfinished"/>
+        <translation>Vetar</translation>
     </message>
     <message>
         <source>Leaving conference...</source>
-        <translation type="unfinished"/>
+        <translation>Saliendo de la sala...</translation>
     </message>
     <message>
         <source>You have left the conference due to error: %1</source>
-        <translation type="unfinished"/>
+        <translation>Has salido de la sala debido a un error: %1</translation>
     </message>
     <message>
         <source>Required parameter &lt;room nick&gt; is not specified</source>
-        <translation type="unfinished"/>
+        <translation>El parámetro necesario &lt;apodo de sala&gt; no está especificado</translation>
     </message>
     <message>
         <source>Required parameter &lt;user nick&gt; is not specified</source>
-        <translation type="unfinished"/>
+        <translation>El parámetro necesario &lt;apodo del usuario&gt; no está especificado</translation>
     </message>
     <message>
         <source>Required parameter &lt;user jid&gt; is not specified</source>
-        <translation type="unfinished"/>
+        <translation>El parámetro necesario &lt;jid del usuario&gt; no está especificado</translation>
     </message>
     <message>
         <source>Required parameter &lt;room name&gt; is not specified</source>
-        <translation type="unfinished"/>
+        <translation>El parámetro necesario &lt;nombre de la sala&gt; no está especificado</translation>
     </message>
     <message>
         <source>Required parameter &lt;new nick&gt; is not specified</source>
-        <translation type="unfinished"/>
+        <translation>El parámetro necesario &lt;nuevo apodo&gt; no está especificado</translation>
     </message>
     <message>
         <source>Change Nickname</source>
-        <translation type="unfinished"/>
+        <translation>Cambiar apodo</translation>
     </message>
     <message>
         <source>Enter new nickname:</source>
-        <translation type="unfinished"/>
+        <translation>Introduzca el nuevo apodo:</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Error</translation>
     </message>
     <message>
         <source>Failed to change nickname to %1</source>
-        <translation type="unfinished"/>
+        <translation>Error al cambiar el apodo a %1</translation>
     </message>
     <message>
         <source>Enter password:</source>
-        <translation type="unfinished"/>
+        <translation>Introduzca la contraseña:</translation>
     </message>
     <message>
         <source>You have been kicked from this conference, you may %1 or %2</source>
-        <translation type="unfinished"/>
+        <translation>Has sido expulsado de esta sala, puedes %1 o %2</translation>
     </message>
     <message>
         <source>return</source>
-        <translation type="unfinished"/>
+        <translation>volver a entrar</translation>
     </message>
     <message>
         <source>exit</source>
-        <translation type="unfinished"/>
+        <translation>salir</translation>
     </message>
     <message>
         <source>You have been banned in this conference, you can not return only %1</source>
-        <translation type="unfinished"/>
+        <translation>Has sido vetado en esta sala, no puedes volver a entrar, solo %1</translation>
     </message>
     <message>
         <source>You have left the conference: %1</source>
-        <translation type="unfinished"/>
+        <translation>Has salido de la sala: %1</translation>
     </message>
     <message>
         <source>Nickname &apos;%1&apos; is in use or registered by another user, you may %2 or %3</source>
-        <translation type="unfinished"/>
+        <translation>El apodo &apos;%1&apos; está en uso o registrado por otro usuario, puedes %2 o %3</translation>
     </message>
     <message>
         <source>change nick</source>
-        <translation type="unfinished"/>
+        <translation>cambiar el apodo</translation>
     </message>
     <message>
         <source>This conference is members only but you are not one of them, you may %1 or %2</source>
-        <translation type="unfinished"/>
+        <translation>Esta sala es solo para miembros y tú no lo eres, puedes %1 o %2</translation>
     </message>
     <message>
         <source>retry</source>
-        <translation type="unfinished"/>
+        <translation>reintentar</translation>
     </message>
     <message>
         <source>This conference does not exists or does not configured yet by owner, you may %1 or %2</source>
-        <translation type="unfinished"/>
+        <translation>Esta sala no existe o aún no ha sido configurada por su propietario, puedes %1 o %2</translation>
     </message>
     <message>
         <source>This conference does not exists and creation is restricted, you may %1 or %2</source>
-        <translation type="unfinished"/>
+        <translation>Esta sala no existe y la creación está restringida, puedes %1 o %2</translation>
     </message>
     <message>
         <source>The maximum number of users has been reached, you may %1 or %2</source>
-        <translation type="unfinished"/>
+        <translation>Se ha alcanzado el número máximo de usuarios, puedes %1 o %2</translation>
     </message>
     <message>
         <source>Failed to change your nickname to %1: %2</source>
-        <translation type="unfinished"/>
+        <translation>Error al cambiar tu apodo a %1: %2</translation>
     </message>
     <message>
         <source>%1 changed nickname to %2</source>
-        <translation type="unfinished"/>
+        <translation>%1 cambió su apodo a %2</translation>
     </message>
     <message>
         <source> by moderator %1</source>
-        <translation type="unfinished"/>
+        <translation> por el moderador %1</translation>
     </message>
     <message>
         <source>Your nickname changed to %1</source>
-        <translation type="unfinished"/>
+        <translation>Tu apodo cambió a %1</translation>
     </message>
     <message>
         <source>Change Password</source>
-        <translation type="unfinished"/>
+        <translation>Cambiar contraseña</translation>
     </message>
     <message>
         <source>This conference is password protected and you provided incorrect password, you may %1 or %2</source>
-        <translation type="unfinished"/>
+        <translation>Esta sala está protegida por contraseña y has proporcionado una contraseña incorrecta, puedes %1 o %2</translation>
     </message>
     <message>
         <source>change password</source>
-        <translation type="unfinished"/>
+        <translation>cambiar la contraseña</translation>
     </message>
     <message>
         <source>Open Private Chat</source>
-        <translation type="unfinished"/>
+        <translation>Abrir conversación privada</translation>
     </message>
     <message>
         <source>Moderate</source>
-        <translation type="unfinished"/>
+        <translation>Moderar</translation>
     </message>
     <message>
         <source>Edit Users Lists</source>
-        <translation type="unfinished"/>
+        <translation>Editar las listas de usuarios</translation>
     </message>
     <message>
         <source>Show participants list</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar la lista de participantes</translation>
     </message>
     <message numerus="yes">
         <source>You invited %1 and %n other contact(s) to this conference. %2</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>Has invitado a %1 y %n contacto más a esta sala. %2</numerusform>
+            <numerusform>Has invitado a %1 y %n contactos más a esta sala. %2</numerusform>
+        </translation>
     </message>
     <message>
         <source>You invited %1 to this conference. %2</source>
-        <translation type="unfinished"/>
+        <translation>Has invitado a %1 a esta sala. %2</translation>
     </message>
     <message>
         <source>Clear Window</source>
-        <translation type="unfinished"/>
+        <translation>Limpiar la ventana</translation>
     </message>
     <message>
         <source>Conference Tools</source>
-        <translation type="unfinished"/>
+        <translation>Herramientas de la sala</translation>
     </message>
     <message>
         <source>Disable Notifications</source>
-        <translation type="unfinished"/>
+        <translation>Deshabilitar las notificaciones</translation>
     </message>
     <message>
         <source>Enter to Conference</source>
-        <translation type="unfinished"/>
+        <translation>Entrar a la sala</translation>
     </message>
     <message>
         <source>Exit from Conference</source>
-        <translation type="unfinished"/>
+        <translation>Salir de la sala</translation>
     </message>
     <message numerus="yes">
         <source>Failed to invite %1 and %n other contact(s) to this conference: %2</source>
-        <translation type="unfinished"><numerusform></numerusform><numerusform></numerusform></translation>
+        <translation>
+            <numerusform>Error al invitar a %1 y %n contacto más a esta sala: %2</numerusform>
+            <numerusform>Error al invitar a %1 y %n contactos más a esta sala: %2</numerusform>
+        </translation>
     </message>
     <message>
         <source>Failed to invite %1 to this conference: %2</source>
-        <translation type="unfinished"/>
+        <translation>Error al invitar a %1 a esta sala: %2</translation>
     </message>
     <message>
         <source>This conference was destroyed by owner %1 %2</source>
-        <translation type="unfinished"/>
+        <translation>Esta sala fue destruida por su propietario %1 %2</translation>
     </message>
 </context>
 <context>
     <name>RoomPage</name>
     <message>
         <source>Conference name</source>
-        <translation type="unfinished"/>
+        <translation>Nombre de la sala</translation>
     </message>
     <message>
         <source>Search conferences</source>
-        <translation type="unfinished"/>
+        <translation>Buscar salas</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished"/>
+        <translation>Título</translation>
     </message>
     <message>
         <source>Join to the conference:</source>
-        <translation type="unfinished"/>
+        <translation>Entrar a la sala:</translation>
     </message>
     <message>
         <source>Select a conference from the list or explicitly specify the name of the hidden one</source>
-        <translation type="unfinished"/>
+        <translation>Seleccione una sala de la lista o especifique explícitamente el nombre de una oculta</translation>
     </message>
     <message>
         <source>Loading list of conferences...</source>
-        <translation type="unfinished"/>
+        <translation>Cargando la lista de salas...</translation>
     </message>
     <message>
         <source>Failed to load list of conferences</source>
-        <translation type="unfinished"/>
+        <translation>Error al cargar la lista de salas</translation>
     </message>
     <message>
         <source>Create the conference:</source>
-        <translation type="unfinished"/>
+        <translation>Crear la sala:</translation>
     </message>
     <message>
         <source>Enter unique name for the new conference</source>
-        <translation type="unfinished"/>
+        <translation>Introduzca un nombre único para la nueva sala</translation>
     </message>
     <message>
         <source>Loading conference description...</source>
-        <translation type="unfinished"/>
+        <translation>Cargando la descripción de la sala...</translation>
     </message>
     <message>
         <source>Checking conference existence...</source>
-        <translation type="unfinished"/>
+        <translation>Comprobando la existencia de la sala...</translation>
     </message>
     <message>
         <source>Failed to load conference description</source>
-        <translation type="unfinished"/>
+        <translation>Error al cargar la descripción de la sala</translation>
     </message>
     <message>
         <source>Failed to check conference existence</source>
-        <translation type="unfinished"/>
+        <translation>Error al comprobar la existencia de la sala</translation>
     </message>
     <message>
         <source>Invalid conference name</source>
-        <translation type="unfinished"/>
+        <translation>Nombre de sala no válido</translation>
     </message>
     <message>
         <source>Failed to load conference description: %1</source>
-        <translation type="unfinished"/>
+        <translation>Error al cargar la descripción de la sala: %1</translation>
     </message>
     <message>
         <source>Failed to check conference existence: %1</source>
-        <translation type="unfinished"/>
+        <translation>Error al comprobar la existencia de la sala: %1</translation>
     </message>
     <message>
         <source>Conference &apos;%1@%2&apos; already exists, choose another name</source>
-        <translation type="unfinished"/>
+        <translation>La sala &apos;%1@%2&apos; ya existe, elija otro nombre</translation>
     </message>
     <message>
         <source>Failed to load list of conferences: %1</source>
-        <translation type="unfinished"/>
+        <translation>Error al cargar la lista de salas: %1</translation>
     </message>
     <message>
         <source>Conference description is not available or invalid</source>
-        <translation type="unfinished"/>
+        <translation>La descripción de la sala no está disponible o no es válida</translation>
     </message>
 </context>
 <context>
     <name>ServicePage</name>
     <message>
         <source>Conference location</source>
-        <translation type="unfinished"/>
+        <translation>Ubicación de la sala</translation>
     </message>
     <message>
         <source>Add...</source>
-        <translation type="unfinished"/>
+        <translation>Añadir...</translation>
     </message>
     <message>
         <source>Account:</source>
-        <translation type="unfinished"/>
+        <translation>Cuenta:</translation>
     </message>
     <message>
         <source>Server:</source>
-        <translation type="unfinished"/>
+        <translation>Servidor:</translation>
     </message>
     <message>
         <source>Service:</source>
-        <translation type="unfinished"/>
+        <translation>Servicio:</translation>
     </message>
     <message>
         <source>Select account, server and service to join to the conference</source>
-        <translation type="unfinished"/>
+        <translation>Seleccione la cuenta, el servidor y el servicio para entrar a la sala</translation>
     </message>
     <message>
         <source>Select the account to join to the conference</source>
-        <translation type="unfinished"/>
+        <translation>Seleccione la cuenta para entrar a la sala</translation>
     </message>
     <message>
         <source>You can join to the conference located at almost any Jabber-server, select one from the list or add your own</source>
-        <translation type="unfinished"/>
+        <translation>Puede entrar a una sala ubicada en casi cualquier servidor Jabber; seleccione uno de la lista o añada el suyo</translation>
     </message>
     <message>
         <source>Each Jabber-server can have multiple conference services, select one of the available</source>
-        <translation type="unfinished"/>
+        <translation>Cada servidor Jabber puede tener varios servicios de salas; seleccione uno de los disponibles</translation>
     </message>
     <message>
         <source>Select account, server, and service to create the conference</source>
-        <translation type="unfinished"/>
+        <translation>Seleccione la cuenta, el servidor y el servicio para crear la sala</translation>
     </message>
     <message>
         <source>Select the account to create a conference</source>
-        <translation type="unfinished"/>
+        <translation>Seleccione la cuenta para crear una sala</translation>
     </message>
     <message>
         <source>You can create a conference at almost any Jabber-server, select one from the list or add your own</source>
-        <translation type="unfinished"/>
+        <translation>Puede crear una sala en casi cualquier servidor Jabber; seleccione uno de la lista o añada el suyo</translation>
     </message>
     <message>
         <source>Searching for conference services (%1)...</source>
-        <translation type="unfinished"/>
+        <translation>Buscando servicios de salas (%1)...</translation>
     </message>
     <message>
         <source>Conference services are not found on this server</source>
-        <translation type="unfinished"/>
+        <translation>No se han encontrado servicios de salas en este servidor</translation>
     </message>
     <message>
         <source>Loading list of available services...</source>
-        <translation type="unfinished"/>
+        <translation>Cargando la lista de servicios disponibles...</translation>
     </message>
     <message>
         <source>Failed to load list of services</source>
-        <translation type="unfinished"/>
+        <translation>Error al cargar la lista de servicios</translation>
     </message>
     <message>
         <source>Account or server is not selected</source>
-        <translation type="unfinished"/>
+        <translation>No se ha seleccionado la cuenta o el servidor</translation>
     </message>
     <message>
         <source>Append Server</source>
-        <translation type="unfinished"/>
+        <translation>Añadir servidor</translation>
     </message>
     <message>
         <source>Enter server domain:</source>
-        <translation type="unfinished"/>
+        <translation>Introduzca el dominio del servidor:</translation>
     </message>
     <message>
         <source>Failed to load a list of services: %1</source>
-        <translation type="unfinished"/>
+        <translation>Error al cargar la lista de servicios: %1</translation>
     </message>
 </context>
 </TS>
