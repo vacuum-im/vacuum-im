@@ -44,11 +44,13 @@ public:
 	void saveWindowGeometryAndState();
 	void loadWindowGeometryAndState();
 protected:
+	void updateWindowFlags(bool AVisible);
 	void updateWindow();
 	QMenu *createPopupMenu();
 	void correctWindowPosition();
 	void restoreAcceptDrops(QWidget *AParent);
 	void setCentralWidgetVisible(bool AVisible);
+	QString geometryOptionsNamespace() const;
 protected:
 	void closeEvent(QCloseEvent *AEvent);
 	void showEvent(QShowEvent *AEvent);
@@ -67,11 +69,11 @@ private:
 	BoxWidget *FLeftWidget;
 	MenuBarChanger *FMainMenuBar;
 private:
-	bool FGeometryLoaded;
-	bool FAligned;
-	bool FCentralVisible;
-	int FLeftWidgetWidth;
-	int FSplitterHandleWidth;
+	bool FGeometryLoaded = false;
+	bool FAligned = false;
+	bool FCentralVisible = false;
+	int FLeftWidgetWidth = 0;
+	int FSplitterHandleWidth = 0;
 	QMap<int, ToolBarChanger *> FToolBarOrders;
 };
 

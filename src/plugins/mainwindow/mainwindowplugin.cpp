@@ -20,9 +20,7 @@ MainWindowPlugin::MainWindowPlugin()
 	FTrayManager = NULL;
 	FOptionsManager = NULL;
 
-	FStartShowLoopCount = 0;
-
-	FActivationChanged = QTime::currentTime();
+	FActivationChanged.start();
 	FMainWindow = new MainWindow(NULL, Qt::Window | Qt::WindowCloseButtonHint);
 	FMainWindow->installEventFilter(this);
 	WidgetManager::setWindowSticky(FMainWindow,true);
@@ -65,11 +63,11 @@ bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &AIni
 		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
 	}
 
-	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
-	connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
+	connect(Options::instance(), &Options::optionsOpened, this, &MainWindowPlugin::onOptionsOpened);
+	connect(Options::instance(), &Options::optionsClosed, this, &MainWindowPlugin::onOptionsClosed);
 
-	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString, QWidget *)),SLOT(onShortcutActivated(const QString, QWidget *)));
-	
+	connect(Shortcuts::instance(), &Shortcuts::shortcutActivated, this, &MainWindowPlugin::onShortcutActivated);
+
 	return true;
 }
 
@@ -83,7 +81,7 @@ bool MainWindowPlugin::initObjects()
 	Action *quitAction = new Action(this);
 	quitAction->setText(tr("Quit"));
 	quitAction->setIcon(RSR_STORAGE_MENUICONS,MNI_MAINWINDOW_QUIT);
-	connect(quitAction,SIGNAL(triggered()),FPluginManager->instance(),SLOT(quit()));
+	connect(quitAction, &QAction::triggered, FPluginManager->instance(), [this]() { FPluginManager->quit(); });
 	FMainWindow->mainMenu()->addAction(quitAction,AG_MMENU_MAINWINDOW_QUIT,true);
 
 	if (FTrayManager)
@@ -91,7 +89,7 @@ bool MainWindowPlugin::initObjects()
 		Action *showRosterAction = new Action(this);
 		showRosterAction->setText(tr("Show roster"));
 		showRosterAction->setIcon(RSR_STORAGE_MENUICONS,MNI_MAINWINDOW_SHOW_ROSTER);
-		connect(showRosterAction,SIGNAL(triggered(bool)),SLOT(onShowMainWindowByAction(bool)));
+		connect(showRosterAction, &QAction::triggered, this, &MainWindowPlugin::onShowMainWindowByAction);
 		FTrayManager->contextMenu()->addAction(showRosterAction,AG_TMTM_MAINWINDOW_SHOW,true);
 	}
 	if (FOptionsManager)
@@ -133,13 +131,13 @@ IMainWindow *MainWindowPlugin::mainWindow() const
 bool MainWindowPlugin::eventFilter(QObject *AWatched, QEvent *AEvent)
 {
 	if (AWatched==FMainWindow && AEvent->type()==QEvent::ActivationChange)
-		FActivationChanged = QTime::currentTime();
+		FActivationChanged.start();
 	return QObject::eventFilter(AWatched,AEvent);
 }
 
 void MainWindowPlugin::onOptionsOpened()
 {
-	QTimer::singleShot(0,this,SLOT(onShowMainWindowOnStart()));
+	QTimer::singleShot(0,this,&MainWindowPlugin::onShowMainWindowOnStart);
 }
 
 void MainWindowPlugin::onOptionsClosed()
@@ -180,7 +178,7 @@ void MainWindowPlugin::onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::Act
 {
 	if (ANotifyId<=0 && AReason==QSystemTrayIcon::Trigger)
 	{
-		if (FMainWindow->isActive() || qAbs(FActivationChanged.msecsTo(QTime::currentTime())) < qApp->doubleClickInterval())
+		if (FMainWindow->isActive() || FActivationChanged.elapsed() < qApp->doubleClickInterval())
 			FMainWindow->closeWindow();
 		else
 			FMainWindow->showWindow();

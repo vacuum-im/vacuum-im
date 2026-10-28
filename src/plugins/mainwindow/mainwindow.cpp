@@ -5,6 +5,7 @@
 #include <QResizeEvent>
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QStringList>
 #include <definitions/version.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
@@ -14,17 +15,13 @@
 #include <utils/options.h>
 
 #define ONE_WINDOW_MODE_OPTIONS_NS "one-window-mode"
+#define DEFAULT_LEFT_FRAME_WIDTH 200
 
 MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(AParent,AFlags)
 {
 	setWindowRole("MainWindow");
 	setAttribute(Qt::WA_DeleteOnClose,false);
 	setIconSize(QSize(16,16));
-
-	FGeometryLoaded = false;
-	FAligned = false;
-	FCentralVisible = false;
-	FLeftWidgetWidth = 0;
 
 	QIcon icon;
 	IconStorage *iconStorage = IconStorage::staticStorage(RSR_STORAGE_MENUICONS);
@@ -41,7 +38,7 @@ MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(A
 	FSplitter->installEventFilter(this);
 	FSplitter->setOrientation(Qt::Horizontal);
 	FSplitterHandleWidth = FSplitter->handleWidth();
-	connect(FSplitter,SIGNAL(splitterMoved(int,int)),SLOT(onSplitterMoved(int,int)));
+	connect(FSplitter, &QSplitter::splitterMoved, this, &MainWindow::onSplitterMoved);
 	setCentralWidget(FSplitter);
 
 	FLeftWidget = new BoxWidget(this);
@@ -51,18 +48,19 @@ MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(A
 	FSplitter->setCollapsible(0,false);
 	FSplitter->setStretchFactor(0,1);
 
-	FCentralWidget = new MainCentralWidget(this,this);
-	FCentralWidget->instance()->setFrameShape(QFrame::StyledPanel);
-	connect(FCentralWidget->instance(),SIGNAL(currentCentralPageChanged(IMainCentralPage *)),SLOT(onCurrentCentralPageChanged()));
-	connect(FCentralWidget->instance(),SIGNAL(centralPageAppended(IMainCentralPage *)),SLOT(onCentralPageAddedOrRemoved(IMainCentralPage *)));
-	connect(FCentralWidget->instance(),SIGNAL(centralPageRemoved(IMainCentralPage *)),SLOT(onCentralPageAddedOrRemoved(IMainCentralPage *)));
+	MainCentralWidget *centralWidget = new MainCentralWidget(this,this);
+	FCentralWidget = centralWidget;
+	connect(centralWidget, &MainCentralWidget::currentCentralPageChanged, this, &MainWindow::onCurrentCentralPageChanged);
+	connect(centralWidget, &MainCentralWidget::centralPageAppended, this, &MainWindow::onCentralPageAddedOrRemoved);
+	connect(centralWidget, &MainCentralWidget::centralPageRemoved, this, &MainWindow::onCentralPageAddedOrRemoved);
+	centralWidget->setFrameShape(QFrame::StyledPanel);
 
-	FSplitter->addWidget(FCentralWidget->instance());
+	FSplitter->addWidget(centralWidget);
 	FSplitter->setCollapsible(1,false);
 	FSplitter->setStretchFactor(1,4);
 
 	FSplitter->setHandleWidth(0);
-	FCentralWidget->instance()->setVisible(false);
+	centralWidget->setVisible(false);
 
 	FTabWidget = new MainTabWidget(FLeftWidget);
 	FTabWidget->instance()->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
@@ -90,8 +88,6 @@ MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(A
 	FMainMenuBar = new MenuBarChanger(new QMenuBar());
 	setMenuBar(FMainMenuBar->menuBar());
 
-	this->installEventFilter(this);
-
 	updateWindow();
 }
 
@@ -109,24 +105,22 @@ void MainWindow::showWindow(bool AMinimized)
 {
 	if (!Options::isNull())
 	{
-		if (!AMinimized)
-			WidgetManager::showActivateRaiseWindow(this);
-		else if (!isVisible())
-			showMinimized();
-
+		// Restore geometry before the first show: the window manager must map
+		// the window once with its final size, otherwise it may briefly appear
+		// at the default size and occasionally keep it (X11 WM race).
 		if (!FGeometryLoaded)
 		{
 			const bool shouldBeVisible = !FCentralWidget->centralPages().isEmpty();
 			if (shouldBeVisible != FCentralVisible)
-			{
 				setCentralWidgetVisible(shouldBeVisible);
-				return;
-			}
-			else
-			{
+			if (!FGeometryLoaded)
 				loadWindowGeometryAndState();
-			}
 		}
+
+		if (!AMinimized)
+			WidgetManager::showActivateRaiseWindow(this);
+		else if (!isVisible())
+			showMinimized();
 
 		correctWindowPosition();
 	}
@@ -184,7 +178,7 @@ QList<ToolBarChanger *> MainWindow::toolBarChangers() const
 
 int MainWindow::toolBarChangerOrder(ToolBarChanger *AChanger) const
 {
-	return FToolBarOrders.key(AChanger);
+	return FToolBarOrders.key(AChanger,-1);
 }
 
 ToolBarChanger *MainWindow::toolBarChangerByOrder(int AOrderId) const
@@ -194,7 +188,7 @@ ToolBarChanger *MainWindow::toolBarChangerByOrder(int AOrderId) const
 
 void MainWindow::insertToolBarChanger(int AOrderId, ToolBarChanger *AChanger)
 {
-	if (FLeftWidget->widgetByOrder(AOrderId) == NULL)
+	if (FLeftWidget->widgetByOrder(AOrderId)==NULL && !toolBarChangers().contains(AChanger))
 	{
 		AChanger->toolBar()->setIconSize(iconSize());
 		FLeftWidget->insertWidget(AOrderId,AChanger->toolBar());
@@ -215,7 +209,12 @@ void MainWindow::removeToolBarChanger(ToolBarChanger *AChanger)
 
 void MainWindow::saveWindowGeometryAndState()
 {
-	QString ns = isCentralWidgetVisible() ? ONE_WINDOW_MODE_OPTIONS_NS : "";
+	// Never persist geometry of a window that has not had it loaded yet
+	// (e.g. hidden in tray since startup): that would save the default size.
+	if (!FGeometryLoaded)
+		return;
+
+	QString ns = geometryOptionsNamespace();
 	if (isCentralWidgetVisible() && FLeftWidgetWidth>0)
 		Options::setFileValue(FLeftWidgetWidth,"mainwindow.left-frame-width",ns);
 	Options::setFileValue(saveGeometry(),"mainwindow.geometry",ns);
@@ -226,14 +225,14 @@ void MainWindow::loadWindowGeometryAndState()
 {
 	FGeometryLoaded = true;
 	FAligned = false;
-	QString ns = isCentralWidgetVisible() ? ONE_WINDOW_MODE_OPTIONS_NS : "";
+	QString ns = geometryOptionsNamespace();
 	if (!restoreGeometry(Options::fileValue("mainwindow.geometry",ns).toByteArray()))
 	{
 		if (isCentralWidgetVisible())
 		{
 			FLeftWidgetWidth = Options::fileValue("mainwindow.left-frame-width",ns).toInt();
 			if (FLeftWidgetWidth <= 0)
-				FLeftWidgetWidth = 200;
+				FLeftWidgetWidth = DEFAULT_LEFT_FRAME_WIDTH;
 			Options::setFileValue(0,"mainwindow.align",ns);
 			setGeometry(WidgetManager::alignGeometry(QSize(800,600),this,Qt::AlignCenter));
 		}
@@ -246,6 +245,25 @@ void MainWindow::loadWindowGeometryAndState()
 	else if (isCentralWidgetVisible())
 	{
 		FLeftWidgetWidth = Options::fileValue("mainwindow.left-frame-width",ns).toInt();
+		if (FLeftWidgetWidth <= 0)
+			FLeftWidgetWidth = DEFAULT_LEFT_FRAME_WIDTH;
+	}
+}
+
+void MainWindow::updateWindowFlags(bool AVisible)
+{
+	if (AVisible)
+		setWindowFlags(Qt::Window);
+	else
+	{
+		// Window Flags button hints works incorrectly under Gnome, especially under Gnome X11.
+		// XDG_CURRENT_DESKTOP is a colon-separated list of DEs, e.g. "ubuntu:GNOME".
+		QStringList desktops = qEnvironmentVariable("XDG_CURRENT_DESKTOP").split(QLatin1Char(':'), QString::SkipEmptyParts);
+		bool isGnome = false;
+		foreach (const QString &desktop, desktops)
+			isGnome = isGnome || desktop.startsWith("GNOME", Qt::CaseInsensitive);
+		if (!isGnome)
+			setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint);
 	}
 }
 
@@ -263,6 +281,11 @@ QMenu *MainWindow::createPopupMenu()
 	return NULL;
 }
 
+QString MainWindow::geometryOptionsNamespace() const
+{
+	return isCentralWidgetVisible() ? QString(ONE_WINDOW_MODE_OPTIONS_NS) : QString();
+}
+
 void MainWindow::correctWindowPosition()
 {
 	if (!FGeometryLoaded)
@@ -271,7 +294,7 @@ void MainWindow::correctWindowPosition()
 	if (!FAligned)
 	{
 		FAligned = true;
-		QString ns = isCentralWidgetVisible() ? ONE_WINDOW_MODE_OPTIONS_NS : "";
+		QString ns = geometryOptionsNamespace();
 		WidgetManager::alignWindow(this,(Qt::Alignment)Options::fileValue("mainwindow.align",ns).toInt());
 	}
 
@@ -330,16 +353,15 @@ void MainWindow::setCentralWidgetVisible(bool AVisible)
 			FSplitter->setHandleWidth(FSplitterHandleWidth);
 			FLeftWidget->setFrameShape(QFrame::StyledPanel);
 			FCentralWidget->instance()->setVisible(true);
-			setWindowFlags(Qt::Window);
 		}
 		else
 		{
 			FSplitter->setHandleWidth(0);
 			FLeftWidget->setFrameShape(QFrame::NoFrame);
 			FCentralWidget->instance()->setVisible(false);
-			setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint);
 		}
 
+		updateWindowFlags(AVisible);
 		updateWindow();
 		setMinimumSize(0,0);
 		restoreAcceptDrops(this);
@@ -378,7 +400,7 @@ void MainWindow::closeEvent(QCloseEvent *AEvent)
 		if (Options::node(OPV_ROSTER_MINIMIZEONCLOSE).value().toBool() && AEvent->spontaneous())
 		{
 			AEvent->ignore();
-			setWindowState(Qt::WindowMinimized);
+			setWindowState(windowState() | Qt::WindowMinimized);
 		}
 	}
 }
@@ -391,7 +413,7 @@ bool MainWindow::eventFilter(QObject *AObject, QEvent *AEvent)
 			int leftIndex = FSplitter->indexOf(FLeftWidget);
 			int rightIndex = FSplitter->indexOf(FCentralWidget->instance());
 			QResizeEvent *resizeEvent = static_cast<QResizeEvent *>(AEvent);
-			if (resizeEvent && FLeftWidgetWidth>0 && leftIndex>=0 && rightIndex>=0 && resizeEvent->oldSize().width()>0)
+			if (FLeftWidgetWidth>0 && leftIndex>=0 && rightIndex>=0 && resizeEvent->oldSize().width()>0)
 			{
 				double k = (double)resizeEvent->size().width() / resizeEvent->oldSize().width();
 				QList<int> splitterSizes = FSplitter->sizes();
@@ -422,7 +444,7 @@ void MainWindow::onCurrentCentralPageChanged()
 void MainWindow::onCentralPageAddedOrRemoved(IMainCentralPage *APage)
 {
 	Q_UNUSED(APage);
-	QTimer::singleShot(0,this,SLOT(onUpdateCentralWidgetVisible()));
+	QTimer::singleShot(0,this,&MainWindow::onUpdateCentralWidgetVisible);
 }
 
 void MainWindow::onSplitterMoved(int APos, int AIndex)

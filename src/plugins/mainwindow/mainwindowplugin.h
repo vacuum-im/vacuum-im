@@ -1,7 +1,7 @@
 #ifndef MAINWINDOWPLUGIN_H
 #define MAINWINDOWPLUGIN_H
 
-#include <QTime>
+#include <QElapsedTimer>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/imainwindow.h>
@@ -47,9 +47,8 @@ private:
 	IPluginManager *FPluginManager;
 	IOptionsManager *FOptionsManager;
 private:
-	int FStartShowLoopCount;
 	MainWindow *FMainWindow;
-	QTime FActivationChanged;
+	QElapsedTimer FActivationChanged;
 };
 
 #endif // MAINWINDOW_H

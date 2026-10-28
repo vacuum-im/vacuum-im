@@ -36,8 +36,8 @@ void MainCentralWidget::appendCentralPage(IMainCentralPage *APage)
 		connect(APage->instance(),SIGNAL(centralPageShow(bool)),SLOT(onCentralPageShow(bool)));
 		connect(APage->instance(),SIGNAL(centralPageChanged()),SLOT(onCentralPageChanged()));
 		connect(APage->instance(),SIGNAL(centralPageDestroyed()),SLOT(onCentralPageDestroyed()));
-		emit centralPageAppended(APage);
 		addWidget(APage->instance());
+		emit centralPageAppended(APage);
 	}
 }
 
@@ -46,7 +46,7 @@ void MainCentralWidget::removeCentralPage(IMainCentralPage *APage)
 	if (FCentralPages.contains(APage))
 	{
 		FCentralPages.removeAll(APage);
-		disconnect(APage->instance());
+		APage->instance()->disconnect(this);
 		removeWidget(APage->instance());
 		APage->instance()->setParent(NULL);
 		emit centralPageRemoved(APage);

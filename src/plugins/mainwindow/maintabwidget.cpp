@@ -22,7 +22,7 @@ QList<IMainTabPage *> MainTabWidget::tabPages() const
 
 int MainTabWidget::tabPageOrder(IMainTabPage *APage) const
 {
-	return FTabPageOrders.key(APage);
+	return FTabPageOrders.key(APage,-1);
 }
 
 IMainTabPage *MainTabWidget::tabPageByOrder(int AOrderId) const
@@ -66,7 +66,7 @@ void MainTabWidget::removeTabPage(IMainTabPage *APage)
 	{
 		removeTab(indexOf(APage->instance()));
 		FTabPageOrders.remove(tabPageOrder(APage));
-		disconnect(APage->instance());
+		APage->instance()->disconnect(this);
 		emit tabPageRemoved(APage);
 	}
 }
