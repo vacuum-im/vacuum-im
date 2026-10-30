@@ -8,7 +8,6 @@
 #include <QDomDocument>
 #include <QApplication>
 #include <QPluginLoader>
-#include <QSessionManager>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/itraymanager.h>
@@ -89,7 +88,6 @@ protected:
 	void declareShortcuts();
 protected slots:
 	void onApplicationAboutToQuit();
-	void onApplicationCommitDataRequested(QSessionManager &AManager);
 	void onShowSetupPluginsDialog(bool);
 	void onSetupPluginsDialogAccepted();
 	void onShowAboutBoxDialog();

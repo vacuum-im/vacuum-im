@@ -82,7 +82,6 @@ PluginManager::PluginManager(QApplication *AParent) : QObject(AParent)
 	connect(&FShutdownTimer,SIGNAL(timeout()),SLOT(onShutdownTimerTimeout()));
 
 	connect(AParent,SIGNAL(aboutToQuit()),SLOT(onApplicationAboutToQuit()));
-	connect(AParent,SIGNAL(commitDataRequest(QSessionManager &)),SLOT(onApplicationCommitDataRequested(QSessionManager &)));
 
 	PluginHelper::setPluginManager(this);
 }
@@ -918,13 +917,6 @@ void PluginManager::declareShortcuts()
 void PluginManager::onApplicationAboutToQuit()
 {
 	LOG_INFO("Application about to quit");
-	closeAndQuit();
-}
-
-void PluginManager::onApplicationCommitDataRequested(QSessionManager &AManager)
-{
-	AManager.release();
-	LOG_INFO("Application session about to close");
 	closeAndQuit();
 }
 
