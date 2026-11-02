@@ -17,6 +17,9 @@
 #define   SCT_APP_MULTIUSERCHAT_WIZARD                             "application.muc-wizard"
 //FileStreamsManager
 #define   SCT_APP_FILETRANSFERS_SHOW                               "application.show-filetransfers"
+//ShortcutManager
+#define   SCT_APP_FOCUSROSTER                                      "application.focus-roster"
+#define   SCT_APP_OPENNOTIFIEDCONTACT                              "application.open-notified-contact"
 
 //RosterView
 #define SCTG_ROSTERVIEW                                            "roster-view"
@@ -47,6 +50,10 @@
 //MessageWidgets
 #define SCTG_MESSAGEWINDOWS                                        "message-windows"
 #define   SCT_MESSAGEWINDOWS_QUOTE                                 "message-windows.quote"
+#define   SCT_MESSAGEWINDOWS_SCROLLUP                              "message-windows.scroll-up"
+#define   SCT_MESSAGEWINDOWS_SCROLLDOWN                            "message-windows.scroll-down"
+#define   SCT_MESSAGEWINDOWS_SCROLLPREVMESSAGE                     "message-windows.scroll-prev-message"
+#define   SCT_MESSAGEWINDOWS_SCROLLNEXTMESSAGE                     "message-windows.scroll-next-message"
 #define   SCT_MESSAGEWINDOWS_CLOSEWINDOW                           "message-windows.close-window"
 #define   SCT_MESSAGEWINDOWS_EDITPREVMESSAGE                       "message-windows.edit-prev-message"
 #define   SCT_MESSAGEWINDOWS_EDITNEXTMESSAGE                       "message-windows.edit-next-message"

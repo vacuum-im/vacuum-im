@@ -6,6 +6,7 @@
 #include <QInputDialog>
 #include <QCoreApplication>
 #include <QContextMenuEvent>
+#include <QScrollBar>
 #include <QUrlQuery>
 #include <definitions/namespaces.h>
 #include <definitions/resources.h>
@@ -1113,6 +1114,10 @@ void MultiUserChatWindow::createMessageWidgets()
 
 		FEditWidget = FMessageWidgets->newEditWidget(this,FMainSplitter);
 		FEditWidget->setSendShortcutId(SCT_MESSAGEWINDOWS_SENDCHATMESSAGE);
+		Shortcuts::insertWidgetShortcut(SCT_MESSAGEWINDOWS_SCROLLUP,FEditWidget->textEdit());
+		Shortcuts::insertWidgetShortcut(SCT_MESSAGEWINDOWS_SCROLLDOWN,FEditWidget->textEdit());
+		Shortcuts::insertWidgetShortcut(SCT_MESSAGEWINDOWS_SCROLLPREVMESSAGE,FEditWidget->textEdit());
+		Shortcuts::insertWidgetShortcut(SCT_MESSAGEWINDOWS_SCROLLNEXTMESSAGE,FEditWidget->textEdit());
 		connect(FEditWidget->instance(),SIGNAL(keyEventReceived(QKeyEvent *,bool &)),SLOT(onMultiChatEditWidgetKeyEvent(QKeyEvent *,bool &)));
 		FMainSplitter->insertWidget(MUCWW_EDITWIDGET,FEditWidget->instance());
 
@@ -3097,6 +3102,22 @@ void MultiUserChatWindow::onShortcutActivated(const QString &AId, QWidget *AWidg
 {
 	if (AId==SCT_MESSAGEWINDOWS_CLOSEWINDOW && AWidget==this)
 		closeTabPage();
+	else if (FViewWidget && FEditWidget && AWidget==FEditWidget->textEdit() && (AId==SCT_MESSAGEWINDOWS_SCROLLUP || AId==SCT_MESSAGEWINDOWS_SCROLLDOWN))
+	{
+		QAbstractScrollArea *viewer = qobject_cast<QAbstractScrollArea *>(FViewWidget->styleWidget());
+		if (viewer)
+		{
+			QScrollBar *scrollBar = viewer->verticalScrollBar();
+			if (AId==SCT_MESSAGEWINDOWS_SCROLLUP)
+				scrollBar->triggerAction(QScrollBar::SliderPageStepSub);
+			else
+				scrollBar->triggerAction(QScrollBar::SliderPageStepAdd);
+		}
+	}
+	else if (FViewWidget && FEditWidget && AWidget==FEditWidget->textEdit() && (AId==SCT_MESSAGEWINDOWS_SCROLLPREVMESSAGE || AId==SCT_MESSAGEWINDOWS_SCROLLNEXTMESSAGE))
+	{
+		WidgetManager::scrollDocumentByItems(qobject_cast<QAbstractScrollArea *>(FViewWidget->styleWidget()), AId==SCT_MESSAGEWINDOWS_SCROLLPREVMESSAGE);
+	}
 }
 
 void MultiUserChatWindow::onArchiveRequestFailed(const QString &AId, const XmppError &AError)

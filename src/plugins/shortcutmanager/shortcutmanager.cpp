@@ -19,15 +19,26 @@ ShortcutManager::ShortcutManager()
 	FTrayManager = NULL;
 	FNotifications = NULL;
 	FOptionsManager = NULL;
+	FMainWindowPlugin = NULL;
+	FRostersViewPlugin = NULL;
 
 	FAllHidden = false;
 	FTrayHidden = false;
 	FNotifyHidden = 0;
+
+	FFocusRoster = NULL;
+	FOpenNotifiedContact = NULL;
 }
 
 ShortcutManager::~ShortcutManager()
 {
-
+	if (!FMainWindowWidget.isNull())
+	{
+		FMainWindowWidget->removeAction(FFocusRoster);
+		FMainWindowWidget->removeAction(FOpenNotifiedContact);
+	}
+	delete FFocusRoster;
+	delete FOpenNotifiedContact;
 }
 
 void ShortcutManager::pluginInfo(IPluginInfo *APluginInfo)
@@ -62,6 +73,18 @@ bool ShortcutManager::initConnections(IPluginManager *APluginManager, int &AInit
 		FNotifications = qobject_cast<INotifications *>(plugin->instance());
 	}
 
+	plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
+	if (plugin)
+	{
+		FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
+	}
+
+	plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
+	if (plugin)
+	{
+		FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
+	}
+
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 	connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString, QWidget *)),SLOT(onShortcutActivated(const QString, QWidget *)));
@@ -72,6 +95,28 @@ bool ShortcutManager::initConnections(IPluginManager *APluginManager, int &AInit
 bool ShortcutManager::initObjects()
 {
 	Shortcuts::declareShortcut(SCT_GLOBAL_HIDEALLWIDGETS,tr("Hide all windows, tray icon and notifications"),QKeySequence::UnknownKey,Shortcuts::GlobalShortcut);
+	Shortcuts::declareShortcut(SCT_APP_FOCUSROSTER,tr("Switch focus to roster"),tr("Ctrl+R","Switch focus to roster"),Shortcuts::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_APP_OPENNOTIFIEDCONTACT,tr("Open contact with active notification"),tr("Ctrl+O","Open contact with active notification"),Shortcuts::ApplicationShortcut);
+
+	FFocusRoster = new Action(this);
+	FFocusRoster->setShortcutId(SCT_APP_FOCUSROSTER);
+	connect(FFocusRoster,SIGNAL(triggered(bool)),SLOT(onAppFocusRosterTriggered(bool)));
+
+	FOpenNotifiedContact = new Action(this);
+	FOpenNotifiedContact->setShortcutId(SCT_APP_OPENNOTIFIEDCONTACT);
+	connect(FOpenNotifiedContact,SIGNAL(triggered(bool)),SLOT(onOpenNotifiedContactTriggered(bool)));
+
+	// Both shortcuts must work only while the main window is visible.
+	// In Qt6 an application-context action dispatches only when its host
+	// widget belongs to a visible window, so the main window is used as the
+	// visible-only host. Hidden actions are not dispatched, proxies are
+	// kept visible, they are never shown anywhere by themselves.
+	if (FMainWindowPlugin)
+	{
+		FMainWindowWidget = FMainWindowPlugin->mainWindow()->instance();
+		FMainWindowWidget->addAction(FFocusRoster);
+		FMainWindowWidget->addAction(FOpenNotifiedContact);
+	}
 	return true;
 }
 
@@ -256,5 +301,33 @@ void ShortcutManager::onShortcutActivated(const QString &AId, QWidget *AWidget)
 			hideAllWidgets();
 		else
 			showHiddenWidgets();
+	}
+}
+
+void ShortcutManager::onAppFocusRosterTriggered(bool AChecked)
+{
+	Q_UNUSED(AChecked);
+	IMainWindow *mainWindow = FMainWindowPlugin ? FMainWindowPlugin->mainWindow() : NULL;
+	IRostersView *rostersView = FRostersViewPlugin ? FRostersViewPlugin->rostersView() : NULL;
+	if (mainWindow && rostersView)
+	{
+		LOG_INFO("Switching keyboard focus to contact list");
+		mainWindow->showWindow();
+		mainWindow->mainTabWidget()->instance()->setCurrentWidget(rostersView->instance());
+		rostersView->instance()->setFocus();
+	}
+}
+
+void ShortcutManager::onOpenNotifiedContactTriggered(bool AChecked)
+{
+	Q_UNUSED(AChecked);
+	if (FNotifications)
+	{
+		QList<int> pendingList = FNotifications->notifications();
+		if (!pendingList.isEmpty())
+		{
+			LOG_INFO(QString("Activating last pending notification, id=%1").arg(pendingList.last()));
+			FNotifications->activateNotification(pendingList.last());
+		}
 	}
 }
