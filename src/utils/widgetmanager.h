@@ -22,6 +22,7 @@ public:
 	static bool alignWindow(QWidget *AWindow, Qt::Alignment AAlign);
 	static QRect alignRect(const QRect &ARect, const QRect &ABoundary, Qt::Alignment AAlign=Qt::AlignCenter);
 	static QRect alignGeometry(const QSize &ASize, const QWidget *AWidget=NULL, Qt::Alignment AAlign=Qt::AlignCenter);
+	static void scrollDocumentByPage(QAbstractScrollArea *AView, bool AUp);
 	static void scrollDocumentByItems(QAbstractScrollArea *AView, bool APrevious);
 private:
 	WidgetManager();

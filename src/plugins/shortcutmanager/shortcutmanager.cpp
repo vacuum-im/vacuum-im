@@ -11,6 +11,7 @@
 #include <definitions/optionnodeorders.h>
 #include <definitions/optionwidgetorders.h>
 #include <utils/shortcuts.h>
+#include <utils/action.h>
 #include <utils/options.h>
 #include <utils/logger.h>
 
@@ -106,11 +107,13 @@ bool ShortcutManager::initObjects()
 	FOpenNotifiedContact->setShortcutId(SCT_APP_OPENNOTIFIEDCONTACT);
 	connect(FOpenNotifiedContact,SIGNAL(triggered(bool)),SLOT(onOpenNotifiedContactTriggered(bool)));
 
-	// Both shortcuts must work only while the main window is visible.
-	// In Qt6 an application-context action dispatches only when its host
-	// widget belongs to a visible window, so the main window is used as the
-	// visible-only host. Hidden actions are not dispatched, proxies are
-	// kept visible, they are never shown anywhere by themselves.
+	// The Shortcuts utility makes application-context object shortcuts work
+	// application-wide by hosting them on the (always hidden) desktop widget.
+	// The actions are also hosted on the main window, which under Qt6 keeps
+	// them inactive while it is hidden (there an application-context action
+	// dispatches only when its host widget belongs to a visible window).
+	// The actions are proxies without text and are never shown anywhere by
+	// themselves.
 	if (FMainWindowPlugin)
 	{
 		FMainWindowWidget = FMainWindowPlugin->mainWindow()->instance();

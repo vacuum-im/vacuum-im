@@ -3,6 +3,7 @@
 #include <QMimeData>
 #include <QKeyEvent>
 #include <QWheelEvent>
+#include <QAbstractScrollArea>
 #include <definitions/actiongroups.h>
 #include <definitions/optionvalues.h>
 #include <definitions/resources.h>
@@ -11,6 +12,7 @@
 #include <definitions/toolbargroups.h>
 #include <utils/toolbarchanger.h>
 #include <utils/shortcuts.h>
+#include <utils/widgetmanager.h>
 #include <utils/options.h>
 
 #define MAX_BUFFERED_MESSAGES     10
@@ -56,6 +58,10 @@ EditWidget::EditWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow
 	ui.medEditor->setContextMenuPolicy(Qt::CustomContextMenu);
 	Shortcuts::insertWidgetShortcut(SCT_MESSAGEWINDOWS_EDITNEXTMESSAGE,ui.medEditor);
 	Shortcuts::insertWidgetShortcut(SCT_MESSAGEWINDOWS_EDITPREVMESSAGE,ui.medEditor);
+	Shortcuts::insertWidgetShortcut(SCT_MESSAGEWINDOWS_SCROLLUP,ui.medEditor);
+	Shortcuts::insertWidgetShortcut(SCT_MESSAGEWINDOWS_SCROLLDOWN,ui.medEditor);
+	Shortcuts::insertWidgetShortcut(SCT_MESSAGEWINDOWS_SCROLLPREVMESSAGE,ui.medEditor);
+	Shortcuts::insertWidgetShortcut(SCT_MESSAGEWINDOWS_SCROLLNEXTMESSAGE,ui.medEditor);
 	connect(ui.medEditor,SIGNAL(createDataRequest(QMimeData *)),SLOT(onEditorCreateDataRequest(QMimeData *)));
 	connect(ui.medEditor,SIGNAL(canInsertDataRequest(const QMimeData *, bool &)),
 		SLOT(onEditorCanInsertDataRequest(const QMimeData *, bool &)));
@@ -373,6 +379,18 @@ void EditWidget::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	else if (AId==SCT_MESSAGEWINDOWS_EDITPREVMESSAGE && AWidget==ui.medEditor)
 	{
 		showNextBufferedMessage();
+	}
+	else if (AWidget==ui.medEditor && (AId==SCT_MESSAGEWINDOWS_SCROLLUP || AId==SCT_MESSAGEWINDOWS_SCROLLDOWN || AId==SCT_MESSAGEWINDOWS_SCROLLPREVMESSAGE || AId==SCT_MESSAGEWINDOWS_SCROLLNEXTMESSAGE))
+	{
+		IMessageViewWidget *view = FWindow!=NULL ? FWindow->viewWidget() : NULL;
+		QAbstractScrollArea *viewer = view!=NULL ? qobject_cast<QAbstractScrollArea *>(view->styleWidget()) : NULL;
+		if (viewer)
+		{
+			if (AId==SCT_MESSAGEWINDOWS_SCROLLUP || AId==SCT_MESSAGEWINDOWS_SCROLLDOWN)
+				WidgetManager::scrollDocumentByPage(viewer,AId==SCT_MESSAGEWINDOWS_SCROLLUP);
+			else
+				WidgetManager::scrollDocumentByItems(viewer,AId==SCT_MESSAGEWINDOWS_SCROLLPREVMESSAGE);
+		}
 	}
 }
 

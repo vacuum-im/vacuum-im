@@ -4,6 +4,7 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QScreen>
+#include <QAbstractScrollArea>
 #include <QTextEdit>
 #include <QScrollBar>
 #include <QTextCursor>
@@ -299,6 +300,12 @@ QRect WidgetManager::alignGeometry(const QSize &ASize, const QWidget *AWidget, Q
 	QRect availRect = AWidget!=NULL ? QApplication::desktop()->availableGeometry(AWidget) : QApplication::desktop()->availableGeometry();
 #endif
 	return QStyle::alignedRect(Qt::LeftToRight,AAlign,ASize.boundedTo(availRect.size()),availRect);
+}
+
+void WidgetManager::scrollDocumentByPage(QAbstractScrollArea *AView, bool AUp)
+{
+	if (AView)
+		AView->verticalScrollBar()->triggerAction(AUp ? QScrollBar::SliderPageStepSub : QScrollBar::SliderPageStepAdd);
 }
 
 void WidgetManager::scrollDocumentByItems(QAbstractScrollArea *AView, bool APrevious)
