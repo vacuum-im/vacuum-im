@@ -172,7 +172,7 @@ void NetworkManager::request(const QString &AUrlStr, const QUrl &AUrl, qint64 AM
 
 	if (FActiveDownloads >= IV_MAX_CONCURRENT_DOWNLOADS)
 	{
-		FQueued.enqueue({AUrlStr, AUrl, AMaxBytes, AHandler});
+		FQueued.enqueue(QueuedRequest(AUrlStr, AUrl, AMaxBytes, AHandler));
 		return;
 	}
 

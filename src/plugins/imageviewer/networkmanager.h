@@ -61,6 +61,9 @@ private:
 	};
 	struct QueuedRequest
 	{
+		QueuedRequest(const QString &AUrlStr, const QUrl &AUrl, qint64 AMaxBytes, const DataHandler &AHandler) :
+			urlStr(AUrlStr), url(AUrl), maxBytes(AMaxBytes), handler(AHandler) {}
+
 		QString urlStr;
 		QUrl url;
 		qint64 maxBytes = 0;
